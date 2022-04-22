@@ -11,7 +11,8 @@ rustdoc-args = ["--cfg", "doc_cfg"]
 crate-type = ["cdylib", "rlib", "staticlib"]
 
 [features]
-default = ["std"]
+default = ["std", "nstd_core"]
 std = []
+nstd_core = []
 
 [dependencies]
