@@ -3,7 +3,15 @@ name = "cstd"
 version = "0.0.0"
 edition = "2021"
 
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "doc_cfg"]
+
 [lib]
 crate-type = ["cdylib", "rlib", "staticlib"]
+
+[features]
+default = ["std"]
+std = []
 
 [dependencies]
