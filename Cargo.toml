@@ -13,6 +13,7 @@ crate-type = ["cdylib", "rlib", "staticlib"]
 [features]
 default = ["std", "nstd_core"]
 std = []
+clib = []
 nstd_core = ["cty"]
 
 [dependencies]
