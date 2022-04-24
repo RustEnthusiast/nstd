@@ -5,3 +5,5 @@
 #[cfg(feature = "nstd_core")]
 #[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_core")))]
 pub mod core;
+#[cfg(test)]
+pub(crate) mod test;
