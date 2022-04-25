@@ -29,22 +29,6 @@ NSTDAPI NSTDPtr nstd_core_ptr_new(NSTDAny obj, NSTDUSize size);
 ///
 /// # Parameters:
 ///
-/// - `const NSTDPtr *ptr` - The higher level pointer.
-///
-/// # Returns
-///
-/// `NSTDAnyConst raw` - A raw pointer to the object.
-///
-/// # Safety
-///
-/// This operation is unsafe because there is no way of knowing if the object being pointed to is
-/// still valid.
-NSTDAPI NSTDAnyConst nstd_core_ptr_read(const NSTDPtr *ptr);
-
-/// Returns a raw mutable pointer to the object pointed to by `ptr`.
-///
-/// # Parameters:
-///
 /// - `NSTDPtr *ptr` - The higher level pointer.
 ///
 /// # Returns
@@ -55,7 +39,23 @@ NSTDAPI NSTDAnyConst nstd_core_ptr_read(const NSTDPtr *ptr);
 ///
 /// This operation is unsafe because there is no way of knowing if the object being pointed to is
 /// still valid.
-NSTDAPI NSTDAny nstd_core_ptr_read_mut(NSTDPtr *ptr);
+NSTDAPI NSTDAny nstd_core_ptr_read(NSTDPtr *ptr);
+
+/// Returns a raw immutable pointer to the object pointed to by `ptr`.
+///
+/// # Parameters:
+///
+/// - `const NSTDPtr *ptr` - The higher level pointer.
+///
+/// # Returns
+///
+/// `NSTDAnyConst raw` - A raw pointer to the object.
+///
+/// # Safety
+///
+/// This operation is unsafe because there is no way of knowing if the object being pointed to is
+/// still valid.
+NSTDAPI NSTDAnyConst nstd_core_ptr_read_const(const NSTDPtr *ptr);
 
 /// Writes data from `obj` to `ptr`. The number of bytes written is determined by `ptr.size`.
 ///

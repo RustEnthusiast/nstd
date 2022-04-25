@@ -32,26 +32,6 @@ pub extern "C" fn nstd_core_ptr_new(obj: NSTDAny, size: NSTDUSize) -> NSTDPtr {
 ///
 /// # Parameters:
 ///
-/// - `const NSTDPtr *ptr` - The higher level pointer.
-///
-/// # Returns
-///
-/// `NSTDAnyConst raw` - A raw pointer to the object.
-///
-/// # Safety
-///
-/// This operation is unsafe because there is no way of knowing if the object being pointed to is
-/// still valid.
-#[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_ptr_read(ptr: &NSTDPtr) -> NSTDAnyConst {
-    ptr.raw
-}
-
-/// Returns a raw mutable pointer to the object pointed to by `ptr`.
-///
-/// # Parameters:
-///
 /// - `NSTDPtr *ptr` - The higher level pointer.
 ///
 /// # Returns
@@ -64,7 +44,27 @@ pub unsafe extern "C" fn nstd_core_ptr_read(ptr: &NSTDPtr) -> NSTDAnyConst {
 /// still valid.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_ptr_read_mut(ptr: &mut NSTDPtr) -> NSTDAny {
+pub unsafe extern "C" fn nstd_core_ptr_read(ptr: &mut NSTDPtr) -> NSTDAny {
+    ptr.raw
+}
+
+/// Returns a raw immutable pointer to the object pointed to by `ptr`.
+///
+/// # Parameters:
+///
+/// - `const NSTDPtr *ptr` - The higher level pointer.
+///
+/// # Returns
+///
+/// `NSTDAnyConst raw` - A raw pointer to the object.
+///
+/// # Safety
+///
+/// This operation is unsafe because there is no way of knowing if the object being pointed to is
+/// still valid.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_core_ptr_read_const(ptr: &NSTDPtr) -> NSTDAnyConst {
     ptr.raw
 }
 
