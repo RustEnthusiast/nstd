@@ -20,6 +20,7 @@ pub struct NSTDPtr {
 /// - `NSTDUSize size` - The number of bytes that `obj`'s type occupies.
 ///
 /// # Returns
+///
 /// `NSTDPtr ptr` - A new instance of `NSTDPtr` that points to `obj`.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
@@ -34,9 +35,11 @@ pub extern "C" fn nstd_core_ptr_new(obj: NSTDAny, size: NSTDUSize) -> NSTDPtr {
 /// - `const NSTDPtr *ptr` - The higher level pointer.
 ///
 /// # Returns
+///
 /// `NSTDAnyConst raw` - A raw pointer to the object.
 ///
 /// # Safety
+///
 /// This operation is unsafe because there is no way of knowing if the object being pointed to is
 /// still valid.
 #[inline]
@@ -52,9 +55,11 @@ pub unsafe extern "C" fn nstd_core_ptr_read(ptr: &NSTDPtr) -> NSTDAnyConst {
 /// - `NSTDPtr *ptr` - The higher level pointer.
 ///
 /// # Returns
+///
 /// `NSTDAny raw` - A raw pointer to the object.
 ///
 /// # Safety
+///
 /// This operation is unsafe because there is no way of knowing if the object being pointed to is
 /// still valid.
 #[inline]
@@ -72,6 +77,7 @@ pub unsafe extern "C" fn nstd_core_ptr_read_mut(ptr: &mut NSTDPtr) -> NSTDAny {
 /// - `NSTDAnyConst obj` - A pointer to the object to write to `ptr`.
 ///
 /// # Safety
+///
 /// This operation is highly unsafe because there is no way of knowing if either of the pointers
 /// are valid.
 #[cfg_attr(feature = "clib", no_mangle)]

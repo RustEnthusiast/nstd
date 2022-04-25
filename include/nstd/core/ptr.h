@@ -21,6 +21,7 @@ typedef struct {
 /// - `NSTDUSize size` - The number of bytes that `obj`'s type occupies.
 ///
 /// # Returns
+///
 /// `NSTDPtr ptr` - A new instance of `NSTDPtr` that points to `obj`.
 NSTDAPI NSTDPtr nstd_core_ptr_new(NSTDAny obj, NSTDUSize size);
 
@@ -31,9 +32,11 @@ NSTDAPI NSTDPtr nstd_core_ptr_new(NSTDAny obj, NSTDUSize size);
 /// - `const NSTDPtr *ptr` - The higher level pointer.
 ///
 /// # Returns
+///
 /// `NSTDAnyConst raw` - A raw pointer to the object.
 ///
 /// # Safety
+///
 /// This operation is unsafe because there is no way of knowing if the object being pointed to is
 /// still valid.
 NSTDAPI NSTDAnyConst nstd_core_ptr_read(const NSTDPtr *ptr);
@@ -45,9 +48,11 @@ NSTDAPI NSTDAnyConst nstd_core_ptr_read(const NSTDPtr *ptr);
 /// - `NSTDPtr *ptr` - The higher level pointer.
 ///
 /// # Returns
+///
 /// `NSTDAny raw` - A raw pointer to the object.
 ///
 /// # Safety
+///
 /// This operation is unsafe because there is no way of knowing if the object being pointed to is
 /// still valid.
 NSTDAPI NSTDAny nstd_core_ptr_read_mut(NSTDPtr *ptr);
@@ -61,6 +66,7 @@ NSTDAPI NSTDAny nstd_core_ptr_read_mut(NSTDPtr *ptr);
 /// - `NSTDAnyConst obj` - A pointer to the object to write to `ptr`.
 ///
 /// # Safety
+///
 /// This operation is highly unsafe because there is no way of knowing if either of the pointers
 /// are valid.
 NSTDAPI void nstd_core_ptr_write(NSTDPtr *ptr, NSTDAnyConst obj);
