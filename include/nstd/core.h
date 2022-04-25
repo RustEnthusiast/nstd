@@ -2,5 +2,6 @@
 #define NSTD_CORE_H_INCLUDED
 #include "core/def.h"
 #include "core/ptr.h"
+#include "core/slice.h"
 #include "nstd.h"
 #endif

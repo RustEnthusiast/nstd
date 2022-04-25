@@ -10,6 +10,7 @@ Rust syntax).
     - `core` - The central and most important part of `nstd`.
         - `def` - Contains common types used throughout `nstd`.
         - `ptr` - A sized pointer to some arbitrary type.
+        - `slice` - A view into a sequence of values in memory.
 
 # How to build
 `nstd` let's you decide what features you want to use. Any module that falls under the top level
