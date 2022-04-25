@@ -9,3 +9,4 @@ Rust syntax).
 - `nstd` - A cross-platform, fast, and safe general purpose C library written in Rust.
     - `core` - The central and most important part of `nstd`.
         - `def` - Contains common types used throughout `nstd`.
+        - `ptr` - A sized pointer to some arbitrary type.
