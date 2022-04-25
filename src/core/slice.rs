@@ -90,3 +90,89 @@ pub unsafe extern "C" fn nstd_core_slice_get_const(
         false => NSTD_CORE_NULL,
     }
 }
+
+/// Returns a pointer to the first element in the slice.
+///
+/// # Parameters:
+///
+/// - `NSTDSlice *slice` - The slice to get the first element of.
+///
+/// # Returns
+///
+/// `NSTDAny element` - A pointer to the first element in `slice` or `NSTD_CORE_NULL` if the slice
+/// is empty.
+///
+/// # Safety
+///
+/// This operation is unsafe because the underlying data is not guaranteed to be valid.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_core_slice_first(slice: &mut NSTDSlice) -> NSTDAny {
+    nstd_core_slice_first_const(slice) as NSTDAny
+}
+
+/// Returns an immutable pointer to the first element in the slice.
+///
+/// # Parameters:
+///
+/// - `const NSTDSlice *slice` - The slice to get the first element of.
+///
+/// # Returns
+///
+/// `NSTDAnyConst element` - A pointer to the first element in `slice` or `NSTD_CORE_NULL` if the
+/// slice is empty.
+///
+/// # Safety
+///
+/// This operation is unsafe because the underlying data is not guaranteed to be valid.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_core_slice_first_const(slice: &NSTDSlice) -> NSTDAnyConst {
+    match slice.len > 0 {
+        true => slice.ptr.raw,
+        false => NSTD_CORE_NULL,
+    }
+}
+
+/// Returns a pointer to the last element in the slice.
+///
+/// # Parameters:
+///
+/// - `NSTDSlice *slice` - The slice to get the last element of.
+///
+/// # Returns
+///
+/// `NSTDAny element` - A pointer to the last element in `slice` or `NSTD_CORE_NULL` if the slice
+/// is empty.
+///
+/// # Safety
+///
+/// This operation is unsafe because the underlying data is not guaranteed to be valid.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_core_slice_last(slice: &mut NSTDSlice) -> NSTDAny {
+    nstd_core_slice_last_const(slice) as NSTDAny
+}
+
+/// Returns an immutable pointer to the last element in the slice.
+///
+/// # Parameters:
+///
+/// - `const NSTDSlice *slice` - The slice to get the last element of.
+///
+/// # Returns
+///
+/// `NSTDAnyConst element` - A pointer to the last element in `slice` or `NSTD_CORE_NULL` if the
+/// slice is empty.
+///
+/// # Safety
+///
+/// This operation is unsafe because the underlying data is not guaranteed to be valid.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_core_slice_last_const(slice: &NSTDSlice) -> NSTDAnyConst {
+    match slice.len > 0 {
+        true => nstd_core_slice_get_const(slice, slice.len - 1),
+        false => NSTD_CORE_NULL,
+    }
+}

@@ -64,5 +64,69 @@ NSTDAPI NSTDAny nstd_core_slice_get(NSTDSlice *slice, NSTDUSize pos);
 /// This operation is unsafe because the underlying data is not guaranteed to be valid.
 NSTDAPI NSTDAnyConst nstd_core_slice_get_const(const NSTDSlice *slice, NSTDUSize pos);
 
+/// Returns a pointer to the first element in the slice.
+///
+/// # Parameters:
+///
+/// - `NSTDSlice *slice` - The slice to get the first element of.
+///
+/// # Returns
+///
+/// `NSTDAny element` - A pointer to the first element in `slice` or `NSTD_CORE_NULL` if the slice
+/// is empty.
+///
+/// # Safety
+///
+/// This operation is unsafe because the underlying data is not guaranteed to be valid.
+NSTDAPI NSTDAny nstd_core_slice_first(NSTDSlice *slice);
+
+/// Returns an immutable pointer to the first element in the slice.
+///
+/// # Parameters:
+///
+/// - `const NSTDSlice *slice` - The slice to get the first element of.
+///
+/// # Returns
+///
+/// `NSTDAnyConst element` - A pointer to the first element in `slice` or `NSTD_CORE_NULL` if the
+/// slice is empty.
+///
+/// # Safety
+///
+/// This operation is unsafe because the underlying data is not guaranteed to be valid.
+NSTDAPI NSTDAnyConst nstd_core_slice_first_const(const NSTDSlice *slice);
+
+/// Returns a pointer to the last element in the slice.
+///
+/// # Parameters:
+///
+/// - `NSTDSlice *slice` - The slice to get the last element of.
+///
+/// # Returns
+///
+/// `NSTDAny element` - A pointer to the last element in `slice` or `NSTD_CORE_NULL` if the slice
+/// is empty.
+///
+/// # Safety
+///
+/// This operation is unsafe because the underlying data is not guaranteed to be valid.
+NSTDAPI NSTDAny nstd_core_slice_last(NSTDSlice *slice);
+
+/// Returns an immutable pointer to the last element in the slice.
+///
+/// # Parameters:
+///
+/// - `const NSTDSlice *slice` - The slice to get the last element of.
+///
+/// # Returns
+///
+/// `NSTDAnyConst element` - A pointer to the last element in `slice` or `NSTD_CORE_NULL` if the
+/// slice is empty.
+///
+/// # Safety
+///
+/// This operation is unsafe because the underlying data is not guaranteed to be valid.
+NSTDAPI NSTDAnyConst nstd_core_slice_last_const(const NSTDSlice *slice);
+
 NSTDCPPEND
 #endif
