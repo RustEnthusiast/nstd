@@ -2,3 +2,7 @@
 //! supports a wide range of systems, including embedded.
 pub mod def;
 pub mod ptr;
+use self::def::NSTDAny;
+
+/// A null pointer value constant.
+pub const NSTD_CORE_NULL: NSTDAny = core::ptr::null_mut();
