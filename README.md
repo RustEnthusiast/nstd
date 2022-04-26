@@ -8,6 +8,7 @@ Rust syntax).
 # Modules
 - `nstd` - A cross-platform, fast, and safe general purpose C library written in Rust.
     - `core` - The central and most important part of `nstd`.
+        - `cstr` - C string processing.
         - `def` - Contains common types used throughout `nstd`.
         - `ptr` - A sized pointer to some arbitrary type.
         - `slice` - A view into a sequence of values in memory.
