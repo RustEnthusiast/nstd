@@ -2,8 +2,8 @@
 //!
 //! # Note
 //!
-//! The functions in this module must be provided valid C strings, because they do not check for
-//! null pointers.
+//! The functions in this module must be provided valid C strings, as they do not accept null
+//! pointers.
 use crate::core::def::{NSTDChar, NSTDUSize};
 
 /// Gets the length of a null terminated C string, excluding the null byte.
