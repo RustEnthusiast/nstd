@@ -7,6 +7,7 @@ Rust syntax).
 
 # Modules
 - `nstd` - A cross-platform, fast, and safe general purpose C library written in Rust.
+    - `alloc` - Low level memory allocation.
     - `core` - The central and most important part of `nstd`.
         - `cstr` - C string processing.
         - `def` - Contains common types used throughout `nstd`.
@@ -16,12 +17,12 @@ Rust syntax).
 
 # How to build
 `nstd` let's you decide what features you want to use. Any module that falls under the top level
-module has a dedicated feature flag, for example `nstd.core` has the feature flag `nstd_core`. To
-build `nstd` as a C library, use the `clib` feature flag. The `std` feature flag enables Rust
-standard library support, all modules other than `nstd.core` require this flag. `std` and
-`nstd_core` are enabled by default.
+module has a dedicated feature flag, for example `nstd.core` has the feature flag `nstd_core` and
+`nstd.alloc` has the feature flag `nstd_alloc`. To build `nstd` as a C library, use the `clib`
+feature flag. The `std` feature flag enables Rust standard library support, all modules other than
+`nstd.core` require this flag. `std` and `nstd_core` are enabled by default.
 
 For example:
 ```
-cargo build --features "clib nstd_libx nstd_liby nstd_libz"
+cargo build --features "clib nstd_alloc"
 ```
