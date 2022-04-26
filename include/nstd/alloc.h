@@ -1,7 +1,7 @@
 #ifndef NSTD_ALLOC_H_INCLUDED
 #define NSTD_ALLOC_H_INCLUDED
-#include "nstd.h"
 #include "core/def.h"
+#include "nstd.h"
 NSTDCPPSTART
 
 /// Allocates a block of memory on the heap.
