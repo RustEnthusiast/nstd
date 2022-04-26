@@ -5,5 +5,6 @@
 #include "core/def.h"
 #include "core/ptr.h"
 #include "core/slice.h"
+#include "core/str.h"
 #include "nstd.h"
 #endif

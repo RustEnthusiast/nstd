@@ -4,6 +4,7 @@ pub mod cstr;
 pub mod def;
 pub mod ptr;
 pub mod slice;
+pub mod str;
 use self::def::NSTDAny;
 
 /// A null pointer value constant.

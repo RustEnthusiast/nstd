@@ -12,6 +12,7 @@ Rust syntax).
         - `def` - Contains common types used throughout `nstd`.
         - `ptr` - A sized pointer to some arbitrary type.
         - `slice` - A view into a sequence of values in memory.
+        - `str` - An unowned view into a UTF-8 encoded byte string.
 
 # How to build
 `nstd` let's you decide what features you want to use. Any module that falls under the top level
