@@ -13,7 +13,7 @@ pub struct NSTDStr {
     pub bytes: NSTDSlice,
 }
 
-/// Creates a new instance of `NSTDStr` from a UTF-8 encoded C string.
+/// Creates a new instance of `NSTDStr` from a C string.
 ///
 /// # Parameters:
 ///
@@ -22,9 +22,13 @@ pub struct NSTDStr {
 /// # Returns
 ///
 /// `NSTDStr str` - The new `NSTDStr` instance, excluding the C string's null terminator.
+///
+/// # Safety
+///
+/// This function does not check to ensure that `cstr` is valid UTF-8.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_str_from_cstr(cstr: *mut NSTDChar) -> NSTDStr {
+pub unsafe extern "C" fn nstd_core_str_from_cstr(cstr: *mut NSTDChar) -> NSTDStr {
     let len = nstd_core_cstr_len(cstr);
     NSTDStr {
         bytes: nstd_core_slice_new(cstr.cast(), 1, len),

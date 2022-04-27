@@ -11,7 +11,7 @@ typedef struct {
     NSTDSlice bytes;
 } NSTDStr;
 
-/// Creates a new instance of `NSTDStr` from a UTF-8 encoded C string.
+/// Creates a new instance of `NSTDStr` from a C string.
 ///
 /// # Parameters:
 ///
@@ -20,6 +20,10 @@ typedef struct {
 /// # Returns
 ///
 /// `NSTDStr str` - The new `NSTDStr` instance, excluding the C string's null terminator.
+///
+/// # Safety
+///
+/// This function does not check to ensure that `cstr` is valid UTF-8.
 NSTDAPI NSTDStr nstd_core_str_from_cstr(NSTDChar *cstr);
 
 NSTDCPPEND
