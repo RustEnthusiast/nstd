@@ -3,4 +3,5 @@
 #include "nstd/alloc.h"
 #include "nstd/core.h"
 #include "nstd/nstd.h"
+#include "nstd/os.h"
 #endif

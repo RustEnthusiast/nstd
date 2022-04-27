@@ -8,5 +8,8 @@ pub mod alloc;
 #[cfg(feature = "nstd_core")]
 #[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_core")))]
 pub mod core;
+#[cfg(feature = "nstd_os")]
+#[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_os")))]
+pub mod os;
 #[cfg(test)]
 pub(crate) mod test;
