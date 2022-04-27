@@ -82,16 +82,18 @@ pub unsafe extern "C" fn nstd_core_ptr_read_const(ptr: &NSTDPtr) -> NSTDAnyConst
 /// are valid.
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_ptr_write(ptr: &mut NSTDPtr, obj: NSTDAnyConst) {
-    let mut write_byte = ptr.raw as *mut u8;
-    let mut read_byte = obj as *const u8;
-    let mut written = 0_usize;
-    loop {
-        *write_byte = *read_byte;
-        written += 1;
-        if written >= ptr.size {
-            break;
+    if ptr.size > 0 {
+        let mut write_byte = ptr.raw as *mut u8;
+        let mut read_byte = obj as *const u8;
+        let mut written = 0_usize;
+        loop {
+            *write_byte = *read_byte;
+            written += 1;
+            if written >= ptr.size {
+                break;
+            }
+            write_byte = write_byte.add(1);
+            read_byte = read_byte.add(1);
         }
-        write_byte = write_byte.add(1);
-        read_byte = read_byte.add(1);
     }
 }
