@@ -4,7 +4,7 @@
 //!
 //! The functions in this module must be provided valid C strings, as they do not accept null
 //! pointers.
-use crate::core::def::{NSTDChar, NSTDUSize};
+use crate::core::def::{NSTDBool, NSTDChar, NSTDUSize};
 
 /// Gets the length of a null terminated C string, excluding the null byte.
 ///
@@ -38,4 +38,38 @@ pub extern "C" fn nstd_core_cstr_len(cstr: *const NSTDChar) -> NSTDUSize {
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_cstr_len_with_null(cstr: *const NSTDChar) -> NSTDUSize {
     nstd_core_cstr_len(cstr) + 1
+}
+
+/// Compares two C strings, returning `NSTD_BOOL_TRUE` if they are lexicographically equal.
+///
+/// # Parameters:
+///
+/// - `const NSTDChar *cstr1` - The first C string.
+///
+/// - `const NSTDChar *cstr2` - The second C string.
+///
+/// # Returns
+///
+/// `NSTDBool is_eq` - `NSTD_BOOL_TRUE` if the C strings are lexicographically equal.
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_core_cstr_compare(
+    mut cstr1: *const NSTDChar,
+    mut cstr2: *const NSTDChar,
+) -> NSTDBool {
+    // If the C strings point to the same data return true.
+    if cstr1 == cstr2 {
+        return NSTDBool::NSTD_BOOL_TRUE;
+    }
+    // Otherwise compare them lexicographically.
+    unsafe {
+        loop {
+            if *cstr1 != *cstr2 {
+                return NSTDBool::NSTD_BOOL_FALSE;
+            } else if *cstr1 == 0 && *cstr2 == 0 {
+                return NSTDBool::NSTD_BOOL_TRUE;
+            }
+            cstr1 = cstr1.add(1);
+            cstr2 = cstr2.add(1);
+        }
+    }
 }
