@@ -1,9 +1,5 @@
 //! Low level memory allocation.
-use crate::core::{
-    def::{NSTDAny, NSTDErrorCode, NSTDUSize},
-    NSTD_CORE_NULL,
-};
-use std::alloc::Layout;
+use crate::core::def::{NSTDAny, NSTDErrorCode, NSTDUSize};
 
 /// Allocates a block of memory on the heap.
 /// The number of bytes to be allocated is specified by `size`.
@@ -22,8 +18,16 @@ use std::alloc::Layout;
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_alloc_allocate(size: NSTDUSize) -> NSTDAny {
-    let layout = Layout::from_size_align_unchecked(size, 1);
-    std::alloc::alloc(layout).cast()
+    #[cfg(not(target_os = "windows"))]
+    {
+        use std::alloc::Layout;
+        let layout = Layout::from_size_align_unchecked(size, 1);
+        std::alloc::alloc(layout).cast()
+    }
+    #[cfg(target_os = "windows")]
+    {
+        crate::os::windows::alloc::nstd_os_windows_alloc_allocate(size)
+    }
 }
 
 /// Allocates a block of zero-initialized memory on the heap.
@@ -42,8 +46,16 @@ pub unsafe extern "C" fn nstd_alloc_allocate(size: NSTDUSize) -> NSTDAny {
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_alloc_allocate_zeroed(size: NSTDUSize) -> NSTDAny {
-    let layout = Layout::from_size_align_unchecked(size, 1);
-    std::alloc::alloc_zeroed(layout).cast()
+    #[cfg(not(target_os = "windows"))]
+    {
+        use std::alloc::Layout;
+        let layout = Layout::from_size_align_unchecked(size, 1);
+        std::alloc::alloc_zeroed(layout).cast()
+    }
+    #[cfg(target_os = "windows")]
+    {
+        crate::os::windows::alloc::nstd_os_windows_alloc_allocate_zeroed(size)
+    }
 }
 
 /// Reallocates a block of memory previously allocated by `nstd_alloc_allocate[_zeroed]`.
@@ -70,18 +82,27 @@ pub unsafe extern "C" fn nstd_alloc_allocate_zeroed(size: NSTDUSize) -> NSTDAny 
 /// `nstd_alloc_allocate[_zeroed]`.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(target_os = "windows", allow(unused_variables))]
 pub unsafe extern "C" fn nstd_alloc_reallocate(
     ptr: &mut NSTDAny,
     size: NSTDUSize,
     new_size: NSTDUSize,
 ) -> NSTDErrorCode {
-    let layout = Layout::from_size_align_unchecked(size, 1);
-    let new_mem = std::alloc::realloc((*ptr).cast(), layout, new_size);
-    if !new_mem.is_null() {
-        *ptr = new_mem.cast();
-        return 0;
+    #[cfg(not(target_os = "windows"))]
+    {
+        use std::alloc::Layout;
+        let layout = Layout::from_size_align_unchecked(size, 1);
+        let new_mem = std::alloc::realloc((*ptr).cast(), layout, new_size);
+        if !new_mem.is_null() {
+            *ptr = new_mem.cast();
+            return 0;
+        }
+        1
     }
-    1
+    #[cfg(target_os = "windows")]
+    {
+        crate::os::windows::alloc::nstd_os_windows_alloc_reallocate(ptr, new_size)
+    }
 }
 
 /// Deallocates a block of memory previously allocated by `nstd_alloc_allocate[_zeroed]`.
@@ -98,8 +119,18 @@ pub unsafe extern "C" fn nstd_alloc_reallocate(
 /// `nstd_alloc_allocate[_zeroed]`.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(target_os = "windows", allow(unused_variables))]
 pub unsafe extern "C" fn nstd_alloc_deallocate(ptr: &mut NSTDAny, size: NSTDUSize) {
-    let layout = Layout::from_size_align_unchecked(size, 1);
-    std::alloc::dealloc((*ptr).cast(), layout);
-    *ptr = NSTD_CORE_NULL;
+    #[cfg(not(target_os = "windows"))]
+    {
+        use crate::core::NSTD_CORE_NULL;
+        use std::alloc::Layout;
+        let layout = Layout::from_size_align_unchecked(size, 1);
+        std::alloc::dealloc((*ptr).cast(), layout);
+        *ptr = NSTD_CORE_NULL;
+    }
+    #[cfg(target_os = "windows")]
+    {
+        crate::os::windows::alloc::nstd_os_windows_alloc_deallocate(ptr);
+    }
 }
