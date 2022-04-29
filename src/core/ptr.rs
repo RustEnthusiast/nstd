@@ -1,5 +1,8 @@
 //! A sized pointer to some arbitrary type.
-use crate::core::def::{NSTDAny, NSTDAnyConst, NSTDUSize};
+use crate::core::{
+    def::{NSTDAny, NSTDAnyConst, NSTDUSize},
+    mem::nstd_core_mem_copy,
+};
 
 /// A sized pointer to some arbitrary type.
 #[repr(C)]
@@ -70,6 +73,11 @@ pub unsafe extern "C" fn nstd_core_ptr_read_const(ptr: &NSTDPtr) -> NSTDAnyConst
 
 /// Writes data from `obj` to `ptr`. The number of bytes written is determined by `ptr.size`.
 ///
+/// # Note
+///
+/// It is up to the user of this function to ensure that `obj`'s memory buffer is at least
+/// `ptr.size` bytes wide to avoid writing garbage data to this pointer.
+///
 /// # Parameters:
 ///
 /// - `NSTDPtr *ptr` - The pointer to write to.
@@ -80,20 +88,8 @@ pub unsafe extern "C" fn nstd_core_ptr_read_const(ptr: &NSTDPtr) -> NSTDAnyConst
 ///
 /// This operation is highly unsafe because there is no way of knowing if either of the pointers
 /// are valid.
+#[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_ptr_write(ptr: &mut NSTDPtr, obj: NSTDAnyConst) {
-    if ptr.size > 0 {
-        let mut write_byte = ptr.raw as *mut u8;
-        let mut read_byte = obj as *const u8;
-        let mut written = 0_usize;
-        loop {
-            *write_byte = *read_byte;
-            written += 1;
-            if written >= ptr.size {
-                break;
-            }
-            write_byte = write_byte.add(1);
-            read_byte = read_byte.add(1);
-        }
-    }
+    nstd_core_mem_copy(ptr.raw.cast(), obj.cast(), ptr.size);
 }

@@ -59,6 +59,11 @@ NSTDAPI NSTDAnyConst nstd_core_ptr_read_const(const NSTDPtr *ptr);
 
 /// Writes data from `obj` to `ptr`. The number of bytes written is determined by `ptr.size`.
 ///
+/// # Note
+///
+/// It is up to the user of this function to ensure that `obj`'s memory buffer is at least
+/// `ptr.size` bytes wide to avoid writing garbage data to this pointer.
+///
 /// # Parameters:
 ///
 /// - `NSTDPtr *ptr` - The pointer to write to.
