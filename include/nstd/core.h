@@ -3,6 +3,7 @@
 #include "core/core.h"
 #include "core/cstr.h"
 #include "core/def.h"
+#include "core/mem.h"
 #include "core/ptr.h"
 #include "core/slice.h"
 #include "core/str.h"
