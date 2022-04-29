@@ -11,6 +11,7 @@ Rust syntax).
     - `core` - The central and most important part of `nstd`.
         - `cstr` - C string processing.
         - `def` - Contains common types used throughout `nstd`.
+        - `mem` - Contains mostly unsafe functions for interacting with raw memory.
         - `ptr` - A sized pointer to some arbitrary type.
         - `slice` - A view into a sequence of values in memory.
         - `str` - An unowned view into a UTF-8 encoded byte string.
