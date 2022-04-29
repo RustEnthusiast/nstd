@@ -115,3 +115,56 @@ pub extern "C" fn nstd_core_cstr_compare(
         }
     }
 }
+
+/// Copies the contents of `src` to `dest`, excluding the null terminator.
+///
+/// # Parameters:
+///
+/// - `NSTDChar *dest` - The C string buffer to copy data to.
+///
+/// - `const NSTDChar *src` - The C string to copy data from.
+///
+/// # Safety
+///
+/// This operation is highly unsafe because it cannot guarantee that it won't write past the end of
+/// `dest`'s memory buffer.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_core_cstr_copy(mut dest: *mut NSTDChar, mut src: *const NSTDChar) {
+    loop {
+        if *src == 0 {
+            break;
+        }
+        *dest = *src;
+        dest = dest.add(1);
+        src = src.add(1);
+    }
+}
+
+/// Copies the contents of `src` to `dest`, including the null terminator.
+///
+/// # Parameters:
+///
+/// - `NSTDChar *dest` - The C string buffer to copy data to.
+///
+/// - `const NSTDChar *src` - The C string to copy data from.
+///
+/// # Safety
+///
+/// This operation is highly unsafe because it cannot guarantee that it won't write past the end of
+/// `dest`'s memory buffer.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_core_cstr_copy_with_null(
+    mut dest: *mut NSTDChar,
+    mut src: *const NSTDChar,
+) {
+    loop {
+        *dest = *src;
+        if *src == 0 {
+            break;
+        }
+        dest = dest.add(1);
+        src = src.add(1);
+    }
+}

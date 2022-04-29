@@ -62,5 +62,33 @@ NSTDAPI NSTDUSize nstd_core_cstr_len_with_null(const NSTDChar *cstr);
 /// `NSTDBool is_eq` - `NSTD_BOOL_TRUE` if the C strings are lexicographically equal.
 NSTDAPI NSTDBool nstd_core_cstr_compare(const NSTDChar *cstr1, const NSTDChar *cstr2);
 
+/// Copies the contents of `src` to `dest`, excluding the null terminator.
+///
+/// # Parameters:
+///
+/// - `NSTDChar *dest` - The C string buffer to copy data to.
+///
+/// - `const NSTDChar *src` - The C string to copy data from.
+///
+/// # Safety
+///
+/// This operation is highly unsafe because it cannot guarantee that it won't write past the end of
+/// `dest`'s memory buffer.
+NSTDAPI void nstd_core_cstr_copy(NSTDChar *dest, const NSTDChar *src);
+
+/// Copies the contents of `src` to `dest`, including the null terminator.
+///
+/// # Parameters:
+///
+/// - `NSTDChar *dest` - The C string buffer to copy data to.
+///
+/// - `const NSTDChar *src` - The C string to copy data from.
+///
+/// # Safety
+///
+/// This operation is highly unsafe because it cannot guarantee that it won't write past the end of
+/// `dest`'s memory buffer.
+NSTDAPI void nstd_core_cstr_copy_with_null(NSTDChar *dest, const NSTDChar *src);
+
 NSTDCPPEND
 #endif
