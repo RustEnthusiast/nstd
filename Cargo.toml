@@ -23,4 +23,4 @@ nstd_os_alloc = ["nstd_os", "nstd_core", "windows-sys/Win32_Foundation", "window
 cty = { version = "0.2", optional = true }
 
 [target.'cfg(target_os = "windows")'.dependencies]
-windows-sys = { version = "0.35", optional = true }
+windows-sys = { version = "0.36", optional = true }
