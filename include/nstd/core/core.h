@@ -3,6 +3,10 @@
 #include "../nstd.h"
 
 /// A null pointer value constant.
+#ifndef NSTDCPP
 #define NSTD_CORE_NULL 0
+#else
+#define NSTD_CORE_NULL nullptr
+#endif
 
 #endif
