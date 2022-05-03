@@ -46,5 +46,34 @@ NSTDAPI NSTDFloat32 nstd_core_math_rad_f32(NSTDFloat32 deg);
 /// `NSTDFloat64 rad` - The degrees value converted to radians.
 NSTDAPI NSTDFloat64 nstd_core_math_rad_f64(NSTDFloat64 deg);
 
+/// Clamps the value `x` to the bounds `min` and `max`.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat32 x` - The value to clamp.
+///
+/// - `NSTDFloat32 min` - The minimum clamp value.
+///
+/// - `NSTDFloat32 max` - The maximum clamp value.
+///
+/// # Returns
+///
+/// `NSTDFloat32 v` - The clamped value.
+NSTDAPI NSTDFloat32 nstd_core_math_clamp_f32(NSTDFloat32 x, NSTDFloat32 min, NSTDFloat32 max);
+/// Clamps the value `x` to the bounds `min` and `max`.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat64 x` - The value to clamp.
+///
+/// - `NSTDFloat64 min` - The minimum clamp value.
+///
+/// - `NSTDFloat64 max` - The maximum clamp value.
+///
+/// # Returns
+///
+/// `NSTDFloat64 v` - The clamped value.
+NSTDAPI NSTDFloat64 nstd_core_math_clamp_f64(NSTDFloat64 x, NSTDFloat64 min, NSTDFloat64 max);
+
 NSTDCPPEND
 #endif
