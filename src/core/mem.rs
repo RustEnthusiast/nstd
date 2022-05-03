@@ -16,22 +16,12 @@ use crate::core::def::{NSTDByte, NSTDUSize};
 /// This function is highly unsafe as it does not know how large either of the memory buffers are,
 /// quickly leading to undefined behaviour if this function ends up reading or writing past the end
 /// of a buffer.
+#[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_mem_copy(
-    mut dest: *mut NSTDByte,
-    mut src: *const NSTDByte,
+    dest: *mut NSTDByte,
+    src: *const NSTDByte,
     num: NSTDUSize,
 ) {
-    if num > 0 {
-        let mut written = 0;
-        loop {
-            *dest = *src;
-            written += 1;
-            if written >= num {
-                break;
-            }
-            dest = dest.add(1);
-            src = src.add(1);
-        }
-    }
+    core::ptr::copy_nonoverlapping(src, dest, num);
 }
