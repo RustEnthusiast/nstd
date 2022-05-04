@@ -59,6 +59,10 @@ NSTDAPI NSTDFloat64 nstd_core_math_rad_f64(NSTDFloat64 deg);
 /// # Returns
 ///
 /// `NSTDFloat32 v` - The clamped value.
+///
+/// # Panics
+///
+/// Panics if `min` > `max`, `min` is NaN, or `max` is NaN.
 NSTDAPI NSTDFloat32 nstd_core_math_clamp_f32(NSTDFloat32 x, NSTDFloat32 min, NSTDFloat32 max);
 /// Clamps the value `x` to the bounds `min` and `max`.
 ///
@@ -73,6 +77,10 @@ NSTDAPI NSTDFloat32 nstd_core_math_clamp_f32(NSTDFloat32 x, NSTDFloat32 min, NST
 /// # Returns
 ///
 /// `NSTDFloat64 v` - The clamped value.
+///
+/// # Panics
+///
+/// Panics if `min` > `max`, `min` is NaN, or `max` is NaN.
 NSTDAPI NSTDFloat64 nstd_core_math_clamp_f64(NSTDFloat64 x, NSTDFloat64 min, NSTDFloat64 max);
 
 NSTDCPPEND

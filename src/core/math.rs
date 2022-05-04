@@ -72,6 +72,10 @@ pub extern "C" fn nstd_core_math_rad_f64(deg: NSTDFloat64) -> NSTDFloat64 {
 /// # Returns
 ///
 /// `NSTDFloat32 v` - The clamped value.
+///
+/// # Panics
+///
+/// Panics if `min` > `max`, `min` is NaN, or `max` is NaN.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_math_clamp_f32(
@@ -94,6 +98,10 @@ pub extern "C" fn nstd_core_math_clamp_f32(
 /// # Returns
 ///
 /// `NSTDFloat64 v` - The clamped value.
+///
+/// # Panics
+///
+/// Panics if `min` > `max`, `min` is NaN, or `max` is NaN.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_math_clamp_f64(
