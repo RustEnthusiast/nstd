@@ -64,6 +64,11 @@ NSTDAPI NSTDBool nstd_core_cstr_compare(const NSTDChar *cstr1, const NSTDChar *c
 
 /// Copies the contents of `src` to `dest`, excluding the null terminator.
 ///
+/// # Note
+///
+/// If you already know how many bytes should be copied, `nstd_core_mem_copy[_overlapped]` should
+/// be used instead.
+///
 /// # Parameters:
 ///
 /// - `NSTDChar *dest` - The C string buffer to copy data to.
@@ -77,6 +82,11 @@ NSTDAPI NSTDBool nstd_core_cstr_compare(const NSTDChar *cstr1, const NSTDChar *c
 NSTDAPI void nstd_core_cstr_copy(NSTDChar *dest, const NSTDChar *src);
 
 /// Copies the contents of `src` to `dest`, including the null terminator.
+///
+/// # Note
+///
+/// If you already know how many bytes should be copied, `nstd_core_mem_copy[_overlapped]` should
+/// be used instead.
 ///
 /// # Parameters:
 ///

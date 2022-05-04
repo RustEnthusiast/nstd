@@ -118,6 +118,11 @@ pub extern "C" fn nstd_core_cstr_compare(
 
 /// Copies the contents of `src` to `dest`, excluding the null terminator.
 ///
+/// # Note
+///
+/// If you already know how many bytes should be copied, `nstd_core_mem_copy[_overlapped]` should
+/// be used instead.
+///
 /// # Parameters:
 ///
 /// - `NSTDChar *dest` - The C string buffer to copy data to.
@@ -142,6 +147,11 @@ pub unsafe extern "C" fn nstd_core_cstr_copy(mut dest: *mut NSTDChar, mut src: *
 }
 
 /// Copies the contents of `src` to `dest`, including the null terminator.
+///
+/// # Note
+///
+/// If you already know how many bytes should be copied, `nstd_core_mem_copy[_overlapped]` should
+/// be used instead.
 ///
 /// # Parameters:
 ///
