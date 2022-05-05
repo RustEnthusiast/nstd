@@ -69,3 +69,13 @@ impl Default for NSTDBool {
         Self::NSTD_BOOL_FALSE
     }
 }
+impl From<bool> for NSTDBool {
+    /// Creates an `NSTDBool` from a Rust [bool].
+    #[inline]
+    fn from(b: bool) -> Self {
+        match b {
+            true => Self::NSTD_BOOL_TRUE,
+            false => Self::NSTD_BOOL_FALSE,
+        }
+    }
+}
