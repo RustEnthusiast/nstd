@@ -16,7 +16,7 @@ use windows_sys::Win32::System::Memory::{
 ///
 /// # Safety
 ///
-/// See https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapalloc.
+/// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapalloc>.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_os_windows_alloc_allocate(size: NSTDUSize) -> NSTDAny {
@@ -35,7 +35,7 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_allocate(size: NSTDUSize) -> NSTD
 ///
 /// # Safety
 ///
-/// See https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapalloc.
+/// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapalloc>.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_os_windows_alloc_allocate_zeroed(size: NSTDUSize) -> NSTDAny {
@@ -61,7 +61,7 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_allocate_zeroed(size: NSTDUSize) 
 ///
 /// # Safety
 ///
-/// See https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heaprealloc.
+/// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heaprealloc>.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_os_windows_alloc_reallocate(
@@ -89,7 +89,7 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_reallocate(
 ///
 /// # Safety
 ///
-/// See https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapfree.
+/// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapfree>.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_os_windows_alloc_deallocate(ptr: &mut NSTDAny) -> NSTDErrorCode {
