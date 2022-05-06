@@ -16,7 +16,7 @@ NSTDCPPSTART
 ///
 /// # Safety
 ///
-/// See https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapalloc.
+/// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapalloc>.
 NSTDAPI NSTDAny nstd_os_windows_alloc_allocate(NSTDUSize size);
 
 /// Allocates a new block of zero-initialized memory on the current process' heap.
@@ -31,7 +31,7 @@ NSTDAPI NSTDAny nstd_os_windows_alloc_allocate(NSTDUSize size);
 ///
 /// # Safety
 ///
-/// See https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapalloc.
+/// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapalloc>.
 NSTDAPI NSTDAny nstd_os_windows_alloc_allocate_zeroed(NSTDUSize size);
 
 /// Reallocates a block of memory previously allocated by
@@ -53,7 +53,7 @@ NSTDAPI NSTDAny nstd_os_windows_alloc_allocate_zeroed(NSTDUSize size);
 ///
 /// # Safety
 ///
-/// See https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heaprealloc.
+/// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heaprealloc>.
 NSTDAPI NSTDErrorCode nstd_os_windows_alloc_reallocate(NSTDAny *ptr, NSTDUSize new_size);
 
 /// Deallocates a block of memory previously allocated by
@@ -69,7 +69,7 @@ NSTDAPI NSTDErrorCode nstd_os_windows_alloc_reallocate(NSTDAny *ptr, NSTDUSize n
 ///
 /// # Safety
 ///
-/// See https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapfree.
+/// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapfree>.
 NSTDAPI NSTDErrorCode nstd_os_windows_alloc_deallocate(NSTDAny *ptr);
 
 NSTDCPPEND
