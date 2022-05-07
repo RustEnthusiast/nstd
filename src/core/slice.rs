@@ -1,9 +1,10 @@
 //! A view into a sequence of values in memory.
 use crate::core::{
-    def::{NSTDAny, NSTDAnyConst, NSTDUSize},
+    def::{NSTDAny, NSTDAnyConst, NSTDBool, NSTDUSize},
     ptr::{nstd_core_ptr_new, NSTDPtr},
     NSTD_CORE_NULL,
 };
+use core::ops::Deref;
 
 /// A view into a sequence of values in memory.
 #[repr(C)]
@@ -13,6 +14,16 @@ pub struct NSTDSlice {
     pub ptr: NSTDPtr,
     /// The number of elements in the slice.
     pub len: NSTDUSize,
+}
+impl Deref for NSTDSlice {
+    /// The dereference target for `NSTDSlice`.
+    type Target = [u8];
+
+    /// Dereferences an `NSTDSlice`.
+    #[inline]
+    fn deref(&self) -> &Self::Target {
+        unsafe { core::slice::from_raw_parts(self.ptr.raw.cast(), self.len * self.ptr.size) }
+    }
 }
 
 /// Creates a new slice from raw data.
@@ -175,4 +186,21 @@ pub unsafe extern "C" fn nstd_core_slice_last_const(slice: &NSTDSlice) -> NSTDAn
         true => nstd_core_slice_get_const(slice, slice.len - 1),
         false => NSTD_CORE_NULL,
     }
+}
+
+/// Compares two slices, returning true if the slices carry, or point to the same data.
+///
+/// # Parameters:
+///
+/// - `const NSTDSlice *s1` - The first slice to compare.
+///
+/// - `const NSTDSlice *s2` - The second slice to compare.
+///
+/// # Returns
+///
+/// `NSTDBool is_eq` - `NSTD_BOOL_TRUE` if the two slices compare equal.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_core_slice_compare(s1: &NSTDSlice, s2: &NSTDSlice) -> NSTDBool {
+    (**s1 == **s2).into()
 }

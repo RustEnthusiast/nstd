@@ -128,5 +128,18 @@ NSTDAPI NSTDAny nstd_core_slice_last(NSTDSlice *slice);
 /// This operation is unsafe because the underlying data is not guaranteed to be valid.
 NSTDAPI NSTDAnyConst nstd_core_slice_last_const(const NSTDSlice *slice);
 
+/// Compares two slices, returning true if the slices carry, or point to the same data.
+///
+/// # Parameters:
+///
+/// - `const NSTDSlice *s1` - The first slice to compare.
+///
+/// - `const NSTDSlice *s2` - The second slice to compare.
+///
+/// # Returns
+///
+/// `NSTDBool is_eq` - `NSTD_BOOL_TRUE` if the two slices compare equal.
+NSTDAPI NSTDBool nstd_core_slice_compare(const NSTDSlice *s1, const NSTDSlice *s2);
+
 NSTDCPPEND
 #endif
