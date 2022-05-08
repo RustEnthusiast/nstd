@@ -4,7 +4,6 @@ use crate::core::{
     ptr::{nstd_core_ptr_new, NSTDPtr},
     NSTD_CORE_NULL,
 };
-use core::ops::Deref;
 
 /// A view into a sequence of values in memory.
 #[repr(C)]
@@ -15,13 +14,10 @@ pub struct NSTDSlice {
     /// The number of elements in the slice.
     pub len: NSTDUSize,
 }
-impl Deref for NSTDSlice {
-    /// The dereference target for `NSTDSlice`.
-    type Target = [u8];
-
-    /// Dereferences an `NSTDSlice`.
+impl NSTDSlice {
+    /// Creates a Rust byte slice from this `NSTDSlice`.
     #[inline]
-    fn deref(&self) -> &Self::Target {
+    pub(crate) fn as_slice(&self) -> &[u8] {
         unsafe { core::slice::from_raw_parts(self.ptr.raw.cast(), self.len * self.ptr.size) }
     }
 }
@@ -202,5 +198,5 @@ pub unsafe extern "C" fn nstd_core_slice_last_const(slice: &NSTDSlice) -> NSTDAn
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_slice_compare(s1: &NSTDSlice, s2: &NSTDSlice) -> NSTDBool {
-    (**s1 == **s2).into()
+    (s1.as_slice() == s2.as_slice()).into()
 }
