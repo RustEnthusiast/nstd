@@ -202,9 +202,13 @@ pub unsafe extern "C" fn nstd_core_slice_last_const(slice: &NSTDSlice) -> NSTDAn
 /// # Returns
 ///
 /// `NSTDBool is_eq` - `NSTD_BOOL_TRUE` if the two slices compare equal.
+///
+/// # Safety
+///
+/// This operation is unsafe because the underlying data is not guaranteed to be valid.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_slice_compare(s1: &NSTDSlice, s2: &NSTDSlice) -> NSTDBool {
+pub unsafe extern "C" fn nstd_core_slice_compare(s1: &NSTDSlice, s2: &NSTDSlice) -> NSTDBool {
     (s1.as_slice() == s2.as_slice()).into()
 }
 
@@ -219,11 +223,14 @@ pub extern "C" fn nstd_core_slice_compare(s1: &NSTDSlice, s2: &NSTDSlice) -> NST
 /// # Panics
 ///
 /// This function panics if the byte length of `dest` is less than the byte length of `src`.
+///
+/// # Safety
+///
+/// This operation is unsafe because the underlying data for `dest` or `src` is not guaranteed to
+/// be valid.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_slice_copy(dest: &mut NSTDSlice, src: &NSTDSlice) {
+pub unsafe extern "C" fn nstd_core_slice_copy(dest: &mut NSTDSlice, src: &NSTDSlice) {
     assert!(dest.byte_len() >= src.byte_len());
-    unsafe {
-        nstd_core_mem_copy(dest.ptr.raw.cast(), src.ptr.raw.cast(), src.byte_len());
-    }
+    nstd_core_mem_copy(dest.ptr.raw.cast(), src.ptr.raw.cast(), src.byte_len());
 }
