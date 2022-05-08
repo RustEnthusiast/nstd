@@ -1,6 +1,7 @@
 //! A view into a sequence of values in memory.
 use crate::core::{
     def::{NSTDAny, NSTDAnyConst, NSTDBool, NSTDUSize},
+    mem::nstd_core_mem_copy,
     ptr::{nstd_core_ptr_new, NSTDPtr},
     NSTD_CORE_NULL,
 };
@@ -15,10 +16,16 @@ pub struct NSTDSlice {
     pub len: NSTDUSize,
 }
 impl NSTDSlice {
+    /// Returns the number of bytes that this slice covers.
+    #[inline]
+    pub(crate) const fn byte_len(&self) -> usize {
+        self.len * self.ptr.size
+    }
+
     /// Creates a Rust byte slice from this `NSTDSlice`.
     #[inline]
     pub(crate) fn as_slice(&self) -> &[u8] {
-        unsafe { core::slice::from_raw_parts(self.ptr.raw.cast(), self.len * self.ptr.size) }
+        unsafe { core::slice::from_raw_parts(self.ptr.raw.cast(), self.byte_len()) }
     }
 }
 
@@ -199,4 +206,24 @@ pub unsafe extern "C" fn nstd_core_slice_last_const(slice: &NSTDSlice) -> NSTDAn
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_slice_compare(s1: &NSTDSlice, s2: &NSTDSlice) -> NSTDBool {
     (s1.as_slice() == s2.as_slice()).into()
+}
+
+/// Copies data into `dest` from `src`. The number of bytes copied is determined by `src`.
+///
+/// # Parameters:
+///
+/// - `NSTDSlice *dest` - The slice to copy data to.
+///
+/// - `const NSTDSlice *src` - The slice to copy data from.
+///
+/// # Panics
+///
+/// This function panics if the byte length of `dest` is less than the byte length of `src`.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_core_slice_copy(dest: &mut NSTDSlice, src: &NSTDSlice) {
+    assert!(dest.byte_len() >= src.byte_len());
+    unsafe {
+        nstd_core_mem_copy(dest.ptr.raw.cast(), src.ptr.raw.cast(), src.byte_len());
+    }
 }
