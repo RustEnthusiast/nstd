@@ -19,6 +19,7 @@ Rust syntax).
     - `os` - Operating system specific functionality.
         - `windows` - OS support for Windows.
             - `alloc` - Low level memory allocation for Windows.
+    - `vec` - A dynamically sized contiguous sequence of values.
 
 # How to build
 `nstd` let's you decide what features you want to use. Any module that falls under the top level
@@ -29,5 +30,5 @@ feature flag. The `std` feature flag enables Rust standard library support, all 
 
 For example:
 ```
-cargo build --features "clib nstd_alloc"
+cargo build --features "clib nstd_alloc nstd_vec"
 ```

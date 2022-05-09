@@ -13,3 +13,6 @@ pub mod core;
 pub mod os;
 #[cfg(test)]
 pub(crate) mod test;
+#[cfg(feature = "nstd_vec")]
+#[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_vec")))]
+pub mod vec;

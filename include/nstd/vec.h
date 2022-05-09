@@ -1,0 +1,3 @@
+#ifndef NSTD_VEC_H_INCLUDED
+#define NSTD_VEC_H_INCLUDED
+#endif
