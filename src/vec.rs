@@ -27,9 +27,14 @@ pub struct NSTDVec {
 /// # Returns
 ///
 /// `NSTDVec vec` - The new vector.
+///
+/// # Panics
+///
+/// This function will panic if `element_size` is zero.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_vec_new(element_size: NSTDUSize) -> NSTDVec {
+    assert!(element_size != 0);
     NSTDVec {
         buffer: nstd_core_slice_new(NSTD_CORE_NULL, element_size, 0),
         len: 0,

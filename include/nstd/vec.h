@@ -22,6 +22,10 @@ typedef struct {
 /// # Returns
 ///
 /// `NSTDVec vec` - The new vector.
+///
+/// # Panics
+///
+/// This function will panic if `element_size` is zero.
 NSTDAPI NSTDVec nstd_vec_new(NSTDUSize element_size);
 
 /// Frees an instance of `NSTDVec`.
