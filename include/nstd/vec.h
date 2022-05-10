@@ -3,6 +3,7 @@
 #include "core/def.h"
 #include "core/slice.h"
 #include "nstd.h"
+NSTDCPPSTART
 
 /// A dynamically sized contiguous sequence of values.
 typedef struct {
@@ -12,4 +13,23 @@ typedef struct {
     NSTDUSize len;
 } NSTDVec;
 
+/// Creates a new vector without allocating any resources.
+///
+/// # Parameters:
+///
+/// - `NSTDUSize element_size` - The size in bytes of each value in the vector.
+///
+/// # Returns
+///
+/// `NSTDVec vec` - The new vector.
+NSTDAPI NSTDVec nstd_vec_new(NSTDUSize element_size);
+
+/// Frees an instance of `NSTDVec`.
+///
+/// # Parameters:
+///
+/// - `NSTDVec *vec` - The vector to free.
+NSTDAPI void nstd_vec_free(NSTDVec *vec);
+
+NSTDCPPEND
 #endif
