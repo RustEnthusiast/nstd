@@ -82,9 +82,8 @@ pub extern "C" fn nstd_vec_reserve(vec: &mut NSTDVec, size: NSTDUSize) -> NSTDEr
         // On success increase the buffer length.
         if errc == 0 {
             vec.buffer.len += size;
-            return 0;
         }
-        1
+        errc
     }
 }
 
