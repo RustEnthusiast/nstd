@@ -28,6 +28,24 @@ typedef struct {
 /// This function will panic if `element_size` is zero.
 NSTDAPI NSTDVec nstd_vec_new(NSTDUSize element_size);
 
+/// Reserves some space on the heap for at least `size` more elements to be pushed onto a vector
+/// without making more allocations.
+///
+/// # Parameters:
+///
+/// - `NSTDVec *vec` - The vector to reserve space for.
+///
+/// - `NSTDUSize size` - The number of additional elements to allocate for.
+///
+/// # Returns
+///
+/// `NSTDErrorCode errc` - Nonzero on error.
+///
+/// # Panics
+///
+/// This operation will panic if `size` is zero.
+NSTDAPI NSTDErrorCode nstd_vec_reserve(NSTDVec *vec, NSTDUSize size);
+
 /// Frees an instance of `NSTDVec`.
 ///
 /// # Parameters:
