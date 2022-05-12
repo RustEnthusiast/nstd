@@ -2,7 +2,8 @@
 use crate::{
     alloc::{nstd_alloc_allocate, nstd_alloc_deallocate, nstd_alloc_reallocate},
     core::{
-        def::{NSTDErrorCode, NSTDUSize},
+        def::{NSTDAnyConst, NSTDErrorCode, NSTDUSize},
+        mem::nstd_core_mem_copy,
         slice::{nstd_core_slice_new, NSTDSlice},
         NSTD_CORE_NULL,
     },
@@ -16,6 +17,13 @@ pub struct NSTDVec {
     pub buffer: NSTDSlice,
     /// The number of active elements in the vector.
     pub len: NSTDUSize,
+}
+impl NSTDVec {
+    /// Returns the number of active bytes in the vector.
+    #[inline]
+    pub(crate) fn byte_len(&self) -> usize {
+        self.len * self.buffer.ptr.size
+    }
 }
 
 /// Creates a new vector without allocating any resources.
@@ -38,6 +46,67 @@ pub extern "C" fn nstd_vec_new(element_size: NSTDUSize) -> NSTDVec {
     NSTDVec {
         buffer: nstd_core_slice_new(NSTD_CORE_NULL, element_size, 0),
         len: 0,
+    }
+}
+
+/// Pushes a value onto a vector by copying bytes to the end of the vector's buffer. The number of
+/// bytes to push is determined by `vec.buffer.ptr.size`.
+///
+/// # Parameters:
+///
+/// - `NSTDVec *vec` - The vector.
+///
+/// - `NSTDAnyConst value` - A pointer to the value to push onto the vector.
+///
+/// # Returns
+///
+/// `NSTDErrorCode errc` - Nonzero on error.
+///
+/// # Safety
+///
+/// This operation is unsafe because undefined behaviour can occur if the size of the value being
+/// pushed onto the vector is not equal to `vec.buffer.ptr.size`.
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_vec_push(vec: &mut NSTDVec, value: NSTDAnyConst) -> NSTDErrorCode {
+    let mut errc = 0;
+    // Checking if the vector has reached it's capacity.
+    if vec.len == vec.buffer.len {
+        let new_cap = (vec.buffer.len.max(1) as f32 * 1.5).ceil() as usize;
+        errc = nstd_vec_reserve(vec, new_cap);
+    }
+    // Copying bytes to the end of the vector.
+    if errc == 0 {
+        let vec_end = vec.buffer.ptr.raw.add(vec.byte_len());
+        nstd_core_mem_copy(vec_end.cast(), value.cast(), vec.buffer.ptr.size);
+        vec.len += 1;
+    }
+    errc
+}
+
+/// Removes the last value of a vector and returns a pointer to it.
+///
+/// # Note
+///
+/// It is highly advised to copy the return value onto the stack because the pointer can easily
+/// become invalid if the vector is mutated.
+///
+/// # Parameters:
+///
+/// - `NSTDVec *vec` - The vector.
+///
+/// # Returns
+///
+/// - `NSTDAnyConst value` - A pointer to the value that was popped off the stack, or null if the
+/// vector is empty.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_vec_pop(vec: &mut NSTDVec) -> NSTDAnyConst {
+    match vec.len {
+        0 => NSTD_CORE_NULL,
+        _ => {
+            vec.len -= 1;
+            unsafe { vec.buffer.ptr.raw.add(vec.byte_len()) }
+        }
     }
 }
 
