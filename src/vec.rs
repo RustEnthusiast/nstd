@@ -2,7 +2,7 @@
 use crate::{
     alloc::{nstd_alloc_allocate, nstd_alloc_deallocate, nstd_alloc_reallocate},
     core::{
-        def::{NSTDAnyConst, NSTDErrorCode, NSTDUSize},
+        def::{NSTDAny, NSTDAnyConst, NSTDErrorCode, NSTDUSize},
         mem::nstd_core_mem_copy,
         slice::{nstd_core_slice_new, NSTDSlice},
         NSTD_CORE_NULL,
@@ -23,6 +23,16 @@ impl NSTDVec {
     #[inline]
     pub(crate) fn byte_len(&self) -> usize {
         self.len * self.buffer.ptr.size
+    }
+
+    /// Returns a pointer to one element past the end of the vector.
+    ///
+    /// # Safety
+    ///
+    /// This method does ***NOT*** check to make sure the vector is non-null.
+    #[inline]
+    pub(crate) unsafe fn end(&self) -> NSTDAny {
+        self.buffer.ptr.raw.add(self.byte_len())
     }
 }
 
@@ -76,8 +86,7 @@ pub unsafe extern "C" fn nstd_vec_push(vec: &mut NSTDVec, value: NSTDAnyConst) -
     }
     // Copying bytes to the end of the vector.
     if errc == 0 {
-        let vec_end = vec.buffer.ptr.raw.add(vec.byte_len());
-        nstd_core_mem_copy(vec_end.cast(), value.cast(), vec.buffer.ptr.size);
+        nstd_core_mem_copy(vec.end().cast(), value.cast(), vec.buffer.ptr.size);
         vec.len += 1;
     }
     errc
@@ -103,7 +112,7 @@ pub unsafe extern "C" fn nstd_vec_push(vec: &mut NSTDVec, value: NSTDAnyConst) -
 pub extern "C" fn nstd_vec_pop(vec: &mut NSTDVec) -> NSTDAnyConst {
     if vec.len > 0 {
         vec.len -= 1;
-        return unsafe { vec.buffer.ptr.raw.add(vec.byte_len()) };
+        return unsafe { vec.end() };
     }
     NSTD_CORE_NULL
 }
@@ -168,20 +177,4 @@ pub extern "C" fn nstd_vec_free(vec: &mut NSTDVec) {
         vec.buffer.len = 0;
         vec.len = 0;
     }
-}
-
-/// 48878
-#[test]
-fn test() {
-    use std::ptr::addr_of_mut;
-    crate::test::run_test(|| unsafe {
-        let mut vec = nstd_vec_new(4);
-        for mut i in 0..100 {
-            nstd_vec_push(&mut vec, addr_of_mut!(i).cast());
-        }
-        for _ in 0..100 {
-            nstd_vec_pop(&mut vec);
-        }
-        nstd_vec_free(&mut vec);
-    });
 }
