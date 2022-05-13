@@ -59,6 +59,55 @@ pub extern "C" fn nstd_vec_new(element_size: NSTDUSize) -> NSTDVec {
     }
 }
 
+/// Returns a pointer to the element at index `pos` in `vec`.
+///
+/// # Note
+///
+/// It is highly advised to copy the return value onto the stack because the pointer can easily
+/// become invalid if the vector is mutated.
+///
+/// # Parameters:
+///
+/// - `NSTDVec *vec` - The vector to read an element from.
+///
+/// - `NSTDUSize pos` - The position of the element to get, starting at 0.
+///
+/// # Returns
+///
+/// `NSTDAny element` - A pointer to the element at `pos` or `NSTD_CORE_NULL` if `pos` is out of
+/// the vector's boundaries.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_vec_get(vec: &mut NSTDVec, pos: NSTDUSize) -> NSTDAny {
+    nstd_vec_get_const(vec, pos) as NSTDAny
+}
+
+/// Returns an immutable pointer to the element at index `pos` in `vec`.
+///
+/// # Note
+///
+/// It is highly advised to copy the return value onto the stack because the pointer can easily
+/// become invalid if the vector is mutated.
+///
+/// # Parameters:
+///
+/// - `const NSTDVec *vec` - The vector to read an element from.
+///
+/// - `NSTDUSize pos` - The position of the element to get, starting at 0.
+///
+/// # Returns
+///
+/// `NSTDAnyConst element` - A pointer to the element at `pos` or `NSTD_CORE_NULL` if `pos` is out
+/// of the vector's boundaries.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_vec_get_const(vec: &NSTDVec, pos: NSTDUSize) -> NSTDAnyConst {
+    match pos < vec.len {
+        true => unsafe { vec.buffer.ptr.raw.add(pos * vec.buffer.ptr.size) },
+        false => NSTD_CORE_NULL,
+    }
+}
+
 /// Pushes a value onto a vector by copying bytes to the end of the vector's buffer. The number of
 /// bytes to push is determined by `vec.buffer.ptr.size`.
 ///
