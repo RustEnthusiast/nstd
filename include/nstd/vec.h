@@ -120,6 +120,21 @@ NSTDAPI NSTDAnyConst nstd_vec_pop(NSTDVec *vec);
 /// This operation will panic if `size` is zero.
 NSTDAPI NSTDErrorCode nstd_vec_reserve(NSTDVec *vec, NSTDUSize size);
 
+/// Decreases a vector's capacity to match it's length.
+///
+/// # Note
+///
+/// This will return an error code of `0` if the vector is "null".
+///
+/// # Parameters:
+///
+/// - `NSTDVec *vec` - The vector.
+///
+/// # Returns
+///
+/// `NSTDErrorCode errc` - Nonzero on error.
+NSTDAPI NSTDErrorCode nstd_vec_shrink(NSTDVec *vec);
+
 /// Frees an instance of `NSTDVec`.
 ///
 /// # Parameters:

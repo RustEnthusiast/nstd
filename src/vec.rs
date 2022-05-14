@@ -212,6 +212,36 @@ pub extern "C" fn nstd_vec_reserve(vec: &mut NSTDVec, size: NSTDUSize) -> NSTDEr
     }
 }
 
+/// Decreases a vector's capacity to match it's length.
+///
+/// # Note
+///
+/// This will return an error code of `0` if the vector is "null".
+///
+/// # Parameters:
+///
+/// - `NSTDVec *vec` - The vector.
+///
+/// # Returns
+///
+/// `NSTDErrorCode errc` - Nonzero on error.
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_vec_shrink(vec: &mut NSTDVec) -> NSTDErrorCode {
+    let mut errc = 0;
+    // Make sure the vector is non-null and it's capacity is greater than it's length.
+    if !vec.buffer.ptr.raw.is_null() && vec.len < vec.buffer.len {
+        let current_len = vec.buffer.byte_len();
+        // Make sure to allocate at least one element to avoid undefined behavior.
+        let new_len = vec.byte_len().max(vec.buffer.ptr.size);
+        errc = unsafe { nstd_alloc_reallocate(&mut vec.buffer.ptr.raw, current_len, new_len) };
+        if errc == 0 {
+            // The buffer's new length is at least 1.
+            vec.buffer.len = vec.len.max(1);
+        }
+    }
+    errc
+}
+
 /// Frees an instance of `NSTDVec`.
 ///
 /// # Parameters:
