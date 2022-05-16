@@ -102,6 +102,32 @@ NSTDAPI NSTDErrorCode nstd_vec_push(NSTDVec *vec, NSTDAnyConst value);
 /// vector is empty.
 NSTDAPI NSTDAnyConst nstd_vec_pop(NSTDVec *vec);
 
+/// Attempts to insert a value into a vector at `index`.
+///
+/// # Parameters:
+///
+/// - `NSTDVec *vec` - The vector.
+///
+/// - `NSTDAnyConst value` - A pointer to the value to insert into the vector.
+///
+/// - `NSTDUSize index` - The index at which to insert the value.
+///
+/// # Returns
+///
+/// `NSTDErrorCode errc` - Nonzero on error.
+///
+/// # Possible errors
+///
+/// - `1` - `index` is greater than the vector's length.
+///
+/// - `2` - Reserving space for the vector failed.
+///
+/// # Safety
+///
+/// This operation is unsafe because undefined behaviour can occur if the size of the value being
+/// inserted into the vector is not equal to `vec.buffer.ptr.size`.
+NSTDAPI NSTDErrorCode nstd_vec_insert(NSTDVec *vec, NSTDAnyConst value, NSTDUSize index);
+
 /// Reserves some space on the heap for at least `size` more elements to be pushed onto a vector
 /// without making more allocations.
 ///

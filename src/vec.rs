@@ -2,8 +2,8 @@
 use crate::{
     alloc::{nstd_alloc_allocate, nstd_alloc_deallocate, nstd_alloc_reallocate},
     core::{
-        def::{NSTDAny, NSTDAnyConst, NSTDErrorCode, NSTDUSize},
-        mem::nstd_core_mem_copy,
+        def::{NSTDAny, NSTDAnyConst, NSTDByte, NSTDErrorCode, NSTDUSize},
+        mem::{nstd_core_mem_copy, nstd_core_mem_copy_overlapping},
         slice::{nstd_core_slice_new, NSTDSlice},
         NSTD_CORE_NULL,
     },
@@ -33,6 +33,16 @@ impl NSTDVec {
     #[inline]
     pub(crate) unsafe fn end(&self) -> NSTDAny {
         self.buffer.ptr.raw.add(self.byte_len())
+    }
+
+    /// Attempts to reserve some memory for the vector if needed.
+    #[inline]
+    pub(crate) fn try_reserve(&mut self) -> NSTDErrorCode {
+        if self.len == self.buffer.len {
+            let new_cap = (self.buffer.len.max(1) as f32 * 1.5).ceil() as usize;
+            return nstd_vec_reserve(self, new_cap);
+        }
+        0
     }
 }
 
@@ -125,15 +135,12 @@ pub extern "C" fn nstd_vec_get_const(vec: &NSTDVec, pos: NSTDUSize) -> NSTDAnyCo
 ///
 /// This operation is unsafe because undefined behaviour can occur if the size of the value being
 /// pushed onto the vector is not equal to `vec.buffer.ptr.size`.
+#[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_vec_push(vec: &mut NSTDVec, value: NSTDAnyConst) -> NSTDErrorCode {
-    let mut errc = 0;
-    // Checking if the vector has reached it's capacity.
-    if vec.len == vec.buffer.len {
-        let new_cap = (vec.buffer.len.max(1) as f32 * 1.5).ceil() as usize;
-        errc = nstd_vec_reserve(vec, new_cap);
-    }
-    // Copying bytes to the end of the vector.
+    // Attempt to reserve space for the push.
+    let errc = vec.try_reserve();
+    // On success: copy bytes to the end of the vector.
     if errc == 0 {
         nstd_core_mem_copy(vec.end().cast(), value.cast(), vec.buffer.ptr.size);
         vec.len += 1;
@@ -164,6 +171,59 @@ pub extern "C" fn nstd_vec_pop(vec: &mut NSTDVec) -> NSTDAnyConst {
         return unsafe { vec.end() };
     }
     NSTD_CORE_NULL
+}
+
+/// Attempts to insert a value into a vector at `index`.
+///
+/// # Parameters:
+///
+/// - `NSTDVec *vec` - The vector.
+///
+/// - `NSTDAnyConst value` - A pointer to the value to insert into the vector.
+///
+/// - `NSTDUSize index` - The index at which to insert the value.
+///
+/// # Returns
+///
+/// `NSTDErrorCode errc` - Nonzero on error.
+///
+/// # Possible errors
+///
+/// - `1` - `index` is greater than the vector's length.
+///
+/// - `2` - Reserving space for the vector failed.
+///
+/// # Safety
+///
+/// This operation is unsafe because undefined behaviour can occur if the size of the value being
+/// inserted into the vector is not equal to `vec.buffer.ptr.size`.
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_vec_insert(
+    vec: &mut NSTDVec,
+    value: NSTDAnyConst,
+    index: NSTDUSize,
+) -> NSTDErrorCode {
+    // Make sure `index` is valid.
+    if index > vec.len {
+        1
+    }
+    // Attempt to reserve space for the insert.
+    else if vec.try_reserve() != 0 {
+        2
+    }
+    // Insert the value.
+    else {
+        // Move elements at/after `index` over by one element.
+        let bytes_to_copy = (vec.len - index) * vec.buffer.ptr.size;
+        let idxpos = index * vec.buffer.ptr.size;
+        let idxptr = vec.buffer.ptr.raw.add(idxpos).cast::<NSTDByte>();
+        let dest = idxptr.add(vec.buffer.ptr.size);
+        nstd_core_mem_copy_overlapping(dest, idxptr, bytes_to_copy);
+        // Write `value` over the old value at `index`.
+        nstd_core_mem_copy(idxptr, value.cast(), vec.buffer.ptr.size);
+        vec.len += 1;
+        0
+    }
 }
 
 /// Reserves some space on the heap for at least `size` more elements to be pushed onto a vector
