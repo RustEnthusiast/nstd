@@ -226,6 +226,39 @@ pub unsafe extern "C" fn nstd_vec_insert(
     }
 }
 
+/// Removes the element at `index` in a vector.
+///
+/// # Parameters:
+///
+/// - `NSTDVec *vec` - The vector.
+///
+/// - `NSTDUSize index` - The index of the element to remove.
+///
+/// # Returns
+///
+/// `NSTDErrorCode errc` - Nonzero if `index` is invalid.
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_vec_remove(vec: &mut NSTDVec, index: NSTDUSize) -> NSTDErrorCode {
+    // Make sure `index` is valid. This also ensures that `vec.len` is at least 1.
+    if index < vec.len {
+        // Move bytes after `index` to the left by one element.
+        let bytes_to_copy = (vec.len - index - 1) * vec.buffer.ptr.size;
+        let idxpos = index * vec.buffer.ptr.size;
+        unsafe {
+            let idxptr = vec.buffer.ptr.raw.add(idxpos).cast::<NSTDByte>();
+            let src = idxptr.add(vec.buffer.ptr.size);
+            nstd_core_mem_copy_overlapping(idxptr, src, bytes_to_copy);
+        }
+        // Decrement the vector's length AFTER shifting the bytes.
+        // This is done here because another thread may attempt to shrink the vector. This would
+        // cause undefined behavior if the vectors length is decremented before shifting the bytes.
+        vec.len -= 1;
+        0
+    } else {
+        1
+    }
+}
+
 /// Reserves some space on the heap for at least `size` more elements to be pushed onto a vector
 /// without making more allocations.
 ///

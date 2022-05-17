@@ -128,6 +128,19 @@ NSTDAPI NSTDAnyConst nstd_vec_pop(NSTDVec *vec);
 /// inserted into the vector is not equal to `vec.buffer.ptr.size`.
 NSTDAPI NSTDErrorCode nstd_vec_insert(NSTDVec *vec, NSTDAnyConst value, NSTDUSize index);
 
+/// Removes the element at `index` in a vector.
+///
+/// # Parameters:
+///
+/// - `NSTDVec *vec` - The vector.
+///
+/// - `NSTDUSize index` - The index of the element to remove.
+///
+/// # Returns
+///
+/// `NSTDErrorCode errc` - Nonzero if `index` is invalid.
+NSTDAPI NSTDErrorCode nstd_vec_remove(NSTDVec *vec, NSTDUSize index);
+
 /// Reserves some space on the heap for at least `size` more elements to be pushed onto a vector
 /// without making more allocations.
 ///
