@@ -28,6 +28,27 @@ typedef struct {
 /// This function will panic if `element_size` is zero.
 NSTDAPI NSTDVec nstd_vec_new(NSTDUSize element_size);
 
+/// Creates a new vector initialized with the given capacity.
+///
+/// # Note
+///
+/// This will return a "null vector" (a vector that has not allocated yet) on error.
+///
+/// # Parameters:
+///
+/// - `NSTDUSize element_size` - The size in bytes of each value in the vector.
+///
+/// - `NSTDUSize cap` - The initial capacity for the vector.
+///
+/// # Returns
+///
+/// `NSTDVec vec` - The new vector.
+///
+/// # Panics
+///
+/// This function will panic if either `element_size` or `cap` are zero.
+NSTDAPI NSTDVec nstd_vec_new_with_cap(NSTDUSize element_size, NSTDUSize cap);
+
 /// Returns a pointer to the element at index `pos` in `vec`.
 ///
 /// # Note

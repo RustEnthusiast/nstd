@@ -69,6 +69,43 @@ pub extern "C" fn nstd_vec_new(element_size: NSTDUSize) -> NSTDVec {
     }
 }
 
+/// Creates a new vector initialized with the given capacity.
+///
+/// # Note
+///
+/// This will return a "null vector" (a vector that has not allocated yet) on error.
+///
+/// # Parameters:
+///
+/// - `NSTDUSize element_size` - The size in bytes of each value in the vector.
+///
+/// - `NSTDUSize cap` - The initial capacity for the vector.
+///
+/// # Returns
+///
+/// `NSTDVec vec` - The new vector.
+///
+/// # Panics
+///
+/// This function will panic if either `element_size` or `cap` are zero.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_vec_new_with_cap(element_size: NSTDUSize, mut cap: NSTDUSize) -> NSTDVec {
+    // Ensure that neither `element_size` or `cap` are zero.
+    assert!(element_size != 0);
+    assert!(cap != 0);
+    // Attempt to allocate the memory buffer.
+    let mem = unsafe { nstd_alloc_allocate(cap * element_size) };
+    if mem.is_null() {
+        cap = 0;
+    }
+    // Construct the vector.
+    NSTDVec {
+        buffer: nstd_core_slice_new(mem, element_size, cap),
+        len: 0,
+    }
+}
+
 /// Returns a pointer to the element at index `pos` in `vec`.
 ///
 /// # Note
