@@ -1,6 +1,6 @@
 import os
 
-FEATURES = ("nstd_alloc", "nstd_core", "nstd_os_alloc")
+FEATURES = ("nstd_alloc", "nstd_core", "nstd_os_alloc", "nstd_vec")
 
 for feature in FEATURES:
     cmd = f"cargo check --quiet --no-default-features --features \"std {feature}\""
