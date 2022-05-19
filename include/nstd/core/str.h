@@ -24,7 +24,7 @@ typedef struct {
 /// # Safety
 ///
 /// This function does not check to ensure that `cstr` is valid UTF-8.
-NSTDAPI NSTDStr nstd_core_str_from_cstr(NSTDChar *cstr);
+NSTDAPI NSTDStr nstd_core_str_from_cstr_unchecked(NSTDChar *cstr);
 
 NSTDCPPEND
 #endif

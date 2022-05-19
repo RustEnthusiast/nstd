@@ -28,7 +28,7 @@ pub struct NSTDStr {
 /// This function does not check to ensure that `cstr` is valid UTF-8.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_str_from_cstr(cstr: *mut NSTDChar) -> NSTDStr {
+pub unsafe extern "C" fn nstd_core_str_from_cstr_unchecked(cstr: *mut NSTDChar) -> NSTDStr {
     let len = nstd_core_cstr_len(cstr);
     NSTDStr {
         bytes: nstd_core_slice_new(cstr.cast(), 1, len),
