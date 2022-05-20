@@ -1,7 +1,7 @@
 #ifndef NSTD_CORE_MEM_H_INCLUDED
 #define NSTD_CORE_MEM_H_INCLUDED
-#include "../core/def.h"
 #include "../nstd.h"
+#include "def.h"
 NSTDCPPSTART
 
 /// Compares two memory buffers of `num` bytes.
