@@ -2,6 +2,7 @@
 //! supports a wide range of systems, including embedded.
 pub mod cstr;
 pub mod def;
+pub mod fty;
 pub mod ity;
 pub mod math;
 pub mod mem;

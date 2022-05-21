@@ -11,6 +11,7 @@ Rust syntax).
     - `core` - The central and most important part of `nstd`.
         - `cstr` - C string processing.
         - `def` - Contains common types used throughout `nstd`.
+        - `fty` - Provides functions for examining and operating on floating point types.
         - `ity` - Provides functions for examining and operating on integral types.
         - `math` - Low level math operations.
         - `mem` - Contains mostly unsafe functions for interacting with raw memory.
