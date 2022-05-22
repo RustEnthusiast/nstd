@@ -39,8 +39,8 @@ impl NSTDVec {
     #[inline]
     pub(crate) fn try_reserve(&mut self) -> NSTDErrorCode {
         if self.len == self.buffer.len {
-            let new_cap = (self.buffer.len.max(1) as f32 * 1.5).ceil() as usize;
-            return nstd_vec_reserve(self, new_cap);
+            let additional = (self.buffer.len.max(1) as f32 * 0.5).ceil() as usize;
+            return nstd_vec_reserve(self, additional);
         }
         0
     }
