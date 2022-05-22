@@ -2,6 +2,7 @@
 #define NSTD_CORE_H_INCLUDED
 #include "core/core.h"
 #include "core/cstr.h"
+#include "core/cty.h"
 #include "core/def.h"
 #include "core/fty.h"
 #include "core/ity.h"
