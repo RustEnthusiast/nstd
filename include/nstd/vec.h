@@ -49,6 +49,21 @@ NSTDAPI NSTDVec nstd_vec_new(NSTDUSize element_size);
 /// This function will panic if either `element_size` or `cap` are zero.
 NSTDAPI NSTDVec nstd_vec_new_with_cap(NSTDUSize element_size, NSTDUSize cap);
 
+/// Creates a new deep copy of `vec`.
+///
+/// # Parameters:
+///
+/// - `const NSTDVec *vec` - The vector to create a new deep copy of.
+///
+/// # Returns
+///
+/// `NSTDVec cloned` - The new deep copy of `vec`.
+///
+/// # Panics
+///
+/// This operation will panic if allocating for the new vector fails.
+NSTDAPI NSTDVec nstd_vec_clone(const NSTDVec *vec);
+
 /// Returns a pointer to the element at index `pos` in `vec`.
 ///
 /// # Note

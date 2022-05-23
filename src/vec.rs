@@ -45,6 +45,13 @@ impl NSTDVec {
         0
     }
 }
+impl Clone for NSTDVec {
+    /// Creates a deep copy of the vector.
+    #[inline]
+    fn clone(&self) -> Self {
+        nstd_vec_clone(self)
+    }
+}
 
 /// Creates a new vector without allocating any resources.
 ///
@@ -103,6 +110,38 @@ pub extern "C" fn nstd_vec_new_with_cap(element_size: NSTDUSize, mut cap: NSTDUS
     NSTDVec {
         buffer: nstd_core_slice_new(mem, element_size, cap),
         len: 0,
+    }
+}
+
+/// Creates a new deep copy of `vec`.
+///
+/// # Parameters:
+///
+/// - `const NSTDVec *vec` - The vector to create a new deep copy of.
+///
+/// # Returns
+///
+/// `NSTDVec cloned` - The new deep copy of `vec`.
+///
+/// # Panics
+///
+/// This operation will panic if allocating for the new vector fails.
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_vec_clone(vec: &NSTDVec) -> NSTDVec {
+    if !vec.buffer.ptr.raw.is_null() {
+        let mut cloned = nstd_vec_new_with_cap(vec.buffer.ptr.size, vec.buffer.len);
+        assert!(!cloned.buffer.ptr.raw.is_null());
+        unsafe {
+            nstd_core_mem_copy(
+                cloned.buffer.ptr.raw.cast(),
+                vec.buffer.ptr.raw.cast(),
+                vec.byte_len(),
+            );
+        }
+        cloned.len = vec.len;
+        cloned
+    } else {
+        nstd_vec_new(vec.buffer.ptr.size)
     }
 }
 
