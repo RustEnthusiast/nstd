@@ -4,5 +4,6 @@
 #include "nstd/core.h"
 #include "nstd/nstd.h"
 #include "nstd/os.h"
+#include "nstd/string.h"
 #include "nstd/vec.h"
 #endif

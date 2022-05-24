@@ -11,6 +11,9 @@ pub mod core;
 #[cfg(feature = "nstd_os")]
 #[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_os")))]
 pub mod os;
+#[cfg(feature = "nstd_string")]
+#[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_string")))]
+pub mod string;
 #[cfg(test)]
 pub(crate) mod test;
 #[cfg(feature = "nstd_vec")]

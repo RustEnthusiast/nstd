@@ -22,6 +22,7 @@ Rust syntax).
     - `os` - Operating system specific functionality.
         - `windows` - OS support for Windows.
             - `alloc` - Low level memory allocation for Windows.
+    - `string` - Dynamically sized UTF-8 encoded byte string.
     - `vec` - A dynamically sized contiguous sequence of values.
 
 # How to build
