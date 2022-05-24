@@ -64,6 +64,17 @@ NSTDAPI NSTDVec nstd_vec_new_with_cap(NSTDUSize element_size, NSTDUSize cap);
 /// This operation will panic if allocating for the new vector fails.
 NSTDAPI NSTDVec nstd_vec_clone(const NSTDVec *vec);
 
+/// Returns a slice containing all of a vector's active elements.
+///
+/// # Parameters:
+///
+/// - `NSTDVec *vec` - The vector.
+///
+/// # Returns
+///
+/// `NSTDSlice slice` - A *mutable* view into the vector.
+NSTDAPI NSTDSlice nstd_vec_as_slice(NSTDVec *vec);
+
 /// Returns a pointer to the element at index `pos` in `vec`.
 ///
 /// # Note

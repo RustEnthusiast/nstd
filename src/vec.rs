@@ -145,6 +145,21 @@ pub extern "C" fn nstd_vec_clone(vec: &NSTDVec) -> NSTDVec {
     }
 }
 
+/// Returns a slice containing all of a vector's active elements.
+///
+/// # Parameters:
+///
+/// - `NSTDVec *vec` - The vector.
+///
+/// # Returns
+///
+/// `NSTDSlice slice` - A *mutable* view into the vector.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_vec_as_slice(vec: &mut NSTDVec) -> NSTDSlice {
+    nstd_core_slice_new(vec.buffer.ptr.raw, vec.buffer.ptr.size, vec.len)
+}
+
 /// Returns a pointer to the element at index `pos` in `vec`.
 ///
 /// # Note
