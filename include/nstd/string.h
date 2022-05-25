@@ -1,5 +1,6 @@
 #ifndef NSTD_STRING_H_INCLUDED
 #define NSTD_STRING_H_INCLUDED
+#include "core/def.h"
 #include "nstd.h"
 #include "vec.h"
 NSTDCPPSTART
@@ -16,6 +17,21 @@ typedef struct {
 ///
 /// `NSTDString string` - The new string.
 NSTDAPI NSTDString nstd_string_new();
+
+/// Creates a new string initialized with the given capacity.
+///
+/// # Parameters:
+///
+/// - `NSTDUSize cap` - The number of bytes to preallocate.
+///
+/// # Returns
+///
+/// `NSTDString string` - The new string.
+///
+/// # Panics
+///
+/// This function will panic if `cap` is zero.
+NSTDAPI NSTDString nstd_string_new_with_cap(NSTDUSize cap);
 
 /// Frees an instance of `NSTDString`.
 ///
