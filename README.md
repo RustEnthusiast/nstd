@@ -5,6 +5,22 @@ The library is organized as a series of modules. The top level module `nstd` enc
 crate. Each module can have their own submodules (eg. `nstd.core.def` or `nstd::core::def` with
 Rust syntax).
 
+# Platform support
+`nstd.core` supports just about everything as it doesn't require the use of Rust's `std` crate.
+
+`nstd.os`'s child modules will only work on the operating system they target. For example,
+`nstd.os.windows` will only work on Windows and `nstd.os.linux` will only work on Linux
+distributions.
+
+Other modules will work on most platforms, primarily targeting Windows, macOS,
+Linux, Android, and iOS.
+
+# Safety notes
+Because `nstd` is a C library, accessing pointer types such as `NSTDPtr` or `NSTDSlice` is
+unsafe because the data being referenced is never guaranteed to be valid. Similarly, pointer
+types allow mutability accross multiple instances (it is legal to have multiple `NSTDPtr`s mutate
+the same value within the same scope).
+
 # Modules
 - `nstd` - A cross-platform, fast, and safe general purpose C library written in Rust.
     - `alloc` - Low level memory allocation.
@@ -33,5 +49,10 @@ feature flag. The `std` feature flag enables Rust standard library support, all 
 
 For example:
 ```
-cargo build --features "clib nstd_alloc nstd_vec"
+cargo build --release --features "clib nstd_alloc nstd_vec"
+```
+
+To build with all features:
+```
+cargo build --release --all-features
 ```
