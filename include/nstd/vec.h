@@ -188,6 +188,27 @@ NSTDAPI NSTDErrorCode nstd_vec_insert(NSTDVec *vec, NSTDAnyConst value, NSTDUSiz
 /// `NSTDErrorCode errc` - Nonzero if `index` is invalid.
 NSTDAPI NSTDErrorCode nstd_vec_remove(NSTDVec *vec, NSTDUSize index);
 
+/// Pushes a series of values onto a vector.
+///
+/// # Parameters:
+///
+/// - `NSTDVec *vec` - The vector to extend.
+///
+/// - `const NSTDSlice *values` - A slice of values to push onto the vector.
+///
+/// # Returns
+///
+/// `NSTDErrorCode errc` - Nonzero if reserving memory for the extension fails.
+///
+/// # Panics
+///
+/// This operation will panic if the element sizes for `vec` and `values` do not match.
+///
+/// # Safety
+///
+/// This operation is unsafe because `values`'s data is never guaranteed to be valid.
+NSTDAPI NSTDErrorCode nstd_vec_extend(NSTDVec *vec, const NSTDSlice *values);
+
 /// Reserves some space on the heap for at least `size` more elements to be pushed onto a vector
 /// without making more allocations.
 ///
