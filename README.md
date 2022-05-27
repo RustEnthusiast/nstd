@@ -25,6 +25,22 @@ Rust syntax).
     - `string` - Dynamically sized UTF-8 encoded byte string.
     - `vec` - A dynamically sized contiguous sequence of values.
 
+# Platform support
+`nstd.core` supports just about everything as it doesn't require the use of Rust's `std` crate.
+
+`nstd.os`'s child modules will only work on the operating system they target. For example,
+`nstd.os.windows` will only work on Windows and `nstd.os.linux` will only work on Linux
+distributions.
+
+Other modules will work on most platforms, primarily targeting Windows, macOS,
+Linux, Android, and iOS.
+
+# Safety notes
+Because `nstd` is a C library, accessing pointer types such as `NSTDPtr` or `NSTDSlice` is
+unsafe because the data being referenced is never guaranteed to be valid. Similarly, pointer
+types allow mutability across multiple instances (it is legal to have multiple `NSTDPtr`s mutate
+the same value within the same scope).
+
 # How to build
 `nstd` let's you decide what features you want to use. Any module that falls under the top level
 module has a dedicated feature flag, for example `nstd.core` has the feature flag `nstd_core` and
@@ -34,5 +50,10 @@ feature flag. The `std` feature flag enables Rust standard library support, all 
 
 For example:
 ```
-cargo build --features "clib nstd_alloc nstd_vec"
+cargo build --release --features "clib nstd_alloc nstd_vec"
+```
+
+To build with all features:
+```
+cargo build --release --all-features
 ```

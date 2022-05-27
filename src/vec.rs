@@ -350,6 +350,43 @@ pub extern "C" fn nstd_vec_remove(vec: &mut NSTDVec, index: NSTDUSize) -> NSTDEr
     }
 }
 
+/// Pushes a series of values onto a vector.
+///
+/// # Parameters:
+///
+/// - `NSTDVec *vec` - The vector to extend.
+///
+/// - `const NSTDSlice *values` - A slice of values to push onto the vector.
+///
+/// # Returns
+///
+/// `NSTDErrorCode errc` - Nonzero if reserving memory for the extension fails.
+///
+/// # Panics
+///
+/// This operation will panic if the element sizes for `vec` and `values` do not match.
+///
+/// # Safety
+///
+/// This operation is unsafe because `values`'s data is never guaranteed to be valid.
+pub unsafe extern "C" fn nstd_vec_extend(vec: &mut NSTDVec, values: &NSTDSlice) -> NSTDErrorCode {
+    // Ensure value sizes are the same for both the vector and the slice.
+    assert!(vec.buffer.ptr.size == values.ptr.size);
+    // Making sure there's enough space for the extension.
+    let mut errc = 0;
+    let reserved = vec.buffer.len - vec.len;
+    if reserved < values.len {
+        let additional = values.len - reserved;
+        errc = nstd_vec_reserve(vec, additional);
+    }
+    // On success copy bytes to the end of the vector.
+    if errc == 0 {
+        nstd_core_mem_copy(vec.end().cast(), values.ptr.raw.cast(), values.byte_len());
+        vec.len += values.len;
+    }
+    errc
+}
+
 /// Reserves some space on the heap for at least `size` more elements to be pushed onto a vector
 /// without making more allocations.
 ///
