@@ -369,6 +369,7 @@ pub extern "C" fn nstd_vec_remove(vec: &mut NSTDVec, index: NSTDUSize) -> NSTDEr
 /// # Safety
 ///
 /// This operation is unsafe because `values`'s data is never guaranteed to be valid.
+#[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_vec_extend(vec: &mut NSTDVec, values: &NSTDSlice) -> NSTDErrorCode {
     // Ensure value sizes are the same for both the vector and the slice.
     assert!(vec.buffer.ptr.size == values.ptr.size);
