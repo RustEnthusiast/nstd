@@ -33,6 +33,19 @@ NSTDAPI NSTDString nstd_string_new();
 /// This function will panic if `cap` is zero.
 NSTDAPI NSTDString nstd_string_new_with_cap(NSTDUSize cap);
 
+/// Pushes an `NSTDUnichar` onto the end of a string.
+///
+/// # Parameters:
+///
+/// - `NSTDString *string` - The string to append the character to.
+///
+/// - `NSTDUnichar chr` - The Unicode character to append to the string.
+///
+/// # Returns
+///
+/// `NSTDErrorCode errc` - Nonzero on error.
+NSTDAPI NSTDErrorCode nstd_string_push(NSTDString *string, NSTDUnichar chr);
+
 /// Frees an instance of `NSTDString`.
 ///
 /// # Parameters:
