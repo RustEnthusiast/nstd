@@ -209,6 +209,19 @@ NSTDAPI NSTDErrorCode nstd_vec_remove(NSTDVec *vec, NSTDUSize index);
 /// This operation is unsafe because `values`'s data is never guaranteed to be valid.
 NSTDAPI NSTDErrorCode nstd_vec_extend(NSTDVec *vec, const NSTDSlice *values);
 
+/// Shortens a vector, keeping the first `len` elements.
+///
+/// # Note
+///
+/// This function does nothing if `vec.len` is less than or equal to `len`.
+///
+/// # Parameters:
+///
+/// - `NSTDVec *vec` - The vector to truncate.
+///
+/// - `NSTDUSize len` - The number of elements to keep.
+NSTDAPI void nstd_vec_truncate(NSTDVec *vec, NSTDUSize len);
+
 /// Reserves some space on the heap for at least `size` more elements to be pushed onto a vector
 /// without making more allocations.
 ///
