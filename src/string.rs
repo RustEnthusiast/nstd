@@ -4,7 +4,10 @@ use crate::{
         def::{NSTDErrorCode, NSTDUSize, NSTDUnichar},
         slice::nstd_core_slice_new,
     },
-    vec::{nstd_vec_extend, nstd_vec_free, nstd_vec_new, nstd_vec_new_with_cap, NSTDVec},
+    vec::{
+        nstd_vec_clone, nstd_vec_extend, nstd_vec_free, nstd_vec_new, nstd_vec_new_with_cap,
+        NSTDVec,
+    },
 };
 
 /// Dynamically sized UTF-8 encoded byte string.
@@ -46,6 +49,27 @@ pub extern "C" fn nstd_string_new() -> NSTDString {
 pub extern "C" fn nstd_string_new_with_cap(cap: NSTDUSize) -> NSTDString {
     NSTDString {
         bytes: nstd_vec_new_with_cap(1, cap),
+    }
+}
+
+/// Creates a deep copy of a string.
+///
+/// # Parameters:
+///
+/// - `const NSTDString *string` - The string to create a deep copy of.
+///
+/// # Returns
+///
+/// `NSTDString cloned` - A new deep copy of `string`.
+///
+/// # Panics
+///
+/// This function will panic if allocating for the new string fails.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_string_clone(string: &NSTDString) -> NSTDString {
+    NSTDString {
+        bytes: nstd_vec_clone(&string.bytes),
     }
 }
 

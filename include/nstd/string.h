@@ -33,6 +33,21 @@ NSTDAPI NSTDString nstd_string_new();
 /// This function will panic if `cap` is zero.
 NSTDAPI NSTDString nstd_string_new_with_cap(NSTDUSize cap);
 
+/// Creates a deep copy of a string.
+///
+/// # Parameters:
+///
+/// - `const NSTDString *string` - The string to create a deep copy of.
+///
+/// # Returns
+///
+/// `NSTDString cloned` - A new deep copy of `string`.
+///
+/// # Panics
+///
+/// This function will panic if allocating for the new string fails.
+NSTDAPI NSTDString nstd_string_clone(const NSTDString *string);
+
 /// Pushes an `NSTDUnichar` onto the end of a string.
 ///
 /// # Parameters:
