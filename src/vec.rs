@@ -388,6 +388,25 @@ pub unsafe extern "C" fn nstd_vec_extend(vec: &mut NSTDVec, values: &NSTDSlice) 
     errc
 }
 
+/// Shortens a vector, keeping the first `len` elements.
+///
+/// # Note
+///
+/// This function does nothing if `vec.len` is less than or equal to `len`.
+///
+/// # Parameters:
+///
+/// - `NSTDVec *vec` - The vector to truncate.
+///
+/// - `NSTDUSize len` - The number of elements to keep.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_vec_truncate(vec: &mut NSTDVec, len: NSTDUSize) {
+    if vec.len > len {
+        vec.len = len;
+    }
+}
+
 /// Reserves some space on the heap for at least `size` more elements to be pushed onto a vector
 /// without making more allocations.
 ///
