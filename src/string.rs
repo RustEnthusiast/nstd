@@ -3,10 +3,11 @@ use crate::{
     core::{
         def::{NSTDErrorCode, NSTDUSize, NSTDUnichar},
         slice::nstd_core_slice_new,
+        str::{nstd_core_str_from_bytes_unchecked, NSTDStr},
     },
     vec::{
-        nstd_vec_clone, nstd_vec_extend, nstd_vec_free, nstd_vec_new, nstd_vec_new_with_cap,
-        nstd_vec_truncate, NSTDVec,
+        nstd_vec_as_slice, nstd_vec_clone, nstd_vec_extend, nstd_vec_free, nstd_vec_new,
+        nstd_vec_new_with_cap, nstd_vec_truncate, NSTDVec,
     },
 };
 
@@ -71,6 +72,23 @@ pub extern "C" fn nstd_string_clone(string: &NSTDString) -> NSTDString {
     NSTDString {
         bytes: nstd_vec_clone(&string.bytes),
     }
+}
+
+/// Creates a string slice containing the contents of `string`.
+///
+/// # Parameters:
+///
+/// - `NSTDString *string` - The string.
+///
+/// # Returns
+///
+/// `NSTDStr str` - The new string slice.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_string_as_str(string: &mut NSTDString) -> NSTDStr {
+    let bytes = nstd_vec_as_slice(&mut string.bytes);
+    // SAFETY: The string's bytes are always be UTF-8 encoded.
+    unsafe { nstd_core_str_from_bytes_unchecked(&bytes) }
 }
 
 /// Pushes an `NSTDUnichar` onto the end of a string.

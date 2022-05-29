@@ -26,5 +26,24 @@ typedef struct {
 /// This function does not check to ensure that `cstr` is valid UTF-8.
 NSTDAPI NSTDStr nstd_core_str_from_cstr_unchecked(NSTDChar *cstr);
 
+/// Creates a string slice from raw bytes, without checking for UTF-8.
+///
+/// # Parameters:
+///
+/// - `NSTDSlice *bytes` - The UTF-8 encoded byte slice.
+///
+/// # Returns
+///
+/// `NSTDStr str` - The new string slice.
+///
+/// # Panics
+///
+/// This operation will panic if `bytes.ptr.size` is not 1.
+///
+/// # Safety
+///
+/// This function does not check to ensure that `bytes` is valid UTF-8.
+NSTDAPI NSTDStr nstd_core_str_from_bytes_unchecked(NSTDSlice *bytes);
+
 NSTDCPPEND
 #endif

@@ -1,6 +1,7 @@
 #ifndef NSTD_STRING_H_INCLUDED
 #define NSTD_STRING_H_INCLUDED
 #include "core/def.h"
+#include "core/str.h"
 #include "nstd.h"
 #include "vec.h"
 NSTDCPPSTART
@@ -47,6 +48,17 @@ NSTDAPI NSTDString nstd_string_new_with_cap(NSTDUSize cap);
 ///
 /// This function will panic if allocating for the new string fails.
 NSTDAPI NSTDString nstd_string_clone(const NSTDString *string);
+
+/// Creates a string slice containing the contents of `string`.
+///
+/// # Parameters:
+///
+/// - `NSTDString *string` - The string.
+///
+/// # Returns
+///
+/// `NSTDStr str` - The new string slice.
+NSTDAPI NSTDStr nstd_string_as_str(NSTDString *string);
 
 /// Pushes an `NSTDUnichar` onto the end of a string.
 ///

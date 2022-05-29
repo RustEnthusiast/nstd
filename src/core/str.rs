@@ -34,3 +34,27 @@ pub unsafe extern "C" fn nstd_core_str_from_cstr_unchecked(cstr: *mut NSTDChar) 
         bytes: nstd_core_slice_new(cstr.cast(), 1, len),
     }
 }
+
+/// Creates a string slice from raw bytes, without checking for UTF-8.
+///
+/// # Parameters:
+///
+/// - `NSTDSlice *bytes` - The UTF-8 encoded byte slice.
+///
+/// # Returns
+///
+/// `NSTDStr str` - The new string slice.
+///
+/// # Panics
+///
+/// This operation will panic if `bytes.ptr.size` is not 1.
+///
+/// # Safety
+///
+/// This function does not check to ensure that `bytes` is valid UTF-8.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_core_str_from_bytes_unchecked(bytes: &NSTDSlice) -> NSTDStr {
+    assert!(bytes.ptr.size == 1);
+    NSTDStr { bytes: *bytes }
+}
