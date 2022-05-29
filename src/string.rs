@@ -6,7 +6,7 @@ use crate::{
     },
     vec::{
         nstd_vec_clone, nstd_vec_extend, nstd_vec_free, nstd_vec_new, nstd_vec_new_with_cap,
-        NSTDVec,
+        nstd_vec_truncate, NSTDVec,
     },
 };
 
@@ -94,6 +94,28 @@ pub extern "C" fn nstd_string_push(string: &mut NSTDString, chr: NSTDUnichar) ->
         return unsafe { nstd_vec_extend(&mut string.bytes, &buf) };
     }
     1
+}
+
+/// Removes the last character from a string and returns it.
+///
+/// # Parameters:
+///
+/// - `NSTDString *string` - The string to pop.
+///
+/// # Returns
+///
+/// `NSTDUnichar chr` - The removed character, or the Unicode replacement character on error.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_string_pop(string: &mut NSTDString) -> NSTDUnichar {
+    // SAFETY: `NSTDString` is always UTF-8 encoded.
+    let str = unsafe { std::str::from_utf8_unchecked(string.bytes.as_slice()) };
+    if let Some(chr) = str.chars().last() {
+        let len = string.bytes.len - chr.len_utf8();
+        nstd_vec_truncate(&mut string.bytes, len);
+        return chr as NSTDUnichar;
+    }
+    char::REPLACEMENT_CHARACTER as NSTDUnichar
 }
 
 /// Frees an instance of `NSTDString`.

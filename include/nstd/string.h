@@ -61,6 +61,17 @@ NSTDAPI NSTDString nstd_string_clone(const NSTDString *string);
 /// `NSTDErrorCode errc` - Nonzero on error.
 NSTDAPI NSTDErrorCode nstd_string_push(NSTDString *string, NSTDUnichar chr);
 
+/// Removes the last character from a string and returns it.
+///
+/// # Parameters:
+///
+/// - `NSTDString *string` - The string to pop.
+///
+/// # Returns
+///
+/// `NSTDUnichar chr` - The removed character, or the Unicode replacement character on error.
+NSTDAPI NSTDUnichar nstd_string_pop(NSTDString *string);
+
 /// Frees an instance of `NSTDString`.
 ///
 /// # Parameters:

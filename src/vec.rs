@@ -25,6 +25,12 @@ impl NSTDVec {
         self.len * self.buffer.ptr.size
     }
 
+    /// Creates a Rust byte slice containing all the *active* elements from this `NSTDVec`.
+    #[inline]
+    pub(crate) fn as_slice(&self) -> &[u8] {
+        unsafe { core::slice::from_raw_parts(self.buffer.ptr.raw.cast(), self.byte_len()) }
+    }
+
     /// Returns a pointer to one element past the end of the vector.
     ///
     /// # Safety
