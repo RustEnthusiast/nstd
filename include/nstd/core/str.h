@@ -45,5 +45,23 @@ NSTDAPI NSTDStr nstd_core_str_from_cstr_unchecked(NSTDChar *cstr);
 /// This function does not check to ensure that `bytes` is valid UTF-8.
 NSTDAPI NSTDStr nstd_core_str_from_bytes_unchecked(NSTDSlice *bytes);
 
+/// Gets the `NSTDUnichar` at index `pos` in `str`.
+///
+/// # Note
+///
+/// `pos` does not refer to the byte index of the character, but the `NSTDUnichar` index instead.
+///
+/// # Parameters:
+///
+/// - `const NSTDStr *str` - The string slice to index.
+///
+/// - `NSTDUSize pos` - The index of the character to get.
+///
+/// # Returns
+///
+/// `NSTDUnichar chr` - The character at index `pos`, or the Unicode replacement character on
+/// error.
+NSTDAPI NSTDUnichar nstd_core_str_get_char(const NSTDStr *str, NSTDUSize pos);
+
 NSTDCPPEND
 #endif
