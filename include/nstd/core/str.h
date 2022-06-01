@@ -76,6 +76,10 @@ NSTDAPI NSTDStr nstd_core_str_from_bytes_unchecked(NSTDSlice *bytes);
 ///
 /// `NSTDUnichar chr` - The character at index `pos`, or the Unicode replacement character on
 /// error.
+///
+/// # Safety
+///
+/// This function is unsafe because the string slice's data may be invalid at the time of access.
 NSTDAPI NSTDUnichar nstd_core_str_get_char(const NSTDStr *str, NSTDUSize pos);
 
 NSTDCPPEND

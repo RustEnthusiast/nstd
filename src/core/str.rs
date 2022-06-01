@@ -96,11 +96,15 @@ pub unsafe extern "C" fn nstd_core_str_from_bytes_unchecked(bytes: &NSTDSlice) -
 ///
 /// `NSTDUnichar chr` - The character at index `pos`, or the Unicode replacement character on
 /// error.
+///
+/// # Safety
+///
+/// This function is unsafe because the string slice's data may be invalid at the time of access.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_str_get_char(str: &NSTDStr, pos: NSTDUSize) -> NSTDUnichar {
+pub unsafe extern "C" fn nstd_core_str_get_char(str: &NSTDStr, pos: NSTDUSize) -> NSTDUnichar {
     // SAFETY: String slices are always valid UTF-8.
-    let str = unsafe { core::str::from_utf8_unchecked(str.bytes.as_slice()) };
+    let str = core::str::from_utf8_unchecked(str.bytes.as_slice());
     match str.chars().nth(pos) {
         Some(chr) => chr as NSTDUnichar,
         _ => char::REPLACEMENT_CHARACTER as NSTDUnichar,
