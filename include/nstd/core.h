@@ -9,6 +9,7 @@
 #include "core/math.h"
 #include "core/mem.h"
 #include "core/ptr.h"
+#include "core/range.h"
 #include "core/slice.h"
 #include "core/str.h"
 #include "nstd.h"
