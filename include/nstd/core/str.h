@@ -2,6 +2,7 @@
 #define NSTD_CORE_STR_H_INCLUDED
 #include "../nstd.h"
 #include "def.h"
+#include "range.h"
 #include "slice.h"
 NSTDCPPSTART
 
@@ -81,6 +82,34 @@ NSTDAPI NSTDStr nstd_core_str_from_bytes_unchecked(NSTDSlice *bytes);
 ///
 /// This function is unsafe because the string slice's data may be invalid at the time of access.
 NSTDAPI NSTDUnichar nstd_core_str_get_char(const NSTDStr *str, NSTDUSize pos);
+
+/// Creates a substring of an existing string slice.
+///
+/// # Note
+///
+/// This function is considered safe because the returned string slice is already unsafe to operate
+/// on.
+///
+/// # Parameters:
+///
+/// - `NSTDStr *str` - The string slice to create the new substring from.
+///
+/// - `NSTDURange range` - The bounds of the new substring (indexed by bytes).
+///
+/// # Returns
+///
+/// `NSTDStr substr` - The new substring.
+///
+/// # Panics
+///
+/// This operation can panic under the following circumstances:
+///
+/// - `range.end` is greater than `str.bytes.len`.
+///
+/// - `range.start` is greater than `range.end`.
+///
+/// - The substring bytes are not valid UTF-8.
+NSTDAPI NSTDStr nstd_core_str_substr(NSTDStr *str, NSTDURange range);
 
 NSTDCPPEND
 #endif

@@ -2,6 +2,7 @@
 use crate::core::{
     cstr::nstd_core_cstr_len,
     def::{NSTDChar, NSTDUSize, NSTDUnichar},
+    range::NSTDURange,
     slice::{nstd_core_slice_new, NSTDSlice},
 };
 
@@ -109,4 +110,41 @@ pub unsafe extern "C" fn nstd_core_str_get_char(str: &NSTDStr, pos: NSTDUSize) -
         Some(chr) => chr as NSTDUnichar,
         _ => char::REPLACEMENT_CHARACTER as NSTDUnichar,
     }
+}
+
+/// Creates a substring of an existing string slice.
+///
+/// # Note
+///
+/// This function is considered safe because the returned string slice is already unsafe to operate
+/// on.
+///
+/// # Parameters:
+///
+/// - `NSTDStr *str` - The string slice to create the new substring from.
+///
+/// - `NSTDURange range` - The bounds of the new substring (indexed by bytes).
+///
+/// # Returns
+///
+/// `NSTDStr substr` - The new substring.
+///
+/// # Panics
+///
+/// This operation can panic under the following circumstances:
+///
+/// - `range.end` is greater than `str.bytes.len`.
+///
+/// - `range.start` is greater than `range.end`.
+///
+/// - The substring bytes are not valid UTF-8.
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_core_str_substr(str: &mut NSTDStr, range: NSTDURange) -> NSTDStr {
+    // Make sure the range is valid for the bounds of `str`.
+    assert!(range.end <= str.bytes.len);
+    assert!(range.start <= range.end);
+    // Create the byte slice with `range` and use it to create the new string slice.
+    let start = unsafe { str.bytes.ptr.raw.add(range.start) };
+    let bytes = nstd_core_slice_new(start, 1, range.end - range.start);
+    nstd_core_str_from_bytes(&bytes)
 }
