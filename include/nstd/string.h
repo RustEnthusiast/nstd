@@ -73,6 +73,19 @@ NSTDAPI NSTDStr nstd_string_as_str(NSTDString *string);
 /// `NSTDErrorCode errc` - Nonzero on error.
 NSTDAPI NSTDErrorCode nstd_string_push(NSTDString *string, NSTDUnichar chr);
 
+/// Appends a string slice to the end of a string.
+///
+/// # Parameters:
+///
+/// - `NSTDString *string` - The string.
+///
+/// - `const NSTDStr *str` - The string slice to append to the end of `string`.
+///
+/// # Returns
+///
+/// `NSTDErrorCode errc` - Nonzero on error.
+NSTDAPI NSTDErrorCode nstd_string_push_str(NSTDString *string, const NSTDStr *str);
+
 /// Removes the last character from a string and returns it.
 ///
 /// # Parameters:

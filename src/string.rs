@@ -114,6 +114,23 @@ pub extern "C" fn nstd_string_push(string: &mut NSTDString, chr: NSTDUnichar) ->
     1
 }
 
+/// Appends a string slice to the end of a string.
+///
+/// # Parameters:
+///
+/// - `NSTDString *string` - The string.
+///
+/// - `const NSTDStr *str` - The string slice to append to the end of `string`.
+///
+/// # Returns
+///
+/// `NSTDErrorCode errc` - Nonzero on error.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_string_push_str(string: &mut NSTDString, str: &NSTDStr) -> NSTDErrorCode {
+    unsafe { nstd_vec_extend(&mut string.bytes, &str.bytes) }
+}
+
 /// Removes the last character from a string and returns it.
 ///
 /// # Parameters:
