@@ -4,10 +4,9 @@
 //!
 //! The functions in this module must be provided valid C strings, as they do not accept null
 //! pointers.
-use crate::core::{
-    def::{NSTDBool, NSTDChar, NSTDUSize},
-    ptr::nstd_core_ptr_new,
-    slice::NSTDSlice,
+use crate::{
+    core::{def::NSTDChar, ptr::nstd_core_ptr_new, slice::NSTDSlice},
+    NSTDBool, NSTDUSize,
 };
 
 /// Creates a byte slice over a C string, excluding the null terminator.

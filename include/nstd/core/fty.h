@@ -1,7 +1,6 @@
 #ifndef NSTD_CORE_FTY_H_INCLUDED
 #define NSTD_CORE_FTY_H_INCLUDED
 #include "../nstd.h"
-#include "def.h"
 NSTDCPPSTART
 
 /// Returns the smallest finite value representable by `NSTDFloat32`.

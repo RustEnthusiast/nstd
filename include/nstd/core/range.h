@@ -1,7 +1,6 @@
 #ifndef NSTD_CORE_RANGE_H_INCLUDED
 #define NSTD_CORE_RANGE_H_INCLUDED
 #include "../nstd.h"
-#include "def.h"
 
 /// A half-open (low inclusive, high exclusive) arch-bit unsigned numerical range.
 typedef struct {

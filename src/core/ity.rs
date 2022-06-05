@@ -1,5 +1,8 @@
 //! Provides functions for examining and operating on integral types.
-use crate::core::def::*;
+use crate::{
+    NSTDISize, NSTDInt16, NSTDInt32, NSTDInt64, NSTDInt8, NSTDUInt16, NSTDUInt32, NSTDUInt64,
+    NSTDUInt8, NSTDUSize,
+};
 
 /// Generates the `min` and `max` functions.
 macro_rules! gen_min_max {

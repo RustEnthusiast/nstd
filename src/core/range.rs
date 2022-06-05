@@ -1,5 +1,8 @@
 //! A half-open (low inclusive, high exclusive) numerical range.
-use crate::core::def::*;
+use crate::{
+    NSTDFloat32, NSTDFloat64, NSTDISize, NSTDInt16, NSTDInt32, NSTDInt64, NSTDInt8, NSTDUInt16,
+    NSTDUInt32, NSTDUInt64, NSTDUInt8, NSTDUSize,
+};
 
 /// Generates the `NSTD*Range*` structs.
 macro_rules! gen_range_struct {

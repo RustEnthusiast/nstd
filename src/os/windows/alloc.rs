@@ -1,5 +1,8 @@
 //! Low level memory allocation for Windows.
-use crate::core::def::{NSTDAny, NSTDErrorCode, NSTDUSize};
+use crate::{
+    core::def::{NSTDAny, NSTDErrorCode},
+    NSTDUSize,
+};
 use windows_sys::Win32::System::Memory::{
     GetProcessHeap, HeapAlloc, HeapFree, HeapReAlloc, HEAP_FLAGS, HEAP_ZERO_MEMORY,
 };

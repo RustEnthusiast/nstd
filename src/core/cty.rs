@@ -3,7 +3,7 @@
 //! # Note
 //!
 //! Functions in this module that return a boolean will always return false on error.
-use crate::core::def::{NSTDBool, NSTDUnichar};
+use crate::{NSTDBool, NSTDUnichar};
 
 /// Returns the Unicode replacement character (�).
 ///

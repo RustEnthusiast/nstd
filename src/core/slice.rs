@@ -1,9 +1,12 @@
 //! A view into a sequence of values in memory.
-use crate::core::{
-    def::{NSTDAny, NSTDAnyConst, NSTDBool, NSTDUSize},
-    mem::nstd_core_mem_copy,
-    ptr::{nstd_core_ptr_new, NSTDPtr},
-    NSTD_CORE_NULL,
+use crate::{
+    core::{
+        def::{NSTDAny, NSTDAnyConst},
+        mem::nstd_core_mem_copy,
+        ptr::{nstd_core_ptr_new, NSTDPtr},
+        NSTD_CORE_NULL,
+    },
+    NSTDBool, NSTDUSize,
 };
 
 /// A view into a sequence of values in memory.

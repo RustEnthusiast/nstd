@@ -2,11 +2,12 @@
 use crate::{
     alloc::{nstd_alloc_allocate, nstd_alloc_deallocate, nstd_alloc_reallocate},
     core::{
-        def::{NSTDAny, NSTDAnyConst, NSTDByte, NSTDErrorCode, NSTDUSize},
+        def::{NSTDAny, NSTDAnyConst, NSTDByte, NSTDErrorCode},
         mem::{nstd_core_mem_copy, nstd_core_mem_copy_overlapping},
         slice::{nstd_core_slice_new, NSTDSlice},
         NSTD_CORE_NULL,
     },
+    NSTDUSize,
 };
 
 /// A dynamically sized contiguous sequence of values.

@@ -1,9 +1,12 @@
 //! An unowned view into a UTF-8 encoded byte string.
-use crate::core::{
-    cstr::nstd_core_cstr_len,
-    def::{NSTDChar, NSTDUSize, NSTDUnichar},
-    range::NSTDURange,
-    slice::{nstd_core_slice_new, NSTDSlice},
+use crate::{
+    core::{
+        cstr::nstd_core_cstr_len,
+        def::NSTDChar,
+        range::NSTDURange,
+        slice::{nstd_core_slice_new, NSTDSlice},
+    },
+    NSTDUSize, NSTDUnichar,
 };
 
 /// An unowned view into a UTF-8 encoded byte string.

@@ -1,5 +1,8 @@
 //! Low level memory allocation.
-use crate::core::def::{NSTDAny, NSTDErrorCode, NSTDUSize};
+use crate::{
+    core::def::{NSTDAny, NSTDErrorCode},
+    NSTDUSize,
+};
 
 /// Allocates a block of memory on the heap.
 /// The number of bytes to be allocated is specified by `size`.

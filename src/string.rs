@@ -1,7 +1,7 @@
 //! Dynamically sized UTF-8 encoded byte string.
 use crate::{
     core::{
-        def::{NSTDErrorCode, NSTDUSize, NSTDUnichar},
+        def::NSTDErrorCode,
         slice::nstd_core_slice_new,
         str::{nstd_core_str_from_bytes_unchecked, NSTDStr},
     },
@@ -9,6 +9,7 @@ use crate::{
         nstd_vec_as_slice, nstd_vec_clone, nstd_vec_extend, nstd_vec_free, nstd_vec_new,
         nstd_vec_new_with_cap, nstd_vec_truncate, NSTDVec,
     },
+    NSTDUSize, NSTDUnichar,
 };
 
 /// Dynamically sized UTF-8 encoded byte string.

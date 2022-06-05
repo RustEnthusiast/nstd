@@ -1,7 +1,6 @@
 #ifndef NSTD_CORE_CTY_H_INCLUDED
 #define NSTD_CORE_CTY_H_INCLUDED
 #include "../nstd.h"
-#include "def.h"
 NSTDCPPSTART
 
 /// Returns the Unicode replacement character (�).

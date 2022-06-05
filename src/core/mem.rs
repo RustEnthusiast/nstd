@@ -1,5 +1,5 @@
 //! Contains mostly unsafe functions for interacting with raw memory.
-use crate::core::def::{NSTDBool, NSTDByte, NSTDUSize};
+use crate::{core::def::NSTDByte, NSTDBool, NSTDUSize};
 
 /// Compares two memory buffers of `num` bytes.
 ///

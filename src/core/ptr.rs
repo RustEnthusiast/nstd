@@ -1,7 +1,10 @@
 //! A sized pointer to some arbitrary type.
-use crate::core::{
-    def::{NSTDAny, NSTDAnyConst, NSTDUSize},
-    mem::nstd_core_mem_copy,
+use crate::{
+    core::{
+        def::{NSTDAny, NSTDAnyConst},
+        mem::nstd_core_mem_copy,
+    },
+    NSTDUSize,
 };
 
 /// A sized pointer to some arbitrary type.

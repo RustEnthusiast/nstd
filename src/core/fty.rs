@@ -1,5 +1,5 @@
 //! Provides functions for examining and operating on floating point types.
-use crate::core::def::{NSTDFloat32, NSTDFloat64};
+use crate::{NSTDFloat32, NSTDFloat64};
 
 /// Returns the smallest finite value representable by `NSTDFloat32`.
 ///
