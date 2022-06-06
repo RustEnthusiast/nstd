@@ -17,7 +17,7 @@ use crate::{
 #[derive(Clone, Debug, Hash)]
 pub struct NSTDString {
     /// The underlying UTF-8 encoded byte buffer.
-    pub bytes: NSTDVec,
+    bytes: NSTDVec,
 }
 
 /// Creates a new instance of `NSTDString`.
