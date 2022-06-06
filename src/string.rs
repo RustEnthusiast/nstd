@@ -2,7 +2,7 @@
 use crate::{
     core::{
         def::NSTDErrorCode,
-        slice::nstd_core_slice_new,
+        slice::{nstd_core_slice_new, NSTDSlice},
         str::{nstd_core_str_from_bytes_unchecked, NSTDStr},
     },
     vec::{
@@ -90,6 +90,25 @@ pub extern "C" fn nstd_string_as_str(string: &mut NSTDString) -> NSTDStr {
     let bytes = nstd_vec_as_slice(&mut string.bytes);
     // SAFETY: The string's bytes are always be UTF-8 encoded.
     unsafe { nstd_core_str_from_bytes_unchecked(&bytes) }
+}
+
+/// Returns a byte slice of the string's active data.
+///
+/// # Parameters:
+///
+/// - `NSTDString *string` - The string.
+///
+/// # Returns
+///
+/// `NSTDSlice bytes` - The string's active data.
+///
+/// # Safety
+///
+/// This method is unsafe because mutating the bytes can lead to undefined behavior.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_string_as_bytes(string: &mut NSTDString) -> NSTDSlice {
+    nstd_vec_as_slice(&mut string.bytes)
 }
 
 /// Pushes an `NSTDUnichar` onto the end of a string.

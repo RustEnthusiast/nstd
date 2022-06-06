@@ -1,6 +1,7 @@
 #ifndef NSTD_STRING_H_INCLUDED
 #define NSTD_STRING_H_INCLUDED
 #include "core/def.h"
+#include "core/slice.h"
 #include "core/str.h"
 #include "nstd.h"
 #include "vec.h"
@@ -59,6 +60,21 @@ NSTDAPI NSTDString nstd_string_clone(const NSTDString *string);
 ///
 /// `NSTDStr str` - The new string slice.
 NSTDAPI NSTDStr nstd_string_as_str(NSTDString *string);
+
+/// Returns a byte slice of the string's active data.
+///
+/// # Parameters:
+///
+/// - `NSTDString *string` - The string.
+///
+/// # Returns
+///
+/// `NSTDSlice bytes` - The string's active data.
+///
+/// # Safety
+///
+/// This method is unsafe because mutating the bytes can lead to undefined behavior.
+NSTDAPI NSTDSlice nstd_string_as_bytes(NSTDString *string);
 
 /// Pushes an `NSTDUnichar` onto the end of a string.
 ///
