@@ -6,8 +6,8 @@ use crate::{
         str::{nstd_core_str_from_bytes_unchecked, NSTDStr},
     },
     vec::{
-        nstd_vec_as_slice, nstd_vec_clone, nstd_vec_extend, nstd_vec_free, nstd_vec_new,
-        nstd_vec_new_with_cap, nstd_vec_truncate, NSTDVec,
+        nstd_vec_as_slice, nstd_vec_clone, nstd_vec_extend, nstd_vec_free, nstd_vec_len,
+        nstd_vec_new, nstd_vec_new_with_cap, nstd_vec_truncate, NSTDVec,
     },
     NSTDUSize, NSTDUnichar,
 };
@@ -147,7 +147,7 @@ pub extern "C" fn nstd_string_pop(string: &mut NSTDString) -> NSTDUnichar {
     // SAFETY: `NSTDString` is always UTF-8 encoded.
     let str = unsafe { std::str::from_utf8_unchecked(string.bytes.as_slice()) };
     if let Some(chr) = str.chars().last() {
-        let len = string.bytes.len - chr.len_utf8();
+        let len = nstd_vec_len(&string.bytes) - chr.len_utf8();
         nstd_vec_truncate(&mut string.bytes, len);
         return chr as NSTDUnichar;
     }

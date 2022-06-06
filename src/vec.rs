@@ -15,9 +15,9 @@ use crate::{
 #[derive(Debug, Hash)]
 pub struct NSTDVec {
     /// The underlying memory buffer.
-    pub buffer: NSTDSlice,
+    buffer: NSTDSlice,
     /// The number of active elements in the vector.
-    pub len: NSTDUSize,
+    len: NSTDUSize,
 }
 impl NSTDVec {
     /// Returns the number of active bytes in the vector.
@@ -150,6 +150,21 @@ pub extern "C" fn nstd_vec_clone(vec: &NSTDVec) -> NSTDVec {
     } else {
         nstd_vec_new(vec.buffer.ptr.size)
     }
+}
+
+/// Returns the length of a vector.
+///
+/// # Parameters:
+///
+/// - `const NSTDVec *vec` - The vector.
+///
+/// # Returns
+///
+/// `NSTDUSize len` - The length of the vector.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_vec_len(vec: &NSTDVec) -> NSTDUSize {
+    vec.len
 }
 
 /// Returns a slice containing all of a vector's active elements.

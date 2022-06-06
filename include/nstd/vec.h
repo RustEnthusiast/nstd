@@ -64,6 +64,17 @@ NSTDAPI NSTDVec nstd_vec_new_with_cap(NSTDUSize element_size, NSTDUSize cap);
 /// This operation will panic if allocating for the new vector fails.
 NSTDAPI NSTDVec nstd_vec_clone(const NSTDVec *vec);
 
+/// Returns the length of a vector.
+///
+/// # Parameters:
+///
+/// - `const NSTDVec *vec` - The vector.
+///
+/// # Returns
+///
+/// `NSTDUSize len` - The length of the vector.
+NSTDAPI NSTDUSize nstd_vec_len(const NSTDVec *vec);
+
 /// Returns a slice containing all of a vector's active elements.
 ///
 /// # Parameters:
