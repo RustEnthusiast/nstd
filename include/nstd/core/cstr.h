@@ -36,6 +36,11 @@ NSTDAPI NSTDSlice nstd_core_cstr_as_slice_with_null(NSTDChar *cstr);
 /// # Returns
 ///
 /// `NSTDUSize len` - The length of the C string, excluding the null byte.
+///
+/// # Safety
+///
+/// The C string's buffer may not be large enough to contain the null byte, resulting in an
+/// incorrect length.
 NSTDAPI NSTDUSize nstd_core_cstr_len(const NSTDChar *cstr);
 
 /// Gets the length of a null terminated C string, including the null byte.
@@ -47,6 +52,11 @@ NSTDAPI NSTDUSize nstd_core_cstr_len(const NSTDChar *cstr);
 /// # Returns
 ///
 /// `NSTDUSize len` - The length of the C string, including the null byte.
+///
+/// # Safety
+///
+/// The C string's buffer may not be large enough to contain the null byte, resulting in an
+/// incorrect length.
 NSTDAPI NSTDUSize nstd_core_cstr_len_with_null(const NSTDChar *cstr);
 
 /// Compares two C strings, returning `NSTD_BOOL_TRUE` if they are lexicographically equal.
@@ -60,6 +70,10 @@ NSTDAPI NSTDUSize nstd_core_cstr_len_with_null(const NSTDChar *cstr);
 /// # Returns
 ///
 /// `NSTDBool is_eq` - `NSTD_BOOL_TRUE` if the C strings are lexicographically equal.
+///
+/// # Safety
+///
+/// This function is unsafe because the C string's null byte may be outside of it's memory buffer.
 NSTDAPI NSTDBool nstd_core_cstr_compare(const NSTDChar *cstr1, const NSTDChar *cstr2);
 
 /// Copies the contents of `src` to `dest`, excluding the null terminator.

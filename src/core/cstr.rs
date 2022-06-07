@@ -21,7 +21,8 @@ use crate::{
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_cstr_as_slice(cstr: *mut NSTDChar) -> NSTDSlice {
-    let len = nstd_core_cstr_len(cstr);
+    // SAFETY: The slice is already unsafe to access.
+    let len = unsafe { nstd_core_cstr_len(cstr) };
     NSTDSlice {
         ptr: nstd_core_ptr_new(cstr.cast(), 1),
         len,
@@ -40,7 +41,8 @@ pub extern "C" fn nstd_core_cstr_as_slice(cstr: *mut NSTDChar) -> NSTDSlice {
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_cstr_as_slice_with_null(cstr: *mut NSTDChar) -> NSTDSlice {
-    let len = nstd_core_cstr_len_with_null(cstr);
+    // SAFETY: The slice is already unsafe to access.
+    let len = unsafe { nstd_core_cstr_len_with_null(cstr) };
     NSTDSlice {
         ptr: nstd_core_ptr_new(cstr.cast(), 1),
         len,
@@ -56,11 +58,16 @@ pub extern "C" fn nstd_core_cstr_as_slice_with_null(cstr: *mut NSTDChar) -> NSTD
 /// # Returns
 ///
 /// `NSTDUSize len` - The length of the C string, excluding the null byte.
+///
+/// # Safety
+///
+/// The C string's buffer may not be large enough to contain the null byte, resulting in an
+/// incorrect length.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_cstr_len(cstr: *const NSTDChar) -> NSTDUSize {
+pub unsafe extern "C" fn nstd_core_cstr_len(cstr: *const NSTDChar) -> NSTDUSize {
     let mut i = 0;
-    while unsafe { *cstr.add(i) } != 0 {
+    while *cstr.add(i) != 0 {
         i += 1;
     }
     i
@@ -75,9 +82,14 @@ pub extern "C" fn nstd_core_cstr_len(cstr: *const NSTDChar) -> NSTDUSize {
 /// # Returns
 ///
 /// `NSTDUSize len` - The length of the C string, including the null byte.
+///
+/// # Safety
+///
+/// The C string's buffer may not be large enough to contain the null byte, resulting in an
+/// incorrect length.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_cstr_len_with_null(cstr: *const NSTDChar) -> NSTDUSize {
+pub unsafe extern "C" fn nstd_core_cstr_len_with_null(cstr: *const NSTDChar) -> NSTDUSize {
     nstd_core_cstr_len(cstr) + 1
 }
 
@@ -92,8 +104,12 @@ pub extern "C" fn nstd_core_cstr_len_with_null(cstr: *const NSTDChar) -> NSTDUSi
 /// # Returns
 ///
 /// `NSTDBool is_eq` - `NSTD_BOOL_TRUE` if the C strings are lexicographically equal.
+///
+/// # Safety
+///
+/// This function is unsafe because the C string's null byte may be outside of it's memory buffer.
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_cstr_compare(
+pub unsafe extern "C" fn nstd_core_cstr_compare(
     mut cstr1: *const NSTDChar,
     mut cstr2: *const NSTDChar,
 ) -> NSTDBool {
@@ -102,16 +118,14 @@ pub extern "C" fn nstd_core_cstr_compare(
         return NSTDBool::NSTD_BOOL_TRUE;
     }
     // Otherwise compare them lexicographically.
-    unsafe {
-        loop {
-            if *cstr1 != *cstr2 {
-                return NSTDBool::NSTD_BOOL_FALSE;
-            } else if *cstr1 == 0 && *cstr2 == 0 {
-                return NSTDBool::NSTD_BOOL_TRUE;
-            }
-            cstr1 = cstr1.add(1);
-            cstr2 = cstr2.add(1);
+    loop {
+        if *cstr1 != *cstr2 {
+            return NSTDBool::NSTD_BOOL_FALSE;
+        } else if *cstr1 == 0 && *cstr2 == 0 {
+            return NSTDBool::NSTD_BOOL_TRUE;
         }
+        cstr1 = cstr1.add(1);
+        cstr2 = cstr2.add(1);
     }
 }
 
