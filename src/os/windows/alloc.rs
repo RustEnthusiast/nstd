@@ -1,6 +1,9 @@
 //! Low level memory allocation for Windows.
 use crate::{
-    core::def::{NSTDAny, NSTDErrorCode},
+    core::{
+        def::{NSTDAny, NSTDErrorCode},
+        NSTD_CORE_NULL,
+    },
     NSTDUSize,
 };
 use windows_sys::Win32::System::Memory::{
@@ -97,6 +100,6 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_reallocate(
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_os_windows_alloc_deallocate(ptr: &mut NSTDAny) -> NSTDErrorCode {
     let memptr = *ptr;
-    *ptr = std::ptr::null_mut();
+    *ptr = NSTD_CORE_NULL;
     (HeapFree(GetProcessHeap(), HEAP_FLAGS::default(), memptr) == 0) as NSTDErrorCode
 }

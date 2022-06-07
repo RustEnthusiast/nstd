@@ -1,4 +1,6 @@
 //! Low level memory allocation.
+#[cfg(not(target_os = "windows"))]
+extern crate alloc;
 use crate::{
     core::def::{NSTDAny, NSTDErrorCode},
     NSTDUSize,
@@ -23,9 +25,9 @@ use crate::{
 pub unsafe extern "C" fn nstd_alloc_allocate(size: NSTDUSize) -> NSTDAny {
     #[cfg(not(target_os = "windows"))]
     {
-        use std::alloc::Layout;
+        use alloc::alloc::Layout;
         let layout = Layout::from_size_align_unchecked(size, 1);
-        std::alloc::alloc(layout).cast()
+        alloc::alloc::alloc(layout).cast()
     }
     #[cfg(target_os = "windows")]
     {
@@ -51,9 +53,9 @@ pub unsafe extern "C" fn nstd_alloc_allocate(size: NSTDUSize) -> NSTDAny {
 pub unsafe extern "C" fn nstd_alloc_allocate_zeroed(size: NSTDUSize) -> NSTDAny {
     #[cfg(not(target_os = "windows"))]
     {
-        use std::alloc::Layout;
+        use alloc::alloc::Layout;
         let layout = Layout::from_size_align_unchecked(size, 1);
-        std::alloc::alloc_zeroed(layout).cast()
+        alloc::alloc::alloc_zeroed(layout).cast()
     }
     #[cfg(target_os = "windows")]
     {
@@ -93,9 +95,9 @@ pub unsafe extern "C" fn nstd_alloc_reallocate(
 ) -> NSTDErrorCode {
     #[cfg(not(target_os = "windows"))]
     {
-        use std::alloc::Layout;
+        use alloc::alloc::Layout;
         let layout = Layout::from_size_align_unchecked(size, 1);
-        let new_mem = std::alloc::realloc((*ptr).cast(), layout, new_size);
+        let new_mem = alloc::alloc::realloc((*ptr).cast(), layout, new_size);
         if !new_mem.is_null() {
             *ptr = new_mem.cast();
             return 0;
@@ -127,9 +129,9 @@ pub unsafe extern "C" fn nstd_alloc_deallocate(ptr: &mut NSTDAny, size: NSTDUSiz
     #[cfg(not(target_os = "windows"))]
     {
         use crate::core::NSTD_CORE_NULL;
-        use std::alloc::Layout;
+        use alloc::alloc::Layout;
         let layout = Layout::from_size_align_unchecked(size, 1);
-        std::alloc::dealloc((*ptr).cast(), layout);
+        alloc::alloc::dealloc((*ptr).cast(), layout);
         *ptr = NSTD_CORE_NULL;
     }
     #[cfg(target_os = "windows")]
