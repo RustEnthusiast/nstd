@@ -164,7 +164,7 @@ pub extern "C" fn nstd_string_push_str(string: &mut NSTDString, str: &NSTDStr) -
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_string_pop(string: &mut NSTDString) -> NSTDUnichar {
     // SAFETY: `NSTDString` is always UTF-8 encoded.
-    let str = unsafe { std::str::from_utf8_unchecked(string.bytes.as_slice()) };
+    let str = unsafe { core::str::from_utf8_unchecked(string.bytes.as_slice()) };
     if let Some(chr) = str.chars().last() {
         let len = nstd_vec_len(&string.bytes) - chr.len_utf8();
         nstd_vec_truncate(&mut string.bytes, len);
