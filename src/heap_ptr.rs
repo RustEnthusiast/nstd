@@ -17,30 +17,6 @@ pub struct NSTDHeapPtr {
     ptr: NSTDPtr,
 }
 
-/// Creates a new zero-initialized heap allocated object.
-///
-/// # Parameters:
-///
-/// - `NSTDUSize element_size` - The size (in bytes) of the heap object.
-///
-/// # Returns
-///
-/// `NSTDHeapPtr hptr` - The new heap allocated object.
-///
-/// # Panics
-///
-/// This function will panic if either `element_size` is zero, or allocation fails.
-#[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_heap_ptr_new(element_size: NSTDUSize) -> NSTDHeapPtr {
-    assert!(element_size != 0);
-    let mem = unsafe { nstd_alloc_allocate_zeroed(element_size) };
-    assert!(!mem.is_null());
-    NSTDHeapPtr {
-        ptr: nstd_core_ptr_new(mem, element_size),
-    }
-}
-
 /// Creates a new initialized heap allocated object.
 ///
 /// # Parameters:
@@ -62,7 +38,7 @@ pub extern "C" fn nstd_heap_ptr_new(element_size: NSTDUSize) -> NSTDHeapPtr {
 /// This operation is unsafe because passing `init` as a null pointer can cause undefined behavior.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_heap_ptr_new_initialized(
+pub unsafe extern "C" fn nstd_heap_ptr_new(
     element_size: NSTDUSize,
     init: NSTDAnyConst,
 ) -> NSTDHeapPtr {
@@ -70,6 +46,30 @@ pub unsafe extern "C" fn nstd_heap_ptr_new_initialized(
     let mem = nstd_alloc_allocate(element_size);
     assert!(!mem.is_null());
     nstd_core_mem_copy(mem.cast(), init.cast(), element_size);
+    NSTDHeapPtr {
+        ptr: nstd_core_ptr_new(mem, element_size),
+    }
+}
+
+/// Creates a new zero-initialized heap allocated object.
+///
+/// # Parameters:
+///
+/// - `NSTDUSize element_size` - The size (in bytes) of the heap object.
+///
+/// # Returns
+///
+/// `NSTDHeapPtr hptr` - The new heap allocated object.
+///
+/// # Panics
+///
+/// This function will panic if either `element_size` is zero, or allocation fails.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_heap_ptr_new_zeroed(element_size: NSTDUSize) -> NSTDHeapPtr {
+    assert!(element_size != 0);
+    let mem = unsafe { nstd_alloc_allocate_zeroed(element_size) };
+    assert!(!mem.is_null());
     NSTDHeapPtr {
         ptr: nstd_core_ptr_new(mem, element_size),
     }

@@ -11,21 +11,6 @@ typedef struct {
     NSTDPtr ptr;
 } NSTDHeapPtr;
 
-/// Creates a new zero-initialized heap allocated object.
-///
-/// # Parameters:
-///
-/// - `NSTDUSize element_size` - The size (in bytes) of the heap object.
-///
-/// # Returns
-///
-/// `NSTDHeapPtr hptr` - The new heap allocated object.
-///
-/// # Panics
-///
-/// This function will panic if either `element_size` is zero, or allocation fails.
-NSTDAPI NSTDHeapPtr nstd_heap_ptr_new(NSTDUSize element_size);
-
 /// Creates a new initialized heap allocated object.
 ///
 /// # Parameters:
@@ -45,7 +30,22 @@ NSTDAPI NSTDHeapPtr nstd_heap_ptr_new(NSTDUSize element_size);
 /// # Safety
 ///
 /// This operation is unsafe because passing `init` as a null pointer can cause undefined behavior.
-NSTDAPI NSTDHeapPtr nstd_heap_ptr_new_initialized(NSTDUSize element_size, NSTDAnyConst init);
+NSTDAPI NSTDHeapPtr nstd_heap_ptr_new(NSTDUSize element_size, NSTDAnyConst init);
+
+/// Creates a new zero-initialized heap allocated object.
+///
+/// # Parameters:
+///
+/// - `NSTDUSize element_size` - The size (in bytes) of the heap object.
+///
+/// # Returns
+///
+/// `NSTDHeapPtr hptr` - The new heap allocated object.
+///
+/// # Panics
+///
+/// This function will panic if either `element_size` is zero, or allocation fails.
+NSTDAPI NSTDHeapPtr nstd_heap_ptr_new_zeroed(NSTDUSize element_size);
 
 /// Returns a raw pointer to the object on the heap.
 ///
