@@ -86,7 +86,7 @@ pub unsafe extern "C" fn nstd_heap_ptr_new_initialized(
 /// `NSTDAny ptr` - A raw pointer to the object on the heap.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_heap_ptr_read(hptr: &mut NSTDHeapPtr) -> NSTDAny {
+pub extern "C" fn nstd_heap_ptr_get(hptr: &mut NSTDHeapPtr) -> NSTDAny {
     hptr.ptr.raw
 }
 

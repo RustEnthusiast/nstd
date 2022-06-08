@@ -56,7 +56,7 @@ NSTDAPI NSTDHeapPtr nstd_heap_ptr_new_initialized(NSTDUSize element_size, NSTDAn
 /// # Returns
 ///
 /// `NSTDAny ptr` - A raw pointer to the object on the heap.
-NSTDAPI NSTDAny nstd_heap_ptr_read(NSTDHeapPtr *hptr);
+NSTDAPI NSTDAny nstd_heap_ptr_get(NSTDHeapPtr *hptr);
 
 /// Frees an instance of `NSTDHeapPtr`.
 ///
