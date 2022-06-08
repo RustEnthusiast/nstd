@@ -26,6 +26,27 @@ typedef struct {
 /// This function will panic if either `element_size` is zero, or allocation fails.
 NSTDAPI NSTDHeapPtr nstd_heap_ptr_new(NSTDUSize element_size);
 
+/// Creates a new initialized heap allocated object.
+///
+/// # Parameters:
+///
+/// - `NSTDUSize element_size` - The size (in bytes) of the heap object.
+///
+/// - `NSTDAnyConst init` - A pointer to the object to initialize the heap object with.
+///
+/// # Returns
+///
+/// `NSTDHeapPtr hptr` - The new heap allocated object.
+///
+/// # Panics
+///
+/// This function will panic if either `element_size` is zero, or allocation fails.
+///
+/// # Safety
+///
+/// This operation is unsafe because passing `init` as a null pointer can cause undefined behavior.
+NSTDAPI NSTDHeapPtr nstd_heap_ptr_new_initialized(NSTDUSize element_size, NSTDAnyConst init);
+
 /// Returns a raw pointer to the object on the heap.
 ///
 /// # Parameters:
