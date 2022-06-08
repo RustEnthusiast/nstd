@@ -1,7 +1,10 @@
 //! A pointer type for single value heap allocation.
 use crate::{
     alloc::{nstd_alloc_allocate_zeroed, nstd_alloc_deallocate},
-    core::ptr::{nstd_core_ptr_new, NSTDPtr},
+    core::{
+        def::NSTDAny,
+        ptr::{nstd_core_ptr_new, NSTDPtr},
+    },
     NSTDUSize,
 };
 
@@ -35,6 +38,21 @@ pub extern "C" fn nstd_heap_ptr_new(element_size: NSTDUSize) -> NSTDHeapPtr {
     NSTDHeapPtr {
         ptr: nstd_core_ptr_new(mem, element_size),
     }
+}
+
+/// Returns a raw pointer to the object on the heap.
+///
+/// # Parameters:
+///
+/// - `NSTDHeapPtr *hptr` - The heap pointer.
+///
+/// # Returns
+///
+/// `NSTDAny ptr` - A raw pointer to the object on the heap.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_heap_ptr_read(hptr: &mut NSTDHeapPtr) -> NSTDAny {
+    hptr.ptr.raw
 }
 
 /// Frees an instance of `NSTDHeapPtr`.
