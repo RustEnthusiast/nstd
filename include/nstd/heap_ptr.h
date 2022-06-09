@@ -69,6 +69,17 @@ NSTDAPI NSTDUSize nstd_heap_ptr_size(const NSTDHeapPtr *hptr);
 /// `NSTDAny ptr` - A raw pointer to the object on the heap.
 NSTDAPI NSTDAny nstd_heap_ptr_get(NSTDHeapPtr *hptr);
 
+/// Returns an immutable raw pointer to the object on the heap.
+///
+/// # Parameters:
+///
+/// - `const NSTDHeapPtr *hptr` - The heap pointer.
+///
+/// # Returns
+///
+/// `NSTDAnyConst ptr` - A raw pointer to the object on the heap.
+NSTDAPI NSTDAnyConst nstd_heap_ptr_get_const(const NSTDHeapPtr *hptr);
+
 /// Frees an instance of `NSTDHeapPtr`.
 ///
 /// # Parameters:

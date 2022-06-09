@@ -105,6 +105,21 @@ pub extern "C" fn nstd_heap_ptr_get(hptr: &mut NSTDHeapPtr) -> NSTDAny {
     hptr.ptr.raw
 }
 
+/// Returns an immutable raw pointer to the object on the heap.
+///
+/// # Parameters:
+///
+/// - `const NSTDHeapPtr *hptr` - The heap pointer.
+///
+/// # Returns
+///
+/// `NSTDAnyConst ptr` - A raw pointer to the object on the heap.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_heap_ptr_get_const(hptr: &NSTDHeapPtr) -> NSTDAnyConst {
+    hptr.ptr.raw
+}
+
 /// Frees an instance of `NSTDHeapPtr`.
 ///
 /// # Parameters:
