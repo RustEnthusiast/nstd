@@ -39,7 +39,7 @@ NSTDAPI NSTDPtr nstd_core_ptr_new(NSTDAny obj, NSTDUSize size);
 ///
 /// This operation is unsafe because there is no way of knowing if the object being pointed to is
 /// still valid.
-NSTDAPI NSTDAny nstd_core_ptr_read(NSTDPtr *ptr);
+NSTDAPI NSTDAny nstd_core_ptr_get(NSTDPtr *ptr);
 
 /// Returns a raw immutable pointer to the object pointed to by `ptr`.
 ///
@@ -55,7 +55,7 @@ NSTDAPI NSTDAny nstd_core_ptr_read(NSTDPtr *ptr);
 ///
 /// This operation is unsafe because there is no way of knowing if the object being pointed to is
 /// still valid.
-NSTDAPI NSTDAnyConst nstd_core_ptr_read_const(const NSTDPtr *ptr);
+NSTDAPI NSTDAnyConst nstd_core_ptr_get_const(const NSTDPtr *ptr);
 
 /// Writes data from `obj` to `ptr`. The number of bytes written is determined by `ptr.size`.
 ///

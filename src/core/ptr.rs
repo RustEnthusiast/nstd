@@ -50,7 +50,7 @@ pub extern "C" fn nstd_core_ptr_new(obj: NSTDAny, size: NSTDUSize) -> NSTDPtr {
 /// still valid.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_ptr_read(ptr: &mut NSTDPtr) -> NSTDAny {
+pub unsafe extern "C" fn nstd_core_ptr_get(ptr: &mut NSTDPtr) -> NSTDAny {
     ptr.raw
 }
 
@@ -70,7 +70,7 @@ pub unsafe extern "C" fn nstd_core_ptr_read(ptr: &mut NSTDPtr) -> NSTDAny {
 /// still valid.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_ptr_read_const(ptr: &NSTDPtr) -> NSTDAnyConst {
+pub unsafe extern "C" fn nstd_core_ptr_get_const(ptr: &NSTDPtr) -> NSTDAnyConst {
     ptr.raw
 }
 
