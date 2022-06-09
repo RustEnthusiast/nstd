@@ -20,6 +20,7 @@ Rust syntax).
         - `range` - A half-open (low inclusive, high exclusive) numerical range.
         - `slice` - A view into a sequence of values in memory.
         - `str` - An unowned view into a UTF-8 encoded byte string.
+    - `heap_ptr` - A pointer type for single value heap allocation.
     - `os` - Operating system specific functionality.
         - `windows` - OS support for Windows.
             - `alloc` - Low level memory allocation for Windows.
