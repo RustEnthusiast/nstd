@@ -47,6 +47,17 @@ NSTDAPI NSTDHeapPtr nstd_heap_ptr_new(NSTDUSize element_size, NSTDAnyConst init)
 /// This function will panic if either `element_size` is zero, or allocation fails.
 NSTDAPI NSTDHeapPtr nstd_heap_ptr_new_zeroed(NSTDUSize element_size);
 
+/// Returns the size of the heap allocated object.
+///
+/// # Parameters:
+///
+/// - `const NSTDHeapPtr *hptr` - The heap pointer.
+///
+/// # Returns
+///
+/// `NSTDUSize size` - The size of the heap allocated object.
+NSTDAPI NSTDUSize nstd_heap_ptr_size(const NSTDHeapPtr *hptr);
+
 /// Returns a raw pointer to the object on the heap.
 ///
 /// # Parameters:

@@ -75,6 +75,21 @@ pub extern "C" fn nstd_heap_ptr_new_zeroed(element_size: NSTDUSize) -> NSTDHeapP
     }
 }
 
+/// Returns the size of the heap allocated object.
+///
+/// # Parameters:
+///
+/// - `const NSTDHeapPtr *hptr` - The heap pointer.
+///
+/// # Returns
+///
+/// `NSTDUSize size` - The size of the heap allocated object.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_heap_ptr_size(hptr: &NSTDHeapPtr) -> NSTDUSize {
+    hptr.ptr.size
+}
+
 /// Returns a raw pointer to the object on the heap.
 ///
 /// # Parameters:
