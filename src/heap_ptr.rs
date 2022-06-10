@@ -16,6 +16,13 @@ pub struct NSTDHeapPtr {
     /// A pointer to the value on the heap.
     ptr: NSTDPtr,
 }
+impl Clone for NSTDHeapPtr {
+    /// Creates a clone of the [NSTDHeapPtr].
+    #[inline]
+    fn clone(&self) -> Self {
+        nstd_heap_ptr_clone(self)
+    }
+}
 
 /// Creates a new initialized heap allocated object.
 ///
@@ -72,6 +79,30 @@ pub extern "C" fn nstd_heap_ptr_new_zeroed(element_size: NSTDUSize) -> NSTDHeapP
     assert!(!mem.is_null());
     NSTDHeapPtr {
         ptr: nstd_core_ptr_new(mem, element_size),
+    }
+}
+
+/// Creates a clone of a heap allocated object.
+///
+/// # Parameters:
+///
+/// - `const NSTDHeapPtr *hptr` - The heap pointer.
+///
+/// # Returns
+///
+/// `NSTDHeapPtr cloned` - A new clone of the original heap object.
+///
+/// # Panics
+///
+/// This function will panic if allocation fails.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_heap_ptr_clone(hptr: &NSTDHeapPtr) -> NSTDHeapPtr {
+    let mem = unsafe { nstd_alloc_allocate(hptr.ptr.size) };
+    assert!(!mem.is_null());
+    unsafe { nstd_core_mem_copy(mem.cast(), hptr.ptr.raw.cast(), hptr.ptr.size) };
+    NSTDHeapPtr {
+        ptr: nstd_core_ptr_new(mem, hptr.ptr.size),
     }
 }
 

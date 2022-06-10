@@ -47,6 +47,21 @@ NSTDAPI NSTDHeapPtr nstd_heap_ptr_new(NSTDUSize element_size, NSTDAnyConst init)
 /// This function will panic if either `element_size` is zero, or allocation fails.
 NSTDAPI NSTDHeapPtr nstd_heap_ptr_new_zeroed(NSTDUSize element_size);
 
+/// Creates a clone of a heap allocated object.
+///
+/// # Parameters:
+///
+/// - `const NSTDHeapPtr *hptr` - The heap pointer.
+///
+/// # Returns
+///
+/// `NSTDHeapPtr cloned` - A new clone of the original heap object.
+///
+/// # Panics
+///
+/// This function will panic if allocation fails.
+NSTDAPI NSTDHeapPtr nstd_heap_ptr_clone(const NSTDHeapPtr *hptr);
+
 /// Returns the size of the heap allocated object.
 ///
 /// # Parameters:
