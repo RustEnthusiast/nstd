@@ -16,13 +16,6 @@ pub struct NSTDHeapPtr {
     /// A pointer to the value on the heap.
     ptr: NSTDPtr,
 }
-impl Clone for NSTDHeapPtr {
-    /// Creates a clone of the [NSTDHeapPtr].
-    #[inline]
-    fn clone(&self) -> Self {
-        nstd_heap_ptr_clone(self)
-    }
-}
 
 /// Creates a new initialized heap allocated object.
 ///

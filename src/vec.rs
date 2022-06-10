@@ -52,13 +52,6 @@ impl NSTDVec {
         0
     }
 }
-impl Clone for NSTDVec {
-    /// Creates a deep copy of the vector.
-    #[inline]
-    fn clone(&self) -> Self {
-        nstd_vec_clone(self)
-    }
-}
 
 /// Creates a new vector without allocating any resources.
 ///

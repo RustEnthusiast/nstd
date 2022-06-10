@@ -14,7 +14,7 @@ use crate::{
 
 /// Dynamically sized UTF-8 encoded byte string.
 #[repr(C)]
-#[derive(Clone, Debug, Hash)]
+#[derive(Debug, Hash)]
 pub struct NSTDString {
     /// The underlying UTF-8 encoded byte buffer.
     bytes: NSTDVec,
