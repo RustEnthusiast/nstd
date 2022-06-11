@@ -20,6 +20,11 @@
 #include <stddef.h>
 #include <stdint.h>
 
+/// Boolean value false (0).
+#define NSTD_FALSE 0
+/// Boolean value true (1).
+#define NSTD_TRUE 1
+
 /// An integral type who's size matches the target architecture's pointer size.
 typedef ptrdiff_t NSTDISize;
 /// An unsigned integral type who's size matches the target architecture's pointer size.
@@ -56,12 +61,7 @@ typedef NSTDUInt32 NSTDChar32;
 /// Represents a Unicode scalar value.
 typedef NSTDChar32 NSTDUnichar;
 
-/// A boolean type, can either be `NSTD_BOOL_TRUE` (1) or `NSTD_BOOL_FALSE` (0).
-typedef enum {
-    /// Boolean value false (0).
-    NSTD_BOOL_FALSE,
-    /// Boolean value true (1).
-    NSTD_BOOL_TRUE
-} NSTDBool;
+/// A boolean type, can either be `NSTD_TRUE` (1) or `NSTD_FALSE` (0).
+typedef NSTDUInt8 NSTDBool;
 
 #endif

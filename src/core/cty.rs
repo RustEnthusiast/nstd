@@ -3,7 +3,7 @@
 //! # Note
 //!
 //! Functions in this module that return a boolean will always return false on error.
-use crate::{NSTDBool, NSTDUnichar};
+use crate::{NSTDBool, NSTDUnichar, NSTD_FALSE};
 
 /// Returns the Unicode replacement character (�).
 ///
@@ -29,7 +29,7 @@ macro_rules! gen_deterministic {
         pub extern "C" fn $name(chr: NSTDUnichar) -> NSTDBool {
             match char::from_u32(chr) {
                 Some(chr) => chr.$method().into(),
-                _ => NSTDBool::NSTD_BOOL_FALSE,
+                _ => NSTD_FALSE,
             }
         }
     };
@@ -43,7 +43,7 @@ gen_deterministic!(
     ///
     /// # Returns
     ///
-    /// `NSTDBool is_alphabetic` - `NSTD_BOOL_TRUE` if `chr` is alphabetic.
+    /// `NSTDBool is_alphabetic` - `NSTD_TRUE` if `chr` is alphabetic.
     nstd_core_cty_is_alphabetic,
     is_alphabetic
 );
@@ -56,7 +56,7 @@ gen_deterministic!(
     ///
     /// # Returns
     ///
-    /// `NSTDBool is_numeric` - `NSTD_BOOL_TRUE` if `chr` is numeric.
+    /// `NSTDBool is_numeric` - `NSTD_TRUE` if `chr` is numeric.
     nstd_core_cty_is_numeric,
     is_numeric
 );
@@ -69,7 +69,7 @@ gen_deterministic!(
     ///
     /// # Returns
     ///
-    /// `NSTDBool is_alphanumeric` - `NSTD_BOOL_TRUE` if `chr` is alphanumeric.
+    /// `NSTDBool is_alphanumeric` - `NSTD_TRUE` if `chr` is alphanumeric.
     nstd_core_cty_is_alphanumeric,
     is_alphanumeric
 );
@@ -82,7 +82,7 @@ gen_deterministic!(
     ///
     /// # Returns
     ///
-    /// `NSTDBool is_lowercase` - `NSTD_BOOL_TRUE` if `chr` is lowercase.
+    /// `NSTDBool is_lowercase` - `NSTD_TRUE` if `chr` is lowercase.
     nstd_core_cty_is_lowercase,
     is_lowercase
 );
@@ -95,7 +95,7 @@ gen_deterministic!(
     ///
     /// # Returns
     ///
-    /// `NSTDBool is_uppercase` - `NSTD_BOOL_TRUE` if `chr` is uppercase.
+    /// `NSTDBool is_uppercase` - `NSTD_TRUE` if `chr` is uppercase.
     nstd_core_cty_is_uppercase,
     is_uppercase
 );
@@ -108,7 +108,7 @@ gen_deterministic!(
     ///
     /// # Returns
     ///
-    /// `NSTDBool is_whitespace` - `NSTD_BOOL_TRUE` if `chr` is white space.
+    /// `NSTDBool is_whitespace` - `NSTD_TRUE` if `chr` is white space.
     nstd_core_cty_is_whitespace,
     is_whitespace
 );
@@ -121,7 +121,7 @@ gen_deterministic!(
     ///
     /// # Returns
     ///
-    /// `NSTDBool is_control` - `NSTD_BOOL_TRUE` if `chr` is a control character.
+    /// `NSTDBool is_control` - `NSTD_TRUE` if `chr` is a control character.
     nstd_core_cty_is_control,
     is_control
 );

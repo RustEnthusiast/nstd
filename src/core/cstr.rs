@@ -9,7 +9,7 @@ use crate::{
         def::NSTDChar,
         slice::{nstd_core_slice_new, NSTDSlice},
     },
-    NSTDBool, NSTDUSize,
+    NSTDBool, NSTDUSize, NSTD_FALSE, NSTD_TRUE,
 };
 
 /// Creates a byte slice over a C string, excluding the null terminator.
@@ -98,7 +98,7 @@ pub unsafe extern "C" fn nstd_core_cstr_len_with_null(cstr: *const NSTDChar) -> 
     nstd_core_cstr_len(cstr) + 1
 }
 
-/// Compares two C strings, returning `NSTD_BOOL_TRUE` if they are lexicographically equal.
+/// Compares two C strings, returning `NSTD_TRUE` if they are lexicographically equal.
 ///
 /// # Parameters:
 ///
@@ -108,7 +108,7 @@ pub unsafe extern "C" fn nstd_core_cstr_len_with_null(cstr: *const NSTDChar) -> 
 ///
 /// # Returns
 ///
-/// `NSTDBool is_eq` - `NSTD_BOOL_TRUE` if the C strings are lexicographically equal.
+/// `NSTDBool is_eq` - `NSTD_TRUE` if the C strings are lexicographically equal.
 ///
 /// # Safety
 ///
@@ -120,14 +120,14 @@ pub unsafe extern "C" fn nstd_core_cstr_compare(
 ) -> NSTDBool {
     // If the C strings point to the same data return true.
     if cstr1 == cstr2 {
-        return NSTDBool::NSTD_BOOL_TRUE;
+        return NSTD_TRUE;
     }
     // Otherwise compare them lexicographically.
     loop {
         if *cstr1 != *cstr2 {
-            return NSTDBool::NSTD_BOOL_FALSE;
+            return NSTD_FALSE;
         } else if *cstr1 == 0 && *cstr2 == 0 {
-            return NSTDBool::NSTD_BOOL_TRUE;
+            return NSTD_TRUE;
         }
         cstr1 = cstr1.add(1);
         cstr2 = cstr2.add(1);

@@ -181,7 +181,7 @@ pub extern "C" fn nstd_core_slice_last_const(slice: &NSTDSlice) -> NSTDAnyConst 
 ///
 /// # Returns
 ///
-/// `NSTDBool is_eq` - `NSTD_BOOL_TRUE` if the two slices compare equal.
+/// `NSTDBool is_eq` - `NSTD_TRUE` if the two slices compare equal.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_slice_compare(s1: &NSTDSlice, s2: &NSTDSlice) -> NSTDBool {
@@ -331,7 +331,7 @@ pub extern "C" fn nstd_core_slice_const_last(slice: &NSTDSliceConst) -> NSTDAnyC
 ///
 /// # Returns
 ///
-/// `NSTDBool is_eq` - `NSTD_BOOL_TRUE` if the two slices compare equal.
+/// `NSTDBool is_eq` - `NSTD_TRUE` if the two slices compare equal.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_slice_const_compare(

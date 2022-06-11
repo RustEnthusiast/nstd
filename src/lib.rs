@@ -23,6 +23,11 @@ pub(crate) mod test;
 #[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_vec")))]
 pub mod vec;
 
+/// Boolean value false (0).
+pub const NSTD_FALSE: NSTDBool = 0;
+/// Boolean value true (1).
+pub const NSTD_TRUE: NSTDBool = 1;
+
 /// An integral type who's size matches the target architecture's pointer size.
 pub type NSTDISize = isize;
 /// An unsigned integral type who's size matches the target architecture's pointer size.
@@ -59,30 +64,5 @@ pub type NSTDChar32 = NSTDUInt32;
 /// Represents a Unicode scalar value.
 pub type NSTDUnichar = NSTDChar32;
 
-/// A boolean type, can either be `NSTD_BOOL_TRUE` (1) or `NSTD_BOOL_FALSE` (0).
-#[repr(C)]
-#[allow(non_camel_case_types)]
-#[derive(Clone, Copy, Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub enum NSTDBool {
-    /// Boolean value false (0).
-    NSTD_BOOL_FALSE,
-    /// Boolean value true (1).
-    NSTD_BOOL_TRUE,
-}
-impl Default for NSTDBool {
-    /// Returns `NSTD_BOOL_FALSE`.
-    #[inline]
-    fn default() -> Self {
-        Self::NSTD_BOOL_FALSE
-    }
-}
-impl From<bool> for NSTDBool {
-    /// Creates an `NSTDBool` from a Rust [bool].
-    #[inline]
-    fn from(b: bool) -> Self {
-        match b {
-            true => Self::NSTD_BOOL_TRUE,
-            false => Self::NSTD_BOOL_FALSE,
-        }
-    }
-}
+/// A boolean type, can either be `NSTD_TRUE` (1) or `NSTD_FALSE` (0).
+pub type NSTDBool = NSTDUInt8;

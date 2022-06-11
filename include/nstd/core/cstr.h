@@ -67,7 +67,7 @@ NSTDAPI NSTDUSize nstd_core_cstr_len(const NSTDChar *cstr);
 /// incorrect length.
 NSTDAPI NSTDUSize nstd_core_cstr_len_with_null(const NSTDChar *cstr);
 
-/// Compares two C strings, returning `NSTD_BOOL_TRUE` if they are lexicographically equal.
+/// Compares two C strings, returning `NSTD_TRUE` if they are lexicographically equal.
 ///
 /// # Parameters:
 ///
@@ -77,7 +77,7 @@ NSTDAPI NSTDUSize nstd_core_cstr_len_with_null(const NSTDChar *cstr);
 ///
 /// # Returns
 ///
-/// `NSTDBool is_eq` - `NSTD_BOOL_TRUE` if the C strings are lexicographically equal.
+/// `NSTDBool is_eq` - `NSTD_TRUE` if the C strings are lexicographically equal.
 ///
 /// # Safety
 ///

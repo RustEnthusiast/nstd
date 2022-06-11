@@ -18,7 +18,7 @@ NSTDAPI NSTDUnichar nstd_core_cty_replacement_char();
 ///
 /// # Returns
 ///
-/// `NSTDBool is_alphabetic` - `NSTD_BOOL_TRUE` if `chr` is alphabetic.
+/// `NSTDBool is_alphabetic` - `NSTD_TRUE` if `chr` is alphabetic.
 NSTDAPI NSTDBool nstd_core_cty_is_alphabetic(NSTDUnichar chr);
 /// Determines whether or not `chr` is numeric according to the Unicode standard.
 ///
@@ -28,7 +28,7 @@ NSTDAPI NSTDBool nstd_core_cty_is_alphabetic(NSTDUnichar chr);
 ///
 /// # Returns
 ///
-/// `NSTDBool is_numeric` - `NSTD_BOOL_TRUE` if `chr` is numeric.
+/// `NSTDBool is_numeric` - `NSTD_TRUE` if `chr` is numeric.
 NSTDAPI NSTDBool nstd_core_cty_is_numeric(NSTDUnichar chr);
 /// Determines whether or not `chr` is alphanumeric according to the Unicode standard.
 ///
@@ -38,7 +38,7 @@ NSTDAPI NSTDBool nstd_core_cty_is_numeric(NSTDUnichar chr);
 ///
 /// # Returns
 ///
-/// `NSTDBool is_alphanumeric` - `NSTD_BOOL_TRUE` if `chr` is alphanumeric.
+/// `NSTDBool is_alphanumeric` - `NSTD_TRUE` if `chr` is alphanumeric.
 NSTDAPI NSTDBool nstd_core_cty_is_alphanumeric(NSTDUnichar chr);
 /// Determines whether or not `chr` is lowercase according to the Unicode standard.
 ///
@@ -48,7 +48,7 @@ NSTDAPI NSTDBool nstd_core_cty_is_alphanumeric(NSTDUnichar chr);
 ///
 /// # Returns
 ///
-/// `NSTDBool is_lowercase` - `NSTD_BOOL_TRUE` if `chr` is lowercase.
+/// `NSTDBool is_lowercase` - `NSTD_TRUE` if `chr` is lowercase.
 NSTDAPI NSTDBool nstd_core_cty_is_lowercase(NSTDUnichar chr);
 /// Determines whether or not `chr` is uppercase according to the Unicode standard.
 ///
@@ -58,7 +58,7 @@ NSTDAPI NSTDBool nstd_core_cty_is_lowercase(NSTDUnichar chr);
 ///
 /// # Returns
 ///
-/// `NSTDBool is_uppercase` - `NSTD_BOOL_TRUE` if `chr` is uppercase.
+/// `NSTDBool is_uppercase` - `NSTD_TRUE` if `chr` is uppercase.
 NSTDAPI NSTDBool nstd_core_cty_is_uppercase(NSTDUnichar chr);
 /// Determines whether or not `chr` is white space according to the Unicode standard.
 ///
@@ -68,7 +68,7 @@ NSTDAPI NSTDBool nstd_core_cty_is_uppercase(NSTDUnichar chr);
 ///
 /// # Returns
 ///
-/// `NSTDBool is_whitespace` - `NSTD_BOOL_TRUE` if `chr` is white space.
+/// `NSTDBool is_whitespace` - `NSTD_TRUE` if `chr` is white space.
 NSTDAPI NSTDBool nstd_core_cty_is_whitespace(NSTDUnichar chr);
 /// Determines whether or not `chr` is a control character according to the Unicode standard.
 ///
@@ -78,7 +78,7 @@ NSTDAPI NSTDBool nstd_core_cty_is_whitespace(NSTDUnichar chr);
 ///
 /// # Returns
 ///
-/// `NSTDBool is_control` - `NSTD_BOOL_TRUE` if `chr` is a control character.
+/// `NSTDBool is_control` - `NSTD_TRUE` if `chr` is a control character.
 NSTDAPI NSTDBool nstd_core_cty_is_control(NSTDUnichar chr);
 
 /// Returns the lowercase version of `chr` or `chr` if there is no lowercase version.

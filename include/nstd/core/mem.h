@@ -16,7 +16,7 @@ NSTDCPPSTART
 ///
 /// # Returns
 ///
-/// `NSTDBool is_eq` - `NSTD_BOOL_TRUE` if the memory buffers carry the same data.
+/// `NSTDBool is_eq` - `NSTD_TRUE` if the memory buffers carry the same data.
 ///
 /// # Safety
 ///

@@ -1,5 +1,5 @@
 //! Contains mostly unsafe functions for interacting with raw memory.
-use crate::{core::def::NSTDByte, NSTDBool, NSTDUSize};
+use crate::{core::def::NSTDByte, NSTDBool, NSTDUSize, NSTD_TRUE};
 
 /// Compares two memory buffers of `num` bytes.
 ///
@@ -13,7 +13,7 @@ use crate::{core::def::NSTDByte, NSTDBool, NSTDUSize};
 ///
 /// # Returns
 ///
-/// `NSTDBool is_eq` - `NSTD_BOOL_TRUE` if the memory buffers carry the same data.
+/// `NSTDBool is_eq` - `NSTD_TRUE` if the memory buffers carry the same data.
 ///
 /// # Safety
 ///
@@ -29,7 +29,7 @@ pub unsafe extern "C" fn nstd_core_mem_compare(
 ) -> NSTDBool {
     // If the two pointers point to the same buffer, or `num` is 0, return true.
     if buf1 == buf2 || num == 0 {
-        return NSTDBool::NSTD_BOOL_TRUE;
+        return NSTD_TRUE;
     }
     // Otherwise compare them manually.
     let buf1 = core::slice::from_raw_parts(buf1, num);

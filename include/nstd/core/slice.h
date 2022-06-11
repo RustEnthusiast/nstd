@@ -118,7 +118,7 @@ NSTDAPI NSTDAnyConst nstd_core_slice_last_const(const NSTDSlice *slice);
 ///
 /// # Returns
 ///
-/// `NSTDBool is_eq` - `NSTD_BOOL_TRUE` if the two slices compare equal.
+/// `NSTDBool is_eq` - `NSTD_TRUE` if the two slices compare equal.
 NSTDAPI NSTDBool nstd_core_slice_compare(const NSTDSlice *s1, const NSTDSlice *s2);
 
 /// Copies data into `dest` from `src`. The number of bytes copied is determined by `src`.
@@ -210,7 +210,7 @@ NSTDAPI NSTDAnyConst nstd_core_slice_const_last(const NSTDSliceConst *slice);
 ///
 /// # Returns
 ///
-/// `NSTDBool is_eq` - `NSTD_BOOL_TRUE` if the two slices compare equal.
+/// `NSTDBool is_eq` - `NSTD_TRUE` if the two slices compare equal.
 NSTDAPI NSTDBool nstd_core_slice_const_compare(const NSTDSliceConst *s1, const NSTDSliceConst *s2);
 
 NSTDCPPEND
