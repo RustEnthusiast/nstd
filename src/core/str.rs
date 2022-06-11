@@ -226,7 +226,7 @@ pub unsafe extern "C" fn nstd_core_str_const_from_bytes(bytes: &NSTDSliceConst) 
 ///
 /// # Parameters:
 ///
-/// - `Nconst STDSliceConst *bytes` - The UTF-8 encoded byte slice.
+/// - `const NSTDSliceConst *bytes` - The UTF-8 encoded byte slice.
 ///
 /// # Returns
 ///
@@ -287,7 +287,7 @@ pub extern "C" fn nstd_core_str_const_get_char(str: &NSTDStrConst, pos: NSTDUSiz
 ///
 /// # Parameters:
 ///
-/// - `NSTDStrConst *str` - The string slice to create the new substring from.
+/// - `const NSTDStrConst *str` - The string slice to create the new substring from.
 ///
 /// - `NSTDURange range` - The bounds of the new substring (indexed by bytes).
 ///
@@ -310,7 +310,7 @@ pub extern "C" fn nstd_core_str_const_get_char(str: &NSTDStrConst, pos: NSTDUSiz
 /// `str`'s data must remain valid while the returned string slice is in use.
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_const_substr(
-    str: &mut NSTDStrConst,
+    str: &NSTDStrConst,
     range: NSTDURange,
 ) -> NSTDStrConst {
     // Make sure the range is valid for the bounds of `str`.
