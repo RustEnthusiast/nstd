@@ -9,7 +9,7 @@ use crate::{
 
 /// A sized pointer to some arbitrary type.
 #[repr(C)]
-#[derive(Clone, Copy, Debug, Hash, PartialEq, Eq)]
+#[derive(Debug, Hash, PartialEq, Eq)]
 pub struct NSTDPtr {
     /// A raw pointer to the data.
     pub raw: NSTDAny,
@@ -28,9 +28,13 @@ pub struct NSTDPtr {
 /// # Returns
 ///
 /// `NSTDPtr ptr` - A new instance of `NSTDPtr` that points to `obj`.
+///
+/// # Safety
+///
+/// `obj` must remain valid while the returned pointer is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_ptr_new(obj: NSTDAny, size: NSTDUSize) -> NSTDPtr {
+pub unsafe extern "C" fn nstd_core_ptr_new(obj: NSTDAny, size: NSTDUSize) -> NSTDPtr {
     NSTDPtr { raw: obj, size }
 }
 
@@ -43,14 +47,9 @@ pub extern "C" fn nstd_core_ptr_new(obj: NSTDAny, size: NSTDUSize) -> NSTDPtr {
 /// # Returns
 ///
 /// `NSTDAny raw` - A raw pointer to the object.
-///
-/// # Safety
-///
-/// This operation is unsafe because there is no way of knowing if the object being pointed to is
-/// still valid.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_ptr_get(ptr: &mut NSTDPtr) -> NSTDAny {
+pub extern "C" fn nstd_core_ptr_get(ptr: &mut NSTDPtr) -> NSTDAny {
     ptr.raw
 }
 
@@ -63,14 +62,9 @@ pub unsafe extern "C" fn nstd_core_ptr_get(ptr: &mut NSTDPtr) -> NSTDAny {
 /// # Returns
 ///
 /// `NSTDAnyConst raw` - A raw pointer to the object.
-///
-/// # Safety
-///
-/// This operation is unsafe because there is no way of knowing if the object being pointed to is
-/// still valid.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_ptr_get_const(ptr: &NSTDPtr) -> NSTDAnyConst {
+pub extern "C" fn nstd_core_ptr_get_const(ptr: &NSTDPtr) -> NSTDAnyConst {
     ptr.raw
 }
 
@@ -89,8 +83,7 @@ pub unsafe extern "C" fn nstd_core_ptr_get_const(ptr: &NSTDPtr) -> NSTDAnyConst 
 ///
 /// # Safety
 ///
-/// This operation is highly unsafe because there is no way of knowing if either of the pointers
-/// are valid.
+/// This operation is highly unsafe because there is no way of knowing if `obj`'s data is valid.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_ptr_write(ptr: &mut NSTDPtr, obj: NSTDAnyConst) {

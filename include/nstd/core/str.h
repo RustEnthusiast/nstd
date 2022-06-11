@@ -24,7 +24,8 @@ typedef struct {
 ///
 /// # Safety
 ///
-/// This function does not check to ensure that `cstr` is valid UTF-8.
+/// This function does not check to ensure that `cstr` is valid UTF-8. `cstr`'s data must remain
+/// valid while the returned string slice is in use.
 NSTDAPI NSTDStr nstd_core_str_from_cstr_unchecked(NSTDChar *cstr);
 
 /// Creates a string slice from raw bytes.
@@ -40,6 +41,10 @@ NSTDAPI NSTDStr nstd_core_str_from_cstr_unchecked(NSTDChar *cstr);
 /// # Panics
 ///
 /// This operation will panic if `bytes.ptr.size` is not 1, or `bytes` is not valid UTF-8.
+///
+/// # Safety
+///
+/// `bytes` must remain valid while the returned string slice is in use.
 NSTDAPI NSTDStr nstd_core_str_from_bytes(NSTDSlice *bytes);
 
 /// Creates a string slice from raw bytes, without checking for UTF-8.
@@ -58,7 +63,8 @@ NSTDAPI NSTDStr nstd_core_str_from_bytes(NSTDSlice *bytes);
 ///
 /// # Safety
 ///
-/// This function does not check to ensure that `bytes` is valid UTF-8.
+/// This function does not check to ensure that `bytes` are valid UTF-8.`bytes` must remain valid
+/// while the returned string slice is in use.
 NSTDAPI NSTDStr nstd_core_str_from_bytes_unchecked(NSTDSlice *bytes);
 
 /// Gets the `NSTDUnichar` at index `pos` in `str`.
@@ -77,10 +83,6 @@ NSTDAPI NSTDStr nstd_core_str_from_bytes_unchecked(NSTDSlice *bytes);
 ///
 /// `NSTDUnichar chr` - The character at index `pos`, or the Unicode replacement character on
 /// error.
-///
-/// # Safety
-///
-/// This function is unsafe because the string slice's data may be invalid at the time of access.
 NSTDAPI NSTDUnichar nstd_core_str_get_char(const NSTDStr *str, NSTDUSize pos);
 
 /// Creates a substring of an existing string slice.
@@ -109,6 +111,10 @@ NSTDAPI NSTDUnichar nstd_core_str_get_char(const NSTDStr *str, NSTDUSize pos);
 /// - `range.start` is greater than `range.end`.
 ///
 /// - The substring bytes are not valid UTF-8.
+///
+/// # Safety
+///
+/// `str`'s data must remain valid while the returned string slice is in use.
 NSTDAPI NSTDStr nstd_core_str_substr(NSTDStr *str, NSTDURange range);
 
 NSTDCPPEND

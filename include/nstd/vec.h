@@ -84,6 +84,10 @@ NSTDAPI NSTDUSize nstd_vec_len(const NSTDVec *vec);
 /// # Returns
 ///
 /// `NSTDSlice slice` - A *mutable* view into the vector.
+///
+/// # Safety
+///
+/// `vec`'s data must remain valid while the returned slice is in use.
 NSTDAPI NSTDSlice nstd_vec_as_slice(NSTDVec *vec);
 
 /// Returns a pointer to the element at index `pos` in `vec`.
@@ -214,10 +218,6 @@ NSTDAPI NSTDErrorCode nstd_vec_remove(NSTDVec *vec, NSTDUSize index);
 /// # Panics
 ///
 /// This operation will panic if the element sizes for `vec` and `values` do not match.
-///
-/// # Safety
-///
-/// This operation is unsafe because `values`'s data is never guaranteed to be valid.
 NSTDAPI NSTDErrorCode nstd_vec_extend(NSTDVec *vec, const NSTDSlice *values);
 
 /// Shortens a vector, keeping the first `len` elements.

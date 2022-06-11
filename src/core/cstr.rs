@@ -5,7 +5,10 @@
 //! The functions in this module must be provided valid C strings, as they do not accept null
 //! pointers.
 use crate::{
-    core::{def::NSTDChar, ptr::nstd_core_ptr_new, slice::NSTDSlice},
+    core::{
+        def::NSTDChar,
+        slice::{nstd_core_slice_new, NSTDSlice},
+    },
     NSTDBool, NSTDUSize,
 };
 
@@ -18,15 +21,16 @@ use crate::{
 /// # Returns
 ///
 /// `NSTDSlice slice` - The new byte slice over the C string (without the null byte at the end).
+///
+/// # Safety
+///
+/// `cstr`'s data must remain valid while the returned slice is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_cstr_as_slice(cstr: *mut NSTDChar) -> NSTDSlice {
+pub unsafe extern "C" fn nstd_core_cstr_as_slice(cstr: *mut NSTDChar) -> NSTDSlice {
     // SAFETY: The slice is already unsafe to access.
-    let len = unsafe { nstd_core_cstr_len(cstr) };
-    NSTDSlice {
-        ptr: nstd_core_ptr_new(cstr.cast(), 1),
-        len,
-    }
+    let len = nstd_core_cstr_len(cstr);
+    nstd_core_slice_new(cstr.cast(), 1, len)
 }
 
 /// Creates a byte slice over a C string, including the null terminator.
@@ -38,15 +42,16 @@ pub extern "C" fn nstd_core_cstr_as_slice(cstr: *mut NSTDChar) -> NSTDSlice {
 /// # Returns
 ///
 /// `NSTDSlice slice` - The new byte slice over the C string (including the null byte at the end).
+///
+/// # Safety
+///
+/// `cstr`'s data must remain valid while the returned slice is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_cstr_as_slice_with_null(cstr: *mut NSTDChar) -> NSTDSlice {
+pub unsafe extern "C" fn nstd_core_cstr_as_slice_with_null(cstr: *mut NSTDChar) -> NSTDSlice {
     // SAFETY: The slice is already unsafe to access.
-    let len = unsafe { nstd_core_cstr_len_with_null(cstr) };
-    NSTDSlice {
-        ptr: nstd_core_ptr_new(cstr.cast(), 1),
-        len,
-    }
+    let len = nstd_core_cstr_len_with_null(cstr);
+    nstd_core_slice_new(cstr.cast(), 1, len)
 }
 
 /// Gets the length of a null terminated C string, excluding the null byte.

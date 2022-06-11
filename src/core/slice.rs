@@ -11,7 +11,7 @@ use crate::{
 
 /// A view into a sequence of values in memory.
 #[repr(C)]
-#[derive(Clone, Copy, Debug, Hash)]
+#[derive(Debug, Hash)]
 pub struct NSTDSlice {
     /// A pointer to the first element in the slice.
     pub ptr: NSTDPtr,
@@ -45,9 +45,13 @@ impl NSTDSlice {
 /// # Returns
 ///
 /// `NSTDSlice slice` - The new slice.
+///
+/// # Safety
+///
+/// `ptr`'s data must remain valid while the returned slice is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_slice_new(
+pub unsafe extern "C" fn nstd_core_slice_new(
     ptr: NSTDAny,
     element_size: NSTDUSize,
     len: NSTDUSize,
@@ -70,13 +74,9 @@ pub extern "C" fn nstd_core_slice_new(
 ///
 /// `NSTDAny element` - A pointer to the element at `pos` or `NSTD_CORE_NULL` if `pos` is out of
 /// the slice's boundaries.
-///
-/// # Safety
-///
-/// This operation is unsafe because the underlying data is not guaranteed to be valid.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_slice_get(slice: &mut NSTDSlice, pos: NSTDUSize) -> NSTDAny {
+pub extern "C" fn nstd_core_slice_get(slice: &mut NSTDSlice, pos: NSTDUSize) -> NSTDAny {
     nstd_core_slice_get_const(slice, pos) as NSTDAny
 }
 
@@ -92,18 +92,11 @@ pub unsafe extern "C" fn nstd_core_slice_get(slice: &mut NSTDSlice, pos: NSTDUSi
 ///
 /// `NSTDAnyConst element` - A pointer to the element at `pos` or `NSTD_CORE_NULL` if `pos` is out
 /// of the slice's boundaries.
-///
-/// # Safety
-///
-/// This operation is unsafe because the underlying data is not guaranteed to be valid.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_slice_get_const(
-    slice: &NSTDSlice,
-    pos: NSTDUSize,
-) -> NSTDAnyConst {
+pub extern "C" fn nstd_core_slice_get_const(slice: &NSTDSlice, pos: NSTDUSize) -> NSTDAnyConst {
     match pos < slice.len {
-        true => slice.ptr.raw.add(pos * slice.ptr.size),
+        true => unsafe { slice.ptr.raw.add(pos * slice.ptr.size) },
         false => NSTD_CORE_NULL,
     }
 }
@@ -118,13 +111,9 @@ pub unsafe extern "C" fn nstd_core_slice_get_const(
 ///
 /// `NSTDAny element` - A pointer to the first element in `slice` or `NSTD_CORE_NULL` if the slice
 /// is empty.
-///
-/// # Safety
-///
-/// This operation is unsafe because the underlying data is not guaranteed to be valid.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_slice_first(slice: &mut NSTDSlice) -> NSTDAny {
+pub extern "C" fn nstd_core_slice_first(slice: &mut NSTDSlice) -> NSTDAny {
     nstd_core_slice_first_const(slice) as NSTDAny
 }
 
@@ -138,13 +127,9 @@ pub unsafe extern "C" fn nstd_core_slice_first(slice: &mut NSTDSlice) -> NSTDAny
 ///
 /// `NSTDAnyConst element` - A pointer to the first element in `slice` or `NSTD_CORE_NULL` if the
 /// slice is empty.
-///
-/// # Safety
-///
-/// This operation is unsafe because the underlying data is not guaranteed to be valid.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_slice_first_const(slice: &NSTDSlice) -> NSTDAnyConst {
+pub extern "C" fn nstd_core_slice_first_const(slice: &NSTDSlice) -> NSTDAnyConst {
     match slice.len > 0 {
         true => slice.ptr.raw,
         false => NSTD_CORE_NULL,
@@ -161,13 +146,9 @@ pub unsafe extern "C" fn nstd_core_slice_first_const(slice: &NSTDSlice) -> NSTDA
 ///
 /// `NSTDAny element` - A pointer to the last element in `slice` or `NSTD_CORE_NULL` if the slice
 /// is empty.
-///
-/// # Safety
-///
-/// This operation is unsafe because the underlying data is not guaranteed to be valid.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_slice_last(slice: &mut NSTDSlice) -> NSTDAny {
+pub extern "C" fn nstd_core_slice_last(slice: &mut NSTDSlice) -> NSTDAny {
     nstd_core_slice_last_const(slice) as NSTDAny
 }
 
@@ -181,13 +162,9 @@ pub unsafe extern "C" fn nstd_core_slice_last(slice: &mut NSTDSlice) -> NSTDAny 
 ///
 /// `NSTDAnyConst element` - A pointer to the last element in `slice` or `NSTD_CORE_NULL` if the
 /// slice is empty.
-///
-/// # Safety
-///
-/// This operation is unsafe because the underlying data is not guaranteed to be valid.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_slice_last_const(slice: &NSTDSlice) -> NSTDAnyConst {
+pub extern "C" fn nstd_core_slice_last_const(slice: &NSTDSlice) -> NSTDAnyConst {
     match slice.len > 0 {
         true => nstd_core_slice_get_const(slice, slice.len - 1),
         false => NSTD_CORE_NULL,
@@ -205,13 +182,9 @@ pub unsafe extern "C" fn nstd_core_slice_last_const(slice: &NSTDSlice) -> NSTDAn
 /// # Returns
 ///
 /// `NSTDBool is_eq` - `NSTD_BOOL_TRUE` if the two slices compare equal.
-///
-/// # Safety
-///
-/// This operation is unsafe because the underlying data is not guaranteed to be valid.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_slice_compare(s1: &NSTDSlice, s2: &NSTDSlice) -> NSTDBool {
+pub extern "C" fn nstd_core_slice_compare(s1: &NSTDSlice, s2: &NSTDSlice) -> NSTDBool {
     (s1.as_slice() == s2.as_slice()).into()
 }
 
@@ -226,14 +199,9 @@ pub unsafe extern "C" fn nstd_core_slice_compare(s1: &NSTDSlice, s2: &NSTDSlice)
 /// # Panics
 ///
 /// This function panics if the byte length of `dest` is less than the byte length of `src`.
-///
-/// # Safety
-///
-/// This operation is unsafe because the underlying data for `dest` or `src` is not guaranteed to
-/// be valid.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_slice_copy(dest: &mut NSTDSlice, src: &NSTDSlice) {
+pub extern "C" fn nstd_core_slice_copy(dest: &mut NSTDSlice, src: &NSTDSlice) {
     assert!(dest.byte_len() >= src.byte_len());
-    nstd_core_mem_copy(dest.ptr.raw.cast(), src.ptr.raw.cast(), src.byte_len());
+    unsafe { nstd_core_mem_copy(dest.ptr.raw.cast(), src.ptr.raw.cast(), src.byte_len()) };
 }

@@ -11,7 +11,7 @@ use crate::{
 
 /// An unowned view into a UTF-8 encoded byte string.
 #[repr(C)]
-#[derive(Clone, Copy, Debug, Hash)]
+#[derive(Debug, Hash)]
 pub struct NSTDStr {
     /// A view into the UTF-8 encoded buffer.
     pub bytes: NSTDSlice,
@@ -29,7 +29,8 @@ pub struct NSTDStr {
 ///
 /// # Safety
 ///
-/// This function does not check to ensure that `cstr` is valid UTF-8.
+/// This function does not check to ensure that `cstr` is valid UTF-8. `cstr`'s data must remain
+/// valid while the returned string slice is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_from_cstr_unchecked(cstr: *mut NSTDChar) -> NSTDStr {
@@ -52,12 +53,18 @@ pub unsafe extern "C" fn nstd_core_str_from_cstr_unchecked(cstr: *mut NSTDChar) 
 /// # Panics
 ///
 /// This operation will panic if `bytes.ptr.size` is not 1, or `bytes` is not valid UTF-8.
+///
+/// # Safety
+///
+/// `bytes` must remain valid while the returned string slice is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_str_from_bytes(bytes: &NSTDSlice) -> NSTDStr {
+pub unsafe extern "C" fn nstd_core_str_from_bytes(bytes: &NSTDSlice) -> NSTDStr {
     assert!(bytes.ptr.size == 1);
     core::str::from_utf8(bytes.as_slice()).expect("Invalid UTF-8 bytes");
-    NSTDStr { bytes: *bytes }
+    NSTDStr {
+        bytes: nstd_core_slice_new(bytes.ptr.raw, bytes.ptr.size, bytes.len),
+    }
 }
 
 /// Creates a string slice from raw bytes, without checking for UTF-8.
@@ -76,12 +83,15 @@ pub extern "C" fn nstd_core_str_from_bytes(bytes: &NSTDSlice) -> NSTDStr {
 ///
 /// # Safety
 ///
-/// This function does not check to ensure that `bytes` is valid UTF-8.
+/// This function does not check to ensure that `bytes` are valid UTF-8.`bytes` must remain valid
+/// while the returned string slice is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_from_bytes_unchecked(bytes: &NSTDSlice) -> NSTDStr {
     assert!(bytes.ptr.size == 1);
-    NSTDStr { bytes: *bytes }
+    NSTDStr {
+        bytes: nstd_core_slice_new(bytes.ptr.raw, bytes.ptr.size, bytes.len),
+    }
 }
 
 /// Gets the `NSTDUnichar` at index `pos` in `str`.
@@ -100,15 +110,11 @@ pub unsafe extern "C" fn nstd_core_str_from_bytes_unchecked(bytes: &NSTDSlice) -
 ///
 /// `NSTDUnichar chr` - The character at index `pos`, or the Unicode replacement character on
 /// error.
-///
-/// # Safety
-///
-/// This function is unsafe because the string slice's data may be invalid at the time of access.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_str_get_char(str: &NSTDStr, pos: NSTDUSize) -> NSTDUnichar {
+pub extern "C" fn nstd_core_str_get_char(str: &NSTDStr, pos: NSTDUSize) -> NSTDUnichar {
     // SAFETY: String slices are always valid UTF-8.
-    let str = core::str::from_utf8_unchecked(str.bytes.as_slice());
+    let str = unsafe { core::str::from_utf8_unchecked(str.bytes.as_slice()) };
     match str.chars().nth(pos) {
         Some(chr) => chr as NSTDUnichar,
         _ => char::REPLACEMENT_CHARACTER as NSTDUnichar,
@@ -141,13 +147,17 @@ pub unsafe extern "C" fn nstd_core_str_get_char(str: &NSTDStr, pos: NSTDUSize) -
 /// - `range.start` is greater than `range.end`.
 ///
 /// - The substring bytes are not valid UTF-8.
+///
+/// # Safety
+///
+/// `str`'s data must remain valid while the returned string slice is in use.
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_str_substr(str: &mut NSTDStr, range: NSTDURange) -> NSTDStr {
+pub unsafe extern "C" fn nstd_core_str_substr(str: &mut NSTDStr, range: NSTDURange) -> NSTDStr {
     // Make sure the range is valid for the bounds of `str`.
     assert!(range.end <= str.bytes.len);
     assert!(range.start <= range.end);
     // Create the byte slice with `range` and use it to create the new string slice.
-    let start = unsafe { str.bytes.ptr.raw.add(range.start) };
+    let start = str.bytes.ptr.raw.add(range.start);
     let bytes = nstd_core_slice_new(start, 1, range.end - range.start);
     nstd_core_str_from_bytes(&bytes)
 }

@@ -59,6 +59,10 @@ NSTDAPI NSTDString nstd_string_clone(const NSTDString *string);
 /// # Returns
 ///
 /// `NSTDStr str` - The new string slice.
+///
+/// # Safety
+///
+/// `string`'s data must remain valid while the returned string slice is in use.
 NSTDAPI NSTDStr nstd_string_as_str(NSTDString *string);
 
 /// Returns a byte slice of the string's active data.

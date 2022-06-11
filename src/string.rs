@@ -84,12 +84,16 @@ pub extern "C" fn nstd_string_clone(string: &NSTDString) -> NSTDString {
 /// # Returns
 ///
 /// `NSTDStr str` - The new string slice.
+///
+/// # Safety
+///
+/// `string`'s data must remain valid while the returned string slice is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_string_as_str(string: &mut NSTDString) -> NSTDStr {
+pub unsafe extern "C" fn nstd_string_as_str(string: &mut NSTDString) -> NSTDStr {
     let bytes = nstd_vec_as_slice(&mut string.bytes);
     // SAFETY: The string's bytes are always be UTF-8 encoded.
-    unsafe { nstd_core_str_from_bytes_unchecked(&bytes) }
+    nstd_core_str_from_bytes_unchecked(&bytes)
 }
 
 /// Returns a byte slice of the string's active data.
@@ -128,8 +132,8 @@ pub extern "C" fn nstd_string_push(string: &mut NSTDString, chr: NSTDUnichar) ->
     if let Some(chr) = char::from_u32(chr) {
         let mut buf = [0; 4];
         chr.encode_utf8(&mut buf);
-        let buf = nstd_core_slice_new(buf.as_mut_ptr().cast(), 1, chr.len_utf8());
-        return unsafe { nstd_vec_extend(&mut string.bytes, &buf) };
+        let buf = unsafe { nstd_core_slice_new(buf.as_mut_ptr().cast(), 1, chr.len_utf8()) };
+        return nstd_vec_extend(&mut string.bytes, &buf);
     }
     1
 }
@@ -148,7 +152,7 @@ pub extern "C" fn nstd_string_push(string: &mut NSTDString, chr: NSTDUnichar) ->
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_string_push_str(string: &mut NSTDString, str: &NSTDStr) -> NSTDErrorCode {
-    unsafe { nstd_vec_extend(&mut string.bytes, &str.bytes) }
+    nstd_vec_extend(&mut string.bytes, &str.bytes)
 }
 
 /// Removes the last character from a string and returns it.

@@ -38,10 +38,8 @@ Other modules will work on most platforms, primarily targeting Windows, macOS,
 Linux, Android, and iOS.
 
 # Safety notes
-Because `nstd` is a C library, accessing pointer types such as `NSTDPtr` or `NSTDSlice` is
-unsafe because the data being referenced is never guaranteed to be valid. Similarly, pointer
-types allow mutability across multiple instances (it is legal to have multiple `NSTDPtr`s mutate
-the same value within the same scope).
+Because `nstd` is a C library, creating reference types such as `NSTDPtr` or `NSTDSlice` is
+unsafe because the data cannot have a lifetime attached to it.
 
 # How to build
 `nstd` let's you decide what features you want to use. Any module that falls under the top level

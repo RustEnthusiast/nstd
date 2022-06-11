@@ -14,6 +14,10 @@ NSTDCPPSTART
 /// # Returns
 ///
 /// `NSTDSlice slice` - The new byte slice over the C string (without the null byte at the end).
+///
+/// # Safety
+///
+/// `cstr`'s data must remain valid while the returned slice is in use.
 NSTDAPI NSTDSlice nstd_core_cstr_as_slice(NSTDChar *cstr);
 
 /// Creates a byte slice over a C string, including the null terminator.
@@ -25,6 +29,10 @@ NSTDAPI NSTDSlice nstd_core_cstr_as_slice(NSTDChar *cstr);
 /// # Returns
 ///
 /// `NSTDSlice slice` - The new byte slice over the C string (including the null byte at the end).
+///
+/// # Safety
+///
+/// `cstr`'s data must remain valid while the returned slice is in use.
 NSTDAPI NSTDSlice nstd_core_cstr_as_slice_with_null(NSTDChar *cstr);
 
 /// Gets the length of a null terminated C string, excluding the null byte.

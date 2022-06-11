@@ -71,7 +71,7 @@ impl NSTDVec {
 pub extern "C" fn nstd_vec_new(element_size: NSTDUSize) -> NSTDVec {
     assert!(element_size != 0);
     NSTDVec {
-        buffer: nstd_core_slice_new(NSTD_CORE_NULL, element_size, 0),
+        buffer: unsafe { nstd_core_slice_new(NSTD_CORE_NULL, element_size, 0) },
         len: 0,
     }
 }
@@ -108,7 +108,7 @@ pub extern "C" fn nstd_vec_new_with_cap(element_size: NSTDUSize, mut cap: NSTDUS
     }
     // Construct the vector.
     NSTDVec {
-        buffer: nstd_core_slice_new(mem, element_size, cap),
+        buffer: unsafe { nstd_core_slice_new(mem, element_size, cap) },
         len: 0,
     }
 }
@@ -169,9 +169,13 @@ pub extern "C" fn nstd_vec_len(vec: &NSTDVec) -> NSTDUSize {
 /// # Returns
 ///
 /// `NSTDSlice slice` - A *mutable* view into the vector.
+///
+/// # Safety
+///
+/// `vec`'s data must remain valid while the returned slice is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_vec_as_slice(vec: &mut NSTDVec) -> NSTDSlice {
+pub unsafe extern "C" fn nstd_vec_as_slice(vec: &mut NSTDVec) -> NSTDSlice {
     nstd_core_slice_new(vec.buffer.ptr.raw, vec.buffer.ptr.size, vec.len)
 }
 
@@ -380,12 +384,8 @@ pub extern "C" fn nstd_vec_remove(vec: &mut NSTDVec, index: NSTDUSize) -> NSTDEr
 /// # Panics
 ///
 /// This operation will panic if the element sizes for `vec` and `values` do not match.
-///
-/// # Safety
-///
-/// This operation is unsafe because `values`'s data is never guaranteed to be valid.
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_vec_extend(vec: &mut NSTDVec, values: &NSTDSlice) -> NSTDErrorCode {
+pub extern "C" fn nstd_vec_extend(vec: &mut NSTDVec, values: &NSTDSlice) -> NSTDErrorCode {
     // Ensure value sizes are the same for both the vector and the slice.
     assert!(vec.buffer.ptr.size == values.ptr.size);
     // Making sure there's enough space for the extension.
@@ -397,7 +397,7 @@ pub unsafe extern "C" fn nstd_vec_extend(vec: &mut NSTDVec, values: &NSTDSlice) 
     }
     // On success copy bytes to the end of the vector.
     if errc == 0 {
-        nstd_core_mem_copy(vec.end().cast(), values.ptr.raw.cast(), values.byte_len());
+        unsafe { nstd_core_mem_copy(vec.end().cast(), values.ptr.raw.cast(), values.byte_len()) };
         vec.len += values.len;
     }
     errc

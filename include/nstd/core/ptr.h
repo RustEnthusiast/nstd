@@ -23,6 +23,10 @@ typedef struct {
 /// # Returns
 ///
 /// `NSTDPtr ptr` - A new instance of `NSTDPtr` that points to `obj`.
+///
+/// # Safety
+///
+/// `obj` must remain valid while the returned pointer is in use.
 NSTDAPI NSTDPtr nstd_core_ptr_new(NSTDAny obj, NSTDUSize size);
 
 /// Returns a raw pointer to the object pointed to by `ptr`.
@@ -34,11 +38,6 @@ NSTDAPI NSTDPtr nstd_core_ptr_new(NSTDAny obj, NSTDUSize size);
 /// # Returns
 ///
 /// `NSTDAny raw` - A raw pointer to the object.
-///
-/// # Safety
-///
-/// This operation is unsafe because there is no way of knowing if the object being pointed to is
-/// still valid.
 NSTDAPI NSTDAny nstd_core_ptr_get(NSTDPtr *ptr);
 
 /// Returns a raw immutable pointer to the object pointed to by `ptr`.
@@ -50,11 +49,6 @@ NSTDAPI NSTDAny nstd_core_ptr_get(NSTDPtr *ptr);
 /// # Returns
 ///
 /// `NSTDAnyConst raw` - A raw pointer to the object.
-///
-/// # Safety
-///
-/// This operation is unsafe because there is no way of knowing if the object being pointed to is
-/// still valid.
 NSTDAPI NSTDAnyConst nstd_core_ptr_get_const(const NSTDPtr *ptr);
 
 /// Writes data from `obj` to `ptr`. The number of bytes written is determined by `ptr.size`.
@@ -72,8 +66,7 @@ NSTDAPI NSTDAnyConst nstd_core_ptr_get_const(const NSTDPtr *ptr);
 ///
 /// # Safety
 ///
-/// This operation is highly unsafe because there is no way of knowing if either of the pointers
-/// are valid.
+/// This operation is highly unsafe because there is no way of knowing if `obj`'s data is valid.
 NSTDAPI void nstd_core_ptr_write(NSTDPtr *ptr, NSTDAnyConst obj);
 
 NSTDCPPEND
