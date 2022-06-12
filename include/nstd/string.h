@@ -65,6 +65,21 @@ NSTDAPI NSTDString nstd_string_clone(const NSTDString *string);
 /// `string`'s data must remain valid while the returned string slice is in use.
 NSTDAPI NSTDStr nstd_string_as_str(NSTDString *string);
 
+/// Creates a string slice containing the contents of `string`.
+///
+/// # Parameters:
+///
+/// - `const NSTDString *string` - The string.
+///
+/// # Returns
+///
+/// `NSTDStrConst str` - The new string slice.
+///
+/// # Safety
+///
+/// `string`'s data must remain valid while the returned string slice is in use.
+NSTDAPI NSTDStrConst nstd_string_as_str_const(const NSTDString *string);
+
 /// Returns a byte slice of the string's active data.
 ///
 /// # Parameters:
@@ -79,6 +94,21 @@ NSTDAPI NSTDStr nstd_string_as_str(NSTDString *string);
 ///
 /// This method is unsafe because mutating the bytes can lead to undefined behavior.
 NSTDAPI NSTDSlice nstd_string_as_bytes(NSTDString *string);
+
+/// Returns an immutable byte slice of the string's active data.
+///
+/// # Parameters:
+///
+/// - `const NSTDString *string` - The string.
+///
+/// # Returns
+///
+/// `NSTDSliceConst bytes` - The string's active data.
+///
+/// # Safety
+///
+/// `string`'s data must remain valid while the returned slice is in use.
+NSTDAPI NSTDSliceConst nstd_string_as_bytes_const(const NSTDString *string);
 
 /// Pushes an `NSTDUnichar` onto the end of a string.
 ///
@@ -99,12 +129,12 @@ NSTDAPI NSTDErrorCode nstd_string_push(NSTDString *string, NSTDUnichar chr);
 ///
 /// - `NSTDString *string` - The string.
 ///
-/// - `const NSTDStr *str` - The string slice to append to the end of `string`.
+/// - `const NSTDStrConst *str` - The string slice to append to the end of `string`.
 ///
 /// # Returns
 ///
 /// `NSTDErrorCode errc` - Nonzero on error.
-NSTDAPI NSTDErrorCode nstd_string_push_str(NSTDString *string, const NSTDStr *str);
+NSTDAPI NSTDErrorCode nstd_string_push_str(NSTDString *string, const NSTDStrConst *str);
 
 /// Removes the last character from a string and returns it.
 ///

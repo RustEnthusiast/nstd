@@ -2,38 +2,7 @@
 #define NSTD_CORE_CSTR_H_INCLUDED
 #include "../nstd.h"
 #include "def.h"
-#include "slice.h"
 NSTDCPPSTART
-
-/// Creates a byte slice over a C string, excluding the null terminator.
-///
-/// # Parameters:
-///
-/// - `NSTDChar *cstr` - The C string to create a slice for.
-///
-/// # Returns
-///
-/// `NSTDSlice slice` - The new byte slice over the C string (without the null byte at the end).
-///
-/// # Safety
-///
-/// `cstr`'s data must remain valid while the returned slice is in use.
-NSTDAPI NSTDSlice nstd_core_cstr_as_slice(NSTDChar *cstr);
-
-/// Creates a byte slice over a C string, including the null terminator.
-///
-/// # Parameters:
-///
-/// - `NSTDChar *cstr` - The C string to create a slice for.
-///
-/// # Returns
-///
-/// `NSTDSlice slice` - The new byte slice over the C string (including the null byte at the end).
-///
-/// # Safety
-///
-/// `cstr`'s data must remain valid while the returned slice is in use.
-NSTDAPI NSTDSlice nstd_core_cstr_as_slice_with_null(NSTDChar *cstr);
 
 /// Gets the length of a null terminated C string, excluding the null byte.
 ///

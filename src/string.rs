@@ -2,12 +2,15 @@
 use crate::{
     core::{
         def::NSTDErrorCode,
-        slice::{nstd_core_slice_new, NSTDSlice},
-        str::{nstd_core_str_from_bytes_unchecked, NSTDStr},
+        slice::{nstd_core_slice_const_new, NSTDSlice, NSTDSliceConst},
+        str::{
+            nstd_core_str_const_from_bytes_unchecked, nstd_core_str_from_bytes_unchecked, NSTDStr,
+            NSTDStrConst,
+        },
     },
     vec::{
-        nstd_vec_as_slice, nstd_vec_clone, nstd_vec_extend, nstd_vec_free, nstd_vec_len,
-        nstd_vec_new, nstd_vec_new_with_cap, nstd_vec_truncate, NSTDVec,
+        nstd_vec_as_slice, nstd_vec_as_slice_const, nstd_vec_clone, nstd_vec_extend, nstd_vec_free,
+        nstd_vec_len, nstd_vec_new, nstd_vec_new_with_cap, nstd_vec_truncate, NSTDVec,
     },
     NSTDUSize, NSTDUnichar,
 };
@@ -96,6 +99,27 @@ pub unsafe extern "C" fn nstd_string_as_str(string: &mut NSTDString) -> NSTDStr 
     nstd_core_str_from_bytes_unchecked(&bytes)
 }
 
+/// Creates a string slice containing the contents of `string`.
+///
+/// # Parameters:
+///
+/// - `const NSTDString *string` - The string.
+///
+/// # Returns
+///
+/// `NSTDStrConst str` - The new string slice.
+///
+/// # Safety
+///
+/// `string`'s data must remain valid while the returned string slice is in use.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_string_as_str_const(string: &NSTDString) -> NSTDStrConst {
+    let bytes = nstd_vec_as_slice_const(&string.bytes);
+    // SAFETY: The string's bytes are always be UTF-8 encoded.
+    nstd_core_str_const_from_bytes_unchecked(&bytes)
+}
+
 /// Returns a byte slice of the string's active data.
 ///
 /// # Parameters:
@@ -115,6 +139,25 @@ pub unsafe extern "C" fn nstd_string_as_bytes(string: &mut NSTDString) -> NSTDSl
     nstd_vec_as_slice(&mut string.bytes)
 }
 
+/// Returns an immutable byte slice of the string's active data.
+///
+/// # Parameters:
+///
+/// - `const NSTDString *string` - The string.
+///
+/// # Returns
+///
+/// `NSTDSliceConst bytes` - The string's active data.
+///
+/// # Safety
+///
+/// `string`'s data must remain valid while the returned slice is in use.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_string_as_bytes_const(string: &NSTDString) -> NSTDSliceConst {
+    nstd_vec_as_slice_const(&string.bytes)
+}
+
 /// Pushes an `NSTDUnichar` onto the end of a string.
 ///
 /// # Parameters:
@@ -132,7 +175,7 @@ pub extern "C" fn nstd_string_push(string: &mut NSTDString, chr: NSTDUnichar) ->
     if let Some(chr) = char::from_u32(chr) {
         let mut buf = [0; 4];
         chr.encode_utf8(&mut buf);
-        let buf = unsafe { nstd_core_slice_new(buf.as_mut_ptr().cast(), 1, chr.len_utf8()) };
+        let buf = unsafe { nstd_core_slice_const_new(buf.as_ptr().cast(), 1, chr.len_utf8()) };
         return nstd_vec_extend(&mut string.bytes, &buf);
     }
     1
@@ -144,14 +187,17 @@ pub extern "C" fn nstd_string_push(string: &mut NSTDString, chr: NSTDUnichar) ->
 ///
 /// - `NSTDString *string` - The string.
 ///
-/// - `const NSTDStr *str` - The string slice to append to the end of `string`.
+/// - `const NSTDStrConst *str` - The string slice to append to the end of `string`.
 ///
 /// # Returns
 ///
 /// `NSTDErrorCode errc` - Nonzero on error.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_string_push_str(string: &mut NSTDString, str: &NSTDStr) -> NSTDErrorCode {
+pub extern "C" fn nstd_string_push_str(
+    string: &mut NSTDString,
+    str: &NSTDStrConst,
+) -> NSTDErrorCode {
     nstd_vec_extend(&mut string.bytes, &str.bytes)
 }
 

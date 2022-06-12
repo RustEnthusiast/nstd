@@ -90,6 +90,21 @@ NSTDAPI NSTDUSize nstd_vec_len(const NSTDVec *vec);
 /// `vec`'s data must remain valid while the returned slice is in use.
 NSTDAPI NSTDSlice nstd_vec_as_slice(NSTDVec *vec);
 
+/// Returns an immutable slice containing all of a vector's active elements.
+///
+/// # Parameters:
+///
+/// - `const NSTDVec *vec` - The vector.
+///
+/// # Returns
+///
+/// `NSTDSliceConst slice` - An *immutable* view into the vector.
+///
+/// # Safety
+///
+/// `vec`'s data must remain valid while the returned slice is in use.
+NSTDAPI NSTDSliceConst nstd_vec_as_slice_const(const NSTDVec *vec);
+
 /// Returns a pointer to the element at index `pos` in `vec`.
 ///
 /// # Note
@@ -209,7 +224,7 @@ NSTDAPI NSTDErrorCode nstd_vec_remove(NSTDVec *vec, NSTDUSize index);
 ///
 /// - `NSTDVec *vec` - The vector to extend.
 ///
-/// - `const NSTDSlice *values` - A slice of values to push onto the vector.
+/// - `const NSTDSliceConst *values` - A slice of values to push onto the vector.
 ///
 /// # Returns
 ///
@@ -218,7 +233,7 @@ NSTDAPI NSTDErrorCode nstd_vec_remove(NSTDVec *vec, NSTDUSize index);
 /// # Panics
 ///
 /// This operation will panic if the element sizes for `vec` and `values` do not match.
-NSTDAPI NSTDErrorCode nstd_vec_extend(NSTDVec *vec, const NSTDSlice *values);
+NSTDAPI NSTDErrorCode nstd_vec_extend(NSTDVec *vec, const NSTDSliceConst *values);
 
 /// Shortens a vector, keeping the first `len` elements.
 ///

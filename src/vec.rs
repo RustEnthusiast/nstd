@@ -4,7 +4,7 @@ use crate::{
     core::{
         def::{NSTDAny, NSTDAnyConst, NSTDByte, NSTDErrorCode},
         mem::{nstd_core_mem_copy, nstd_core_mem_copy_overlapping},
-        slice::{nstd_core_slice_new, NSTDSlice},
+        slice::{nstd_core_slice_const_new, nstd_core_slice_new, NSTDSlice, NSTDSliceConst},
         NSTD_CORE_NULL,
     },
     NSTDUSize,
@@ -177,6 +177,25 @@ pub extern "C" fn nstd_vec_len(vec: &NSTDVec) -> NSTDUSize {
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_vec_as_slice(vec: &mut NSTDVec) -> NSTDSlice {
     nstd_core_slice_new(vec.buffer.ptr.raw, vec.buffer.ptr.size, vec.len)
+}
+
+/// Returns an immutable slice containing all of a vector's active elements.
+///
+/// # Parameters:
+///
+/// - `const NSTDVec *vec` - The vector.
+///
+/// # Returns
+///
+/// `NSTDSliceConst slice` - An *immutable* view into the vector.
+///
+/// # Safety
+///
+/// `vec`'s data must remain valid while the returned slice is in use.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_vec_as_slice_const(vec: &NSTDVec) -> NSTDSliceConst {
+    nstd_core_slice_const_new(vec.buffer.ptr.raw, vec.buffer.ptr.size, vec.len)
 }
 
 /// Returns a pointer to the element at index `pos` in `vec`.
@@ -375,7 +394,7 @@ pub extern "C" fn nstd_vec_remove(vec: &mut NSTDVec, index: NSTDUSize) -> NSTDEr
 ///
 /// - `NSTDVec *vec` - The vector to extend.
 ///
-/// - `const NSTDSlice *values` - A slice of values to push onto the vector.
+/// - `const NSTDSliceConst *values` - A slice of values to push onto the vector.
 ///
 /// # Returns
 ///
@@ -385,7 +404,7 @@ pub extern "C" fn nstd_vec_remove(vec: &mut NSTDVec, index: NSTDUSize) -> NSTDEr
 ///
 /// This operation will panic if the element sizes for `vec` and `values` do not match.
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_vec_extend(vec: &mut NSTDVec, values: &NSTDSlice) -> NSTDErrorCode {
+pub extern "C" fn nstd_vec_extend(vec: &mut NSTDVec, values: &NSTDSliceConst) -> NSTDErrorCode {
     // Ensure value sizes are the same for both the vector and the slice.
     assert!(vec.buffer.ptr.size == values.ptr.size);
     // Making sure there's enough space for the extension.

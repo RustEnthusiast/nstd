@@ -4,55 +4,7 @@
 //!
 //! The functions in this module must be provided valid C strings, as they do not accept null
 //! pointers.
-use crate::{
-    core::{
-        def::NSTDChar,
-        slice::{nstd_core_slice_new, NSTDSlice},
-    },
-    NSTDBool, NSTDUSize, NSTD_FALSE, NSTD_TRUE,
-};
-
-/// Creates a byte slice over a C string, excluding the null terminator.
-///
-/// # Parameters:
-///
-/// - `NSTDChar *cstr` - The C string to create a slice for.
-///
-/// # Returns
-///
-/// `NSTDSlice slice` - The new byte slice over the C string (without the null byte at the end).
-///
-/// # Safety
-///
-/// `cstr`'s data must remain valid while the returned slice is in use.
-#[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_cstr_as_slice(cstr: *mut NSTDChar) -> NSTDSlice {
-    // SAFETY: The slice is already unsafe to access.
-    let len = nstd_core_cstr_len(cstr);
-    nstd_core_slice_new(cstr.cast(), 1, len)
-}
-
-/// Creates a byte slice over a C string, including the null terminator.
-///
-/// # Parameters:
-///
-/// - `NSTDChar *cstr` - The C string to create a slice for.
-///
-/// # Returns
-///
-/// `NSTDSlice slice` - The new byte slice over the C string (including the null byte at the end).
-///
-/// # Safety
-///
-/// `cstr`'s data must remain valid while the returned slice is in use.
-#[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_cstr_as_slice_with_null(cstr: *mut NSTDChar) -> NSTDSlice {
-    // SAFETY: The slice is already unsafe to access.
-    let len = nstd_core_cstr_len_with_null(cstr);
-    nstd_core_slice_new(cstr.cast(), 1, len)
-}
+use crate::{core::def::NSTDChar, NSTDBool, NSTDUSize, NSTD_FALSE, NSTD_TRUE};
 
 /// Gets the length of a null terminated C string, excluding the null byte.
 ///
