@@ -1,7 +1,6 @@
 #ifndef NSTD_CORE_PTR_H_INCLUDED
 #define NSTD_CORE_PTR_H_INCLUDED
 #include "../nstd.h"
-#include "def.h"
 NSTDCPPSTART
 
 /// A sized pointer to some arbitrary type.

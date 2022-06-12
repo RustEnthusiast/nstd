@@ -20,6 +20,13 @@
 #include <stddef.h>
 #include <stdint.h>
 
+/// A null pointer value constant.
+#ifndef NSTDCPP
+#define NSTD_NULL 0
+#else
+#define NSTD_NULL nullptr
+#endif
+
 /// Boolean value false (0).
 #define NSTD_FALSE 0
 /// Boolean value true (1).
@@ -60,6 +67,11 @@ typedef NSTDUInt16 NSTDChar16;
 typedef NSTDUInt32 NSTDChar32;
 /// Represents a Unicode scalar value.
 typedef NSTDChar32 NSTDUnichar;
+
+/// A void pointer (a pointer to some arbitrary type).
+typedef void *NSTDAny;
+/// A void pointer to some immutable data.
+typedef const void *NSTDAnyConst;
 
 /// A boolean type, can either be `NSTD_TRUE` (1) or `NSTD_FALSE` (0).
 typedef NSTDUInt8 NSTDBool;

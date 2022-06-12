@@ -10,7 +10,3 @@ pub mod ptr;
 pub mod range;
 pub mod slice;
 pub mod str;
-use self::def::NSTDAny;
-
-/// A null pointer value constant.
-pub const NSTD_CORE_NULL: NSTDAny = core::ptr::null_mut();

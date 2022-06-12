@@ -2,11 +2,10 @@
 use crate::{
     alloc::{nstd_alloc_allocate, nstd_alloc_allocate_zeroed, nstd_alloc_deallocate},
     core::{
-        def::{NSTDAny, NSTDAnyConst},
         mem::nstd_core_mem_copy,
         ptr::{nstd_core_ptr_new, NSTDPtr},
     },
-    NSTDUSize,
+    NSTDAny, NSTDAnyConst, NSTDUSize,
 };
 
 /// A pointer type for single value heap allocation.

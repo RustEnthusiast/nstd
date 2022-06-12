@@ -1,12 +1,10 @@
 //! A view into a sequence of values in memory.
 use crate::{
     core::{
-        def::{NSTDAny, NSTDAnyConst},
         mem::nstd_core_mem_copy,
         ptr::{nstd_core_ptr_const_new, nstd_core_ptr_new, NSTDPtr, NSTDPtrConst},
-        NSTD_CORE_NULL,
     },
-    NSTDBool, NSTDUSize,
+    NSTDAny, NSTDAnyConst, NSTDBool, NSTDUSize, NSTD_NULL,
 };
 
 /// A view into a sequence of values in memory.
@@ -72,7 +70,7 @@ pub unsafe extern "C" fn nstd_core_slice_new(
 ///
 /// # Returns
 ///
-/// `NSTDAny element` - A pointer to the element at `pos` or `NSTD_CORE_NULL` if `pos` is out of
+/// `NSTDAny element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out of
 /// the slice's boundaries.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
@@ -90,14 +88,14 @@ pub extern "C" fn nstd_core_slice_get(slice: &mut NSTDSlice, pos: NSTDUSize) -> 
 ///
 /// # Returns
 ///
-/// `NSTDAnyConst element` - A pointer to the element at `pos` or `NSTD_CORE_NULL` if `pos` is out
+/// `NSTDAnyConst element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out
 /// of the slice's boundaries.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_slice_get_const(slice: &NSTDSlice, pos: NSTDUSize) -> NSTDAnyConst {
     match pos < slice.len {
         true => unsafe { slice.ptr.raw.add(pos * slice.ptr.size) },
-        false => NSTD_CORE_NULL,
+        false => NSTD_NULL,
     }
 }
 
@@ -109,7 +107,7 @@ pub extern "C" fn nstd_core_slice_get_const(slice: &NSTDSlice, pos: NSTDUSize) -
 ///
 /// # Returns
 ///
-/// `NSTDAny element` - A pointer to the first element in `slice` or `NSTD_CORE_NULL` if the slice
+/// `NSTDAny element` - A pointer to the first element in `slice` or `NSTD_NULL` if the slice
 /// is empty.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
@@ -125,14 +123,14 @@ pub extern "C" fn nstd_core_slice_first(slice: &mut NSTDSlice) -> NSTDAny {
 ///
 /// # Returns
 ///
-/// `NSTDAnyConst element` - A pointer to the first element in `slice` or `NSTD_CORE_NULL` if the
+/// `NSTDAnyConst element` - A pointer to the first element in `slice` or `NSTD_NULL` if the
 /// slice is empty.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_slice_first_const(slice: &NSTDSlice) -> NSTDAnyConst {
     match slice.len > 0 {
         true => slice.ptr.raw,
-        false => NSTD_CORE_NULL,
+        false => NSTD_NULL,
     }
 }
 
@@ -144,7 +142,7 @@ pub extern "C" fn nstd_core_slice_first_const(slice: &NSTDSlice) -> NSTDAnyConst
 ///
 /// # Returns
 ///
-/// `NSTDAny element` - A pointer to the last element in `slice` or `NSTD_CORE_NULL` if the slice
+/// `NSTDAny element` - A pointer to the last element in `slice` or `NSTD_NULL` if the slice
 /// is empty.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
@@ -160,14 +158,14 @@ pub extern "C" fn nstd_core_slice_last(slice: &mut NSTDSlice) -> NSTDAny {
 ///
 /// # Returns
 ///
-/// `NSTDAnyConst element` - A pointer to the last element in `slice` or `NSTD_CORE_NULL` if the
+/// `NSTDAnyConst element` - A pointer to the last element in `slice` or `NSTD_NULL` if the
 /// slice is empty.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_slice_last_const(slice: &NSTDSlice) -> NSTDAnyConst {
     match slice.len > 0 {
         true => nstd_core_slice_get_const(slice, slice.len - 1),
-        false => NSTD_CORE_NULL,
+        false => NSTD_NULL,
     }
 }
 
@@ -269,7 +267,7 @@ pub unsafe extern "C" fn nstd_core_slice_const_new(
 ///
 /// # Returns
 ///
-/// `NSTDAnyConst element` - A pointer to the element at `pos` or `NSTD_CORE_NULL` if `pos` is out
+/// `NSTDAnyConst element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out
 /// of the slice's boundaries.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
@@ -279,7 +277,7 @@ pub extern "C" fn nstd_core_slice_const_get(
 ) -> NSTDAnyConst {
     match pos < slice.len {
         true => unsafe { slice.ptr.raw.add(pos * slice.ptr.size) },
-        false => NSTD_CORE_NULL,
+        false => NSTD_NULL,
     }
 }
 
@@ -291,14 +289,14 @@ pub extern "C" fn nstd_core_slice_const_get(
 ///
 /// # Returns
 ///
-/// `NSTDAnyConst element` - A pointer to the first element in `slice` or `NSTD_CORE_NULL` if the
+/// `NSTDAnyConst element` - A pointer to the first element in `slice` or `NSTD_NULL` if the
 /// slice is empty.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_slice_const_first(slice: &NSTDSliceConst) -> NSTDAnyConst {
     match slice.len > 0 {
         true => slice.ptr.raw,
-        false => NSTD_CORE_NULL,
+        false => NSTD_NULL,
     }
 }
 
@@ -310,14 +308,14 @@ pub extern "C" fn nstd_core_slice_const_first(slice: &NSTDSliceConst) -> NSTDAny
 ///
 /// # Returns
 ///
-/// `NSTDAnyConst element` - A pointer to the last element in `slice` or `NSTD_CORE_NULL` if the
+/// `NSTDAnyConst element` - A pointer to the last element in `slice` or `NSTD_NULL` if the
 /// slice is empty.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_slice_const_last(slice: &NSTDSliceConst) -> NSTDAnyConst {
     match slice.len > 0 {
         true => nstd_core_slice_const_get(slice, slice.len - 1),
-        false => NSTD_CORE_NULL,
+        false => NSTD_NULL,
     }
 }
 

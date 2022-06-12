@@ -1,12 +1,6 @@
 //! Common types used throughout `nstd`.
 use crate::{NSTDInt32, NSTDUInt8};
-use core::ffi::c_void;
 use cty::c_char;
-
-/// A void pointer (a pointer to some arbitrary type).
-pub type NSTDAny = *mut c_void;
-/// A void pointer to some immutable data.
-pub type NSTDAnyConst = *const c_void;
 
 /// Equivalent to C's `char` type.
 pub type NSTDChar = c_char;

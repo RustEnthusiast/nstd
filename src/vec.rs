@@ -2,12 +2,11 @@
 use crate::{
     alloc::{nstd_alloc_allocate, nstd_alloc_deallocate, nstd_alloc_reallocate},
     core::{
-        def::{NSTDAny, NSTDAnyConst, NSTDByte, NSTDErrorCode},
+        def::{NSTDByte, NSTDErrorCode},
         mem::{nstd_core_mem_copy, nstd_core_mem_copy_overlapping},
         slice::{nstd_core_slice_const_new, nstd_core_slice_new, NSTDSlice, NSTDSliceConst},
-        NSTD_CORE_NULL,
     },
-    NSTDUSize,
+    NSTDAny, NSTDAnyConst, NSTDUSize, NSTD_NULL,
 };
 
 /// A dynamically sized contiguous sequence of values.
@@ -71,7 +70,7 @@ impl NSTDVec {
 pub extern "C" fn nstd_vec_new(element_size: NSTDUSize) -> NSTDVec {
     assert!(element_size != 0);
     NSTDVec {
-        buffer: unsafe { nstd_core_slice_new(NSTD_CORE_NULL, element_size, 0) },
+        buffer: unsafe { nstd_core_slice_new(NSTD_NULL, element_size, 0) },
         len: 0,
     }
 }
@@ -213,7 +212,7 @@ pub unsafe extern "C" fn nstd_vec_as_slice_const(vec: &NSTDVec) -> NSTDSliceCons
 ///
 /// # Returns
 ///
-/// `NSTDAny element` - A pointer to the element at `pos` or `NSTD_CORE_NULL` if `pos` is out of
+/// `NSTDAny element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out of
 /// the vector's boundaries.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
@@ -236,14 +235,14 @@ pub extern "C" fn nstd_vec_get(vec: &mut NSTDVec, pos: NSTDUSize) -> NSTDAny {
 ///
 /// # Returns
 ///
-/// `NSTDAnyConst element` - A pointer to the element at `pos` or `NSTD_CORE_NULL` if `pos` is out
+/// `NSTDAnyConst element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out
 /// of the vector's boundaries.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_vec_get_const(vec: &NSTDVec, pos: NSTDUSize) -> NSTDAnyConst {
     match pos < vec.len {
         true => unsafe { vec.buffer.ptr.raw.add(pos * vec.buffer.ptr.size) },
-        false => NSTD_CORE_NULL,
+        false => NSTD_NULL,
     }
 }
 
@@ -299,7 +298,7 @@ pub extern "C" fn nstd_vec_pop(vec: &mut NSTDVec) -> NSTDAnyConst {
         vec.len -= 1;
         return unsafe { vec.end() };
     }
-    NSTD_CORE_NULL
+    NSTD_NULL
 }
 
 /// Attempts to insert a value into a vector at `index`.

@@ -22,6 +22,10 @@ pub(crate) mod test;
 #[cfg(feature = "nstd_vec")]
 #[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_vec")))]
 pub mod vec;
+use ::core::ffi::c_void;
+
+/// A null pointer value constant.
+pub const NSTD_NULL: NSTDAny = ::core::ptr::null_mut();
 
 /// Boolean value false (0).
 pub const NSTD_FALSE: NSTDBool = 0;
@@ -63,6 +67,11 @@ pub type NSTDChar16 = NSTDUInt16;
 pub type NSTDChar32 = NSTDUInt32;
 /// Represents a Unicode scalar value.
 pub type NSTDUnichar = NSTDChar32;
+
+/// A void pointer (a pointer to some arbitrary type).
+pub type NSTDAny = *mut c_void;
+/// A void pointer to some immutable data.
+pub type NSTDAnyConst = *const c_void;
 
 /// A boolean type, can either be `NSTD_TRUE` (1) or `NSTD_FALSE` (0).
 pub type NSTDBool = NSTDUInt8;

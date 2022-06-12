@@ -2,11 +2,6 @@
 #define NSTD_CORE_DEF_H_INCLUDED
 #include "../nstd.h"
 
-/// A void pointer (a pointer to some arbitrary type).
-typedef void *NSTDAny;
-/// A void pointer to some immutable data.
-typedef const void *NSTDAnyConst;
-
 /// Equivalent to C's `char` type.
 typedef char NSTDChar;
 

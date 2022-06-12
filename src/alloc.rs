@@ -1,10 +1,7 @@
 //! Low level memory allocation.
 #[cfg(not(target_os = "windows"))]
 extern crate alloc;
-use crate::{
-    core::def::{NSTDAny, NSTDErrorCode},
-    NSTDUSize,
-};
+use crate::{core::def::NSTDErrorCode, NSTDAny, NSTDUSize};
 
 /// Allocates a block of memory on the heap.
 /// The number of bytes to be allocated is specified by `size`.
@@ -128,11 +125,11 @@ pub unsafe extern "C" fn nstd_alloc_reallocate(
 pub unsafe extern "C" fn nstd_alloc_deallocate(ptr: &mut NSTDAny, size: NSTDUSize) {
     #[cfg(not(target_os = "windows"))]
     {
-        use crate::core::NSTD_CORE_NULL;
+        use crate::NSTD_NULL;
         use alloc::alloc::Layout;
         let layout = Layout::from_size_align_unchecked(size, 1);
         alloc::alloc::dealloc((*ptr).cast(), layout);
-        *ptr = NSTD_CORE_NULL;
+        *ptr = NSTD_NULL;
     }
     #[cfg(target_os = "windows")]
     {

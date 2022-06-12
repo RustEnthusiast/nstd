@@ -120,7 +120,7 @@ NSTDAPI NSTDSliceConst nstd_vec_as_slice_const(const NSTDVec *vec);
 ///
 /// # Returns
 ///
-/// `NSTDAny element` - A pointer to the element at `pos` or `NSTD_CORE_NULL` if `pos` is out of
+/// `NSTDAny element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out of
 /// the vector's boundaries.
 NSTDAPI NSTDAny nstd_vec_get(NSTDVec *vec, NSTDUSize pos);
 
@@ -139,7 +139,7 @@ NSTDAPI NSTDAny nstd_vec_get(NSTDVec *vec, NSTDUSize pos);
 ///
 /// # Returns
 ///
-/// `NSTDAnyConst element` - A pointer to the element at `pos` or `NSTD_CORE_NULL` if `pos` is out
+/// `NSTDAnyConst element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out
 /// of the vector's boundaries.
 NSTDAPI NSTDAnyConst nstd_vec_get_const(const NSTDVec *vec, NSTDUSize pos);
 

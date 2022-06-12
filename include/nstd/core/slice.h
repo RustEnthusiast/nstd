@@ -1,7 +1,6 @@
 #ifndef NSTD_CORE_SLICE_H_INCLUDED
 #define NSTD_CORE_SLICE_H_INCLUDED
 #include "../nstd.h"
-#include "def.h"
 #include "ptr.h"
 NSTDCPPSTART
 
@@ -42,7 +41,7 @@ NSTDAPI NSTDSlice nstd_core_slice_new(NSTDAny ptr, NSTDUSize element_size, NSTDU
 ///
 /// # Returns
 ///
-/// `NSTDAny element` - A pointer to the element at `pos` or `NSTD_CORE_NULL` if `pos` is out of
+/// `NSTDAny element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out of
 /// the slice's boundaries.
 NSTDAPI NSTDAny nstd_core_slice_get(NSTDSlice *slice, NSTDUSize pos);
 
@@ -56,7 +55,7 @@ NSTDAPI NSTDAny nstd_core_slice_get(NSTDSlice *slice, NSTDUSize pos);
 ///
 /// # Returns
 ///
-/// `NSTDAnyConst element` - A pointer to the element at `pos` or `NSTD_CORE_NULL` if `pos` is out
+/// `NSTDAnyConst element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out
 /// of the slice's boundaries.
 NSTDAPI NSTDAnyConst nstd_core_slice_get_const(const NSTDSlice *slice, NSTDUSize pos);
 
@@ -68,7 +67,7 @@ NSTDAPI NSTDAnyConst nstd_core_slice_get_const(const NSTDSlice *slice, NSTDUSize
 ///
 /// # Returns
 ///
-/// `NSTDAny element` - A pointer to the first element in `slice` or `NSTD_CORE_NULL` if the slice
+/// `NSTDAny element` - A pointer to the first element in `slice` or `NSTD_NULL` if the slice
 /// is empty.
 NSTDAPI NSTDAny nstd_core_slice_first(NSTDSlice *slice);
 
@@ -80,7 +79,7 @@ NSTDAPI NSTDAny nstd_core_slice_first(NSTDSlice *slice);
 ///
 /// # Returns
 ///
-/// `NSTDAnyConst element` - A pointer to the first element in `slice` or `NSTD_CORE_NULL` if the
+/// `NSTDAnyConst element` - A pointer to the first element in `slice` or `NSTD_NULL` if the
 /// slice is empty.
 NSTDAPI NSTDAnyConst nstd_core_slice_first_const(const NSTDSlice *slice);
 
@@ -92,7 +91,7 @@ NSTDAPI NSTDAnyConst nstd_core_slice_first_const(const NSTDSlice *slice);
 ///
 /// # Returns
 ///
-/// `NSTDAny element` - A pointer to the last element in `slice` or `NSTD_CORE_NULL` if the slice
+/// `NSTDAny element` - A pointer to the last element in `slice` or `NSTD_NULL` if the slice
 /// is empty.
 NSTDAPI NSTDAny nstd_core_slice_last(NSTDSlice *slice);
 
@@ -104,7 +103,7 @@ NSTDAPI NSTDAny nstd_core_slice_last(NSTDSlice *slice);
 ///
 /// # Returns
 ///
-/// `NSTDAnyConst element` - A pointer to the last element in `slice` or `NSTD_CORE_NULL` if the
+/// `NSTDAnyConst element` - A pointer to the last element in `slice` or `NSTD_NULL` if the
 /// slice is empty.
 NSTDAPI NSTDAnyConst nstd_core_slice_last_const(const NSTDSlice *slice);
 
@@ -172,7 +171,7 @@ NSTDUSize len);
 ///
 /// # Returns
 ///
-/// `NSTDAnyConst element` - A pointer to the element at `pos` or `NSTD_CORE_NULL` if `pos` is out
+/// `NSTDAnyConst element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out
 /// of the slice's boundaries.
 NSTDAPI NSTDAnyConst nstd_core_slice_const_get(const NSTDSliceConst *slice, NSTDUSize pos);
 
@@ -184,7 +183,7 @@ NSTDAPI NSTDAnyConst nstd_core_slice_const_get(const NSTDSliceConst *slice, NSTD
 ///
 /// # Returns
 ///
-/// `NSTDAnyConst element` - A pointer to the first element in `slice` or `NSTD_CORE_NULL` if the
+/// `NSTDAnyConst element` - A pointer to the first element in `slice` or `NSTD_NULL` if the
 /// slice is empty.
 NSTDAPI NSTDAnyConst nstd_core_slice_const_first(const NSTDSliceConst *slice);
 
@@ -196,7 +195,7 @@ NSTDAPI NSTDAnyConst nstd_core_slice_const_first(const NSTDSliceConst *slice);
 ///
 /// # Returns
 ///
-/// `NSTDAnyConst element` - A pointer to the last element in `slice` or `NSTD_CORE_NULL` if the
+/// `NSTDAnyConst element` - A pointer to the last element in `slice` or `NSTD_NULL` if the
 /// slice is empty.
 NSTDAPI NSTDAnyConst nstd_core_slice_const_last(const NSTDSliceConst *slice);
 
