@@ -43,6 +43,10 @@ NSTDAPI NSTDSlice nstd_core_slice_new(NSTDAny ptr, NSTDUSize element_size, NSTDU
 ///
 /// `NSTDAny element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out of
 /// the slice's boundaries.
+///
+/// # Safety
+///
+/// `slice`'s data must remain valid while the returned pointer is in use.
 NSTDAPI NSTDAny nstd_core_slice_get(NSTDSlice *slice, NSTDUSize pos);
 
 /// Returns an immutable pointer to the element at index `pos` in `slice`.
@@ -57,6 +61,10 @@ NSTDAPI NSTDAny nstd_core_slice_get(NSTDSlice *slice, NSTDUSize pos);
 ///
 /// `NSTDAnyConst element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out
 /// of the slice's boundaries.
+///
+/// # Safety
+///
+/// `slice`'s data must remain valid while the returned pointer is in use.
 NSTDAPI NSTDAnyConst nstd_core_slice_get_const(const NSTDSlice *slice, NSTDUSize pos);
 
 /// Returns a pointer to the first element in the slice.
@@ -69,6 +77,10 @@ NSTDAPI NSTDAnyConst nstd_core_slice_get_const(const NSTDSlice *slice, NSTDUSize
 ///
 /// `NSTDAny element` - A pointer to the first element in `slice` or `NSTD_NULL` if the slice
 /// is empty.
+///
+/// # Safety
+///
+/// `slice`'s data must remain valid while the returned pointer is in use.
 NSTDAPI NSTDAny nstd_core_slice_first(NSTDSlice *slice);
 
 /// Returns an immutable pointer to the first element in the slice.
@@ -81,6 +93,10 @@ NSTDAPI NSTDAny nstd_core_slice_first(NSTDSlice *slice);
 ///
 /// `NSTDAnyConst element` - A pointer to the first element in `slice` or `NSTD_NULL` if the
 /// slice is empty.
+///
+/// # Safety
+///
+/// `slice`'s data must remain valid while the returned pointer is in use.
 NSTDAPI NSTDAnyConst nstd_core_slice_first_const(const NSTDSlice *slice);
 
 /// Returns a pointer to the last element in the slice.
@@ -93,6 +109,10 @@ NSTDAPI NSTDAnyConst nstd_core_slice_first_const(const NSTDSlice *slice);
 ///
 /// `NSTDAny element` - A pointer to the last element in `slice` or `NSTD_NULL` if the slice
 /// is empty.
+///
+/// # Safety
+///
+/// `slice`'s data must remain valid while the returned pointer is in use.
 NSTDAPI NSTDAny nstd_core_slice_last(NSTDSlice *slice);
 
 /// Returns an immutable pointer to the last element in the slice.
@@ -105,6 +125,10 @@ NSTDAPI NSTDAny nstd_core_slice_last(NSTDSlice *slice);
 ///
 /// `NSTDAnyConst element` - A pointer to the last element in `slice` or `NSTD_NULL` if the
 /// slice is empty.
+///
+/// # Safety
+///
+/// `slice`'s data must remain valid while the returned pointer is in use.
 NSTDAPI NSTDAnyConst nstd_core_slice_last_const(const NSTDSlice *slice);
 
 /// Compares two slices, returning true if the slices carry, or point to the same data.
@@ -173,6 +197,10 @@ NSTDUSize len);
 ///
 /// `NSTDAnyConst element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out
 /// of the slice's boundaries.
+///
+/// # Safety
+///
+/// `slice`'s data must remain valid while the returned pointer is in use.
 NSTDAPI NSTDAnyConst nstd_core_slice_const_get(const NSTDSliceConst *slice, NSTDUSize pos);
 
 /// Returns an immutable pointer to the first element in the slice.
@@ -185,6 +213,10 @@ NSTDAPI NSTDAnyConst nstd_core_slice_const_get(const NSTDSliceConst *slice, NSTD
 ///
 /// `NSTDAnyConst element` - A pointer to the first element in `slice` or `NSTD_NULL` if the
 /// slice is empty.
+///
+/// # Safety
+///
+/// `slice`'s data must remain valid while the returned pointer is in use.
 NSTDAPI NSTDAnyConst nstd_core_slice_const_first(const NSTDSliceConst *slice);
 
 /// Returns an immutable pointer to the last element in the slice.
@@ -197,6 +229,10 @@ NSTDAPI NSTDAnyConst nstd_core_slice_const_first(const NSTDSliceConst *slice);
 ///
 /// `NSTDAnyConst element` - A pointer to the last element in `slice` or `NSTD_NULL` if the
 /// slice is empty.
+///
+/// # Safety
+///
+/// `slice`'s data must remain valid while the returned pointer is in use.
 NSTDAPI NSTDAnyConst nstd_core_slice_const_last(const NSTDSliceConst *slice);
 
 /// Compares two slices, returning true if the slices carry, or point to the same data.

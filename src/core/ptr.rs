@@ -41,9 +41,13 @@ pub unsafe extern "C" fn nstd_core_ptr_new(obj: NSTDAny, size: NSTDUSize) -> NST
 /// # Returns
 ///
 /// `NSTDAny raw` - A raw pointer to the object.
+///
+/// # Safety
+///
+/// `ptr`'s data must remain valid while the returned pointer is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_ptr_get(ptr: &mut NSTDPtr) -> NSTDAny {
+pub unsafe extern "C" fn nstd_core_ptr_get(ptr: &mut NSTDPtr) -> NSTDAny {
     ptr.raw
 }
 
@@ -56,9 +60,13 @@ pub extern "C" fn nstd_core_ptr_get(ptr: &mut NSTDPtr) -> NSTDAny {
 /// # Returns
 ///
 /// `NSTDAnyConst raw` - A raw pointer to the object.
+///
+/// # Safety
+///
+/// `ptr`'s data must remain valid while the returned pointer is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_ptr_get_const(ptr: &NSTDPtr) -> NSTDAnyConst {
+pub unsafe extern "C" fn nstd_core_ptr_get_const(ptr: &NSTDPtr) -> NSTDAnyConst {
     ptr.raw
 }
 
@@ -127,8 +135,12 @@ pub unsafe extern "C" fn nstd_core_ptr_const_new(
 /// # Returns
 ///
 /// `NSTDAnyConst raw` - A raw pointer to the object.
+///
+/// # Safety
+///
+/// `ptr`'s data must remain valid while the returned pointer is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_ptr_const_get(ptr: &NSTDPtrConst) -> NSTDAnyConst {
+pub unsafe extern "C" fn nstd_core_ptr_const_get(ptr: &NSTDPtrConst) -> NSTDAnyConst {
     ptr.raw
 }

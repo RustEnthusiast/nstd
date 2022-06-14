@@ -122,6 +122,10 @@ NSTDAPI NSTDSliceConst nstd_vec_as_slice_const(const NSTDVec *vec);
 ///
 /// `NSTDAny element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out of
 /// the vector's boundaries.
+///
+/// # Safety
+///
+/// `vec`'s data must remain valid while the returned pointer is in use.
 NSTDAPI NSTDAny nstd_vec_get(NSTDVec *vec, NSTDUSize pos);
 
 /// Returns an immutable pointer to the element at index `pos` in `vec`.
@@ -141,6 +145,10 @@ NSTDAPI NSTDAny nstd_vec_get(NSTDVec *vec, NSTDUSize pos);
 ///
 /// `NSTDAnyConst element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out
 /// of the vector's boundaries.
+///
+/// # Safety
+///
+/// `vec`'s data must remain valid while the returned pointer is in use.
 NSTDAPI NSTDAnyConst nstd_vec_get_const(const NSTDVec *vec, NSTDUSize pos);
 
 /// Pushes a value onto a vector by copying bytes to the end of the vector's buffer. The number of
@@ -177,6 +185,10 @@ NSTDAPI NSTDErrorCode nstd_vec_push(NSTDVec *vec, NSTDAnyConst value);
 ///
 /// - `NSTDAnyConst value` - A pointer to the value that was popped off the stack, or null if the
 /// vector is empty.
+///
+/// # Safety
+///
+/// `vec`'s data must remain valid while the returned pointer is in use.
 NSTDAPI NSTDAnyConst nstd_vec_pop(NSTDVec *vec);
 
 /// Attempts to insert a value into a vector at `index`.

@@ -37,6 +37,10 @@ NSTDAPI NSTDPtr nstd_core_ptr_new(NSTDAny obj, NSTDUSize size);
 /// # Returns
 ///
 /// `NSTDAny raw` - A raw pointer to the object.
+///
+/// # Safety
+///
+/// `ptr`'s data must remain valid while the returned pointer is in use.
 NSTDAPI NSTDAny nstd_core_ptr_get(NSTDPtr *ptr);
 
 /// Returns a raw immutable pointer to the object pointed to by `ptr`.
@@ -48,6 +52,10 @@ NSTDAPI NSTDAny nstd_core_ptr_get(NSTDPtr *ptr);
 /// # Returns
 ///
 /// `NSTDAnyConst raw` - A raw pointer to the object.
+///
+/// # Safety
+///
+/// `ptr`'s data must remain valid while the returned pointer is in use.
 NSTDAPI NSTDAnyConst nstd_core_ptr_get_const(const NSTDPtr *ptr);
 
 /// Writes data from `obj` to `ptr`. The number of bytes written is determined by `ptr.size`.
@@ -102,6 +110,10 @@ NSTDAPI NSTDPtrConst nstd_core_ptr_const_new(NSTDAnyConst obj, NSTDUSize size);
 /// # Returns
 ///
 /// `NSTDAnyConst raw` - A raw pointer to the object.
+///
+/// # Safety
+///
+/// `ptr`'s data must remain valid while the returned pointer is in use.
 NSTDAPI NSTDAnyConst nstd_core_ptr_const_get(const NSTDPtrConst *ptr);
 
 NSTDCPPEND
