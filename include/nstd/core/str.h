@@ -1,7 +1,7 @@
 #ifndef NSTD_CORE_STR_H_INCLUDED
 #define NSTD_CORE_STR_H_INCLUDED
 #include "../nstd.h"
-#include "def.h"
+#include "cstr.h"
 #include "range.h"
 #include "slice.h"
 NSTDCPPSTART
@@ -16,7 +16,7 @@ typedef struct {
 ///
 /// # Parameters:
 ///
-/// - `NSTDChar *cstr` - The C string to wrap.
+/// - `NSTDCStr *cstr` - The C string to wrap.
 ///
 /// # Returns
 ///
@@ -26,7 +26,7 @@ typedef struct {
 ///
 /// This function does not check to ensure that `cstr` is valid UTF-8. `cstr`'s data must remain
 /// valid while the returned string slice is in use.
-NSTDAPI NSTDStr nstd_core_str_from_cstr_unchecked(NSTDChar *cstr);
+NSTDAPI NSTDStr nstd_core_str_from_cstr_unchecked(NSTDCStr *cstr);
 
 /// Creates a string slice from raw bytes.
 ///
@@ -127,7 +127,7 @@ typedef struct {
 ///
 /// # Parameters:
 ///
-/// - `const NSTDChar *cstr` - The C string to wrap.
+/// - `const NSTDCStrConst *cstr` - The C string to wrap.
 ///
 /// # Returns
 ///
@@ -137,7 +137,7 @@ typedef struct {
 ///
 /// This function does not check to ensure that `cstr` is valid UTF-8. `cstr`'s data must remain
 /// valid while the returned string slice is in use.
-NSTDAPI NSTDStrConst nstd_core_str_const_from_cstr_unchecked(const NSTDChar *cstr);
+NSTDAPI NSTDStrConst nstd_core_str_const_from_cstr_unchecked(const NSTDCStrConst *cstr);
 
 /// Creates a string slice from raw bytes.
 ///

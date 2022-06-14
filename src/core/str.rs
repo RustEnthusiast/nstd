@@ -1,8 +1,7 @@
 //! An unowned view into a UTF-8 encoded byte string.
 use crate::{
     core::{
-        cstr::nstd_core_cstr_len,
-        def::NSTDChar,
+        cstr::{NSTDCStr, NSTDCStrConst},
         range::NSTDURange,
         slice::{nstd_core_slice_const_new, nstd_core_slice_new, NSTDSlice, NSTDSliceConst},
     },
@@ -21,7 +20,7 @@ pub struct NSTDStr {
 ///
 /// # Parameters:
 ///
-/// - `NSTDChar *cstr` - The C string to wrap.
+/// - `NSTDCStr *cstr` - The C string to wrap.
 ///
 /// # Returns
 ///
@@ -33,10 +32,9 @@ pub struct NSTDStr {
 /// valid while the returned string slice is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_str_from_cstr_unchecked(cstr: *mut NSTDChar) -> NSTDStr {
-    let len = nstd_core_cstr_len(cstr);
+pub unsafe extern "C" fn nstd_core_str_from_cstr_unchecked(cstr: &mut NSTDCStr) -> NSTDStr {
     NSTDStr {
-        bytes: nstd_core_slice_new(cstr.cast(), 1, len),
+        bytes: nstd_core_slice_new(cstr.ptr.cast(), 1, cstr.len),
     }
 }
 
@@ -174,7 +172,7 @@ pub struct NSTDStrConst {
 ///
 /// # Parameters:
 ///
-/// - `const NSTDChar *cstr` - The C string to wrap.
+/// - `const NSTDCStrConst *cstr` - The C string to wrap.
 ///
 /// # Returns
 ///
@@ -187,11 +185,10 @@ pub struct NSTDStrConst {
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_const_from_cstr_unchecked(
-    cstr: *const NSTDChar,
+    cstr: &NSTDCStrConst,
 ) -> NSTDStrConst {
-    let len = nstd_core_cstr_len(cstr);
     NSTDStrConst {
-        bytes: nstd_core_slice_const_new(cstr.cast(), 1, len),
+        bytes: nstd_core_slice_const_new(cstr.ptr.cast(), 1, cstr.len),
     }
 }
 
