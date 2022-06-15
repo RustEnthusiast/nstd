@@ -2,6 +2,7 @@
 #define NSTD_H_INCLUDED
 #include "nstd/alloc.h"
 #include "nstd/core.h"
+#include "nstd/cstring.h"
 #include "nstd/heap_ptr.h"
 #include "nstd/nstd.h"
 #include "nstd/os.h"
