@@ -1,6 +1,6 @@
 //! A dynamically sized, null terminated, C string.
 use crate::{
-    vec::{nstd_vec_free, nstd_vec_new, nstd_vec_new_with_cap, NSTDVec},
+    vec::{nstd_vec_clone, nstd_vec_free, nstd_vec_new, nstd_vec_new_with_cap, NSTDVec},
     NSTDUSize,
 };
 
@@ -43,6 +43,27 @@ pub extern "C" fn nstd_cstring_new() -> NSTDCString {
 pub extern "C" fn nstd_cstring_new_with_cap(cap: NSTDUSize) -> NSTDCString {
     NSTDCString {
         bytes: nstd_vec_new_with_cap(1, cap),
+    }
+}
+
+/// Creates a deep copy of an `NSTDCString`.
+///
+/// # Parameters:
+///
+/// - `const NSTDCString *cstring` - The C string to create a deep copy of.
+///
+/// # Returns
+///
+/// `NSTDCString cloned` - A new deep copy of `cstring`.
+///
+/// # Panics
+///
+/// This function will panic if allocating for the new C string fails.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_cstring_clone(cstring: &NSTDCString) -> NSTDCString {
+    NSTDCString {
+        bytes: nstd_vec_clone(&cstring.bytes),
     }
 }
 
