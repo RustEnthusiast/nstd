@@ -17,6 +17,21 @@ typedef struct {
 /// `NSTDCString cstring` - The new C string.
 NSTDAPI NSTDCString nstd_cstring_new();
 
+/// Creates a new `NSTDCString` initialized with the given capacity.
+///
+/// # Parameters:
+///
+/// - `NSTDUSize cap` - The number of bytes to preallocate.
+///
+/// # Returns
+///
+/// `NSTDCString cstring` - The new C string.
+///
+/// # Panics
+///
+/// This function will panic if `cap` is zero.
+NSTDAPI NSTDCString nstd_cstring_new_with_cap(NSTDUSize cap);
+
 /// Frees an instance of `NSTDCString`.
 ///
 /// # Parameters:

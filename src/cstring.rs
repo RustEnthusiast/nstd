@@ -1,5 +1,8 @@
 //! A dynamically sized, null terminated, C string.
-use crate::vec::{nstd_vec_free, nstd_vec_new, NSTDVec};
+use crate::{
+    vec::{nstd_vec_free, nstd_vec_new, nstd_vec_new_with_cap, NSTDVec},
+    NSTDUSize,
+};
 
 /// A dynamically sized, null terminated, C string.
 #[repr(C)]
@@ -19,6 +22,27 @@ pub struct NSTDCString {
 pub extern "C" fn nstd_cstring_new() -> NSTDCString {
     NSTDCString {
         bytes: nstd_vec_new(1),
+    }
+}
+
+/// Creates a new `NSTDCString` initialized with the given capacity.
+///
+/// # Parameters:
+///
+/// - `NSTDUSize cap` - The number of bytes to preallocate.
+///
+/// # Returns
+///
+/// `NSTDCString cstring` - The new C string.
+///
+/// # Panics
+///
+/// This function will panic if `cap` is zero.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_cstring_new_with_cap(cap: NSTDUSize) -> NSTDCString {
+    NSTDCString {
+        bytes: nstd_vec_new_with_cap(1, cap),
     }
 }
 
