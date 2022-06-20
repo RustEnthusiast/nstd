@@ -1,5 +1,6 @@
 #ifndef NSTD_CSTRING_H_INCLUDED
 #define NSTD_CSTRING_H_INCLUDED
+#include "core/cstr.h"
 #include "nstd.h"
 #include "vec.h"
 NSTDCPPSTART
@@ -46,6 +47,36 @@ NSTDAPI NSTDCString nstd_cstring_new_with_cap(NSTDUSize cap);
 ///
 /// This function will panic if allocating for the new C string fails.
 NSTDAPI NSTDCString nstd_cstring_clone(const NSTDCString *cstring);
+
+/// Creates a C string slice containing the contents of `cstring` (excluding the null byte).
+///
+/// # Parameters:
+///
+/// - `NSTDCString *cstring` - The C string.
+///
+/// # Returns
+///
+/// `NSTDCStr cstr` - The new C string slice.
+///
+/// # Safety
+///
+/// `cstring`'s data must remain valid while the returned C string slice is in use.
+NSTDAPI NSTDCStr nstd_cstring_as_cstr(NSTDCString *cstring);
+
+/// Creates a C string slice containing the contents of `cstring` (excluding the null byte).
+///
+/// # Parameters:
+///
+/// - `const NSTDCString *cstring` - The C string.
+///
+/// # Returns
+///
+/// `NSTDCStrConst cstr` - The new C string slice.
+///
+/// # Safety
+///
+/// `cstring`'s data must remain valid while the returned C string slice is in use.
+NSTDAPI NSTDCStrConst nstd_cstring_as_cstr_const(const NSTDCString *cstring);
 
 /// Frees an instance of `NSTDCString`.
 ///
