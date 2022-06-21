@@ -60,5 +60,22 @@ NSTDAPI void nstd_core_mem_copy(NSTDByte *dest, const NSTDByte *src, NSTDUSize n
 /// of a buffer.
 NSTDAPI void nstd_core_mem_copy_overlapping(NSTDByte *dest, const NSTDByte *src, NSTDUSize num);
 
+/// Swaps `num` bytes between the memory buffers `x` and `y`.
+///
+/// # Parameters:
+///
+/// - `NSTDByte *x` - A pointer to the first memory buffer.
+///
+/// - `NSTDByte *y` - A pointer to the second memory buffer.
+///
+/// - `NSTDUSize num` - The number of bytes to swap.
+///
+/// # Safety
+///
+/// This function is highly unsafe as it does not know how large either of the memory buffers are,
+/// quickly leading to undefined behaviour if this function ends up reading or writing past the end
+/// of a buffer.
+NSTDAPI void nstd_core_mem_swap(NSTDByte *x, NSTDByte *y, NSTDUSize num);
+
 NSTDCPPEND
 #endif
