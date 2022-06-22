@@ -3,10 +3,10 @@ use crate::{
     core::{
         cstr::{nstd_core_cstr_const_new, nstd_core_cstr_new, NSTDCStr, NSTDCStrConst},
         def::NSTDChar,
-        mem::nstd_core_mem_copy,
     },
     vec::{
-        nstd_vec_clone, nstd_vec_free, nstd_vec_get, nstd_vec_new_with_cap, nstd_vec_push, NSTDVec,
+        nstd_vec_clone, nstd_vec_free, nstd_vec_get, nstd_vec_new_with_cap, nstd_vec_pop,
+        nstd_vec_push, NSTDVec,
     },
     NSTDUSize,
 };
@@ -138,12 +138,38 @@ pub extern "C" fn nstd_cstring_push(cstring: &mut NSTDCString, chr: NSTDChar) {
     unsafe {
         // Push a new null byte onto the end of the C string.
         let nulpos = cstring.bytes.len - 1;
-        let mut nul = nstd_vec_get(&mut cstring.bytes, nulpos);
-        assert!(nstd_vec_push(&mut cstring.bytes, nul) == 0);
+        let nul = nstd_vec_get(&mut cstring.bytes, nulpos).cast::<NSTDChar>();
+        assert!(nstd_vec_push(&mut cstring.bytes, nul.cast()) == 0);
         // Write `chr` over the old null byte.
-        nul = nstd_vec_get(&mut cstring.bytes, nulpos);
-        nstd_core_mem_copy(nul.cast(), addr_of!(chr).cast(), 1);
+        *nul = chr;
     }
+}
+
+/// Removes the last character from a C string and returns it.
+///
+/// # Parameters:
+///
+/// - `NSTDCString *cstring` - The C string.
+///
+/// # Returns
+///
+/// `NSTDChar chr` - The removed character, or null if the C string is empty.
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_cstring_pop(cstring: &mut NSTDCString) -> NSTDChar {
+    let mut ret = 0;
+    if cstring.bytes.len > 1 {
+        unsafe {
+            // Write the last character in the C string to the return value.
+            let lastpos = cstring.bytes.len - 2;
+            let last = nstd_vec_get(&mut cstring.bytes, lastpos).cast::<NSTDChar>();
+            ret = *last;
+            // Set the last byte to null.
+            *last = 0;
+            // Pop the old null byte.
+            nstd_vec_pop(&mut cstring.bytes);
+        }
+    }
+    ret
 }
 
 /// Frees an instance of `NSTDCString`.

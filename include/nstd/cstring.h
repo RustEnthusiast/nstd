@@ -96,6 +96,17 @@ NSTDAPI NSTDCStrConst nstd_cstring_as_cstr_const(const NSTDCString *cstring);
 /// This operation panics if `chr` cannot be appended to the C string.
 NSTDAPI void nstd_cstring_push(NSTDCString *cstring, NSTDChar chr);
 
+/// Removes the last character from a C string and returns it.
+///
+/// # Parameters:
+///
+/// - `NSTDCString *cstring` - The C string.
+///
+/// # Returns
+///
+/// `NSTDChar chr` - The removed character, or null if the C string is empty.
+NSTDAPI NSTDChar nstd_cstring_pop(NSTDCString *cstring);
+
 /// Frees an instance of `NSTDCString`.
 ///
 /// # Parameters:
