@@ -1,9 +1,16 @@
 //! A dynamically sized, null terminated, C string.
 use crate::{
-    core::cstr::{nstd_core_cstr_const_new, nstd_core_cstr_new, NSTDCStr, NSTDCStrConst},
-    vec::{nstd_vec_clone, nstd_vec_free, nstd_vec_new, nstd_vec_new_with_cap, NSTDVec},
+    core::{
+        cstr::{nstd_core_cstr_const_new, nstd_core_cstr_new, NSTDCStr, NSTDCStrConst},
+        def::NSTDChar,
+        mem::nstd_core_mem_copy,
+    },
+    vec::{
+        nstd_vec_clone, nstd_vec_free, nstd_vec_get, nstd_vec_new_with_cap, nstd_vec_push, NSTDVec,
+    },
     NSTDUSize,
 };
+use core::ptr::addr_of;
 
 /// A dynamically sized, null terminated, C string.
 #[repr(C)]
@@ -18,12 +25,14 @@ pub struct NSTDCString {
 /// # Returns
 ///
 /// `NSTDCString cstring` - The new C string.
+///
+/// # Panics
+///
+/// This function will panic if either `cap` is zero or allocating for the null byte fails.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_cstring_new() -> NSTDCString {
-    NSTDCString {
-        bytes: nstd_vec_new(1),
-    }
+    nstd_cstring_new_with_cap(1)
 }
 
 /// Creates a new `NSTDCString` initialized with the given capacity.
@@ -38,13 +47,14 @@ pub extern "C" fn nstd_cstring_new() -> NSTDCString {
 ///
 /// # Panics
 ///
-/// This function will panic if `cap` is zero.
+/// This function will panic if either `cap` is zero or allocating for the null byte fails.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_cstring_new_with_cap(cap: NSTDUSize) -> NSTDCString {
-    NSTDCString {
-        bytes: nstd_vec_new_with_cap(1, cap),
-    }
+    let mut bytes = nstd_vec_new_with_cap(1, cap);
+    let nul: NSTDChar = 0;
+    unsafe { assert!(nstd_vec_push(&mut bytes, addr_of!(nul).cast()) == 0) };
+    NSTDCString { bytes }
 }
 
 /// Creates a deep copy of an `NSTDCString`.
@@ -110,6 +120,30 @@ pub unsafe extern "C" fn nstd_cstring_as_cstr_const(cstring: &NSTDCString) -> NS
         cstring.bytes.buffer.ptr.raw.cast(),
         cstring.bytes.len.saturating_sub(1),
     )
+}
+
+/// Appends an `NSTDChar` to the end of an `NSTDCString`.
+///
+/// # Parameters:
+///
+/// - `NSTDCString *cstring` - The C string.
+///
+/// - `NSTDChar chr` - The C char to append to the C string.
+///
+/// # Panics
+///
+/// This operation panics if `chr` cannot be appended to the C string.
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_cstring_push(cstring: &mut NSTDCString, chr: NSTDChar) {
+    unsafe {
+        // Push a new null byte onto the end of the C string.
+        let nulpos = cstring.bytes.len - 1;
+        let mut nul = nstd_vec_get(&mut cstring.bytes, nulpos);
+        assert!(nstd_vec_push(&mut cstring.bytes, nul) == 0);
+        // Write `chr` over the old null byte.
+        nul = nstd_vec_get(&mut cstring.bytes, nulpos);
+        nstd_core_mem_copy(nul.cast(), addr_of!(chr).cast(), 1);
+    }
 }
 
 /// Frees an instance of `NSTDCString`.

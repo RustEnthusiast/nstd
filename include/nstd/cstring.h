@@ -1,6 +1,7 @@
 #ifndef NSTD_CSTRING_H_INCLUDED
 #define NSTD_CSTRING_H_INCLUDED
 #include "core/cstr.h"
+#include "core/def.h"
 #include "nstd.h"
 #include "vec.h"
 NSTDCPPSTART
@@ -16,6 +17,10 @@ typedef struct {
 /// # Returns
 ///
 /// `NSTDCString cstring` - The new C string.
+///
+/// # Panics
+///
+/// This function will panic if either `cap` is zero or allocating for the null byte fails.
 NSTDAPI NSTDCString nstd_cstring_new();
 
 /// Creates a new `NSTDCString` initialized with the given capacity.
@@ -30,7 +35,7 @@ NSTDAPI NSTDCString nstd_cstring_new();
 ///
 /// # Panics
 ///
-/// This function will panic if `cap` is zero.
+/// This function will panic if either `cap` is zero or allocating for the null byte fails.
 NSTDAPI NSTDCString nstd_cstring_new_with_cap(NSTDUSize cap);
 
 /// Creates a deep copy of an `NSTDCString`.
@@ -77,6 +82,19 @@ NSTDAPI NSTDCStr nstd_cstring_as_cstr(NSTDCString *cstring);
 ///
 /// `cstring`'s data must remain valid while the returned C string slice is in use.
 NSTDAPI NSTDCStrConst nstd_cstring_as_cstr_const(const NSTDCString *cstring);
+
+/// Appends an `NSTDChar` to the end of an `NSTDCString`.
+///
+/// # Parameters:
+///
+/// - `NSTDCString *cstring` - The C string.
+///
+/// - `NSTDChar chr` - The C char to append to the C string.
+///
+/// # Panics
+///
+/// This operation panics if `chr` cannot be appended to the C string.
+NSTDAPI void nstd_cstring_push(NSTDCString *cstring, NSTDChar chr);
 
 /// Frees an instance of `NSTDCString`.
 ///
