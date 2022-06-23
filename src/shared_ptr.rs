@@ -15,6 +15,14 @@ pub struct NSTDSharedPtr {
     /// A pointer to private data about the shared object.
     pub ptr: NSTDPtr,
 }
+impl NSTDSharedPtr {
+    /// Returns the number of pointers sharing the object.
+    #[inline]
+    fn ptrs(&self) -> *mut usize {
+        let obj_size = self.ptr.size - USIZE_SIZE;
+        unsafe { self.ptr.raw.add(obj_size).cast::<usize>() }
+    }
+}
 
 /// Creates a new zero-initialized instance of a shared pointer.
 ///
@@ -61,8 +69,7 @@ pub extern "C" fn nstd_shared_ptr_new_zeroed(element_size: NSTDUSize) -> NSTDSha
 pub extern "C" fn nstd_shared_ptr_share(shared_ptr: &NSTDSharedPtr) -> NSTDSharedPtr {
     unsafe {
         // Update the pointer count.
-        let obj_size = shared_ptr.ptr.size - USIZE_SIZE;
-        let ptrs = shared_ptr.ptr.raw.add(obj_size).cast::<usize>();
+        let ptrs = shared_ptr.ptrs();
         *ptrs += 1;
         // Construct the new shared pointer instance.
         NSTDSharedPtr {
@@ -81,8 +88,7 @@ pub extern "C" fn nstd_shared_ptr_share(shared_ptr: &NSTDSharedPtr) -> NSTDShare
 pub extern "C" fn nstd_shared_ptr_free(shared_ptr: &mut NSTDSharedPtr) {
     unsafe {
         // Update the pointer count.
-        let obj_size = shared_ptr.ptr.size - USIZE_SIZE;
-        let ptrs = shared_ptr.ptr.raw.add(obj_size).cast::<usize>();
+        let ptrs = shared_ptr.ptrs();
         *ptrs -= 1;
         // If the pointer count is zero, free the data.
         if *ptrs == 0 {
