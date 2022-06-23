@@ -138,9 +138,10 @@ pub extern "C" fn nstd_cstring_push(cstring: &mut NSTDCString, chr: NSTDChar) {
     unsafe {
         // Push a new null byte onto the end of the C string.
         let nulpos = cstring.bytes.len - 1;
-        let nul = nstd_vec_get(&mut cstring.bytes, nulpos).cast::<NSTDChar>();
+        let mut nul = nstd_vec_get(&mut cstring.bytes, nulpos).cast::<NSTDChar>();
         assert!(nstd_vec_push(&mut cstring.bytes, nul.cast()) == 0);
         // Write `chr` over the old null byte.
+        nul = nstd_vec_get(&mut cstring.bytes, nulpos).cast();
         *nul = chr;
     }
 }
