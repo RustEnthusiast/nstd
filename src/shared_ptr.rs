@@ -19,8 +19,7 @@ impl NSTDSharedPtr {
     /// Returns the number of pointers sharing the object.
     #[inline]
     fn ptrs(&self) -> *mut usize {
-        let obj_size = self.ptr.size - USIZE_SIZE;
-        unsafe { self.ptr.raw.add(obj_size).cast() }
+        unsafe { self.ptr.raw.add(nstd_shared_ptr_size(self)).cast() }
     }
 }
 
@@ -76,6 +75,21 @@ pub extern "C" fn nstd_shared_ptr_share(shared_ptr: &NSTDSharedPtr) -> NSTDShare
             ptr: nstd_core_ptr_new(shared_ptr.ptr.raw, shared_ptr.ptr.size),
         }
     }
+}
+
+/// Returns the size of the shared object.
+///
+/// # Parameters:
+///
+/// - `const NSTDSharedPtr *shared_ptr` - The shared pointer.
+///
+/// # Returns
+///
+/// `NSTDUSize size` - The size of the shared object.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_shared_ptr_size(shared_ptr: &NSTDSharedPtr) -> NSTDUSize {
+    shared_ptr.ptr.size - USIZE_SIZE
 }
 
 /// Returns a raw pointer to the shared object.
