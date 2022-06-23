@@ -20,7 +20,7 @@ impl NSTDSharedPtr {
     #[inline]
     fn ptrs(&self) -> *mut usize {
         let obj_size = self.ptr.size - USIZE_SIZE;
-        unsafe { self.ptr.raw.add(obj_size).cast::<usize>() }
+        unsafe { self.ptr.raw.add(obj_size).cast() }
     }
 }
 
