@@ -162,7 +162,7 @@ pub extern "C" fn nstd_cstring_pop(cstring: &mut NSTDCString) -> NSTDChar {
         unsafe {
             // Write the last character in the C string to the return value.
             let lastpos = cstring.bytes.len - 2;
-            let last = nstd_vec_get(&mut cstring.bytes, lastpos).cast::<NSTDChar>();
+            let last = nstd_vec_get(&mut cstring.bytes, lastpos).cast();
             ret = *last;
             // Set the last byte to null.
             *last = 0;
