@@ -60,7 +60,7 @@ NSTDAPI NSTDUSize nstd_shared_ptr_size(const NSTDSharedPtr *shared_ptr);
 /// # Safety
 ///
 /// The shared data must remain valid while the returned pointer is in use.
-NSTDAPI NSTDAnyConst nstd_shared_ptr_get_const(const NSTDSharedPtr *shared_ptr);
+NSTDAPI NSTDAnyConst nstd_shared_ptr_get(const NSTDSharedPtr *shared_ptr);
 
 /// Frees an instance of `NSTDSharedPtr`.
 ///
