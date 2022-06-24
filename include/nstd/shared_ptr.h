@@ -47,21 +47,6 @@ NSTDAPI NSTDSharedPtr nstd_shared_ptr_share(const NSTDSharedPtr *shared_ptr);
 /// `NSTDUSize size` - The size of the shared object.
 NSTDAPI NSTDUSize nstd_shared_ptr_size(const NSTDSharedPtr *shared_ptr);
 
-/// Returns a raw pointer to the shared object.
-///
-/// # Parameters:
-///
-/// - `NSTDSharedPtr *shared_ptr` - The shared pointer.
-///
-/// # Returns
-///
-/// `NSTDAny ptr` - A raw pointer to the shared object.
-///
-/// # Safety
-///
-/// The shared data must remain valid while the returned pointer is in use.
-NSTDAPI NSTDAny nstd_shared_ptr_get(NSTDSharedPtr *shared_ptr);
-
 /// Returns an immutable raw pointer to the shared object.
 ///
 /// # Parameters:

@@ -2,7 +2,7 @@
 use crate::{
     alloc::{nstd_alloc_allocate_zeroed, nstd_alloc_deallocate},
     core::ptr::{nstd_core_ptr_new, NSTDPtr},
-    NSTDAny, NSTDAnyConst, NSTDUSize,
+    NSTDAnyConst, NSTDUSize,
 };
 
 /// The size (in bytes) of [usize].
@@ -90,25 +90,6 @@ pub extern "C" fn nstd_shared_ptr_share(shared_ptr: &NSTDSharedPtr) -> NSTDShare
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_shared_ptr_size(shared_ptr: &NSTDSharedPtr) -> NSTDUSize {
     shared_ptr.ptr.size - USIZE_SIZE
-}
-
-/// Returns a raw pointer to the shared object.
-///
-/// # Parameters:
-///
-/// - `NSTDSharedPtr *shared_ptr` - The shared pointer.
-///
-/// # Returns
-///
-/// `NSTDAny ptr` - A raw pointer to the shared object.
-///
-/// # Safety
-///
-/// The shared data must remain valid while the returned pointer is in use.
-#[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_shared_ptr_get(shared_ptr: &mut NSTDSharedPtr) -> NSTDAny {
-    shared_ptr.ptr.raw
 }
 
 /// Returns an immutable raw pointer to the shared object.
