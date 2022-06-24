@@ -28,7 +28,7 @@ pub struct NSTDCString {
 ///
 /// # Panics
 ///
-/// This function will panic if either `cap` is zero or allocating for the null byte fails.
+/// This function will panic if allocating for the null byte fails.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_cstring_new() -> NSTDCString {
@@ -47,7 +47,7 @@ pub extern "C" fn nstd_cstring_new() -> NSTDCString {
 ///
 /// # Panics
 ///
-/// This function will panic if either `cap` is zero or allocating for the null byte fails.
+/// This function will panic if either `cap` is zero or allocating fails.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_cstring_new_with_cap(cap: NSTDUSize) -> NSTDCString {

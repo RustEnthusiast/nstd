@@ -20,7 +20,7 @@ typedef struct {
 ///
 /// # Panics
 ///
-/// This function will panic if either `cap` is zero or allocating for the null byte fails.
+/// This function will panic if allocating for the null byte fails.
 NSTDAPI NSTDCString nstd_cstring_new();
 
 /// Creates a new `NSTDCString` initialized with the given capacity.
@@ -35,7 +35,7 @@ NSTDAPI NSTDCString nstd_cstring_new();
 ///
 /// # Panics
 ///
-/// This function will panic if either `cap` is zero or allocating for the null byte fails.
+/// This function will panic if either `cap` is zero or allocating fails.
 NSTDAPI NSTDCString nstd_cstring_new_with_cap(NSTDUSize cap);
 
 /// Creates a deep copy of an `NSTDCString`.
