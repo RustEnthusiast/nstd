@@ -135,7 +135,7 @@ pub unsafe extern "C" fn nstd_string_as_str_const(string: &NSTDString) -> NSTDSt
 /// `string`'s data must remain valid while the returned slice is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_string_as_bytes_const(string: &NSTDString) -> NSTDSliceConst {
+pub unsafe extern "C" fn nstd_string_as_bytes(string: &NSTDString) -> NSTDSliceConst {
     nstd_vec_as_slice_const(&string.bytes)
 }
 

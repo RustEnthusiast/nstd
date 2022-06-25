@@ -93,7 +93,7 @@ NSTDAPI NSTDStrConst nstd_string_as_str_const(const NSTDString *string);
 /// # Safety
 ///
 /// `string`'s data must remain valid while the returned slice is in use.
-NSTDAPI NSTDSliceConst nstd_string_as_bytes_const(const NSTDString *string);
+NSTDAPI NSTDSliceConst nstd_string_as_bytes(const NSTDString *string);
 
 /// Pushes an `NSTDUnichar` onto the end of a string.
 ///
