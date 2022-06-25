@@ -2,7 +2,7 @@
 use crate::{
     core::{
         def::NSTDErrorCode,
-        slice::{nstd_core_slice_const_new, NSTDSlice, NSTDSliceConst},
+        slice::{nstd_core_slice_const_new, NSTDSliceConst},
         str::{
             nstd_core_str_const_from_bytes_unchecked, nstd_core_str_from_bytes_unchecked, NSTDStr,
             NSTDStrConst,
@@ -118,25 +118,6 @@ pub unsafe extern "C" fn nstd_string_as_str_const(string: &NSTDString) -> NSTDSt
     let bytes = nstd_vec_as_slice_const(&string.bytes);
     // SAFETY: The string's bytes are always be UTF-8 encoded.
     nstd_core_str_const_from_bytes_unchecked(&bytes)
-}
-
-/// Returns a byte slice of the string's active data.
-///
-/// # Parameters:
-///
-/// - `NSTDString *string` - The string.
-///
-/// # Returns
-///
-/// `NSTDSlice bytes` - The string's active data.
-///
-/// # Safety
-///
-/// This method is unsafe because mutating the bytes can lead to undefined behavior.
-#[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_string_as_bytes(string: &mut NSTDString) -> NSTDSlice {
-    nstd_vec_as_slice(&mut string.bytes)
 }
 
 /// Returns an immutable byte slice of the string's active data.
