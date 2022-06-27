@@ -1,12 +1,15 @@
 //! A dynamically sized, null terminated, C string.
 use crate::{
     core::{
-        cstr::{nstd_core_cstr_const_new, nstd_core_cstr_new, NSTDCStr, NSTDCStrConst},
-        def::NSTDChar,
+        cstr::{
+            nstd_core_cstr_const_as_bytes, nstd_core_cstr_const_new, nstd_core_cstr_new, NSTDCStr,
+            NSTDCStrConst,
+        },
+        def::{NSTDChar, NSTDErrorCode},
     },
     vec::{
-        nstd_vec_clone, nstd_vec_free, nstd_vec_get, nstd_vec_new_with_cap, nstd_vec_pop,
-        nstd_vec_push, NSTDVec,
+        nstd_vec_clone, nstd_vec_extend, nstd_vec_free, nstd_vec_get, nstd_vec_new_with_cap,
+        nstd_vec_pop, nstd_vec_push, NSTDVec,
     },
     NSTDUSize,
 };
@@ -143,6 +146,38 @@ pub extern "C" fn nstd_cstring_push(cstring: &mut NSTDCString, chr: NSTDChar) {
         // Write `chr` over the old null byte.
         nul = nstd_vec_get(&mut cstring.bytes, nulpos).cast();
         *nul = chr;
+    }
+}
+
+/// Appends a C string slice to the end of a C string.
+///
+/// # Parameters:
+///
+/// - `NSTDCString *cstring` - The C string.
+///
+/// - `const NSTDCStrConst *cstr` - The C string slice to append to the end of `cstring`.
+///
+/// # Returns
+///
+/// `NSTDErrorCode errc` - Nonzero if reserving memory for the push fails.
+///
+/// # Panics
+///
+/// This operation will panic if appending the new null byte to the end of the C string fails.
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_cstring_push_cstr(
+    cstring: &mut NSTDCString,
+    cstr: &NSTDCStrConst,
+) -> NSTDErrorCode {
+    unsafe {
+        // Pop the old null byte.
+        let nul = *nstd_vec_pop(&mut cstring.bytes).cast::<NSTDChar>();
+        // Append the C string slice.
+        let bytes = nstd_core_cstr_const_as_bytes(cstr);
+        let errc = nstd_vec_extend(&mut cstring.bytes, &bytes);
+        // Push a new null byte.
+        assert!(nstd_vec_push(&mut cstring.bytes, addr_of!(nul).cast()) == 0);
+        errc
     }
 }
 

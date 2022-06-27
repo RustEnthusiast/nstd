@@ -96,6 +96,23 @@ NSTDAPI NSTDCStrConst nstd_cstring_as_cstr_const(const NSTDCString *cstring);
 /// This operation panics if `chr` cannot be appended to the C string.
 NSTDAPI void nstd_cstring_push(NSTDCString *cstring, NSTDChar chr);
 
+/// Appends a C string slice to the end of a C string.
+///
+/// # Parameters:
+///
+/// - `NSTDCString *cstring` - The C string.
+///
+/// - `const NSTDCStrConst *cstr` - The C string slice to append to the end of `cstring`.
+///
+/// # Returns
+///
+/// `NSTDErrorCode errc` - Nonzero if reserving memory for the push fails.
+///
+/// # Panics
+///
+/// This operation will panic if appending the new null byte to the end of the C string fails.
+NSTDAPI NSTDErrorCode nstd_cstring_push_cstr(NSTDCString *cstring, const NSTDCStrConst *cstr);
+
 /// Removes the last character from a C string and returns it.
 ///
 /// # Parameters:
