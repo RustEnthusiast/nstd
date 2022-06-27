@@ -2,6 +2,7 @@
 #define NSTD_CORE_CSTR_H_INCLUDED
 #include "../nstd.h"
 #include "def.h"
+#include "slice.h"
 NSTDCPPSTART
 
 /// A mutable slice of a C string.
@@ -28,6 +29,21 @@ typedef struct {
 ///
 /// `raw`'s data must remain valid while the returned C string slice is in use.
 NSTDAPI NSTDCStr nstd_core_cstr_new(NSTDChar *raw, NSTDUSize len);
+
+/// Returns a byte slice of a C string slice's data.
+///
+/// # Parameters:
+///
+/// - `const NSTDCStr *cstr` - The C string slice.
+///
+/// # Returns
+///
+/// `NSTDSliceConst bytes` - An immutable byte slice of the C string slice's data.
+///
+/// # Safety
+///
+/// `cstr`'s data must remain valid while the returned byte slice is in use.
+NSTDAPI NSTDSliceConst nstd_core_cstr_as_bytes(const NSTDCStr *cstr);
 
 /// Return a pointer the character at `pos` in `cstr`.
 ///
@@ -87,6 +103,21 @@ typedef struct {
 ///
 /// `raw`'s data must remain valid while the returned C string slice is in use.
 NSTDAPI NSTDCStrConst nstd_core_cstr_const_new(const NSTDChar *raw, NSTDUSize len);
+
+/// Returns a byte slice of a C string slice's data.
+///
+/// # Parameters:
+///
+/// - `const NSTDCStrConst *cstr` - The C string slice.
+///
+/// # Returns
+///
+/// `NSTDSliceConst bytes` - An immutable byte slice of the C string slice's data.
+///
+/// # Safety
+///
+/// `cstr`'s data must remain valid while the returned byte slice is in use.
+NSTDAPI NSTDSliceConst nstd_core_cstr_const_as_bytes(const NSTDCStrConst *cstr);
 
 /// Return a pointer the character at `pos` in `cstr`.
 ///

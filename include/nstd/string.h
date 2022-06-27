@@ -80,21 +80,6 @@ NSTDAPI NSTDStr nstd_string_as_str(NSTDString *string);
 /// `string`'s data must remain valid while the returned string slice is in use.
 NSTDAPI NSTDStrConst nstd_string_as_str_const(const NSTDString *string);
 
-/// Returns a byte slice of the string's active data.
-///
-/// # Parameters:
-///
-/// - `NSTDString *string` - The string.
-///
-/// # Returns
-///
-/// `NSTDSlice bytes` - The string's active data.
-///
-/// # Safety
-///
-/// This method is unsafe because mutating the bytes can lead to undefined behavior.
-NSTDAPI NSTDSlice nstd_string_as_bytes(NSTDString *string);
-
 /// Returns an immutable byte slice of the string's active data.
 ///
 /// # Parameters:
@@ -108,7 +93,7 @@ NSTDAPI NSTDSlice nstd_string_as_bytes(NSTDString *string);
 /// # Safety
 ///
 /// `string`'s data must remain valid while the returned slice is in use.
-NSTDAPI NSTDSliceConst nstd_string_as_bytes_const(const NSTDString *string);
+NSTDAPI NSTDSliceConst nstd_string_as_bytes(const NSTDString *string);
 
 /// Pushes an `NSTDUnichar` onto the end of a string.
 ///

@@ -92,6 +92,25 @@ pub unsafe extern "C" fn nstd_core_str_from_bytes_unchecked(bytes: &NSTDSlice) -
     }
 }
 
+/// Returns an immutable byte slice over `str`'s data.
+///
+/// # Parameters:
+///
+/// - `const NSTDStr *str` - The string slice.
+///
+/// # Returns
+///
+/// `NSTDSliceConst bytes` - An immutable byte slice over `str`'s data.
+///
+/// # Safety
+///
+/// `str`'s data must remain valid while the returned slice is in use.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_core_str_as_bytes(str: &NSTDStr) -> NSTDSliceConst {
+    nstd_core_slice_const_new(str.bytes.ptr.raw.cast(), 1, str.bytes.len)
+}
+
 /// Gets the `NSTDUnichar` at index `pos` in `str`.
 ///
 /// # Note
@@ -246,6 +265,25 @@ pub unsafe extern "C" fn nstd_core_str_const_from_bytes_unchecked(
     NSTDStrConst {
         bytes: nstd_core_slice_const_new(bytes.ptr.raw, bytes.ptr.size, bytes.len),
     }
+}
+
+/// Returns an immutable byte slice over `str`'s data.
+///
+/// # Parameters:
+///
+/// - `const NSTDStrConst *str` - The string slice.
+///
+/// # Returns
+///
+/// `NSTDSliceConst bytes` - An immutable byte slice over `str`'s data.
+///
+/// # Safety
+///
+/// `str`'s data must remain valid while the returned slice is in use.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_core_str_const_as_bytes(str: &NSTDStrConst) -> NSTDSliceConst {
+    nstd_core_slice_const_new(str.bytes.ptr.raw.cast(), 1, str.bytes.len)
 }
 
 /// Gets the `NSTDUnichar` at index `pos` in `str`.

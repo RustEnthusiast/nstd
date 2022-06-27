@@ -4,7 +4,13 @@
 //!
 //! The functions in this module must be provided valid C strings, as they do not accept null
 //! pointers.
-use crate::{core::def::NSTDChar, NSTDBool, NSTDUSize, NSTD_FALSE, NSTD_TRUE};
+use crate::{
+    core::{
+        def::NSTDChar,
+        slice::{nstd_core_slice_const_new, NSTDSliceConst},
+    },
+    NSTDBool, NSTDUSize, NSTD_FALSE, NSTD_TRUE,
+};
 
 /// A mutable slice of a C string.
 #[repr(C)]
@@ -35,6 +41,25 @@ pub struct NSTDCStr {
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_cstr_new(raw: *mut NSTDChar, len: NSTDUSize) -> NSTDCStr {
     NSTDCStr { ptr: raw, len }
+}
+
+/// Returns a byte slice of a C string slice's data.
+///
+/// # Parameters:
+///
+/// - `const NSTDCStr *cstr` - The C string slice.
+///
+/// # Returns
+///
+/// `NSTDSliceConst bytes` - An immutable byte slice of the C string slice's data.
+///
+/// # Safety
+///
+/// `cstr`'s data must remain valid while the returned byte slice is in use.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_core_cstr_as_bytes(cstr: &NSTDCStr) -> NSTDSliceConst {
+    nstd_core_slice_const_new(cstr.ptr.cast(), 1, cstr.len)
 }
 
 /// Return a pointer the character at `pos` in `cstr`.
@@ -117,6 +142,25 @@ pub unsafe extern "C" fn nstd_core_cstr_const_new(
     len: NSTDUSize,
 ) -> NSTDCStrConst {
     NSTDCStrConst { ptr: raw, len }
+}
+
+/// Returns a byte slice of a C string slice's data.
+///
+/// # Parameters:
+///
+/// - `const NSTDCStrConst *cstr` - The C string slice.
+///
+/// # Returns
+///
+/// `NSTDSliceConst bytes` - An immutable byte slice of the C string slice's data.
+///
+/// # Safety
+///
+/// `cstr`'s data must remain valid while the returned byte slice is in use.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_core_cstr_const_as_bytes(cstr: &NSTDCStrConst) -> NSTDSliceConst {
+    nstd_core_slice_const_new(cstr.ptr.cast(), 1, cstr.len)
 }
 
 /// Return a pointer the character at `pos` in `cstr`.

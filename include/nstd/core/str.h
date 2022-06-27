@@ -67,6 +67,21 @@ NSTDAPI NSTDStr nstd_core_str_from_bytes(NSTDSlice *bytes);
 /// while the returned string slice is in use.
 NSTDAPI NSTDStr nstd_core_str_from_bytes_unchecked(NSTDSlice *bytes);
 
+/// Returns an immutable byte slice over `str`'s data.
+///
+/// # Parameters:
+///
+/// - `const NSTDStr *str` - The string slice.
+///
+/// # Returns
+///
+/// `NSTDSliceConst bytes` - An immutable byte slice over `str`'s data.
+///
+/// # Safety
+///
+/// `str`'s data must remain valid while the returned slice is in use.
+NSTDAPI NSTDSliceConst nstd_core_str_as_bytes(const NSTDStr *str);
+
 /// Gets the `NSTDUnichar` at index `pos` in `str`.
 ///
 /// # Note
@@ -177,6 +192,21 @@ NSTDAPI NSTDStrConst nstd_core_str_const_from_bytes(const NSTDSliceConst *bytes)
 /// This function does not check to ensure that `bytes` are valid UTF-8.`bytes` must remain valid
 /// while the returned string slice is in use.
 NSTDAPI NSTDStrConst nstd_core_str_const_from_bytes_unchecked(const NSTDSliceConst *bytes);
+
+/// Returns an immutable byte slice over `str`'s data.
+///
+/// # Parameters:
+///
+/// - `const NSTDStrConst *str` - The string slice.
+///
+/// # Returns
+///
+/// `NSTDSliceConst bytes` - An immutable byte slice over `str`'s data.
+///
+/// # Safety
+///
+/// `str`'s data must remain valid while the returned slice is in use.
+NSTDAPI NSTDSliceConst nstd_core_str_const_as_bytes(const NSTDStrConst *str);
 
 /// Gets the `NSTDUnichar` at index `pos` in `str`.
 ///
