@@ -77,6 +77,21 @@ pub extern "C" fn nstd_shared_ptr_share(shared_ptr: &NSTDSharedPtr) -> NSTDShare
     }
 }
 
+/// Returns the number pointers that share `shared_ptr`'s data.
+///
+/// # Parameters:
+///
+/// - `const NSTDSharedPtr *shared_ptr` - An instance of a shared pointer.
+///
+/// # Returns
+///
+/// `NSTDUSize owners` - The number pointers that share `shared_ptr`'s data.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_shared_ptr_owners(shared_ptr: &NSTDSharedPtr) -> NSTDUSize {
+    unsafe { *shared_ptr.ptrs() }
+}
+
 /// Returns the size of the shared object.
 ///
 /// # Parameters:
