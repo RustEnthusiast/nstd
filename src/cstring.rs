@@ -6,10 +6,11 @@ use crate::{
             NSTDCStrConst,
         },
         def::{NSTDChar, NSTDErrorCode},
+        slice::NSTDSliceConst,
     },
     vec::{
-        nstd_vec_clone, nstd_vec_extend, nstd_vec_free, nstd_vec_get, nstd_vec_new_with_cap,
-        nstd_vec_pop, nstd_vec_push, NSTDVec,
+        nstd_vec_as_slice_const, nstd_vec_clone, nstd_vec_extend, nstd_vec_free, nstd_vec_get,
+        nstd_vec_new_with_cap, nstd_vec_pop, nstd_vec_push, NSTDVec,
     },
     NSTDUSize,
 };
@@ -123,6 +124,25 @@ pub unsafe extern "C" fn nstd_cstring_as_cstr_const(cstring: &NSTDCString) -> NS
         cstring.bytes.buffer.ptr.raw.cast(),
         cstring.bytes.len.saturating_sub(1),
     )
+}
+
+/// Returns an immutable byte slice of the C string's active data, including the null byte.
+///
+/// # Parameters:
+///
+/// - `const NSTDCString *cstring` - The C string.
+///
+/// # Returns
+///
+/// `NSTDSliceConst bytes` - The C string's active data.
+///
+/// # Safety
+///
+/// `cstring`'s data must remain valid while the returned slice is in use.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_cstring_as_bytes(cstring: &NSTDCString) -> NSTDSliceConst {
+    nstd_vec_as_slice_const(&cstring.bytes)
 }
 
 /// Appends an `NSTDChar` to the end of an `NSTDCString`.

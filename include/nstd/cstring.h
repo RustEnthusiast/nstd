@@ -2,6 +2,7 @@
 #define NSTD_CSTRING_H_INCLUDED
 #include "core/cstr.h"
 #include "core/def.h"
+#include "core/slice.h"
 #include "nstd.h"
 #include "vec.h"
 NSTDCPPSTART
@@ -82,6 +83,21 @@ NSTDAPI NSTDCStr nstd_cstring_as_cstr(NSTDCString *cstring);
 ///
 /// `cstring`'s data must remain valid while the returned C string slice is in use.
 NSTDAPI NSTDCStrConst nstd_cstring_as_cstr_const(const NSTDCString *cstring);
+
+/// Returns an immutable byte slice of the C string's active data, including the null byte.
+///
+/// # Parameters:
+///
+/// - `const NSTDCString *cstring` - The C string.
+///
+/// # Returns
+///
+/// `NSTDSliceConst bytes` - The C string's active data.
+///
+/// # Safety
+///
+/// `cstring`'s data must remain valid while the returned slice is in use.
+NSTDAPI NSTDSliceConst nstd_cstring_as_bytes(const NSTDCString *cstring);
 
 /// Appends an `NSTDChar` to the end of an `NSTDCString`.
 ///
