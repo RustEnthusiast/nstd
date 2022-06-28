@@ -8,6 +8,8 @@
 NSTDCPPSTART
 
 /// A dynamically sized, null terminated, C string.
+///
+/// Managed C strings (`NSTDCString`) will always contain a null byte until freed.
 typedef struct {
     /// The underlying vector of `NSTDChar`s.
     NSTDVec bytes;

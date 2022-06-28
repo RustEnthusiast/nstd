@@ -17,6 +17,8 @@ use crate::{
 use core::ptr::addr_of;
 
 /// A dynamically sized, null terminated, C string.
+///
+/// Managed C strings (`NSTDCString`) will always contain a null byte until freed.
 #[repr(C)]
 #[derive(Debug, Hash)]
 pub struct NSTDCString {
@@ -98,10 +100,7 @@ pub extern "C" fn nstd_cstring_clone(cstring: &NSTDCString) -> NSTDCString {
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_cstring_as_cstr(cstring: &mut NSTDCString) -> NSTDCStr {
-    nstd_core_cstr_new(
-        cstring.bytes.buffer.ptr.raw.cast(),
-        cstring.bytes.len.saturating_sub(1),
-    )
+    nstd_core_cstr_new(cstring.bytes.buffer.ptr.raw.cast(), cstring.bytes.len - 1)
 }
 
 /// Creates a C string slice containing the contents of `cstring` (excluding the null byte).
@@ -120,10 +119,7 @@ pub unsafe extern "C" fn nstd_cstring_as_cstr(cstring: &mut NSTDCString) -> NSTD
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_cstring_as_cstr_const(cstring: &NSTDCString) -> NSTDCStrConst {
-    nstd_core_cstr_const_new(
-        cstring.bytes.buffer.ptr.raw.cast(),
-        cstring.bytes.len.saturating_sub(1),
-    )
+    nstd_core_cstr_const_new(cstring.bytes.buffer.ptr.raw.cast(), cstring.bytes.len - 1)
 }
 
 /// Returns an immutable byte slice of the C string's active data, including the null byte.
