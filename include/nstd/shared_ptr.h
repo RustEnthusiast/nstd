@@ -10,6 +10,27 @@ typedef struct {
     NSTDPtr ptr;
 } NSTDSharedPtr;
 
+/// Creates a new initialized instance of a shared pointer.
+///
+/// # Parameters:
+///
+/// - `NSTDUSize element_size` - The size of the shared object.
+///
+/// - `NSTDAnyConst init` - A pointer to the object to initialize the shared pointer with.
+///
+/// # Returns
+///
+/// `NSTDSharedPtr shared_ptr` - The new shared pointer.
+///
+/// # Panics
+///
+/// This operation will panic if allocating fails.
+///
+/// # Safety
+///
+/// This operation is unsafe because passing `init` as a null pointer can cause undefined behavior.
+NSTDAPI NSTDSharedPtr nstd_shared_ptr_new(NSTDUSize element_size, NSTDAnyConst init);
+
 /// Creates a new zero-initialized instance of a shared pointer.
 ///
 /// # Parameters:

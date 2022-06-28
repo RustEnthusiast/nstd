@@ -1,7 +1,10 @@
 //! A reference counting smart pointer.
 use crate::{
-    alloc::{nstd_alloc_allocate_zeroed, nstd_alloc_deallocate},
-    core::ptr::{nstd_core_ptr_new, NSTDPtr},
+    alloc::{nstd_alloc_allocate, nstd_alloc_allocate_zeroed, nstd_alloc_deallocate},
+    core::{
+        mem::nstd_core_mem_copy,
+        ptr::{nstd_core_ptr_new, NSTDPtr},
+    },
     NSTDAnyConst, NSTDUSize,
 };
 
@@ -20,6 +23,46 @@ impl NSTDSharedPtr {
     #[inline]
     fn ptrs(&self) -> *mut usize {
         unsafe { self.ptr.raw.add(nstd_shared_ptr_size(self)).cast() }
+    }
+}
+
+/// Creates a new initialized instance of a shared pointer.
+///
+/// # Parameters:
+///
+/// - `NSTDUSize element_size` - The size of the shared object.
+///
+/// - `NSTDAnyConst init` - A pointer to the object to initialize the shared pointer with.
+///
+/// # Returns
+///
+/// `NSTDSharedPtr shared_ptr` - The new shared pointer.
+///
+/// # Panics
+///
+/// This operation will panic if allocating fails.
+///
+/// # Safety
+///
+/// This operation is unsafe because passing `init` as a null pointer can cause undefined behavior.
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_shared_ptr_new(
+    element_size: NSTDUSize,
+    init: NSTDAnyConst,
+) -> NSTDSharedPtr {
+    // Allocate a region of memory for the object and the pointer count.
+    let buffer_size = element_size + USIZE_SIZE;
+    let raw = nstd_alloc_allocate(buffer_size);
+    assert!(!raw.is_null());
+    // Initialize the shared object.
+    nstd_core_mem_copy(raw.cast(), init.cast(), element_size);
+    // Set the pointer count to one.
+    let ptrs = raw.add(element_size).cast::<usize>();
+    *ptrs = 1;
+    // Construct the pointer with `element_size`, this does not include the size of the pointer
+    // count (a `usize`).
+    NSTDSharedPtr {
+        ptr: nstd_core_ptr_new(raw, buffer_size),
     }
 }
 
