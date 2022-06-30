@@ -46,9 +46,12 @@ unsafe because the data cannot have a lifetime attached to it.
 # How to build
 `nstd` let's you decide what features you want to use. Any module that falls under the top level
 module has a dedicated feature flag, for example `nstd.core` has the feature flag `nstd_core` and
-`nstd.alloc` has the feature flag `nstd_alloc`. To build `nstd` as a C library, use the `clib`
-feature flag. The `std` feature flag enables Rust standard library support. `std` and `nstd_core`
-are enabled by default.
+`nstd.alloc` has the feature flag `nstd_alloc`. Each module can also have additional features, for
+example `nstd.os` has the additional `nstd_os_windows_alloc` feature for memory allocation on
+Windows, this allows other modules to use the low level memory allocation API for Windows without
+enabling memory allocation support for other operating systems. To build `nstd` as a C library, use
+the `clib` feature flag. The `std` feature flag enables Rust standard library support. `std` and
+`nstd_core` are enabled by default.
 
 For example:
 ```
