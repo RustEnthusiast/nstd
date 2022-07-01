@@ -10,6 +10,7 @@ Rust syntax).
     - `alloc` - Low level memory allocation.
     - `core` - Provides core functionality for `nstd`.
         - `cstr` - C string processing.
+            - `raw` - Raw C string processing.
         - `cty` - Provides functions for examining and operating on character types.
         - `def` - Contains common types used throughout `nstd`.
         - `fty` - Provides functions for examining and operating on floating point types.

@@ -1,22 +1,17 @@
-//! C string processing.
-pub mod raw;
-use crate::{
-    core::{
-        def::NSTDChar,
-        slice::{nstd_core_slice_const_new, NSTDSliceConst},
-    },
-    NSTDUSize,
-};
+#ifndef NSTD_CORE_CSTR_CSTR_H_INCLUDED
+#define NSTD_CORE_CSTR_CSTR_H_INCLUDED
+#include "../../nstd.h"
+#include "../def.h"
+#include "../slice.h"
+NSTDCPPSTART
 
 /// A mutable slice of a C string.
-#[repr(C)]
-#[derive(Debug, Hash)]
-pub struct NSTDCStr {
+typedef struct {
     /// A pointer to the first character in the C string.
-    pub ptr: *mut NSTDChar,
+    NSTDChar *ptr;
     /// The length of the C string, excluding the null byte.
-    pub len: NSTDUSize,
-}
+    NSTDUSize len;
+} NSTDCStr;
 
 /// Creates a new C string slice from a raw pointer and a size.
 ///
@@ -33,11 +28,7 @@ pub struct NSTDCStr {
 /// # Safety
 ///
 /// `raw`'s data must remain valid while the returned C string slice is in use.
-#[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_cstr_new(raw: *mut NSTDChar, len: NSTDUSize) -> NSTDCStr {
-    NSTDCStr { ptr: raw, len }
-}
+NSTDAPI NSTDCStr nstd_core_cstr_new(NSTDChar *raw, NSTDUSize len);
 
 /// Returns a byte slice of a C string slice's data.
 ///
@@ -52,11 +43,7 @@ pub unsafe extern "C" fn nstd_core_cstr_new(raw: *mut NSTDChar, len: NSTDUSize) 
 /// # Safety
 ///
 /// `cstr`'s data must remain valid while the returned byte slice is in use.
-#[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_cstr_as_bytes(cstr: &NSTDCStr) -> NSTDSliceConst {
-    nstd_core_slice_const_new(cstr.ptr.cast(), 1, cstr.len)
-}
+NSTDAPI NSTDSliceConst nstd_core_cstr_as_bytes(const NSTDCStr *cstr);
 
 /// Return a pointer the character at `pos` in `cstr`.
 ///
@@ -73,11 +60,7 @@ pub unsafe extern "C" fn nstd_core_cstr_as_bytes(cstr: &NSTDCStr) -> NSTDSliceCo
 /// # Safety
 ///
 /// `cstr`'s data must remain valid while the returned pointer is in use.
-#[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_cstr_get(cstr: &mut NSTDCStr, pos: NSTDUSize) -> *mut NSTDChar {
-    nstd_core_cstr_get_const(cstr, pos) as *mut NSTDChar
-}
+NSTDAPI NSTDChar *nstd_core_cstr_get(NSTDCStr *cstr, NSTDUSize pos);
 
 /// Return an immutable pointer the character at `pos` in `cstr`.
 ///
@@ -94,27 +77,15 @@ pub unsafe extern "C" fn nstd_core_cstr_get(cstr: &mut NSTDCStr, pos: NSTDUSize)
 /// # Safety
 ///
 /// `cstr`'s data must remain valid while the returned pointer is in use.
-#[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_cstr_get_const(
-    cstr: &NSTDCStr,
-    pos: NSTDUSize,
-) -> *const NSTDChar {
-    match pos < cstr.len {
-        true => cstr.ptr.add(pos),
-        false => core::ptr::null(),
-    }
-}
+NSTDAPI const NSTDChar *nstd_core_cstr_get_const(const NSTDCStr *cstr, NSTDUSize pos);
 
 /// An immutable slice of a C string.
-#[repr(C)]
-#[derive(Debug, Hash)]
-pub struct NSTDCStrConst {
+typedef struct {
     /// A pointer to the first character in the C string.
-    pub ptr: *const NSTDChar,
+    const NSTDChar *ptr;
     /// The length of the C string, excluding the null byte.
-    pub len: NSTDUSize,
-}
+    NSTDUSize len;
+} NSTDCStrConst;
 
 /// Creates a new C string slice from a raw pointer and a size.
 ///
@@ -131,14 +102,7 @@ pub struct NSTDCStrConst {
 /// # Safety
 ///
 /// `raw`'s data must remain valid while the returned C string slice is in use.
-#[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_cstr_const_new(
-    raw: *const NSTDChar,
-    len: NSTDUSize,
-) -> NSTDCStrConst {
-    NSTDCStrConst { ptr: raw, len }
-}
+NSTDAPI NSTDCStrConst nstd_core_cstr_const_new(const NSTDChar *raw, NSTDUSize len);
 
 /// Returns a byte slice of a C string slice's data.
 ///
@@ -153,11 +117,7 @@ pub unsafe extern "C" fn nstd_core_cstr_const_new(
 /// # Safety
 ///
 /// `cstr`'s data must remain valid while the returned byte slice is in use.
-#[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_cstr_const_as_bytes(cstr: &NSTDCStrConst) -> NSTDSliceConst {
-    nstd_core_slice_const_new(cstr.ptr.cast(), 1, cstr.len)
-}
+NSTDAPI NSTDSliceConst nstd_core_cstr_const_as_bytes(const NSTDCStrConst *cstr);
 
 /// Return a pointer the character at `pos` in `cstr`.
 ///
@@ -174,14 +134,7 @@ pub unsafe extern "C" fn nstd_core_cstr_const_as_bytes(cstr: &NSTDCStrConst) -> 
 /// # Safety
 ///
 /// `cstr`'s data must remain valid while the returned pointer is in use.
-#[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_cstr_const_get(
-    cstr: &NSTDCStrConst,
-    pos: NSTDUSize,
-) -> *const NSTDChar {
-    match pos < cstr.len {
-        true => cstr.ptr.add(pos),
-        false => core::ptr::null(),
-    }
-}
+NSTDAPI const NSTDChar *nstd_core_cstr_const_get(const NSTDCStrConst *cstr, NSTDUSize pos);
+
+NSTDCPPEND
+#endif
