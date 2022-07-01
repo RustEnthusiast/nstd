@@ -532,14 +532,12 @@ pub extern "C" fn nstd_vec_shrink(vec: &mut NSTDVec) -> NSTDErrorCode {
 ///
 /// # Parameters:
 ///
-/// - `NSTDVec *vec` - The vector to free.
+/// - `NSTDVec vec` - The vector to free.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_vec_free(vec: &mut NSTDVec) {
+pub extern "C" fn nstd_vec_free(mut vec: NSTDVec) {
     if !vec.buffer.ptr.raw.is_null() {
         let buffer_len = vec.buffer.byte_len();
         unsafe { nstd_alloc_deallocate(&mut vec.buffer.ptr.raw, buffer_len) };
-        vec.buffer.len = 0;
-        vec.len = 0;
     }
 }

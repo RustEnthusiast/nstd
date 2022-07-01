@@ -146,8 +146,8 @@ NSTDAPI NSTDChar nstd_cstring_pop(NSTDCString *cstring);
 ///
 /// # Parameters:
 ///
-/// - `NSTDCString *cstring` - The C string to free.
-NSTDAPI void nstd_cstring_free(NSTDCString *cstring);
+/// - `NSTDCString cstring` - The C string to free.
+NSTDAPI void nstd_cstring_free(NSTDCString cstring);
 
 NSTDCPPEND
 #endif

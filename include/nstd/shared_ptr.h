@@ -98,8 +98,8 @@ NSTDAPI NSTDAnyConst nstd_shared_ptr_get(const NSTDSharedPtr *shared_ptr);
 ///
 /// # Parameters:
 ///
-/// - `NSTDSharedPtr *shared_ptr` - The shared object to free.
-NSTDAPI void nstd_shared_ptr_free(NSTDSharedPtr *shared_ptr);
+/// - `NSTDSharedPtr shared_ptr` - The shared object to free.
+NSTDAPI void nstd_shared_ptr_free(NSTDSharedPtr shared_ptr);
 
 NSTDCPPEND
 #endif

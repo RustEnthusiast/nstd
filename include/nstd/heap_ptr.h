@@ -106,8 +106,8 @@ NSTDAPI NSTDAnyConst nstd_heap_ptr_get_const(const NSTDHeapPtr *hptr);
 ///
 /// # Parameters:
 ///
-/// - `NSTDHeapPtr *hptr` - A pointer to the heap object.
-NSTDAPI void nstd_heap_ptr_free(NSTDHeapPtr *hptr);
+/// - `NSTDHeapPtr hptr` - A pointer to the heap object.
+NSTDAPI void nstd_heap_ptr_free(NSTDHeapPtr hptr);
 
 NSTDCPPEND
 #endif

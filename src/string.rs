@@ -208,9 +208,9 @@ pub extern "C" fn nstd_string_pop(string: &mut NSTDString) -> NSTDUnichar {
 ///
 /// # Parameters:
 ///
-/// - `NSTDString *string` - A pointer to the string to free.
+/// - `NSTDString string` - A pointer to the string to free.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_string_free(string: &mut NSTDString) {
-    nstd_vec_free(&mut string.bytes);
+pub extern "C" fn nstd_string_free(string: NSTDString) {
+    nstd_vec_free(string.bytes);
 }

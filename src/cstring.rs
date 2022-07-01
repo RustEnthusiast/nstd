@@ -228,9 +228,9 @@ pub extern "C" fn nstd_cstring_pop(cstring: &mut NSTDCString) -> NSTDChar {
 ///
 /// # Parameters:
 ///
-/// - `NSTDCString *cstring` - The C string to free.
+/// - `NSTDCString cstring` - The C string to free.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_cstring_free(cstring: &mut NSTDCString) {
-    nstd_vec_free(&mut cstring.bytes);
+pub extern "C" fn nstd_cstring_free(cstring: NSTDCString) {
+    nstd_vec_free(cstring.bytes);
 }

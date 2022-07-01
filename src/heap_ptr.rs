@@ -155,11 +155,9 @@ pub unsafe extern "C" fn nstd_heap_ptr_get_const(hptr: &NSTDHeapPtr) -> NSTDAnyC
 ///
 /// # Parameters:
 ///
-/// - `NSTDHeapPtr *hptr` - A pointer to the heap object.
+/// - `NSTDHeapPtr hptr` - A pointer to the heap object.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_heap_ptr_free(hptr: &mut NSTDHeapPtr) {
-    if !hptr.ptr.raw.is_null() {
-        unsafe { nstd_alloc_deallocate(&mut hptr.ptr.raw, hptr.ptr.size) };
-    }
+pub extern "C" fn nstd_heap_ptr_free(mut hptr: NSTDHeapPtr) {
+    unsafe { nstd_alloc_deallocate(&mut hptr.ptr.raw, hptr.ptr.size) };
 }

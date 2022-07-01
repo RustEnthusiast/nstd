@@ -136,8 +136,8 @@ NSTDAPI NSTDUnichar nstd_string_pop(NSTDString *string);
 ///
 /// # Parameters:
 ///
-/// - `NSTDString *string` - A pointer to the string to free.
-NSTDAPI void nstd_string_free(NSTDString *string);
+/// - `NSTDString string` - A pointer to the string to free.
+NSTDAPI void nstd_string_free(NSTDString string);
 
 NSTDCPPEND
 #endif

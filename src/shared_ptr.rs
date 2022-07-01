@@ -173,10 +173,9 @@ pub unsafe extern "C" fn nstd_shared_ptr_get(shared_ptr: &NSTDSharedPtr) -> NSTD
 ///
 /// # Parameters:
 ///
-/// - `NSTDSharedPtr *shared_ptr` - The shared object to free.
-#[inline]
+/// - `NSTDSharedPtr shared_ptr` - The shared object to free.
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_shared_ptr_free(shared_ptr: &mut NSTDSharedPtr) {
+pub extern "C" fn nstd_shared_ptr_free(mut shared_ptr: NSTDSharedPtr) {
     unsafe {
         // Update the pointer count.
         let ptrs = shared_ptr.ptrs();
