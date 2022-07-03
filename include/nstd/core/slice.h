@@ -31,6 +31,17 @@ typedef struct {
 /// `ptr`'s data must remain valid while the returned slice is in use.
 NSTDAPI NSTDSlice nstd_core_slice_new(NSTDAny ptr, NSTDUSize element_size, NSTDUSize len);
 
+/// Returns the number of elements in a slice.
+///
+/// # Parameters:
+///
+/// - `const NSTDSlice *slice` - The slice.
+///
+/// # Returns
+///
+/// `NSTDUSize len` - The length of the slice.
+NSTDAPI NSTDUSize nstd_core_slice_len(const NSTDSlice *slice);
+
 /// Returns a pointer to the element at index `pos` in `slice`.
 ///
 /// # Parameters:
@@ -184,6 +195,17 @@ typedef struct {
 /// `ptr`'s data must remain valid while the returned slice is in use.
 NSTDAPI NSTDSliceConst nstd_core_slice_const_new(NSTDAnyConst ptr, NSTDUSize element_size,
 NSTDUSize len);
+
+/// Returns the number of elements in an immutable slice.
+///
+/// # Parameters:
+///
+/// - `const NSTDSliceConst *slice` - The immutable slice.
+///
+/// # Returns
+///
+/// `NSTDUSize len` - The length of the slice.
+NSTDAPI NSTDUSize nstd_core_slice_const_len(const NSTDSliceConst *slice);
 
 /// Returns an immutable pointer to the element at index `pos` in `slice`.
 ///

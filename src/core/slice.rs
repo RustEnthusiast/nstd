@@ -60,6 +60,21 @@ pub unsafe extern "C" fn nstd_core_slice_new(
     }
 }
 
+/// Returns the number of elements in a slice.
+///
+/// # Parameters:
+///
+/// - `const NSTDSlice *slice` - The slice.
+///
+/// # Returns
+///
+/// `NSTDUSize len` - The length of the slice.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_core_slice_len(slice: &NSTDSlice) -> NSTDUSize {
+    slice.len
+}
+
 /// Returns a pointer to the element at index `pos` in `slice`.
 ///
 /// # Parameters:
@@ -282,6 +297,21 @@ pub unsafe extern "C" fn nstd_core_slice_const_new(
         ptr: nstd_core_ptr_const_new(ptr, element_size),
         len,
     }
+}
+
+/// Returns the number of elements in an immutable slice.
+///
+/// # Parameters:
+///
+/// - `const NSTDSliceConst *slice` - The immutable slice.
+///
+/// # Returns
+///
+/// `NSTDUSize len` - The length of the slice.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_core_slice_const_len(slice: &NSTDSliceConst) -> NSTDUSize {
+    slice.len
 }
 
 /// Returns an immutable pointer to the element at index `pos` in `slice`.
