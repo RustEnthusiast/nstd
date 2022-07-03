@@ -32,6 +32,21 @@ pub unsafe extern "C" fn nstd_core_ptr_new(obj: NSTDAny, size: NSTDUSize) -> NST
     NSTDPtr { raw: obj, size }
 }
 
+/// Returns the size of the object being pointed to.
+///
+/// # Parameters:
+///
+/// - `const NSTDPtr *ptr` - The pointer.
+///
+/// # Returns
+///
+/// `NSTDUSize size` - The size of the object pointed to by `ptr`.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_core_ptr_size(ptr: &NSTDPtr) -> NSTDUSize {
+    ptr.size
+}
+
 /// Returns a raw pointer to the object pointed to by `ptr`.
 ///
 /// # Parameters:
@@ -124,6 +139,21 @@ pub unsafe extern "C" fn nstd_core_ptr_const_new(
     size: NSTDUSize,
 ) -> NSTDPtrConst {
     NSTDPtrConst { raw: obj, size }
+}
+
+/// Returns the size of the object being pointed to.
+///
+/// # Parameters:
+///
+/// - `const NSTDPtrConst *ptr` - The pointer.
+///
+/// # Returns
+///
+/// `NSTDUSize size` - The size of the object pointed to by `ptr`.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_core_ptr_const_size(ptr: &NSTDPtrConst) -> NSTDUSize {
+    ptr.size
 }
 
 /// Returns a raw immutable pointer to the object pointed to by `ptr`.

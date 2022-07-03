@@ -28,6 +28,17 @@ typedef struct {
 /// `obj` must remain valid while the returned pointer is in use.
 NSTDAPI NSTDPtr nstd_core_ptr_new(NSTDAny obj, NSTDUSize size);
 
+/// Returns the size of the object being pointed to.
+///
+/// # Parameters:
+///
+/// - `const NSTDPtr *ptr` - The pointer.
+///
+/// # Returns
+///
+/// `NSTDUSize size` - The size of the object pointed to by `ptr`.
+NSTDAPI NSTDUSize nstd_core_ptr_size(const NSTDPtr *ptr);
+
 /// Returns a raw pointer to the object pointed to by `ptr`.
 ///
 /// # Parameters:
@@ -100,6 +111,17 @@ typedef struct {
 ///
 /// `obj` must remain valid while the returned pointer is in use.
 NSTDAPI NSTDPtrConst nstd_core_ptr_const_new(NSTDAnyConst obj, NSTDUSize size);
+
+/// Returns the size of the object being pointed to.
+///
+/// # Parameters:
+///
+/// - `const NSTDPtrConst *ptr` - The pointer.
+///
+/// # Returns
+///
+/// `NSTDUSize size` - The size of the object pointed to by `ptr`.
+NSTDAPI NSTDUSize nstd_core_ptr_const_size(const NSTDPtrConst *ptr);
 
 /// Returns a raw immutable pointer to the object pointed to by `ptr`.
 ///
