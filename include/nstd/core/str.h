@@ -10,9 +10,9 @@ NSTDCPPSTART
 typedef struct {
     /// A view into the UTF-8 encoded buffer.
     NSTDSliceMut bytes;
-} NSTDStr;
+} NSTDStrMut;
 
-/// Creates a new instance of `NSTDStr` from a C string.
+/// Creates a new instance of `NSTDStrMut` from a C string.
 ///
 /// # Parameters:
 ///
@@ -20,13 +20,13 @@ typedef struct {
 ///
 /// # Returns
 ///
-/// `NSTDStr str` - The new `NSTDStr` instance, excluding the C string's null terminator.
+/// `NSTDStrMut str` - The new `NSTDStrMut` instance, excluding the C string's null terminator.
 ///
 /// # Safety
 ///
 /// This function does not check to ensure that `cstr` is valid UTF-8. `cstr`'s data must remain
 /// valid while the returned string slice is in use.
-NSTDAPI NSTDStr nstd_core_str_from_cstr_unchecked(NSTDCStr *cstr);
+NSTDAPI NSTDStrMut nstd_core_str_mut_from_cstr_unchecked(NSTDCStr *cstr);
 
 /// Creates a string slice from raw bytes.
 ///
@@ -36,7 +36,7 @@ NSTDAPI NSTDStr nstd_core_str_from_cstr_unchecked(NSTDCStr *cstr);
 ///
 /// # Returns
 ///
-/// `NSTDStr str` - The new string slice.
+/// `NSTDStrMut str` - The new string slice.
 ///
 /// # Panics
 ///
@@ -45,7 +45,7 @@ NSTDAPI NSTDStr nstd_core_str_from_cstr_unchecked(NSTDCStr *cstr);
 /// # Safety
 ///
 /// `bytes` must remain valid while the returned string slice is in use.
-NSTDAPI NSTDStr nstd_core_str_from_bytes(NSTDSliceMut *bytes);
+NSTDAPI NSTDStrMut nstd_core_str_mut_from_bytes(NSTDSliceMut *bytes);
 
 /// Creates a string slice from raw bytes, without checking for UTF-8.
 ///
@@ -55,7 +55,7 @@ NSTDAPI NSTDStr nstd_core_str_from_bytes(NSTDSliceMut *bytes);
 ///
 /// # Returns
 ///
-/// `NSTDStr str` - The new string slice.
+/// `NSTDStrMut str` - The new string slice.
 ///
 /// # Panics
 ///
@@ -65,13 +65,13 @@ NSTDAPI NSTDStr nstd_core_str_from_bytes(NSTDSliceMut *bytes);
 ///
 /// This function does not check to ensure that `bytes` are valid UTF-8.`bytes` must remain valid
 /// while the returned string slice is in use.
-NSTDAPI NSTDStr nstd_core_str_from_bytes_unchecked(NSTDSliceMut *bytes);
+NSTDAPI NSTDStrMut nstd_core_str_mut_from_bytes_unchecked(NSTDSliceMut *bytes);
 
 /// Returns an immutable byte slice over `str`'s data.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDStr *str` - The string slice.
+/// - `const NSTDStrMut *str` - The string slice.
 ///
 /// # Returns
 ///
@@ -80,7 +80,7 @@ NSTDAPI NSTDStr nstd_core_str_from_bytes_unchecked(NSTDSliceMut *bytes);
 /// # Safety
 ///
 /// `str`'s data must remain valid while the returned slice is in use.
-NSTDAPI NSTDSliceConst nstd_core_str_as_bytes(const NSTDStr *str);
+NSTDAPI NSTDSliceConst nstd_core_str_mut_as_bytes(const NSTDStrMut *str);
 
 /// Gets the `NSTDUnichar` at index `pos` in `str`.
 ///
@@ -90,7 +90,7 @@ NSTDAPI NSTDSliceConst nstd_core_str_as_bytes(const NSTDStr *str);
 ///
 /// # Parameters:
 ///
-/// - `const NSTDStr *str` - The string slice to index.
+/// - `const NSTDStrMut *str` - The string slice to index.
 ///
 /// - `NSTDUSize pos` - The index of the character to get.
 ///
@@ -98,7 +98,7 @@ NSTDAPI NSTDSliceConst nstd_core_str_as_bytes(const NSTDStr *str);
 ///
 /// `NSTDUnichar chr` - The character at index `pos`, or the Unicode replacement character on
 /// error.
-NSTDAPI NSTDUnichar nstd_core_str_get_char(const NSTDStr *str, NSTDUSize pos);
+NSTDAPI NSTDUnichar nstd_core_str_mut_get_char(const NSTDStrMut *str, NSTDUSize pos);
 
 /// Creates a substring of an existing string slice.
 ///
@@ -109,13 +109,13 @@ NSTDAPI NSTDUnichar nstd_core_str_get_char(const NSTDStr *str, NSTDUSize pos);
 ///
 /// # Parameters:
 ///
-/// - `NSTDStr *str` - The string slice to create the new substring from.
+/// - `NSTDStrMut *str` - The string slice to create the new substring from.
 ///
 /// - `NSTDURange range` - The bounds of the new substring (indexed by bytes).
 ///
 /// # Returns
 ///
-/// `NSTDStr substr` - The new substring.
+/// `NSTDStrMut substr` - The new substring.
 ///
 /// # Panics
 ///
@@ -130,7 +130,7 @@ NSTDAPI NSTDUnichar nstd_core_str_get_char(const NSTDStr *str, NSTDUSize pos);
 /// # Safety
 ///
 /// `str`'s data must remain valid while the returned string slice is in use.
-NSTDAPI NSTDStr nstd_core_str_substr(NSTDStr *str, NSTDURange range);
+NSTDAPI NSTDStrMut nstd_core_str_mut_substr(NSTDStrMut *str, NSTDURange range);
 
 /// An immutable unowned view into a UTF-8 encoded byte string.
 typedef struct {

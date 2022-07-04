@@ -4,8 +4,8 @@ use crate::{
         def::NSTDErrorCode,
         slice::{nstd_core_slice_const_new, NSTDSliceConst},
         str::{
-            nstd_core_str_const_from_bytes_unchecked, nstd_core_str_from_bytes_unchecked, NSTDStr,
-            NSTDStrConst,
+            nstd_core_str_const_from_bytes_unchecked, nstd_core_str_mut_from_bytes_unchecked,
+            NSTDStrConst, NSTDStrMut,
         },
     },
     vec::{
@@ -87,17 +87,17 @@ pub extern "C" fn nstd_string_clone(string: &NSTDString) -> NSTDString {
 ///
 /// # Returns
 ///
-/// `NSTDStr str` - The new string slice.
+/// `NSTDStrMut str` - The new string slice.
 ///
 /// # Safety
 ///
 /// `string`'s data must remain valid while the returned string slice is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_string_as_str(string: &mut NSTDString) -> NSTDStr {
+pub unsafe extern "C" fn nstd_string_as_str_mut(string: &mut NSTDString) -> NSTDStrMut {
     let bytes = nstd_vec_as_slice_mut(&mut string.bytes);
     // SAFETY: The string's bytes are always be UTF-8 encoded.
-    nstd_core_str_from_bytes_unchecked(&bytes)
+    nstd_core_str_mut_from_bytes_unchecked(&bytes)
 }
 
 /// Creates a string slice containing the contents of `string`.
