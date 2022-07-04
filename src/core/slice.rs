@@ -10,20 +10,20 @@ use crate::{
 /// A view into a sequence of values in memory.
 #[repr(C)]
 #[derive(Debug, Hash)]
-pub struct NSTDSlice {
+pub struct NSTDSliceMut {
     /// A pointer to the first element in the slice.
     pub ptr: NSTDPtrMut,
     /// The number of elements in the slice.
     pub len: NSTDUSize,
 }
-impl NSTDSlice {
+impl NSTDSliceMut {
     /// Returns the number of bytes that this slice covers.
     #[inline]
     pub(crate) const fn byte_len(&self) -> usize {
         self.len * self.ptr.size
     }
 
-    /// Creates a Rust byte slice from this `NSTDSlice`.
+    /// Creates a Rust byte slice from this `NSTDSliceMut`.
     #[inline]
     pub(crate) fn as_slice(&self) -> &[u8] {
         unsafe { core::slice::from_raw_parts(self.ptr.raw.cast(), self.byte_len()) }
@@ -42,19 +42,19 @@ impl NSTDSlice {
 ///
 /// # Returns
 ///
-/// `NSTDSlice slice` - The new slice.
+/// `NSTDSliceMut slice` - The new slice.
 ///
 /// # Safety
 ///
 /// `ptr`'s data must remain valid while the returned slice is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_slice_new(
+pub unsafe extern "C" fn nstd_core_slice_mut_new(
     ptr: NSTDAnyMut,
     element_size: NSTDUSize,
     len: NSTDUSize,
-) -> NSTDSlice {
-    NSTDSlice {
+) -> NSTDSliceMut {
+    NSTDSliceMut {
         ptr: nstd_core_ptr_mut_new(ptr, element_size),
         len,
     }
@@ -64,14 +64,14 @@ pub unsafe extern "C" fn nstd_core_slice_new(
 ///
 /// # Parameters:
 ///
-/// - `const NSTDSlice *slice` - The slice.
+/// - `const NSTDSliceMut *slice` - The slice.
 ///
 /// # Returns
 ///
 /// `NSTDUSize len` - The length of the slice.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_slice_len(slice: &NSTDSlice) -> NSTDUSize {
+pub extern "C" fn nstd_core_slice_mut_len(slice: &NSTDSliceMut) -> NSTDUSize {
     slice.len
 }
 
@@ -79,7 +79,7 @@ pub extern "C" fn nstd_core_slice_len(slice: &NSTDSlice) -> NSTDUSize {
 ///
 /// # Parameters:
 ///
-/// - `NSTDSlice *slice` - The slice to read an element from.
+/// - `NSTDSliceMut *slice` - The slice to read an element from.
 ///
 /// - `NSTDUSize pos` - The position of the element to get, starting at 0.
 ///
@@ -93,18 +93,18 @@ pub extern "C" fn nstd_core_slice_len(slice: &NSTDSlice) -> NSTDUSize {
 /// `slice`'s data must remain valid while the returned pointer is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_slice_get_mut(
-    slice: &mut NSTDSlice,
+pub unsafe extern "C" fn nstd_core_slice_mut_get(
+    slice: &mut NSTDSliceMut,
     pos: NSTDUSize,
 ) -> NSTDAnyMut {
-    nstd_core_slice_get_const(slice, pos) as NSTDAnyMut
+    nstd_core_slice_mut_get_const(slice, pos) as NSTDAnyMut
 }
 
 /// Returns an immutable pointer to the element at index `pos` in `slice`.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDSlice *slice` - The slice to read an element from.
+/// - `const NSTDSliceMut *slice` - The slice to read an element from.
 ///
 /// - `NSTDUSize pos` - The position of the element to get, starting at 0.
 ///
@@ -118,8 +118,8 @@ pub unsafe extern "C" fn nstd_core_slice_get_mut(
 /// `slice`'s data must remain valid while the returned pointer is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_slice_get_const(
-    slice: &NSTDSlice,
+pub unsafe extern "C" fn nstd_core_slice_mut_get_const(
+    slice: &NSTDSliceMut,
     pos: NSTDUSize,
 ) -> NSTDAnyConst {
     match pos < slice.len {
@@ -132,7 +132,7 @@ pub unsafe extern "C" fn nstd_core_slice_get_const(
 ///
 /// # Parameters:
 ///
-/// - `NSTDSlice *slice` - The slice to get the first element of.
+/// - `NSTDSliceMut *slice` - The slice to get the first element of.
 ///
 /// # Returns
 ///
@@ -144,15 +144,15 @@ pub unsafe extern "C" fn nstd_core_slice_get_const(
 /// `slice`'s data must remain valid while the returned pointer is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_slice_first_mut(slice: &mut NSTDSlice) -> NSTDAnyMut {
-    nstd_core_slice_first_const(slice) as NSTDAnyMut
+pub unsafe extern "C" fn nstd_core_slice_mut_first(slice: &mut NSTDSliceMut) -> NSTDAnyMut {
+    nstd_core_slice_mut_first_const(slice) as NSTDAnyMut
 }
 
 /// Returns an immutable pointer to the first element in the slice.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDSlice *slice` - The slice to get the first element of.
+/// - `const NSTDSliceMut *slice` - The slice to get the first element of.
 ///
 /// # Returns
 ///
@@ -164,7 +164,7 @@ pub unsafe extern "C" fn nstd_core_slice_first_mut(slice: &mut NSTDSlice) -> NST
 /// `slice`'s data must remain valid while the returned pointer is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_slice_first_const(slice: &NSTDSlice) -> NSTDAnyConst {
+pub unsafe extern "C" fn nstd_core_slice_mut_first_const(slice: &NSTDSliceMut) -> NSTDAnyConst {
     match slice.len > 0 {
         true => slice.ptr.raw,
         false => NSTD_NULL,
@@ -175,7 +175,7 @@ pub unsafe extern "C" fn nstd_core_slice_first_const(slice: &NSTDSlice) -> NSTDA
 ///
 /// # Parameters:
 ///
-/// - `NSTDSlice *slice` - The slice to get the last element of.
+/// - `NSTDSliceMut *slice` - The slice to get the last element of.
 ///
 /// # Returns
 ///
@@ -187,15 +187,15 @@ pub unsafe extern "C" fn nstd_core_slice_first_const(slice: &NSTDSlice) -> NSTDA
 /// `slice`'s data must remain valid while the returned pointer is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_slice_last_mut(slice: &mut NSTDSlice) -> NSTDAnyMut {
-    nstd_core_slice_last_const(slice) as NSTDAnyMut
+pub unsafe extern "C" fn nstd_core_slice_mut_last(slice: &mut NSTDSliceMut) -> NSTDAnyMut {
+    nstd_core_slice_mut_last_const(slice) as NSTDAnyMut
 }
 
 /// Returns an immutable pointer to the last element in the slice.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDSlice *slice` - The slice to get the last element of.
+/// - `const NSTDSliceMut *slice` - The slice to get the last element of.
 ///
 /// # Returns
 ///
@@ -207,9 +207,9 @@ pub unsafe extern "C" fn nstd_core_slice_last_mut(slice: &mut NSTDSlice) -> NSTD
 /// `slice`'s data must remain valid while the returned pointer is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_slice_last_const(slice: &NSTDSlice) -> NSTDAnyConst {
+pub unsafe extern "C" fn nstd_core_slice_mut_last_const(slice: &NSTDSliceMut) -> NSTDAnyConst {
     match slice.len > 0 {
-        true => nstd_core_slice_get_const(slice, slice.len - 1),
+        true => nstd_core_slice_mut_get_const(slice, slice.len - 1),
         false => NSTD_NULL,
     }
 }
@@ -218,16 +218,16 @@ pub unsafe extern "C" fn nstd_core_slice_last_const(slice: &NSTDSlice) -> NSTDAn
 ///
 /// # Parameters:
 ///
-/// - `const NSTDSlice *s1` - The first slice to compare.
+/// - `const NSTDSliceMut *s1` - The first slice to compare.
 ///
-/// - `const NSTDSlice *s2` - The second slice to compare.
+/// - `const NSTDSliceMut *s2` - The second slice to compare.
 ///
 /// # Returns
 ///
 /// `NSTDBool is_eq` - `NSTD_TRUE` if the two slices compare equal.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_slice_compare(s1: &NSTDSlice, s2: &NSTDSlice) -> NSTDBool {
+pub extern "C" fn nstd_core_slice_mut_compare(s1: &NSTDSliceMut, s2: &NSTDSliceMut) -> NSTDBool {
     (s1.as_slice() == s2.as_slice()).into()
 }
 
@@ -235,16 +235,16 @@ pub extern "C" fn nstd_core_slice_compare(s1: &NSTDSlice, s2: &NSTDSlice) -> NST
 ///
 /// # Parameters:
 ///
-/// - `NSTDSlice *dest` - The slice to copy data to.
+/// - `NSTDSliceMut *dest` - The slice to copy data to.
 ///
-/// - `const NSTDSlice *src` - The slice to copy data from.
+/// - `const NSTDSliceMut *src` - The slice to copy data from.
 ///
 /// # Panics
 ///
 /// This function panics if the byte length of `dest` is less than the byte length of `src`.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_slice_copy(dest: &mut NSTDSlice, src: &NSTDSlice) {
+pub extern "C" fn nstd_core_slice_mut_copy(dest: &mut NSTDSliceMut, src: &NSTDSliceMut) {
     assert!(dest.byte_len() >= src.byte_len());
     unsafe { nstd_core_mem_copy(dest.ptr.raw.cast(), src.ptr.raw.cast(), src.byte_len()) };
 }

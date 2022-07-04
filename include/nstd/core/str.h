@@ -9,7 +9,7 @@ NSTDCPPSTART
 /// An unowned view into a UTF-8 encoded byte string.
 typedef struct {
     /// A view into the UTF-8 encoded buffer.
-    NSTDSlice bytes;
+    NSTDSliceMut bytes;
 } NSTDStr;
 
 /// Creates a new instance of `NSTDStr` from a C string.
@@ -32,7 +32,7 @@ NSTDAPI NSTDStr nstd_core_str_from_cstr_unchecked(NSTDCStr *cstr);
 ///
 /// # Parameters:
 ///
-/// - `NSTDSlice *bytes` - The UTF-8 encoded byte slice.
+/// - `NSTDSliceMut *bytes` - The UTF-8 encoded byte slice.
 ///
 /// # Returns
 ///
@@ -45,13 +45,13 @@ NSTDAPI NSTDStr nstd_core_str_from_cstr_unchecked(NSTDCStr *cstr);
 /// # Safety
 ///
 /// `bytes` must remain valid while the returned string slice is in use.
-NSTDAPI NSTDStr nstd_core_str_from_bytes(NSTDSlice *bytes);
+NSTDAPI NSTDStr nstd_core_str_from_bytes(NSTDSliceMut *bytes);
 
 /// Creates a string slice from raw bytes, without checking for UTF-8.
 ///
 /// # Parameters:
 ///
-/// - `NSTDSlice *bytes` - The UTF-8 encoded byte slice.
+/// - `NSTDSliceMut *bytes` - The UTF-8 encoded byte slice.
 ///
 /// # Returns
 ///
@@ -65,7 +65,7 @@ NSTDAPI NSTDStr nstd_core_str_from_bytes(NSTDSlice *bytes);
 ///
 /// This function does not check to ensure that `bytes` are valid UTF-8.`bytes` must remain valid
 /// while the returned string slice is in use.
-NSTDAPI NSTDStr nstd_core_str_from_bytes_unchecked(NSTDSlice *bytes);
+NSTDAPI NSTDStr nstd_core_str_from_bytes_unchecked(NSTDSliceMut *bytes);
 
 /// Returns an immutable byte slice over `str`'s data.
 ///

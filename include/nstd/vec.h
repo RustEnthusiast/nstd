@@ -8,7 +8,7 @@ NSTDCPPSTART
 /// A dynamically sized contiguous sequence of values.
 typedef struct {
     /// The underlying memory buffer.
-    NSTDSlice buffer;
+    NSTDSliceMut buffer;
     /// The number of active elements in the vector.
     NSTDUSize len;
 } NSTDVec;
@@ -83,12 +83,12 @@ NSTDAPI NSTDUSize nstd_vec_len(const NSTDVec *vec);
 ///
 /// # Returns
 ///
-/// `NSTDSlice slice` - A *mutable* view into the vector.
+/// `NSTDSliceMut slice` - A *mutable* view into the vector.
 ///
 /// # Safety
 ///
 /// `vec`'s data must remain valid while the returned slice is in use.
-NSTDAPI NSTDSlice nstd_vec_as_slice(NSTDVec *vec);
+NSTDAPI NSTDSliceMut nstd_vec_as_slice_mut(NSTDVec *vec);
 
 /// Returns an immutable slice containing all of a vector's active elements.
 ///

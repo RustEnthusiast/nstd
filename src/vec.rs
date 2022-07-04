@@ -4,7 +4,7 @@ use crate::{
     core::{
         def::{NSTDByte, NSTDErrorCode},
         mem::{nstd_core_mem_copy, nstd_core_mem_copy_overlapping},
-        slice::{nstd_core_slice_const_new, nstd_core_slice_new, NSTDSlice, NSTDSliceConst},
+        slice::{nstd_core_slice_const_new, nstd_core_slice_mut_new, NSTDSliceConst, NSTDSliceMut},
     },
     NSTDAnyConst, NSTDAnyMut, NSTDUSize, NSTD_NULL,
 };
@@ -14,7 +14,7 @@ use crate::{
 #[derive(Debug, Hash)]
 pub struct NSTDVec {
     /// The underlying memory buffer.
-    pub buffer: NSTDSlice,
+    pub buffer: NSTDSliceMut,
     /// The number of active elements in the vector.
     pub len: NSTDUSize,
 }
@@ -70,7 +70,7 @@ impl NSTDVec {
 pub extern "C" fn nstd_vec_new(element_size: NSTDUSize) -> NSTDVec {
     assert!(element_size != 0);
     NSTDVec {
-        buffer: unsafe { nstd_core_slice_new(NSTD_NULL, element_size, 0) },
+        buffer: unsafe { nstd_core_slice_mut_new(NSTD_NULL, element_size, 0) },
         len: 0,
     }
 }
@@ -107,7 +107,7 @@ pub extern "C" fn nstd_vec_new_with_cap(element_size: NSTDUSize, mut cap: NSTDUS
     }
     // Construct the vector.
     NSTDVec {
-        buffer: unsafe { nstd_core_slice_new(mem, element_size, cap) },
+        buffer: unsafe { nstd_core_slice_mut_new(mem, element_size, cap) },
         len: 0,
     }
 }
@@ -167,15 +167,15 @@ pub extern "C" fn nstd_vec_len(vec: &NSTDVec) -> NSTDUSize {
 ///
 /// # Returns
 ///
-/// `NSTDSlice slice` - A *mutable* view into the vector.
+/// `NSTDSliceMut slice` - A *mutable* view into the vector.
 ///
 /// # Safety
 ///
 /// `vec`'s data must remain valid while the returned slice is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_vec_as_slice(vec: &mut NSTDVec) -> NSTDSlice {
-    nstd_core_slice_new(vec.buffer.ptr.raw, vec.buffer.ptr.size, vec.len)
+pub unsafe extern "C" fn nstd_vec_as_slice_mut(vec: &mut NSTDVec) -> NSTDSliceMut {
+    nstd_core_slice_mut_new(vec.buffer.ptr.raw, vec.buffer.ptr.size, vec.len)
 }
 
 /// Returns an immutable slice containing all of a vector's active elements.

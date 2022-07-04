@@ -10,7 +10,7 @@ typedef struct {
     NSTDPtrMut ptr;
     /// The number of elements in the slice.
     NSTDUSize len;
-} NSTDSlice;
+} NSTDSliceMut;
 
 /// Creates a new slice from raw data.
 ///
@@ -24,29 +24,29 @@ typedef struct {
 ///
 /// # Returns
 ///
-/// `NSTDSlice slice` - The new slice.
+/// `NSTDSliceMut slice` - The new slice.
 ///
 /// # Safety
 ///
 /// `ptr`'s data must remain valid while the returned slice is in use.
-NSTDAPI NSTDSlice nstd_core_slice_new(NSTDAnyMut ptr, NSTDUSize element_size, NSTDUSize len);
+NSTDAPI NSTDSliceMut nstd_core_slice_mut_new(NSTDAnyMut ptr, NSTDUSize element_size, NSTDUSize len);
 
 /// Returns the number of elements in a slice.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDSlice *slice` - The slice.
+/// - `const NSTDSliceMut *slice` - The slice.
 ///
 /// # Returns
 ///
 /// `NSTDUSize len` - The length of the slice.
-NSTDAPI NSTDUSize nstd_core_slice_len(const NSTDSlice *slice);
+NSTDAPI NSTDUSize nstd_core_slice_mut_len(const NSTDSliceMut *slice);
 
 /// Returns a pointer to the element at index `pos` in `slice`.
 ///
 /// # Parameters:
 ///
-/// - `NSTDSlice *slice` - The slice to read an element from.
+/// - `NSTDSliceMut *slice` - The slice to read an element from.
 ///
 /// - `NSTDUSize pos` - The position of the element to get, starting at 0.
 ///
@@ -58,13 +58,13 @@ NSTDAPI NSTDUSize nstd_core_slice_len(const NSTDSlice *slice);
 /// # Safety
 ///
 /// `slice`'s data must remain valid while the returned pointer is in use.
-NSTDAPI NSTDAnyMut nstd_core_slice_get_mut(NSTDSlice *slice, NSTDUSize pos);
+NSTDAPI NSTDAnyMut nstd_core_slice_mut_get(NSTDSliceMut *slice, NSTDUSize pos);
 
 /// Returns an immutable pointer to the element at index `pos` in `slice`.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDSlice *slice` - The slice to read an element from.
+/// - `const NSTDSliceMut *slice` - The slice to read an element from.
 ///
 /// - `NSTDUSize pos` - The position of the element to get, starting at 0.
 ///
@@ -76,13 +76,13 @@ NSTDAPI NSTDAnyMut nstd_core_slice_get_mut(NSTDSlice *slice, NSTDUSize pos);
 /// # Safety
 ///
 /// `slice`'s data must remain valid while the returned pointer is in use.
-NSTDAPI NSTDAnyConst nstd_core_slice_get_const(const NSTDSlice *slice, NSTDUSize pos);
+NSTDAPI NSTDAnyConst nstd_core_slice_mut_get_const(const NSTDSliceMut *slice, NSTDUSize pos);
 
 /// Returns a pointer to the first element in the slice.
 ///
 /// # Parameters:
 ///
-/// - `NSTDSlice *slice` - The slice to get the first element of.
+/// - `NSTDSliceMut *slice` - The slice to get the first element of.
 ///
 /// # Returns
 ///
@@ -92,13 +92,13 @@ NSTDAPI NSTDAnyConst nstd_core_slice_get_const(const NSTDSlice *slice, NSTDUSize
 /// # Safety
 ///
 /// `slice`'s data must remain valid while the returned pointer is in use.
-NSTDAPI NSTDAnyMut nstd_core_slice_first_mut(NSTDSlice *slice);
+NSTDAPI NSTDAnyMut nstd_core_slice_mut_first(NSTDSliceMut *slice);
 
 /// Returns an immutable pointer to the first element in the slice.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDSlice *slice` - The slice to get the first element of.
+/// - `const NSTDSliceMut *slice` - The slice to get the first element of.
 ///
 /// # Returns
 ///
@@ -108,13 +108,13 @@ NSTDAPI NSTDAnyMut nstd_core_slice_first_mut(NSTDSlice *slice);
 /// # Safety
 ///
 /// `slice`'s data must remain valid while the returned pointer is in use.
-NSTDAPI NSTDAnyConst nstd_core_slice_first_const(const NSTDSlice *slice);
+NSTDAPI NSTDAnyConst nstd_core_slice_mut_first_const(const NSTDSliceMut *slice);
 
 /// Returns a pointer to the last element in the slice.
 ///
 /// # Parameters:
 ///
-/// - `NSTDSlice *slice` - The slice to get the last element of.
+/// - `NSTDSliceMut *slice` - The slice to get the last element of.
 ///
 /// # Returns
 ///
@@ -124,13 +124,13 @@ NSTDAPI NSTDAnyConst nstd_core_slice_first_const(const NSTDSlice *slice);
 /// # Safety
 ///
 /// `slice`'s data must remain valid while the returned pointer is in use.
-NSTDAPI NSTDAnyMut nstd_core_slice_last_mut(NSTDSlice *slice);
+NSTDAPI NSTDAnyMut nstd_core_slice_mut_last(NSTDSliceMut *slice);
 
 /// Returns an immutable pointer to the last element in the slice.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDSlice *slice` - The slice to get the last element of.
+/// - `const NSTDSliceMut *slice` - The slice to get the last element of.
 ///
 /// # Returns
 ///
@@ -140,33 +140,33 @@ NSTDAPI NSTDAnyMut nstd_core_slice_last_mut(NSTDSlice *slice);
 /// # Safety
 ///
 /// `slice`'s data must remain valid while the returned pointer is in use.
-NSTDAPI NSTDAnyConst nstd_core_slice_last_const(const NSTDSlice *slice);
+NSTDAPI NSTDAnyConst nstd_core_slice_mut_last_const(const NSTDSliceMut *slice);
 
 /// Compares two slices, returning true if the slices carry, or point to the same data.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDSlice *s1` - The first slice to compare.
+/// - `const NSTDSliceMut *s1` - The first slice to compare.
 ///
-/// - `const NSTDSlice *s2` - The second slice to compare.
+/// - `const NSTDSliceMut *s2` - The second slice to compare.
 ///
 /// # Returns
 ///
 /// `NSTDBool is_eq` - `NSTD_TRUE` if the two slices compare equal.
-NSTDAPI NSTDBool nstd_core_slice_compare(const NSTDSlice *s1, const NSTDSlice *s2);
+NSTDAPI NSTDBool nstd_core_slice_mut_compare(const NSTDSliceMut *s1, const NSTDSliceMut *s2);
 
 /// Copies data into `dest` from `src`. The number of bytes copied is determined by `src`.
 ///
 /// # Parameters:
 ///
-/// - `NSTDSlice *dest` - The slice to copy data to.
+/// - `NSTDSliceMut *dest` - The slice to copy data to.
 ///
-/// - `const NSTDSlice *src` - The slice to copy data from.
+/// - `const NSTDSliceMut *src` - The slice to copy data from.
 ///
 /// # Panics
 ///
 /// This function panics if the byte length of `dest` is less than the byte length of `src`.
-NSTDAPI void nstd_core_slice_copy(NSTDSlice *dest, const NSTDSlice *src);
+NSTDAPI void nstd_core_slice_mut_copy(NSTDSliceMut *dest, const NSTDSliceMut *src);
 
 /// An immutable view into a sequence of values in memory.
 typedef struct {

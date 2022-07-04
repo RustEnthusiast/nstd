@@ -3,7 +3,7 @@ use crate::{
     core::{
         cstr::{NSTDCStr, NSTDCStrConst},
         range::NSTDURange,
-        slice::{nstd_core_slice_const_new, nstd_core_slice_new, NSTDSlice, NSTDSliceConst},
+        slice::{nstd_core_slice_const_new, nstd_core_slice_mut_new, NSTDSliceConst, NSTDSliceMut},
     },
     NSTDUSize, NSTDUnichar,
 };
@@ -13,7 +13,7 @@ use crate::{
 #[derive(Debug, Hash)]
 pub struct NSTDStr {
     /// A view into the UTF-8 encoded buffer.
-    pub bytes: NSTDSlice,
+    pub bytes: NSTDSliceMut,
 }
 
 /// Creates a new instance of `NSTDStr` from a C string.
@@ -34,7 +34,7 @@ pub struct NSTDStr {
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_from_cstr_unchecked(cstr: &mut NSTDCStr) -> NSTDStr {
     NSTDStr {
-        bytes: nstd_core_slice_new(cstr.ptr.cast(), 1, cstr.len),
+        bytes: nstd_core_slice_mut_new(cstr.ptr.cast(), 1, cstr.len),
     }
 }
 
@@ -42,7 +42,7 @@ pub unsafe extern "C" fn nstd_core_str_from_cstr_unchecked(cstr: &mut NSTDCStr) 
 ///
 /// # Parameters:
 ///
-/// - `NSTDSlice *bytes` - The UTF-8 encoded byte slice.
+/// - `NSTDSliceMut *bytes` - The UTF-8 encoded byte slice.
 ///
 /// # Returns
 ///
@@ -57,11 +57,11 @@ pub unsafe extern "C" fn nstd_core_str_from_cstr_unchecked(cstr: &mut NSTDCStr) 
 /// `bytes` must remain valid while the returned string slice is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_str_from_bytes(bytes: &NSTDSlice) -> NSTDStr {
+pub unsafe extern "C" fn nstd_core_str_from_bytes(bytes: &NSTDSliceMut) -> NSTDStr {
     assert!(bytes.ptr.size == 1);
     core::str::from_utf8(bytes.as_slice()).expect("Invalid UTF-8 bytes");
     NSTDStr {
-        bytes: nstd_core_slice_new(bytes.ptr.raw, bytes.ptr.size, bytes.len),
+        bytes: nstd_core_slice_mut_new(bytes.ptr.raw, bytes.ptr.size, bytes.len),
     }
 }
 
@@ -69,7 +69,7 @@ pub unsafe extern "C" fn nstd_core_str_from_bytes(bytes: &NSTDSlice) -> NSTDStr 
 ///
 /// # Parameters:
 ///
-/// - `NSTDSlice *bytes` - The UTF-8 encoded byte slice.
+/// - `NSTDSliceMut *bytes` - The UTF-8 encoded byte slice.
 ///
 /// # Returns
 ///
@@ -85,10 +85,10 @@ pub unsafe extern "C" fn nstd_core_str_from_bytes(bytes: &NSTDSlice) -> NSTDStr 
 /// while the returned string slice is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_str_from_bytes_unchecked(bytes: &NSTDSlice) -> NSTDStr {
+pub unsafe extern "C" fn nstd_core_str_from_bytes_unchecked(bytes: &NSTDSliceMut) -> NSTDStr {
     assert!(bytes.ptr.size == 1);
     NSTDStr {
-        bytes: nstd_core_slice_new(bytes.ptr.raw, bytes.ptr.size, bytes.len),
+        bytes: nstd_core_slice_mut_new(bytes.ptr.raw, bytes.ptr.size, bytes.len),
     }
 }
 
@@ -175,7 +175,7 @@ pub unsafe extern "C" fn nstd_core_str_substr(str: &mut NSTDStr, range: NSTDURan
     assert!(range.start <= range.end);
     // Create the byte slice with `range` and use it to create the new string slice.
     let start = str.bytes.ptr.raw.add(range.start);
-    let bytes = nstd_core_slice_new(start, 1, range.end - range.start);
+    let bytes = nstd_core_slice_mut_new(start, 1, range.end - range.start);
     nstd_core_str_from_bytes(&bytes)
 }
 
