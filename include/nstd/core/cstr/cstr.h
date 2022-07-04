@@ -11,7 +11,7 @@ typedef struct {
     NSTDChar *ptr;
     /// The length of the C string, excluding the null byte.
     NSTDUSize len;
-} NSTDCStr;
+} NSTDCStrMut;
 
 /// Creates a new C string slice from a raw pointer and a size.
 ///
@@ -23,18 +23,18 @@ typedef struct {
 ///
 /// # Returns
 ///
-/// `NSTDCStr cstr` - The new C string slice, referencing `raw`'s data.
+/// `NSTDCStrMut cstr` - The new C string slice, referencing `raw`'s data.
 ///
 /// # Safety
 ///
 /// `raw`'s data must remain valid while the returned C string slice is in use.
-NSTDAPI NSTDCStr nstd_core_cstr_new(NSTDChar *raw, NSTDUSize len);
+NSTDAPI NSTDCStrMut nstd_core_cstr_mut_new(NSTDChar *raw, NSTDUSize len);
 
 /// Returns a byte slice of a C string slice's data.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDCStr *cstr` - The C string slice.
+/// - `const NSTDCStrMut *cstr` - The C string slice.
 ///
 /// # Returns
 ///
@@ -43,13 +43,13 @@ NSTDAPI NSTDCStr nstd_core_cstr_new(NSTDChar *raw, NSTDUSize len);
 /// # Safety
 ///
 /// `cstr`'s data must remain valid while the returned byte slice is in use.
-NSTDAPI NSTDSliceConst nstd_core_cstr_as_bytes(const NSTDCStr *cstr);
+NSTDAPI NSTDSliceConst nstd_core_cstr_mut_as_bytes(const NSTDCStrMut *cstr);
 
 /// Return a pointer the character at `pos` in `cstr`.
 ///
 /// # Parameters:
 ///
-/// - `NSTDCStr *cstr` - The C string.
+/// - `NSTDCStrMut *cstr` - The C string.
 ///
 /// - `NSTDUSize pos` - The position of the character to get.
 ///
@@ -60,13 +60,13 @@ NSTDAPI NSTDSliceConst nstd_core_cstr_as_bytes(const NSTDCStr *cstr);
 /// # Safety
 ///
 /// `cstr`'s data must remain valid while the returned pointer is in use.
-NSTDAPI NSTDChar *nstd_core_cstr_get(NSTDCStr *cstr, NSTDUSize pos);
+NSTDAPI NSTDChar *nstd_core_cstr_mut_get(NSTDCStrMut *cstr, NSTDUSize pos);
 
 /// Return an immutable pointer the character at `pos` in `cstr`.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDCStr *cstr` - The C string.
+/// - `const NSTDCStrMut *cstr` - The C string.
 ///
 /// - `NSTDUSize pos` - The position of the character to get.
 ///
@@ -77,7 +77,7 @@ NSTDAPI NSTDChar *nstd_core_cstr_get(NSTDCStr *cstr, NSTDUSize pos);
 /// # Safety
 ///
 /// `cstr`'s data must remain valid while the returned pointer is in use.
-NSTDAPI const NSTDChar *nstd_core_cstr_get_const(const NSTDCStr *cstr, NSTDUSize pos);
+NSTDAPI const NSTDChar *nstd_core_cstr_mut_get_const(const NSTDCStrMut *cstr, NSTDUSize pos);
 
 /// An immutable slice of a C string.
 typedef struct {

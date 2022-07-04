@@ -64,12 +64,12 @@ NSTDAPI NSTDCString nstd_cstring_clone(const NSTDCString *cstring);
 ///
 /// # Returns
 ///
-/// `NSTDCStr cstr` - The new C string slice.
+/// `NSTDCStrMut cstr` - The new C string slice.
 ///
 /// # Safety
 ///
 /// `cstring`'s data must remain valid while the returned C string slice is in use.
-NSTDAPI NSTDCStr nstd_cstring_as_cstr(NSTDCString *cstring);
+NSTDAPI NSTDCStrMut nstd_cstring_as_cstr_mut(NSTDCString *cstring);
 
 /// Creates a C string slice containing the contents of `cstring` (excluding the null byte).
 ///

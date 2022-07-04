@@ -11,7 +11,7 @@ use crate::{
 /// A mutable slice of a C string.
 #[repr(C)]
 #[derive(Debug, Hash)]
-pub struct NSTDCStr {
+pub struct NSTDCStrMut {
     /// A pointer to the first character in the C string.
     pub ptr: *mut NSTDChar,
     /// The length of the C string, excluding the null byte.
@@ -28,22 +28,22 @@ pub struct NSTDCStr {
 ///
 /// # Returns
 ///
-/// `NSTDCStr cstr` - The new C string slice, referencing `raw`'s data.
+/// `NSTDCStrMut cstr` - The new C string slice, referencing `raw`'s data.
 ///
 /// # Safety
 ///
 /// `raw`'s data must remain valid while the returned C string slice is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_cstr_new(raw: *mut NSTDChar, len: NSTDUSize) -> NSTDCStr {
-    NSTDCStr { ptr: raw, len }
+pub unsafe extern "C" fn nstd_core_cstr_mut_new(raw: *mut NSTDChar, len: NSTDUSize) -> NSTDCStrMut {
+    NSTDCStrMut { ptr: raw, len }
 }
 
 /// Returns a byte slice of a C string slice's data.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDCStr *cstr` - The C string slice.
+/// - `const NSTDCStrMut *cstr` - The C string slice.
 ///
 /// # Returns
 ///
@@ -54,7 +54,7 @@ pub unsafe extern "C" fn nstd_core_cstr_new(raw: *mut NSTDChar, len: NSTDUSize) 
 /// `cstr`'s data must remain valid while the returned byte slice is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_cstr_as_bytes(cstr: &NSTDCStr) -> NSTDSliceConst {
+pub unsafe extern "C" fn nstd_core_cstr_mut_as_bytes(cstr: &NSTDCStrMut) -> NSTDSliceConst {
     nstd_core_slice_const_new(cstr.ptr.cast(), 1, cstr.len)
 }
 
@@ -62,7 +62,7 @@ pub unsafe extern "C" fn nstd_core_cstr_as_bytes(cstr: &NSTDCStr) -> NSTDSliceCo
 ///
 /// # Parameters:
 ///
-/// - `NSTDCStr *cstr` - The C string.
+/// - `NSTDCStrMut *cstr` - The C string.
 ///
 /// - `NSTDUSize pos` - The position of the character to get.
 ///
@@ -75,15 +75,18 @@ pub unsafe extern "C" fn nstd_core_cstr_as_bytes(cstr: &NSTDCStr) -> NSTDSliceCo
 /// `cstr`'s data must remain valid while the returned pointer is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_cstr_get(cstr: &mut NSTDCStr, pos: NSTDUSize) -> *mut NSTDChar {
-    nstd_core_cstr_get_const(cstr, pos) as *mut NSTDChar
+pub unsafe extern "C" fn nstd_core_cstr_mut_get(
+    cstr: &mut NSTDCStrMut,
+    pos: NSTDUSize,
+) -> *mut NSTDChar {
+    nstd_core_cstr_mut_get_const(cstr, pos) as *mut NSTDChar
 }
 
 /// Return an immutable pointer the character at `pos` in `cstr`.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDCStr *cstr` - The C string.
+/// - `const NSTDCStrMut *cstr` - The C string.
 ///
 /// - `NSTDUSize pos` - The position of the character to get.
 ///
@@ -96,8 +99,8 @@ pub unsafe extern "C" fn nstd_core_cstr_get(cstr: &mut NSTDCStr, pos: NSTDUSize)
 /// `cstr`'s data must remain valid while the returned pointer is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_cstr_get_const(
-    cstr: &NSTDCStr,
+pub unsafe extern "C" fn nstd_core_cstr_mut_get_const(
+    cstr: &NSTDCStrMut,
     pos: NSTDUSize,
 ) -> *const NSTDChar {
     match pos < cstr.len {

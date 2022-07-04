@@ -2,8 +2,8 @@
 use crate::{
     core::{
         cstr::{
-            nstd_core_cstr_const_as_bytes, nstd_core_cstr_const_new, nstd_core_cstr_new, NSTDCStr,
-            NSTDCStrConst,
+            nstd_core_cstr_const_as_bytes, nstd_core_cstr_const_new, nstd_core_cstr_mut_new,
+            NSTDCStrConst, NSTDCStrMut,
         },
         def::{NSTDChar, NSTDErrorCode},
         slice::NSTDSliceConst,
@@ -92,15 +92,15 @@ pub extern "C" fn nstd_cstring_clone(cstring: &NSTDCString) -> NSTDCString {
 ///
 /// # Returns
 ///
-/// `NSTDCStr cstr` - The new C string slice.
+/// `NSTDCStrMut cstr` - The new C string slice.
 ///
 /// # Safety
 ///
 /// `cstring`'s data must remain valid while the returned C string slice is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_cstring_as_cstr(cstring: &mut NSTDCString) -> NSTDCStr {
-    nstd_core_cstr_new(cstring.bytes.buffer.ptr.raw.cast(), cstring.bytes.len - 1)
+pub unsafe extern "C" fn nstd_cstring_as_cstr_mut(cstring: &mut NSTDCString) -> NSTDCStrMut {
+    nstd_core_cstr_mut_new(cstring.bytes.buffer.ptr.raw.cast(), cstring.bytes.len - 1)
 }
 
 /// Creates a C string slice containing the contents of `cstring` (excluding the null byte).

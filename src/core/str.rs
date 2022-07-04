@@ -1,7 +1,7 @@
 //! An unowned view into a UTF-8 encoded byte string.
 use crate::{
     core::{
-        cstr::{NSTDCStr, NSTDCStrConst},
+        cstr::{NSTDCStrConst, NSTDCStrMut},
         range::NSTDURange,
         slice::{nstd_core_slice_const_new, nstd_core_slice_mut_new, NSTDSliceConst, NSTDSliceMut},
     },
@@ -20,7 +20,7 @@ pub struct NSTDStrMut {
 ///
 /// # Parameters:
 ///
-/// - `NSTDCStr *cstr` - The C string to wrap.
+/// - `NSTDCStrMut *cstr` - The C string to wrap.
 ///
 /// # Returns
 ///
@@ -32,7 +32,9 @@ pub struct NSTDStrMut {
 /// valid while the returned string slice is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_str_mut_from_cstr_unchecked(cstr: &mut NSTDCStr) -> NSTDStrMut {
+pub unsafe extern "C" fn nstd_core_str_mut_from_cstr_unchecked(
+    cstr: &mut NSTDCStrMut,
+) -> NSTDStrMut {
     NSTDStrMut {
         bytes: nstd_core_slice_mut_new(cstr.ptr.cast(), 1, cstr.len),
     }

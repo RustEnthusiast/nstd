@@ -16,7 +16,7 @@ typedef struct {
 ///
 /// # Parameters:
 ///
-/// - `NSTDCStr *cstr` - The C string to wrap.
+/// - `NSTDCStrMut *cstr` - The C string to wrap.
 ///
 /// # Returns
 ///
@@ -26,7 +26,7 @@ typedef struct {
 ///
 /// This function does not check to ensure that `cstr` is valid UTF-8. `cstr`'s data must remain
 /// valid while the returned string slice is in use.
-NSTDAPI NSTDStrMut nstd_core_str_mut_from_cstr_unchecked(NSTDCStr *cstr);
+NSTDAPI NSTDStrMut nstd_core_str_mut_from_cstr_unchecked(NSTDCStrMut *cstr);
 
 /// Creates a string slice from raw bytes.
 ///
