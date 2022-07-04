@@ -6,7 +6,7 @@ use crate::{
         mem::{nstd_core_mem_copy, nstd_core_mem_copy_overlapping},
         slice::{nstd_core_slice_const_new, nstd_core_slice_new, NSTDSlice, NSTDSliceConst},
     },
-    NSTDAny, NSTDAnyConst, NSTDUSize, NSTD_NULL,
+    NSTDAnyConst, NSTDAnyMut, NSTDUSize, NSTD_NULL,
 };
 
 /// A dynamically sized contiguous sequence of values.
@@ -37,7 +37,7 @@ impl NSTDVec {
     ///
     /// This method does ***NOT*** check to make sure the vector is non-null.
     #[inline]
-    pub(crate) unsafe fn end(&self) -> NSTDAny {
+    pub(crate) unsafe fn end(&self) -> NSTDAnyMut {
         self.buffer.ptr.raw.add(self.byte_len())
     }
 
@@ -212,7 +212,7 @@ pub unsafe extern "C" fn nstd_vec_as_slice_const(vec: &NSTDVec) -> NSTDSliceCons
 ///
 /// # Returns
 ///
-/// `NSTDAny element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out of
+/// `NSTDAnyMut element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out of
 /// the vector's boundaries.
 ///
 /// # Safety
@@ -220,8 +220,8 @@ pub unsafe extern "C" fn nstd_vec_as_slice_const(vec: &NSTDVec) -> NSTDSliceCons
 /// `vec`'s data must remain valid while the returned pointer is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_vec_get(vec: &mut NSTDVec, pos: NSTDUSize) -> NSTDAny {
-    nstd_vec_get_const(vec, pos) as NSTDAny
+pub unsafe extern "C" fn nstd_vec_get_mut(vec: &mut NSTDVec, pos: NSTDUSize) -> NSTDAnyMut {
+    nstd_vec_get_const(vec, pos) as NSTDAnyMut
 }
 
 /// Returns an immutable pointer to the element at index `pos` in `vec`.

@@ -4,7 +4,7 @@ use crate::{
         mem::nstd_core_mem_copy,
         ptr::{nstd_core_ptr_const_new, nstd_core_ptr_new, NSTDPtr, NSTDPtrConst},
     },
-    NSTDAny, NSTDAnyConst, NSTDBool, NSTDUSize, NSTD_NULL,
+    NSTDAnyConst, NSTDAnyMut, NSTDBool, NSTDUSize, NSTD_NULL,
 };
 
 /// A view into a sequence of values in memory.
@@ -34,7 +34,7 @@ impl NSTDSlice {
 ///
 /// # Parameters:
 ///
-/// - `NSTDAny ptr` - A pointer to the first element in the sequence.
+/// - `NSTDAnyMut ptr` - A pointer to the first element in the sequence.
 ///
 /// - `NSTDUSize element_size` - The number of bytes each element occupies.
 ///
@@ -50,7 +50,7 @@ impl NSTDSlice {
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_slice_new(
-    ptr: NSTDAny,
+    ptr: NSTDAnyMut,
     element_size: NSTDUSize,
     len: NSTDUSize,
 ) -> NSTDSlice {
@@ -85,7 +85,7 @@ pub extern "C" fn nstd_core_slice_len(slice: &NSTDSlice) -> NSTDUSize {
 ///
 /// # Returns
 ///
-/// `NSTDAny element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out of
+/// `NSTDAnyMut element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out of
 /// the slice's boundaries.
 ///
 /// # Safety
@@ -93,8 +93,11 @@ pub extern "C" fn nstd_core_slice_len(slice: &NSTDSlice) -> NSTDUSize {
 /// `slice`'s data must remain valid while the returned pointer is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_slice_get(slice: &mut NSTDSlice, pos: NSTDUSize) -> NSTDAny {
-    nstd_core_slice_get_const(slice, pos) as NSTDAny
+pub unsafe extern "C" fn nstd_core_slice_get_mut(
+    slice: &mut NSTDSlice,
+    pos: NSTDUSize,
+) -> NSTDAnyMut {
+    nstd_core_slice_get_const(slice, pos) as NSTDAnyMut
 }
 
 /// Returns an immutable pointer to the element at index `pos` in `slice`.
@@ -133,7 +136,7 @@ pub unsafe extern "C" fn nstd_core_slice_get_const(
 ///
 /// # Returns
 ///
-/// `NSTDAny element` - A pointer to the first element in `slice` or `NSTD_NULL` if the slice
+/// `NSTDAnyMut element` - A pointer to the first element in `slice` or `NSTD_NULL` if the slice
 /// is empty.
 ///
 /// # Safety
@@ -141,8 +144,8 @@ pub unsafe extern "C" fn nstd_core_slice_get_const(
 /// `slice`'s data must remain valid while the returned pointer is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_slice_first(slice: &mut NSTDSlice) -> NSTDAny {
-    nstd_core_slice_first_const(slice) as NSTDAny
+pub unsafe extern "C" fn nstd_core_slice_first_mut(slice: &mut NSTDSlice) -> NSTDAnyMut {
+    nstd_core_slice_first_const(slice) as NSTDAnyMut
 }
 
 /// Returns an immutable pointer to the first element in the slice.
@@ -176,7 +179,7 @@ pub unsafe extern "C" fn nstd_core_slice_first_const(slice: &NSTDSlice) -> NSTDA
 ///
 /// # Returns
 ///
-/// `NSTDAny element` - A pointer to the last element in `slice` or `NSTD_NULL` if the slice
+/// `NSTDAnyMut element` - A pointer to the last element in `slice` or `NSTD_NULL` if the slice
 /// is empty.
 ///
 /// # Safety
@@ -184,8 +187,8 @@ pub unsafe extern "C" fn nstd_core_slice_first_const(slice: &NSTDSlice) -> NSTDA
 /// `slice`'s data must remain valid while the returned pointer is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_slice_last(slice: &mut NSTDSlice) -> NSTDAny {
-    nstd_core_slice_last_const(slice) as NSTDAny
+pub unsafe extern "C" fn nstd_core_slice_last_mut(slice: &mut NSTDSlice) -> NSTDAnyMut {
+    nstd_core_slice_last_const(slice) as NSTDAnyMut
 }
 
 /// Returns an immutable pointer to the last element in the slice.

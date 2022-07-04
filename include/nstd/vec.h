@@ -120,13 +120,13 @@ NSTDAPI NSTDSliceConst nstd_vec_as_slice_const(const NSTDVec *vec);
 ///
 /// # Returns
 ///
-/// `NSTDAny element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out of
+/// `NSTDAnyMut element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out of
 /// the vector's boundaries.
 ///
 /// # Safety
 ///
 /// `vec`'s data must remain valid while the returned pointer is in use.
-NSTDAPI NSTDAny nstd_vec_get(NSTDVec *vec, NSTDUSize pos);
+NSTDAPI NSTDAnyMut nstd_vec_get_mut(NSTDVec *vec, NSTDUSize pos);
 
 /// Returns an immutable pointer to the element at index `pos` in `vec`.
 ///

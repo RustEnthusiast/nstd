@@ -5,7 +5,7 @@ use crate::{
         mem::nstd_core_mem_copy,
         ptr::{nstd_core_ptr_new, NSTDPtr},
     },
-    NSTDAny, NSTDAnyConst, NSTDUSize,
+    NSTDAnyConst, NSTDAnyMut, NSTDUSize,
 };
 
 /// A pointer type for single value heap allocation.
@@ -121,14 +121,14 @@ pub extern "C" fn nstd_heap_ptr_size(hptr: &NSTDHeapPtr) -> NSTDUSize {
 ///
 /// # Returns
 ///
-/// `NSTDAny ptr` - A raw pointer to the object on the heap.
+/// `NSTDAnyMut ptr` - A raw pointer to the object on the heap.
 ///
 /// # Safety
 ///
 /// `hptr`'s data must remain valid while the returned pointer is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_heap_ptr_get(hptr: &mut NSTDHeapPtr) -> NSTDAny {
+pub unsafe extern "C" fn nstd_heap_ptr_get_mut(hptr: &mut NSTDHeapPtr) -> NSTDAnyMut {
     hptr.ptr.raw
 }
 

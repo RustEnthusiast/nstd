@@ -1,7 +1,7 @@
 //! Low level memory allocation.
 #[cfg(not(target_os = "windows"))]
 extern crate alloc;
-use crate::{core::def::NSTDErrorCode, NSTDAny, NSTDUSize};
+use crate::{core::def::NSTDErrorCode, NSTDAnyMut, NSTDUSize};
 
 /// Allocates a block of memory on the heap.
 /// The number of bytes to be allocated is specified by `size`.
@@ -12,14 +12,14 @@ use crate::{core::def::NSTDErrorCode, NSTDAny, NSTDUSize};
 ///
 /// # Returns
 ///
-/// `NSTDAny ptr` - A pointer to the allocated memory, null on error.
+/// `NSTDAnyMut ptr` - A pointer to the allocated memory, null on error.
 ///
 /// # Safety
 ///
 /// This operation is unsafe because the behaviour is undefined if `size` is zero.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_alloc_allocate(size: NSTDUSize) -> NSTDAny {
+pub unsafe extern "C" fn nstd_alloc_allocate(size: NSTDUSize) -> NSTDAnyMut {
     #[cfg(not(target_os = "windows"))]
     {
         use alloc::alloc::Layout;
@@ -40,14 +40,14 @@ pub unsafe extern "C" fn nstd_alloc_allocate(size: NSTDUSize) -> NSTDAny {
 ///
 /// # Returns
 ///
-/// `NSTDAny ptr` - A pointer to the allocated memory, null on error.
+/// `NSTDAnyMut ptr` - A pointer to the allocated memory, null on error.
 ///
 /// # Safety
 ///
 /// This operation is unsafe because the behaviour is undefined if `size` is zero.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_alloc_allocate_zeroed(size: NSTDUSize) -> NSTDAny {
+pub unsafe extern "C" fn nstd_alloc_allocate_zeroed(size: NSTDUSize) -> NSTDAnyMut {
     #[cfg(not(target_os = "windows"))]
     {
         use alloc::alloc::Layout;
@@ -68,7 +68,7 @@ pub unsafe extern "C" fn nstd_alloc_allocate_zeroed(size: NSTDUSize) -> NSTDAny 
 ///
 /// # Parameters:
 ///
-/// - `NSTDAny *ptr` - A pointer to the allocated memory.
+/// - `NSTDAnyMut *ptr` - A pointer to the allocated memory.
 ///
 /// - `NSTDUSize size` - The number of bytes currently allocated.
 ///
@@ -86,7 +86,7 @@ pub unsafe extern "C" fn nstd_alloc_allocate_zeroed(size: NSTDUSize) -> NSTDAny 
 #[cfg_attr(feature = "clib", no_mangle)]
 #[cfg_attr(target_os = "windows", allow(unused_variables))]
 pub unsafe extern "C" fn nstd_alloc_reallocate(
-    ptr: &mut NSTDAny,
+    ptr: &mut NSTDAnyMut,
     size: NSTDUSize,
     new_size: NSTDUSize,
 ) -> NSTDErrorCode {
@@ -111,7 +111,7 @@ pub unsafe extern "C" fn nstd_alloc_reallocate(
 ///
 /// # Parameters:
 ///
-/// - `NSTDAny *ptr` - A pointer to the allocated memory, once freed the pointer is set to null.
+/// - `NSTDAnyMut *ptr` - A pointer to the allocated memory, once freed the pointer is set to null.
 ///
 /// - `NSTDUSize size` - The number of bytes to free.
 ///
@@ -122,7 +122,7 @@ pub unsafe extern "C" fn nstd_alloc_reallocate(
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 #[cfg_attr(target_os = "windows", allow(unused_variables))]
-pub unsafe extern "C" fn nstd_alloc_deallocate(ptr: &mut NSTDAny, size: NSTDUSize) {
+pub unsafe extern "C" fn nstd_alloc_deallocate(ptr: &mut NSTDAnyMut, size: NSTDUSize) {
     #[cfg(not(target_os = "windows"))]
     {
         use crate::NSTD_NULL;

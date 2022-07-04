@@ -12,12 +12,12 @@ NSTDCPPSTART
 ///
 /// # Returns
 ///
-/// `NSTDAny ptr` - A pointer to the block of memory, null on error.
+/// `NSTDAnyMut ptr` - A pointer to the block of memory, null on error.
 ///
 /// # Safety
 ///
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapalloc>.
-NSTDAPI NSTDAny nstd_os_windows_alloc_allocate(NSTDUSize size);
+NSTDAPI NSTDAnyMut nstd_os_windows_alloc_allocate(NSTDUSize size);
 
 /// Allocates a new block of zero-initialized memory on the current process' heap.
 ///
@@ -27,12 +27,12 @@ NSTDAPI NSTDAny nstd_os_windows_alloc_allocate(NSTDUSize size);
 ///
 /// # Returns
 ///
-/// `NSTDAny ptr` - A pointer to the block of memory, null on error.
+/// `NSTDAnyMut ptr` - A pointer to the block of memory, null on error.
 ///
 /// # Safety
 ///
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapalloc>.
-NSTDAPI NSTDAny nstd_os_windows_alloc_allocate_zeroed(NSTDUSize size);
+NSTDAPI NSTDAnyMut nstd_os_windows_alloc_allocate_zeroed(NSTDUSize size);
 
 /// Reallocates a block of memory previously allocated by
 /// `nstd_os_windows_alloc_allocate[_zeroed]`.
@@ -43,7 +43,7 @@ NSTDAPI NSTDAny nstd_os_windows_alloc_allocate_zeroed(NSTDUSize size);
 ///
 /// # Parameters:
 ///
-/// - `NSTDAny *ptr` - A pointer to the allocated memory.
+/// - `NSTDAnyMut *ptr` - A pointer to the allocated memory.
 ///
 /// - `NSTDUSize new_size` - The number of bytes to reallocate.
 ///
@@ -54,14 +54,14 @@ NSTDAPI NSTDAny nstd_os_windows_alloc_allocate_zeroed(NSTDUSize size);
 /// # Safety
 ///
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heaprealloc>.
-NSTDAPI NSTDErrorCode nstd_os_windows_alloc_reallocate(NSTDAny *ptr, NSTDUSize new_size);
+NSTDAPI NSTDErrorCode nstd_os_windows_alloc_reallocate(NSTDAnyMut *ptr, NSTDUSize new_size);
 
 /// Deallocates a block of memory previously allocated by
 /// `nstd_os_windows_alloc_allocate[_zeroed]`.
 ///
 /// # Parameters:
 ///
-/// - `NSTDAny *ptr` - A pointer to the allocated memory.
+/// - `NSTDAnyMut *ptr` - A pointer to the allocated memory.
 ///
 /// # Returns
 ///
@@ -70,7 +70,7 @@ NSTDAPI NSTDErrorCode nstd_os_windows_alloc_reallocate(NSTDAny *ptr, NSTDUSize n
 /// # Safety
 ///
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapfree>.
-NSTDAPI NSTDErrorCode nstd_os_windows_alloc_deallocate(NSTDAny *ptr);
+NSTDAPI NSTDErrorCode nstd_os_windows_alloc_deallocate(NSTDAnyMut *ptr);
 
 NSTDCPPEND
 #endif

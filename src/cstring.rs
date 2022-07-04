@@ -9,7 +9,7 @@ use crate::{
         slice::NSTDSliceConst,
     },
     vec::{
-        nstd_vec_as_slice_const, nstd_vec_clone, nstd_vec_extend, nstd_vec_free, nstd_vec_get,
+        nstd_vec_as_slice_const, nstd_vec_clone, nstd_vec_extend, nstd_vec_free, nstd_vec_get_mut,
         nstd_vec_new_with_cap, nstd_vec_pop, nstd_vec_push, NSTDVec,
     },
     NSTDUSize,
@@ -157,10 +157,10 @@ pub extern "C" fn nstd_cstring_push(cstring: &mut NSTDCString, chr: NSTDChar) {
     unsafe {
         // Push a new null byte onto the end of the C string.
         let nulpos = cstring.bytes.len - 1;
-        let mut nul = nstd_vec_get(&mut cstring.bytes, nulpos).cast::<NSTDChar>();
+        let mut nul = nstd_vec_get_mut(&mut cstring.bytes, nulpos).cast::<NSTDChar>();
         assert!(nstd_vec_push(&mut cstring.bytes, nul.cast()) == 0);
         // Write `chr` over the old null byte.
-        nul = nstd_vec_get(&mut cstring.bytes, nulpos).cast();
+        nul = nstd_vec_get_mut(&mut cstring.bytes, nulpos).cast();
         *nul = chr;
     }
 }
@@ -213,7 +213,7 @@ pub extern "C" fn nstd_cstring_pop(cstring: &mut NSTDCString) -> NSTDChar {
         unsafe {
             // Write the last character in the C string to the return value.
             let lastpos = cstring.bytes.len - 2;
-            let last = nstd_vec_get(&mut cstring.bytes, lastpos).cast();
+            let last = nstd_vec_get_mut(&mut cstring.bytes, lastpos).cast();
             ret = *last;
             // Set the last byte to null.
             *last = 0;

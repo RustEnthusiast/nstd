@@ -31,7 +31,7 @@ pub mod vec;
 use ::core::ffi::c_void;
 
 /// A null pointer value constant.
-pub const NSTD_NULL: NSTDAny = ::core::ptr::null_mut();
+pub const NSTD_NULL: NSTDAnyMut = ::core::ptr::null_mut();
 
 /// Boolean value false (0).
 pub const NSTD_FALSE: NSTDBool = 0;
@@ -75,7 +75,7 @@ pub type NSTDChar32 = NSTDUInt32;
 pub type NSTDUnichar = NSTDChar32;
 
 /// A void pointer (a pointer to some arbitrary type).
-pub type NSTDAny = *mut c_void;
+pub type NSTDAnyMut = *mut c_void;
 /// A void pointer to some immutable data.
 pub type NSTDAnyConst = *const c_void;
 

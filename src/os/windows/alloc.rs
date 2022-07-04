@@ -1,5 +1,5 @@
 //! Low level memory allocation for Windows.
-use crate::{core::def::NSTDErrorCode, NSTDAny, NSTDUSize, NSTD_NULL};
+use crate::{core::def::NSTDErrorCode, NSTDAnyMut, NSTDUSize, NSTD_NULL};
 use windows_sys::Win32::System::Memory::{
     GetProcessHeap, HeapAlloc, HeapFree, HeapReAlloc, HEAP_FLAGS, HEAP_ZERO_MEMORY,
 };
@@ -12,14 +12,14 @@ use windows_sys::Win32::System::Memory::{
 ///
 /// # Returns
 ///
-/// `NSTDAny ptr` - A pointer to the block of memory, null on error.
+/// `NSTDAnyMut ptr` - A pointer to the block of memory, null on error.
 ///
 /// # Safety
 ///
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapalloc>.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_os_windows_alloc_allocate(size: NSTDUSize) -> NSTDAny {
+pub unsafe extern "C" fn nstd_os_windows_alloc_allocate(size: NSTDUSize) -> NSTDAnyMut {
     HeapAlloc(GetProcessHeap(), HEAP_FLAGS::default(), size)
 }
 
@@ -31,14 +31,14 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_allocate(size: NSTDUSize) -> NSTD
 ///
 /// # Returns
 ///
-/// `NSTDAny ptr` - A pointer to the block of memory, null on error.
+/// `NSTDAnyMut ptr` - A pointer to the block of memory, null on error.
 ///
 /// # Safety
 ///
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapalloc>.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_os_windows_alloc_allocate_zeroed(size: NSTDUSize) -> NSTDAny {
+pub unsafe extern "C" fn nstd_os_windows_alloc_allocate_zeroed(size: NSTDUSize) -> NSTDAnyMut {
     HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, size)
 }
 
@@ -51,7 +51,7 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_allocate_zeroed(size: NSTDUSize) 
 ///
 /// # Parameters:
 ///
-/// - `NSTDAny *ptr` - A pointer to the allocated memory.
+/// - `NSTDAnyMut *ptr` - A pointer to the allocated memory.
 ///
 /// - `NSTDUSize new_size` - The number of bytes to reallocate.
 ///
@@ -65,7 +65,7 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_allocate_zeroed(size: NSTDUSize) 
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_os_windows_alloc_reallocate(
-    ptr: &mut NSTDAny,
+    ptr: &mut NSTDAnyMut,
     new_size: NSTDUSize,
 ) -> NSTDErrorCode {
     let new_mem = HeapReAlloc(GetProcessHeap(), HEAP_FLAGS::default(), *ptr, new_size);
@@ -81,7 +81,7 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_reallocate(
 ///
 /// # Parameters:
 ///
-/// - `NSTDAny *ptr` - A pointer to the allocated memory.
+/// - `NSTDAnyMut *ptr` - A pointer to the allocated memory.
 ///
 /// # Returns
 ///
@@ -92,7 +92,7 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_reallocate(
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapfree>.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_os_windows_alloc_deallocate(ptr: &mut NSTDAny) -> NSTDErrorCode {
+pub unsafe extern "C" fn nstd_os_windows_alloc_deallocate(ptr: &mut NSTDAnyMut) -> NSTDErrorCode {
     let memptr = *ptr;
     *ptr = NSTD_NULL;
     (HeapFree(GetProcessHeap(), HEAP_FLAGS::default(), memptr) == 0) as NSTDErrorCode

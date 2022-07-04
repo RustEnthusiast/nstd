@@ -1,12 +1,12 @@
 //! A sized pointer to some arbitrary type.
-use crate::{core::mem::nstd_core_mem_copy, NSTDAny, NSTDAnyConst, NSTDUSize};
+use crate::{core::mem::nstd_core_mem_copy, NSTDAnyConst, NSTDAnyMut, NSTDUSize};
 
 /// A sized pointer to some arbitrary type.
 #[repr(C)]
 #[derive(Debug, Hash, PartialEq, Eq)]
 pub struct NSTDPtr {
     /// A raw pointer to the data.
-    pub raw: NSTDAny,
+    pub raw: NSTDAnyMut,
     /// The size of the object being pointed to.
     pub size: NSTDUSize,
 }
@@ -15,7 +15,7 @@ pub struct NSTDPtr {
 ///
 /// # Parameters:
 ///
-/// - `NSTDAny obj` - The object to point to.
+/// - `NSTDAnyMut obj` - The object to point to.
 ///
 /// - `NSTDUSize size` - The number of bytes that `obj`'s type occupies.
 ///
@@ -28,7 +28,7 @@ pub struct NSTDPtr {
 /// `obj` must remain valid while the returned pointer is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_ptr_new(obj: NSTDAny, size: NSTDUSize) -> NSTDPtr {
+pub unsafe extern "C" fn nstd_core_ptr_new(obj: NSTDAnyMut, size: NSTDUSize) -> NSTDPtr {
     NSTDPtr { raw: obj, size }
 }
 
@@ -55,14 +55,14 @@ pub extern "C" fn nstd_core_ptr_size(ptr: &NSTDPtr) -> NSTDUSize {
 ///
 /// # Returns
 ///
-/// `NSTDAny raw` - A raw pointer to the object.
+/// `NSTDAnyMut raw` - A raw pointer to the object.
 ///
 /// # Safety
 ///
 /// `ptr`'s data must remain valid while the returned pointer is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_ptr_get(ptr: &mut NSTDPtr) -> NSTDAny {
+pub unsafe extern "C" fn nstd_core_ptr_get_mut(ptr: &mut NSTDPtr) -> NSTDAnyMut {
     ptr.raw
 }
 

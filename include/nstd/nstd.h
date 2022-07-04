@@ -69,7 +69,7 @@ typedef NSTDUInt32 NSTDChar32;
 typedef NSTDChar32 NSTDUnichar;
 
 /// A void pointer (a pointer to some arbitrary type).
-typedef void *NSTDAny;
+typedef void *NSTDAnyMut;
 /// A void pointer to some immutable data.
 typedef const void *NSTDAnyConst;
 

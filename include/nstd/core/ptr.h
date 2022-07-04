@@ -6,7 +6,7 @@ NSTDCPPSTART
 /// A sized pointer to some arbitrary type.
 typedef struct {
     /// A raw pointer to the data.
-    NSTDAny raw;
+    NSTDAnyMut raw;
     /// The size of the object being pointed to.
     NSTDUSize size;
 } NSTDPtr;
@@ -15,7 +15,7 @@ typedef struct {
 ///
 /// # Parameters:
 ///
-/// - `NSTDAny obj` - The object to point to.
+/// - `NSTDAnyMut obj` - The object to point to.
 ///
 /// - `NSTDUSize size` - The number of bytes that `obj`'s type occupies.
 ///
@@ -26,7 +26,7 @@ typedef struct {
 /// # Safety
 ///
 /// `obj` must remain valid while the returned pointer is in use.
-NSTDAPI NSTDPtr nstd_core_ptr_new(NSTDAny obj, NSTDUSize size);
+NSTDAPI NSTDPtr nstd_core_ptr_new(NSTDAnyMut obj, NSTDUSize size);
 
 /// Returns the size of the object being pointed to.
 ///
@@ -47,12 +47,12 @@ NSTDAPI NSTDUSize nstd_core_ptr_size(const NSTDPtr *ptr);
 ///
 /// # Returns
 ///
-/// `NSTDAny raw` - A raw pointer to the object.
+/// `NSTDAnyMut raw` - A raw pointer to the object.
 ///
 /// # Safety
 ///
 /// `ptr`'s data must remain valid while the returned pointer is in use.
-NSTDAPI NSTDAny nstd_core_ptr_get(NSTDPtr *ptr);
+NSTDAPI NSTDAnyMut nstd_core_ptr_get_mut(NSTDPtr *ptr);
 
 /// Returns a raw immutable pointer to the object pointed to by `ptr`.
 ///

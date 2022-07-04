@@ -16,7 +16,7 @@ typedef struct {
 ///
 /// # Parameters:
 ///
-/// - `NSTDAny ptr` - A pointer to the first element in the sequence.
+/// - `NSTDAnyMut ptr` - A pointer to the first element in the sequence.
 ///
 /// - `NSTDUSize element_size` - The number of bytes each element occupies.
 ///
@@ -29,7 +29,7 @@ typedef struct {
 /// # Safety
 ///
 /// `ptr`'s data must remain valid while the returned slice is in use.
-NSTDAPI NSTDSlice nstd_core_slice_new(NSTDAny ptr, NSTDUSize element_size, NSTDUSize len);
+NSTDAPI NSTDSlice nstd_core_slice_new(NSTDAnyMut ptr, NSTDUSize element_size, NSTDUSize len);
 
 /// Returns the number of elements in a slice.
 ///
@@ -52,13 +52,13 @@ NSTDAPI NSTDUSize nstd_core_slice_len(const NSTDSlice *slice);
 ///
 /// # Returns
 ///
-/// `NSTDAny element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out of
+/// `NSTDAnyMut element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out of
 /// the slice's boundaries.
 ///
 /// # Safety
 ///
 /// `slice`'s data must remain valid while the returned pointer is in use.
-NSTDAPI NSTDAny nstd_core_slice_get(NSTDSlice *slice, NSTDUSize pos);
+NSTDAPI NSTDAnyMut nstd_core_slice_get_mut(NSTDSlice *slice, NSTDUSize pos);
 
 /// Returns an immutable pointer to the element at index `pos` in `slice`.
 ///
@@ -86,13 +86,13 @@ NSTDAPI NSTDAnyConst nstd_core_slice_get_const(const NSTDSlice *slice, NSTDUSize
 ///
 /// # Returns
 ///
-/// `NSTDAny element` - A pointer to the first element in `slice` or `NSTD_NULL` if the slice
+/// `NSTDAnyMut element` - A pointer to the first element in `slice` or `NSTD_NULL` if the slice
 /// is empty.
 ///
 /// # Safety
 ///
 /// `slice`'s data must remain valid while the returned pointer is in use.
-NSTDAPI NSTDAny nstd_core_slice_first(NSTDSlice *slice);
+NSTDAPI NSTDAnyMut nstd_core_slice_first_mut(NSTDSlice *slice);
 
 /// Returns an immutable pointer to the first element in the slice.
 ///
@@ -118,13 +118,13 @@ NSTDAPI NSTDAnyConst nstd_core_slice_first_const(const NSTDSlice *slice);
 ///
 /// # Returns
 ///
-/// `NSTDAny element` - A pointer to the last element in `slice` or `NSTD_NULL` if the slice
+/// `NSTDAnyMut element` - A pointer to the last element in `slice` or `NSTD_NULL` if the slice
 /// is empty.
 ///
 /// # Safety
 ///
 /// `slice`'s data must remain valid while the returned pointer is in use.
-NSTDAPI NSTDAny nstd_core_slice_last(NSTDSlice *slice);
+NSTDAPI NSTDAnyMut nstd_core_slice_last_mut(NSTDSlice *slice);
 
 /// Returns an immutable pointer to the last element in the slice.
 ///

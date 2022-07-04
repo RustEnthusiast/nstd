@@ -13,12 +13,12 @@ NSTDCPPSTART
 ///
 /// # Returns
 ///
-/// `NSTDAny ptr` - A pointer to the allocated memory, null on error.
+/// `NSTDAnyMut ptr` - A pointer to the allocated memory, null on error.
 ///
 /// # Safety
 ///
 /// This operation is unsafe because the behaviour is undefined if `size` is zero.
-NSTDAPI NSTDAny nstd_alloc_allocate(NSTDUSize size);
+NSTDAPI NSTDAnyMut nstd_alloc_allocate(NSTDUSize size);
 
 /// Allocates a block of zero-initialized memory on the heap.
 ///
@@ -28,12 +28,12 @@ NSTDAPI NSTDAny nstd_alloc_allocate(NSTDUSize size);
 ///
 /// # Returns
 ///
-/// `NSTDAny ptr` - A pointer to the allocated memory, null on error.
+/// `NSTDAnyMut ptr` - A pointer to the allocated memory, null on error.
 ///
 /// # Safety
 ///
 /// This operation is unsafe because the behaviour is undefined if `size` is zero.
-NSTDAPI NSTDAny nstd_alloc_allocate_zeroed(NSTDUSize size);
+NSTDAPI NSTDAnyMut nstd_alloc_allocate_zeroed(NSTDUSize size);
 
 /// Reallocates a block of memory previously allocated by `nstd_alloc_allocate[_zeroed]`.
 ///
@@ -43,7 +43,7 @@ NSTDAPI NSTDAny nstd_alloc_allocate_zeroed(NSTDUSize size);
 ///
 /// # Parameters:
 ///
-/// - `NSTDAny *ptr` - A pointer to the allocated memory.
+/// - `NSTDAnyMut *ptr` - A pointer to the allocated memory.
 ///
 /// - `NSTDUSize size` - The number of bytes currently allocated.
 ///
@@ -57,13 +57,13 @@ NSTDAPI NSTDAny nstd_alloc_allocate_zeroed(NSTDUSize size);
 ///
 /// This operation is unsafe because the behaviour is undefined if `ptr` is not a value returned by
 /// `nstd_alloc_allocate[_zeroed]`.
-NSTDAPI NSTDErrorCode nstd_alloc_reallocate(NSTDAny *ptr, NSTDUSize size, NSTDUSize new_size);
+NSTDAPI NSTDErrorCode nstd_alloc_reallocate(NSTDAnyMut *ptr, NSTDUSize size, NSTDUSize new_size);
 
 /// Deallocates a block of memory previously allocated by `nstd_alloc_allocate[_zeroed]`.
 ///
 /// # Parameters:
 ///
-/// - `NSTDAny *ptr` - A pointer to the allocated memory, once freed the pointer is set to null.
+/// - `NSTDAnyMut *ptr` - A pointer to the allocated memory, once freed the pointer is set to null.
 ///
 /// - `NSTDUSize size` - The number of bytes to free.
 ///
@@ -71,7 +71,7 @@ NSTDAPI NSTDErrorCode nstd_alloc_reallocate(NSTDAny *ptr, NSTDUSize size, NSTDUS
 ///
 /// This operation is unsafe because the behaviour is undefined if `ptr` is not a value returned by
 /// `nstd_alloc_allocate[_zeroed]`.
-NSTDAPI void nstd_alloc_deallocate(NSTDAny *ptr, NSTDUSize size);
+NSTDAPI void nstd_alloc_deallocate(NSTDAnyMut *ptr, NSTDUSize size);
 
 NSTDCPPEND
 #endif
