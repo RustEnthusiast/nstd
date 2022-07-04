@@ -2,7 +2,7 @@
 use crate::{
     core::{
         mem::nstd_core_mem_copy,
-        ptr::{nstd_core_ptr_const_new, nstd_core_ptr_new, NSTDPtr, NSTDPtrConst},
+        ptr::{nstd_core_ptr_const_new, nstd_core_ptr_mut_new, NSTDPtrConst, NSTDPtrMut},
     },
     NSTDAnyConst, NSTDAnyMut, NSTDBool, NSTDUSize, NSTD_NULL,
 };
@@ -12,7 +12,7 @@ use crate::{
 #[derive(Debug, Hash)]
 pub struct NSTDSlice {
     /// A pointer to the first element in the slice.
-    pub ptr: NSTDPtr,
+    pub ptr: NSTDPtrMut,
     /// The number of elements in the slice.
     pub len: NSTDUSize,
 }
@@ -55,7 +55,7 @@ pub unsafe extern "C" fn nstd_core_slice_new(
     len: NSTDUSize,
 ) -> NSTDSlice {
     NSTDSlice {
-        ptr: nstd_core_ptr_new(ptr, element_size),
+        ptr: nstd_core_ptr_mut_new(ptr, element_size),
         len,
     }
 }

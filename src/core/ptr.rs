@@ -4,14 +4,14 @@ use crate::{core::mem::nstd_core_mem_copy, NSTDAnyConst, NSTDAnyMut, NSTDUSize};
 /// A sized pointer to some arbitrary type.
 #[repr(C)]
 #[derive(Debug, Hash, PartialEq, Eq)]
-pub struct NSTDPtr {
+pub struct NSTDPtrMut {
     /// A raw pointer to the data.
     pub raw: NSTDAnyMut,
     /// The size of the object being pointed to.
     pub size: NSTDUSize,
 }
 
-/// Creates a new instance of `NSTDPtr`.
+/// Creates a new instance of `NSTDPtrMut`.
 ///
 /// # Parameters:
 ///
@@ -21,29 +21,29 @@ pub struct NSTDPtr {
 ///
 /// # Returns
 ///
-/// `NSTDPtr ptr` - A new instance of `NSTDPtr` that points to `obj`.
+/// `NSTDPtrMut ptr` - A new instance of `NSTDPtrMut` that points to `obj`.
 ///
 /// # Safety
 ///
 /// `obj` must remain valid while the returned pointer is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_ptr_new(obj: NSTDAnyMut, size: NSTDUSize) -> NSTDPtr {
-    NSTDPtr { raw: obj, size }
+pub unsafe extern "C" fn nstd_core_ptr_mut_new(obj: NSTDAnyMut, size: NSTDUSize) -> NSTDPtrMut {
+    NSTDPtrMut { raw: obj, size }
 }
 
 /// Returns the size of the object being pointed to.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDPtr *ptr` - The pointer.
+/// - `const NSTDPtrMut *ptr` - The pointer.
 ///
 /// # Returns
 ///
 /// `NSTDUSize size` - The size of the object pointed to by `ptr`.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_ptr_size(ptr: &NSTDPtr) -> NSTDUSize {
+pub extern "C" fn nstd_core_ptr_mut_size(ptr: &NSTDPtrMut) -> NSTDUSize {
     ptr.size
 }
 
@@ -51,7 +51,7 @@ pub extern "C" fn nstd_core_ptr_size(ptr: &NSTDPtr) -> NSTDUSize {
 ///
 /// # Parameters:
 ///
-/// - `NSTDPtr *ptr` - The higher level pointer.
+/// - `NSTDPtrMut *ptr` - The higher level pointer.
 ///
 /// # Returns
 ///
@@ -62,7 +62,7 @@ pub extern "C" fn nstd_core_ptr_size(ptr: &NSTDPtr) -> NSTDUSize {
 /// `ptr`'s data must remain valid while the returned pointer is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_ptr_get_mut(ptr: &mut NSTDPtr) -> NSTDAnyMut {
+pub unsafe extern "C" fn nstd_core_ptr_mut_get(ptr: &mut NSTDPtrMut) -> NSTDAnyMut {
     ptr.raw
 }
 
@@ -70,7 +70,7 @@ pub unsafe extern "C" fn nstd_core_ptr_get_mut(ptr: &mut NSTDPtr) -> NSTDAnyMut 
 ///
 /// # Parameters:
 ///
-/// - `const NSTDPtr *ptr` - The higher level pointer.
+/// - `const NSTDPtrMut *ptr` - The higher level pointer.
 ///
 /// # Returns
 ///
@@ -81,7 +81,7 @@ pub unsafe extern "C" fn nstd_core_ptr_get_mut(ptr: &mut NSTDPtr) -> NSTDAnyMut 
 /// `ptr`'s data must remain valid while the returned pointer is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_ptr_get_const(ptr: &NSTDPtr) -> NSTDAnyConst {
+pub unsafe extern "C" fn nstd_core_ptr_mut_get_const(ptr: &NSTDPtrMut) -> NSTDAnyConst {
     ptr.raw
 }
 
@@ -94,7 +94,7 @@ pub unsafe extern "C" fn nstd_core_ptr_get_const(ptr: &NSTDPtr) -> NSTDAnyConst 
 ///
 /// # Parameters:
 ///
-/// - `NSTDPtr *ptr` - The pointer to write to.
+/// - `NSTDPtrMut *ptr` - The pointer to write to.
 ///
 /// - `NSTDAnyConst obj` - A pointer to the object to write to `ptr`.
 ///
@@ -103,7 +103,7 @@ pub unsafe extern "C" fn nstd_core_ptr_get_const(ptr: &NSTDPtr) -> NSTDAnyConst 
 /// This operation is highly unsafe because there is no way of knowing if `obj`'s data is valid.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_ptr_write(ptr: &mut NSTDPtr, obj: NSTDAnyConst) {
+pub unsafe extern "C" fn nstd_core_ptr_mut_write(ptr: &mut NSTDPtrMut, obj: NSTDAnyConst) {
     nstd_core_mem_copy(ptr.raw.cast(), obj.cast(), ptr.size);
 }
 

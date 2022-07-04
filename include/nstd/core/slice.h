@@ -7,7 +7,7 @@ NSTDCPPSTART
 /// A view into a sequence of values in memory.
 typedef struct {
     /// A pointer to the first element in the slice.
-    NSTDPtr ptr;
+    NSTDPtrMut ptr;
     /// The number of elements in the slice.
     NSTDUSize len;
 } NSTDSlice;

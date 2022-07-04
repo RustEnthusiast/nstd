@@ -7,7 +7,7 @@ NSTDCPPSTART
 /// A reference counting smart pointer.
 typedef struct {
     /// A pointer to private data about the shared object.
-    NSTDPtr ptr;
+    NSTDPtrMut ptr;
 } NSTDSharedPtr;
 
 /// Creates a new initialized instance of a shared pointer.

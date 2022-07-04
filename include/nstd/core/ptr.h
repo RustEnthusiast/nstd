@@ -9,9 +9,9 @@ typedef struct {
     NSTDAnyMut raw;
     /// The size of the object being pointed to.
     NSTDUSize size;
-} NSTDPtr;
+} NSTDPtrMut;
 
-/// Creates a new instance of `NSTDPtr`.
+/// Creates a new instance of `NSTDPtrMut`.
 ///
 /// # Parameters:
 ///
@@ -21,29 +21,29 @@ typedef struct {
 ///
 /// # Returns
 ///
-/// `NSTDPtr ptr` - A new instance of `NSTDPtr` that points to `obj`.
+/// `NSTDPtrMut ptr` - A new instance of `NSTDPtrMut` that points to `obj`.
 ///
 /// # Safety
 ///
 /// `obj` must remain valid while the returned pointer is in use.
-NSTDAPI NSTDPtr nstd_core_ptr_new(NSTDAnyMut obj, NSTDUSize size);
+NSTDAPI NSTDPtrMut nstd_core_ptr_mut_new(NSTDAnyMut obj, NSTDUSize size);
 
 /// Returns the size of the object being pointed to.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDPtr *ptr` - The pointer.
+/// - `const NSTDPtrMut *ptr` - The pointer.
 ///
 /// # Returns
 ///
 /// `NSTDUSize size` - The size of the object pointed to by `ptr`.
-NSTDAPI NSTDUSize nstd_core_ptr_size(const NSTDPtr *ptr);
+NSTDAPI NSTDUSize nstd_core_ptr_mut_size(const NSTDPtrMut *ptr);
 
 /// Returns a raw pointer to the object pointed to by `ptr`.
 ///
 /// # Parameters:
 ///
-/// - `NSTDPtr *ptr` - The higher level pointer.
+/// - `NSTDPtrMut *ptr` - The higher level pointer.
 ///
 /// # Returns
 ///
@@ -52,13 +52,13 @@ NSTDAPI NSTDUSize nstd_core_ptr_size(const NSTDPtr *ptr);
 /// # Safety
 ///
 /// `ptr`'s data must remain valid while the returned pointer is in use.
-NSTDAPI NSTDAnyMut nstd_core_ptr_get_mut(NSTDPtr *ptr);
+NSTDAPI NSTDAnyMut nstd_core_ptr_mut_get(NSTDPtrMut *ptr);
 
 /// Returns a raw immutable pointer to the object pointed to by `ptr`.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDPtr *ptr` - The higher level pointer.
+/// - `const NSTDPtrMut *ptr` - The higher level pointer.
 ///
 /// # Returns
 ///
@@ -67,7 +67,7 @@ NSTDAPI NSTDAnyMut nstd_core_ptr_get_mut(NSTDPtr *ptr);
 /// # Safety
 ///
 /// `ptr`'s data must remain valid while the returned pointer is in use.
-NSTDAPI NSTDAnyConst nstd_core_ptr_get_const(const NSTDPtr *ptr);
+NSTDAPI NSTDAnyConst nstd_core_ptr_mut_get_const(const NSTDPtrMut *ptr);
 
 /// Writes data from `obj` to `ptr`. The number of bytes written is determined by `ptr.size`.
 ///
@@ -78,14 +78,14 @@ NSTDAPI NSTDAnyConst nstd_core_ptr_get_const(const NSTDPtr *ptr);
 ///
 /// # Parameters:
 ///
-/// - `NSTDPtr *ptr` - The pointer to write to.
+/// - `NSTDPtrMut *ptr` - The pointer to write to.
 ///
 /// - `NSTDAnyConst obj` - A pointer to the object to write to `ptr`.
 ///
 /// # Safety
 ///
 /// This operation is highly unsafe because there is no way of knowing if `obj`'s data is valid.
-NSTDAPI void nstd_core_ptr_write(NSTDPtr *ptr, NSTDAnyConst obj);
+NSTDAPI void nstd_core_ptr_mut_write(NSTDPtrMut *ptr, NSTDAnyConst obj);
 
 /// A sized immutable pointer to some arbitrary type.
 typedef struct {

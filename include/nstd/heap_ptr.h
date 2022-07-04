@@ -7,7 +7,7 @@ NSTDCPPSTART
 /// A pointer type for single value heap allocation.
 typedef struct {
     /// A pointer to the value on the heap.
-    NSTDPtr ptr;
+    NSTDPtrMut ptr;
 } NSTDHeapPtr;
 
 /// Creates a new initialized heap allocated object.
