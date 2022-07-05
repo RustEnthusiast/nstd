@@ -60,6 +60,21 @@ NSTDAPI NSTDCString nstd_cstring_clone(const NSTDCString *cstring);
 ///
 /// # Parameters:
 ///
+/// - `const NSTDCString *cstring` - The C string.
+///
+/// # Returns
+///
+/// `NSTDCStrConst cstr` - The new C string slice.
+///
+/// # Safety
+///
+/// `cstring`'s data must remain valid while the returned C string slice is in use.
+NSTDAPI NSTDCStrConst nstd_cstring_as_cstr(const NSTDCString *cstring);
+
+/// Creates a C string slice containing the contents of `cstring` (excluding the null byte).
+///
+/// # Parameters:
+///
 /// - `NSTDCString *cstring` - The C string.
 ///
 /// # Returns
@@ -70,21 +85,6 @@ NSTDAPI NSTDCString nstd_cstring_clone(const NSTDCString *cstring);
 ///
 /// `cstring`'s data must remain valid while the returned C string slice is in use.
 NSTDAPI NSTDCStrMut nstd_cstring_as_cstr_mut(NSTDCString *cstring);
-
-/// Creates a C string slice containing the contents of `cstring` (excluding the null byte).
-///
-/// # Parameters:
-///
-/// - `const NSTDCString *cstring` - The C string.
-///
-/// # Returns
-///
-/// `NSTDCStrConst cstr` - The new C string slice.
-///
-/// # Safety
-///
-/// `cstring`'s data must remain valid while the returned C string slice is in use.
-NSTDAPI NSTDCStrConst nstd_cstring_as_cstr_const(const NSTDCString *cstring);
 
 /// Returns an immutable byte slice of the C string's active data, including the null byte.
 ///
