@@ -72,6 +72,21 @@ NSTDAPI NSTDHeapPtr nstd_heap_ptr_clone(const NSTDHeapPtr *hptr);
 /// `NSTDUSize size` - The size of the heap allocated object.
 NSTDAPI NSTDUSize nstd_heap_ptr_size(const NSTDHeapPtr *hptr);
 
+/// Returns an immutable raw pointer to the object on the heap.
+///
+/// # Parameters:
+///
+/// - `const NSTDHeapPtr *hptr` - The heap pointer.
+///
+/// # Returns
+///
+/// `NSTDAnyConst ptr` - A raw pointer to the object on the heap.
+///
+/// # Safety
+///
+/// `hptr`'s data must remain valid while the returned pointer is in use.
+NSTDAPI NSTDAnyConst nstd_heap_ptr_get(const NSTDHeapPtr *hptr);
+
 /// Returns a raw pointer to the object on the heap.
 ///
 /// # Parameters:
@@ -86,21 +101,6 @@ NSTDAPI NSTDUSize nstd_heap_ptr_size(const NSTDHeapPtr *hptr);
 ///
 /// `hptr`'s data must remain valid while the returned pointer is in use.
 NSTDAPI NSTDAnyMut nstd_heap_ptr_get_mut(NSTDHeapPtr *hptr);
-
-/// Returns an immutable raw pointer to the object on the heap.
-///
-/// # Parameters:
-///
-/// - `const NSTDHeapPtr *hptr` - The heap pointer.
-///
-/// # Returns
-///
-/// `NSTDAnyConst ptr` - A raw pointer to the object on the heap.
-///
-/// # Safety
-///
-/// `hptr`'s data must remain valid while the returned pointer is in use.
-NSTDAPI NSTDAnyConst nstd_heap_ptr_get_const(const NSTDHeapPtr *hptr);
 
 /// Frees an instance of `NSTDHeapPtr`.
 ///
