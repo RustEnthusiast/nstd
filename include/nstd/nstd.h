@@ -68,10 +68,10 @@ typedef NSTDUInt32 NSTDChar32;
 /// Represents a Unicode scalar value.
 typedef NSTDChar32 NSTDUnichar;
 
-/// A void pointer (a pointer to some arbitrary type).
-typedef void *NSTDAnyMut;
 /// A void pointer to some immutable data.
 typedef const void *NSTDAnyConst;
+/// A void pointer (a pointer to some arbitrary type).
+typedef void *NSTDAnyMut;
 
 /// A boolean type, can either be `NSTD_TRUE` (1) or `NSTD_FALSE` (0).
 typedef NSTDUInt8 NSTDBool;

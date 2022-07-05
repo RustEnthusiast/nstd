@@ -74,10 +74,10 @@ pub type NSTDChar32 = NSTDUInt32;
 /// Represents a Unicode scalar value.
 pub type NSTDUnichar = NSTDChar32;
 
-/// A void pointer (a pointer to some arbitrary type).
-pub type NSTDAnyMut = *mut c_void;
 /// A void pointer to some immutable data.
 pub type NSTDAnyConst = *const c_void;
+/// A void pointer (a pointer to some arbitrary type).
+pub type NSTDAnyMut = *mut c_void;
 
 /// A boolean type, can either be `NSTD_TRUE` (1) or `NSTD_FALSE` (0).
 pub type NSTDBool = NSTDUInt8;
