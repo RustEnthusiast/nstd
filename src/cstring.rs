@@ -9,7 +9,7 @@ use crate::{
         slice::NSTDSliceConst,
     },
     vec::{
-        nstd_vec_as_slice_const, nstd_vec_clone, nstd_vec_extend, nstd_vec_free, nstd_vec_get_mut,
+        nstd_vec_as_slice, nstd_vec_clone, nstd_vec_extend, nstd_vec_free, nstd_vec_get_mut,
         nstd_vec_new_with_cap, nstd_vec_pop, nstd_vec_push, NSTDVec,
     },
     NSTDUSize,
@@ -138,7 +138,7 @@ pub unsafe extern "C" fn nstd_cstring_as_cstr_mut(cstring: &mut NSTDCString) -> 
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_cstring_as_bytes(cstring: &NSTDCString) -> NSTDSliceConst {
-    nstd_vec_as_slice_const(&cstring.bytes)
+    nstd_vec_as_slice(&cstring.bytes)
 }
 
 /// Appends an `NSTDChar` to the end of an `NSTDCString`.

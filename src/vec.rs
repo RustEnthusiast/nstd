@@ -159,6 +159,25 @@ pub extern "C" fn nstd_vec_len(vec: &NSTDVec) -> NSTDUSize {
     vec.len
 }
 
+/// Returns an immutable slice containing all of a vector's active elements.
+///
+/// # Parameters:
+///
+/// - `const NSTDVec *vec` - The vector.
+///
+/// # Returns
+///
+/// `NSTDSliceConst slice` - An *immutable* view into the vector.
+///
+/// # Safety
+///
+/// `vec`'s data must remain valid while the returned slice is in use.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_vec_as_slice(vec: &NSTDVec) -> NSTDSliceConst {
+    nstd_core_slice_const_new(vec.buffer.ptr.raw, vec.buffer.ptr.size, vec.len)
+}
+
 /// Returns a slice containing all of a vector's active elements.
 ///
 /// # Parameters:
@@ -178,23 +197,34 @@ pub unsafe extern "C" fn nstd_vec_as_slice_mut(vec: &mut NSTDVec) -> NSTDSliceMu
     nstd_core_slice_mut_new(vec.buffer.ptr.raw, vec.buffer.ptr.size, vec.len)
 }
 
-/// Returns an immutable slice containing all of a vector's active elements.
+/// Returns an immutable pointer to the element at index `pos` in `vec`.
+///
+/// # Note
+///
+/// It is highly advised to copy the return value onto the stack because the pointer can easily
+/// become invalid if the vector is mutated.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDVec *vec` - The vector.
+/// - `const NSTDVec *vec` - The vector to read an element from.
+///
+/// - `NSTDUSize pos` - The position of the element to get, starting at 0.
 ///
 /// # Returns
 ///
-/// `NSTDSliceConst slice` - An *immutable* view into the vector.
+/// `NSTDAnyConst element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out
+/// of the vector's boundaries.
 ///
 /// # Safety
 ///
-/// `vec`'s data must remain valid while the returned slice is in use.
+/// `vec`'s data must remain valid while the returned pointer is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_vec_as_slice_const(vec: &NSTDVec) -> NSTDSliceConst {
-    nstd_core_slice_const_new(vec.buffer.ptr.raw, vec.buffer.ptr.size, vec.len)
+pub unsafe extern "C" fn nstd_vec_get(vec: &NSTDVec, pos: NSTDUSize) -> NSTDAnyConst {
+    match pos < vec.len {
+        true => vec.buffer.ptr.raw.add(pos * vec.buffer.ptr.size),
+        false => NSTD_NULL,
+    }
 }
 
 /// Returns a pointer to the element at index `pos` in `vec`.
@@ -221,37 +251,7 @@ pub unsafe extern "C" fn nstd_vec_as_slice_const(vec: &NSTDVec) -> NSTDSliceCons
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_vec_get_mut(vec: &mut NSTDVec, pos: NSTDUSize) -> NSTDAnyMut {
-    nstd_vec_get_const(vec, pos) as NSTDAnyMut
-}
-
-/// Returns an immutable pointer to the element at index `pos` in `vec`.
-///
-/// # Note
-///
-/// It is highly advised to copy the return value onto the stack because the pointer can easily
-/// become invalid if the vector is mutated.
-///
-/// # Parameters:
-///
-/// - `const NSTDVec *vec` - The vector to read an element from.
-///
-/// - `NSTDUSize pos` - The position of the element to get, starting at 0.
-///
-/// # Returns
-///
-/// `NSTDAnyConst element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out
-/// of the vector's boundaries.
-///
-/// # Safety
-///
-/// `vec`'s data must remain valid while the returned pointer is in use.
-#[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_vec_get_const(vec: &NSTDVec, pos: NSTDUSize) -> NSTDAnyConst {
-    match pos < vec.len {
-        true => vec.buffer.ptr.raw.add(pos * vec.buffer.ptr.size),
-        false => NSTD_NULL,
-    }
+    nstd_vec_get(vec, pos) as NSTDAnyMut
 }
 
 /// Pushes a value onto a vector by copying bytes to the end of the vector's buffer. The number of

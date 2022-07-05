@@ -75,6 +75,21 @@ NSTDAPI NSTDVec nstd_vec_clone(const NSTDVec *vec);
 /// `NSTDUSize len` - The length of the vector.
 NSTDAPI NSTDUSize nstd_vec_len(const NSTDVec *vec);
 
+/// Returns an immutable slice containing all of a vector's active elements.
+///
+/// # Parameters:
+///
+/// - `const NSTDVec *vec` - The vector.
+///
+/// # Returns
+///
+/// `NSTDSliceConst slice` - An *immutable* view into the vector.
+///
+/// # Safety
+///
+/// `vec`'s data must remain valid while the returned slice is in use.
+NSTDAPI NSTDSliceConst nstd_vec_as_slice(const NSTDVec *vec);
+
 /// Returns a slice containing all of a vector's active elements.
 ///
 /// # Parameters:
@@ -90,20 +105,28 @@ NSTDAPI NSTDUSize nstd_vec_len(const NSTDVec *vec);
 /// `vec`'s data must remain valid while the returned slice is in use.
 NSTDAPI NSTDSliceMut nstd_vec_as_slice_mut(NSTDVec *vec);
 
-/// Returns an immutable slice containing all of a vector's active elements.
+/// Returns an immutable pointer to the element at index `pos` in `vec`.
+///
+/// # Note
+///
+/// It is highly advised to copy the return value onto the stack because the pointer can easily
+/// become invalid if the vector is mutated.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDVec *vec` - The vector.
+/// - `const NSTDVec *vec` - The vector to read an element from.
+///
+/// - `NSTDUSize pos` - The position of the element to get, starting at 0.
 ///
 /// # Returns
 ///
-/// `NSTDSliceConst slice` - An *immutable* view into the vector.
+/// `NSTDAnyConst element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out
+/// of the vector's boundaries.
 ///
 /// # Safety
 ///
-/// `vec`'s data must remain valid while the returned slice is in use.
-NSTDAPI NSTDSliceConst nstd_vec_as_slice_const(const NSTDVec *vec);
+/// `vec`'s data must remain valid while the returned pointer is in use.
+NSTDAPI NSTDAnyConst nstd_vec_get(const NSTDVec *vec, NSTDUSize pos);
 
 /// Returns a pointer to the element at index `pos` in `vec`.
 ///
@@ -127,29 +150,6 @@ NSTDAPI NSTDSliceConst nstd_vec_as_slice_const(const NSTDVec *vec);
 ///
 /// `vec`'s data must remain valid while the returned pointer is in use.
 NSTDAPI NSTDAnyMut nstd_vec_get_mut(NSTDVec *vec, NSTDUSize pos);
-
-/// Returns an immutable pointer to the element at index `pos` in `vec`.
-///
-/// # Note
-///
-/// It is highly advised to copy the return value onto the stack because the pointer can easily
-/// become invalid if the vector is mutated.
-///
-/// # Parameters:
-///
-/// - `const NSTDVec *vec` - The vector to read an element from.
-///
-/// - `NSTDUSize pos` - The position of the element to get, starting at 0.
-///
-/// # Returns
-///
-/// `NSTDAnyConst element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out
-/// of the vector's boundaries.
-///
-/// # Safety
-///
-/// `vec`'s data must remain valid while the returned pointer is in use.
-NSTDAPI NSTDAnyConst nstd_vec_get_const(const NSTDVec *vec, NSTDUSize pos);
 
 /// Pushes a value onto a vector by copying bytes to the end of the vector's buffer. The number of
 /// bytes to push is determined by `vec.buffer.ptr.size`.
