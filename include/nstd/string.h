@@ -54,6 +54,21 @@ NSTDAPI NSTDString nstd_string_clone(const NSTDString *string);
 ///
 /// # Parameters:
 ///
+/// - `const NSTDString *string` - The string.
+///
+/// # Returns
+///
+/// `NSTDStrConst str` - The new string slice.
+///
+/// # Safety
+///
+/// `string`'s data must remain valid while the returned string slice is in use.
+NSTDAPI NSTDStrConst nstd_string_as_str(const NSTDString *string);
+
+/// Creates a string slice containing the contents of `string`.
+///
+/// # Parameters:
+///
 /// - `NSTDString *string` - The string.
 ///
 /// # Returns
@@ -64,21 +79,6 @@ NSTDAPI NSTDString nstd_string_clone(const NSTDString *string);
 ///
 /// `string`'s data must remain valid while the returned string slice is in use.
 NSTDAPI NSTDStrMut nstd_string_as_str_mut(NSTDString *string);
-
-/// Creates a string slice containing the contents of `string`.
-///
-/// # Parameters:
-///
-/// - `const NSTDString *string` - The string.
-///
-/// # Returns
-///
-/// `NSTDStrConst str` - The new string slice.
-///
-/// # Safety
-///
-/// `string`'s data must remain valid while the returned string slice is in use.
-NSTDAPI NSTDStrConst nstd_string_as_str_const(const NSTDString *string);
 
 /// Returns an immutable byte slice of the string's active data.
 ///
