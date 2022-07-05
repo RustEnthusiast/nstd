@@ -3,6 +3,57 @@
 #include "../nstd.h"
 NSTDCPPSTART
 
+/// A sized immutable pointer to some arbitrary type.
+typedef struct {
+    /// A raw pointer to the data.
+    NSTDAnyConst raw;
+    /// The size of the object being pointed to.
+    NSTDUSize size;
+} NSTDPtrConst;
+
+/// Creates a new instance of `NSTDPtrConst`.
+///
+/// # Parameters:
+///
+/// - `NSTDAnyConst obj` - The object to point to.
+///
+/// - `NSTDUSize size` - The number of bytes that `obj`'s type occupies.
+///
+/// # Returns
+///
+/// `NSTDPtrConst ptr` - A new instance of `NSTDPtrConst` that points to `obj`.
+///
+/// # Safety
+///
+/// `obj` must remain valid while the returned pointer is in use.
+NSTDAPI NSTDPtrConst nstd_core_ptr_const_new(NSTDAnyConst obj, NSTDUSize size);
+
+/// Returns the size of the object being pointed to.
+///
+/// # Parameters:
+///
+/// - `const NSTDPtrConst *ptr` - The pointer.
+///
+/// # Returns
+///
+/// `NSTDUSize size` - The size of the object pointed to by `ptr`.
+NSTDAPI NSTDUSize nstd_core_ptr_const_size(const NSTDPtrConst *ptr);
+
+/// Returns a raw immutable pointer to the object pointed to by `ptr`.
+///
+/// # Parameters:
+///
+/// - `const NSTDPtrConst *ptr` - The higher level pointer.
+///
+/// # Returns
+///
+/// `NSTDAnyConst raw` - A raw pointer to the object.
+///
+/// # Safety
+///
+/// `ptr`'s data must remain valid while the returned pointer is in use.
+NSTDAPI NSTDAnyConst nstd_core_ptr_const_get(const NSTDPtrConst *ptr);
+
 /// A sized pointer to some arbitrary type.
 typedef struct {
     /// A raw pointer to the data.
@@ -86,57 +137,6 @@ NSTDAPI NSTDAnyConst nstd_core_ptr_mut_get_const(const NSTDPtrMut *ptr);
 ///
 /// This operation is highly unsafe because there is no way of knowing if `obj`'s data is valid.
 NSTDAPI void nstd_core_ptr_mut_write(NSTDPtrMut *ptr, NSTDAnyConst obj);
-
-/// A sized immutable pointer to some arbitrary type.
-typedef struct {
-    /// A raw pointer to the data.
-    NSTDAnyConst raw;
-    /// The size of the object being pointed to.
-    NSTDUSize size;
-} NSTDPtrConst;
-
-/// Creates a new instance of `NSTDPtrConst`.
-///
-/// # Parameters:
-///
-/// - `NSTDAnyConst obj` - The object to point to.
-///
-/// - `NSTDUSize size` - The number of bytes that `obj`'s type occupies.
-///
-/// # Returns
-///
-/// `NSTDPtrConst ptr` - A new instance of `NSTDPtrConst` that points to `obj`.
-///
-/// # Safety
-///
-/// `obj` must remain valid while the returned pointer is in use.
-NSTDAPI NSTDPtrConst nstd_core_ptr_const_new(NSTDAnyConst obj, NSTDUSize size);
-
-/// Returns the size of the object being pointed to.
-///
-/// # Parameters:
-///
-/// - `const NSTDPtrConst *ptr` - The pointer.
-///
-/// # Returns
-///
-/// `NSTDUSize size` - The size of the object pointed to by `ptr`.
-NSTDAPI NSTDUSize nstd_core_ptr_const_size(const NSTDPtrConst *ptr);
-
-/// Returns a raw immutable pointer to the object pointed to by `ptr`.
-///
-/// # Parameters:
-///
-/// - `const NSTDPtrConst *ptr` - The higher level pointer.
-///
-/// # Returns
-///
-/// `NSTDAnyConst raw` - A raw pointer to the object.
-///
-/// # Safety
-///
-/// `ptr`'s data must remain valid while the returned pointer is in use.
-NSTDAPI NSTDAnyConst nstd_core_ptr_const_get(const NSTDPtrConst *ptr);
 
 NSTDCPPEND
 #endif
