@@ -104,10 +104,7 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_copy(
     mut dest: *mut NSTDChar,
     mut src: *const NSTDChar,
 ) {
-    loop {
-        if *src == 0 {
-            break;
-        }
+    while *src != 0 {
         *dest = *src;
         dest = dest.add(1);
         src = src.add(1);
@@ -137,11 +134,10 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_copy_with_null(
     mut dest: *mut NSTDChar,
     mut src: *const NSTDChar,
 ) {
-    loop {
+    while {
         *dest = *src;
-        if *src == 0 {
-            break;
-        }
+        *src != 0
+    } {
         dest = dest.add(1);
         src = src.add(1);
     }
