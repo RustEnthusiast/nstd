@@ -1,7 +1,9 @@
 //! An unowned view into a UTF-8 encoded byte string.
 use crate::{
     core::{
-        cstr::{NSTDCStrConst, NSTDCStrMut},
+        cstr::{
+            nstd_core_cstr_const_as_bytes, nstd_core_cstr_mut_as_ptr, NSTDCStrConst, NSTDCStrMut,
+        },
         range::NSTDURange,
         slice::{nstd_core_slice_const_new, nstd_core_slice_mut_new, NSTDSliceConst, NSTDSliceMut},
     },
@@ -36,7 +38,7 @@ pub unsafe extern "C" fn nstd_core_str_const_from_cstr_unchecked(
     cstr: &NSTDCStrConst,
 ) -> NSTDStrConst {
     NSTDStrConst {
-        bytes: nstd_core_slice_const_new(cstr.ptr.cast(), 1, cstr.len),
+        bytes: nstd_core_cstr_const_as_bytes(cstr),
     }
 }
 
@@ -214,7 +216,7 @@ pub unsafe extern "C" fn nstd_core_str_mut_from_cstr_unchecked(
     cstr: &mut NSTDCStrMut,
 ) -> NSTDStrMut {
     NSTDStrMut {
-        bytes: nstd_core_slice_mut_new(cstr.ptr.cast(), 1, cstr.len),
+        bytes: nstd_core_slice_mut_new(nstd_core_cstr_mut_as_ptr(cstr).cast(), 1, cstr.len),
     }
 }
 

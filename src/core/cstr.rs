@@ -13,7 +13,7 @@ use crate::{
 #[derive(Debug, Hash)]
 pub struct NSTDCStrConst {
     /// A pointer to the first character in the C string.
-    pub ptr: *const NSTDChar,
+    ptr: *const NSTDChar,
     /// The length of the C string, excluding the null byte.
     pub len: NSTDUSize,
 }
@@ -112,7 +112,7 @@ pub unsafe extern "C" fn nstd_core_cstr_const_get(
 #[derive(Debug, Hash)]
 pub struct NSTDCStrMut {
     /// A pointer to the first character in the C string.
-    pub ptr: *mut NSTDChar,
+    ptr: *mut NSTDChar,
     /// The length of the C string, excluding the null byte.
     pub len: NSTDUSize,
 }
