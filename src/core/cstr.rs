@@ -61,6 +61,25 @@ pub unsafe extern "C" fn nstd_core_cstr_const_as_bytes(cstr: &NSTDCStrConst) -> 
     nstd_core_slice_const_new(cstr.ptr.cast(), 1, cstr.len)
 }
 
+/// Returns a pointer to the first character in a C string slice.
+///
+/// # Parameters:
+///
+/// - `const NSTDCStrConst *cstr` - The C string slice.
+///
+/// # Returns
+///
+/// `const NSTDChar *ptr` - A pointer to the first character in the C string.
+///
+/// # Safety
+///
+/// `cstr`'s data must remain valid while the returned pointer is in use.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_core_cstr_const_as_ptr(cstr: &NSTDCStrConst) -> *const NSTDChar {
+    cstr.ptr
+}
+
 /// Return a pointer the character at `pos` in `cstr`.
 ///
 /// # Parameters:
@@ -136,6 +155,44 @@ pub unsafe extern "C" fn nstd_core_cstr_mut_new(raw: *mut NSTDChar, len: NSTDUSi
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_cstr_mut_as_bytes(cstr: &NSTDCStrMut) -> NSTDSliceConst {
     nstd_core_slice_const_new(cstr.ptr.cast(), 1, cstr.len)
+}
+
+/// Returns a pointer to the first character in a C string slice.
+///
+/// # Parameters:
+///
+/// - `NSTDCStrMut *cstr` - The C string slice.
+///
+/// # Returns
+///
+/// `NSTDChar *ptr` - A pointer to the first character in the C string.
+///
+/// # Safety
+///
+/// `cstr`'s data must remain valid while the returned pointer is in use.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_core_cstr_mut_as_ptr(cstr: &mut NSTDCStrMut) -> *mut NSTDChar {
+    cstr.ptr
+}
+
+/// Returns a pointer to the first character in a C string slice.
+///
+/// # Parameters:
+///
+/// - `const NSTDCStrMut *cstr` - The C string slice.
+///
+/// # Returns
+///
+/// `const NSTDChar *ptr` - A pointer to the first character in the C string.
+///
+/// # Safety
+///
+/// `cstr`'s data must remain valid while the returned pointer is in use.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_core_cstr_mut_as_ptr_const(cstr: &NSTDCStrMut) -> *const NSTDChar {
+    cstr.ptr
 }
 
 /// Return a pointer the character at `pos` in `cstr`.

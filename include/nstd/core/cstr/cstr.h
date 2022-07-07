@@ -45,6 +45,21 @@ NSTDAPI NSTDCStrConst nstd_core_cstr_const_new(const NSTDChar *raw, NSTDUSize le
 /// `cstr`'s data must remain valid while the returned byte slice is in use.
 NSTDAPI NSTDSliceConst nstd_core_cstr_const_as_bytes(const NSTDCStrConst *cstr);
 
+/// Returns a pointer to the first character in a C string slice.
+///
+/// # Parameters:
+///
+/// - `const NSTDCStrConst *cstr` - The C string slice.
+///
+/// # Returns
+///
+/// `const NSTDChar *ptr` - A pointer to the first character in the C string.
+///
+/// # Safety
+///
+/// `cstr`'s data must remain valid while the returned pointer is in use.
+NSTDAPI const NSTDChar *nstd_core_cstr_const_as_ptr(const NSTDCStrConst *cstr);
+
 /// Return a pointer the character at `pos` in `cstr`.
 ///
 /// # Parameters:
@@ -101,6 +116,36 @@ NSTDAPI NSTDCStrMut nstd_core_cstr_mut_new(NSTDChar *raw, NSTDUSize len);
 ///
 /// `cstr`'s data must remain valid while the returned byte slice is in use.
 NSTDAPI NSTDSliceConst nstd_core_cstr_mut_as_bytes(const NSTDCStrMut *cstr);
+
+/// Returns a pointer to the first character in a C string slice.
+///
+/// # Parameters:
+///
+/// - `NSTDCStrMut *cstr` - The C string slice.
+///
+/// # Returns
+///
+/// `NSTDChar *ptr` - A pointer to the first character in the C string.
+///
+/// # Safety
+///
+/// `cstr`'s data must remain valid while the returned pointer is in use.
+NSTDAPI NSTDChar *nstd_core_cstr_mut_as_ptr(NSTDCStrMut *cstr);
+
+/// Returns a pointer to the first character in a C string slice.
+///
+/// # Parameters:
+///
+/// - `const NSTDCStrMut *cstr` - The C string slice.
+///
+/// # Returns
+///
+/// `const NSTDChar *ptr` - A pointer to the first character in the C string.
+///
+/// # Safety
+///
+/// `cstr`'s data must remain valid while the returned pointer is in use.
+NSTDAPI const NSTDChar *nstd_core_cstr_mut_as_ptr_const(const NSTDCStrMut *cstr);
 
 /// Return a pointer the character at `pos` in `cstr`.
 ///
