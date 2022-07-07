@@ -115,6 +115,22 @@ pub unsafe extern "C" fn nstd_core_str_const_as_bytes(str: &NSTDStrConst) -> NST
     nstd_core_slice_const_new(str.bytes.ptr.raw.cast(), 1, str.bytes.len)
 }
 
+/// Returns the number of Unicode characters in a string slice.
+///
+/// # Parameters:
+///
+/// - `const NSTDStrConst *str` - The string slice.
+///
+/// # Returns
+///
+/// `NSTDUSize len` - The length of the string slice.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_core_str_const_len(str: &NSTDStrConst) -> NSTDUSize {
+    let str = unsafe { core::str::from_utf8_unchecked(str.bytes.as_slice()) };
+    str.chars().count()
+}
+
 /// Gets the `NSTDUnichar` at index `pos` in `str`.
 ///
 /// # Note
@@ -291,6 +307,22 @@ pub unsafe extern "C" fn nstd_core_str_mut_from_bytes_unchecked(
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_mut_as_bytes(str: &NSTDStrMut) -> NSTDSliceConst {
     nstd_core_slice_const_new(str.bytes.ptr.raw.cast(), 1, str.bytes.len)
+}
+
+/// Returns the number of Unicode characters in a string slice.
+///
+/// # Parameters:
+///
+/// - `const NSTDStrMut *str` - The string slice.
+///
+/// # Returns
+///
+/// `NSTDUSize len` - The length of the string slice.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_core_str_mut_len(str: &NSTDStrMut) -> NSTDUSize {
+    let str = unsafe { core::str::from_utf8_unchecked(str.bytes.as_slice()) };
+    str.chars().count()
 }
 
 /// Gets the `NSTDUnichar` at index `pos` in `str`.

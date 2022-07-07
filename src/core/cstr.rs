@@ -80,6 +80,21 @@ pub unsafe extern "C" fn nstd_core_cstr_const_as_ptr(cstr: &NSTDCStrConst) -> *c
     cstr.ptr
 }
 
+/// Returns the length of a C string slice.
+///
+/// # Parameters:
+///
+/// - `const NSTDCStrConst *cstr` - The C string slice.
+///
+/// # Returns
+///
+/// `NSTDUSize len` - The length of the C string slice.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_core_cstr_const_len(cstr: &NSTDCStrConst) -> NSTDUSize {
+    cstr.len
+}
+
 /// Return a pointer the character at `pos` in `cstr`.
 ///
 /// # Parameters:
@@ -193,6 +208,21 @@ pub unsafe extern "C" fn nstd_core_cstr_mut_as_ptr(cstr: &mut NSTDCStrMut) -> *m
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_cstr_mut_as_ptr_const(cstr: &NSTDCStrMut) -> *const NSTDChar {
     cstr.ptr
+}
+
+/// Returns the length of a C string slice.
+///
+/// # Parameters:
+///
+/// - `const NSTDCStrMut *cstr` - The C string slice.
+///
+/// # Returns
+///
+/// `NSTDUSize len` - The length of the C string slice.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_core_cstr_mut_len(cstr: &NSTDCStrMut) -> NSTDUSize {
+    cstr.len
 }
 
 /// Return a pointer the character at `pos` in `cstr`.
