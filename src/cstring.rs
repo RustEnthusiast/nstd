@@ -23,7 +23,7 @@ use core::ptr::addr_of;
 #[derive(Debug, Hash)]
 pub struct NSTDCString {
     /// The underlying vector of `NSTDChar`s.
-    pub bytes: NSTDVec,
+    bytes: NSTDVec,
 }
 
 /// Creates a new empty `NSTDCString`.
