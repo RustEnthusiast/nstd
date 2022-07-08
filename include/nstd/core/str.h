@@ -82,6 +82,17 @@ NSTDAPI NSTDStrConst nstd_core_str_const_from_bytes_unchecked(const NSTDSliceCon
 /// `str`'s data must remain valid while the returned slice is in use.
 NSTDAPI NSTDSliceConst nstd_core_str_const_as_bytes(const NSTDStrConst *str);
 
+/// Returns the number of Unicode characters in a string slice.
+///
+/// # Parameters:
+///
+/// - `const NSTDStrConst *str` - The string slice.
+///
+/// # Returns
+///
+/// `NSTDUSize len` - The length of the string slice.
+NSTDAPI NSTDUSize nstd_core_str_const_len(const NSTDStrConst *str);
+
 /// Gets the `NSTDUnichar` at index `pos` in `str`.
 ///
 /// # Note
@@ -207,6 +218,17 @@ NSTDAPI NSTDStrMut nstd_core_str_mut_from_bytes_unchecked(NSTDSliceMut *bytes);
 ///
 /// `str`'s data must remain valid while the returned slice is in use.
 NSTDAPI NSTDSliceConst nstd_core_str_mut_as_bytes(const NSTDStrMut *str);
+
+/// Returns the number of Unicode characters in a string slice.
+///
+/// # Parameters:
+///
+/// - `const NSTDStrMut *str` - The string slice.
+///
+/// # Returns
+///
+/// `NSTDUSize len` - The length of the string slice.
+NSTDAPI NSTDUSize nstd_core_str_mut_len(const NSTDStrMut *str);
 
 /// Gets the `NSTDUnichar` at index `pos` in `str`.
 ///

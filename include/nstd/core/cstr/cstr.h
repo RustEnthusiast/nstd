@@ -60,6 +60,17 @@ NSTDAPI NSTDSliceConst nstd_core_cstr_const_as_bytes(const NSTDCStrConst *cstr);
 /// `cstr`'s data must remain valid while the returned pointer is in use.
 NSTDAPI const NSTDChar *nstd_core_cstr_const_as_ptr(const NSTDCStrConst *cstr);
 
+/// Returns the length of a C string slice.
+///
+/// # Parameters:
+///
+/// - `const NSTDCStrConst *cstr` - The C string slice.
+///
+/// # Returns
+///
+/// `NSTDUSize len` - The length of the C string slice.
+NSTDAPI NSTDUSize nstd_core_cstr_const_len(const NSTDCStrConst *cstr);
+
 /// Return a pointer the character at `pos` in `cstr`.
 ///
 /// # Parameters:
@@ -146,6 +157,17 @@ NSTDAPI NSTDChar *nstd_core_cstr_mut_as_ptr(NSTDCStrMut *cstr);
 ///
 /// `cstr`'s data must remain valid while the returned pointer is in use.
 NSTDAPI const NSTDChar *nstd_core_cstr_mut_as_ptr_const(const NSTDCStrMut *cstr);
+
+/// Returns the length of a C string slice.
+///
+/// # Parameters:
+///
+/// - `const NSTDCStrMut *cstr` - The C string slice.
+///
+/// # Returns
+///
+/// `NSTDUSize len` - The length of the C string slice.
+NSTDAPI NSTDUSize nstd_core_cstr_mut_len(const NSTDCStrMut *cstr);
 
 /// Return a pointer the character at `pos` in `cstr`.
 ///
