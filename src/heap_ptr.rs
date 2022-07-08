@@ -13,7 +13,7 @@ use crate::{
 #[derive(Debug, Hash, PartialEq, Eq)]
 pub struct NSTDHeapPtr {
     /// A pointer to the value on the heap.
-    pub ptr: NSTDPtrMut,
+    ptr: NSTDPtrMut,
 }
 
 /// Creates a new initialized heap allocated object.
