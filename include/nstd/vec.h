@@ -105,6 +105,36 @@ NSTDAPI NSTDSliceConst nstd_vec_as_slice(const NSTDVec *vec);
 /// `vec`'s data must remain valid while the returned slice is in use.
 NSTDAPI NSTDSliceMut nstd_vec_as_slice_mut(NSTDVec *vec);
 
+/// Returns a pointer to a vector's raw data.
+///
+/// # Parameters:
+///
+/// - `const NSTDVec *vec` - The vector.
+///
+/// # Returns
+///
+/// `NSTDAnyConst ptr` - A pointer to the vector's raw data.
+///
+/// # Safety
+///
+/// `vec`'s data must remain valid while the returned pointer is in use.
+NSTDAPI NSTDAnyConst nstd_vec_as_ptr(const NSTDVec *vec);
+
+/// Returns a pointer to a vector's raw data.
+///
+/// # Parameters:
+///
+/// - `NSTDVec *vec` - The vector.
+///
+/// # Returns
+///
+/// `NSTDAnyMut ptr` - A pointer to the vector's raw data.
+///
+/// # Safety
+///
+/// `vec`'s data must remain valid while the returned pointer is in use.
+NSTDAPI NSTDAnyMut nstd_vec_as_mut_ptr(NSTDVec *vec);
+
 /// Returns an immutable pointer to the element at index `pos` in `vec`.
 ///
 /// # Note
