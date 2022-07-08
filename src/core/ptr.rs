@@ -6,9 +6,9 @@ use crate::{core::mem::nstd_core_mem_copy, NSTDAnyConst, NSTDAnyMut, NSTDUSize};
 #[derive(Debug, Hash, PartialEq, Eq)]
 pub struct NSTDPtrConst {
     /// A raw pointer to the data.
-    pub raw: NSTDAnyConst,
+    pub(crate) raw: NSTDAnyConst,
     /// The size of the object being pointed to.
-    pub size: NSTDUSize,
+    pub(crate) size: NSTDUSize,
 }
 
 /// Creates a new instance of `NSTDPtrConst`.
@@ -74,9 +74,9 @@ pub unsafe extern "C" fn nstd_core_ptr_const_get(ptr: &NSTDPtrConst) -> NSTDAnyC
 #[derive(Debug, Hash, PartialEq, Eq)]
 pub struct NSTDPtrMut {
     /// A raw pointer to the data.
-    pub raw: NSTDAnyMut,
+    pub(crate) raw: NSTDAnyMut,
     /// The size of the object being pointed to.
-    pub size: NSTDUSize,
+    pub(crate) size: NSTDUSize,
 }
 
 /// Creates a new instance of `NSTDPtrMut`.
