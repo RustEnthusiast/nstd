@@ -197,6 +197,44 @@ pub unsafe extern "C" fn nstd_vec_as_slice_mut(vec: &mut NSTDVec) -> NSTDSliceMu
     nstd_core_slice_mut_new(vec.buffer.ptr.raw, vec.buffer.ptr.size, vec.len)
 }
 
+/// Returns a pointer to a vector's raw data.
+///
+/// # Parameters:
+///
+/// - `const NSTDVec *vec` - The vector.
+///
+/// # Returns
+///
+/// `NSTDAnyConst ptr` - A pointer to the vector's raw data.
+///
+/// # Safety
+///
+/// `vec`'s data must remain valid while the returned pointer is in use.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_vec_as_ptr(vec: &NSTDVec) -> NSTDAnyConst {
+    vec.buffer.ptr.raw
+}
+
+/// Returns a pointer to a vector's raw data.
+///
+/// # Parameters:
+///
+/// - `NSTDVec *vec` - The vector.
+///
+/// # Returns
+///
+/// `NSTDAnyMut ptr` - A pointer to the vector's raw data.
+///
+/// # Safety
+///
+/// `vec`'s data must remain valid while the returned pointer is in use.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_vec_as_mut_ptr(vec: &mut NSTDVec) -> NSTDAnyMut {
+    vec.buffer.ptr.raw
+}
+
 /// Returns an immutable pointer to the element at index `pos` in `vec`.
 ///
 /// # Note
