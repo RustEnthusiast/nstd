@@ -12,9 +12,9 @@ use crate::{
 #[derive(Debug, Hash)]
 pub struct NSTDSliceConst {
     /// A pointer to the first element in the slice.
-    pub ptr: NSTDPtrConst,
+    pub(crate) ptr: NSTDPtrConst,
     /// The number of elements in the slice.
-    pub len: NSTDUSize,
+    pub(crate) len: NSTDUSize,
 }
 impl NSTDSliceConst {
     /// Returns the number of bytes that this slice covers.
@@ -174,9 +174,9 @@ pub extern "C" fn nstd_core_slice_const_compare(
 #[derive(Debug, Hash)]
 pub struct NSTDSliceMut {
     /// A pointer to the first element in the slice.
-    pub ptr: NSTDPtrMut,
+    pub(crate) ptr: NSTDPtrMut,
     /// The number of elements in the slice.
-    pub len: NSTDUSize,
+    pub(crate) len: NSTDUSize,
 }
 impl NSTDSliceMut {
     /// Returns the number of bytes that this slice covers.
