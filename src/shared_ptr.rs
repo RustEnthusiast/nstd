@@ -16,7 +16,7 @@ const USIZE_SIZE: usize = core::mem::size_of::<usize>();
 #[derive(Debug, Hash, PartialEq, Eq)]
 pub struct NSTDSharedPtr {
     /// A pointer to private data about the shared object.
-    pub ptr: NSTDPtrMut,
+    ptr: NSTDPtrMut,
 }
 impl NSTDSharedPtr {
     /// Returns the number of pointers sharing the object.
