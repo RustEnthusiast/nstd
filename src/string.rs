@@ -4,8 +4,8 @@ use crate::{
         def::NSTDErrorCode,
         slice::{nstd_core_slice_const_new, NSTDSliceConst},
         str::{
-            nstd_core_str_const_from_bytes_unchecked, nstd_core_str_mut_from_bytes_unchecked,
-            NSTDStrConst, NSTDStrMut,
+            nstd_core_str_const_as_bytes, nstd_core_str_const_from_bytes_unchecked,
+            nstd_core_str_mut_from_bytes_unchecked, NSTDStrConst, NSTDStrMut,
         },
     },
     vec::{
@@ -179,7 +179,8 @@ pub extern "C" fn nstd_string_push_str(
     string: &mut NSTDString,
     str: &NSTDStrConst,
 ) -> NSTDErrorCode {
-    nstd_vec_extend(&mut string.bytes, &str.bytes)
+    let str_bytes = unsafe { nstd_core_str_const_as_bytes(str) };
+    nstd_vec_extend(&mut string.bytes, &str_bytes)
 }
 
 /// Removes the last character from a string and returns it.

@@ -16,7 +16,7 @@ use crate::{
 #[derive(Debug, Hash)]
 pub struct NSTDStrConst {
     /// A view into the UTF-8 encoded buffer.
-    pub bytes: NSTDSliceConst,
+    bytes: NSTDSliceConst,
 }
 
 /// Creates a new instance of `NSTDStrConst` from a C string.
@@ -210,7 +210,7 @@ pub unsafe extern "C" fn nstd_core_str_const_substr(
 #[derive(Debug, Hash)]
 pub struct NSTDStrMut {
     /// A view into the UTF-8 encoded buffer.
-    pub bytes: NSTDSliceMut,
+    bytes: NSTDSliceMut,
 }
 
 /// Creates a new instance of `NSTDStrMut` from a C string.
