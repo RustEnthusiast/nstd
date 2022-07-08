@@ -14,9 +14,9 @@ use crate::{
 #[derive(Debug, Hash)]
 pub struct NSTDVec {
     /// The underlying memory buffer.
-    pub buffer: NSTDSliceMut,
+    buffer: NSTDSliceMut,
     /// The number of active elements in the vector.
-    pub len: NSTDUSize,
+    len: NSTDUSize,
 }
 impl NSTDVec {
     /// Returns the number of active bytes in the vector.
