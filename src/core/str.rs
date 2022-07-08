@@ -2,7 +2,8 @@
 use crate::{
     core::{
         cstr::{
-            nstd_core_cstr_const_as_bytes, nstd_core_cstr_mut_as_ptr, NSTDCStrConst, NSTDCStrMut,
+            nstd_core_cstr_const_as_bytes, nstd_core_cstr_mut_as_ptr, nstd_core_cstr_mut_len,
+            NSTDCStrConst, NSTDCStrMut,
         },
         range::NSTDURange,
         slice::{nstd_core_slice_const_new, nstd_core_slice_mut_new, NSTDSliceConst, NSTDSliceMut},
@@ -231,8 +232,10 @@ pub struct NSTDStrMut {
 pub unsafe extern "C" fn nstd_core_str_mut_from_cstr_unchecked(
     cstr: &mut NSTDCStrMut,
 ) -> NSTDStrMut {
+    let ptr = nstd_core_cstr_mut_as_ptr(cstr).cast();
+    let len = nstd_core_cstr_mut_len(cstr);
     NSTDStrMut {
-        bytes: nstd_core_slice_mut_new(nstd_core_cstr_mut_as_ptr(cstr).cast(), 1, cstr.len),
+        bytes: nstd_core_slice_mut_new(ptr, 1, len),
     }
 }
 

@@ -15,7 +15,7 @@ pub struct NSTDCStrConst {
     /// A pointer to the first character in the C string.
     ptr: *const NSTDChar,
     /// The length of the C string, excluding the null byte.
-    pub len: NSTDUSize,
+    len: NSTDUSize,
 }
 
 /// Creates a new C string slice from a raw pointer and a size.
@@ -129,7 +129,7 @@ pub struct NSTDCStrMut {
     /// A pointer to the first character in the C string.
     ptr: *mut NSTDChar,
     /// The length of the C string, excluding the null byte.
-    pub len: NSTDUSize,
+    len: NSTDUSize,
 }
 
 /// Creates a new C string slice from a raw pointer and a size.
