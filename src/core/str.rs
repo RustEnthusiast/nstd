@@ -18,6 +18,13 @@ pub struct NSTDStrConst {
     /// A view into the UTF-8 encoded buffer.
     bytes: NSTDSliceConst,
 }
+impl NSTDStrConst {
+    /// Creates a Rust string slice from this [NSTDStrConst].
+    #[inline]
+    fn as_str(&self) -> &str {
+        unsafe { core::str::from_utf8_unchecked(self.bytes.as_slice()) }
+    }
+}
 
 /// Creates a new instance of `NSTDStrConst` from a C string.
 ///
@@ -130,8 +137,7 @@ pub unsafe extern "C" fn nstd_core_str_const_as_bytes(str: &NSTDStrConst) -> NST
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_str_const_len(str: &NSTDStrConst) -> NSTDUSize {
-    let str = unsafe { core::str::from_utf8_unchecked(str.bytes.as_slice()) };
-    str.chars().count()
+    str.as_str().chars().count()
 }
 
 /// Gets the `NSTDUnichar` at index `pos` in `str`.
@@ -153,9 +159,7 @@ pub extern "C" fn nstd_core_str_const_len(str: &NSTDStrConst) -> NSTDUSize {
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_str_const_get_char(str: &NSTDStrConst, pos: NSTDUSize) -> NSTDUnichar {
-    // SAFETY: String slices are always valid UTF-8.
-    let str = unsafe { core::str::from_utf8_unchecked(str.bytes.as_slice()) };
-    match str.chars().nth(pos) {
+    match str.as_str().chars().nth(pos) {
         Some(chr) => chr as NSTDUnichar,
         _ => char::REPLACEMENT_CHARACTER as NSTDUnichar,
     }
@@ -211,6 +215,13 @@ pub unsafe extern "C" fn nstd_core_str_const_substr(
 pub struct NSTDStrMut {
     /// A view into the UTF-8 encoded buffer.
     bytes: NSTDSliceMut,
+}
+impl NSTDStrMut {
+    /// Creates a Rust string slice from this [NSTDStrMut].
+    #[inline]
+    fn as_str(&self) -> &str {
+        unsafe { core::str::from_utf8_unchecked(self.bytes.as_slice()) }
+    }
 }
 
 /// Creates a new instance of `NSTDStrMut` from a C string.
@@ -326,8 +337,7 @@ pub unsafe extern "C" fn nstd_core_str_mut_as_bytes(str: &NSTDStrMut) -> NSTDSli
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_str_mut_len(str: &NSTDStrMut) -> NSTDUSize {
-    let str = unsafe { core::str::from_utf8_unchecked(str.bytes.as_slice()) };
-    str.chars().count()
+    str.as_str().chars().count()
 }
 
 /// Gets the `NSTDUnichar` at index `pos` in `str`.
@@ -349,9 +359,7 @@ pub extern "C" fn nstd_core_str_mut_len(str: &NSTDStrMut) -> NSTDUSize {
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_str_mut_get_char(str: &NSTDStrMut, pos: NSTDUSize) -> NSTDUnichar {
-    // SAFETY: String slices are always valid UTF-8.
-    let str = unsafe { core::str::from_utf8_unchecked(str.bytes.as_slice()) };
-    match str.chars().nth(pos) {
+    match str.as_str().chars().nth(pos) {
         Some(chr) => chr as NSTDUnichar,
         _ => char::REPLACEMENT_CHARACTER as NSTDUnichar,
     }
