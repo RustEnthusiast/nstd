@@ -17,6 +17,9 @@ pub mod heap_ptr;
 #[cfg(feature = "nstd_os")]
 #[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_os")))]
 pub mod os;
+#[cfg(feature = "nstd_shared_lib")]
+#[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_shared_lib")))]
+pub mod shared_lib;
 #[cfg(feature = "nstd_shared_ptr")]
 #[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_shared_ptr")))]
 pub mod shared_ptr;
