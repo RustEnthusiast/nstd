@@ -115,9 +115,9 @@ pub unsafe extern "C" fn nstd_string_as_str(string: &NSTDString) -> NSTDStrConst
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_string_as_str_mut(string: &mut NSTDString) -> NSTDStrMut {
-    let bytes = nstd_vec_as_slice_mut(&mut string.bytes);
+    let mut bytes = nstd_vec_as_slice_mut(&mut string.bytes);
     // SAFETY: The string's bytes are always be UTF-8 encoded.
-    nstd_core_str_mut_from_bytes_unchecked(&bytes)
+    nstd_core_str_mut_from_bytes_unchecked(&mut bytes)
 }
 
 /// Returns an immutable byte slice of the string's active data.

@@ -258,7 +258,7 @@ pub unsafe extern "C" fn nstd_core_str_mut_from_cstr_unchecked(
 /// `bytes` must remain valid while the returned string slice is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_str_mut_from_bytes(bytes: &NSTDSliceMut) -> NSTDStrMut {
+pub unsafe extern "C" fn nstd_core_str_mut_from_bytes(bytes: &mut NSTDSliceMut) -> NSTDStrMut {
     assert!(bytes.ptr.size == 1);
     core::str::from_utf8(bytes.as_slice()).expect("Invalid UTF-8 bytes");
     NSTDStrMut {
@@ -287,7 +287,7 @@ pub unsafe extern "C" fn nstd_core_str_mut_from_bytes(bytes: &NSTDSliceMut) -> N
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_mut_from_bytes_unchecked(
-    bytes: &NSTDSliceMut,
+    bytes: &mut NSTDSliceMut,
 ) -> NSTDStrMut {
     assert!(bytes.ptr.size == 1);
     NSTDStrMut {
@@ -397,6 +397,6 @@ pub unsafe extern "C" fn nstd_core_str_mut_substr(
     assert!(range.start <= range.end);
     // Create the byte slice with `range` and use it to create the new string slice.
     let start = str.bytes.ptr.raw.add(range.start);
-    let bytes = nstd_core_slice_mut_new(start, 1, range.end - range.start);
-    nstd_core_str_mut_from_bytes(&bytes)
+    let mut bytes = nstd_core_slice_mut_new(start, 1, range.end - range.start);
+    nstd_core_str_mut_from_bytes(&mut bytes)
 }
