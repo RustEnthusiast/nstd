@@ -21,7 +21,7 @@ pub struct NSTDStrConst {
 impl NSTDStrConst {
     /// Creates a Rust string slice from this [NSTDStrConst].
     #[inline]
-    fn as_str(&self) -> &str {
+    pub(crate) fn as_str(&self) -> &str {
         unsafe { core::str::from_utf8_unchecked(self.bytes.as_slice()) }
     }
 }
