@@ -10,8 +10,8 @@ use crate::{
     },
     vec::{
         nstd_vec_as_mut_ptr, nstd_vec_as_ptr, nstd_vec_as_slice, nstd_vec_clone, nstd_vec_extend,
-        nstd_vec_free, nstd_vec_get_mut, nstd_vec_len, nstd_vec_new_with_cap, nstd_vec_pop,
-        nstd_vec_push, NSTDVec,
+        nstd_vec_get_mut, nstd_vec_len, nstd_vec_new_with_cap, nstd_vec_pop, nstd_vec_push,
+        NSTDVec,
     },
     NSTDUSize,
 };
@@ -237,6 +237,5 @@ pub extern "C" fn nstd_cstring_pop(cstring: &mut NSTDCString) -> NSTDChar {
 /// - `NSTDCString cstring` - The C string to free.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_cstring_free(cstring: NSTDCString) {
-    nstd_vec_free(cstring.bytes);
-}
+#[allow(unused_variables)]
+pub extern "C" fn nstd_cstring_free(cstring: NSTDCString) {}

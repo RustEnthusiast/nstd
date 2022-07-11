@@ -9,8 +9,8 @@ use crate::{
         },
     },
     vec::{
-        nstd_vec_as_slice, nstd_vec_as_slice_mut, nstd_vec_clone, nstd_vec_extend, nstd_vec_free,
-        nstd_vec_len, nstd_vec_new, nstd_vec_new_with_cap, nstd_vec_truncate, NSTDVec,
+        nstd_vec_as_slice, nstd_vec_as_slice_mut, nstd_vec_clone, nstd_vec_extend, nstd_vec_len,
+        nstd_vec_new, nstd_vec_new_with_cap, nstd_vec_truncate, NSTDVec,
     },
     NSTDUSize, NSTDUnichar,
 };
@@ -212,6 +212,5 @@ pub extern "C" fn nstd_string_pop(string: &mut NSTDString) -> NSTDUnichar {
 /// - `NSTDString string` - A pointer to the string to free.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_string_free(string: NSTDString) {
-    nstd_vec_free(string.bytes);
-}
+#[allow(unused_variables)]
+pub extern "C" fn nstd_string_free(string: NSTDString) {}

@@ -25,6 +25,21 @@ impl NSTDSharedPtr {
         unsafe { self.ptr.raw.add(nstd_shared_ptr_size(self)).cast() }
     }
 }
+impl Drop for NSTDSharedPtr {
+    /// [NSTDSharedPtr]'s destructor.
+    #[inline]
+    fn drop(&mut self) {
+        unsafe {
+            // Update the pointer count.
+            let ptrs = self.ptrs();
+            *ptrs -= 1;
+            // If the pointer count is zero, free the data.
+            if *ptrs == 0 {
+                nstd_alloc_deallocate(&mut self.ptr.raw, self.ptr.size);
+            }
+        }
+    }
+}
 
 /// Creates a new initialized instance of a shared pointer.
 ///
@@ -175,14 +190,5 @@ pub unsafe extern "C" fn nstd_shared_ptr_get(shared_ptr: &NSTDSharedPtr) -> NSTD
 ///
 /// - `NSTDSharedPtr shared_ptr` - The shared object to free.
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_shared_ptr_free(mut shared_ptr: NSTDSharedPtr) {
-    unsafe {
-        // Update the pointer count.
-        let ptrs = shared_ptr.ptrs();
-        *ptrs -= 1;
-        // If the pointer count is zero, free the data.
-        if *ptrs == 0 {
-            nstd_alloc_deallocate(&mut shared_ptr.ptr.raw, shared_ptr.ptr.size);
-        }
-    }
-}
+#[allow(unused_variables)]
+pub extern "C" fn nstd_shared_ptr_free(shared_ptr: NSTDSharedPtr) {}

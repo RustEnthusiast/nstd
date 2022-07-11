@@ -15,6 +15,13 @@ pub struct NSTDHeapPtr {
     /// A pointer to the value on the heap.
     ptr: NSTDPtrMut,
 }
+impl Drop for NSTDHeapPtr {
+    /// [NSTDHeapPtr]'s destructor.
+    #[inline]
+    fn drop(&mut self) {
+        unsafe { nstd_alloc_deallocate(&mut self.ptr.raw, self.ptr.size) };
+    }
+}
 
 /// Creates a new initialized heap allocated object.
 ///
@@ -158,6 +165,5 @@ pub unsafe extern "C" fn nstd_heap_ptr_get_mut(hptr: &mut NSTDHeapPtr) -> NSTDAn
 /// - `NSTDHeapPtr hptr` - A pointer to the heap object.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_heap_ptr_free(mut hptr: NSTDHeapPtr) {
-    unsafe { nstd_alloc_deallocate(&mut hptr.ptr.raw, hptr.ptr.size) };
-}
+#[allow(unused_variables)]
+pub extern "C" fn nstd_heap_ptr_free(hptr: NSTDHeapPtr) {}

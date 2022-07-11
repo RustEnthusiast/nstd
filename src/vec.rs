@@ -51,6 +51,16 @@ impl NSTDVec {
         0
     }
 }
+impl Drop for NSTDVec {
+    /// [NSTDVec]'s destructor.
+    #[inline]
+    fn drop(&mut self) {
+        if !self.buffer.ptr.raw.is_null() {
+            let buffer_len = self.buffer.byte_len();
+            unsafe { nstd_alloc_deallocate(&mut self.buffer.ptr.raw, buffer_len) };
+        }
+    }
+}
 
 /// Creates a new vector without allocating any resources.
 ///
@@ -573,9 +583,5 @@ pub extern "C" fn nstd_vec_shrink(vec: &mut NSTDVec) -> NSTDErrorCode {
 /// - `NSTDVec vec` - The vector to free.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_vec_free(mut vec: NSTDVec) {
-    if !vec.buffer.ptr.raw.is_null() {
-        let buffer_len = vec.buffer.byte_len();
-        unsafe { nstd_alloc_deallocate(&mut vec.buffer.ptr.raw, buffer_len) };
-    }
-}
+#[allow(unused_variables)]
+pub extern "C" fn nstd_vec_free(vec: NSTDVec) {}
