@@ -183,12 +183,8 @@ pub extern "C" fn nstd_core_str_const_get_char(str: &NSTDStrConst, pos: NSTDUSiz
 /// - `range.start` is greater than `range.end`.
 ///
 /// - The substring bytes are not valid UTF-8.
-///
-/// # Safety
-///
-/// `str`'s data must remain valid while the returned string slice is in use.
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_str_const_substr(
+pub extern "C" fn nstd_core_str_const_substr(
     str: &NSTDStrConst,
     range: NSTDURange,
 ) -> NSTDStrConst {
@@ -196,7 +192,7 @@ pub unsafe extern "C" fn nstd_core_str_const_substr(
     assert!(range.end <= str.bytes.len);
     assert!(range.start <= range.end);
     // Create the byte slice with `range` and use it to create the new string slice.
-    let start = str.bytes.ptr.raw.add(range.start);
+    let start = unsafe { str.bytes.ptr.raw.add(range.start) };
     let bytes = nstd_core_slice_const_new(start, 1, range.end - range.start);
     nstd_core_str_const_from_bytes(&bytes)
 }
@@ -375,20 +371,13 @@ pub extern "C" fn nstd_core_str_mut_get_char(str: &NSTDStrMut, pos: NSTDUSize) -
 /// - `range.start` is greater than `range.end`.
 ///
 /// - The substring bytes are not valid UTF-8.
-///
-/// # Safety
-///
-/// `str`'s data must remain valid while the returned string slice is in use.
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_str_mut_substr(
-    str: &mut NSTDStrMut,
-    range: NSTDURange,
-) -> NSTDStrMut {
+pub extern "C" fn nstd_core_str_mut_substr(str: &mut NSTDStrMut, range: NSTDURange) -> NSTDStrMut {
     // Make sure the range is valid for the bounds of `str`.
     assert!(range.end <= str.bytes.len);
     assert!(range.start <= range.end);
     // Create the byte slice with `range` and use it to create the new string slice.
-    let start = str.bytes.ptr.raw.add(range.start);
+    let start = unsafe { str.bytes.ptr.raw.add(range.start) };
     let mut bytes = nstd_core_slice_mut_new(start, 1, range.end - range.start);
     nstd_core_str_mut_from_bytes(&mut bytes)
 }

@@ -129,10 +129,6 @@ NSTDAPI NSTDUnichar nstd_core_str_const_get_char(const NSTDStrConst *str, NSTDUS
 /// - `range.start` is greater than `range.end`.
 ///
 /// - The substring bytes are not valid UTF-8.
-///
-/// # Safety
-///
-/// `str`'s data must remain valid while the returned string slice is in use.
 NSTDAPI NSTDStrConst nstd_core_str_const_substr(const NSTDStrConst *str, NSTDURange range);
 
 /// An unowned view into a UTF-8 encoded byte string.
@@ -258,10 +254,6 @@ NSTDAPI NSTDUnichar nstd_core_str_mut_get_char(const NSTDStrMut *str, NSTDUSize 
 /// - `range.start` is greater than `range.end`.
 ///
 /// - The substring bytes are not valid UTF-8.
-///
-/// # Safety
-///
-/// `str`'s data must remain valid while the returned string slice is in use.
 NSTDAPI NSTDStrMut nstd_core_str_mut_substr(NSTDStrMut *str, NSTDURange range);
 
 NSTDCPPEND
