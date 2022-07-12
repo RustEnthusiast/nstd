@@ -39,10 +39,6 @@ NSTDAPI NSTDCStrConst nstd_core_cstr_const_new(const NSTDChar *raw, NSTDUSize le
 /// # Returns
 ///
 /// `NSTDSliceConst bytes` - An immutable byte slice of the C string slice's data.
-///
-/// # Safety
-///
-/// `cstr`'s data must remain valid while the returned byte slice is in use.
 NSTDAPI NSTDSliceConst nstd_core_cstr_const_as_bytes(const NSTDCStrConst *cstr);
 
 /// Returns a pointer to the first character in a C string slice.
@@ -122,10 +118,6 @@ NSTDAPI NSTDCStrMut nstd_core_cstr_mut_new(NSTDChar *raw, NSTDUSize len);
 /// # Returns
 ///
 /// `NSTDSliceConst bytes` - An immutable byte slice of the C string slice's data.
-///
-/// # Safety
-///
-/// `cstr`'s data must remain valid while the returned byte slice is in use.
 NSTDAPI NSTDSliceConst nstd_core_cstr_mut_as_bytes(const NSTDCStrMut *cstr);
 
 /// Returns a pointer to the first character in a C string slice.

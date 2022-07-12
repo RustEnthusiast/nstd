@@ -84,10 +84,6 @@ NSTDAPI NSTDUSize nstd_vec_len(const NSTDVec *vec);
 /// # Returns
 ///
 /// `NSTDSliceConst slice` - An *immutable* view into the vector.
-///
-/// # Safety
-///
-/// `vec`'s data must remain valid while the returned slice is in use.
 NSTDAPI NSTDSliceConst nstd_vec_as_slice(const NSTDVec *vec);
 
 /// Returns a slice containing all of a vector's active elements.
@@ -99,10 +95,6 @@ NSTDAPI NSTDSliceConst nstd_vec_as_slice(const NSTDVec *vec);
 /// # Returns
 ///
 /// `NSTDSliceMut slice` - A *mutable* view into the vector.
-///
-/// # Safety
-///
-/// `vec`'s data must remain valid while the returned slice is in use.
 NSTDAPI NSTDSliceMut nstd_vec_as_slice_mut(NSTDVec *vec);
 
 /// Returns a pointer to a vector's raw data.
@@ -275,6 +267,10 @@ NSTDAPI NSTDErrorCode nstd_vec_remove(NSTDVec *vec, NSTDUSize index);
 /// # Panics
 ///
 /// This operation will panic if the element sizes for `vec` and `values` do not match.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if `values`'s data is invalid.
 NSTDAPI NSTDErrorCode nstd_vec_extend(NSTDVec *vec, const NSTDSliceConst *values);
 
 /// Shortens a vector, keeping the first `len` elements.

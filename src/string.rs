@@ -129,13 +129,9 @@ pub unsafe extern "C" fn nstd_string_as_str_mut(string: &mut NSTDString) -> NSTD
 /// # Returns
 ///
 /// `NSTDSliceConst bytes` - The string's active data.
-///
-/// # Safety
-///
-/// `string`'s data must remain valid while the returned slice is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_string_as_bytes(string: &NSTDString) -> NSTDSliceConst {
+pub extern "C" fn nstd_string_as_bytes(string: &NSTDString) -> NSTDSliceConst {
     nstd_vec_as_slice(&string.bytes)
 }
 
@@ -156,8 +152,8 @@ pub extern "C" fn nstd_string_push(string: &mut NSTDString, chr: NSTDUnichar) ->
     if let Some(chr) = char::from_u32(chr) {
         let mut buf = [0; 4];
         chr.encode_utf8(&mut buf);
-        let buf = unsafe { nstd_core_slice_const_new(buf.as_ptr().cast(), 1, chr.len_utf8()) };
-        return nstd_vec_extend(&mut string.bytes, &buf);
+        let buf = nstd_core_slice_const_new(buf.as_ptr().cast(), 1, chr.len_utf8());
+        return unsafe { nstd_vec_extend(&mut string.bytes, &buf) };
     }
     1
 }
@@ -173,13 +169,17 @@ pub extern "C" fn nstd_string_push(string: &mut NSTDString, chr: NSTDUnichar) ->
 /// # Returns
 ///
 /// `NSTDErrorCode errc` - Nonzero on error.
+///
+/// # Safety
+///
+/// This function will cause undefined behavior in the case where `str`'s data is no longer valid.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_string_push_str(
+pub unsafe extern "C" fn nstd_string_push_str(
     string: &mut NSTDString,
     str: &NSTDStrConst,
 ) -> NSTDErrorCode {
-    let str_bytes = unsafe { nstd_core_str_const_as_bytes(str) };
+    let str_bytes = nstd_core_str_const_as_bytes(str);
     nstd_vec_extend(&mut string.bytes, &str_bytes)
 }
 

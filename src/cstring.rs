@@ -136,13 +136,9 @@ pub unsafe extern "C" fn nstd_cstring_as_cstr_mut(cstring: &mut NSTDCString) -> 
 /// # Returns
 ///
 /// `NSTDSliceConst bytes` - The C string's active data.
-///
-/// # Safety
-///
-/// `cstring`'s data must remain valid while the returned slice is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_cstring_as_bytes(cstring: &NSTDCString) -> NSTDSliceConst {
+pub extern "C" fn nstd_cstring_as_bytes(cstring: &NSTDCString) -> NSTDSliceConst {
     nstd_vec_as_slice(&cstring.bytes)
 }
 

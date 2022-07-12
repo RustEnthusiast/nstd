@@ -89,10 +89,6 @@ NSTDAPI NSTDStrMut nstd_string_as_str_mut(NSTDString *string);
 /// # Returns
 ///
 /// `NSTDSliceConst bytes` - The string's active data.
-///
-/// # Safety
-///
-/// `string`'s data must remain valid while the returned slice is in use.
 NSTDAPI NSTDSliceConst nstd_string_as_bytes(const NSTDString *string);
 
 /// Pushes an `NSTDUnichar` onto the end of a string.
@@ -119,6 +115,10 @@ NSTDAPI NSTDErrorCode nstd_string_push(NSTDString *string, NSTDUnichar chr);
 /// # Returns
 ///
 /// `NSTDErrorCode errc` - Nonzero on error.
+///
+/// # Safety
+///
+/// This function will cause undefined behavior in the case where `str`'s data is no longer valid.
 NSTDAPI NSTDErrorCode nstd_string_push_str(NSTDString *string, const NSTDStrConst *str);
 
 /// Removes the last character from a string and returns it.

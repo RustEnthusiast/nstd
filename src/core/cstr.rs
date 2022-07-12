@@ -51,13 +51,9 @@ pub unsafe extern "C" fn nstd_core_cstr_const_new(
 /// # Returns
 ///
 /// `NSTDSliceConst bytes` - An immutable byte slice of the C string slice's data.
-///
-/// # Safety
-///
-/// `cstr`'s data must remain valid while the returned byte slice is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_cstr_const_as_bytes(cstr: &NSTDCStrConst) -> NSTDSliceConst {
+pub extern "C" fn nstd_core_cstr_const_as_bytes(cstr: &NSTDCStrConst) -> NSTDSliceConst {
     nstd_core_slice_const_new(cstr.ptr.cast(), 1, cstr.len)
 }
 
@@ -162,13 +158,9 @@ pub unsafe extern "C" fn nstd_core_cstr_mut_new(raw: *mut NSTDChar, len: NSTDUSi
 /// # Returns
 ///
 /// `NSTDSliceConst bytes` - An immutable byte slice of the C string slice's data.
-///
-/// # Safety
-///
-/// `cstr`'s data must remain valid while the returned byte slice is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_cstr_mut_as_bytes(cstr: &NSTDCStrMut) -> NSTDSliceConst {
+pub extern "C" fn nstd_core_cstr_mut_as_bytes(cstr: &NSTDCStrMut) -> NSTDSliceConst {
     nstd_core_slice_const_new(cstr.ptr.cast(), 1, cstr.len)
 }
 

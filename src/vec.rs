@@ -80,7 +80,7 @@ impl Drop for NSTDVec {
 pub extern "C" fn nstd_vec_new(element_size: NSTDUSize) -> NSTDVec {
     assert!(element_size != 0);
     NSTDVec {
-        buffer: unsafe { nstd_core_slice_mut_new(NSTD_NULL, element_size, 0) },
+        buffer: nstd_core_slice_mut_new(NSTD_NULL, element_size, 0),
         len: 0,
     }
 }
@@ -117,7 +117,7 @@ pub extern "C" fn nstd_vec_new_with_cap(element_size: NSTDUSize, mut cap: NSTDUS
     }
     // Construct the vector.
     NSTDVec {
-        buffer: unsafe { nstd_core_slice_mut_new(mem, element_size, cap) },
+        buffer: nstd_core_slice_mut_new(mem, element_size, cap),
         len: 0,
     }
 }
@@ -178,13 +178,9 @@ pub extern "C" fn nstd_vec_len(vec: &NSTDVec) -> NSTDUSize {
 /// # Returns
 ///
 /// `NSTDSliceConst slice` - An *immutable* view into the vector.
-///
-/// # Safety
-///
-/// `vec`'s data must remain valid while the returned slice is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_vec_as_slice(vec: &NSTDVec) -> NSTDSliceConst {
+pub extern "C" fn nstd_vec_as_slice(vec: &NSTDVec) -> NSTDSliceConst {
     nstd_core_slice_const_new(vec.buffer.ptr.raw, vec.buffer.ptr.size, vec.len)
 }
 
@@ -197,13 +193,9 @@ pub unsafe extern "C" fn nstd_vec_as_slice(vec: &NSTDVec) -> NSTDSliceConst {
 /// # Returns
 ///
 /// `NSTDSliceMut slice` - A *mutable* view into the vector.
-///
-/// # Safety
-///
-/// `vec`'s data must remain valid while the returned slice is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_vec_as_slice_mut(vec: &mut NSTDVec) -> NSTDSliceMut {
+pub extern "C" fn nstd_vec_as_slice_mut(vec: &mut NSTDVec) -> NSTDSliceMut {
     nstd_core_slice_mut_new(vec.buffer.ptr.raw, vec.buffer.ptr.size, vec.len)
 }
 
@@ -462,8 +454,15 @@ pub extern "C" fn nstd_vec_remove(vec: &mut NSTDVec, index: NSTDUSize) -> NSTDEr
 /// # Panics
 ///
 /// This operation will panic if the element sizes for `vec` and `values` do not match.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if `values`'s data is invalid.
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_vec_extend(vec: &mut NSTDVec, values: &NSTDSliceConst) -> NSTDErrorCode {
+pub unsafe extern "C" fn nstd_vec_extend(
+    vec: &mut NSTDVec,
+    values: &NSTDSliceConst,
+) -> NSTDErrorCode {
     // Ensure value sizes are the same for both the vector and the slice.
     assert!(vec.buffer.ptr.size == values.ptr.size);
     // Making sure there's enough space for the extension.
@@ -475,7 +474,7 @@ pub extern "C" fn nstd_vec_extend(vec: &mut NSTDVec, values: &NSTDSliceConst) ->
     }
     // On success copy bytes to the end of the vector.
     if errc == 0 {
-        unsafe { nstd_core_mem_copy(vec.end().cast(), values.ptr.raw.cast(), values.byte_len()) };
+        nstd_core_mem_copy(vec.end().cast(), values.ptr.raw.cast(), values.byte_len());
         vec.len += values.len;
     }
     errc

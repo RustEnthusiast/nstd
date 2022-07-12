@@ -41,10 +41,6 @@ NSTDAPI NSTDStrConst nstd_core_str_const_from_cstr_unchecked(const NSTDCStrConst
 /// # Panics
 ///
 /// This operation will panic if `bytes.ptr.size` is not 1, or `bytes` is not valid UTF-8.
-///
-/// # Safety
-///
-/// `bytes` must remain valid while the returned string slice is in use.
 NSTDAPI NSTDStrConst nstd_core_str_const_from_bytes(const NSTDSliceConst *bytes);
 
 /// Creates a string slice from raw bytes, without checking for UTF-8.
@@ -76,10 +72,6 @@ NSTDAPI NSTDStrConst nstd_core_str_const_from_bytes_unchecked(const NSTDSliceCon
 /// # Returns
 ///
 /// `NSTDSliceConst bytes` - An immutable byte slice over `str`'s data.
-///
-/// # Safety
-///
-/// `str`'s data must remain valid while the returned slice is in use.
 NSTDAPI NSTDSliceConst nstd_core_str_const_as_bytes(const NSTDStrConst *str);
 
 /// Returns the number of Unicode characters in a string slice.
@@ -178,10 +170,6 @@ NSTDAPI NSTDStrMut nstd_core_str_mut_from_cstr_unchecked(NSTDCStrMut *cstr);
 /// # Panics
 ///
 /// This operation will panic if `bytes.ptr.size` is not 1, or `bytes` is not valid UTF-8.
-///
-/// # Safety
-///
-/// `bytes` must remain valid while the returned string slice is in use.
 NSTDAPI NSTDStrMut nstd_core_str_mut_from_bytes(NSTDSliceMut *bytes);
 
 /// Creates a string slice from raw bytes, without checking for UTF-8.
@@ -213,10 +201,6 @@ NSTDAPI NSTDStrMut nstd_core_str_mut_from_bytes_unchecked(NSTDSliceMut *bytes);
 /// # Returns
 ///
 /// `NSTDSliceConst bytes` - An immutable byte slice over `str`'s data.
-///
-/// # Safety
-///
-/// `str`'s data must remain valid while the returned slice is in use.
 NSTDAPI NSTDSliceConst nstd_core_str_mut_as_bytes(const NSTDStrMut *str);
 
 /// Returns the number of Unicode characters in a string slice.

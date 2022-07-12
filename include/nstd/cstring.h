@@ -95,10 +95,6 @@ NSTDAPI NSTDCStrMut nstd_cstring_as_cstr_mut(NSTDCString *cstring);
 /// # Returns
 ///
 /// `NSTDSliceConst bytes` - The C string's active data.
-///
-/// # Safety
-///
-/// `cstring`'s data must remain valid while the returned slice is in use.
 NSTDAPI NSTDSliceConst nstd_cstring_as_bytes(const NSTDCString *cstring);
 
 /// Appends an `NSTDChar` to the end of an `NSTDCString`.

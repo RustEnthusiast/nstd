@@ -63,13 +63,9 @@ pub unsafe extern "C" fn nstd_core_str_const_from_cstr_unchecked(
 /// # Panics
 ///
 /// This operation will panic if `bytes.ptr.size` is not 1, or `bytes` is not valid UTF-8.
-///
-/// # Safety
-///
-/// `bytes` must remain valid while the returned string slice is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_str_const_from_bytes(bytes: &NSTDSliceConst) -> NSTDStrConst {
+pub extern "C" fn nstd_core_str_const_from_bytes(bytes: &NSTDSliceConst) -> NSTDStrConst {
     assert!(bytes.ptr.size == 1);
     core::str::from_utf8(bytes.as_slice()).expect("Invalid UTF-8 bytes");
     NSTDStrConst {
@@ -115,13 +111,9 @@ pub unsafe extern "C" fn nstd_core_str_const_from_bytes_unchecked(
 /// # Returns
 ///
 /// `NSTDSliceConst bytes` - An immutable byte slice over `str`'s data.
-///
-/// # Safety
-///
-/// `str`'s data must remain valid while the returned slice is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_str_const_as_bytes(str: &NSTDStrConst) -> NSTDSliceConst {
+pub extern "C" fn nstd_core_str_const_as_bytes(str: &NSTDStrConst) -> NSTDSliceConst {
     nstd_core_slice_const_new(str.bytes.ptr.raw.cast(), 1, str.bytes.len)
 }
 
@@ -263,13 +255,9 @@ pub unsafe extern "C" fn nstd_core_str_mut_from_cstr_unchecked(
 /// # Panics
 ///
 /// This operation will panic if `bytes.ptr.size` is not 1, or `bytes` is not valid UTF-8.
-///
-/// # Safety
-///
-/// `bytes` must remain valid while the returned string slice is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_str_mut_from_bytes(bytes: &mut NSTDSliceMut) -> NSTDStrMut {
+pub extern "C" fn nstd_core_str_mut_from_bytes(bytes: &mut NSTDSliceMut) -> NSTDStrMut {
     assert!(bytes.ptr.size == 1);
     core::str::from_utf8(bytes.as_slice()).expect("Invalid UTF-8 bytes");
     NSTDStrMut {
@@ -315,13 +303,9 @@ pub unsafe extern "C" fn nstd_core_str_mut_from_bytes_unchecked(
 /// # Returns
 ///
 /// `NSTDSliceConst bytes` - An immutable byte slice over `str`'s data.
-///
-/// # Safety
-///
-/// `str`'s data must remain valid while the returned slice is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_str_mut_as_bytes(str: &NSTDStrMut) -> NSTDSliceConst {
+pub extern "C" fn nstd_core_str_mut_as_bytes(str: &NSTDStrMut) -> NSTDSliceConst {
     nstd_core_slice_const_new(str.bytes.ptr.raw.cast(), 1, str.bytes.len)
 }
 
