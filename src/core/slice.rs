@@ -9,7 +9,7 @@ use crate::{
 
 /// An immutable view into a sequence of values in memory.
 #[repr(C)]
-#[derive(Debug, Hash)]
+#[derive(Clone, Copy, Debug, Hash)]
 pub struct NSTDSliceConst {
     /// A pointer to the first element in the slice.
     pub(crate) ptr: NSTDPtrConst,
@@ -159,7 +159,7 @@ pub unsafe extern "C" fn nstd_core_slice_const_compare(
 
 /// A view into a sequence of values in memory.
 #[repr(C)]
-#[derive(Debug, Hash)]
+#[derive(Clone, Copy, Debug, Hash)]
 pub struct NSTDSliceMut {
     /// A pointer to the first element in the slice.
     pub(crate) ptr: NSTDPtrMut,

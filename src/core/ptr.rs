@@ -3,7 +3,7 @@ use crate::{core::mem::nstd_core_mem_copy, NSTDAnyConst, NSTDAnyMut, NSTDUSize};
 
 /// A sized immutable pointer to some arbitrary type.
 #[repr(C)]
-#[derive(Debug, Hash, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Hash, PartialEq, Eq)]
 pub struct NSTDPtrConst {
     /// A raw pointer to the data.
     pub(crate) raw: NSTDAnyConst,
@@ -60,7 +60,7 @@ pub extern "C" fn nstd_core_ptr_const_get(ptr: &NSTDPtrConst) -> NSTDAnyConst {
 
 /// A sized pointer to some arbitrary type.
 #[repr(C)]
-#[derive(Debug, Hash, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Hash, PartialEq, Eq)]
 pub struct NSTDPtrMut {
     /// A raw pointer to the data.
     pub(crate) raw: NSTDAnyMut,

@@ -10,7 +10,7 @@ use crate::{
 
 /// An immutable slice of a C string.
 #[repr(C)]
-#[derive(Debug, Hash)]
+#[derive(Clone, Copy, Debug, Hash)]
 pub struct NSTDCStrConst {
     /// A pointer to the first character in the C string.
     ptr: *const NSTDChar,
@@ -105,7 +105,7 @@ pub extern "C" fn nstd_core_cstr_const_get(
 
 /// A mutable slice of a C string.
 #[repr(C)]
-#[derive(Debug, Hash)]
+#[derive(Clone, Copy, Debug, Hash)]
 pub struct NSTDCStrMut {
     /// A pointer to the first character in the C string.
     ptr: *mut NSTDChar,

@@ -13,7 +13,7 @@ use crate::{
 
 /// An immutable unowned view into a UTF-8 encoded byte string.
 #[repr(C)]
-#[derive(Debug, Hash)]
+#[derive(Clone, Copy, Debug, Hash)]
 pub struct NSTDStrConst {
     /// A view into the UTF-8 encoded buffer.
     bytes: NSTDSliceConst,
@@ -206,7 +206,7 @@ pub extern "C" fn nstd_core_str_const_substr(
 
 /// An unowned view into a UTF-8 encoded byte string.
 #[repr(C)]
-#[derive(Debug, Hash)]
+#[derive(Clone, Copy, Debug, Hash)]
 pub struct NSTDStrMut {
     /// A view into the UTF-8 encoded buffer.
     bytes: NSTDSliceMut,
