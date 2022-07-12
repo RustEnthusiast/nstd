@@ -101,6 +101,10 @@ NSTDAPI NSTDUSize nstd_core_str_const_len(const NSTDStrConst *str);
 ///
 /// `NSTDUnichar chr` - The character at index `pos`, or the Unicode replacement character on
 /// error.
+///
+/// # Safety
+///
+/// This operation could cause undefined behavior if `str`'s data is invalid.
 NSTDAPI NSTDUnichar nstd_core_str_const_get_char(const NSTDStrConst *str, NSTDUSize pos);
 
 /// Creates a substring of an existing string slice.
@@ -226,6 +230,10 @@ NSTDAPI NSTDUSize nstd_core_str_mut_len(const NSTDStrMut *str);
 ///
 /// `NSTDUnichar chr` - The character at index `pos`, or the Unicode replacement character on
 /// error.
+///
+/// # Safety
+///
+/// This operation could cause undefined behavior if `str`'s data is invalid.
 NSTDAPI NSTDUnichar nstd_core_str_mut_get_char(const NSTDStrMut *str, NSTDUSize pos);
 
 /// Creates a substring of an existing string slice.

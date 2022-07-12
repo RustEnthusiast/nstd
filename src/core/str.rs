@@ -148,9 +148,16 @@ pub extern "C" fn nstd_core_str_const_len(str: &NSTDStrConst) -> NSTDUSize {
 ///
 /// `NSTDUnichar chr` - The character at index `pos`, or the Unicode replacement character on
 /// error.
+///
+/// # Safety
+///
+/// This operation could cause undefined behavior if `str`'s data is invalid.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_str_const_get_char(str: &NSTDStrConst, pos: NSTDUSize) -> NSTDUnichar {
+pub unsafe extern "C" fn nstd_core_str_const_get_char(
+    str: &NSTDStrConst,
+    pos: NSTDUSize,
+) -> NSTDUnichar {
     match str.as_str().chars().nth(pos) {
         Some(chr) => chr as NSTDUnichar,
         _ => char::REPLACEMENT_CHARACTER as NSTDUnichar,
@@ -336,9 +343,16 @@ pub extern "C" fn nstd_core_str_mut_len(str: &NSTDStrMut) -> NSTDUSize {
 ///
 /// `NSTDUnichar chr` - The character at index `pos`, or the Unicode replacement character on
 /// error.
+///
+/// # Safety
+///
+/// This operation could cause undefined behavior if `str`'s data is invalid.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_str_mut_get_char(str: &NSTDStrMut, pos: NSTDUSize) -> NSTDUnichar {
+pub unsafe extern "C" fn nstd_core_str_mut_get_char(
+    str: &NSTDStrMut,
+    pos: NSTDUSize,
+) -> NSTDUnichar {
     match str.as_str().chars().nth(pos) {
         Some(chr) => chr as NSTDUnichar,
         _ => char::REPLACEMENT_CHARACTER as NSTDUnichar,
