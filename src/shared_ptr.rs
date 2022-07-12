@@ -174,13 +174,9 @@ pub extern "C" fn nstd_shared_ptr_size(shared_ptr: &NSTDSharedPtr) -> NSTDUSize 
 /// # Returns
 ///
 /// `NSTDAnyConst ptr` - A raw pointer to the shared object.
-///
-/// # Safety
-///
-/// The shared data must remain valid while the returned pointer is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_shared_ptr_get(shared_ptr: &NSTDSharedPtr) -> NSTDAnyConst {
+pub extern "C" fn nstd_shared_ptr_get(shared_ptr: &NSTDSharedPtr) -> NSTDAnyConst {
     shared_ptr.ptr.raw
 }
 

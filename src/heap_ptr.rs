@@ -129,13 +129,9 @@ pub extern "C" fn nstd_heap_ptr_size(hptr: &NSTDHeapPtr) -> NSTDUSize {
 /// # Returns
 ///
 /// `NSTDAnyConst ptr` - A raw pointer to the object on the heap.
-///
-/// # Safety
-///
-/// `hptr`'s data must remain valid while the returned pointer is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_heap_ptr_get(hptr: &NSTDHeapPtr) -> NSTDAnyConst {
+pub extern "C" fn nstd_heap_ptr_get(hptr: &NSTDHeapPtr) -> NSTDAnyConst {
     hptr.ptr.raw
 }
 
@@ -148,13 +144,9 @@ pub unsafe extern "C" fn nstd_heap_ptr_get(hptr: &NSTDHeapPtr) -> NSTDAnyConst {
 /// # Returns
 ///
 /// `NSTDAnyMut ptr` - A raw pointer to the object on the heap.
-///
-/// # Safety
-///
-/// `hptr`'s data must remain valid while the returned pointer is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_heap_ptr_get_mut(hptr: &mut NSTDHeapPtr) -> NSTDAnyMut {
+pub extern "C" fn nstd_heap_ptr_get_mut(hptr: &mut NSTDHeapPtr) -> NSTDAnyMut {
     hptr.ptr.raw
 }
 

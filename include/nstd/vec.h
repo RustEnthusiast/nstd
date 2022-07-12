@@ -106,10 +106,6 @@ NSTDAPI NSTDSliceMut nstd_vec_as_slice_mut(NSTDVec *vec);
 /// # Returns
 ///
 /// `NSTDAnyConst ptr` - A pointer to the vector's raw data.
-///
-/// # Safety
-///
-/// `vec`'s data must remain valid while the returned pointer is in use.
 NSTDAPI NSTDAnyConst nstd_vec_as_ptr(const NSTDVec *vec);
 
 /// Returns a pointer to a vector's raw data.
@@ -121,10 +117,6 @@ NSTDAPI NSTDAnyConst nstd_vec_as_ptr(const NSTDVec *vec);
 /// # Returns
 ///
 /// `NSTDAnyMut ptr` - A pointer to the vector's raw data.
-///
-/// # Safety
-///
-/// `vec`'s data must remain valid while the returned pointer is in use.
 NSTDAPI NSTDAnyMut nstd_vec_as_mut_ptr(NSTDVec *vec);
 
 /// Returns an immutable pointer to the element at index `pos` in `vec`.
@@ -144,10 +136,6 @@ NSTDAPI NSTDAnyMut nstd_vec_as_mut_ptr(NSTDVec *vec);
 ///
 /// `NSTDAnyConst element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out
 /// of the vector's boundaries.
-///
-/// # Safety
-///
-/// `vec`'s data must remain valid while the returned pointer is in use.
 NSTDAPI NSTDAnyConst nstd_vec_get(const NSTDVec *vec, NSTDUSize pos);
 
 /// Returns a pointer to the element at index `pos` in `vec`.
@@ -167,10 +155,6 @@ NSTDAPI NSTDAnyConst nstd_vec_get(const NSTDVec *vec, NSTDUSize pos);
 ///
 /// `NSTDAnyMut element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out of
 /// the vector's boundaries.
-///
-/// # Safety
-///
-/// `vec`'s data must remain valid while the returned pointer is in use.
 NSTDAPI NSTDAnyMut nstd_vec_get_mut(NSTDVec *vec, NSTDUSize pos);
 
 /// Pushes a value onto a vector by copying bytes to the end of the vector's buffer. The number of
@@ -207,10 +191,6 @@ NSTDAPI NSTDErrorCode nstd_vec_push(NSTDVec *vec, NSTDAnyConst value);
 ///
 /// - `NSTDAnyConst value` - A pointer to the value that was popped off the stack, or null if the
 /// vector is empty.
-///
-/// # Safety
-///
-/// `vec`'s data must remain valid while the returned pointer is in use.
 NSTDAPI NSTDAnyConst nstd_vec_pop(NSTDVec *vec);
 
 /// Attempts to insert a value into a vector at `index`.

@@ -208,13 +208,9 @@ pub extern "C" fn nstd_vec_as_slice_mut(vec: &mut NSTDVec) -> NSTDSliceMut {
 /// # Returns
 ///
 /// `NSTDAnyConst ptr` - A pointer to the vector's raw data.
-///
-/// # Safety
-///
-/// `vec`'s data must remain valid while the returned pointer is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_vec_as_ptr(vec: &NSTDVec) -> NSTDAnyConst {
+pub extern "C" fn nstd_vec_as_ptr(vec: &NSTDVec) -> NSTDAnyConst {
     vec.buffer.ptr.raw
 }
 
@@ -227,13 +223,9 @@ pub unsafe extern "C" fn nstd_vec_as_ptr(vec: &NSTDVec) -> NSTDAnyConst {
 /// # Returns
 ///
 /// `NSTDAnyMut ptr` - A pointer to the vector's raw data.
-///
-/// # Safety
-///
-/// `vec`'s data must remain valid while the returned pointer is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_vec_as_mut_ptr(vec: &mut NSTDVec) -> NSTDAnyMut {
+pub extern "C" fn nstd_vec_as_mut_ptr(vec: &mut NSTDVec) -> NSTDAnyMut {
     vec.buffer.ptr.raw
 }
 
@@ -254,15 +246,11 @@ pub unsafe extern "C" fn nstd_vec_as_mut_ptr(vec: &mut NSTDVec) -> NSTDAnyMut {
 ///
 /// `NSTDAnyConst element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out
 /// of the vector's boundaries.
-///
-/// # Safety
-///
-/// `vec`'s data must remain valid while the returned pointer is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_vec_get(vec: &NSTDVec, pos: NSTDUSize) -> NSTDAnyConst {
+pub extern "C" fn nstd_vec_get(vec: &NSTDVec, pos: NSTDUSize) -> NSTDAnyConst {
     match pos < vec.len {
-        true => vec.buffer.ptr.raw.add(pos * vec.buffer.ptr.size),
+        true => unsafe { vec.buffer.ptr.raw.add(pos * vec.buffer.ptr.size) },
         false => NSTD_NULL,
     }
 }
@@ -284,13 +272,9 @@ pub unsafe extern "C" fn nstd_vec_get(vec: &NSTDVec, pos: NSTDUSize) -> NSTDAnyC
 ///
 /// `NSTDAnyMut element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out of
 /// the vector's boundaries.
-///
-/// # Safety
-///
-/// `vec`'s data must remain valid while the returned pointer is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_vec_get_mut(vec: &mut NSTDVec, pos: NSTDUSize) -> NSTDAnyMut {
+pub extern "C" fn nstd_vec_get_mut(vec: &mut NSTDVec, pos: NSTDUSize) -> NSTDAnyMut {
     nstd_vec_get(vec, pos) as NSTDAnyMut
 }
 
@@ -339,16 +323,12 @@ pub unsafe extern "C" fn nstd_vec_push(vec: &mut NSTDVec, value: NSTDAnyConst) -
 ///
 /// - `NSTDAnyConst value` - A pointer to the value that was popped off the stack, or null if the
 /// vector is empty.
-///
-/// # Safety
-///
-/// `vec`'s data must remain valid while the returned pointer is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_vec_pop(vec: &mut NSTDVec) -> NSTDAnyConst {
+pub extern "C" fn nstd_vec_pop(vec: &mut NSTDVec) -> NSTDAnyConst {
     if vec.len > 0 {
         vec.len -= 1;
-        return vec.end();
+        return unsafe { vec.end() };
     }
     NSTD_NULL
 }
