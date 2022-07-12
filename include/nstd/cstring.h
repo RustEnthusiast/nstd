@@ -65,10 +65,6 @@ NSTDAPI NSTDCString nstd_cstring_clone(const NSTDCString *cstring);
 /// # Returns
 ///
 /// `NSTDCStrConst cstr` - The new C string slice.
-///
-/// # Safety
-///
-/// `cstring`'s data must remain valid while the returned C string slice is in use.
 NSTDAPI NSTDCStrConst nstd_cstring_as_cstr(const NSTDCString *cstring);
 
 /// Creates a C string slice containing the contents of `cstring` (excluding the null byte).
@@ -80,10 +76,6 @@ NSTDAPI NSTDCStrConst nstd_cstring_as_cstr(const NSTDCString *cstring);
 /// # Returns
 ///
 /// `NSTDCStrMut cstr` - The new C string slice.
-///
-/// # Safety
-///
-/// `cstring`'s data must remain valid while the returned C string slice is in use.
 NSTDAPI NSTDCStrMut nstd_cstring_as_cstr_mut(NSTDCString *cstring);
 
 /// Returns an immutable byte slice of the C string's active data, including the null byte.
@@ -125,6 +117,10 @@ NSTDAPI void nstd_cstring_push(NSTDCString *cstring, NSTDChar chr);
 /// # Panics
 ///
 /// This operation will panic if appending the new null byte to the end of the C string fails.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior in the case that `cstr's data is invalid.
 NSTDAPI NSTDErrorCode nstd_cstring_push_cstr(NSTDCString *cstring, const NSTDCStrConst *cstr);
 
 /// Removes the last character from a C string and returns it.

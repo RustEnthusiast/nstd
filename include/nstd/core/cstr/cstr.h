@@ -24,10 +24,6 @@ typedef struct {
 /// # Returns
 ///
 /// `NSTDCStrConst cstr` - The new C string slice, referencing `raw`'s data.
-///
-/// # Safety
-///
-/// `raw`'s data must remain valid while the returned C string slice is in use.
 NSTDAPI NSTDCStrConst nstd_core_cstr_const_new(const NSTDChar *raw, NSTDUSize len);
 
 /// Returns a byte slice of a C string slice's data.
@@ -50,10 +46,6 @@ NSTDAPI NSTDSliceConst nstd_core_cstr_const_as_bytes(const NSTDCStrConst *cstr);
 /// # Returns
 ///
 /// `const NSTDChar *ptr` - A pointer to the first character in the C string.
-///
-/// # Safety
-///
-/// `cstr`'s data must remain valid while the returned pointer is in use.
 NSTDAPI const NSTDChar *nstd_core_cstr_const_as_ptr(const NSTDCStrConst *cstr);
 
 /// Returns the length of a C string slice.
@@ -78,10 +70,6 @@ NSTDAPI NSTDUSize nstd_core_cstr_const_len(const NSTDCStrConst *cstr);
 /// # Returns
 ///
 /// `const NSTDChar *chr` - A pointer to the character at `pos`, or null on error.
-///
-/// # Safety
-///
-/// `cstr`'s data must remain valid while the returned pointer is in use.
 NSTDAPI const NSTDChar *nstd_core_cstr_const_get(const NSTDCStrConst *cstr, NSTDUSize pos);
 
 /// A mutable slice of a C string.
@@ -103,10 +91,6 @@ typedef struct {
 /// # Returns
 ///
 /// `NSTDCStrMut cstr` - The new C string slice, referencing `raw`'s data.
-///
-/// # Safety
-///
-/// `raw`'s data must remain valid while the returned C string slice is in use.
 NSTDAPI NSTDCStrMut nstd_core_cstr_mut_new(NSTDChar *raw, NSTDUSize len);
 
 /// Returns a byte slice of a C string slice's data.
@@ -129,10 +113,6 @@ NSTDAPI NSTDSliceConst nstd_core_cstr_mut_as_bytes(const NSTDCStrMut *cstr);
 /// # Returns
 ///
 /// `NSTDChar *ptr` - A pointer to the first character in the C string.
-///
-/// # Safety
-///
-/// `cstr`'s data must remain valid while the returned pointer is in use.
 NSTDAPI NSTDChar *nstd_core_cstr_mut_as_ptr(NSTDCStrMut *cstr);
 
 /// Returns a pointer to the first character in a C string slice.
@@ -144,10 +124,6 @@ NSTDAPI NSTDChar *nstd_core_cstr_mut_as_ptr(NSTDCStrMut *cstr);
 /// # Returns
 ///
 /// `const NSTDChar *ptr` - A pointer to the first character in the C string.
-///
-/// # Safety
-///
-/// `cstr`'s data must remain valid while the returned pointer is in use.
 NSTDAPI const NSTDChar *nstd_core_cstr_mut_as_ptr_const(const NSTDCStrMut *cstr);
 
 /// Returns the length of a C string slice.
@@ -172,10 +148,6 @@ NSTDAPI NSTDUSize nstd_core_cstr_mut_len(const NSTDCStrMut *cstr);
 /// # Returns
 ///
 /// `NSTDChar *chr` - A pointer to the character at `pos`, or null on error.
-///
-/// # Safety
-///
-/// `cstr`'s data must remain valid while the returned pointer is in use.
 NSTDAPI NSTDChar *nstd_core_cstr_mut_get(NSTDCStrMut *cstr, NSTDUSize pos);
 
 /// Return an immutable pointer the character at `pos` in `cstr`.
@@ -189,10 +161,6 @@ NSTDAPI NSTDChar *nstd_core_cstr_mut_get(NSTDCStrMut *cstr, NSTDUSize pos);
 /// # Returns
 ///
 /// `const NSTDChar *chr` - A pointer to the character at `pos`, or null on error.
-///
-/// # Safety
-///
-/// `cstr`'s data must remain valid while the returned pointer is in use.
 NSTDAPI const NSTDChar *nstd_core_cstr_mut_get_const(const NSTDCStrMut *cstr, NSTDUSize pos);
 
 NSTDCPPEND

@@ -29,16 +29,9 @@ pub struct NSTDCStrConst {
 /// # Returns
 ///
 /// `NSTDCStrConst cstr` - The new C string slice, referencing `raw`'s data.
-///
-/// # Safety
-///
-/// `raw`'s data must remain valid while the returned C string slice is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_cstr_const_new(
-    raw: *const NSTDChar,
-    len: NSTDUSize,
-) -> NSTDCStrConst {
+pub extern "C" fn nstd_core_cstr_const_new(raw: *const NSTDChar, len: NSTDUSize) -> NSTDCStrConst {
     NSTDCStrConst { ptr: raw, len }
 }
 
@@ -66,13 +59,9 @@ pub extern "C" fn nstd_core_cstr_const_as_bytes(cstr: &NSTDCStrConst) -> NSTDSli
 /// # Returns
 ///
 /// `const NSTDChar *ptr` - A pointer to the first character in the C string.
-///
-/// # Safety
-///
-/// `cstr`'s data must remain valid while the returned pointer is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_cstr_const_as_ptr(cstr: &NSTDCStrConst) -> *const NSTDChar {
+pub extern "C" fn nstd_core_cstr_const_as_ptr(cstr: &NSTDCStrConst) -> *const NSTDChar {
     cstr.ptr
 }
 
@@ -102,18 +91,14 @@ pub extern "C" fn nstd_core_cstr_const_len(cstr: &NSTDCStrConst) -> NSTDUSize {
 /// # Returns
 ///
 /// `const NSTDChar *chr` - A pointer to the character at `pos`, or null on error.
-///
-/// # Safety
-///
-/// `cstr`'s data must remain valid while the returned pointer is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_cstr_const_get(
+pub extern "C" fn nstd_core_cstr_const_get(
     cstr: &NSTDCStrConst,
     pos: NSTDUSize,
 ) -> *const NSTDChar {
     match pos < cstr.len {
-        true => cstr.ptr.add(pos),
+        true => unsafe { cstr.ptr.add(pos) },
         false => core::ptr::null(),
     }
 }
@@ -139,13 +124,9 @@ pub struct NSTDCStrMut {
 /// # Returns
 ///
 /// `NSTDCStrMut cstr` - The new C string slice, referencing `raw`'s data.
-///
-/// # Safety
-///
-/// `raw`'s data must remain valid while the returned C string slice is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_cstr_mut_new(raw: *mut NSTDChar, len: NSTDUSize) -> NSTDCStrMut {
+pub extern "C" fn nstd_core_cstr_mut_new(raw: *mut NSTDChar, len: NSTDUSize) -> NSTDCStrMut {
     NSTDCStrMut { ptr: raw, len }
 }
 
@@ -173,13 +154,9 @@ pub extern "C" fn nstd_core_cstr_mut_as_bytes(cstr: &NSTDCStrMut) -> NSTDSliceCo
 /// # Returns
 ///
 /// `NSTDChar *ptr` - A pointer to the first character in the C string.
-///
-/// # Safety
-///
-/// `cstr`'s data must remain valid while the returned pointer is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_cstr_mut_as_ptr(cstr: &mut NSTDCStrMut) -> *mut NSTDChar {
+pub extern "C" fn nstd_core_cstr_mut_as_ptr(cstr: &mut NSTDCStrMut) -> *mut NSTDChar {
     cstr.ptr
 }
 
@@ -192,13 +169,9 @@ pub unsafe extern "C" fn nstd_core_cstr_mut_as_ptr(cstr: &mut NSTDCStrMut) -> *m
 /// # Returns
 ///
 /// `const NSTDChar *ptr` - A pointer to the first character in the C string.
-///
-/// # Safety
-///
-/// `cstr`'s data must remain valid while the returned pointer is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_cstr_mut_as_ptr_const(cstr: &NSTDCStrMut) -> *const NSTDChar {
+pub extern "C" fn nstd_core_cstr_mut_as_ptr_const(cstr: &NSTDCStrMut) -> *const NSTDChar {
     cstr.ptr
 }
 
@@ -228,16 +201,9 @@ pub extern "C" fn nstd_core_cstr_mut_len(cstr: &NSTDCStrMut) -> NSTDUSize {
 /// # Returns
 ///
 /// `NSTDChar *chr` - A pointer to the character at `pos`, or null on error.
-///
-/// # Safety
-///
-/// `cstr`'s data must remain valid while the returned pointer is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_cstr_mut_get(
-    cstr: &mut NSTDCStrMut,
-    pos: NSTDUSize,
-) -> *mut NSTDChar {
+pub extern "C" fn nstd_core_cstr_mut_get(cstr: &mut NSTDCStrMut, pos: NSTDUSize) -> *mut NSTDChar {
     nstd_core_cstr_mut_get_const(cstr, pos) as *mut NSTDChar
 }
 
@@ -252,18 +218,14 @@ pub unsafe extern "C" fn nstd_core_cstr_mut_get(
 /// # Returns
 ///
 /// `const NSTDChar *chr` - A pointer to the character at `pos`, or null on error.
-///
-/// # Safety
-///
-/// `cstr`'s data must remain valid while the returned pointer is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_cstr_mut_get_const(
+pub extern "C" fn nstd_core_cstr_mut_get_const(
     cstr: &NSTDCStrMut,
     pos: NSTDUSize,
 ) -> *const NSTDChar {
     match pos < cstr.len {
-        true => cstr.ptr.add(pos),
+        true => unsafe { cstr.ptr.add(pos) },
         false => core::ptr::null(),
     }
 }

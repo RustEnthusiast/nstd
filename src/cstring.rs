@@ -94,13 +94,9 @@ pub extern "C" fn nstd_cstring_clone(cstring: &NSTDCString) -> NSTDCString {
 /// # Returns
 ///
 /// `NSTDCStrConst cstr` - The new C string slice.
-///
-/// # Safety
-///
-/// `cstring`'s data must remain valid while the returned C string slice is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_cstring_as_cstr(cstring: &NSTDCString) -> NSTDCStrConst {
+pub extern "C" fn nstd_cstring_as_cstr(cstring: &NSTDCString) -> NSTDCStrConst {
     let ptr = nstd_vec_as_ptr(&cstring.bytes).cast();
     let len = nstd_vec_len(&cstring.bytes) - 1;
     nstd_core_cstr_const_new(ptr, len)
@@ -115,13 +111,9 @@ pub unsafe extern "C" fn nstd_cstring_as_cstr(cstring: &NSTDCString) -> NSTDCStr
 /// # Returns
 ///
 /// `NSTDCStrMut cstr` - The new C string slice.
-///
-/// # Safety
-///
-/// `cstring`'s data must remain valid while the returned C string slice is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_cstring_as_cstr_mut(cstring: &mut NSTDCString) -> NSTDCStrMut {
+pub extern "C" fn nstd_cstring_as_cstr_mut(cstring: &mut NSTDCString) -> NSTDCStrMut {
     let ptr = nstd_vec_as_mut_ptr(&mut cstring.bytes).cast();
     let len = nstd_vec_len(&cstring.bytes) - 1;
     nstd_core_cstr_mut_new(ptr, len)
@@ -181,21 +173,23 @@ pub extern "C" fn nstd_cstring_push(cstring: &mut NSTDCString, chr: NSTDChar) {
 /// # Panics
 ///
 /// This operation will panic if appending the new null byte to the end of the C string fails.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior in the case that `cstr's data is invalid.
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_cstring_push_cstr(
+pub unsafe extern "C" fn nstd_cstring_push_cstr(
     cstring: &mut NSTDCString,
     cstr: &NSTDCStrConst,
 ) -> NSTDErrorCode {
-    unsafe {
-        // Pop the old null byte.
-        let nul = *nstd_vec_pop(&mut cstring.bytes).cast::<NSTDChar>();
-        // Append the C string slice.
-        let bytes = nstd_core_cstr_const_as_bytes(cstr);
-        let errc = nstd_vec_extend(&mut cstring.bytes, &bytes);
-        // Push a new null byte.
-        assert!(nstd_vec_push(&mut cstring.bytes, addr_of!(nul).cast()) == 0);
-        errc
-    }
+    // Pop the old null byte.
+    let nul = *nstd_vec_pop(&mut cstring.bytes).cast::<NSTDChar>();
+    // Append the C string slice.
+    let bytes = nstd_core_cstr_const_as_bytes(cstr);
+    let errc = nstd_vec_extend(&mut cstring.bytes, &bytes);
+    // Push a new null byte.
+    assert!(nstd_vec_push(&mut cstring.bytes, addr_of!(nul).cast()) == 0);
+    errc
 }
 
 /// Removes the last character from a C string and returns it.
