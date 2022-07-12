@@ -150,7 +150,7 @@ pub extern "C" fn nstd_core_slice_const_last(slice: &NSTDSliceConst) -> NSTDAnyC
 /// This function can cause undefined behavior if either `s1` or `s2`'s data is invalid.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_slice_const_compare(
+pub unsafe extern "C" fn nstd_core_slice_const_compare(
     s1: &NSTDSliceConst,
     s2: &NSTDSliceConst,
 ) -> NSTDBool {
@@ -350,7 +350,10 @@ pub extern "C" fn nstd_core_slice_mut_last_const(slice: &NSTDSliceMut) -> NSTDAn
 /// This function can cause undefined behavior if either `s1` or `s2`'s data is invalid.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_slice_mut_compare(s1: &NSTDSliceMut, s2: &NSTDSliceMut) -> NSTDBool {
+pub unsafe extern "C" fn nstd_core_slice_mut_compare(
+    s1: &NSTDSliceMut,
+    s2: &NSTDSliceMut,
+) -> NSTDBool {
     (s1.as_slice() == s2.as_slice()).into()
 }
 
