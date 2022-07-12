@@ -77,7 +77,7 @@ pub extern "C" fn nstd_heap_ptr_new_zeroed(element_size: NSTDUSize) -> NSTDHeapP
     let mem = unsafe { nstd_alloc_allocate_zeroed(element_size) };
     assert!(!mem.is_null());
     NSTDHeapPtr {
-        ptr: unsafe { nstd_core_ptr_mut_new(mem, element_size) },
+        ptr: nstd_core_ptr_mut_new(mem, element_size),
     }
 }
 
@@ -101,7 +101,7 @@ pub extern "C" fn nstd_heap_ptr_clone(hptr: &NSTDHeapPtr) -> NSTDHeapPtr {
     assert!(!mem.is_null());
     unsafe { nstd_core_mem_copy(mem.cast(), hptr.ptr.raw.cast(), hptr.ptr.size) };
     NSTDHeapPtr {
-        ptr: unsafe { nstd_core_ptr_mut_new(mem, hptr.ptr.size) },
+        ptr: nstd_core_ptr_mut_new(mem, hptr.ptr.size),
     }
 }
 

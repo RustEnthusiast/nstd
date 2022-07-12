@@ -69,8 +69,18 @@ typedef NSTDUInt32 NSTDChar32;
 typedef NSTDChar32 NSTDUnichar;
 
 /// A void pointer to some immutable data.
+///
+/// # Safety
+///
+/// Accessing any data through this pointer type is unsafe. Raw pointers have no way of knowing if
+/// the data being pointed to is or isn't valid.
 typedef const void *NSTDAnyConst;
 /// A void pointer (a pointer to some arbitrary type).
+///
+/// # Safety
+///
+/// Accessing any data through this pointer type is unsafe. Raw pointers have no way of knowing if
+/// the data being pointed to is or isn't valid.
 typedef void *NSTDAnyMut;
 
 /// A boolean type, can either be `NSTD_TRUE` (1) or `NSTD_FALSE` (0).

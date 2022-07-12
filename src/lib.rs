@@ -75,8 +75,18 @@ pub type NSTDChar32 = NSTDUInt32;
 pub type NSTDUnichar = NSTDChar32;
 
 /// A void pointer to some immutable data.
+///
+/// # Safety
+///
+/// Accessing any data through this pointer type is unsafe. Raw pointers have no way of knowing if
+/// the data being pointed to is or isn't valid.
 pub type NSTDAnyConst = *const c_void;
 /// A void pointer (a pointer to some arbitrary type).
+///
+/// # Safety
+///
+/// Accessing any data through this pointer type is unsafe. Raw pointers have no way of knowing if
+/// the data being pointed to is or isn't valid.
 pub type NSTDAnyMut = *mut c_void;
 
 /// A boolean type, can either be `NSTD_TRUE` (1) or `NSTD_FALSE` (0).

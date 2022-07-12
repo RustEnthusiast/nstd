@@ -22,16 +22,9 @@ pub struct NSTDPtrConst {
 /// # Returns
 ///
 /// `NSTDPtrConst ptr` - A new instance of `NSTDPtrConst` that points to `obj`.
-///
-/// # Safety
-///
-/// `obj` must remain valid while the returned pointer is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_ptr_const_new(
-    obj: NSTDAnyConst,
-    size: NSTDUSize,
-) -> NSTDPtrConst {
+pub extern "C" fn nstd_core_ptr_const_new(obj: NSTDAnyConst, size: NSTDUSize) -> NSTDPtrConst {
     NSTDPtrConst { raw: obj, size }
 }
 
@@ -59,13 +52,9 @@ pub extern "C" fn nstd_core_ptr_const_size(ptr: &NSTDPtrConst) -> NSTDUSize {
 /// # Returns
 ///
 /// `NSTDAnyConst raw` - A raw pointer to the object.
-///
-/// # Safety
-///
-/// `ptr`'s data must remain valid while the returned pointer is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_ptr_const_get(ptr: &NSTDPtrConst) -> NSTDAnyConst {
+pub extern "C" fn nstd_core_ptr_const_get(ptr: &NSTDPtrConst) -> NSTDAnyConst {
     ptr.raw
 }
 
@@ -90,13 +79,9 @@ pub struct NSTDPtrMut {
 /// # Returns
 ///
 /// `NSTDPtrMut ptr` - A new instance of `NSTDPtrMut` that points to `obj`.
-///
-/// # Safety
-///
-/// `obj` must remain valid while the returned pointer is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_ptr_mut_new(obj: NSTDAnyMut, size: NSTDUSize) -> NSTDPtrMut {
+pub extern "C" fn nstd_core_ptr_mut_new(obj: NSTDAnyMut, size: NSTDUSize) -> NSTDPtrMut {
     NSTDPtrMut { raw: obj, size }
 }
 
@@ -124,13 +109,9 @@ pub extern "C" fn nstd_core_ptr_mut_size(ptr: &NSTDPtrMut) -> NSTDUSize {
 /// # Returns
 ///
 /// `NSTDAnyMut raw` - A raw pointer to the object.
-///
-/// # Safety
-///
-/// `ptr`'s data must remain valid while the returned pointer is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_ptr_mut_get(ptr: &mut NSTDPtrMut) -> NSTDAnyMut {
+pub extern "C" fn nstd_core_ptr_mut_get(ptr: &mut NSTDPtrMut) -> NSTDAnyMut {
     ptr.raw
 }
 
@@ -143,13 +124,9 @@ pub unsafe extern "C" fn nstd_core_ptr_mut_get(ptr: &mut NSTDPtrMut) -> NSTDAnyM
 /// # Returns
 ///
 /// `NSTDAnyConst raw` - A raw pointer to the object.
-///
-/// # Safety
-///
-/// `ptr`'s data must remain valid while the returned pointer is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_ptr_mut_get_const(ptr: &NSTDPtrMut) -> NSTDAnyConst {
+pub extern "C" fn nstd_core_ptr_mut_get_const(ptr: &NSTDPtrMut) -> NSTDAnyConst {
     ptr.raw
 }
 

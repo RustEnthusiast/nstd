@@ -22,10 +22,6 @@ typedef struct {
 /// # Returns
 ///
 /// `NSTDPtrConst ptr` - A new instance of `NSTDPtrConst` that points to `obj`.
-///
-/// # Safety
-///
-/// `obj` must remain valid while the returned pointer is in use.
 NSTDAPI NSTDPtrConst nstd_core_ptr_const_new(NSTDAnyConst obj, NSTDUSize size);
 
 /// Returns the size of the object being pointed to.
@@ -48,10 +44,6 @@ NSTDAPI NSTDUSize nstd_core_ptr_const_size(const NSTDPtrConst *ptr);
 /// # Returns
 ///
 /// `NSTDAnyConst raw` - A raw pointer to the object.
-///
-/// # Safety
-///
-/// `ptr`'s data must remain valid while the returned pointer is in use.
 NSTDAPI NSTDAnyConst nstd_core_ptr_const_get(const NSTDPtrConst *ptr);
 
 /// A sized pointer to some arbitrary type.
@@ -73,10 +65,6 @@ typedef struct {
 /// # Returns
 ///
 /// `NSTDPtrMut ptr` - A new instance of `NSTDPtrMut` that points to `obj`.
-///
-/// # Safety
-///
-/// `obj` must remain valid while the returned pointer is in use.
 NSTDAPI NSTDPtrMut nstd_core_ptr_mut_new(NSTDAnyMut obj, NSTDUSize size);
 
 /// Returns the size of the object being pointed to.
@@ -99,10 +87,6 @@ NSTDAPI NSTDUSize nstd_core_ptr_mut_size(const NSTDPtrMut *ptr);
 /// # Returns
 ///
 /// `NSTDAnyMut raw` - A raw pointer to the object.
-///
-/// # Safety
-///
-/// `ptr`'s data must remain valid while the returned pointer is in use.
 NSTDAPI NSTDAnyMut nstd_core_ptr_mut_get(NSTDPtrMut *ptr);
 
 /// Returns a raw immutable pointer to the object pointed to by `ptr`.
@@ -114,10 +98,6 @@ NSTDAPI NSTDAnyMut nstd_core_ptr_mut_get(NSTDPtrMut *ptr);
 /// # Returns
 ///
 /// `NSTDAnyConst raw` - A raw pointer to the object.
-///
-/// # Safety
-///
-/// `ptr`'s data must remain valid while the returned pointer is in use.
 NSTDAPI NSTDAnyConst nstd_core_ptr_mut_get_const(const NSTDPtrMut *ptr);
 
 /// Writes data from `obj` to `ptr`. The number of bytes written is determined by `ptr.size`.
