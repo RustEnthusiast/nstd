@@ -2,8 +2,8 @@
 use crate::{
     core::{
         cstr::{
-            nstd_core_cstr_const_as_bytes, nstd_core_cstr_const_new, nstd_core_cstr_mut_new,
-            NSTDCStrConst, NSTDCStrMut,
+            nstd_core_cstr_const_as_bytes, nstd_core_cstr_const_get_null, nstd_core_cstr_const_new,
+            nstd_core_cstr_mut_new, NSTDCStrConst, NSTDCStrMut,
         },
         def::{NSTDChar, NSTDErrorCode},
         slice::NSTDSliceConst,
@@ -85,7 +85,7 @@ pub extern "C" fn nstd_cstring_clone(cstring: &NSTDCString) -> NSTDCString {
     }
 }
 
-/// Creates a C string slice containing the contents of `cstring` (excluding the null byte).
+/// Creates a C string slice containing the contents of `cstring`.
 ///
 /// # Parameters:
 ///
@@ -98,11 +98,11 @@ pub extern "C" fn nstd_cstring_clone(cstring: &NSTDCString) -> NSTDCString {
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_cstring_as_cstr(cstring: &NSTDCString) -> NSTDCStrConst {
     let ptr = nstd_vec_as_ptr(&cstring.bytes).cast();
-    let len = nstd_vec_len(&cstring.bytes) - 1;
+    let len = nstd_vec_len(&cstring.bytes);
     nstd_core_cstr_const_new(ptr, len)
 }
 
-/// Creates a C string slice containing the contents of `cstring` (excluding the null byte).
+/// Creates a C string slice containing the contents of `cstring`.
 ///
 /// # Parameters:
 ///
@@ -115,7 +115,7 @@ pub extern "C" fn nstd_cstring_as_cstr(cstring: &NSTDCString) -> NSTDCStrConst {
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_cstring_as_cstr_mut(cstring: &mut NSTDCString) -> NSTDCStrMut {
     let ptr = nstd_vec_as_mut_ptr(&mut cstring.bytes).cast();
-    let len = nstd_vec_len(&cstring.bytes) - 1;
+    let len = nstd_vec_len(&cstring.bytes);
     nstd_core_cstr_mut_new(ptr, len)
 }
 
@@ -172,7 +172,11 @@ pub extern "C" fn nstd_cstring_push(cstring: &mut NSTDCString, chr: NSTDChar) {
 ///
 /// # Panics
 ///
-/// This operation will panic if appending the new null byte to the end of the C string fails.
+/// This operation will panic in the following situations:
+///
+/// - `cstr` contains a null byte.
+///
+/// - Appending the new null byte to the end of the C string fails.
 ///
 /// # Safety
 ///
@@ -182,6 +186,8 @@ pub unsafe extern "C" fn nstd_cstring_push_cstr(
     cstring: &mut NSTDCString,
     cstr: &NSTDCStrConst,
 ) -> NSTDErrorCode {
+    // Make sure the C string slice doesn't contain a null byte.
+    assert!(nstd_core_cstr_const_get_null(cstr).is_null());
     // Pop the old null byte.
     let nul = *nstd_vec_pop(&mut cstring.bytes).cast::<NSTDChar>();
     // Append the C string slice.

@@ -56,7 +56,7 @@ NSTDAPI NSTDCString nstd_cstring_new_with_cap(NSTDUSize cap);
 /// This function will panic if allocating for the new C string fails.
 NSTDAPI NSTDCString nstd_cstring_clone(const NSTDCString *cstring);
 
-/// Creates a C string slice containing the contents of `cstring` (excluding the null byte).
+/// Creates a C string slice containing the contents of `cstring`.
 ///
 /// # Parameters:
 ///
@@ -67,7 +67,7 @@ NSTDAPI NSTDCString nstd_cstring_clone(const NSTDCString *cstring);
 /// `NSTDCStrConst cstr` - The new C string slice.
 NSTDAPI NSTDCStrConst nstd_cstring_as_cstr(const NSTDCString *cstring);
 
-/// Creates a C string slice containing the contents of `cstring` (excluding the null byte).
+/// Creates a C string slice containing the contents of `cstring`.
 ///
 /// # Parameters:
 ///
@@ -116,7 +116,11 @@ NSTDAPI void nstd_cstring_push(NSTDCString *cstring, NSTDChar chr);
 ///
 /// # Panics
 ///
-/// This operation will panic if appending the new null byte to the end of the C string fails.
+/// This operation will panic in the following situations:
+///
+/// - `cstr` contains a null byte.
+///
+/// - Appending the new null byte to the end of the C string fails.
 ///
 /// # Safety
 ///

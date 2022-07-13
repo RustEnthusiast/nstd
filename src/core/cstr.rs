@@ -5,7 +5,7 @@ use crate::{
         def::NSTDChar,
         slice::{nstd_core_slice_const_new, NSTDSliceConst},
     },
-    NSTDUSize,
+    NSTDBool, NSTDUSize, NSTD_FALSE, NSTD_NULL,
 };
 
 /// An immutable slice of a C string.
@@ -80,6 +80,55 @@ pub extern "C" fn nstd_core_cstr_const_len(cstr: &NSTDCStrConst) -> NSTDUSize {
     cstr.len
 }
 
+/// Determines whether or not a C string slice is null terminated. This will return false if the C
+/// string slice contains any null bytes in the middle.
+///
+/// # Parameters:
+///
+/// - `const NSTDCStrConst *cstr` - The C string slice.
+///
+/// # Returns
+///
+/// `NSTDBool is_null_terminated` - Returns true if the C string slice contains a single null byte
+/// at the end.
+///
+/// # Safety
+///
+/// Undefined behavior may occur if `cstr`'s data is invalid.
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_core_cstr_const_is_null_terminated(cstr: &NSTDCStrConst) -> NSTDBool {
+    let mut i = 0;
+    while i < cstr.len {
+        if *cstr.ptr.add(i) == 0 {
+            return (i == cstr.len - 1) as NSTDBool;
+        }
+        i += 1;
+    }
+    NSTD_FALSE
+}
+
+/// Returns a pointer to the first null byte in a C string slice if present.
+///
+/// # Parameters:
+///
+/// - `const NSTDCStrConst *cstr` - The C string slice.
+///
+/// # Returns
+///
+/// `const NSTDChar *nul` - A pointer to the first null byte in `cstr`, or null ([NSTD_NULL]) if
+/// the C string slice doesn't contain a null byte.
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_core_cstr_const_get_null(cstr: &NSTDCStrConst) -> *const NSTDChar {
+    let mut i = 0;
+    while i < cstr.len {
+        if unsafe { *cstr.ptr.add(i) } == 0 {
+            return unsafe { cstr.ptr.add(i) };
+        }
+        i += 1;
+    }
+    NSTD_NULL as *const NSTDChar
+}
+
 /// Return a pointer the character at `pos` in `cstr`.
 ///
 /// # Parameters:
@@ -128,6 +177,21 @@ pub struct NSTDCStrMut {
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_cstr_mut_new(raw: *mut NSTDChar, len: NSTDUSize) -> NSTDCStrMut {
     NSTDCStrMut { ptr: raw, len }
+}
+
+/// Creates an immutable version of a mutable C string slice.
+///
+/// # Parameters:
+///
+/// - `const NSTDCStrMut *cstr` - The mutable C string slice.
+///
+/// # Returns
+///
+/// `NSTDCStrConst cstr_const` - The immutable copy of `cstr`.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_core_cstr_mut_as_const(cstr: &NSTDCStrMut) -> NSTDCStrConst {
+    nstd_core_cstr_const_new(cstr.ptr, cstr.len)
 }
 
 /// Returns a byte slice of a C string slice's data.
@@ -188,6 +252,61 @@ pub extern "C" fn nstd_core_cstr_mut_as_ptr_const(cstr: &NSTDCStrMut) -> *const 
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_cstr_mut_len(cstr: &NSTDCStrMut) -> NSTDUSize {
     cstr.len
+}
+
+/// Determines whether or not a C string slice is null terminated. This will return false if the C
+/// string slice contains any null bytes in the middle.
+///
+/// # Parameters:
+///
+/// - `const NSTDCStrMut *cstr` - The C string slice.
+///
+/// # Returns
+///
+/// `NSTDBool is_null_terminated` - Returns true if the C string slice contains a single null byte
+/// at the end.
+///
+/// # Safety
+///
+/// Undefined behavior may occur if `cstr`'s data is invalid.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_core_cstr_mut_is_null_terminated(cstr: &NSTDCStrMut) -> NSTDBool {
+    let cstr_const = nstd_core_cstr_mut_as_const(cstr);
+    nstd_core_cstr_const_is_null_terminated(&cstr_const)
+}
+
+/// Returns a pointer to the first null byte in a C string slice if present.
+///
+/// # Parameters:
+///
+/// - `NSTDCStrMut *cstr` - The C string slice.
+///
+/// # Returns
+///
+/// `NSTDChar *nul` - A pointer to the first null byte in `cstr`, or null ([NSTD_NULL]) if the C
+/// string slice doesn't contain a null byte.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_core_cstr_mut_get_null(cstr: &mut NSTDCStrMut) -> *mut NSTDChar {
+    nstd_core_cstr_mut_get_null_const(cstr) as *mut NSTDChar
+}
+
+/// Returns a pointer to the first null byte in a C string slice if present.
+///
+/// # Parameters:
+///
+/// - `const NSTDCStrMut *cstr` - The C string slice.
+///
+/// # Returns
+///
+/// `const NSTDChar *nul` - A pointer to the first null byte in `cstr`, or null ([NSTD_NULL]) if
+/// the C string slice doesn't contain a null byte.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_core_cstr_mut_get_null_const(cstr: &NSTDCStrMut) -> *const NSTDChar {
+    let cstr_const = nstd_core_cstr_mut_as_const(cstr);
+    nstd_core_cstr_const_get_null(&cstr_const)
 }
 
 /// Return a pointer the character at `pos` in `cstr`.
