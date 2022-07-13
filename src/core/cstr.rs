@@ -1,4 +1,4 @@
-//! C string processing.
+//! Unowned C string slices.
 pub mod raw;
 use crate::{
     core::{
@@ -14,7 +14,7 @@ use crate::{
 pub struct NSTDCStrConst {
     /// A pointer to the first character in the C string.
     ptr: *const NSTDChar,
-    /// The length of the C string, excluding the null byte.
+    /// The length of the C string slice.
     len: NSTDUSize,
 }
 
@@ -24,7 +24,7 @@ pub struct NSTDCStrConst {
 ///
 /// - `const NSTDChar *raw` - A pointer to the first character to be in the C string slice.
 ///
-/// - `NSTDUSize len` - The length of the C string, excluding the null byte.
+/// - `NSTDUSize len` - The length of the C string slice.
 ///
 /// # Returns
 ///
@@ -109,7 +109,7 @@ pub extern "C" fn nstd_core_cstr_const_get(
 pub struct NSTDCStrMut {
     /// A pointer to the first character in the C string.
     ptr: *mut NSTDChar,
-    /// The length of the C string, excluding the null byte.
+    /// The length of the C string slice.
     len: NSTDUSize,
 }
 
@@ -119,7 +119,7 @@ pub struct NSTDCStrMut {
 ///
 /// - `NSTDChar *raw` - A pointer to the first character to be in the C string slice.
 ///
-/// - `NSTDUSize len` - The length of the C string, excluding the null byte.
+/// - `NSTDUSize len` - The length of the C string slice.
 ///
 /// # Returns
 ///

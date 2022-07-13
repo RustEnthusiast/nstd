@@ -9,7 +9,7 @@ NSTDCPPSTART
 typedef struct {
     /// A pointer to the first character in the C string.
     const NSTDChar *ptr;
-    /// The length of the C string, excluding the null byte.
+    /// The length of the C string slice.
     NSTDUSize len;
 } NSTDCStrConst;
 
@@ -19,7 +19,7 @@ typedef struct {
 ///
 /// - `const NSTDChar *raw` - A pointer to the first character to be in the C string slice.
 ///
-/// - `NSTDUSize len` - The length of the C string, excluding the null byte.
+/// - `NSTDUSize len` - The length of the C string slice.
 ///
 /// # Returns
 ///
@@ -76,7 +76,7 @@ NSTDAPI const NSTDChar *nstd_core_cstr_const_get(const NSTDCStrConst *cstr, NSTD
 typedef struct {
     /// A pointer to the first character in the C string.
     NSTDChar *ptr;
-    /// The length of the C string, excluding the null byte.
+    /// The length of the C string slice.
     NSTDUSize len;
 } NSTDCStrMut;
 
@@ -86,7 +86,7 @@ typedef struct {
 ///
 /// - `NSTDChar *raw` - A pointer to the first character to be in the C string slice.
 ///
-/// - `NSTDUSize len` - The length of the C string, excluding the null byte.
+/// - `NSTDUSize len` - The length of the C string slice.
 ///
 /// # Returns
 ///

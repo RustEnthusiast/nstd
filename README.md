@@ -9,7 +9,7 @@ Rust syntax).
 - `nstd` - A cross-platform, fast, and safe general purpose C library written in Rust.
     - `alloc` - Low level memory allocation.
     - `core` - Provides core functionality for `nstd`.
-        - `cstr` - C string processing.
+        - `cstr` - Unowned C string slices.
             - `raw` - Raw C string processing.
         - `cty` - Provides functions for examining and operating on character types.
         - `def` - Contains common types used throughout `nstd`.
