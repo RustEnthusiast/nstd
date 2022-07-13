@@ -16,7 +16,7 @@ typedef NSTDAnyMut NSTDSharedLib;
 ///
 /// # Returns
 ///
-/// `NSTDSharedLib lib` - A handle to the dynamically loaded lobrary.
+/// `NSTDSharedLib lib` - A handle to the dynamically loaded lobrary, or null on error.
 ///
 /// # Safety
 ///

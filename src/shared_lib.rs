@@ -6,7 +6,7 @@ use crate::{
 use libloading::Library;
 
 /// A handle to a dynamically loaded library.
-pub type NSTDSharedLib = Option<Box<Library>>;
+pub type NSTDSharedLib = Box<Library>;
 
 /// Dynamically loads a shared library at runtime.
 ///
@@ -16,14 +16,14 @@ pub type NSTDSharedLib = Option<Box<Library>>;
 ///
 /// # Returns
 ///
-/// `NSTDSharedLib lib` - A handle to the dynamically loaded lobrary.
+/// `NSTDSharedLib lib` - A handle to the dynamically loaded lobrary, or null on error.
 ///
 /// # Safety
 ///
 /// See <https://docs.rs/libloading/latest/libloading/struct.Library.html#method.new>.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_shared_lib_load(path: &NSTDStrConst) -> NSTDSharedLib {
+pub unsafe extern "C" fn nstd_shared_lib_load(path: &NSTDStrConst) -> Option<NSTDSharedLib> {
     match Library::new(path.as_str()) {
         Ok(lib) => Some(Box::new(lib)),
         _ => None,
@@ -50,12 +50,10 @@ pub unsafe extern "C" fn nstd_shared_lib_get(
     lib: &NSTDSharedLib,
     symbol: *const NSTDChar,
 ) -> NSTDAnyMut {
-    if let Some(lib) = lib {
-        let symbol_len = nstd_core_cstr_raw_len_with_null(symbol);
-        let symbol_name = std::slice::from_raw_parts(symbol.cast(), symbol_len);
-        if let Ok(symbol) = lib.get::<NSTDAnyMut>(symbol_name) {
-            return *symbol;
-        }
+    let symbol_len = nstd_core_cstr_raw_len_with_null(symbol);
+    let symbol_name = std::slice::from_raw_parts(symbol.cast(), symbol_len);
+    if let Ok(symbol) = lib.get::<NSTDAnyMut>(symbol_name) {
+        return *symbol;
     }
     NSTD_NULL
 }
