@@ -25,6 +25,22 @@ NSTDCPPSTART
 /// than `num`.
 NSTDAPI NSTDBool nstd_core_mem_compare(const NSTDByte *buf1, const NSTDByte *buf2, NSTDUSize num);
 
+/// Fills the memory buffer `buf` with byte `fill`.
+///
+/// # Parameters:
+///
+/// - `NSTDByte *buf` - The memory buffer to fill.
+///
+/// - `NSTDUSize size` - The size of the memory buffer.
+///
+/// - `NSTDByte fill` - The byte value to fill the memory buffer with.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if the caller does not ensure that the memory
+/// buffer is at least `size` bytes in size.
+NSTDAPI void nstd_core_mem_fill(NSTDByte *buf, NSTDUSize size, NSTDByte fill);
+
 /// Copies `num` bytes from `src` to `dest`.
 ///
 /// # Parameters:

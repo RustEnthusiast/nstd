@@ -37,6 +37,30 @@ pub unsafe extern "C" fn nstd_core_mem_compare(
     (buf1 == buf2).into()
 }
 
+/// Fills the memory buffer `buf` with byte `fill`.
+///
+/// # Parameters:
+///
+/// - `NSTDByte *buf` - The memory buffer to fill.
+///
+/// - `NSTDUSize size` - The size of the memory buffer.
+///
+/// - `NSTDByte fill` - The byte value to fill the memory buffer with.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if the caller does not ensure that the memory
+/// buffer is at least `size` bytes in size.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_core_mem_fill(buf: *mut NSTDByte, size: NSTDUSize, fill: NSTDByte) {
+    let mut i = 0;
+    while i < size {
+        *buf.add(i) = fill;
+        i += 1;
+    }
+}
+
 /// Copies `num` bytes from `src` to `dest`.
 ///
 /// # Parameters:
