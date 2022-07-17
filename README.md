@@ -41,8 +41,9 @@ Other modules will work on most platforms, primarily targeting Windows, macOS,
 Linux, Android, and iOS.
 
 # Safety notes
-Because `nstd` is a C library, creating reference types such as `NSTDPtr` or `NSTDSlice` is
-unsafe because the data cannot have a lifetime attached to it.
+`nstd` tries it's best to comply with Rust's safety. This means anything that can cause undefined
+behavior is considered unsafe (with the exception of functions that take Rusty references, which
+always assume a non-null argument).
 
 # How to build
 `nstd` let's you decide what features you want to use. Any module that falls under the top level
