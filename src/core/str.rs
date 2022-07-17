@@ -26,15 +26,36 @@ impl NSTDStrConst {
     }
 }
 
-/// Creates a new instance of `NSTDStrConst` from a C string.
+/// Creates a new instance of `NSTDStrConst` from a C string slice.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDCStrConst *cstr` - The C string to wrap.
+/// - `const NSTDCStrConst *cstr` - The C string slice to wrap.
 ///
 /// # Returns
 ///
-/// `NSTDStrConst str` - The new `NSTDStrConst` instance, excluding the C string's null terminator.
+/// `NSTDStrConst str` - The new `NSTDStrConst` instance.
+///
+/// # Panics
+///
+/// This function will panic if `cstr`'s data is not valid UTF-8.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_core_str_const_from_cstr(cstr: &NSTDCStrConst) -> NSTDStrConst {
+    let bytes = nstd_core_cstr_const_as_bytes(cstr);
+    core::str::from_utf8(bytes.as_slice()).expect("Invalid UTF-8 bytes");
+    NSTDStrConst { bytes }
+}
+
+/// Creates a new instance of `NSTDStrConst` from a C string slice.
+///
+/// # Parameters:
+///
+/// - `const NSTDCStrConst *cstr` - The C string slice to wrap.
+///
+/// # Returns
+///
+/// `NSTDStrConst str` - The new `NSTDStrConst` instance.
 ///
 /// # Safety
 ///
@@ -219,15 +240,38 @@ impl NSTDStrMut {
     }
 }
 
-/// Creates a new instance of `NSTDStrMut` from a C string.
+/// Creates a new instance of `NSTDStrMut` from a C string slice.
 ///
 /// # Parameters:
 ///
-/// - `NSTDCStrMut *cstr` - The C string to wrap.
+/// - `NSTDCStrMut *cstr` - The C string slice to wrap.
 ///
 /// # Returns
 ///
-/// `NSTDStrMut str` - The new `NSTDStrMut` instance, excluding the C string's null terminator.
+/// `NSTDStrMut str` - The new `NSTDStrMut` instance.
+///
+/// # Panics
+///
+/// This function will panic if `cstr`'s data is not valid UTF-8.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_core_str_mut_from_cstr(cstr: &mut NSTDCStrMut) -> NSTDStrMut {
+    let ptr = nstd_core_cstr_mut_as_ptr(cstr);
+    let len = nstd_core_cstr_mut_len(cstr);
+    let bytes = nstd_core_slice_mut_new(ptr.cast(), 1, len);
+    core::str::from_utf8(bytes.as_slice()).expect("Invalid UTF-8 bytes");
+    NSTDStrMut { bytes }
+}
+
+/// Creates a new instance of `NSTDStrMut` from a C string slice.
+///
+/// # Parameters:
+///
+/// - `NSTDCStrMut *cstr` - The C string slice to wrap.
+///
+/// # Returns
+///
+/// `NSTDStrMut str` - The new `NSTDStrMut` instance.
 ///
 /// # Safety
 ///

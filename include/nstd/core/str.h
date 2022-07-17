@@ -12,15 +12,30 @@ typedef struct {
     NSTDSliceConst bytes;
 } NSTDStrConst;
 
-/// Creates a new instance of `NSTDStrConst` from a C string.
+/// Creates a new instance of `NSTDStrConst` from a C string slice.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDCStrConst *cstr` - The C string to wrap.
+/// - `const NSTDCStrConst *cstr` - The C string slice to wrap.
 ///
 /// # Returns
 ///
-/// `NSTDStrConst str` - The new `NSTDStrConst` instance, excluding the C string's null terminator.
+/// `NSTDStrConst str` - The new `NSTDStrConst` instance.
+///
+/// # Panics
+///
+/// This function will panic if `cstr`'s data is not valid UTF-8.
+NSTDAPI NSTDStrConst nstd_core_str_const_from_cstr(const NSTDCStrConst *cstr);
+
+/// Creates a new instance of `NSTDStrConst` from a C string slice.
+///
+/// # Parameters:
+///
+/// - `const NSTDCStrConst *cstr` - The C string slice to wrap.
+///
+/// # Returns
+///
+/// `NSTDStrConst str` - The new `NSTDStrConst` instance.
 ///
 /// # Safety
 ///
@@ -141,15 +156,30 @@ typedef struct {
     NSTDSliceMut bytes;
 } NSTDStrMut;
 
-/// Creates a new instance of `NSTDStrMut` from a C string.
+/// Creates a new instance of `NSTDStrMut` from a C string slice.
 ///
 /// # Parameters:
 ///
-/// - `NSTDCStrMut *cstr` - The C string to wrap.
+/// - `NSTDCStrMut *cstr` - The C string slice to wrap.
 ///
 /// # Returns
 ///
-/// `NSTDStrMut str` - The new `NSTDStrMut` instance, excluding the C string's null terminator.
+/// `NSTDStrMut str` - The new `NSTDStrMut` instance.
+///
+/// # Panics
+///
+/// This function will panic if `cstr`'s data is not valid UTF-8.
+NSTDAPI NSTDStrMut nstd_core_str_mut_from_cstr(NSTDCStrMut *cstr);
+
+/// Creates a new instance of `NSTDStrMut` from a C string slice.
+///
+/// # Parameters:
+///
+/// - `NSTDCStrMut *cstr` - The C string slice to wrap.
+///
+/// # Returns
+///
+/// `NSTDStrMut str` - The new `NSTDStrMut` instance.
 ///
 /// # Safety
 ///
