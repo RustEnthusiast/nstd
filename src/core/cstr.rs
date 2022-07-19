@@ -1,5 +1,6 @@
 //! Unowned C string slices.
 pub mod raw;
+use self::raw::{nstd_core_cstr_raw_len, nstd_core_cstr_raw_len_with_null};
 use crate::{
     core::{
         def::NSTDChar,
@@ -33,6 +34,42 @@ pub struct NSTDCStrConst {
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_cstr_const_new(raw: *const NSTDChar, len: NSTDUSize) -> NSTDCStrConst {
     NSTDCStrConst { ptr: raw, len }
+}
+
+/// Creates a new instance of `NSTDCStrConst` from a raw C string, excluding the null byte.
+///
+/// # Parameters:
+///
+/// - `const NSTDChar *raw` - A raw pointer to the first character in the C string.
+///
+/// # Returns
+///
+/// `NSTDCStrConst cstr` - The new C string slice, referencing `raw`'s data.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_core_cstr_const_from_raw(raw: *const NSTDChar) -> NSTDCStrConst {
+    // SAFETY: `NSTDCStrConst` is already unsafe to access, so there's no need for any kind of
+    // validation here.
+    let len = unsafe { nstd_core_cstr_raw_len(raw) };
+    nstd_core_cstr_const_new(raw, len)
+}
+
+/// Creates a new instance of `NSTDCStrConst` from a raw C string, including the null byte.
+///
+/// # Parameters:
+///
+/// - `const NSTDChar *raw` - A raw pointer to the first character in the C string.
+///
+/// # Returns
+///
+/// `NSTDCStrConst cstr` - The new C string slice, referencing `raw`'s data.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_core_cstr_const_from_raw_with_null(raw: *const NSTDChar) -> NSTDCStrConst {
+    // SAFETY: `NSTDCStrConst` is already unsafe to access, so there's no need for any kind of
+    // validation here.
+    let len = unsafe { nstd_core_cstr_raw_len_with_null(raw) };
+    nstd_core_cstr_const_new(raw, len)
 }
 
 /// Returns a byte slice of a C string slice's data.
@@ -177,6 +214,42 @@ pub struct NSTDCStrMut {
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_cstr_mut_new(raw: *mut NSTDChar, len: NSTDUSize) -> NSTDCStrMut {
     NSTDCStrMut { ptr: raw, len }
+}
+
+/// Creates a new instance of `NSTDCStrMut` from a raw C string, excluding the null byte.
+///
+/// # Parameters:
+///
+/// - `NSTDChar *raw` - A raw pointer to the first character in the C string.
+///
+/// # Returns
+///
+/// `NSTDCStrMut cstr` - The new C string slice, referencing `raw`'s data.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_core_cstr_mut_from_raw(raw: *mut NSTDChar) -> NSTDCStrMut {
+    // SAFETY: `NSTDCStrMut` is already unsafe to access, so there's no need for any kind of
+    // validation here.
+    let len = unsafe { nstd_core_cstr_raw_len(raw) };
+    nstd_core_cstr_mut_new(raw, len)
+}
+
+/// Creates a new instance of `NSTDCStrMut` from a raw C string, including the null byte.
+///
+/// # Parameters:
+///
+/// - `NSTDChar *raw` - A raw pointer to the first character in the C string.
+///
+/// # Returns
+///
+/// `NSTDCStrMut cstr` - The new C string slice, referencing `raw`'s data.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_core_cstr_mut_from_raw_with_null(raw: *mut NSTDChar) -> NSTDCStrMut {
+    // SAFETY: `NSTDCStrMut` is already unsafe to access, so there's no need for any kind of
+    // validation here.
+    let len = unsafe { nstd_core_cstr_raw_len_with_null(raw) };
+    nstd_core_cstr_mut_new(raw, len)
 }
 
 /// Creates an immutable version of a mutable C string slice.

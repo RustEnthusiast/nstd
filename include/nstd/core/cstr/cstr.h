@@ -26,6 +26,28 @@ typedef struct {
 /// `NSTDCStrConst cstr` - The new C string slice, referencing `raw`'s data.
 NSTDAPI NSTDCStrConst nstd_core_cstr_const_new(const NSTDChar *raw, NSTDUSize len);
 
+/// Creates a new instance of `NSTDCStrConst` from a raw C string, excluding the null byte.
+///
+/// # Parameters:
+///
+/// - `const NSTDChar *raw` - A raw pointer to the first character in the C string.
+///
+/// # Returns
+///
+/// `NSTDCStrConst cstr` - The new C string slice, referencing `raw`'s data.
+NSTDAPI NSTDCStrConst nstd_core_cstr_const_from_raw(const NSTDChar *raw);
+
+/// Creates a new instance of `NSTDCStrConst` from a raw C string, including the null byte.
+///
+/// # Parameters:
+///
+/// - `const NSTDChar *raw` - A raw pointer to the first character in the C string.
+///
+/// # Returns
+///
+/// `NSTDCStrConst cstr` - The new C string slice, referencing `raw`'s data.
+NSTDAPI NSTDCStrConst nstd_core_cstr_const_from_raw_with_null(const NSTDChar *raw);
+
 /// Returns a byte slice of a C string slice's data.
 ///
 /// # Parameters:
@@ -121,6 +143,28 @@ typedef struct {
 ///
 /// `NSTDCStrMut cstr` - The new C string slice, referencing `raw`'s data.
 NSTDAPI NSTDCStrMut nstd_core_cstr_mut_new(NSTDChar *raw, NSTDUSize len);
+
+/// Creates a new instance of `NSTDCStrMut` from a raw C string, excluding the null byte.
+///
+/// # Parameters:
+///
+/// - `NSTDChar *raw` - A raw pointer to the first character in the C string.
+///
+/// # Returns
+///
+/// `NSTDCStrMut cstr` - The new C string slice, referencing `raw`'s data.
+NSTDAPI NSTDCStrMut nstd_core_cstr_mut_from_raw(NSTDChar *raw);
+
+/// Creates a new instance of `NSTDCStrMut` from a raw C string, including the null byte.
+///
+/// # Parameters:
+///
+/// - `NSTDChar *raw` - A raw pointer to the first character in the C string.
+///
+/// # Returns
+///
+/// `NSTDCStrMut cstr` - The new C string slice, referencing `raw`'s data.
+NSTDAPI NSTDCStrMut nstd_core_cstr_mut_from_raw_with_null(NSTDChar *raw);
 
 /// Creates an immutable version of a mutable C string slice.
 ///
