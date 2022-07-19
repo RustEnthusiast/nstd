@@ -2,6 +2,7 @@
 #define NSTD_CORE_STR_H_INCLUDED
 #include "../nstd.h"
 #include "cstr.h"
+#include "def.h"
 #include "range.h"
 #include "slice.h"
 NSTDCPPSTART
@@ -150,6 +151,199 @@ NSTDAPI NSTDUnichar nstd_core_str_const_get_char(const NSTDStrConst *str, NSTDUS
 /// - The substring bytes are not valid UTF-8.
 NSTDAPI NSTDStrConst nstd_core_str_const_substr(const NSTDStrConst *str, NSTDURange range);
 
+/// Attempts to parse a string slice as an `NSTDFloat32`.
+///
+/// # Parameters:
+///
+/// - `const NSTDStrConst *str` - The string slice.
+///
+/// - `NSTDErrorCode *errc` - Set to nonzero on error.
+///
+/// # Returns
+///
+/// `NSTDFloat32 v` - The parsed 32-bit floating-point value.
+///
+/// # Safety:
+///
+/// This operation can cause undefined behavior if `str`'s data is invalid.
+NSTDAPI NSTDFloat32 nstd_core_str_const_to_f32(const NSTDStrConst *str, NSTDErrorCode *errc);
+/// Attempts to parse a string slice as an `NSTDFloat64`.
+///
+/// # Parameters:
+///
+/// - `const NSTDStrConst *str` - The string slice.
+///
+/// - `NSTDErrorCode *errc` - Set to nonzero on error.
+///
+/// # Returns
+///
+/// `NSTDFloat64 v` - The parsed 64-bit floating-point value.
+///
+/// # Safety:
+///
+/// This operation can cause undefined behavior if `str`'s data is invalid.
+NSTDAPI NSTDFloat64 nstd_core_str_const_to_f64(const NSTDStrConst *str, NSTDErrorCode *errc);
+/// Attempts to parse a string slice as an `NSTDUInt8`.
+///
+/// # Parameters:
+///
+/// - `const NSTDStrConst *str` - The string slice.
+///
+/// - `NSTDErrorCode *errc` - Set to nonzero on error.
+///
+/// # Returns
+///
+/// `NSTDUInt8 v` - The parsed 8-bit unsigned integral value.
+///
+/// # Safety:
+///
+/// This operation can cause undefined behavior if `str`'s data is invalid.
+NSTDAPI NSTDUInt8 nstd_core_str_const_to_u8(const NSTDStrConst *str, NSTDErrorCode *errc);
+/// Attempts to parse a string slice as an `NSTDInt8`.
+///
+/// # Parameters:
+///
+/// - `const NSTDStrConst *str` - The string slice.
+///
+/// - `NSTDErrorCode *errc` - Set to nonzero on error.
+///
+/// # Returns
+///
+/// `NSTDInt8 v` - The parsed 8-bit signed integral value.
+///
+/// # Safety:
+///
+/// This operation can cause undefined behavior if `str`'s data is invalid.
+NSTDAPI NSTDInt8 nstd_core_str_const_to_i8(const NSTDStrConst *str, NSTDErrorCode *errc);
+/// Attempts to parse a string slice as an `NSTDUInt16`.
+///
+/// # Parameters:
+///
+/// - `const NSTDStrConst *str` - The string slice.
+///
+/// - `NSTDErrorCode *errc` - Set to nonzero on error.
+///
+/// # Returns
+///
+/// `NSTDUInt16 v` - The parsed 16-bit unsigned integral value.
+///
+/// # Safety:
+///
+/// This operation can cause undefined behavior if `str`'s data is invalid.
+NSTDAPI NSTDUInt16 nstd_core_str_const_to_u16(const NSTDStrConst *str, NSTDErrorCode *errc);
+/// Attempts to parse a string slice as an `NSTDInt16`.
+///
+/// # Parameters:
+///
+/// - `const NSTDStrConst *str` - The string slice.
+///
+/// - `NSTDErrorCode *errc` - Set to nonzero on error.
+///
+/// # Returns
+///
+/// `NSTDInt16 v` - The parsed 16-bit signed integral value.
+///
+/// # Safety:
+///
+/// This operation can cause undefined behavior if `str`'s data is invalid.
+NSTDAPI NSTDInt16 nstd_core_str_const_to_i16(const NSTDStrConst *str, NSTDErrorCode *errc);
+/// Attempts to parse a string slice as an `NSTDUInt32`.
+///
+/// # Parameters:
+///
+/// - `const NSTDStrConst *str` - The string slice.
+///
+/// - `NSTDErrorCode *errc` - Set to nonzero on error.
+///
+/// # Returns
+///
+/// `NSTDUInt32 v` - The parsed 32-bit unsigned integral value.
+///
+/// # Safety:
+///
+/// This operation can cause undefined behavior if `str`'s data is invalid.
+NSTDAPI NSTDUInt32 nstd_core_str_const_to_u32(const NSTDStrConst *str, NSTDErrorCode *errc);
+/// Attempts to parse a string slice as an `NSTDInt32`.
+///
+/// # Parameters:
+///
+/// - `const NSTDStrConst *str` - The string slice.
+///
+/// - `NSTDErrorCode *errc` - Set to nonzero on error.
+///
+/// # Returns
+///
+/// `NSTDInt32 v` - The parsed 32-bit signed integral value.
+///
+/// # Safety:
+///
+/// This operation can cause undefined behavior if `str`'s data is invalid.
+NSTDAPI NSTDInt32 nstd_core_str_const_to_i32(const NSTDStrConst *str, NSTDErrorCode *errc);
+/// Attempts to parse a string slice as an `NSTDUInt64`.
+///
+/// # Parameters:
+///
+/// - `const NSTDStrConst *str` - The string slice.
+///
+/// - `NSTDErrorCode *errc` - Set to nonzero on error.
+///
+/// # Returns
+///
+/// `NSTDUInt64 v` - The parsed 64-bit unsigned integral value.
+///
+/// # Safety:
+///
+/// This operation can cause undefined behavior if `str`'s data is invalid.
+NSTDAPI NSTDUInt64 nstd_core_str_const_to_u64(const NSTDStrConst *str, NSTDErrorCode *errc);
+/// Attempts to parse a string slice as an `NSTDInt64`.
+///
+/// # Parameters:
+///
+/// - `const NSTDStrConst *str` - The string slice.
+///
+/// - `NSTDErrorCode *errc` - Set to nonzero on error.
+///
+/// # Returns
+///
+/// `NSTDInt64 v` - The parsed 64-bit signed integral value.
+///
+/// # Safety:
+///
+/// This operation can cause undefined behavior if `str`'s data is invalid.
+NSTDAPI NSTDInt64 nstd_core_str_const_to_i64(const NSTDStrConst *str, NSTDErrorCode *errc);
+/// Attempts to parse a string slice as an `NSTDUSize`.
+///
+/// # Parameters:
+///
+/// - `const NSTDStrConst *str` - The string slice.
+///
+/// - `NSTDErrorCode *errc` - Set to nonzero on error.
+///
+/// # Returns
+///
+/// `NSTDUSize v` - The parsed arch-bit unsigned integral value.
+///
+/// # Safety:
+///
+/// This operation can cause undefined behavior if `str`'s data is invalid.
+NSTDAPI NSTDUSize nstd_core_str_const_to_usize(const NSTDStrConst *str, NSTDErrorCode *errc);
+/// Attempts to parse a string slice as an `NSTDISize`.
+///
+/// # Parameters:
+///
+/// - `const NSTDStrConst *str` - The string slice.
+///
+/// - `NSTDErrorCode *errc` - Set to nonzero on error.
+///
+/// # Returns
+///
+/// `NSTDISize v` - The parsed arch-bit signed integral value.
+///
+/// # Safety:
+///
+/// This operation can cause undefined behavior if `str`'s data is invalid.
+NSTDAPI NSTDISize nstd_core_str_const_to_isize(const NSTDStrConst *str, NSTDErrorCode *errc);
+
 /// An unowned view into a UTF-8 encoded byte string.
 typedef struct {
     /// A view into the UTF-8 encoded buffer.
@@ -293,6 +487,199 @@ NSTDAPI NSTDUnichar nstd_core_str_mut_get_char(const NSTDStrMut *str, NSTDUSize 
 ///
 /// - The substring bytes are not valid UTF-8.
 NSTDAPI NSTDStrMut nstd_core_str_mut_substr(NSTDStrMut *str, NSTDURange range);
+
+/// Attempts to parse a string slice as an `NSTDFloat32`.
+///
+/// # Parameters:
+///
+/// - `const NSTDStrMut *str` - The string slice.
+///
+/// - `NSTDErrorCode *errc` - Set to nonzero on error.
+///
+/// # Returns
+///
+/// `NSTDFloat32 v` - The parsed 32-bit floating-point value.
+///
+/// # Safety:
+///
+/// This operation can cause undefined behavior if `str`'s data is invalid.
+NSTDAPI NSTDFloat32 nstd_core_str_mut_to_f32(const NSTDStrMut *str, NSTDErrorCode *errc);
+/// Attempts to parse a string slice as an `NSTDFloat64`.
+///
+/// # Parameters:
+///
+/// - `const NSTDStrMut *str` - The string slice.
+///
+/// - `NSTDErrorCode *errc` - Set to nonzero on error.
+///
+/// # Returns
+///
+/// `NSTDFloat64 v` - The parsed 64-bit floating-point value.
+///
+/// # Safety:
+///
+/// This operation can cause undefined behavior if `str`'s data is invalid.
+NSTDAPI NSTDFloat64 nstd_core_str_mut_to_f64(const NSTDStrMut *str, NSTDErrorCode *errc);
+/// Attempts to parse a string slice as an `NSTDUInt8`.
+///
+/// # Parameters:
+///
+/// - `const NSTDStrMut *str` - The string slice.
+///
+/// - `NSTDErrorCode *errc` - Set to nonzero on error.
+///
+/// # Returns
+///
+/// `NSTDUInt8 v` - The parsed 8-bit unsigned integral value.
+///
+/// # Safety:
+///
+/// This operation can cause undefined behavior if `str`'s data is invalid.
+NSTDAPI NSTDUInt8 nstd_core_str_mut_to_u8(const NSTDStrMut *str, NSTDErrorCode *errc);
+/// Attempts to parse a string slice as an `NSTDInt8`.
+///
+/// # Parameters:
+///
+/// - `const NSTDStrMut *str` - The string slice.
+///
+/// - `NSTDErrorCode *errc` - Set to nonzero on error.
+///
+/// # Returns
+///
+/// `NSTDInt8 v` - The parsed 8-bit signed integral value.
+///
+/// # Safety:
+///
+/// This operation can cause undefined behavior if `str`'s data is invalid.
+NSTDAPI NSTDInt8 nstd_core_str_mut_to_i8(const NSTDStrMut *str, NSTDErrorCode *errc);
+/// Attempts to parse a string slice as an `NSTDUInt16`.
+///
+/// # Parameters:
+///
+/// - `const NSTDStrMut *str` - The string slice.
+///
+/// - `NSTDErrorCode *errc` - Set to nonzero on error.
+///
+/// # Returns
+///
+/// `NSTDUInt16 v` - The parsed 16-bit unsigned integral value.
+///
+/// # Safety:
+///
+/// This operation can cause undefined behavior if `str`'s data is invalid.
+NSTDAPI NSTDUInt16 nstd_core_str_mut_to_u16(const NSTDStrMut *str, NSTDErrorCode *errc);
+/// Attempts to parse a string slice as an `NSTDInt16`.
+///
+/// # Parameters:
+///
+/// - `const NSTDStrMut *str` - The string slice.
+///
+/// - `NSTDErrorCode *errc` - Set to nonzero on error.
+///
+/// # Returns
+///
+/// `NSTDInt16 v` - The parsed 16-bit signed integral value.
+///
+/// # Safety:
+///
+/// This operation can cause undefined behavior if `str`'s data is invalid.
+NSTDAPI NSTDInt16 nstd_core_str_mut_to_i16(const NSTDStrMut *str, NSTDErrorCode *errc);
+/// Attempts to parse a string slice as an `NSTDUInt32`.
+///
+/// # Parameters:
+///
+/// - `const NSTDStrMut *str` - The string slice.
+///
+/// - `NSTDErrorCode *errc` - Set to nonzero on error.
+///
+/// # Returns
+///
+/// `NSTDUInt32 v` - The parsed 32-bit unsigned integral value.
+///
+/// # Safety:
+///
+/// This operation can cause undefined behavior if `str`'s data is invalid.
+NSTDAPI NSTDUInt32 nstd_core_str_mut_to_u32(const NSTDStrMut *str, NSTDErrorCode *errc);
+/// Attempts to parse a string slice as an `NSTDInt32`.
+///
+/// # Parameters:
+///
+/// - `const NSTDStrMut *str` - The string slice.
+///
+/// - `NSTDErrorCode *errc` - Set to nonzero on error.
+///
+/// # Returns
+///
+/// `NSTDInt32 v` - The parsed 32-bit signed integral value.
+///
+/// # Safety:
+///
+/// This operation can cause undefined behavior if `str`'s data is invalid.
+NSTDAPI NSTDInt32 nstd_core_str_mut_to_i32(const NSTDStrMut *str, NSTDErrorCode *errc);
+/// Attempts to parse a string slice as an `NSTDUInt64`.
+///
+/// # Parameters:
+///
+/// - `const NSTDStrMut *str` - The string slice.
+///
+/// - `NSTDErrorCode *errc` - Set to nonzero on error.
+///
+/// # Returns
+///
+/// `NSTDUInt64 v` - The parsed 64-bit unsigned integral value.
+///
+/// # Safety:
+///
+/// This operation can cause undefined behavior if `str`'s data is invalid.
+NSTDAPI NSTDUInt64 nstd_core_str_mut_to_u64(const NSTDStrMut *str, NSTDErrorCode *errc);
+/// Attempts to parse a string slice as an `NSTDInt64`.
+///
+/// # Parameters:
+///
+/// - `const NSTDStrMut *str` - The string slice.
+///
+/// - `NSTDErrorCode *errc` - Set to nonzero on error.
+///
+/// # Returns
+///
+/// `NSTDInt64 v` - The parsed 64-bit signed integral value.
+///
+/// # Safety:
+///
+/// This operation can cause undefined behavior if `str`'s data is invalid.
+NSTDAPI NSTDInt64 nstd_core_str_mut_to_i64(const NSTDStrMut *str, NSTDErrorCode *errc);
+/// Attempts to parse a string slice as an `NSTDUSize`.
+///
+/// # Parameters:
+///
+/// - `const NSTDStrMut *str` - The string slice.
+///
+/// - `NSTDErrorCode *errc` - Set to nonzero on error.
+///
+/// # Returns
+///
+/// `NSTDUSize v` - The parsed arch-bit unsigned integral value.
+///
+/// # Safety:
+///
+/// This operation can cause undefined behavior if `str`'s data is invalid.
+NSTDAPI NSTDUSize nstd_core_str_mut_to_usize(const NSTDStrMut *str, NSTDErrorCode *errc);
+/// Attempts to parse a string slice as an `NSTDISize`.
+///
+/// # Parameters:
+///
+/// - `const NSTDStrMut *str` - The string slice.
+///
+/// - `NSTDErrorCode *errc` - Set to nonzero on error.
+///
+/// # Returns
+///
+/// `NSTDISize v` - The parsed arch-bit signed integral value.
+///
+/// # Safety:
+///
+/// This operation can cause undefined behavior if `str`'s data is invalid.
+NSTDAPI NSTDISize nstd_core_str_mut_to_isize(const NSTDStrMut *str, NSTDErrorCode *errc);
 
 NSTDCPPEND
 #endif

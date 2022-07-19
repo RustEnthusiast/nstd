@@ -5,11 +5,36 @@ use crate::{
             nstd_core_cstr_const_as_bytes, nstd_core_cstr_mut_as_ptr, nstd_core_cstr_mut_len,
             NSTDCStrConst, NSTDCStrMut,
         },
+        def::NSTDErrorCode,
         range::NSTDURange,
         slice::{nstd_core_slice_const_new, nstd_core_slice_mut_new, NSTDSliceConst, NSTDSliceMut},
     },
-    NSTDUSize, NSTDUnichar,
+    NSTDFloat32, NSTDFloat64, NSTDISize, NSTDInt16, NSTDInt32, NSTDInt64, NSTDInt8, NSTDUInt16,
+    NSTDUInt32, NSTDUInt64, NSTDUInt8, NSTDUSize, NSTDUnichar,
 };
+
+/// Generates the `nstd_core_str_*_to_[i|u|f]*` functions.
+macro_rules! gen_to_primitive {
+    (
+        $(#[$meta:meta])*
+        $name: ident, $StrT: ty, $RetT: ty
+    ) => {
+        $(#[$meta])*
+        ///
+        /// # Safety:
+        ///
+        /// This operation can cause undefined behavior if `str`'s data is invalid.
+        #[inline]
+        #[cfg_attr(feature = "clib", no_mangle)]
+        pub unsafe extern "C" fn $name(str: &$StrT, errc: &mut NSTDErrorCode) -> $RetT {
+            if let Ok(v) = str.as_str().parse() {
+                return v;
+            }
+            *errc = 1;
+            <$RetT>::default()
+        }
+    };
+}
 
 /// An immutable unowned view into a UTF-8 encoded byte string.
 #[repr(C)]
@@ -225,6 +250,199 @@ pub extern "C" fn nstd_core_str_const_substr(
     nstd_core_str_const_from_bytes(&bytes)
 }
 
+gen_to_primitive!(
+    /// Attempts to parse a string slice as an `NSTDFloat32`.
+    ///
+    /// # Parameters:
+    ///
+    /// - `const NSTDStrConst *str` - The string slice.
+    ///
+    /// - `NSTDErrorCode *errc` - Set to nonzero on error.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDFloat32 v` - The parsed 32-bit floating-point value.
+    nstd_core_str_const_to_f32,
+    NSTDStrConst,
+    NSTDFloat32
+);
+gen_to_primitive!(
+    /// Attempts to parse a string slice as an `NSTDFloat64`.
+    ///
+    /// # Parameters:
+    ///
+    /// - `const NSTDStrConst *str` - The string slice.
+    ///
+    /// - `NSTDErrorCode *errc` - Set to nonzero on error.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDFloat64 v` - The parsed 64-bit floating-point value.
+    nstd_core_str_const_to_f64,
+    NSTDStrConst,
+    NSTDFloat64
+);
+gen_to_primitive!(
+    /// Attempts to parse a string slice as an `NSTDUInt8`.
+    ///
+    /// # Parameters:
+    ///
+    /// - `const NSTDStrConst *str` - The string slice.
+    ///
+    /// - `NSTDErrorCode *errc` - Set to nonzero on error.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDUInt8 v` - The parsed 8-bit unsigned integral value.
+    nstd_core_str_const_to_u8,
+    NSTDStrConst,
+    NSTDUInt8
+);
+gen_to_primitive!(
+    /// Attempts to parse a string slice as an `NSTDInt8`.
+    ///
+    /// # Parameters:
+    ///
+    /// - `const NSTDStrConst *str` - The string slice.
+    ///
+    /// - `NSTDErrorCode *errc` - Set to nonzero on error.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDInt8 v` - The parsed 8-bit signed integral value.
+    nstd_core_str_const_to_i8,
+    NSTDStrConst,
+    NSTDInt8
+);
+gen_to_primitive!(
+    /// Attempts to parse a string slice as an `NSTDUInt16`.
+    ///
+    /// # Parameters:
+    ///
+    /// - `const NSTDStrConst *str` - The string slice.
+    ///
+    /// - `NSTDErrorCode *errc` - Set to nonzero on error.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDUInt16 v` - The parsed 16-bit unsigned integral value.
+    nstd_core_str_const_to_u16,
+    NSTDStrConst,
+    NSTDUInt16
+);
+gen_to_primitive!(
+    /// Attempts to parse a string slice as an `NSTDInt16`.
+    ///
+    /// # Parameters:
+    ///
+    /// - `const NSTDStrConst *str` - The string slice.
+    ///
+    /// - `NSTDErrorCode *errc` - Set to nonzero on error.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDInt16 v` - The parsed 16-bit signed integral value.
+    nstd_core_str_const_to_i16,
+    NSTDStrConst,
+    NSTDInt16
+);
+gen_to_primitive!(
+    /// Attempts to parse a string slice as an `NSTDUInt32`.
+    ///
+    /// # Parameters:
+    ///
+    /// - `const NSTDStrConst *str` - The string slice.
+    ///
+    /// - `NSTDErrorCode *errc` - Set to nonzero on error.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDUInt32 v` - The parsed 32-bit unsigned integral value.
+    nstd_core_str_const_to_u32,
+    NSTDStrConst,
+    NSTDUInt32
+);
+gen_to_primitive!(
+    /// Attempts to parse a string slice as an `NSTDInt32`.
+    ///
+    /// # Parameters:
+    ///
+    /// - `const NSTDStrConst *str` - The string slice.
+    ///
+    /// - `NSTDErrorCode *errc` - Set to nonzero on error.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDInt32 v` - The parsed 32-bit signed integral value.
+    nstd_core_str_const_to_i32,
+    NSTDStrConst,
+    NSTDInt32
+);
+gen_to_primitive!(
+    /// Attempts to parse a string slice as an `NSTDUInt64`.
+    ///
+    /// # Parameters:
+    ///
+    /// - `const NSTDStrConst *str` - The string slice.
+    ///
+    /// - `NSTDErrorCode *errc` - Set to nonzero on error.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDUInt64 v` - The parsed 64-bit unsigned integral value.
+    nstd_core_str_const_to_u64,
+    NSTDStrConst,
+    NSTDUInt64
+);
+gen_to_primitive!(
+    /// Attempts to parse a string slice as an `NSTDInt64`.
+    ///
+    /// # Parameters:
+    ///
+    /// - `const NSTDStrConst *str` - The string slice.
+    ///
+    /// - `NSTDErrorCode *errc` - Set to nonzero on error.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDInt64 v` - The parsed 64-bit signed integral value.
+    nstd_core_str_const_to_i64,
+    NSTDStrConst,
+    NSTDInt64
+);
+gen_to_primitive!(
+    /// Attempts to parse a string slice as an `NSTDUSize`.
+    ///
+    /// # Parameters:
+    ///
+    /// - `const NSTDStrConst *str` - The string slice.
+    ///
+    /// - `NSTDErrorCode *errc` - Set to nonzero on error.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDUSize v` - The parsed arch-bit unsigned integral value.
+    nstd_core_str_const_to_usize,
+    NSTDStrConst,
+    NSTDUSize
+);
+gen_to_primitive!(
+    /// Attempts to parse a string slice as an `NSTDISize`.
+    ///
+    /// # Parameters:
+    ///
+    /// - `const NSTDStrConst *str` - The string slice.
+    ///
+    /// - `NSTDErrorCode *errc` - Set to nonzero on error.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDISize v` - The parsed arch-bit signed integral value.
+    nstd_core_str_const_to_isize,
+    NSTDStrConst,
+    NSTDISize
+);
+
 /// An unowned view into a UTF-8 encoded byte string.
 #[repr(C)]
 #[derive(Clone, Copy, Debug, Hash)]
@@ -439,3 +657,196 @@ pub extern "C" fn nstd_core_str_mut_substr(str: &mut NSTDStrMut, range: NSTDURan
     let mut bytes = nstd_core_slice_mut_new(start, 1, range.end - range.start);
     nstd_core_str_mut_from_bytes(&mut bytes)
 }
+
+gen_to_primitive!(
+    /// Attempts to parse a string slice as an `NSTDFloat32`.
+    ///
+    /// # Parameters:
+    ///
+    /// - `const NSTDStrMut *str` - The string slice.
+    ///
+    /// - `NSTDErrorCode *errc` - Set to nonzero on error.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDFloat32 v` - The parsed 32-bit floating-point value.
+    nstd_core_str_mut_to_f32,
+    NSTDStrMut,
+    NSTDFloat32
+);
+gen_to_primitive!(
+    /// Attempts to parse a string slice as an `NSTDFloat64`.
+    ///
+    /// # Parameters:
+    ///
+    /// - `const NSTDStrMut *str` - The string slice.
+    ///
+    /// - `NSTDErrorCode *errc` - Set to nonzero on error.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDFloat64 v` - The parsed 64-bit floating-point value.
+    nstd_core_str_mut_to_f64,
+    NSTDStrMut,
+    NSTDFloat64
+);
+gen_to_primitive!(
+    /// Attempts to parse a string slice as an `NSTDUInt8`.
+    ///
+    /// # Parameters:
+    ///
+    /// - `const NSTDStrMut *str` - The string slice.
+    ///
+    /// - `NSTDErrorCode *errc` - Set to nonzero on error.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDUInt8 v` - The parsed 8-bit unsigned integral value.
+    nstd_core_str_mut_to_u8,
+    NSTDStrMut,
+    NSTDUInt8
+);
+gen_to_primitive!(
+    /// Attempts to parse a string slice as an `NSTDInt8`.
+    ///
+    /// # Parameters:
+    ///
+    /// - `const NSTDStrMut *str` - The string slice.
+    ///
+    /// - `NSTDErrorCode *errc` - Set to nonzero on error.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDInt8 v` - The parsed 8-bit signed integral value.
+    nstd_core_str_mut_to_i8,
+    NSTDStrMut,
+    NSTDInt8
+);
+gen_to_primitive!(
+    /// Attempts to parse a string slice as an `NSTDUInt16`.
+    ///
+    /// # Parameters:
+    ///
+    /// - `const NSTDStrMut *str` - The string slice.
+    ///
+    /// - `NSTDErrorCode *errc` - Set to nonzero on error.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDUInt16 v` - The parsed 16-bit unsigned integral value.
+    nstd_core_str_mut_to_u16,
+    NSTDStrMut,
+    NSTDUInt16
+);
+gen_to_primitive!(
+    /// Attempts to parse a string slice as an `NSTDInt16`.
+    ///
+    /// # Parameters:
+    ///
+    /// - `const NSTDStrMut *str` - The string slice.
+    ///
+    /// - `NSTDErrorCode *errc` - Set to nonzero on error.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDInt16 v` - The parsed 16-bit signed integral value.
+    nstd_core_str_mut_to_i16,
+    NSTDStrMut,
+    NSTDInt16
+);
+gen_to_primitive!(
+    /// Attempts to parse a string slice as an `NSTDUInt32`.
+    ///
+    /// # Parameters:
+    ///
+    /// - `const NSTDStrMut *str` - The string slice.
+    ///
+    /// - `NSTDErrorCode *errc` - Set to nonzero on error.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDUInt32 v` - The parsed 32-bit unsigned integral value.
+    nstd_core_str_mut_to_u32,
+    NSTDStrMut,
+    NSTDUInt32
+);
+gen_to_primitive!(
+    /// Attempts to parse a string slice as an `NSTDInt32`.
+    ///
+    /// # Parameters:
+    ///
+    /// - `const NSTDStrMut *str` - The string slice.
+    ///
+    /// - `NSTDErrorCode *errc` - Set to nonzero on error.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDInt32 v` - The parsed 32-bit signed integral value.
+    nstd_core_str_mut_to_i32,
+    NSTDStrMut,
+    NSTDInt32
+);
+gen_to_primitive!(
+    /// Attempts to parse a string slice as an `NSTDUInt64`.
+    ///
+    /// # Parameters:
+    ///
+    /// - `const NSTDStrMut *str` - The string slice.
+    ///
+    /// - `NSTDErrorCode *errc` - Set to nonzero on error.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDUInt64 v` - The parsed 64-bit unsigned integral value.
+    nstd_core_str_mut_to_u64,
+    NSTDStrMut,
+    NSTDUInt64
+);
+gen_to_primitive!(
+    /// Attempts to parse a string slice as an `NSTDInt64`.
+    ///
+    /// # Parameters:
+    ///
+    /// - `const NSTDStrMut *str` - The string slice.
+    ///
+    /// - `NSTDErrorCode *errc` - Set to nonzero on error.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDInt64 v` - The parsed 64-bit signed integral value.
+    nstd_core_str_mut_to_i64,
+    NSTDStrMut,
+    NSTDInt64
+);
+gen_to_primitive!(
+    /// Attempts to parse a string slice as an `NSTDUSize`.
+    ///
+    /// # Parameters:
+    ///
+    /// - `const NSTDStrMut *str` - The string slice.
+    ///
+    /// - `NSTDErrorCode *errc` - Set to nonzero on error.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDUSize v` - The parsed arch-bit unsigned integral value.
+    nstd_core_str_mut_to_usize,
+    NSTDStrMut,
+    NSTDUSize
+);
+gen_to_primitive!(
+    /// Attempts to parse a string slice as an `NSTDISize`.
+    ///
+    /// # Parameters:
+    ///
+    /// - `const NSTDStrMut *str` - The string slice.
+    ///
+    /// - `NSTDErrorCode *errc` - Set to nonzero on error.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDISize v` - The parsed arch-bit signed integral value.
+    nstd_core_str_mut_to_isize,
+    NSTDStrMut,
+    NSTDISize
+);
