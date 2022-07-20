@@ -4,6 +4,7 @@
 #include "nstd/core.h"
 #include "nstd/cstring.h"
 #include "nstd/heap_ptr.h"
+#include "nstd/io.h"
 #include "nstd/nstd.h"
 #include "nstd/os.h"
 #include "nstd/shared_ptr.h"
