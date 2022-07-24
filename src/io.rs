@@ -1,15 +1,15 @@
 //! Provides functionality for interacting with the standard I/O streams.
 use crate::core::{
-    cstr::raw::nstd_core_cstr_raw_len,
-    def::{NSTDChar, NSTDErrorCode},
+    cstr::{nstd_core_cstr_const_as_ptr, nstd_core_cstr_const_len, NSTDCStrConst},
+    def::NSTDErrorCode,
 };
 use std::io::Write;
 
-/// Writes a raw null-terminated C string to stdout.
+/// Writes a C string slice to stdout.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDChar *cstr` - The raw null-terminated C string.
+/// - `const NSTDCStrConst *cstr` - The C string slice to write to stdout.
 ///
 /// # Returns
 ///
@@ -23,12 +23,13 @@ use std::io::Write;
 ///
 /// # Safety
 ///
-/// The provided C string must be null terminated, else this function can cause garbage bytes to be
-/// written to stdout.
+/// The provided C string slice's data must be valid, else this function can cause garbage bytes to
+/// be written to stdout.
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_io_print(cstr: *const NSTDChar) -> NSTDErrorCode {
-    let len = nstd_core_cstr_raw_len(cstr);
-    let bytes = std::slice::from_raw_parts(cstr.cast(), len);
+pub unsafe extern "C" fn nstd_io_print(cstr: &NSTDCStrConst) -> NSTDErrorCode {
+    let ptr = nstd_core_cstr_const_as_ptr(cstr).cast();
+    let len = nstd_core_cstr_const_len(cstr);
+    let bytes = std::slice::from_raw_parts(ptr, len);
     let mut stdout = std::io::stdout();
     if let Err(_) = stdout.write_all(bytes) {
         return 1;

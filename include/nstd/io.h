@@ -1,14 +1,15 @@
 #ifndef NSTD_IO_H_INCLUDED
 #define NSTD_IO_H_INCLUDED
+#include "core/cstr/cstr.h"
 #include "core/def.h"
 #include "nstd.h"
 NSTDCPPSTART
 
-/// Writes a raw null-terminated C string to stdout.
+/// Writes a C string slice to stdout.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDChar *cstr` - The raw null-terminated C string.
+/// - `const NSTDCStrConst *cstr` - The C string slice to write to stdout.
 ///
 /// # Returns
 ///
@@ -22,9 +23,9 @@ NSTDCPPSTART
 ///
 /// # Safety
 ///
-/// The provided C string must be null terminated, else this function can cause garbage bytes to be
-/// written to stdout.
-NSTDAPI NSTDErrorCode nstd_io_print(const NSTDChar *cstr);
+/// The provided C string slice's data must be valid, else this function can cause garbage bytes to
+/// be written to stdout.
+NSTDAPI NSTDErrorCode nstd_io_print(const NSTDCStrConst *cstr);
 
 NSTDCPPEND
 #endif
