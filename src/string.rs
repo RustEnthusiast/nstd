@@ -127,6 +127,21 @@ pub extern "C" fn nstd_string_as_bytes(string: &NSTDString) -> NSTDSliceConst {
     nstd_vec_as_slice(&string.bytes)
 }
 
+/// Returns ownership of an `NSTDString`'s raw data, taking ownership of said string.
+///
+/// # Parameters:
+///
+/// - `NSTDString string` - The string.
+///
+/// # Returns
+///
+/// `NSTDVec bytes` - The string's raw data.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_string_to_bytes(string: NSTDString) -> NSTDVec {
+    string.bytes
+}
+
 /// Pushes an `NSTDUnichar` onto the end of a string.
 ///
 /// # Parameters:

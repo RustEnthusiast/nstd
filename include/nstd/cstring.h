@@ -89,6 +89,17 @@ NSTDAPI NSTDCStrMut nstd_cstring_as_cstr_mut(NSTDCString *cstring);
 /// `NSTDSliceConst bytes` - The C string's active data.
 NSTDAPI NSTDSliceConst nstd_cstring_as_bytes(const NSTDCString *cstring);
 
+/// Returns ownership of an `NSTDCString`'s raw data, taking ownership of said C string.
+///
+/// # Parameters:
+///
+/// - `NSTDCString cstring` - The C string.
+///
+/// # Returns
+///
+/// `NSTDVec bytes` - The C string's raw data.
+NSTDAPI NSTDVec nstd_cstring_to_bytes(NSTDCString cstring);
+
 /// Appends an `NSTDChar` to the end of an `NSTDCString`.
 ///
 /// # Parameters:

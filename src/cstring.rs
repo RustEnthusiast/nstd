@@ -134,6 +134,21 @@ pub extern "C" fn nstd_cstring_as_bytes(cstring: &NSTDCString) -> NSTDSliceConst
     nstd_vec_as_slice(&cstring.bytes)
 }
 
+/// Returns ownership of an `NSTDCString`'s raw data, taking ownership of said C string.
+///
+/// # Parameters:
+///
+/// - `NSTDCString cstring` - The C string.
+///
+/// # Returns
+///
+/// `NSTDVec bytes` - The C string's raw data.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_cstring_to_bytes(cstring: NSTDCString) -> NSTDVec {
+    cstring.bytes
+}
+
 /// Appends an `NSTDChar` to the end of an `NSTDCString`.
 ///
 /// # Parameters:
