@@ -47,6 +47,7 @@ pub extern "C" fn nstd_core_cstr_const_new(raw: *const NSTDChar, len: NSTDUSize)
 /// `NSTDCStrConst cstr` - The new C string slice, referencing `raw`'s data.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
+#[allow(clippy::not_unsafe_ptr_arg_deref)]
 pub extern "C" fn nstd_core_cstr_const_from_raw(raw: *const NSTDChar) -> NSTDCStrConst {
     // SAFETY: `NSTDCStrConst` is already unsafe to access, so there's no need for any kind of
     // validation here.
@@ -65,6 +66,7 @@ pub extern "C" fn nstd_core_cstr_const_from_raw(raw: *const NSTDChar) -> NSTDCSt
 /// `NSTDCStrConst cstr` - The new C string slice, referencing `raw`'s data.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
+#[allow(clippy::not_unsafe_ptr_arg_deref)]
 pub extern "C" fn nstd_core_cstr_const_from_raw_with_null(raw: *const NSTDChar) -> NSTDCStrConst {
     // SAFETY: `NSTDCStrConst` is already unsafe to access, so there's no need for any kind of
     // validation here.
@@ -158,8 +160,11 @@ pub unsafe extern "C" fn nstd_core_cstr_const_is_null_terminated(cstr: &NSTDCStr
 pub extern "C" fn nstd_core_cstr_const_get_null(cstr: &NSTDCStrConst) -> *const NSTDChar {
     let mut i = 0;
     while i < cstr.len {
-        if unsafe { *cstr.ptr.add(i) } == 0 {
-            return unsafe { cstr.ptr.add(i) };
+        // SAFETY: The returned pointer is unsafe to access, no need for validation here.
+        unsafe {
+            if *cstr.ptr.add(i) == 0 {
+                return cstr.ptr.add(i);
+            }
         }
         i += 1;
     }
@@ -184,6 +189,7 @@ pub extern "C" fn nstd_core_cstr_const_get(
     pos: NSTDUSize,
 ) -> *const NSTDChar {
     match pos < cstr.len {
+        // SAFETY: We've checked `pos`, and the returned pointer is already unsafe to access.
         true => unsafe { cstr.ptr.add(pos) },
         false => core::ptr::null(),
     }
@@ -227,6 +233,7 @@ pub extern "C" fn nstd_core_cstr_mut_new(raw: *mut NSTDChar, len: NSTDUSize) -> 
 /// `NSTDCStrMut cstr` - The new C string slice, referencing `raw`'s data.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
+#[allow(clippy::not_unsafe_ptr_arg_deref)]
 pub extern "C" fn nstd_core_cstr_mut_from_raw(raw: *mut NSTDChar) -> NSTDCStrMut {
     // SAFETY: `NSTDCStrMut` is already unsafe to access, so there's no need for any kind of
     // validation here.
@@ -245,6 +252,7 @@ pub extern "C" fn nstd_core_cstr_mut_from_raw(raw: *mut NSTDChar) -> NSTDCStrMut
 /// `NSTDCStrMut cstr` - The new C string slice, referencing `raw`'s data.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
+#[allow(clippy::not_unsafe_ptr_arg_deref)]
 pub extern "C" fn nstd_core_cstr_mut_from_raw_with_null(raw: *mut NSTDChar) -> NSTDCStrMut {
     // SAFETY: `NSTDCStrMut` is already unsafe to access, so there's no need for any kind of
     // validation here.
@@ -417,6 +425,7 @@ pub extern "C" fn nstd_core_cstr_mut_get_const(
     pos: NSTDUSize,
 ) -> *const NSTDChar {
     match pos < cstr.len {
+        // SAFETY: We've checked `pos`, and the returned pointer is already unsafe to access.
         true => unsafe { cstr.ptr.add(pos) },
         false => core::ptr::null(),
     }

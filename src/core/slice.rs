@@ -24,9 +24,13 @@ impl NSTDSliceConst {
     }
 
     /// Creates a Rust byte slice from this `NSTDSliceConst`.
+    ///
+    /// # Safety
+    ///
+    /// The `NSTDSliceConst`'s data must remain valid while the returned slice is in use.
     #[inline]
-    pub(crate) fn as_slice(&self) -> &[u8] {
-        unsafe { core::slice::from_raw_parts(self.ptr.raw.cast(), self.byte_len()) }
+    pub(crate) unsafe fn as_slice(&self) -> &[u8] {
+        core::slice::from_raw_parts(self.ptr.raw.cast(), self.byte_len())
     }
 }
 
@@ -90,6 +94,7 @@ pub extern "C" fn nstd_core_slice_const_get(
     pos: NSTDUSize,
 ) -> NSTDAnyConst {
     match pos < slice.len {
+        // SAFETY: We've checked `pos`, and the returned pointer is already unsafe to access.
         true => unsafe { slice.ptr.raw.add(pos * slice.ptr.size) },
         false => NSTD_NULL,
     }
@@ -174,9 +179,13 @@ impl NSTDSliceMut {
     }
 
     /// Creates a Rust byte slice from this `NSTDSliceMut`.
+    ///
+    /// # Safety
+    ///
+    /// The `NSTDSliceMut`'s data must remain valid while the returned slice is in use.
     #[inline]
-    pub(crate) fn as_slice(&self) -> &[u8] {
-        unsafe { core::slice::from_raw_parts(self.ptr.raw.cast(), self.byte_len()) }
+    pub(crate) unsafe fn as_slice(&self) -> &[u8] {
+        core::slice::from_raw_parts(self.ptr.raw.cast(), self.byte_len())
     }
 }
 
@@ -258,6 +267,7 @@ pub extern "C" fn nstd_core_slice_mut_get_const(
     pos: NSTDUSize,
 ) -> NSTDAnyConst {
     match pos < slice.len {
+        // SAFETY: We've checked `pos`, and the returned pointer is already unsafe to access.
         true => unsafe { slice.ptr.raw.add(pos * slice.ptr.size) },
         false => NSTD_NULL,
     }
