@@ -99,6 +99,10 @@ NSTDAPI NSTDSliceConst nstd_core_str_const_as_bytes(const NSTDStrConst *str);
 /// # Returns
 ///
 /// `NSTDUSize len` - The length of the string slice.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 NSTDAPI NSTDUSize nstd_core_str_const_len(const NSTDStrConst *str);
 
 /// Gets the `NSTDUnichar` at index `pos` in `str`.
@@ -436,6 +440,10 @@ NSTDAPI NSTDSliceConst nstd_core_str_mut_as_bytes(const NSTDStrMut *str);
 /// # Returns
 ///
 /// `NSTDUSize len` - The length of the string slice.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 NSTDAPI NSTDUSize nstd_core_str_mut_len(const NSTDStrMut *str);
 
 /// Gets the `NSTDUnichar` at index `pos` in `str`.
