@@ -52,7 +52,7 @@ impl NSTDVec {
     }
 }
 impl<T> From<&[T]> for NSTDVec {
-    /// Creates a new vector from a byte slice.
+    /// Creates a new vector from a Rust slice.
     ///
     /// # Note
     ///
@@ -61,12 +61,12 @@ impl<T> From<&[T]> for NSTDVec {
     /// # Panics
     ///
     /// This operation will panic if `size_of::<T>()` is 0.
-    fn from(bytes: &[T]) -> Self {
+    fn from(slice: &[T]) -> Self {
         // Check the size of `T`.
         let element_size = core::mem::size_of::<T>();
         assert!(element_size != 0);
         // Check the length of the slice.
-        let len = bytes.len();
+        let len = slice.len();
         if len > 0 {
             // Create the new vector.
             let mut vec = nstd_vec_new_with_cap(element_size, len);
@@ -76,7 +76,7 @@ impl<T> From<&[T]> for NSTDVec {
                 unsafe {
                     nstd_core_mem_copy(
                         vec.buffer.ptr.raw.cast(),
-                        bytes.as_ptr().cast(),
+                        slice.as_ptr().cast(),
                         len * element_size,
                     );
                 }
