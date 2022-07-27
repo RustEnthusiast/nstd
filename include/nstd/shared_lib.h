@@ -33,12 +33,12 @@ NSTDAPI NSTDSharedLib nstd_shared_lib_load(const NSTDStrConst *path);
 ///
 /// # Returns
 ///
-/// `NSTDAnyMut ptr` - A pointer to the function or variable.
+/// `NSTDAnyConst ptr` - A pointer to the function or variable.
 ///
 /// # Safety
 ///
 /// Undefined behavior may occur if `symbol`'s data is invalid.
-NSTDAPI NSTDAnyMut nstd_shared_lib_get(const NSTDSharedLib *lib, const NSTDChar *symbol);
+NSTDAPI NSTDAnyConst nstd_shared_lib_get(const NSTDSharedLib *lib, const NSTDChar *symbol);
 
 /// Unloads and frees the resources of a dynamically loaded library.
 ///

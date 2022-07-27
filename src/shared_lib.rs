@@ -1,7 +1,7 @@
 //! Access symbols from loaded shared libraries.
 use crate::{
     core::{cstr::raw::nstd_core_cstr_raw_len_with_null, def::NSTDChar, str::NSTDStrConst},
-    NSTDAnyMut, NSTD_NULL,
+    NSTDAnyConst, NSTD_NULL,
 };
 use libloading::Library;
 
@@ -40,7 +40,7 @@ pub unsafe extern "C" fn nstd_shared_lib_load(path: &NSTDStrConst) -> Option<NST
 ///
 /// # Returns
 ///
-/// `NSTDAnyMut ptr` - A pointer to the function or variable.
+/// `NSTDAnyConst ptr` - A pointer to the function or variable.
 ///
 /// # Safety
 ///
@@ -49,10 +49,10 @@ pub unsafe extern "C" fn nstd_shared_lib_load(path: &NSTDStrConst) -> Option<NST
 pub unsafe extern "C" fn nstd_shared_lib_get(
     lib: &NSTDSharedLib,
     symbol: *const NSTDChar,
-) -> NSTDAnyMut {
+) -> NSTDAnyConst {
     let symbol_len = nstd_core_cstr_raw_len_with_null(symbol);
     let symbol_name = std::slice::from_raw_parts(symbol.cast(), symbol_len);
-    if let Ok(symbol) = lib.get::<NSTDAnyMut>(symbol_name) {
+    if let Ok(symbol) = lib.get(symbol_name) {
         return *symbol;
     }
     NSTD_NULL
