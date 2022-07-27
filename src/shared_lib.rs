@@ -1,7 +1,7 @@
 //! Access symbols from loaded shared libraries.
 use crate::{
     core::{cstr::raw::nstd_core_cstr_raw_len_with_null, def::NSTDChar, str::NSTDStrConst},
-    NSTDAnyConst, NSTD_NULL,
+    NSTDAnyConst, NSTDAnyMut, NSTD_NULL,
 };
 use libloading::Library;
 
@@ -56,6 +56,31 @@ pub unsafe extern "C" fn nstd_shared_lib_get(
         return *symbol;
     }
     NSTD_NULL
+}
+
+/// Gets a pointer to a mutable function or static variable in a dynamically loaded library by
+/// symbol name.
+///
+/// # Parameters
+///
+/// - `NSTDSharedLib *lib` - The loaded library.
+///
+/// - `const NSTDChar *symbol` - The name of the function or variable to get a pointer to.
+///
+/// # Returns
+///
+/// `NSTDAnyMut ptr` - A pointer to the function or variable.
+///
+/// # Safety
+///
+/// Undefined behavior may occur if `symbol`'s data is invalid.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_shared_lib_get_mut(
+    lib: &mut NSTDSharedLib,
+    symbol: *const NSTDChar,
+) -> NSTDAnyMut {
+    nstd_shared_lib_get(lib, symbol) as NSTDAnyMut
 }
 
 /// Unloads and frees the resources of a dynamically loaded library.
