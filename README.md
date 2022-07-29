@@ -31,7 +31,7 @@ Rust syntax).
     - `vec` - A dynamically sized contiguous sequence of values.
 
 # Platform support
-`nstd.core` supports just about everything.
+`nstd.core` should support anything that rustc supports.
 
 `nstd.os`'s child modules will only work on the operating system they target. For example,
 `nstd.os.windows` will only work on Windows and `nstd.os.linux` will only work on Linux
@@ -40,10 +40,19 @@ distributions.
 Other modules will work on most platforms, primarily targeting Windows, macOS,
 Linux, Android, and iOS.
 
+# Language support
+This library can be accessed from any language that supports calling C code! As of now this will
+need to be done manually as there are no official wrappers for the API, however whenever library
+versioning occurs, the plan is to start adding official wrappers so developers from other languages
+can easily use the API.
+
 # Safety notes
 `nstd` tries it's best to comply with Rust's safety. This means anything that can cause undefined
 behavior is considered unsafe (with the exception of functions that take Rusty references, which
-always assume a non-null argument).
+always assume a non-null argument). However `nstd` *is* a C library, and we do not have access to
+the borrow checker in C, and making every function that borrows data mutably "unsafe" would not be
+ideal. I am always looking for ways to make this API as safe as sanely possible, so please open an
+issue if you have any ideas on how we can do so, it would be greatly appreciated.
 
 # How to build
 `nstd` let's you decide what features you want to use. Any module that falls under the top level
