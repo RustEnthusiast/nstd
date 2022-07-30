@@ -10,7 +10,7 @@ NSTDCPPSTART
 ///
 /// # Parameters:
 ///
-/// - `const NSTDCStrConst *cstr` - The C string slice to write to stdout.
+/// - `const NSTDCStrConst *output` - The C string slice to write to stdout.
 ///
 /// # Returns
 ///
@@ -18,7 +18,7 @@ NSTDCPPSTART
 ///
 /// # Possible errors
 ///
-/// - `1` - Writing `cstr`'s bytes to stdout failed.
+/// - `1` - Writing `output`'s bytes to stdout failed.
 ///
 /// - `2` - Flushing stdout failed.
 ///
@@ -26,7 +26,7 @@ NSTDCPPSTART
 ///
 /// The provided C string slice's data must be valid, else this function can cause garbage bytes to
 /// be written to stdout.
-NSTDAPI NSTDErrorCode nstd_io_print(const NSTDCStrConst *cstr);
+NSTDAPI NSTDErrorCode nstd_io_print(const NSTDCStrConst *output);
 
 /// Reads a line of UTF-8 input from stdin and returns it, discarding the newline.
 ///
@@ -34,6 +34,13 @@ NSTDAPI NSTDErrorCode nstd_io_print(const NSTDCStrConst *cstr);
 ///
 /// `NSTDString input` - The input from stdin, or an empty string on error.
 NSTDAPI NSTDString nstd_io_read();
+
+/// Reads a line of UTF-8 input from stdin and returns it.
+///
+/// # Returns
+///
+/// `NSTDString input` - The input from stdin, or an empty string on error.
+NSTDAPI NSTDString nstd_io_read_line();
 
 NSTDCPPEND
 #endif
