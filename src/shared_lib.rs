@@ -1,4 +1,8 @@
 //! Access symbols from loaded shared libraries.
+//!
+//! # Platform support
+//!
+//! This module is only functional on Windows and Unix systems.
 use crate::{
     core::{cstr::raw::nstd_core_cstr_raw_len_with_null, def::NSTDChar, str::NSTDStrConst},
     NSTDAnyConst, NSTDAnyMut, NSTD_NULL,
