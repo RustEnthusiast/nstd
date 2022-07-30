@@ -27,6 +27,7 @@ impl NSTDVec {
 
     /// Creates a Rust byte slice containing all the *active* elements from this `NSTDVec`.
     #[inline]
+    #[allow(dead_code)]
     pub(crate) fn as_slice(&self) -> &[u8] {
         unsafe { core::slice::from_raw_parts(self.buffer.ptr.raw.cast(), self.byte_len()) }
     }
