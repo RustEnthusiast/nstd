@@ -18,6 +18,18 @@ pub struct NSTDCStrConst {
     /// The length of the C string slice.
     len: NSTDUSize,
 }
+impl NSTDCStrConst {
+    /// Interprets a C string slice as a byte slice.
+    ///
+    /// # Safety
+    ///
+    /// This C string slice's data must remain valid while the returned byte slice is in use.
+    #[inline]
+    #[allow(dead_code)]
+    pub(crate) unsafe fn as_bytes(&self) -> &[u8] {
+        core::slice::from_raw_parts(self.ptr.cast(), self.len)
+    }
+}
 
 /// Creates a new C string slice from a raw pointer and a size.
 ///

@@ -102,6 +102,8 @@ NSTDAPI NSTDVec nstd_cstring_to_bytes(NSTDCString cstring);
 
 /// Appends an `NSTDChar` to the end of an `NSTDCString`.
 ///
+/// This will have no effect if `chr` is a null byte (0).
+///
 /// # Parameters:
 ///
 /// - `NSTDCString *cstring` - The C string.

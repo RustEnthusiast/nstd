@@ -151,6 +151,8 @@ pub extern "C" fn nstd_cstring_to_bytes(cstring: NSTDCString) -> NSTDVec {
 
 /// Appends an `NSTDChar` to the end of an `NSTDCString`.
 ///
+/// This will have no effect if `chr` is a null byte (0).
+///
 /// # Parameters:
 ///
 /// - `NSTDCString *cstring` - The C string.
@@ -163,13 +165,15 @@ pub extern "C" fn nstd_cstring_to_bytes(cstring: NSTDCString) -> NSTDVec {
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_cstring_push(cstring: &mut NSTDCString, chr: NSTDChar) {
     unsafe {
-        // Push a new null byte onto the end of the C string.
-        let nulpos = nstd_vec_len(&cstring.bytes) - 1;
-        let mut nul = nstd_vec_get_mut(&mut cstring.bytes, nulpos).cast::<NSTDChar>();
-        assert!(nstd_vec_push(&mut cstring.bytes, nul.cast()) == 0);
-        // Write `chr` over the old null byte.
-        nul = nstd_vec_get_mut(&mut cstring.bytes, nulpos).cast();
-        *nul = chr;
+        if chr != 0 {
+            // Push a new null byte onto the end of the C string.
+            let nulpos = nstd_vec_len(&cstring.bytes) - 1;
+            let mut nul = nstd_vec_get_mut(&mut cstring.bytes, nulpos).cast::<NSTDChar>();
+            assert!(nstd_vec_push(&mut cstring.bytes, nul.cast()) == 0);
+            // Write `chr` over the old null byte.
+            nul = nstd_vec_get_mut(&mut cstring.bytes, nulpos).cast();
+            *nul = chr;
+        }
     }
 }
 
