@@ -1,4 +1,5 @@
 //! Provides functionality for interacting with the standard I/O streams.
+pub mod stdout;
 use crate::{
     core::{cstr::NSTDCStrConst, def::NSTDErrorCode},
     string::{nstd_string_new, nstd_string_pop, NSTDString},
