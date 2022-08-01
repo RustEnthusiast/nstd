@@ -62,6 +62,42 @@ pub unsafe extern "C" fn nstd_io_stdout_write(
     }
 }
 
+/// Writes an entire buffer to the standard output stream.
+///
+/// # Note
+///
+/// This function will return an error code of `NSTD_IO_ERROR_INVALID_INPUT` if the slice's element
+/// size is not 1.
+///
+/// # Parameters:
+///
+/// - `NSTDStdout *handle` - A handle to stdout.
+///
+/// - `const NSTDSliceConst *bytes` - The data to be written to stdout.
+///
+/// # Returns
+///
+/// `NSTDIOError errc` - The I/O operation error code.
+///
+/// # Safety
+///
+/// This function can cause undefined behavior if `bytes`'s data is invalid.
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_io_stdout_write_all(
+    handle: &mut NSTDStdout,
+    bytes: &NSTDSliceConst,
+) -> NSTDIOError {
+    // Make sure the slice's element size is 1.
+    if bytes.ptr.size != 1 {
+        return NSTDIOError::NSTD_IO_ERROR_INVALID_INPUT;
+    }
+    // Attempt to write the bytes to stdout.
+    if let Err(err) = handle.write_all(bytes.as_slice()) {
+        return NSTDIOError::from_err(err.kind());
+    }
+    NSTDIOError::NSTD_IO_ERROR_NONE
+}
+
 /// Flushes the standard output stream.
 ///
 /// # Parameters:
