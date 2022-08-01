@@ -12,7 +12,7 @@ typedef NSTDAnyMut NSTDStdout;
 ///
 /// # Returns
 ///
-/// `NSTDStdout stdout` - A locked handle to the standard output stream.
+/// `NSTDStdout handle` - A locked handle to the standard output stream.
 NSTDAPI NSTDStdout nstd_io_stdout();
 
 /// Writes some data to the standard output stream, setting `written` to the number of bytes
@@ -25,7 +25,7 @@ NSTDAPI NSTDStdout nstd_io_stdout();
 ///
 /// # Parameters:
 ///
-/// - `NSTDStdout *stdout` - A handle to stdout.
+/// - `NSTDStdout *handle` - A handle to stdout.
 ///
 /// - `const NSTDSliceConst *bytes` - The data to be written to stdout.
 ///
@@ -38,15 +38,26 @@ NSTDAPI NSTDStdout nstd_io_stdout();
 /// # Safety
 ///
 /// This function can cause undefined behavior if `bytes`'s data is invalid.
-NSTDAPI NSTDIOError nstd_io_stdout_write(NSTDStdout *stdout, const NSTDSliceConst *bytes,
+NSTDAPI NSTDIOError nstd_io_stdout_write(NSTDStdout *handle, const NSTDSliceConst *bytes,
 NSTDUSize *written);
+
+/// Flushes the standard output stream.
+///
+/// # Parameters:
+///
+/// - `NSTDStdout *handle` - A handle to stdout.
+///
+/// # Returns
+///
+/// `NSTDIOError errc` - The I/O operation error code.
+NSTDAPI NSTDIOError nstd_io_stdout_flush(NSTDStdout *handle);
 
 /// Frees and unlocks an instance of `NSTDStdout`.
 ///
 /// # Parameters:
 ///
-/// - `NSTDStdout stdout` - A handle to the standard output stream.
-NSTDAPI void nstd_io_stdout_free(NSTDStdout stdout);
+/// - `NSTDStdout handle` - A handle to the standard output stream.
+NSTDAPI void nstd_io_stdout_free(NSTDStdout handle);
 
 NSTDCPPEND
 #endif
