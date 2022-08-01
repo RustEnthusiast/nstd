@@ -12,7 +12,7 @@ use std::io::{prelude::*, BufReader, ErrorKind};
 #[derive(Clone, Copy, Debug)]
 #[allow(non_camel_case_types)]
 pub enum NSTDIOError {
-    /// No error ocurred.
+    /// No error occurred.
     NSTD_IO_ERROR_NONE,
     /// An unknown/other error ocurred.
     NSTD_IO_ERROR_UNKNOWN,

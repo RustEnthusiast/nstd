@@ -8,7 +8,7 @@ NSTDCPPSTART
 
 /// An error type for I/O operations.
 typedef enum {
-    /// No error ocurred.
+    /// No error occurred.
     NSTD_IO_ERROR_NONE,
     /// An unknown/other error ocurred.
     NSTD_IO_ERROR_UNKNOWN,
