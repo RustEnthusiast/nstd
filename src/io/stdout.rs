@@ -9,7 +9,7 @@ pub type NSTDStdout = Box<Stdout>;
 ///
 /// # Returns
 ///
-/// `NSTDStdout handle` - A locked handle to the standard output stream.
+/// `NSTDStdout handle` - A handle to the standard output stream.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_io_stdout() -> NSTDStdout {
@@ -116,7 +116,7 @@ pub extern "C" fn nstd_io_stdout_flush(handle: &mut NSTDStdout) -> NSTDIOError {
     NSTDIOError::NSTD_IO_ERROR_NONE
 }
 
-/// Frees and unlocks an instance of `NSTDStdout`.
+/// Frees an instance of `NSTDStdout`.
 ///
 /// # Parameters:
 ///

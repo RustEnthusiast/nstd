@@ -12,7 +12,7 @@ typedef NSTDAnyMut NSTDStdout;
 ///
 /// # Returns
 ///
-/// `NSTDStdout handle` - A locked handle to the standard output stream.
+/// `NSTDStdout handle` - A handle to the standard output stream.
 NSTDAPI NSTDStdout nstd_io_stdout();
 
 /// Writes some data to the standard output stream, setting `written` to the number of bytes
@@ -74,7 +74,7 @@ NSTDAPI NSTDIOError nstd_io_stdout_write_all(NSTDStdout *handle, const NSTDSlice
 /// `NSTDIOError errc` - The I/O operation error code.
 NSTDAPI NSTDIOError nstd_io_stdout_flush(NSTDStdout *handle);
 
-/// Frees and unlocks an instance of `NSTDStdout`.
+/// Frees an instance of `NSTDStdout`.
 ///
 /// # Parameters:
 ///
