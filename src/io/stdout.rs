@@ -1,6 +1,6 @@
 //! A handle to the standard output stream.
 use crate::{core::slice::NSTDSliceConst, io::NSTDIOError, NSTDUSize};
-use std::io::{Stdout, Write};
+use std::io::Stdout;
 
 /// A handle to the standard output stream.
 pub type NSTDStdout = Box<Stdout>;
@@ -39,27 +39,16 @@ pub extern "C" fn nstd_io_stdout() -> NSTDStdout {
 /// # Safety
 ///
 /// This function can cause undefined behavior if `bytes`'s data is invalid.
+#[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_io_stdout_write(
     handle: &mut NSTDStdout,
     bytes: &NSTDSliceConst,
     written: &mut NSTDUSize,
 ) -> NSTDIOError {
-    // Make sure the slice's element size is 1.
-    if bytes.ptr.size != 1 {
-        return NSTDIOError::NSTD_IO_ERROR_INVALID_INPUT;
-    }
-    // Attempt to write the bytes to stdout.
-    match handle.write(bytes.as_slice()) {
-        Ok(w) => {
-            *written = w;
-            NSTDIOError::NSTD_IO_ERROR_NONE
-        }
-        Err(err) => {
-            *written = 0;
-            NSTDIOError::from_err(err.kind())
-        }
-    }
+    let wd = crate::io::stdio::write(handle, bytes);
+    *written = wd.0;
+    wd.1
 }
 
 /// Writes an entire buffer to the standard output stream.
@@ -82,20 +71,13 @@ pub unsafe extern "C" fn nstd_io_stdout_write(
 /// # Safety
 ///
 /// This function can cause undefined behavior if `bytes`'s data is invalid.
+#[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_io_stdout_write_all(
     handle: &mut NSTDStdout,
     bytes: &NSTDSliceConst,
 ) -> NSTDIOError {
-    // Make sure the slice's element size is 1.
-    if bytes.ptr.size != 1 {
-        return NSTDIOError::NSTD_IO_ERROR_INVALID_INPUT;
-    }
-    // Attempt to write the bytes to stdout.
-    if let Err(err) = handle.write_all(bytes.as_slice()) {
-        return NSTDIOError::from_err(err.kind());
-    }
-    NSTDIOError::NSTD_IO_ERROR_NONE
+    crate::io::stdio::write_all(handle, bytes)
 }
 
 /// Flushes the standard output stream.
@@ -110,10 +92,7 @@ pub unsafe extern "C" fn nstd_io_stdout_write_all(
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_io_stdout_flush(handle: &mut NSTDStdout) -> NSTDIOError {
-    if let Err(err) = handle.flush() {
-        return NSTDIOError::from_err(err.kind());
-    }
-    NSTDIOError::NSTD_IO_ERROR_NONE
+    crate::io::stdio::flush(handle)
 }
 
 /// Frees an instance of `NSTDStdout`.

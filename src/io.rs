@@ -1,5 +1,6 @@
 //! Provides functionality for interacting with the standard I/O streams.
 pub mod stderr;
+pub(crate) mod stdio;
 pub mod stdout;
 use crate::{
     core::{
