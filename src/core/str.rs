@@ -50,7 +50,7 @@ impl NSTDStrConst {
     ///
     /// This string slice's data must remain valid while the returned string slice is in use.
     #[inline]
-    unsafe fn as_str(&self) -> &str {
+    pub(crate) unsafe fn as_str(&self) -> &str {
         core::str::from_utf8_unchecked(self.bytes.as_slice())
     }
 }
