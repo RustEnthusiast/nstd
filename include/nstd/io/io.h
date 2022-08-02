@@ -1,7 +1,6 @@
 #ifndef NSTD_IO_IO_H_INCLUDED
 #define NSTD_IO_IO_H_INCLUDED
 #include "../core/cstr/cstr.h"
-#include "../core/def.h"
 #include "../nstd.h"
 #include "../string.h"
 NSTDCPPSTART
@@ -10,7 +9,7 @@ NSTDCPPSTART
 typedef enum {
     /// No error occurred.
     NSTD_IO_ERROR_NONE,
-    /// An unknown/other error ocurred.
+    /// An unknown/other error occurred.
     NSTD_IO_ERROR_UNKNOWN,
     /// An entity, such as a file, was not found.
     NSTD_IO_ERROR_NOT_FOUND,
@@ -60,7 +59,7 @@ typedef enum {
 ///
 /// # Returns
 ///
-/// `NSTDErrorCode errc` - Nonzero on error.
+/// `NSTDIOError errc` - Nonzero on error.
 ///
 /// # Possible errors
 ///
@@ -72,7 +71,7 @@ typedef enum {
 ///
 /// The provided C string slice's data must be valid, else this function can cause garbage bytes to
 /// be written to stdout.
-NSTDAPI NSTDErrorCode nstd_io_print(const NSTDCStrConst *output);
+NSTDAPI NSTDIOError nstd_io_print(const NSTDCStrConst *output);
 
 /// Writes a C string slice to stdout followed by a new line.
 ///
@@ -82,7 +81,7 @@ NSTDAPI NSTDErrorCode nstd_io_print(const NSTDCStrConst *output);
 ///
 /// # Returns
 ///
-/// `NSTDErrorCode errc` - Nonzero on error.
+/// `NSTDIOError errc` - Nonzero on error.
 ///
 /// # Possible errors
 ///
@@ -94,7 +93,7 @@ NSTDAPI NSTDErrorCode nstd_io_print(const NSTDCStrConst *output);
 ///
 /// The provided C string slice's data must be valid, else this function can cause garbage bytes to
 /// be written to stdout.
-NSTDAPI NSTDErrorCode nstd_io_print_line(const NSTDCStrConst *output);
+NSTDAPI NSTDIOError nstd_io_print_line(const NSTDCStrConst *output);
 
 /// Reads a line of UTF-8 input from stdin and returns it, discarding the newline.
 ///

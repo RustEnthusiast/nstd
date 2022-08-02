@@ -2,7 +2,7 @@
 pub mod stderr;
 pub mod stdout;
 use crate::{
-    core::{cstr::NSTDCStrConst, def::NSTDErrorCode},
+    core::cstr::NSTDCStrConst,
     string::{nstd_string_new, nstd_string_pop, NSTDString},
 };
 use std::io::{prelude::*, BufReader, ErrorKind};
@@ -14,7 +14,7 @@ use std::io::{prelude::*, BufReader, ErrorKind};
 pub enum NSTDIOError {
     /// No error occurred.
     NSTD_IO_ERROR_NONE,
-    /// An unknown/other error ocurred.
+    /// An unknown/other error occurred.
     NSTD_IO_ERROR_UNKNOWN,
     /// An entity, such as a file, was not found.
     NSTD_IO_ERROR_NOT_FOUND,
@@ -57,7 +57,6 @@ pub enum NSTDIOError {
 }
 impl NSTDIOError {
     /// Creates a new instance of [NSTDIOError] from a Rust [ErrorKind].
-    #[allow(dead_code)]
     pub(crate) fn from_err(err: ErrorKind) -> Self {
         match err {
             ErrorKind::NotFound => NSTDIOError::NSTD_IO_ERROR_NOT_FOUND,
@@ -92,7 +91,7 @@ impl NSTDIOError {
 ///
 /// # Returns
 ///
-/// `NSTDErrorCode errc` - Nonzero on error.
+/// `NSTDIOError errc` - The I/O operation error code.
 ///
 /// # Possible errors
 ///
@@ -105,14 +104,14 @@ impl NSTDIOError {
 /// The provided C string slice's data must be valid, else this function can cause garbage bytes to
 /// be written to stdout.
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_io_print(output: &NSTDCStrConst) -> NSTDErrorCode {
+pub unsafe extern "C" fn nstd_io_print(output: &NSTDCStrConst) -> NSTDIOError {
     let mut stdout = std::io::stdout();
-    if let Err(_) = stdout.write_all(output.as_bytes()) {
-        return 1;
-    } else if let Err(_) = stdout.flush() {
-        return 2;
+    if let Err(err) = stdout.write_all(output.as_bytes()) {
+        return NSTDIOError::from_err(err.kind());
+    } else if let Err(err) = stdout.flush() {
+        return NSTDIOError::from_err(err.kind());
     }
-    0
+    NSTDIOError::NSTD_IO_ERROR_NONE
 }
 
 /// Writes a C string slice to stdout followed by a new line.
@@ -123,7 +122,7 @@ pub unsafe extern "C" fn nstd_io_print(output: &NSTDCStrConst) -> NSTDErrorCode 
 ///
 /// # Returns
 ///
-/// `NSTDErrorCode errc` - Nonzero on error.
+/// `NSTDIOError errc` - The I/O operation error code.
 ///
 /// # Possible errors
 ///
@@ -136,16 +135,16 @@ pub unsafe extern "C" fn nstd_io_print(output: &NSTDCStrConst) -> NSTDErrorCode 
 /// The provided C string slice's data must be valid, else this function can cause garbage bytes to
 /// be written to stdout.
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_io_print_line(output: &NSTDCStrConst) -> NSTDErrorCode {
+pub unsafe extern "C" fn nstd_io_print_line(output: &NSTDCStrConst) -> NSTDIOError {
     let mut stdout = std::io::stdout();
-    if let Err(_) = stdout.write_all(output.as_bytes()) {
-        return 1;
-    } else if let Err(_) = stdout.write_all(b"\n") {
-        return 1;
-    } else if let Err(_) = stdout.flush() {
-        return 2;
+    if let Err(err) = stdout.write_all(output.as_bytes()) {
+        return NSTDIOError::from_err(err.kind());
+    } else if let Err(err) = stdout.write_all(b"\n") {
+        return NSTDIOError::from_err(err.kind());
+    } else if let Err(err) = stdout.flush() {
+        return NSTDIOError::from_err(err.kind());
     }
-    0
+    NSTDIOError::NSTD_IO_ERROR_NONE
 }
 
 /// Reads a line of UTF-8 input from stdin and returns it, discarding the newline.
