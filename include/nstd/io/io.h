@@ -95,19 +95,27 @@ NSTDAPI NSTDIOError nstd_io_print(const NSTDCStrConst *output);
 /// be written to stdout.
 NSTDAPI NSTDIOError nstd_io_print_line(const NSTDCStrConst *output);
 
-/// Reads a line of UTF-8 input from stdin and returns it, discarding the newline.
+/// Reads a line of UTF-8 input from stdin and pushes it onto `buffer` without the newline.
+///
+/// # Parameters:
+///
+/// - `NSTDString *buffer` - The string buffer to be extended with input from stdin.
 ///
 /// # Returns
 ///
-/// `NSTDString input` - The input from stdin, or an empty string on error.
-NSTDAPI NSTDString nstd_io_read();
+/// `NSTDIOError errc` - The I/O operation error code.
+NSTDAPI NSTDIOError nstd_io_read(NSTDString *buffer);
 
-/// Reads a line of UTF-8 input from stdin and returns it.
+/// Reads a line of UTF-8 input from stdin and pushes it onto `buffer`.
+///
+/// # Parameters:
+///
+/// - `NSTDString *buffer` - The string buffer to be extended with input from stdin.
 ///
 /// # Returns
 ///
-/// `NSTDString input` - The input from stdin, or an empty string on error.
-NSTDAPI NSTDString nstd_io_read_line();
+/// `NSTDIOError errc` - The I/O operation error code.
+NSTDAPI NSTDIOError nstd_io_read_line(NSTDString *buffer);
 
 NSTDCPPEND
 #endif

@@ -2,8 +2,11 @@
 pub mod stderr;
 pub mod stdout;
 use crate::{
-    core::cstr::NSTDCStrConst,
-    string::{nstd_string_new, nstd_string_pop, NSTDString},
+    core::{
+        cstr::NSTDCStrConst, slice::nstd_core_slice_const_new,
+        str::nstd_core_str_const_from_bytes_unchecked,
+    },
+    string::{nstd_string_pop, nstd_string_push_str, NSTDString},
 };
 use std::io::{prelude::*, BufReader, ErrorKind};
 
@@ -147,29 +150,47 @@ pub unsafe extern "C" fn nstd_io_print_line(output: &NSTDCStrConst) -> NSTDIOErr
     NSTDIOError::NSTD_IO_ERROR_NONE
 }
 
-/// Reads a line of UTF-8 input from stdin and returns it, discarding the newline.
+/// Reads a line of UTF-8 input from stdin and pushes it onto `buffer` without the newline.
+///
+/// # Parameters:
+///
+/// - `NSTDString *buffer` - The string buffer to be extended with input from stdin.
 ///
 /// # Returns
 ///
-/// `NSTDString input` - The input from stdin, or an empty string on error.
+/// `NSTDIOError errc` - The I/O operation error code.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_io_read() -> NSTDString {
-    let mut input = nstd_io_read_line();
-    nstd_string_pop(&mut input);
-    input
+pub extern "C" fn nstd_io_read(buffer: &mut NSTDString) -> NSTDIOError {
+    let errc = nstd_io_read_line(buffer);
+    nstd_string_pop(buffer);
+    errc
 }
 
-/// Reads a line of UTF-8 input from stdin and returns it.
+/// Reads a line of UTF-8 input from stdin and pushes it onto `buffer`.
+///
+/// # Parameters:
+///
+/// - `NSTDString *buffer` - The string buffer to be extended with input from stdin.
 ///
 /// # Returns
 ///
-/// `NSTDString input` - The input from stdin, or an empty string on error.
+/// `NSTDIOError errc` - The I/O operation error code.
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_io_read_line() -> NSTDString {
-    let mut buffer = String::new();
-    if let Err(_) = BufReader::new(std::io::stdin()).read_line(&mut buffer) {
-        return nstd_string_new();
+pub extern "C" fn nstd_io_read_line(buffer: &mut NSTDString) -> NSTDIOError {
+    // Attempt to read a line from stdin.
+    let mut input = String::new();
+    if let Err(err) = BufReader::new(std::io::stdin()).read_line(&mut input) {
+        return NSTDIOError::from_err(err.kind());
     }
-    NSTDString::from(buffer.as_str())
+    // SAFETY: Rust strings are UTF-8 encoded.
+    unsafe {
+        // Extend the string buffer with the input from stdin.
+        let bytes = nstd_core_slice_const_new(input.as_ptr().cast(), 1, input.len());
+        let str = nstd_core_str_const_from_bytes_unchecked(&bytes);
+        match nstd_string_push_str(buffer, &str) {
+            0 => NSTDIOError::NSTD_IO_ERROR_NONE,
+            _ => NSTDIOError::NSTD_IO_ERROR_OUT_OF_MEMORY,
+        }
+    }
 }
