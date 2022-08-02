@@ -59,13 +59,7 @@ typedef enum {
 ///
 /// # Returns
 ///
-/// `NSTDIOError errc` - Nonzero on error.
-///
-/// # Possible errors
-///
-/// - `1` - Writing `output`'s bytes to stdout failed.
-///
-/// - `2` - Flushing stdout failed.
+/// `NSTDIOError errc` - The I/O operation error code.
 ///
 /// # Safety
 ///
@@ -81,13 +75,7 @@ NSTDAPI NSTDIOError nstd_io_print(const NSTDStrConst *output);
 ///
 /// # Returns
 ///
-/// `NSTDIOError errc` - Nonzero on error.
-///
-/// # Possible errors
-///
-/// - `1` - Writing bytes to stdout failed.
-///
-/// - `2` - Flushing stdout failed.
+/// `NSTDIOError errc` - The I/O operation error code.
 ///
 /// # Safety
 ///

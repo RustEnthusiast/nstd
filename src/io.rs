@@ -98,12 +98,6 @@ impl NSTDIOError {
 ///
 /// `NSTDIOError errc` - The I/O operation error code.
 ///
-/// # Possible errors
-///
-/// - `1` - Writing `output`'s bytes to stdout failed.
-///
-/// - `2` - Flushing stdout failed.
-///
 /// # Safety
 ///
 /// The provided string slice's data must be valid, else this function can cause garbage bytes to
@@ -128,12 +122,6 @@ pub unsafe extern "C" fn nstd_io_print(output: &NSTDStrConst) -> NSTDIOError {
 /// # Returns
 ///
 /// `NSTDIOError errc` - The I/O operation error code.
-///
-/// # Possible errors
-///
-/// - `1` - Writing bytes to stdout failed.
-///
-/// - `2` - Flushing stdout failed.
 ///
 /// # Safety
 ///

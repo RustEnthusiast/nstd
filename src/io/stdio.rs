@@ -1,8 +1,12 @@
-//! Contains common I/O operations for [Write] with `nstd` types.
-use crate::{core::slice::NSTDSliceConst, io::NSTDIOError, NSTDUSize};
-use std::io::Write;
+//! Contains common I/O operations for [Read] & [Write] with `nstd` types.
+use crate::{
+    core::slice::{NSTDSliceConst, NSTDSliceMut},
+    io::NSTDIOError,
+    NSTDUSize,
+};
+use std::io::{Read, Write};
 
-/// Writes some of an `nstd` byte slice to a [Write] stream.
+/// Writes some `nstd` bytes to a [Write] stream.
 ///
 /// The return values are the number of bytes written to the stream and the I/O operation error
 /// code respectively.
@@ -49,4 +53,27 @@ pub(crate) fn flush<W: Write>(stream: &mut W) -> NSTDIOError {
         return NSTDIOError::from_err(err.kind());
     }
     NSTDIOError::NSTD_IO_ERROR_NONE
+}
+
+/// Reads some data from a [Read] stream into an `nstd` byte slice.
+///
+/// The return values are the number of bytes read from the stream and the I/O operation error
+/// code respectively.
+///
+/// # Safety
+///
+/// `buffer`'s data must be valid for writes.
+pub(crate) unsafe fn read<R: Read>(
+    stream: &mut R,
+    buffer: &mut NSTDSliceMut,
+) -> (NSTDUSize, NSTDIOError) {
+    // Make sure the buffer's element size is 1.
+    if buffer.ptr.size != 1 {
+        return (0, NSTDIOError::NSTD_IO_ERROR_INVALID_INPUT);
+    }
+    // Attempt to read bytes into the buffer.
+    match stream.read(buffer.as_slice_mut()) {
+        Ok(r) => (r, NSTDIOError::NSTD_IO_ERROR_NONE),
+        Err(err) => (0, NSTDIOError::from_err(err.kind())),
+    }
 }
