@@ -187,6 +187,17 @@ impl NSTDSliceMut {
     pub(crate) unsafe fn as_slice(&self) -> &[u8] {
         core::slice::from_raw_parts(self.ptr.raw.cast(), self.byte_len())
     }
+
+    /// Creates a mutable Rust byte slice from this `NSTDSliceMut`.
+    ///
+    /// # Safety
+    ///
+    /// The `NSTDSliceMut`'s data must remain valid while the returned slice is in use.
+    #[inline]
+    #[allow(dead_code)]
+    pub(crate) unsafe fn as_slice_mut(&mut self) -> &mut [u8] {
+        core::slice::from_raw_parts_mut(self.ptr.raw.cast(), self.byte_len())
+    }
 }
 
 /// Creates a new slice from raw data.
