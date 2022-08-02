@@ -1,6 +1,6 @@
 #ifndef NSTD_IO_IO_H_INCLUDED
 #define NSTD_IO_IO_H_INCLUDED
-#include "../core/cstr/cstr.h"
+#include "../core/str.h"
 #include "../nstd.h"
 #include "../string.h"
 NSTDCPPSTART
@@ -51,11 +51,11 @@ typedef enum {
     NSTD_IO_ERROR_OUT_OF_MEMORY,
 } NSTDIOError;
 
-/// Writes a C string slice to stdout.
+/// Writes a string slice to stdout.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDCStrConst *output` - The C string slice to write to stdout.
+/// - `const NSTDStrConst *output` - The string slice to write to stdout.
 ///
 /// # Returns
 ///
@@ -69,15 +69,15 @@ typedef enum {
 ///
 /// # Safety
 ///
-/// The provided C string slice's data must be valid, else this function can cause garbage bytes to
+/// The provided string slice's data must be valid, else this function can cause garbage bytes to
 /// be written to stdout.
-NSTDAPI NSTDIOError nstd_io_print(const NSTDCStrConst *output);
+NSTDAPI NSTDIOError nstd_io_print(const NSTDStrConst *output);
 
-/// Writes a C string slice to stdout followed by a new line.
+/// Writes a string slice to stdout followed by a new line.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDCStrConst *output` - The C string slice to write to stdout.
+/// - `const NSTDStrConst *output` - The string slice to write to stdout.
 ///
 /// # Returns
 ///
@@ -91,9 +91,9 @@ NSTDAPI NSTDIOError nstd_io_print(const NSTDCStrConst *output);
 ///
 /// # Safety
 ///
-/// The provided C string slice's data must be valid, else this function can cause garbage bytes to
+/// The provided string slice's data must be valid, else this function can cause garbage bytes to
 /// be written to stdout.
-NSTDAPI NSTDIOError nstd_io_print_line(const NSTDCStrConst *output);
+NSTDAPI NSTDIOError nstd_io_print_line(const NSTDStrConst *output);
 
 /// Reads a line of UTF-8 input from stdin and pushes it onto `buffer` without the newline.
 ///

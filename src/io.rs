@@ -3,8 +3,8 @@ pub mod stderr;
 pub mod stdout;
 use crate::{
     core::{
-        cstr::NSTDCStrConst, slice::nstd_core_slice_const_new,
-        str::nstd_core_str_const_from_bytes_unchecked,
+        slice::nstd_core_slice_const_new,
+        str::{nstd_core_str_const_from_bytes_unchecked, NSTDStrConst},
     },
     string::{nstd_string_pop, nstd_string_push_str, NSTDString},
 };
@@ -86,11 +86,11 @@ impl NSTDIOError {
     }
 }
 
-/// Writes a C string slice to stdout.
+/// Writes a string slice to stdout.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDCStrConst *output` - The C string slice to write to stdout.
+/// - `const NSTDStrConst *output` - The string slice to write to stdout.
 ///
 /// # Returns
 ///
@@ -104,12 +104,12 @@ impl NSTDIOError {
 ///
 /// # Safety
 ///
-/// The provided C string slice's data must be valid, else this function can cause garbage bytes to
+/// The provided string slice's data must be valid, else this function can cause garbage bytes to
 /// be written to stdout.
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_io_print(output: &NSTDCStrConst) -> NSTDIOError {
+pub unsafe extern "C" fn nstd_io_print(output: &NSTDStrConst) -> NSTDIOError {
     let mut stdout = std::io::stdout();
-    if let Err(err) = stdout.write_all(output.as_bytes()) {
+    if let Err(err) = stdout.write_all(output.as_str().as_bytes()) {
         return NSTDIOError::from_err(err.kind());
     } else if let Err(err) = stdout.flush() {
         return NSTDIOError::from_err(err.kind());
@@ -117,11 +117,11 @@ pub unsafe extern "C" fn nstd_io_print(output: &NSTDCStrConst) -> NSTDIOError {
     NSTDIOError::NSTD_IO_ERROR_NONE
 }
 
-/// Writes a C string slice to stdout followed by a new line.
+/// Writes a string slice to stdout followed by a new line.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDCStrConst *output` - The C string slice to write to stdout.
+/// - `const NSTDStrConst *output` - The string slice to write to stdout.
 ///
 /// # Returns
 ///
@@ -135,12 +135,12 @@ pub unsafe extern "C" fn nstd_io_print(output: &NSTDCStrConst) -> NSTDIOError {
 ///
 /// # Safety
 ///
-/// The provided C string slice's data must be valid, else this function can cause garbage bytes to
+/// The provided string slice's data must be valid, else this function can cause garbage bytes to
 /// be written to stdout.
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_io_print_line(output: &NSTDCStrConst) -> NSTDIOError {
+pub unsafe extern "C" fn nstd_io_print_line(output: &NSTDStrConst) -> NSTDIOError {
     let mut stdout = std::io::stdout();
-    if let Err(err) = stdout.write_all(output.as_bytes()) {
+    if let Err(err) = stdout.write_all(output.as_str().as_bytes()) {
         return NSTDIOError::from_err(err.kind());
     } else if let Err(err) = stdout.write_all(b"\n") {
         return NSTDIOError::from_err(err.kind());
