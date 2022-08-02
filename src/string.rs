@@ -5,7 +5,8 @@ use crate::{
         slice::{nstd_core_slice_const_new, NSTDSliceConst},
         str::{
             nstd_core_str_const_as_bytes, nstd_core_str_const_from_bytes_unchecked,
-            nstd_core_str_mut_from_bytes_unchecked, NSTDStrConst, NSTDStrMut,
+            nstd_core_str_const_len, nstd_core_str_mut_from_bytes_unchecked, NSTDStrConst,
+            NSTDStrMut,
         },
     },
     vec::{
@@ -153,6 +154,23 @@ pub extern "C" fn nstd_string_as_bytes(string: &NSTDString) -> NSTDSliceConst {
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_string_to_bytes(string: NSTDString) -> NSTDVec {
     string.bytes
+}
+
+/// Returns the number of Unicode characters in a string.
+///
+/// # Parameters:
+///
+/// - `const NSTDString *string` - The string.
+///
+/// # Returns
+///
+/// `NSTDUSize len` - The length of the string.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_string_len(string: &NSTDString) -> NSTDUSize {
+    let str = nstd_string_as_str(string);
+    // Managed string data is always valid here when used correctly.
+    unsafe { nstd_core_str_const_len(&str) }
 }
 
 /// Pushes an `NSTDUnichar` onto the end of a string.

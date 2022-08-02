@@ -94,6 +94,17 @@ NSTDAPI NSTDSliceConst nstd_string_as_bytes(const NSTDString *string);
 /// `NSTDVec bytes` - The string's raw data.
 NSTDAPI NSTDVec nstd_string_to_bytes(NSTDString string);
 
+/// Returns the number of Unicode characters in a string.
+///
+/// # Parameters:
+///
+/// - `const NSTDString *string` - The string.
+///
+/// # Returns
+///
+/// `NSTDUSize len` - The length of the string.
+NSTDAPI NSTDUSize nstd_string_len(const NSTDString *string);
+
 /// Pushes an `NSTDUnichar` onto the end of a string.
 ///
 /// # Parameters:
