@@ -46,9 +46,7 @@ pub unsafe extern "C" fn nstd_io_stderr_write(
     bytes: &NSTDSliceConst,
     written: &mut NSTDUSize,
 ) -> NSTDIOError {
-    let wd = crate::io::stdio::write(handle, bytes);
-    *written = wd.0;
-    wd.1
+    crate::io::stdio::write(handle, bytes, written)
 }
 
 /// Writes an entire buffer to the standard error stream.

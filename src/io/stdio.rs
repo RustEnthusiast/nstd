@@ -8,8 +8,7 @@ use std::io::{Read, Write};
 
 /// Writes some `nstd` bytes to a [Write] stream.
 ///
-/// The return values are the number of bytes written to the stream and the I/O operation error
-/// code respectively.
+/// `written` will return as the number of bytes written to the stream.
 ///
 /// # Safety
 ///
@@ -17,15 +16,23 @@ use std::io::{Read, Write};
 pub(crate) unsafe fn write<W: Write>(
     stream: &mut W,
     bytes: &NSTDSliceConst,
-) -> (NSTDUSize, NSTDIOError) {
+    written: &mut NSTDUSize,
+) -> NSTDIOError {
     // Make sure the slice's element size is 1.
     if bytes.ptr.size != 1 {
-        return (0, NSTDIOError::NSTD_IO_ERROR_INVALID_INPUT);
+        *written = 0;
+        return NSTDIOError::NSTD_IO_ERROR_INVALID_INPUT;
     }
     // Attempt to write the bytes to stdout.
     match stream.write(bytes.as_slice()) {
-        Ok(w) => (w, NSTDIOError::NSTD_IO_ERROR_NONE),
-        Err(err) => (0, NSTDIOError::from_err(err.kind())),
+        Ok(w) => {
+            *written = w;
+            NSTDIOError::NSTD_IO_ERROR_NONE
+        }
+        Err(err) => {
+            *written = 0;
+            NSTDIOError::from_err(err.kind())
+        }
     }
 }
 
@@ -57,8 +64,7 @@ pub(crate) fn flush<W: Write>(stream: &mut W) -> NSTDIOError {
 
 /// Reads some data from a [Read] stream into an `nstd` byte slice.
 ///
-/// The return values are the number of bytes read from the stream and the I/O operation error
-/// code respectively.
+/// `read` will return as the number of bytes read from the stream.
 ///
 /// # Safety
 ///
@@ -66,14 +72,22 @@ pub(crate) fn flush<W: Write>(stream: &mut W) -> NSTDIOError {
 pub(crate) unsafe fn read<R: Read>(
     stream: &mut R,
     buffer: &mut NSTDSliceMut,
-) -> (NSTDUSize, NSTDIOError) {
+    read: &mut NSTDUSize,
+) -> NSTDIOError {
     // Make sure the buffer's element size is 1.
     if buffer.ptr.size != 1 {
-        return (0, NSTDIOError::NSTD_IO_ERROR_INVALID_INPUT);
+        *read = 0;
+        return NSTDIOError::NSTD_IO_ERROR_INVALID_INPUT;
     }
     // Attempt to read bytes into the buffer.
     match stream.read(buffer.as_slice_mut()) {
-        Ok(r) => (r, NSTDIOError::NSTD_IO_ERROR_NONE),
-        Err(err) => (0, NSTDIOError::from_err(err.kind())),
+        Ok(r) => {
+            *read = r;
+            NSTDIOError::NSTD_IO_ERROR_NONE
+        }
+        Err(err) => {
+            *read = 0;
+            NSTDIOError::from_err(err.kind())
+        }
     }
 }

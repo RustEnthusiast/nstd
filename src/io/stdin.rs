@@ -42,9 +42,7 @@ pub unsafe extern "C" fn nstd_io_stdin_read(
     buffer: &mut NSTDSliceMut,
     read: &mut NSTDUSize,
 ) -> NSTDIOError {
-    let rd = crate::io::stdio::read(handle, buffer);
-    *read = rd.0;
-    rd.1
+    crate::io::stdio::read(handle, buffer, read)
 }
 
 /// Frees an instance of `NSTDStdin`.
