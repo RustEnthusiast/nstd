@@ -7,7 +7,7 @@ use crate::{
     core::{cstr::raw::nstd_core_cstr_raw_len_with_null, def::NSTDChar, str::NSTDStrConst},
     NSTDAnyConst, NSTDAnyMut, NSTD_NULL,
 };
-use libloading::Library;
+use libloading::{Error, Library, Symbol};
 
 /// A handle to a dynamically loaded library.
 pub type NSTDSharedLib = Box<Library>;
@@ -49,17 +49,16 @@ pub unsafe extern "C" fn nstd_shared_lib_load(path: &NSTDStrConst) -> Option<NST
 /// # Safety
 ///
 /// Undefined behavior may occur if `symbol`'s data is invalid.
+#[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_shared_lib_get(
     lib: &NSTDSharedLib,
     symbol: *const NSTDChar,
 ) -> NSTDAnyConst {
-    let symbol_len = nstd_core_cstr_raw_len_with_null(symbol);
-    let symbol_name = std::slice::from_raw_parts(symbol.cast(), symbol_len);
-    if let Ok(symbol) = lib.get(symbol_name) {
-        return *symbol;
+    match get(lib, symbol) {
+        Ok(ptr) => *ptr,
+        _ => NSTD_NULL,
     }
-    NSTD_NULL
 }
 
 /// Gets a pointer to a mutable function or static variable in a dynamically loaded library by
@@ -84,7 +83,10 @@ pub unsafe extern "C" fn nstd_shared_lib_get_mut(
     lib: &mut NSTDSharedLib,
     symbol: *const NSTDChar,
 ) -> NSTDAnyMut {
-    nstd_shared_lib_get(lib, symbol) as NSTDAnyMut
+    match get(lib, symbol) {
+        Ok(ptr) => *ptr,
+        _ => NSTD_NULL,
+    }
 }
 
 /// Unloads and frees the resources of a dynamically loaded library.
@@ -96,3 +98,17 @@ pub unsafe extern "C" fn nstd_shared_lib_get_mut(
 #[cfg_attr(feature = "clib", no_mangle)]
 #[allow(unused_variables)]
 pub extern "C" fn nstd_shared_lib_free(lib: NSTDSharedLib) {}
+
+/// Gets a pointer to a function or static variable in a dynamically loaded library by symbol name.
+///
+/// # Safety
+///
+/// Undefined behavior may occur if `symbol`'s data is invalid.
+unsafe fn get<'a, T>(
+    lib: &'a NSTDSharedLib,
+    symbol: *const NSTDChar,
+) -> Result<Symbol<'a, T>, Error> {
+    let symbol_len = nstd_core_cstr_raw_len_with_null(symbol);
+    let symbol_name = std::slice::from_raw_parts(symbol.cast(), symbol_len);
+    lib.get(symbol_name)
+}
