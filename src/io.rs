@@ -10,7 +10,7 @@ use crate::{
     },
     string::{nstd_string_pop, nstd_string_push_str, NSTDString},
 };
-use std::io::{prelude::*, BufReader, ErrorKind};
+use std::io::{prelude::*, ErrorKind};
 
 /// An error type for I/O operations.
 #[repr(C)]
@@ -170,7 +170,7 @@ pub extern "C" fn nstd_io_read(buffer: &mut NSTDString) -> NSTDIOError {
 pub extern "C" fn nstd_io_read_line(buffer: &mut NSTDString) -> NSTDIOError {
     // Attempt to read a line from stdin.
     let mut input = String::new();
-    if let Err(err) = BufReader::new(std::io::stdin()).read_line(&mut input) {
+    if let Err(err) = std::io::stdin().read_line(&mut input) {
         return NSTDIOError::from_err(err.kind());
     }
     // SAFETY: Rust strings are UTF-8 encoded.

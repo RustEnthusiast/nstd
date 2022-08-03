@@ -6,8 +6,6 @@
 NSTDCPPSTART
 
 /// A handle to the standard input stream.
-///
-/// This stream is buffered by default.
 typedef NSTDAnyMut NSTDStdin;
 
 /// Constructs a new handle to the standard input stream.

@@ -1,11 +1,9 @@
 //! A handle to the standard input stream.
 use crate::{core::slice::NSTDSliceMut, io::NSTDIOError, NSTDUSize};
-use std::io::{BufReader, Stdin};
+use std::io::Stdin;
 
 /// A handle to the standard input stream.
-///
-/// This stream is buffered by default.
-pub type NSTDStdin = Box<BufReader<Stdin>>;
+pub type NSTDStdin = Box<Stdin>;
 
 /// Constructs a new handle to the standard input stream.
 ///
@@ -15,7 +13,7 @@ pub type NSTDStdin = Box<BufReader<Stdin>>;
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_io_stdin() -> NSTDStdin {
-    NSTDStdin::new(BufReader::new(std::io::stdin()))
+    NSTDStdin::new(std::io::stdin())
 }
 
 /// Reads some data from stdin into a byte slice buffer.
