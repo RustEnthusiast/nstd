@@ -16,7 +16,7 @@ typedef NSTDAnyMut NSTDSharedLib;
 ///
 /// # Returns
 ///
-/// `NSTDSharedLib lib` - A handle to the dynamically loaded lobrary, or null on error.
+/// `NSTDSharedLib lib` - A handle to the dynamically loaded library, or null on error.
 ///
 /// # Safety
 ///
@@ -40,7 +40,7 @@ NSTDAPI NSTDSharedLib nstd_shared_lib_load(const NSTDStrConst *path);
 /// Undefined behavior may occur if `symbol`'s data is invalid.
 NSTDAPI NSTDAnyConst nstd_shared_lib_get(const NSTDSharedLib *lib, const NSTDChar *symbol);
 
-/// Gets a pointer to a mutable function or static variable in a dynamically loaded library by
+/// Gets a mutable pointer to a function or static variable in a dynamically loaded library by
 /// symbol name.
 ///
 /// # Parameters
