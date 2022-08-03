@@ -99,6 +99,11 @@ pub(crate) unsafe fn read<R: Read>(
 
 /// Extends an [NSTDVec] with data from a [Read] stream until EOF is reached.
 ///
+/// # Note
+///
+/// If extending the buffer fails, an error code of `NSTD_IO_ERROR_OUT_OF_MEMORY` will be returned.
+/// This does not mean `read` will return as 0 in this case.
+///
 /// `read` will return as the number of bytes read from the stream.
 pub(crate) fn read_all<R: Read>(
     stream: &mut R,
@@ -114,11 +119,13 @@ pub(crate) fn read_all<R: Read>(
     let mut buf = Vec::new();
     match stream.read_to_end(&mut buf) {
         Ok(r) => {
+            *read = r;
             let bytes = nstd_core_slice_const_new(buf.as_ptr().cast(), 1, buf.len());
             // SAFETY: `bytes` refers to `buf`'s data, which is still valid here.
-            unsafe { nstd_vec_extend(buffer, &bytes) };
-            *read = r;
-            NSTDIOError::NSTD_IO_ERROR_NONE
+            match unsafe { nstd_vec_extend(buffer, &bytes) } {
+                0 => NSTDIOError::NSTD_IO_ERROR_NONE,
+                _ => NSTDIOError::NSTD_IO_ERROR_OUT_OF_MEMORY,
+            }
         }
         Err(err) => {
             *read = 0;

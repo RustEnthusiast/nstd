@@ -47,6 +47,11 @@ pub unsafe extern "C" fn nstd_io_stdin_read(
 
 /// Continuously reads data from stdin into a buffer until EOF is reached.
 ///
+/// # Note
+///
+/// If extending the buffer fails, an error code of `NSTD_IO_ERROR_OUT_OF_MEMORY` will be returned.
+/// This does not mean `read` will return as 0 in this case.
+///
 /// # Parameters:
 ///
 /// - `NSTDStdin *handle` - A handle to the standard input stream.
