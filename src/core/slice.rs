@@ -75,6 +75,21 @@ pub extern "C" fn nstd_core_slice_const_len(slice: &NSTDSliceConst) -> NSTDUSize
     slice.len
 }
 
+/// Returns the amount of bytes each value in a slice occupies.
+///
+/// # Parameters:
+///
+/// - `const NSTDSliceConst *slice` - The slice.
+///
+/// # Returns
+///
+/// `NSTDUSize stride` - The size of each value in the slice.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_core_slice_const_stride(slice: &NSTDSliceConst) -> NSTDUSize {
+    slice.ptr.size
+}
+
 /// Returns an immutable pointer to the element at index `pos` in `slice`.
 ///
 /// # Parameters:
@@ -239,6 +254,21 @@ pub extern "C" fn nstd_core_slice_mut_new(
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_slice_mut_len(slice: &NSTDSliceMut) -> NSTDUSize {
     slice.len
+}
+
+/// Returns the amount of bytes each value in a slice occupies.
+///
+/// # Parameters:
+///
+/// - `const NSTDSliceMut *slice` - The slice.
+///
+/// # Returns
+///
+/// `NSTDUSize stride` - The size of each value in the slice.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_core_slice_mut_stride(slice: &NSTDSliceMut) -> NSTDUSize {
+    slice.ptr.size
 }
 
 /// Returns a pointer to the element at index `pos` in `slice`.
