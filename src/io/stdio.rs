@@ -1,7 +1,8 @@
 //! Contains common I/O operations for [Read] & [Write] with `nstd` types.
 use crate::{
-    core::slice::{NSTDSliceConst, NSTDSliceMut},
+    core::slice::{nstd_core_slice_const_new, NSTDSliceConst, NSTDSliceMut},
     io::NSTDIOError,
+    vec::{nstd_vec_extend, nstd_vec_stride, NSTDVec},
     NSTDUSize,
 };
 use std::io::{Read, Write};
@@ -82,6 +83,36 @@ pub(crate) unsafe fn read<R: Read>(
     // Attempt to read bytes into the buffer.
     match stream.read(buffer.as_slice_mut()) {
         Ok(r) => {
+            *read = r;
+            NSTDIOError::NSTD_IO_ERROR_NONE
+        }
+        Err(err) => {
+            *read = 0;
+            NSTDIOError::from_err(err.kind())
+        }
+    }
+}
+
+/// Extends an [NSTDVec] with data from a [Read] stream until EOF is reached.
+///
+/// `read` will return as the number of bytes read from the stream.
+pub(crate) fn read_all<R: Read>(
+    stream: &mut R,
+    buffer: &mut NSTDVec,
+    read: &mut NSTDUSize,
+) -> NSTDIOError {
+    // Make sure the buffer's element size is 1.
+    if nstd_vec_stride(buffer) != 1 {
+        *read = 0;
+        return NSTDIOError::NSTD_IO_ERROR_INVALID_INPUT;
+    }
+    // Attempt to read data into `buffer`.
+    let mut buf = Vec::new();
+    match stream.read_to_end(&mut buf) {
+        Ok(r) => {
+            let bytes = nstd_core_slice_const_new(buf.as_ptr().cast(), 1, buf.len());
+            // SAFETY: `bytes` refers to `buf`'s data, which is still valid here.
+            unsafe { nstd_vec_extend(buffer, &bytes) };
             *read = r;
             NSTDIOError::NSTD_IO_ERROR_NONE
         }

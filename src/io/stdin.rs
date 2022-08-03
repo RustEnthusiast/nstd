@@ -1,5 +1,5 @@
 //! A handle to the standard input stream.
-use crate::{core::slice::NSTDSliceMut, io::NSTDIOError, NSTDUSize};
+use crate::{core::slice::NSTDSliceMut, io::NSTDIOError, vec::NSTDVec, NSTDUSize};
 use std::io::Stdin;
 
 /// A handle to the standard input stream.
@@ -41,6 +41,29 @@ pub unsafe extern "C" fn nstd_io_stdin_read(
     read: &mut NSTDUSize,
 ) -> NSTDIOError {
     crate::io::stdio::read(handle, buffer, read)
+}
+
+/// Continuously reads data from stdin into a buffer until EOF is reached.
+///
+/// # Parameters:
+///
+/// - `NSTDStdin *handle` - A handle to the standard input stream.
+///
+/// - `NSTDVec *buffer` - The buffer to be extended with data from stdin.
+///
+/// - `NSTDUSize *read` - Returns as the number of bytes read from stdin.
+///
+/// # Returns
+///
+/// `NSTDIOError errc` - The I/O operation error code.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_io_stdin_read_all(
+    handle: &mut NSTDStdin,
+    buffer: &mut NSTDVec,
+    read: &mut NSTDUSize,
+) -> NSTDIOError {
+    crate::io::stdio::read_all(handle, buffer, read)
 }
 
 /// Frees an instance of `NSTDStdin`.
