@@ -34,7 +34,7 @@ NSTDAPI NSTDStdin nstd_io_stdin();
 ///
 /// # Returns
 ///
-/// `NSTDIOErrorCode errc` - The I/O operation error code.
+/// `NSTDIOError errc` - The I/O operation error code.
 ///
 /// # Safety
 ///

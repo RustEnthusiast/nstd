@@ -42,7 +42,7 @@ pub extern "C" fn nstd_io_stdin() -> NSTDStdin {
 ///
 /// # Returns
 ///
-/// `NSTDIOErrorCode errc` - The I/O operation error code.
+/// `NSTDIOError errc` - The I/O operation error code.
 ///
 /// # Safety
 ///
