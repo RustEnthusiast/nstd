@@ -1,5 +1,7 @@
 //! A handle to the standard input stream.
-use crate::{core::slice::NSTDSliceMut, io::NSTDIOError, vec::NSTDVec, NSTDUSize};
+use crate::{
+    core::slice::NSTDSliceMut, io::NSTDIOError, string::NSTDString, vec::NSTDVec, NSTDUSize,
+};
 use std::io::Stdin;
 
 /// A handle to the standard input stream.
@@ -64,6 +66,34 @@ pub extern "C" fn nstd_io_stdin_read_all(
     read: &mut NSTDUSize,
 ) -> NSTDIOError {
     crate::io::stdio::read_all(handle, buffer, read)
+}
+
+/// Continuously reads UTF-8 data from stdin into a string buffer until EOF is reached.
+///
+/// # Note
+///
+/// If extending the buffer fails, an error code of `NSTD_IO_ERROR_OUT_OF_MEMORY` will be returned.
+/// This does not mean `read` will return as 0 in this case.
+///
+/// # Parameters:
+///
+/// - `NSTDStdin *handle` - A handle to the standard input stream.
+///
+/// - `NSTDString *buffer` - The buffer to be extended with data from stdin.
+///
+/// - `NSTDUSize *read` - Returns as the number of bytes read from stdin.
+///
+/// # Returns
+///
+/// `NSTDIOError errc` - The I/O operation error code.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_io_stdin_read_to_string(
+    handle: &mut NSTDStdin,
+    buffer: &mut NSTDString,
+    read: &mut NSTDUSize,
+) -> NSTDIOError {
+    crate::io::stdio::read_to_string(handle, buffer, read)
 }
 
 /// Frees an instance of `NSTDStdin`.

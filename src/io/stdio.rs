@@ -1,7 +1,11 @@
 //! Contains common I/O operations for [Read] & [Write] with `nstd` types.
 use crate::{
-    core::slice::{nstd_core_slice_const_new, NSTDSliceConst, NSTDSliceMut},
+    core::{
+        slice::{nstd_core_slice_const_new, NSTDSliceConst, NSTDSliceMut},
+        str::nstd_core_str_const_from_bytes_unchecked,
+    },
     io::NSTDIOError,
+    string::{nstd_string_push_str, NSTDString},
     vec::{nstd_vec_extend, nstd_vec_stride, NSTDVec},
     NSTDUSize,
 };
@@ -115,6 +119,41 @@ pub(crate) fn read_all<R: Read>(
             unsafe { nstd_vec_extend(buffer, &bytes) };
             *read = r;
             NSTDIOError::NSTD_IO_ERROR_NONE
+        }
+        Err(err) => {
+            *read = 0;
+            NSTDIOError::from_err(err.kind())
+        }
+    }
+}
+
+/// Extends an [NSTDString] with UTF-8 data from a [Read] stream until EOF is reached.
+///
+/// # Note
+///
+/// If extending the buffer fails, an error code of `NSTD_IO_ERROR_OUT_OF_MEMORY` will be returned.
+/// This does not mean `read` will return as 0 in this case.
+///
+/// `read` will return as the number of bytes read from the stream.
+pub(crate) fn read_to_string<R: Read>(
+    stream: &mut R,
+    buffer: &mut NSTDString,
+    read: &mut NSTDUSize,
+) -> NSTDIOError {
+    // Attempt to read data into `buffer`.
+    let mut buf = String::new();
+    match stream.read_to_string(&mut buf) {
+        Ok(r) => {
+            *read = r;
+            let bytes = nstd_core_slice_const_new(buf.as_ptr().cast(), 1, buf.len());
+            // SAFETY: `bytes` refers to `buf`'s data, which is still valid UTF-8 here.
+            unsafe {
+                let str = nstd_core_str_const_from_bytes_unchecked(&bytes);
+                match nstd_string_push_str(buffer, &str) {
+                    0 => NSTDIOError::NSTD_IO_ERROR_NONE,
+                    _ => NSTDIOError::NSTD_IO_ERROR_OUT_OF_MEMORY,
+                }
+            }
         }
         Err(err) => {
             *read = 0;
