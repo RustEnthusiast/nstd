@@ -207,6 +207,21 @@ pub extern "C" fn nstd_vec_len(vec: &NSTDVec) -> NSTDUSize {
     vec.len
 }
 
+/// Returns the amount of bytes each value in a vector occupies.
+///
+/// # Parameters:
+///
+/// - `const NSTDVec *vec` - The vector.
+///
+/// # Returns
+///
+/// `NSTDUSize stride` - The size of each value in the vector.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_vec_stride(vec: &NSTDVec) -> NSTDUSize {
+    vec.buffer.ptr.size
+}
+
 /// Returns an immutable slice containing all of a vector's active elements.
 ///
 /// # Parameters:

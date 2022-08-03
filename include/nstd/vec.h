@@ -75,6 +75,17 @@ NSTDAPI NSTDVec nstd_vec_clone(const NSTDVec *vec);
 /// `NSTDUSize len` - The length of the vector.
 NSTDAPI NSTDUSize nstd_vec_len(const NSTDVec *vec);
 
+/// Returns the amount of bytes each value in a vector occupies.
+///
+/// # Parameters:
+///
+/// - `const NSTDVec *vec` - The vector.
+///
+/// # Returns
+///
+/// `NSTDUSize stride` - The size of each value in the vector.
+NSTDAPI NSTDUSize nstd_vec_stride(const NSTDVec *vec);
+
 /// Returns an immutable slice containing all of a vector's active elements.
 ///
 /// # Parameters:

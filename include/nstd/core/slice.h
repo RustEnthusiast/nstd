@@ -39,6 +39,17 @@ NSTDUSize len);
 /// `NSTDUSize len` - The length of the slice.
 NSTDAPI NSTDUSize nstd_core_slice_const_len(const NSTDSliceConst *slice);
 
+/// Returns the amount of bytes each value in a slice occupies.
+///
+/// # Parameters:
+///
+/// - `const NSTDSliceConst *slice` - The slice.
+///
+/// # Returns
+///
+/// `NSTDUSize stride` - The size of each value in the slice.
+NSTDAPI NSTDUSize nstd_core_slice_const_stride(const NSTDSliceConst *slice);
+
 /// Returns an immutable pointer to the element at index `pos` in `slice`.
 ///
 /// # Parameters:
@@ -127,6 +138,17 @@ NSTDAPI NSTDSliceMut nstd_core_slice_mut_new(NSTDAnyMut ptr, NSTDUSize element_s
 ///
 /// `NSTDUSize len` - The length of the slice.
 NSTDAPI NSTDUSize nstd_core_slice_mut_len(const NSTDSliceMut *slice);
+
+/// Returns the amount of bytes each value in a slice occupies.
+///
+/// # Parameters:
+///
+/// - `const NSTDSliceMut *slice` - The slice.
+///
+/// # Returns
+///
+/// `NSTDUSize stride` - The size of each value in the slice.
+NSTDAPI NSTDUSize nstd_core_slice_mut_stride(const NSTDSliceMut *slice);
 
 /// Returns a pointer to the element at index `pos` in `slice`.
 ///
