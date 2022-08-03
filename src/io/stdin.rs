@@ -1,6 +1,13 @@
 //! A handle to the standard input stream.
 use crate::{
-    core::slice::NSTDSliceMut, io::NSTDIOError, string::NSTDString, vec::NSTDVec, NSTDUSize,
+    core::{
+        slice::{nstd_core_slice_const_new, NSTDSliceMut},
+        str::nstd_core_str_const_from_bytes_unchecked,
+    },
+    io::NSTDIOError,
+    string::{nstd_string_push_str, NSTDString},
+    vec::NSTDVec,
+    NSTDUSize,
 };
 use std::io::Stdin;
 
@@ -133,6 +140,46 @@ pub unsafe extern "C" fn nstd_io_stdin_read_exact(
     buffer: &mut NSTDSliceMut,
 ) -> NSTDIOError {
     crate::io::stdio::read_exact(handle, buffer)
+}
+
+/// Reads a line from stdin and appends it to `buffer`.
+///
+/// # Parameters:
+///
+/// - `NSTDStdin *handle` - A handle to stdin.
+///
+/// - `NSTDString *buffer` - The string buffer to extend with a line from stdin.
+///
+/// - `NSTDUSize *read` - Returns as the number of bytes read from stdin.
+///
+/// # Returns
+///
+/// `NSTDIOError errc` - The I/O operation error code.
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_io_stdin_read_line(
+    handle: &mut NSTDStdin,
+    buffer: &mut NSTDString,
+    read: &mut NSTDUSize,
+) -> NSTDIOError {
+    let mut buf = String::new();
+    match handle.read_line(&mut buf) {
+        Ok(r) => {
+            *read = r;
+            let bytes = nstd_core_slice_const_new(buf.as_ptr().cast(), 1, buf.len());
+            // SAFETY: `bytes` refers to `buf`'s data, which is still valid UTF-8 here.
+            unsafe {
+                let str = nstd_core_str_const_from_bytes_unchecked(&bytes);
+                match nstd_string_push_str(buffer, &str) {
+                    0 => NSTDIOError::NSTD_IO_ERROR_NONE,
+                    _ => NSTDIOError::NSTD_IO_ERROR_OUT_OF_MEMORY,
+                }
+            }
+        }
+        Err(err) => {
+            *read = 0;
+            NSTDIOError::from_err(err.kind())
+        }
+    }
 }
 
 /// Frees an instance of `NSTDStdin`.

@@ -104,6 +104,22 @@ NSTDUSize *read);
 /// `buffer` must be valid for writes.
 NSTDAPI NSTDIOError nstd_io_stdin_read_exact(NSTDStdin *handle, NSTDSliceMut *buffer);
 
+/// Reads a line from stdin and appends it to `buffer`.
+///
+/// # Parameters:
+///
+/// - `NSTDStdin *handle` - A handle to stdin.
+///
+/// - `NSTDString *buffer` - The string buffer to extend with a line from stdin.
+///
+/// - `NSTDUSize *read` - Returns as the number of bytes read from stdin.
+///
+/// # Returns
+///
+/// `NSTDIOError errc` - The I/O operation error code.
+NSTDAPI NSTDIOError nstd_io_stdin_read_line(NSTDStdin *handle, NSTDString *buffer,
+NSTDUSize *read);
+
 /// Frees an instance of `NSTDStdin`.
 ///
 /// # Parameters:
