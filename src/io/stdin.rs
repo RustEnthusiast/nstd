@@ -20,6 +20,11 @@ pub extern "C" fn nstd_io_stdin() -> NSTDStdin {
 
 /// Reads some data from stdin into a byte slice buffer.
 ///
+/// # Note
+///
+/// This function will return an error code of `NSTD_IO_ERROR_INVALID_INPUT` if the buffer's
+/// element size is not 1.
+///
 /// # Parameters:
 ///
 /// - `NSTDStdin *handle` - A handle to the standard input stream.
@@ -99,6 +104,35 @@ pub extern "C" fn nstd_io_stdin_read_to_string(
     read: &mut NSTDUSize,
 ) -> NSTDIOError {
     crate::io::stdio::read_to_string(handle, buffer, read)
+}
+
+/// Reads enough data from stdin to fill the entirety of `buffer`.
+///
+/// # Note
+///
+/// This function will return an error code of `NSTD_IO_ERROR_INVALID_INPUT` if the buffer's
+/// element size is not 1.
+///
+/// # Parameters:
+///
+/// - `NSTDStdin *handle` - A handle to the standard input stream.
+///
+/// - `NSTDSliceMut *buffer` - The buffer to fill with data from stdin.
+///
+/// # Returns
+///
+/// `NSTDIOError errc` - The I/O operation error code.
+///
+/// # Safety
+///
+/// `buffer` must be valid for writes.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_io_stdin_read_exact(
+    handle: &mut NSTDStdin,
+    buffer: &mut NSTDSliceMut,
+) -> NSTDIOError {
+    crate::io::stdio::read_exact(handle, buffer)
 }
 
 /// Frees an instance of `NSTDStdin`.

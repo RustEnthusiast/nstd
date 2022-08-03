@@ -168,3 +168,20 @@ pub(crate) fn read_to_string<R: Read>(
         }
     }
 }
+
+/// Reads enough data from stdin to fill the entirety of `buffer`.
+///
+/// # Safety
+///
+/// `buffer`'s data must be valid for writes.
+pub(crate) unsafe fn read_exact<R: Read>(stream: &mut R, buffer: &mut NSTDSliceMut) -> NSTDIOError {
+    // Make sure the buffer's element size is 1.
+    if buffer.ptr.size != 1 {
+        return NSTDIOError::NSTD_IO_ERROR_INVALID_INPUT;
+    }
+    // Attempt to fill the buffer with data from stdin.
+    if let Err(err) = stream.read_exact(buffer.as_slice_mut()) {
+        return NSTDIOError::from_err(err.kind());
+    }
+    NSTDIOError::NSTD_IO_ERROR_NONE
+}

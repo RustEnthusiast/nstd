@@ -19,6 +19,11 @@ NSTDAPI NSTDStdin nstd_io_stdin();
 
 /// Reads some data from stdin into a byte slice buffer.
 ///
+/// # Note
+///
+/// This function will return an error code of `NSTD_IO_ERROR_INVALID_INPUT` if the buffer's
+/// element size is not 1.
+///
 /// # Parameters:
 ///
 /// - `NSTDStdin *handle` - A handle to the standard input stream.
@@ -76,6 +81,28 @@ NSTDAPI NSTDIOError nstd_io_stdin_read_all(NSTDStdin *handle, NSTDVec *buffer, N
 /// `NSTDIOError errc` - The I/O operation error code.
 NSTDAPI NSTDIOError nstd_io_stdin_read_to_string(NSTDStdin *handle, NSTDString *buffer,
 NSTDUSize *read);
+
+/// Reads enough data from stdin to fill the entirety of `buffer`.
+///
+/// # Note
+///
+/// This function will return an error code of `NSTD_IO_ERROR_INVALID_INPUT` if the buffer's
+/// element size is not 1.
+///
+/// # Parameters:
+///
+/// - `NSTDStdin *handle` - A handle to the standard input stream.
+///
+/// - `NSTDSliceMut *buffer` - The buffer to fill with data from stdin.
+///
+/// # Returns
+///
+/// `NSTDIOError errc` - The I/O operation error code.
+///
+/// # Safety
+///
+/// `buffer` must be valid for writes.
+NSTDAPI NSTDIOError nstd_io_stdin_read_exact(NSTDStdin *handle, NSTDSliceMut *buffer);
 
 /// Frees an instance of `NSTDStdin`.
 ///
