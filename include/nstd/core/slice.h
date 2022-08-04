@@ -249,7 +249,7 @@ NSTDAPI NSTDBool nstd_core_slice_mut_compare(const NSTDSliceMut *s1, const NSTDS
 ///
 /// - `NSTDSliceMut *dest` - The slice to copy data to.
 ///
-/// - `const NSTDSliceMut *src` - The slice to copy data from.
+/// - `const NSTDSliceConst *src` - The slice to copy data from.
 ///
 /// # Panics
 ///
@@ -258,7 +258,7 @@ NSTDAPI NSTDBool nstd_core_slice_mut_compare(const NSTDSliceMut *s1, const NSTDS
 /// # Safety
 ///
 /// This function can cause undefined behavior if either `dest` or `src`'s data is invalid.
-NSTDAPI void nstd_core_slice_mut_copy(NSTDSliceMut *dest, const NSTDSliceMut *src);
+NSTDAPI void nstd_core_slice_mut_copy(NSTDSliceMut *dest, const NSTDSliceConst *src);
 
 NSTDCPPEND
 #endif

@@ -414,7 +414,7 @@ pub unsafe extern "C" fn nstd_core_slice_mut_compare(
 ///
 /// - `NSTDSliceMut *dest` - The slice to copy data to.
 ///
-/// - `const NSTDSliceMut *src` - The slice to copy data from.
+/// - `const NSTDSliceConst *src` - The slice to copy data from.
 ///
 /// # Panics
 ///
@@ -425,7 +425,7 @@ pub unsafe extern "C" fn nstd_core_slice_mut_compare(
 /// This function can cause undefined behavior if either `dest` or `src`'s data is invalid.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_slice_mut_copy(dest: &mut NSTDSliceMut, src: &NSTDSliceMut) {
+pub unsafe extern "C" fn nstd_core_slice_mut_copy(dest: &mut NSTDSliceMut, src: &NSTDSliceConst) {
     assert!(dest.byte_len() >= src.byte_len());
     nstd_core_mem_copy(dest.ptr.raw.cast(), src.ptr.raw.cast(), src.byte_len());
 }

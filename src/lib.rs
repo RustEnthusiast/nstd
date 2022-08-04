@@ -16,6 +16,9 @@ pub mod cstring;
 #[cfg(feature = "nstd_heap_ptr")]
 #[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_heap_ptr")))]
 pub mod heap_ptr;
+#[cfg(feature = "nstd_io")]
+#[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_io")))]
+pub mod io;
 #[cfg(feature = "nstd_os")]
 #[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_os")))]
 pub mod os;

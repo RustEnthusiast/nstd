@@ -23,6 +23,10 @@ Rust syntax).
         - `str` - An unowned view into a UTF-8 encoded byte string.
     - `cstring` - A dynamically sized, null terminated, C string.
     - `heap_ptr` - A pointer type for single value heap allocation.
+    - `io` - Provides functionality for interacting with the standard I/O streams.
+        - `stderr` - A handle to the standard error stream.
+        - `stdin` - A handle to the standard input stream.
+        - `stdout` - A handle to the standard output stream.
     - `os` - Operating system specific functionality.
         - `windows` - OS support for Windows.
             - `alloc` - Low level memory allocation for Windows.
