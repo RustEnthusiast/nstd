@@ -137,7 +137,7 @@ NSTDAPI void nstd_cstring_push(NSTDCString *cstring, NSTDChar chr);
 ///
 /// # Safety
 ///
-/// This operation can cause undefined behavior in the case that `cstr's data is invalid.
+/// This operation can cause undefined behavior in the case that `cstr`'s data is invalid.
 NSTDAPI NSTDErrorCode nstd_cstring_push_cstr(NSTDCString *cstring, const NSTDCStrConst *cstr);
 
 /// Removes the last character from a C string and returns it.

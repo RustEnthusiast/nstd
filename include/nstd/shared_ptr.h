@@ -57,7 +57,7 @@ NSTDAPI NSTDSharedPtr nstd_shared_ptr_new_zeroed(NSTDUSize element_size);
 /// `NSTDSharedPtr shared` - A new pointer pointing to the shared data.
 NSTDAPI NSTDSharedPtr nstd_shared_ptr_share(const NSTDSharedPtr *shared_ptr);
 
-/// Returns the number pointers that share `shared_ptr`'s data.
+/// Returns the number of pointers that share `shared_ptr`'s data.
 ///
 /// # Parameters:
 ///
@@ -65,7 +65,7 @@ NSTDAPI NSTDSharedPtr nstd_shared_ptr_share(const NSTDSharedPtr *shared_ptr);
 ///
 /// # Returns
 ///
-/// `NSTDUSize owners` - The number pointers that share `shared_ptr`'s data.
+/// `NSTDUSize owners` - The number of pointers that share `shared_ptr`'s data.
 NSTDAPI NSTDUSize nstd_shared_ptr_owners(const NSTDSharedPtr *shared_ptr);
 
 /// Returns the size of the shared object.

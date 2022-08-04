@@ -199,7 +199,7 @@ pub extern "C" fn nstd_cstring_push(cstring: &mut NSTDCString, chr: NSTDChar) {
 ///
 /// # Safety
 ///
-/// This operation can cause undefined behavior in the case that `cstr's data is invalid.
+/// This operation can cause undefined behavior in the case that `cstr`'s data is invalid.
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_cstring_push_cstr(
     cstring: &mut NSTDCString,

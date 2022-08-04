@@ -135,7 +135,7 @@ pub extern "C" fn nstd_shared_ptr_share(shared_ptr: &NSTDSharedPtr) -> NSTDShare
     }
 }
 
-/// Returns the number pointers that share `shared_ptr`'s data.
+/// Returns the number of pointers that share `shared_ptr`'s data.
 ///
 /// # Parameters:
 ///
@@ -143,7 +143,7 @@ pub extern "C" fn nstd_shared_ptr_share(shared_ptr: &NSTDSharedPtr) -> NSTDShare
 ///
 /// # Returns
 ///
-/// `NSTDUSize owners` - The number pointers that share `shared_ptr`'s data.
+/// `NSTDUSize owners` - The number of pointers that share `shared_ptr`'s data.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_shared_ptr_owners(shared_ptr: &NSTDSharedPtr) -> NSTDUSize {

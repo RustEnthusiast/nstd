@@ -408,7 +408,7 @@ pub extern "C" fn nstd_vec_pop(vec: &mut NSTDVec) -> NSTDAnyConst {
 ///
 /// # Safety
 ///
-/// This operation is unsafe because undefined behaviour can occur if the size of the value being
+/// This operation is unsafe because undefined behavior can occur if the size of the value being
 /// inserted into the vector is not equal to `vec.buffer.ptr.size`.
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_vec_insert(

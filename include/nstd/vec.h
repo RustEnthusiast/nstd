@@ -226,7 +226,7 @@ NSTDAPI NSTDAnyConst nstd_vec_pop(NSTDVec *vec);
 ///
 /// # Safety
 ///
-/// This operation is unsafe because undefined behaviour can occur if the size of the value being
+/// This operation is unsafe because undefined behavior can occur if the size of the value being
 /// inserted into the vector is not equal to `vec.buffer.ptr.size`.
 NSTDAPI NSTDErrorCode nstd_vec_insert(NSTDVec *vec, NSTDAnyConst value, NSTDUSize index);
 
