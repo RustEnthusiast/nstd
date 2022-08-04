@@ -28,6 +28,17 @@ typedef struct {
 NSTDAPI NSTDSliceConst nstd_core_slice_const_new(NSTDAnyConst ptr, NSTDUSize element_size,
 NSTDUSize len);
 
+/// Returns a raw pointer to the slice's memory.
+///
+/// # Parameters:
+///
+/// - `const NSTDSliceConst *slice` - The slice.
+///
+/// # Returns
+///
+/// `AnyConst ptr` - A raw pointer to the slice's memory.
+NSTDAPI NSTDAnyConst nstd_core_slice_const_as_ptr(const NSTDSliceConst *slice);
+
 /// Returns the number of elements in an immutable slice.
 ///
 /// # Parameters:
@@ -127,6 +138,28 @@ typedef struct {
 ///
 /// `NSTDSliceMut slice` - The new slice.
 NSTDAPI NSTDSliceMut nstd_core_slice_mut_new(NSTDAnyMut ptr, NSTDUSize element_size, NSTDUSize len);
+
+/// Returns a raw pointer to the slice's memory.
+///
+/// # Parameters:
+///
+/// - `NSTDSliceMut *slice` - The slice.
+///
+/// # Returns
+///
+/// `NSTDAnyMut ptr` - A raw pointer to the slice's memory.
+NSTDAPI NSTDAnyMut nstd_core_slice_mut_as_ptr(NSTDSliceMut *slice);
+
+/// Returns an immutable raw pointer to the slice's memory.
+///
+/// # Parameters:
+///
+/// - `const NSTDSliceMut *slice` - The slice.
+///
+/// # Returns
+///
+/// `NSTDAnyConst ptr` - A raw pointer to the slice's memory.
+NSTDAPI NSTDAnyConst nstd_core_slice_mut_as_ptr_const(const NSTDSliceMut *slice);
 
 /// Returns the number of elements in a slice.
 ///

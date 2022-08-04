@@ -2,7 +2,10 @@
 use crate::{
     core::{
         mem::nstd_core_mem_copy,
-        ptr::{nstd_core_ptr_const_new, nstd_core_ptr_mut_new, NSTDPtrConst, NSTDPtrMut},
+        ptr::{
+            nstd_core_ptr_const_get, nstd_core_ptr_const_new, nstd_core_ptr_mut_get,
+            nstd_core_ptr_mut_get_const, nstd_core_ptr_mut_new, NSTDPtrConst, NSTDPtrMut,
+        },
     },
     NSTDAnyConst, NSTDAnyMut, NSTDBool, NSTDUSize, NSTD_NULL,
 };
@@ -58,6 +61,21 @@ pub extern "C" fn nstd_core_slice_const_new(
         ptr: nstd_core_ptr_const_new(ptr, element_size),
         len,
     }
+}
+
+/// Returns a raw pointer to the slice's memory.
+///
+/// # Parameters:
+///
+/// - `const NSTDSliceConst *slice` - The slice.
+///
+/// # Returns
+///
+/// `AnyConst ptr` - A raw pointer to the slice's memory.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_core_slice_const_as_ptr(slice: &NSTDSliceConst) -> NSTDAnyConst {
+    nstd_core_ptr_const_get(&slice.ptr)
 }
 
 /// Returns the number of elements in an immutable slice.
@@ -239,6 +257,36 @@ pub extern "C" fn nstd_core_slice_mut_new(
         ptr: nstd_core_ptr_mut_new(ptr, element_size),
         len,
     }
+}
+
+/// Returns a raw pointer to the slice's memory.
+///
+/// # Parameters:
+///
+/// - `NSTDSliceMut *slice` - The slice.
+///
+/// # Returns
+///
+/// `NSTDAnyMut ptr` - A raw pointer to the slice's memory.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_core_slice_mut_as_ptr(slice: &mut NSTDSliceMut) -> NSTDAnyMut {
+    nstd_core_ptr_mut_get(&mut slice.ptr)
+}
+
+/// Returns an immutable raw pointer to the slice's memory.
+///
+/// # Parameters:
+///
+/// - `const NSTDSliceMut *slice` - The slice.
+///
+/// # Returns
+///
+/// `NSTDAnyConst ptr` - A raw pointer to the slice's memory.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_core_slice_mut_as_ptr_const(slice: &NSTDSliceMut) -> NSTDAnyConst {
+    nstd_core_ptr_mut_get_const(&slice.ptr)
 }
 
 /// Returns the number of elements in a slice.
