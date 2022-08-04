@@ -16,7 +16,7 @@ use crate::{core::def::NSTDErrorCode, NSTDAnyMut, NSTDUSize};
 ///
 /// # Safety
 ///
-/// This operation is unsafe because the behaviour is undefined if `size` is zero.
+/// This operation is unsafe because the behavior is undefined if `size` is zero.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_alloc_allocate(size: NSTDUSize) -> NSTDAnyMut {
@@ -44,7 +44,7 @@ pub unsafe extern "C" fn nstd_alloc_allocate(size: NSTDUSize) -> NSTDAnyMut {
 ///
 /// # Safety
 ///
-/// This operation is unsafe because the behaviour is undefined if `size` is zero.
+/// This operation is unsafe because the behavior is undefined if `size` is zero.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_alloc_allocate_zeroed(size: NSTDUSize) -> NSTDAnyMut {
@@ -80,7 +80,7 @@ pub unsafe extern "C" fn nstd_alloc_allocate_zeroed(size: NSTDUSize) -> NSTDAnyM
 ///
 /// # Safety
 ///
-/// This operation is unsafe because the behaviour is undefined if `ptr` is not a value returned by
+/// This operation is unsafe because the behavior is undefined if `ptr` is not a value returned by
 /// `nstd_alloc_allocate[_zeroed]`.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
@@ -117,7 +117,7 @@ pub unsafe extern "C" fn nstd_alloc_reallocate(
 ///
 /// # Safety
 ///
-/// This operation is unsafe because the behaviour is undefined if `ptr` is not a value returned by
+/// This operation is unsafe because the behavior is undefined if `ptr` is not a value returned by
 /// `nstd_alloc_allocate[_zeroed]`.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]

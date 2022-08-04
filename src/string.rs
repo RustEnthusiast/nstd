@@ -54,7 +54,7 @@ pub extern "C" fn nstd_string_new() -> NSTDString {
 ///
 /// # Parameters:
 ///
-/// - `NSTDUSize cap` - The number of bytes to preallocate.
+/// - `NSTDUSize cap` - The number of bytes to allocate ahead of time.
 ///
 /// # Returns
 ///

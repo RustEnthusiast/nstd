@@ -183,7 +183,7 @@ NSTDAPI NSTDAnyMut nstd_vec_get_mut(NSTDVec *vec, NSTDUSize pos);
 ///
 /// # Safety
 ///
-/// This operation is unsafe because undefined behaviour can occur if the size of the value being
+/// This operation is unsafe because undefined behavior can occur if the size of the value being
 /// pushed onto the vector is not equal to `vec.buffer.ptr.size`.
 NSTDAPI NSTDErrorCode nstd_vec_push(NSTDVec *vec, NSTDAnyConst value);
 

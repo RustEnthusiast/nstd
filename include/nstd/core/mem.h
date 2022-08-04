@@ -21,7 +21,7 @@ NSTDCPPSTART
 /// # Safety
 ///
 /// This function is highly unsafe as it does not know how large either of the memory buffers
-/// actually are, which can lead to undefined behaviour if either of the buffers' length are less
+/// actually are, which can lead to undefined behavior if either of the buffers' length are less
 /// than `num`.
 NSTDAPI NSTDBool nstd_core_mem_compare(const NSTDByte *buf1, const NSTDByte *buf2, NSTDUSize num);
 
@@ -54,7 +54,7 @@ NSTDAPI void nstd_core_mem_fill(NSTDByte *buf, NSTDUSize size, NSTDByte fill);
 /// # Safety
 ///
 /// This function is highly unsafe as it does not know how large either of the memory buffers are,
-/// quickly leading to undefined behaviour if this function ends up reading or writing past the end
+/// quickly leading to undefined behavior if this function ends up reading or writing past the end
 /// of a buffer.
 NSTDAPI void nstd_core_mem_copy(NSTDByte *dest, const NSTDByte *src, NSTDUSize num);
 
@@ -72,7 +72,7 @@ NSTDAPI void nstd_core_mem_copy(NSTDByte *dest, const NSTDByte *src, NSTDUSize n
 /// # Safety
 ///
 /// This function is highly unsafe as it does not know how large either of the memory buffers are,
-/// quickly leading to undefined behaviour if this function ends up reading or writing past the end
+/// quickly leading to undefined behavior if this function ends up reading or writing past the end
 /// of a buffer.
 NSTDAPI void nstd_core_mem_copy_overlapping(NSTDByte *dest, const NSTDByte *src, NSTDUSize num);
 
@@ -89,7 +89,7 @@ NSTDAPI void nstd_core_mem_copy_overlapping(NSTDByte *dest, const NSTDByte *src,
 /// # Safety
 ///
 /// This function is highly unsafe as it does not know how large either of the memory buffers are,
-/// quickly leading to undefined behaviour if this function ends up reading or writing past the end
+/// quickly leading to undefined behavior if this function ends up reading or writing past the end
 /// of a buffer.
 NSTDAPI void nstd_core_mem_swap(NSTDByte *x, NSTDByte *y, NSTDUSize num);
 

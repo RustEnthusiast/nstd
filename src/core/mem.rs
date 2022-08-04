@@ -18,7 +18,7 @@ use crate::{core::def::NSTDByte, NSTDBool, NSTDUSize, NSTD_TRUE};
 /// # Safety
 ///
 /// This function is highly unsafe as it does not know how large either of the memory buffers
-/// actually are, which can lead to undefined behaviour if either of the buffers' length are less
+/// actually are, which can lead to undefined behavior if either of the buffers' length are less
 /// than `num`.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
@@ -74,7 +74,7 @@ pub unsafe extern "C" fn nstd_core_mem_fill(buf: *mut NSTDByte, size: NSTDUSize,
 /// # Safety
 ///
 /// This function is highly unsafe as it does not know how large either of the memory buffers are,
-/// quickly leading to undefined behaviour if this function ends up reading or writing past the end
+/// quickly leading to undefined behavior if this function ends up reading or writing past the end
 /// of a buffer.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
@@ -100,7 +100,7 @@ pub unsafe extern "C" fn nstd_core_mem_copy(
 /// # Safety
 ///
 /// This function is highly unsafe as it does not know how large either of the memory buffers are,
-/// quickly leading to undefined behaviour if this function ends up reading or writing past the end
+/// quickly leading to undefined behavior if this function ends up reading or writing past the end
 /// of a buffer.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
@@ -125,7 +125,7 @@ pub unsafe extern "C" fn nstd_core_mem_copy_overlapping(
 /// # Safety
 ///
 /// This function is highly unsafe as it does not know how large either of the memory buffers are,
-/// quickly leading to undefined behaviour if this function ends up reading or writing past the end
+/// quickly leading to undefined behavior if this function ends up reading or writing past the end
 /// of a buffer.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]

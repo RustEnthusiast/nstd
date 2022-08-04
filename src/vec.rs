@@ -346,7 +346,7 @@ pub extern "C" fn nstd_vec_get_mut(vec: &mut NSTDVec, pos: NSTDUSize) -> NSTDAny
 ///
 /// # Safety
 ///
-/// This operation is unsafe because undefined behaviour can occur if the size of the value being
+/// This operation is unsafe because undefined behavior can occur if the size of the value being
 /// pushed onto the vector is not equal to `vec.buffer.ptr.size`.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]

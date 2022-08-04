@@ -17,7 +17,7 @@ NSTDCPPSTART
 ///
 /// # Safety
 ///
-/// This operation is unsafe because the behaviour is undefined if `size` is zero.
+/// This operation is unsafe because the behavior is undefined if `size` is zero.
 NSTDAPI NSTDAnyMut nstd_alloc_allocate(NSTDUSize size);
 
 /// Allocates a block of zero-initialized memory on the heap.
@@ -32,7 +32,7 @@ NSTDAPI NSTDAnyMut nstd_alloc_allocate(NSTDUSize size);
 ///
 /// # Safety
 ///
-/// This operation is unsafe because the behaviour is undefined if `size` is zero.
+/// This operation is unsafe because the behavior is undefined if `size` is zero.
 NSTDAPI NSTDAnyMut nstd_alloc_allocate_zeroed(NSTDUSize size);
 
 /// Reallocates a block of memory previously allocated by `nstd_alloc_allocate[_zeroed]`.
@@ -55,7 +55,7 @@ NSTDAPI NSTDAnyMut nstd_alloc_allocate_zeroed(NSTDUSize size);
 ///
 /// # Safety
 ///
-/// This operation is unsafe because the behaviour is undefined if `ptr` is not a value returned by
+/// This operation is unsafe because the behavior is undefined if `ptr` is not a value returned by
 /// `nstd_alloc_allocate[_zeroed]`.
 NSTDAPI NSTDErrorCode nstd_alloc_reallocate(NSTDAnyMut *ptr, NSTDUSize size, NSTDUSize new_size);
 
@@ -69,7 +69,7 @@ NSTDAPI NSTDErrorCode nstd_alloc_reallocate(NSTDAnyMut *ptr, NSTDUSize size, NST
 ///
 /// # Safety
 ///
-/// This operation is unsafe because the behaviour is undefined if `ptr` is not a value returned by
+/// This operation is unsafe because the behavior is undefined if `ptr` is not a value returned by
 /// `nstd_alloc_allocate[_zeroed]`.
 NSTDAPI void nstd_alloc_deallocate(NSTDAnyMut *ptr, NSTDUSize size);
 
