@@ -1,7 +1,7 @@
 //! Dynamically sized UTF-8 encoded byte string.
 use crate::{
     core::{
-        def::NSTDErrorCode,
+        def::{NSTDByte, NSTDErrorCode},
         slice::{nstd_core_slice_const_new, NSTDSliceConst},
         str::{
             nstd_core_str_const_as_bytes, nstd_core_str_const_from_bytes_unchecked,
@@ -10,8 +10,8 @@ use crate::{
         },
     },
     vec::{
-        nstd_vec_as_slice, nstd_vec_as_slice_mut, nstd_vec_clone, nstd_vec_extend, nstd_vec_len,
-        nstd_vec_new, nstd_vec_new_with_cap, nstd_vec_truncate, NSTDVec,
+        nstd_vec_as_ptr, nstd_vec_as_slice, nstd_vec_as_slice_mut, nstd_vec_clone, nstd_vec_extend,
+        nstd_vec_len, nstd_vec_new, nstd_vec_new_with_cap, nstd_vec_truncate, NSTDVec,
     },
     NSTDUSize, NSTDUnichar,
 };
@@ -126,6 +126,21 @@ pub extern "C" fn nstd_string_as_str_mut(string: &mut NSTDString) -> NSTDStrMut 
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_string_as_bytes(string: &NSTDString) -> NSTDSliceConst {
     nstd_vec_as_slice(&string.bytes)
+}
+
+/// Returns a raw pointer to a string's memory.
+///
+/// # Parameters:
+///
+/// - `const NSTDString *string` - The string.
+///
+/// # Returns
+///
+/// `const NSTDByte *ptr` - A raw pointer to a string's memory.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_string_as_ptr(string: &NSTDString) -> *const NSTDByte {
+    nstd_vec_as_ptr(&string.bytes).cast()
 }
 
 /// Returns ownership of an `NSTDString`'s raw data, taking ownership of said string.

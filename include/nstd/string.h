@@ -83,6 +83,17 @@ NSTDAPI NSTDStrMut nstd_string_as_str_mut(NSTDString *string);
 /// `NSTDSliceConst bytes` - The string's active data.
 NSTDAPI NSTDSliceConst nstd_string_as_bytes(const NSTDString *string);
 
+/// Returns a raw pointer to a string's memory.
+///
+/// # Parameters:
+///
+/// - `const NSTDString *string` - The string.
+///
+/// # Returns
+///
+/// `const NSTDByte *ptr` - A raw pointer to a string's memory.
+NSTDAPI const NSTDByte *nstd_string_as_ptr(const NSTDString *string);
+
 /// Returns ownership of an `NSTDString`'s raw data, taking ownership of said string.
 ///
 /// # Parameters:
