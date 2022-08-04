@@ -90,6 +90,17 @@ NSTDAPI NSTDStrConst nstd_core_str_const_from_bytes_unchecked(const NSTDSliceCon
 /// `NSTDSliceConst bytes` - An immutable byte slice over `str`'s data.
 NSTDAPI NSTDSliceConst nstd_core_str_const_as_bytes(const NSTDStrConst *str);
 
+/// Returns a raw pointer to a string slice's memory.
+///
+/// # Parameters:
+///
+/// - `const NSTDStrConst *str` - The string slice.
+///
+/// # Returns
+///
+/// `const NSTDByte *ptr` - A raw pointer to a string slice's memory.
+NSTDAPI const NSTDByte *nstd_core_str_const_as_ptr(const NSTDStrConst *str);
+
 /// Returns the number of Unicode characters in a string slice.
 ///
 /// # Parameters:
@@ -430,6 +441,17 @@ NSTDAPI NSTDStrMut nstd_core_str_mut_from_bytes_unchecked(NSTDSliceMut *bytes);
 ///
 /// `NSTDSliceConst bytes` - An immutable byte slice over `str`'s data.
 NSTDAPI NSTDSliceConst nstd_core_str_mut_as_bytes(const NSTDStrMut *str);
+
+/// Returns an immutable raw pointer to a string slice's memory.
+///
+/// # Parameters:
+///
+/// - `const NSTDStrMut *str` - The string slice.
+///
+/// # Returns
+///
+/// `const NSTDByte *ptr` - A raw pointer to a string slice's memory.
+NSTDAPI const NSTDByte *nstd_core_slice_mut_as_ptr(const NSTDStrMut *str);
 
 /// Returns the number of Unicode characters in a string slice.
 ///

@@ -5,9 +5,13 @@ use crate::{
             nstd_core_cstr_const_as_bytes, nstd_core_cstr_mut_as_ptr, nstd_core_cstr_mut_len,
             NSTDCStrConst, NSTDCStrMut,
         },
-        def::NSTDErrorCode,
+        def::{NSTDByte, NSTDErrorCode},
         range::NSTDURange,
-        slice::{nstd_core_slice_const_new, nstd_core_slice_mut_new, NSTDSliceConst, NSTDSliceMut},
+        slice::{
+            nstd_core_slice_const_as_ptr, nstd_core_slice_const_new,
+            nstd_core_slice_mut_as_ptr_const, nstd_core_slice_mut_new, NSTDSliceConst,
+            NSTDSliceMut,
+        },
     },
     NSTDFloat32, NSTDFloat64, NSTDISize, NSTDInt16, NSTDInt32, NSTDInt64, NSTDInt8, NSTDUInt16,
     NSTDUInt32, NSTDUInt64, NSTDUInt8, NSTDUSize, NSTDUnichar,
@@ -167,6 +171,21 @@ pub unsafe extern "C" fn nstd_core_str_const_from_bytes_unchecked(
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_str_const_as_bytes(str: &NSTDStrConst) -> NSTDSliceConst {
     nstd_core_slice_const_new(str.bytes.ptr.raw.cast(), 1, str.bytes.len)
+}
+
+/// Returns a raw pointer to a string slice's memory.
+///
+/// # Parameters:
+///
+/// - `const NSTDStrConst *str` - The string slice.
+///
+/// # Returns
+///
+/// `const NSTDByte *ptr` - A raw pointer to a string slice's memory.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_core_str_const_as_ptr(str: &NSTDStrConst) -> *const NSTDByte {
+    nstd_core_slice_const_as_ptr(&str.bytes).cast()
 }
 
 /// Returns the number of Unicode characters in a string slice.
@@ -589,6 +608,21 @@ pub unsafe extern "C" fn nstd_core_str_mut_from_bytes_unchecked(
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_str_mut_as_bytes(str: &NSTDStrMut) -> NSTDSliceConst {
     nstd_core_slice_const_new(str.bytes.ptr.raw.cast(), 1, str.bytes.len)
+}
+
+/// Returns an immutable raw pointer to a string slice's memory.
+///
+/// # Parameters:
+///
+/// - `const NSTDStrMut *str` - The string slice.
+///
+/// # Returns
+///
+/// `const NSTDByte *ptr` - A raw pointer to a string slice's memory.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_core_str_mut_as_ptr(str: &NSTDStrMut) -> *const NSTDByte {
+    nstd_core_slice_mut_as_ptr_const(&str.bytes).cast()
 }
 
 /// Returns the number of Unicode characters in a string slice.
