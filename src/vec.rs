@@ -55,43 +55,6 @@ impl NSTDVec {
         0
     }
 }
-impl<T> From<&[T]> for NSTDVec {
-    /// Creates a new vector from a Rust slice.
-    ///
-    /// # Note
-    ///
-    /// It is possible for this function to return a null vector on error.
-    ///
-    /// # Panics
-    ///
-    /// This operation will panic if `size_of::<T>()` is 0.
-    fn from(slice: &[T]) -> Self {
-        // Check the size of `T`.
-        let element_size = core::mem::size_of::<T>();
-        assert!(element_size != 0);
-        // Check the length of the slice.
-        let len = slice.len();
-        if len > 0 {
-            // Create the new vector.
-            let mut vec = nstd_vec_new_with_cap(element_size, len);
-            if !vec.buffer.ptr.raw.is_null() {
-                // On success, copy the bytes from the slice to the vector's memory buffer and
-                // set it's length.
-                unsafe {
-                    nstd_core_mem_copy(
-                        vec.buffer.ptr.raw.cast(),
-                        slice.as_ptr().cast(),
-                        len * element_size,
-                    );
-                }
-                vec.len = len;
-            }
-            vec
-        } else {
-            nstd_vec_new(element_size)
-        }
-    }
-}
 impl Drop for NSTDVec {
     /// [NSTDVec]'s destructor.
     #[inline]

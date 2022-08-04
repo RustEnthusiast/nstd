@@ -23,19 +23,6 @@ pub struct NSTDString {
     /// The underlying UTF-8 encoded byte buffer.
     bytes: NSTDVec,
 }
-impl From<&str> for NSTDString {
-    /// Creates a new string from a Rust string slice.
-    ///
-    /// # Note
-    ///
-    /// It is possible for this function to return a null (empty) string on error.
-    #[inline]
-    fn from(str: &str) -> Self {
-        Self {
-            bytes: NSTDVec::from(str.as_bytes()),
-        }
-    }
-}
 
 /// Creates a new instance of `NSTDString`.
 ///
