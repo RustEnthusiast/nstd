@@ -169,7 +169,7 @@ NSTDAPI NSTDAnyConst nstd_vec_get(const NSTDVec *vec, NSTDUSize pos);
 NSTDAPI NSTDAnyMut nstd_vec_get_mut(NSTDVec *vec, NSTDUSize pos);
 
 /// Pushes a value onto a vector by copying bytes to the end of the vector's buffer. The number of
-/// bytes to push is determined by `vec.buffer.ptr.size`.
+/// bytes to push is determined by `vec`'s stride.
 ///
 /// # Parameters:
 ///
@@ -184,7 +184,7 @@ NSTDAPI NSTDAnyMut nstd_vec_get_mut(NSTDVec *vec, NSTDUSize pos);
 /// # Safety
 ///
 /// This operation is unsafe because undefined behavior can occur if the size of the value being
-/// pushed onto the vector is not equal to `vec.buffer.ptr.size`.
+/// pushed onto the vector is not equal to `vec`'s stride.
 NSTDAPI NSTDErrorCode nstd_vec_push(NSTDVec *vec, NSTDAnyConst value);
 
 /// Removes the last value of a vector and returns a pointer to it.
@@ -227,7 +227,7 @@ NSTDAPI NSTDAnyConst nstd_vec_pop(NSTDVec *vec);
 /// # Safety
 ///
 /// This operation is unsafe because undefined behavior can occur if the size of the value being
-/// inserted into the vector is not equal to `vec.buffer.ptr.size`.
+/// inserted into the vector is not equal to `vec`'s stride.
 NSTDAPI NSTDErrorCode nstd_vec_insert(NSTDVec *vec, NSTDAnyConst value, NSTDUSize index);
 
 /// Removes the element at `index` in a vector.

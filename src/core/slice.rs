@@ -3,8 +3,9 @@ use crate::{
     core::{
         mem::nstd_core_mem_copy,
         ptr::{
-            nstd_core_ptr_const_get, nstd_core_ptr_const_new, nstd_core_ptr_mut_get,
-            nstd_core_ptr_mut_get_const, nstd_core_ptr_mut_new, NSTDPtrConst, NSTDPtrMut,
+            nstd_core_ptr_const_get, nstd_core_ptr_const_new, nstd_core_ptr_const_size,
+            nstd_core_ptr_mut_get, nstd_core_ptr_mut_get_const, nstd_core_ptr_mut_new,
+            nstd_core_ptr_mut_size, NSTDPtrConst, NSTDPtrMut,
         },
     },
     NSTDAnyConst, NSTDAnyMut, NSTDBool, NSTDUSize, NSTD_NULL,
@@ -22,8 +23,8 @@ pub struct NSTDSliceConst {
 impl NSTDSliceConst {
     /// Returns the number of bytes that this slice covers.
     #[inline]
-    pub(crate) const fn byte_len(&self) -> usize {
-        self.len * self.ptr.size
+    pub(crate) fn byte_len(&self) -> usize {
+        self.len * nstd_core_slice_const_stride(self)
     }
 
     /// Creates a Rust byte slice from this `NSTDSliceConst`.
@@ -105,7 +106,7 @@ pub extern "C" fn nstd_core_slice_const_len(slice: &NSTDSliceConst) -> NSTDUSize
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_slice_const_stride(slice: &NSTDSliceConst) -> NSTDUSize {
-    slice.ptr.size
+    nstd_core_ptr_const_size(&slice.ptr)
 }
 
 /// Returns an immutable pointer to the element at index `pos` in `slice`.
@@ -128,7 +129,10 @@ pub extern "C" fn nstd_core_slice_const_get(
 ) -> NSTDAnyConst {
     match pos < slice.len {
         // SAFETY: We've checked `pos`, and the returned pointer is already unsafe to access.
-        true => unsafe { slice.ptr.raw.add(pos * slice.ptr.size) },
+        true => unsafe {
+            let stride = nstd_core_slice_const_stride(slice);
+            slice.ptr.raw.add(pos * stride)
+        },
         false => NSTD_NULL,
     }
 }
@@ -207,8 +211,8 @@ pub struct NSTDSliceMut {
 impl NSTDSliceMut {
     /// Returns the number of bytes that this slice covers.
     #[inline]
-    pub(crate) const fn byte_len(&self) -> usize {
-        self.len * self.ptr.size
+    pub(crate) fn byte_len(&self) -> usize {
+        self.len * nstd_core_slice_mut_stride(self)
     }
 
     /// Creates a Rust byte slice from this `NSTDSliceMut`.
@@ -316,7 +320,7 @@ pub extern "C" fn nstd_core_slice_mut_len(slice: &NSTDSliceMut) -> NSTDUSize {
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_slice_mut_stride(slice: &NSTDSliceMut) -> NSTDUSize {
-    slice.ptr.size
+    nstd_core_ptr_mut_size(&slice.ptr)
 }
 
 /// Returns a pointer to the element at index `pos` in `slice`.
@@ -357,7 +361,10 @@ pub extern "C" fn nstd_core_slice_mut_get_const(
 ) -> NSTDAnyConst {
     match pos < slice.len {
         // SAFETY: We've checked `pos`, and the returned pointer is already unsafe to access.
-        true => unsafe { slice.ptr.raw.add(pos * slice.ptr.size) },
+        true => unsafe {
+            let stride = nstd_core_slice_mut_stride(slice);
+            slice.ptr.raw.add(pos * stride)
+        },
         false => NSTD_NULL,
     }
 }

@@ -56,7 +56,7 @@ NSTDAPI NSTDStrConst nstd_core_str_const_from_cstr_unchecked(const NSTDCStrConst
 ///
 /// # Panics
 ///
-/// This operation will panic if `bytes.ptr.size` is not 1, or `bytes` is not valid UTF-8.
+/// This operation will panic if `bytes`'s stride is not 1, or `bytes` is not valid UTF-8.
 NSTDAPI NSTDStrConst nstd_core_str_const_from_bytes(const NSTDSliceConst *bytes);
 
 /// Creates a string slice from raw bytes, without checking for UTF-8.
@@ -71,7 +71,7 @@ NSTDAPI NSTDStrConst nstd_core_str_const_from_bytes(const NSTDSliceConst *bytes)
 ///
 /// # Panics
 ///
-/// This operation will panic if `bytes.ptr.size` is not 1.
+/// This operation will panic if `bytes`'s stride is not 1.
 ///
 /// # Safety
 ///
@@ -408,7 +408,7 @@ NSTDAPI NSTDStrMut nstd_core_str_mut_from_cstr_unchecked(NSTDCStrMut *cstr);
 ///
 /// # Panics
 ///
-/// This operation will panic if `bytes.ptr.size` is not 1, or `bytes` is not valid UTF-8.
+/// This operation will panic if `bytes`'s stride is not 1, or `bytes` is not valid UTF-8.
 NSTDAPI NSTDStrMut nstd_core_str_mut_from_bytes(NSTDSliceMut *bytes);
 
 /// Creates a string slice from raw bytes, without checking for UTF-8.
@@ -423,7 +423,7 @@ NSTDAPI NSTDStrMut nstd_core_str_mut_from_bytes(NSTDSliceMut *bytes);
 ///
 /// # Panics
 ///
-/// This operation will panic if `bytes.ptr.size` is not 1.
+/// This operation will panic if `bytes`'s stride is not 1.
 ///
 /// # Safety
 ///

@@ -4,7 +4,10 @@ use crate::{
     core::{
         def::{NSTDByte, NSTDErrorCode},
         mem::{nstd_core_mem_copy, nstd_core_mem_copy_overlapping},
-        slice::{nstd_core_slice_const_new, nstd_core_slice_mut_new, NSTDSliceConst, NSTDSliceMut},
+        slice::{
+            nstd_core_slice_const_new, nstd_core_slice_const_stride, nstd_core_slice_mut_new,
+            nstd_core_slice_mut_stride, NSTDSliceConst, NSTDSliceMut,
+        },
     },
     NSTDAnyConst, NSTDAnyMut, NSTDUSize, NSTD_NULL,
 };
@@ -22,7 +25,7 @@ impl NSTDVec {
     /// Returns the number of active bytes in the vector.
     #[inline]
     pub(crate) fn byte_len(&self) -> usize {
-        self.len * self.buffer.ptr.size
+        self.len * nstd_vec_stride(self)
     }
 
     /// Creates a Rust byte slice containing all the *active* elements from this `NSTDVec`.
@@ -175,8 +178,9 @@ pub extern "C" fn nstd_vec_new_with_cap(element_size: NSTDUSize, mut cap: NSTDUS
 /// This operation will panic if allocating for the new vector fails.
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_vec_clone(vec: &NSTDVec) -> NSTDVec {
+    let stride = nstd_vec_stride(vec);
     if !vec.buffer.ptr.raw.is_null() {
-        let mut cloned = nstd_vec_new_with_cap(vec.buffer.ptr.size, vec.buffer.len);
+        let mut cloned = nstd_vec_new_with_cap(stride, vec.buffer.len);
         assert!(!cloned.buffer.ptr.raw.is_null());
         unsafe {
             nstd_core_mem_copy(
@@ -188,7 +192,7 @@ pub extern "C" fn nstd_vec_clone(vec: &NSTDVec) -> NSTDVec {
         cloned.len = vec.len;
         cloned
     } else {
-        nstd_vec_new(vec.buffer.ptr.size)
+        nstd_vec_new(stride)
     }
 }
 
@@ -219,7 +223,7 @@ pub extern "C" fn nstd_vec_len(vec: &NSTDVec) -> NSTDUSize {
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_vec_stride(vec: &NSTDVec) -> NSTDUSize {
-    vec.buffer.ptr.size
+    nstd_core_slice_mut_stride(&vec.buffer)
 }
 
 /// Returns an immutable slice containing all of a vector's active elements.
@@ -234,7 +238,7 @@ pub extern "C" fn nstd_vec_stride(vec: &NSTDVec) -> NSTDUSize {
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_vec_as_slice(vec: &NSTDVec) -> NSTDSliceConst {
-    nstd_core_slice_const_new(vec.buffer.ptr.raw, vec.buffer.ptr.size, vec.len)
+    nstd_core_slice_const_new(vec.buffer.ptr.raw, nstd_vec_stride(vec), vec.len)
 }
 
 /// Returns a slice containing all of a vector's active elements.
@@ -249,7 +253,7 @@ pub extern "C" fn nstd_vec_as_slice(vec: &NSTDVec) -> NSTDSliceConst {
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_vec_as_slice_mut(vec: &mut NSTDVec) -> NSTDSliceMut {
-    nstd_core_slice_mut_new(vec.buffer.ptr.raw, vec.buffer.ptr.size, vec.len)
+    nstd_core_slice_mut_new(vec.buffer.ptr.raw, nstd_vec_stride(vec), vec.len)
 }
 
 /// Returns a pointer to a vector's raw data.
@@ -303,7 +307,7 @@ pub extern "C" fn nstd_vec_as_mut_ptr(vec: &mut NSTDVec) -> NSTDAnyMut {
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_vec_get(vec: &NSTDVec, pos: NSTDUSize) -> NSTDAnyConst {
     match pos < vec.len {
-        true => unsafe { vec.buffer.ptr.raw.add(pos * vec.buffer.ptr.size) },
+        true => unsafe { vec.buffer.ptr.raw.add(pos * nstd_vec_stride(vec)) },
         false => NSTD_NULL,
     }
 }
@@ -332,7 +336,7 @@ pub extern "C" fn nstd_vec_get_mut(vec: &mut NSTDVec, pos: NSTDUSize) -> NSTDAny
 }
 
 /// Pushes a value onto a vector by copying bytes to the end of the vector's buffer. The number of
-/// bytes to push is determined by `vec.buffer.ptr.size`.
+/// bytes to push is determined by `vec`'s stride.
 ///
 /// # Parameters:
 ///
@@ -347,7 +351,7 @@ pub extern "C" fn nstd_vec_get_mut(vec: &mut NSTDVec, pos: NSTDUSize) -> NSTDAny
 /// # Safety
 ///
 /// This operation is unsafe because undefined behavior can occur if the size of the value being
-/// pushed onto the vector is not equal to `vec.buffer.ptr.size`.
+/// pushed onto the vector is not equal to `vec`'s stride.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_vec_push(vec: &mut NSTDVec, value: NSTDAnyConst) -> NSTDErrorCode {
@@ -355,7 +359,7 @@ pub unsafe extern "C" fn nstd_vec_push(vec: &mut NSTDVec, value: NSTDAnyConst) -
     let errc = vec.try_reserve();
     // On success: copy bytes to the end of the vector.
     if errc == 0 {
-        nstd_core_mem_copy(vec.end().cast(), value.cast(), vec.buffer.ptr.size);
+        nstd_core_mem_copy(vec.end().cast(), value.cast(), nstd_vec_stride(vec));
         vec.len += 1;
     }
     errc
@@ -409,7 +413,7 @@ pub extern "C" fn nstd_vec_pop(vec: &mut NSTDVec) -> NSTDAnyConst {
 /// # Safety
 ///
 /// This operation is unsafe because undefined behavior can occur if the size of the value being
-/// inserted into the vector is not equal to `vec.buffer.ptr.size`.
+/// inserted into the vector is not equal to `vec`'s stride.
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_vec_insert(
     vec: &mut NSTDVec,
@@ -427,13 +431,14 @@ pub unsafe extern "C" fn nstd_vec_insert(
     // Insert the value.
     else {
         // Move elements at/after `index` over by one element.
-        let bytes_to_copy = (vec.len - index) * vec.buffer.ptr.size;
-        let idxpos = index * vec.buffer.ptr.size;
+        let stride = nstd_vec_stride(vec);
+        let bytes_to_copy = (vec.len - index) * stride;
+        let idxpos = index * stride;
         let idxptr = vec.buffer.ptr.raw.add(idxpos).cast::<NSTDByte>();
-        let dest = idxptr.add(vec.buffer.ptr.size);
+        let dest = idxptr.add(stride);
         nstd_core_mem_copy_overlapping(dest, idxptr, bytes_to_copy);
         // Write `value` over the old value at `index`.
-        nstd_core_mem_copy(idxptr, value.cast(), vec.buffer.ptr.size);
+        nstd_core_mem_copy(idxptr, value.cast(), stride);
         vec.len += 1;
         0
     }
@@ -455,11 +460,12 @@ pub extern "C" fn nstd_vec_remove(vec: &mut NSTDVec, index: NSTDUSize) -> NSTDEr
     // Make sure `index` is valid. This also ensures that `vec.len` is at least 1.
     if index < vec.len {
         // Move bytes after `index` to the left by one element.
-        let bytes_to_copy = (vec.len - index - 1) * vec.buffer.ptr.size;
-        let idxpos = index * vec.buffer.ptr.size;
+        let stride = nstd_vec_stride(vec);
+        let bytes_to_copy = (vec.len - index - 1) * stride;
+        let idxpos = index * stride;
         unsafe {
             let idxptr = vec.buffer.ptr.raw.add(idxpos).cast::<NSTDByte>();
-            let src = idxptr.add(vec.buffer.ptr.size);
+            let src = idxptr.add(stride);
             nstd_core_mem_copy_overlapping(idxptr, src, bytes_to_copy);
         }
         // Decrement the vector's length AFTER shifting the bytes.
@@ -497,7 +503,7 @@ pub unsafe extern "C" fn nstd_vec_extend(
     values: &NSTDSliceConst,
 ) -> NSTDErrorCode {
     // Ensure value sizes are the same for both the vector and the slice.
-    assert!(vec.buffer.ptr.size == values.ptr.size);
+    assert!(nstd_vec_stride(vec) == nstd_core_slice_const_stride(values));
     // Making sure there's enough space for the extension.
     let mut errc = 0;
     let reserved = vec.buffer.len - vec.len;
@@ -552,7 +558,7 @@ pub extern "C" fn nstd_vec_truncate(vec: &mut NSTDVec, len: NSTDUSize) {
 pub extern "C" fn nstd_vec_reserve(vec: &mut NSTDVec, size: NSTDUSize) -> NSTDErrorCode {
     assert!(size != 0);
     // Calculate the number of bytes to allocate.
-    let bytes_to_alloc = size * vec.buffer.ptr.size;
+    let bytes_to_alloc = size * nstd_vec_stride(vec);
     // Checking if the vector is null and needs to make it's first allocation.
     if vec.buffer.ptr.raw.is_null() {
         let mem = unsafe { nstd_alloc_allocate(bytes_to_alloc) };
@@ -598,7 +604,7 @@ pub extern "C" fn nstd_vec_shrink(vec: &mut NSTDVec) -> NSTDErrorCode {
     if !vec.buffer.ptr.raw.is_null() && vec.len < vec.buffer.len {
         let current_len = vec.buffer.byte_len();
         // Make sure to allocate at least one element to avoid undefined behavior.
-        let new_len = vec.byte_len().max(vec.buffer.ptr.size);
+        let new_len = vec.byte_len().max(nstd_vec_stride(vec));
         errc = unsafe { nstd_alloc_reallocate(&mut vec.buffer.ptr.raw, current_len, new_len) };
         if errc == 0 {
             // The buffer's new length is at least 1.

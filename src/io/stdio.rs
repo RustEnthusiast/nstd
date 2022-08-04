@@ -1,7 +1,10 @@
 //! Contains common I/O operations for [Read] & [Write] with `nstd` types.
 use crate::{
     core::{
-        slice::{nstd_core_slice_const_new, NSTDSliceConst, NSTDSliceMut},
+        slice::{
+            nstd_core_slice_const_new, nstd_core_slice_const_stride, nstd_core_slice_mut_stride,
+            NSTDSliceConst, NSTDSliceMut,
+        },
         str::nstd_core_str_const_from_bytes_unchecked,
     },
     io::NSTDIOError,
@@ -24,7 +27,7 @@ pub(crate) unsafe fn write<W: Write>(
     written: &mut NSTDUSize,
 ) -> NSTDIOError {
     // Make sure the slice's element size is 1.
-    if bytes.ptr.size != 1 {
+    if nstd_core_slice_const_stride(bytes) != 1 {
         *written = 0;
         return NSTDIOError::NSTD_IO_ERROR_INVALID_INPUT;
     }
@@ -48,7 +51,7 @@ pub(crate) unsafe fn write<W: Write>(
 /// This function can cause undefined behavior if `bytes`'s data is invalid.
 pub(crate) unsafe fn write_all<W: Write>(stream: &mut W, bytes: &NSTDSliceConst) -> NSTDIOError {
     // Make sure the slice's element size is 1.
-    if bytes.ptr.size != 1 {
+    if nstd_core_slice_const_stride(bytes) != 1 {
         return NSTDIOError::NSTD_IO_ERROR_INVALID_INPUT;
     }
     // Attempt to write the bytes to stdout.
@@ -80,7 +83,7 @@ pub(crate) unsafe fn read<R: Read>(
     read: &mut NSTDUSize,
 ) -> NSTDIOError {
     // Make sure the buffer's element size is 1.
-    if buffer.ptr.size != 1 {
+    if nstd_core_slice_mut_stride(buffer) != 1 {
         *read = 0;
         return NSTDIOError::NSTD_IO_ERROR_INVALID_INPUT;
     }
@@ -176,7 +179,7 @@ pub(crate) fn read_to_string<R: Read>(
 /// `buffer`'s data must be valid for writes.
 pub(crate) unsafe fn read_exact<R: Read>(stream: &mut R, buffer: &mut NSTDSliceMut) -> NSTDIOError {
     // Make sure the buffer's element size is 1.
-    if buffer.ptr.size != 1 {
+    if nstd_core_slice_mut_stride(buffer) != 1 {
         return NSTDIOError::NSTD_IO_ERROR_INVALID_INPUT;
     }
     // Attempt to fill the buffer with data from stdin.

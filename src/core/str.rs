@@ -8,9 +8,9 @@ use crate::{
         def::{NSTDByte, NSTDErrorCode},
         range::NSTDURange,
         slice::{
-            nstd_core_slice_const_as_ptr, nstd_core_slice_const_new,
-            nstd_core_slice_mut_as_ptr_const, nstd_core_slice_mut_new, NSTDSliceConst,
-            NSTDSliceMut,
+            nstd_core_slice_const_as_ptr, nstd_core_slice_const_new, nstd_core_slice_const_stride,
+            nstd_core_slice_mut_as_ptr_const, nstd_core_slice_mut_new, nstd_core_slice_mut_stride,
+            NSTDSliceConst, NSTDSliceMut,
         },
     },
     NSTDFloat32, NSTDFloat64, NSTDISize, NSTDInt16, NSTDInt32, NSTDInt64, NSTDInt8, NSTDUInt16,
@@ -117,15 +117,16 @@ pub unsafe extern "C" fn nstd_core_str_const_from_cstr_unchecked(
 ///
 /// # Panics
 ///
-/// This operation will panic if `bytes.ptr.size` is not 1, or `bytes` is not valid UTF-8.
+/// This operation will panic if `bytes`'s stride is not 1, or `bytes` is not valid UTF-8.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_str_const_from_bytes(bytes: &NSTDSliceConst) -> NSTDStrConst {
-    assert!(bytes.ptr.size == 1);
+    let stride = nstd_core_slice_const_stride(bytes);
+    assert!(stride == 1);
     // SAFETY: The returned string slice is already unsafe to access.
     core::str::from_utf8(unsafe { bytes.as_slice() }).expect("Invalid UTF-8 bytes");
     NSTDStrConst {
-        bytes: nstd_core_slice_const_new(bytes.ptr.raw, bytes.ptr.size, bytes.len),
+        bytes: nstd_core_slice_const_new(bytes.ptr.raw, stride, bytes.len),
     }
 }
 
@@ -141,7 +142,7 @@ pub extern "C" fn nstd_core_str_const_from_bytes(bytes: &NSTDSliceConst) -> NSTD
 ///
 /// # Panics
 ///
-/// This operation will panic if `bytes.ptr.size` is not 1.
+/// This operation will panic if `bytes`'s stride is not 1.
 ///
 /// # Safety
 ///
@@ -152,9 +153,10 @@ pub extern "C" fn nstd_core_str_const_from_bytes(bytes: &NSTDSliceConst) -> NSTD
 pub unsafe extern "C" fn nstd_core_str_const_from_bytes_unchecked(
     bytes: &NSTDSliceConst,
 ) -> NSTDStrConst {
-    assert!(bytes.ptr.size == 1);
+    let stride = nstd_core_slice_const_stride(bytes);
+    assert!(stride == 1);
     NSTDStrConst {
-        bytes: nstd_core_slice_const_new(bytes.ptr.raw, bytes.ptr.size, bytes.len),
+        bytes: nstd_core_slice_const_new(bytes.ptr.raw, stride, bytes.len),
     }
 }
 
@@ -554,15 +556,16 @@ pub unsafe extern "C" fn nstd_core_str_mut_from_cstr_unchecked(
 ///
 /// # Panics
 ///
-/// This operation will panic if `bytes.ptr.size` is not 1, or `bytes` is not valid UTF-8.
+/// This operation will panic if `bytes`'s stride is not 1, or `bytes` is not valid UTF-8.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_str_mut_from_bytes(bytes: &mut NSTDSliceMut) -> NSTDStrMut {
-    assert!(bytes.ptr.size == 1);
+    let stride = nstd_core_slice_mut_stride(bytes);
+    assert!(stride == 1);
     // SAFETY: The returned string slice is already unsafe to access.
     core::str::from_utf8(unsafe { bytes.as_slice() }).expect("Invalid UTF-8 bytes");
     NSTDStrMut {
-        bytes: nstd_core_slice_mut_new(bytes.ptr.raw, bytes.ptr.size, bytes.len),
+        bytes: nstd_core_slice_mut_new(bytes.ptr.raw, stride, bytes.len),
     }
 }
 
@@ -578,7 +581,7 @@ pub extern "C" fn nstd_core_str_mut_from_bytes(bytes: &mut NSTDSliceMut) -> NSTD
 ///
 /// # Panics
 ///
-/// This operation will panic if `bytes.ptr.size` is not 1.
+/// This operation will panic if `bytes`'s stride is not 1.
 ///
 /// # Safety
 ///
@@ -589,9 +592,10 @@ pub extern "C" fn nstd_core_str_mut_from_bytes(bytes: &mut NSTDSliceMut) -> NSTD
 pub unsafe extern "C" fn nstd_core_str_mut_from_bytes_unchecked(
     bytes: &mut NSTDSliceMut,
 ) -> NSTDStrMut {
-    assert!(bytes.ptr.size == 1);
+    let stride = nstd_core_slice_mut_stride(bytes);
+    assert!(stride == 1);
     NSTDStrMut {
-        bytes: nstd_core_slice_mut_new(bytes.ptr.raw, bytes.ptr.size, bytes.len),
+        bytes: nstd_core_slice_mut_new(bytes.ptr.raw, stride, bytes.len),
     }
 }
 

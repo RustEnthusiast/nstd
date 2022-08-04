@@ -8,7 +8,7 @@ pub struct NSTDPtrConst {
     /// A raw pointer to the data.
     pub(crate) raw: NSTDAnyConst,
     /// The size of the object being pointed to.
-    pub(crate) size: NSTDUSize,
+    size: NSTDUSize,
 }
 
 /// Creates a new instance of `NSTDPtrConst`.
@@ -65,7 +65,7 @@ pub struct NSTDPtrMut {
     /// A raw pointer to the data.
     pub(crate) raw: NSTDAnyMut,
     /// The size of the object being pointed to.
-    pub(crate) size: NSTDUSize,
+    size: NSTDUSize,
 }
 
 /// Creates a new instance of `NSTDPtrMut`.
