@@ -1,24 +1,16 @@
-//! An application event loop.
-pub mod events;
-use self::events::NSTDAppEvents;
-use winit::event_loop::EventLoop;
-
-/// Application data that cannot be stored on the stack.
-#[derive(Debug, Default)]
-struct App {
-    /// The underlying [winit] event loop.
-    event_loop: EventLoop<()>,
-}
+#ifndef NSTD_APP_APP_H
+#define NSTD_APP_APP_H
+#include "../nstd.h"
+#include "events.h"
+NSTDCPPSTART
 
 /// An application event loop.
-#[repr(C)]
-#[derive(Debug)]
-pub struct NSTDApp {
+typedef struct {
     /// The application event callback function pointers.
-    events: NSTDAppEvents,
+    NSTDAppEvents events;
     /// Application data that cannot live on the stack.
-    data: Box<App>,
-}
+    NSTDAnyMut data;
+} NSTDApp;
 
 /// Creates a new `nstd` application.
 ///
@@ -34,14 +26,7 @@ pub struct NSTDApp {
 /// # Panics
 ///
 /// This function must be called on the "main" thread, otherwise a panic may occurr.
-#[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_app_new() -> NSTDApp {
-    NSTDApp {
-        events: NSTDAppEvents::new(),
-        data: Box::default(),
-    }
-}
+NSTDAPI NSTDApp nstd_app_new();
 
 /// Returns a mutable reference to an `NSTDApp`'s event table.
 ///
@@ -52,11 +37,7 @@ pub extern "C" fn nstd_app_new() -> NSTDApp {
 /// # Returns
 ///
 /// `NSTDAppEvents *events` - A pointer to the application event table.
-#[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_app_events(app: &mut NSTDApp) -> &mut NSTDAppEvents {
-    &mut app.events
-}
+NSTDAPI NSTDAppEvents *nstd_app_events(NSTDApp *app);
 
 /// Runs an `NSTDApp`'s event loop.
 ///
@@ -71,16 +52,7 @@ pub extern "C" fn nstd_app_events(app: &mut NSTDApp) -> &mut NSTDAppEvents {
 /// # Safety
 ///
 /// This function's caller must guarantee validity of the `app`'s event callbacks.
-#[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_app_run(app: NSTDApp) -> ! {
-    // Dispatch the `start` event.
-    if let Some(start) = app.events.start {
-        start();
-    }
-    // Run the winit event loop.
-    app.data.event_loop.run(|_, _, _| {})
-}
+NSTDAPI void nstd_app_run(NSTDApp app);
 
 /// Frees an instance of `NSTDApp`. The application's event loop must not be ran after this is
 /// called.
@@ -88,7 +60,7 @@ pub unsafe extern "C" fn nstd_app_run(app: NSTDApp) -> ! {
 /// # Parameters:
 ///
 /// - `NSTDApp app` - The `nstd` application.
-#[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-#[allow(unused_variables)]
-pub extern "C" fn nstd_app_free(app: NSTDApp) {}
+NSTDAPI void nstd_app_free(NSTDApp app);
+
+NSTDCPPEND
+#endif
