@@ -1,5 +1,5 @@
-#ifndef NSTD_SHARED_LIB_H_INCLUDED
-#define NSTD_SHARED_LIB_H_INCLUDED
+#ifndef NSTD_SHARED_LIB_H
+#define NSTD_SHARED_LIB_H
 #include "core/def.h"
 #include "core/str.h"
 #include "nstd.h"

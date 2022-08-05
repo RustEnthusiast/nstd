@@ -1,5 +1,5 @@
-#ifndef NSTD_VEC_H_INCLUDED
-#define NSTD_VEC_H_INCLUDED
+#ifndef NSTD_VEC_H
+#define NSTD_VEC_H
 #include "core/def.h"
 #include "core/slice.h"
 #include "nstd.h"

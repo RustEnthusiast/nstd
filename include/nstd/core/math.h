@@ -1,5 +1,5 @@
-#ifndef NSTD_CORE_MATH_H_INCLUDED
-#define NSTD_CORE_MATH_H_INCLUDED
+#ifndef NSTD_CORE_MATH_H
+#define NSTD_CORE_MATH_H
 #include "../nstd.h"
 NSTDCPPSTART
 

@@ -1,5 +1,5 @@
-#ifndef NSTD_CSTRING_H_INCLUDED
-#define NSTD_CSTRING_H_INCLUDED
+#ifndef NSTD_CSTRING_H
+#define NSTD_CSTRING_H
 #include "core/cstr.h"
 #include "core/def.h"
 #include "core/slice.h"

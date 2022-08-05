@@ -1,5 +1,5 @@
-#ifndef NSTD_ALLOC_H_INCLUDED
-#define NSTD_ALLOC_H_INCLUDED
+#ifndef NSTD_ALLOC_H
+#define NSTD_ALLOC_H
 #include "core/def.h"
 #include "nstd.h"
 NSTDCPPSTART

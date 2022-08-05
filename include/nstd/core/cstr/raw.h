@@ -1,5 +1,5 @@
-#ifndef NSTD_CORE_CSTR_RAW_H_INCLUDED
-#define NSTD_CORE_CSTR_RAW_H_INCLUDED
+#ifndef NSTD_CORE_CSTR_RAW_H
+#define NSTD_CORE_CSTR_RAW_H
 #include "../../nstd.h"
 #include "../def.h"
 NSTDCPPSTART

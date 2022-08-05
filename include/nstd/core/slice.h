@@ -1,5 +1,5 @@
-#ifndef NSTD_CORE_SLICE_H_INCLUDED
-#define NSTD_CORE_SLICE_H_INCLUDED
+#ifndef NSTD_CORE_SLICE_H
+#define NSTD_CORE_SLICE_H
 #include "../nstd.h"
 #include "ptr.h"
 NSTDCPPSTART

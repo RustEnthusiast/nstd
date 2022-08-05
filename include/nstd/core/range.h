@@ -1,5 +1,5 @@
-#ifndef NSTD_CORE_RANGE_H_INCLUDED
-#define NSTD_CORE_RANGE_H_INCLUDED
+#ifndef NSTD_CORE_RANGE_H
+#define NSTD_CORE_RANGE_H
 #include "../nstd.h"
 
 /// A half-open (low inclusive, high exclusive) arch-bit unsigned numerical range.

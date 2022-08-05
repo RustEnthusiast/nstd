@@ -1,5 +1,5 @@
-#ifndef NSTD_CORE_FTY_H_INCLUDED
-#define NSTD_CORE_FTY_H_INCLUDED
+#ifndef NSTD_CORE_FTY_H
+#define NSTD_CORE_FTY_H
 #include "../nstd.h"
 NSTDCPPSTART
 

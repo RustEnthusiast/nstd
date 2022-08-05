@@ -1,5 +1,5 @@
-#ifndef NSTD_NSTD_H_INCLUDED
-#define NSTD_NSTD_H_INCLUDED
+#ifndef NSTD_NSTD_H
+#define NSTD_NSTD_H
 #if defined(__WINDOWS__)\
     || defined(_WIN32)\
     || defined(_WIN64)\

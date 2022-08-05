@@ -1,5 +1,5 @@
-#ifndef NSTD_IO_STDIN_H_INCLUDED
-#define NSTD_IO_STDIN_H_INCLUDED
+#ifndef NSTD_IO_STDIN_H
+#define NSTD_IO_STDIN_H
 #include "../core/slice.h"
 #include "../nstd.h"
 #include "../string.h"

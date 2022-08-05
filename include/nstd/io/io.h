@@ -1,5 +1,5 @@
-#ifndef NSTD_IO_IO_H_INCLUDED
-#define NSTD_IO_IO_H_INCLUDED
+#ifndef NSTD_IO_IO_H
+#define NSTD_IO_IO_H
 #include "../core/str.h"
 #include "../nstd.h"
 #include "../string.h"

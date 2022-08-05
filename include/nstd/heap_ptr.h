@@ -1,5 +1,5 @@
-#ifndef NSTD_HEAP_PTR_H_INCLUDED
-#define NSTD_HEAP_PTR_H_INCLUDED
+#ifndef NSTD_HEAP_PTR_H
+#define NSTD_HEAP_PTR_H
 #include "core/ptr.h"
 #include "nstd.h"
 NSTDCPPSTART

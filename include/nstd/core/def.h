@@ -1,5 +1,5 @@
-#ifndef NSTD_CORE_DEF_H_INCLUDED
-#define NSTD_CORE_DEF_H_INCLUDED
+#ifndef NSTD_CORE_DEF_H
+#define NSTD_CORE_DEF_H
 #include "../nstd.h"
 
 /// Equivalent to C's `char` type.

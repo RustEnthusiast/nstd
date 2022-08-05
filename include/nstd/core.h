@@ -1,5 +1,5 @@
-#ifndef NSTD_CORE_H_INCLUDED
-#define NSTD_CORE_H_INCLUDED
+#ifndef NSTD_CORE_H
+#define NSTD_CORE_H
 #include "core/cstr.h"
 #include "core/cty.h"
 #include "core/def.h"

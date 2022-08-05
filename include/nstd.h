@@ -1,5 +1,5 @@
-#ifndef NSTD_H_INCLUDED
-#define NSTD_H_INCLUDED
+#ifndef NSTD_H
+#define NSTD_H
 #include "nstd/alloc.h"
 #include "nstd/core.h"
 #include "nstd/cstring.h"
