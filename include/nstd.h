@@ -1,6 +1,7 @@
 #ifndef NSTD_H
 #define NSTD_H
 #include "nstd/alloc.h"
+#include "nstd/app.h"
 #include "nstd/core.h"
 #include "nstd/cstring.h"
 #include "nstd/heap_ptr.h"

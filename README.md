@@ -8,6 +8,7 @@ Rust syntax).
 # Modules
 - `nstd` - A cross-platform, fast, and safe general purpose C library written in Rust.
     - `alloc` - Low level memory allocation.
+    - `app` - An application event loop.
     - `core` - Provides core functionality for `nstd`.
         - `cstr` - Unowned C string slices.
             - `raw` - Raw C string processing.
