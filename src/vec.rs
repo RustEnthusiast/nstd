@@ -24,15 +24,24 @@ pub struct NSTDVec {
 impl NSTDVec {
     /// Returns the number of active bytes in the vector.
     #[inline]
-    pub(crate) fn byte_len(&self) -> usize {
+    fn byte_len(&self) -> usize {
         self.len * nstd_vec_stride(self)
     }
 
     /// Creates a Rust byte slice containing all the *active* elements from this `NSTDVec`.
+    ///
+    /// # Panics
+    ///
+    /// This operation will panic if `size_of::<T>()` does not match the vector's stride.
+    ///
+    /// # Safety
+    ///
+    /// The vector's data must remain valid while the returned slice is in use.
     #[inline]
     #[allow(dead_code)]
-    pub(crate) fn as_slice(&self) -> &[u8] {
-        unsafe { core::slice::from_raw_parts(self.buffer.ptr.raw.cast(), self.byte_len()) }
+    pub(crate) unsafe fn as_slice<T>(&self) -> &[T] {
+        assert!(nstd_vec_stride(self) == core::mem::size_of::<T>());
+        core::slice::from_raw_parts(self.buffer.ptr.raw.cast(), self.byte_len())
     }
 
     /// Returns a pointer to one element past the end of the vector.
@@ -41,13 +50,13 @@ impl NSTDVec {
     ///
     /// This method does ***NOT*** check to make sure the vector is non-null.
     #[inline]
-    pub(crate) unsafe fn end(&self) -> NSTDAnyMut {
+    unsafe fn end(&self) -> NSTDAnyMut {
         self.buffer.ptr.raw.add(self.byte_len())
     }
 
     /// Attempts to reserve some memory for the vector if needed.
     #[inline]
-    pub(crate) fn try_reserve(&mut self) -> NSTDErrorCode {
+    fn try_reserve(&mut self) -> NSTDErrorCode {
         if self.len == self.buffer.len {
             let additional = 1 + self.buffer.len / 2;
             return nstd_vec_reserve(self, additional);

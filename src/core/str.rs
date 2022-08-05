@@ -121,10 +121,9 @@ pub unsafe extern "C" fn nstd_core_str_const_from_cstr_unchecked(
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_str_const_from_bytes(bytes: &NSTDSliceConst) -> NSTDStrConst {
-    let stride = nstd_core_slice_const_stride(bytes);
-    assert!(stride == 1);
     // SAFETY: The returned string slice is already unsafe to access.
     core::str::from_utf8(unsafe { bytes.as_slice() }).expect("Invalid UTF-8 bytes");
+    let stride = nstd_core_slice_const_stride(bytes);
     NSTDStrConst {
         bytes: nstd_core_slice_const_new(bytes.ptr.raw, stride, bytes.len),
     }
@@ -560,10 +559,9 @@ pub unsafe extern "C" fn nstd_core_str_mut_from_cstr_unchecked(
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_str_mut_from_bytes(bytes: &mut NSTDSliceMut) -> NSTDStrMut {
-    let stride = nstd_core_slice_mut_stride(bytes);
-    assert!(stride == 1);
     // SAFETY: The returned string slice is already unsafe to access.
     core::str::from_utf8(unsafe { bytes.as_slice() }).expect("Invalid UTF-8 bytes");
+    let stride = nstd_core_slice_mut_stride(bytes);
     NSTDStrMut {
         bytes: nstd_core_slice_mut_new(bytes.ptr.raw, stride, bytes.len),
     }

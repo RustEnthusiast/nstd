@@ -29,11 +29,16 @@ impl NSTDSliceConst {
 
     /// Creates a Rust byte slice from this `NSTDSliceConst`.
     ///
+    /// # Panics
+    ///
+    /// This operation will panic if `size_of::<T>()` does not match the slice's stride.
+    ///
     /// # Safety
     ///
     /// The `NSTDSliceConst`'s data must remain valid while the returned slice is in use.
     #[inline]
-    pub(crate) unsafe fn as_slice(&self) -> &[u8] {
+    pub(crate) unsafe fn as_slice<T>(&self) -> &[T] {
+        assert!(nstd_core_slice_const_stride(self) == core::mem::size_of::<T>());
         core::slice::from_raw_parts(self.ptr.raw.cast(), self.byte_len())
     }
 }
@@ -196,7 +201,7 @@ pub unsafe extern "C" fn nstd_core_slice_const_compare(
     s1: &NSTDSliceConst,
     s2: &NSTDSliceConst,
 ) -> NSTDBool {
-    (s1.as_slice() == s2.as_slice()).into()
+    (s1.as_slice::<u8>() == s2.as_slice::<u8>()).into()
 }
 
 /// A view into a sequence of values in memory.
@@ -217,22 +222,32 @@ impl NSTDSliceMut {
 
     /// Creates a Rust byte slice from this `NSTDSliceMut`.
     ///
+    /// # Panics
+    ///
+    /// This operation will panic if `size_of::<T>()` does not match the slice's stride.
+    ///
     /// # Safety
     ///
     /// The `NSTDSliceMut`'s data must remain valid while the returned slice is in use.
     #[inline]
-    pub(crate) unsafe fn as_slice(&self) -> &[u8] {
+    pub(crate) unsafe fn as_slice<T>(&self) -> &[T] {
+        assert!(nstd_core_slice_mut_stride(self) == core::mem::size_of::<T>());
         core::slice::from_raw_parts(self.ptr.raw.cast(), self.byte_len())
     }
 
     /// Creates a mutable Rust byte slice from this `NSTDSliceMut`.
+    ///
+    /// # Panics
+    ///
+    /// This operation will panic if `size_of::<T>()` does not match the slice's stride.
     ///
     /// # Safety
     ///
     /// The `NSTDSliceMut`'s data must remain valid while the returned slice is in use.
     #[inline]
     #[allow(dead_code)]
-    pub(crate) unsafe fn as_slice_mut(&mut self) -> &mut [u8] {
+    pub(crate) unsafe fn as_slice_mut<T>(&mut self) -> &mut [T] {
+        assert!(nstd_core_slice_mut_stride(self) == core::mem::size_of::<T>());
         core::slice::from_raw_parts_mut(self.ptr.raw.cast(), self.byte_len())
     }
 }
@@ -460,7 +475,7 @@ pub unsafe extern "C" fn nstd_core_slice_mut_compare(
     s1: &NSTDSliceMut,
     s2: &NSTDSliceMut,
 ) -> NSTDBool {
-    (s1.as_slice() == s2.as_slice()).into()
+    (s1.as_slice::<u8>() == s2.as_slice::<u8>()).into()
 }
 
 /// Copies data into `dest` from `src`. The number of bytes copied is determined by `src`.
