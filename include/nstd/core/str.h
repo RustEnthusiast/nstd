@@ -451,7 +451,7 @@ NSTDAPI NSTDSliceConst nstd_core_str_mut_as_bytes(const NSTDStrMut *str);
 /// # Returns
 ///
 /// `const NSTDByte *ptr` - A raw pointer to a string slice's memory.
-NSTDAPI const NSTDByte *nstd_core_slice_mut_as_ptr(const NSTDStrMut *str);
+NSTDAPI const NSTDByte *nstd_core_str_mut_as_ptr(const NSTDStrMut *str);
 
 /// Returns the number of Unicode characters in a string slice.
 ///
