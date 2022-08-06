@@ -23,6 +23,7 @@ Rust syntax).
         - `str` - An unowned view into a UTF-8 encoded byte string.
     - `cstring` - A dynamically sized, null terminated, C string.
     - `fs` - Provides access to the file system.
+        - `file` - A handle to an opened file.
     - `heap_ptr` - A pointer type for single value heap allocation.
     - `io` - Provides functionality for interacting with the standard I/O streams.
         - `stderr` - A handle to the standard error stream.
