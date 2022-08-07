@@ -23,6 +23,16 @@ pub struct NSTDString {
     /// The underlying UTF-8 encoded byte buffer.
     bytes: NSTDVec,
 }
+impl NSTDString {
+    /// Creates a new [NSTDString] from a Rust &[str].
+    #[inline]
+    #[allow(dead_code)]
+    pub(crate) fn from_str(str: &str) -> Self {
+        NSTDString {
+            bytes: NSTDVec::from_slice(str.as_bytes()),
+        }
+    }
+}
 
 /// Creates a new instance of `NSTDString`.
 ///

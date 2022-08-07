@@ -7,8 +7,12 @@ NSTDCPPSTART
 
 /// A dynamically sized contiguous sequence of values.
 typedef struct {
-    /// The underlying memory buffer.
-    NSTDSliceMut buffer;
+    /// A raw pointer to the vector's memory buffer.
+    NSTDAnyMut ptr;
+    /// The number of bytes each value in the vector takes up.
+    NSTDUSize stride;
+    /// The number of values allocated in the memory buffer.
+    NSTDUSize buffer_len;
     /// The number of active elements in the vector.
     NSTDUSize len;
 } NSTDVec;
