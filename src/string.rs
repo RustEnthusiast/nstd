@@ -13,8 +13,24 @@ use crate::{
         nstd_vec_as_ptr, nstd_vec_as_slice, nstd_vec_as_slice_mut, nstd_vec_clone, nstd_vec_extend,
         nstd_vec_len, nstd_vec_new, nstd_vec_new_with_cap, nstd_vec_truncate, NSTDVec,
     },
-    NSTDUSize, NSTDUnichar,
+    NSTDFloat32, NSTDFloat64, NSTDISize, NSTDInt16, NSTDInt32, NSTDInt64, NSTDInt8, NSTDUInt16,
+    NSTDUInt32, NSTDUInt64, NSTDUInt8, NSTDUSize, NSTDUnichar,
 };
+
+/// Generates the `nstd_string_from_[i|u|f]*` functions.
+macro_rules! gen_from_primitive {
+    (
+        $(#[$meta:meta])*
+        $name: ident, $FromT: ty
+    ) => {
+        $(#[$meta])*
+        #[inline]
+        #[cfg_attr(feature = "clib", no_mangle)]
+        pub extern "C" fn $name(v: $FromT) -> NSTDString {
+            NSTDString::from_str(&v.to_string())
+        }
+    };
+}
 
 /// Dynamically sized UTF-8 encoded byte string.
 #[repr(C)]
@@ -26,7 +42,6 @@ pub struct NSTDString {
 impl NSTDString {
     /// Creates a new [NSTDString] from a Rust &[str].
     #[inline]
-    #[allow(dead_code)]
     pub(crate) fn from_str(str: &str) -> Self {
         NSTDString {
             bytes: NSTDVec::from_slice(str.as_bytes()),
@@ -254,6 +269,163 @@ pub extern "C" fn nstd_string_pop(string: &mut NSTDString) -> NSTDUnichar {
     }
     char::REPLACEMENT_CHARACTER as NSTDUnichar
 }
+
+gen_from_primitive!(
+    /// Creates a new `NSTDString` from an `NSTDFloat32`.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDFloat32 v` - The 32-bit floating-point value.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDString string` - The 32-bit floating-point value as a string.
+    nstd_string_from_f32,
+    NSTDFloat32
+);
+gen_from_primitive!(
+    /// Creates a new `NSTDString` from an `NSTDFloat64`.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDFloat64 v` - The 64-bit floating-point value.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDString string` - The 64-bit floating-point value as a string.
+    nstd_string_from_f64,
+    NSTDFloat64
+);
+gen_from_primitive!(
+    /// Creates a new `NSTDString` from an `NSTDUInt8`.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDUInt8 v` - The 8-bit unsigned integer value.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDString string` - The 8-bit unsigned integer value as a string.
+    nstd_string_from_u8,
+    NSTDUInt8
+);
+gen_from_primitive!(
+    /// Creates a new `NSTDString` from an `NSTDInt8`.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDInt8 v` - The 8-bit signed integer value.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDString string` - The 8-bit signed integer value as a string.
+    nstd_string_from_i8,
+    NSTDInt8
+);
+gen_from_primitive!(
+    /// Creates a new `NSTDString` from an `NSTDUInt16`.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDUInt16 v` - The 16-bit unsigned integer value.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDString string` - The 16-bit unsigned integer value as a string.
+    nstd_string_from_u16,
+    NSTDUInt16
+);
+gen_from_primitive!(
+    /// Creates a new `NSTDString` from an `NSTDInt16`.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDInt16 v` - The 16-bit signed integer value.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDString string` - The 16-bit signed integer value as a string.
+    nstd_string_from_i16,
+    NSTDInt16
+);
+gen_from_primitive!(
+    /// Creates a new `NSTDString` from an `NSTDUInt32`.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDUInt32 v` - The 32-bit unsigned integer value.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDString string` - The 32-bit unsigned integer value as a string.
+    nstd_string_from_u32,
+    NSTDUInt32
+);
+gen_from_primitive!(
+    /// Creates a new `NSTDString` from an `NSTDInt32`.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDInt32 v` - The 32-bit signed integer value.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDString string` - The 32-bit signed integer value as a string.
+    nstd_string_from_i32,
+    NSTDInt32
+);
+gen_from_primitive!(
+    /// Creates a new `NSTDString` from an `NSTDUInt64`.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDUInt64 v` - The 64-bit unsigned integer value.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDString string` - The 64-bit unsigned integer value as a string.
+    nstd_string_from_u64,
+    NSTDUInt64
+);
+gen_from_primitive!(
+    /// Creates a new `NSTDString` from an `NSTDInt64`.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDInt64 v` - The 64-bit signed integer value.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDString string` - The 64-bit signed integer value as a string.
+    nstd_string_from_i64,
+    NSTDInt64
+);
+gen_from_primitive!(
+    /// Creates a new `NSTDString` from an `NSTDUSize`.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDUSize v` - The arch-bit unsigned integer value.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDString string` - The arch-bit unsigned integer value as a string.
+    nstd_string_from_usize,
+    NSTDUSize
+);
+gen_from_primitive!(
+    /// Creates a new `NSTDString` from an `NSTDISize`.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDISize v` - The arch-bit signed integer value.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDString string` - The arch-bit signed integer value as a string.
+    nstd_string_from_isize,
+    NSTDISize
+);
 
 /// Frees an instance of `NSTDString`.
 ///
