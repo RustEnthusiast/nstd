@@ -11,10 +11,10 @@ typedef struct {
     NSTDAnyMut ptr;
     /// The number of bytes each value in the vector takes up.
     NSTDUSize stride;
-    /// The number of values allocated in the memory buffer.
-    NSTDUSize buffer_len;
     /// The number of active elements in the vector.
     NSTDUSize len;
+    /// The number of values allocated in the memory buffer.
+    NSTDUSize cap;
 } NSTDVec;
 
 /// Creates a new vector without allocating any resources.

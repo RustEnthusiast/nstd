@@ -20,10 +20,10 @@ pub struct NSTDVec {
     ptr: NSTDAnyMut,
     /// The number of bytes each value in the vector takes up.
     stride: NSTDUSize,
-    /// The number of values allocated in the memory buffer.
-    buffer_len: NSTDUSize,
     /// The number of active elements in the vector.
     len: NSTDUSize,
+    /// The number of values allocated in the memory buffer.
+    cap: NSTDUSize,
 }
 impl NSTDVec {
     /// Creates a new [NSTDVec] from a Rust slice.
@@ -58,7 +58,7 @@ impl NSTDVec {
     /// Returns the number of bytes in the vector's memory buffer.
     #[inline]
     fn buffer_byte_len(&self) -> usize {
-        self.buffer_len * self.stride
+        self.cap * self.stride
     }
 
     /// Creates a Rust byte slice containing all the *active* elements from this `NSTDVec`.
@@ -90,8 +90,8 @@ impl NSTDVec {
     /// Attempts to reserve some memory for the vector if needed.
     #[inline]
     fn try_reserve(&mut self) -> NSTDErrorCode {
-        if self.len == self.buffer_len {
-            let additional = 1 + self.buffer_len / 2;
+        if self.len == self.cap {
+            let additional = 1 + self.cap / 2;
             return nstd_vec_reserve(self, additional);
         }
         0
@@ -128,7 +128,7 @@ pub extern "C" fn nstd_vec_new(element_size: NSTDUSize) -> NSTDVec {
     NSTDVec {
         ptr: NSTD_NULL,
         stride: element_size,
-        buffer_len: 0,
+        cap: 0,
         len: 0,
     }
 }
@@ -167,7 +167,7 @@ pub extern "C" fn nstd_vec_new_with_cap(element_size: NSTDUSize, mut cap: NSTDUS
     NSTDVec {
         ptr: mem,
         stride: element_size,
-        buffer_len: cap,
+        cap,
         len: 0,
     }
 }
@@ -510,7 +510,7 @@ pub unsafe extern "C" fn nstd_vec_extend(
     assert!(vec.stride == nstd_core_slice_const_stride(values));
     // Making sure there's enough space for the extension.
     let mut errc = 0;
-    let reserved = vec.buffer_len - vec.len;
+    let reserved = vec.cap - vec.len;
     if reserved < values.len {
         let additional = values.len - reserved;
         errc = nstd_vec_reserve(vec, additional);
@@ -568,7 +568,7 @@ pub extern "C" fn nstd_vec_reserve(vec: &mut NSTDVec, size: NSTDUSize) -> NSTDEr
         let mem = unsafe { nstd_alloc_allocate(bytes_to_alloc) };
         if !mem.is_null() {
             vec.ptr = mem;
-            vec.buffer_len = size;
+            vec.cap = size;
             return 0;
         }
         1
@@ -580,7 +580,7 @@ pub extern "C" fn nstd_vec_reserve(vec: &mut NSTDVec, size: NSTDUSize) -> NSTDEr
         let errc = unsafe { nstd_alloc_reallocate(&mut vec.ptr, current_byte_len, new_byte_len) };
         // On success increase the buffer length.
         if errc == 0 {
-            vec.buffer_len += size;
+            vec.cap += size;
         }
         errc
     }
@@ -603,14 +603,14 @@ pub extern "C" fn nstd_vec_reserve(vec: &mut NSTDVec, size: NSTDUSize) -> NSTDEr
 pub extern "C" fn nstd_vec_shrink(vec: &mut NSTDVec) -> NSTDErrorCode {
     let mut errc = 0;
     // Make sure the vector is non-null and it's capacity is greater than it's length.
-    if !vec.ptr.is_null() && vec.len < vec.buffer_len {
+    if !vec.ptr.is_null() && vec.len < vec.cap {
         let current_len = vec.buffer_byte_len();
         // Make sure to allocate at least one element to avoid undefined behavior.
         let new_len = vec.byte_len().max(vec.stride);
         errc = unsafe { nstd_alloc_reallocate(&mut vec.ptr, current_len, new_len) };
         if errc == 0 {
             // The buffer's new length is at least 1.
-            vec.buffer_len = vec.len.max(1);
+            vec.cap = vec.len.max(1);
         }
     }
     errc
