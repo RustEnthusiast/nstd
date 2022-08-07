@@ -1,5 +1,6 @@
 //! An application event loop.
 pub mod events;
+pub mod handle;
 use self::events::NSTDAppEvents;
 use winit::event_loop::EventLoop;
 
@@ -76,7 +77,7 @@ pub extern "C" fn nstd_app_events(app: &mut NSTDApp) -> &mut NSTDAppEvents {
 pub unsafe extern "C" fn nstd_app_run(app: NSTDApp) -> ! {
     // Dispatch the `start` event.
     if let Some(start) = app.events.start {
-        start();
+        start(&*app.data.event_loop);
     }
     // Run the winit event loop.
     app.data.event_loop.run(|_, _, _| {})
