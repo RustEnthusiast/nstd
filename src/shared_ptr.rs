@@ -1,11 +1,8 @@
 //! A reference counting smart pointer.
 use crate::{
     alloc::{nstd_alloc_allocate, nstd_alloc_allocate_zeroed, nstd_alloc_deallocate},
-    core::{
-        mem::nstd_core_mem_copy,
-        ptr::{nstd_core_ptr_mut_new, nstd_core_ptr_mut_size, NSTDPtrMut},
-    },
-    NSTDAnyConst, NSTDUSize,
+    core::mem::nstd_core_mem_copy,
+    NSTDAnyConst, NSTDAnyMut, NSTDUSize,
 };
 
 /// The size (in bytes) of [usize].
@@ -15,14 +12,16 @@ const USIZE_SIZE: usize = core::mem::size_of::<usize>();
 #[repr(C)]
 #[derive(Debug, Hash, PartialEq, Eq)]
 pub struct NSTDSharedPtr {
-    /// A pointer to private data about the shared object.
-    ptr: NSTDPtrMut,
+    /// A raw pointer to private data about the shared object.
+    ptr: NSTDAnyMut,
+    /// The size of the shared pointer's memory buffer.
+    size: NSTDUSize,
 }
 impl NSTDSharedPtr {
     /// Returns the number of pointers sharing the object.
     #[inline]
     fn ptrs(&self) -> *mut usize {
-        unsafe { self.ptr.raw.add(nstd_shared_ptr_size(self)).cast() }
+        unsafe { self.ptr.add(nstd_shared_ptr_size(self)).cast() }
     }
 }
 impl Drop for NSTDSharedPtr {
@@ -35,8 +34,7 @@ impl Drop for NSTDSharedPtr {
             *ptrs -= 1;
             // If the pointer count is zero, free the data.
             if *ptrs == 0 {
-                let size = nstd_shared_ptr_size(self);
-                nstd_alloc_deallocate(&mut self.ptr.raw, size);
+                nstd_alloc_deallocate(&mut self.ptr, self.size);
             }
         }
     }
@@ -78,7 +76,8 @@ pub unsafe extern "C" fn nstd_shared_ptr_new(
     // Construct the pointer with `element_size`, this does not include the size of the pointer
     // count (a `usize`).
     NSTDSharedPtr {
-        ptr: nstd_core_ptr_mut_new(raw, buffer_size),
+        ptr: raw,
+        size: buffer_size,
     }
 }
 
@@ -108,7 +107,8 @@ pub extern "C" fn nstd_shared_ptr_new_zeroed(element_size: NSTDUSize) -> NSTDSha
         // Construct the pointer with `element_size`, this does not include the size of the pointer
         // count (a `usize`).
         NSTDSharedPtr {
-            ptr: nstd_core_ptr_mut_new(raw, buffer_size),
+            ptr: raw,
+            size: buffer_size,
         }
     }
 }
@@ -131,7 +131,8 @@ pub extern "C" fn nstd_shared_ptr_share(shared_ptr: &NSTDSharedPtr) -> NSTDShare
         *ptrs += 1;
         // Construct the new shared pointer instance.
         NSTDSharedPtr {
-            ptr: nstd_core_ptr_mut_new(shared_ptr.ptr.raw, nstd_shared_ptr_size(shared_ptr)),
+            ptr: shared_ptr.ptr,
+            size: shared_ptr.size,
         }
     }
 }
@@ -163,7 +164,7 @@ pub extern "C" fn nstd_shared_ptr_owners(shared_ptr: &NSTDSharedPtr) -> NSTDUSiz
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_shared_ptr_size(shared_ptr: &NSTDSharedPtr) -> NSTDUSize {
-    nstd_core_ptr_mut_size(&shared_ptr.ptr) - USIZE_SIZE
+    shared_ptr.size - USIZE_SIZE
 }
 
 /// Returns an immutable raw pointer to the shared object.
@@ -178,7 +179,7 @@ pub extern "C" fn nstd_shared_ptr_size(shared_ptr: &NSTDSharedPtr) -> NSTDUSize 
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_shared_ptr_get(shared_ptr: &NSTDSharedPtr) -> NSTDAnyConst {
-    shared_ptr.ptr.raw
+    shared_ptr.ptr
 }
 
 /// Frees an instance of `NSTDSharedPtr`.

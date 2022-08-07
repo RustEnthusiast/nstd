@@ -1,13 +1,14 @@
 #ifndef NSTD_HEAP_PTR_H
 #define NSTD_HEAP_PTR_H
-#include "core/ptr.h"
 #include "nstd.h"
 NSTDCPPSTART
 
 /// A pointer type for single value heap allocation.
 typedef struct {
-    /// A pointer to the value on the heap.
-    NSTDPtrMut ptr;
+    /// A raw pointer to the value on the heap.
+    NSTDAnyMut ptr;
+    /// The size of the object in bytes.
+    NSTDUSize size;
 } NSTDHeapPtr;
 
 /// Creates a new initialized heap allocated object.
