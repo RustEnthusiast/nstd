@@ -1,6 +1,7 @@
 //! A view into a sequence of values in memory.
 use crate::{
     core::{
+        def::NSTDErrorCode,
         mem::nstd_core_mem_copy,
         ptr::{
             nstd_core_ptr_const_get, nstd_core_ptr_const_new, nstd_core_ptr_const_size,
@@ -486,16 +487,31 @@ pub unsafe extern "C" fn nstd_core_slice_mut_compare(
 ///
 /// - `const NSTDSliceConst *src` - The slice to copy data from.
 ///
-/// # Panics
+/// # Returns
 ///
-/// This function panics if the byte length of `dest` is less than the byte length of `src`.
+/// `NSTDErrorCode errc` - Nonzero on error.
+///
+/// # Possible errors
+///
+/// - `1` - The two buffer's lengths do not match.
+///
+/// - `2` - The two buffer's strides do not match.
 ///
 /// # Safety
 ///
 /// This function can cause undefined behavior if either `dest` or `src`'s data is invalid.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_slice_mut_copy(dest: &mut NSTDSliceMut, src: &NSTDSliceConst) {
-    assert!(dest.byte_len() >= src.byte_len());
-    nstd_core_mem_copy(dest.ptr.raw.cast(), src.ptr.raw.cast(), src.byte_len());
+pub unsafe extern "C" fn nstd_core_slice_mut_copy(
+    dest: &mut NSTDSliceMut,
+    src: &NSTDSliceConst,
+) -> NSTDErrorCode {
+    if dest.len != src.len {
+        1
+    } else if nstd_core_slice_mut_stride(dest) != nstd_core_slice_const_stride(src) {
+        2
+    } else {
+        nstd_core_mem_copy(dest.ptr.raw.cast(), src.ptr.raw.cast(), src.byte_len());
+        0
+    }
 }
