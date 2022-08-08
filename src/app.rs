@@ -1,7 +1,7 @@
 //! An application event loop.
 pub mod events;
 pub mod handle;
-use self::events::NSTDAppEvents;
+use self::{events::NSTDAppEvents, handle::NSTDAppHandle};
 use winit::event_loop::EventLoop;
 
 /// An application event loop.
@@ -34,6 +34,21 @@ pub extern "C" fn nstd_app_new() -> NSTDApp {
         events: NSTDAppEvents::new(),
         event_loop: Box::default(),
     }
+}
+
+/// Returns a handle to an `NSTDApp`'s event loop.
+///
+/// # Parameters:
+///
+/// - `const NSTDApp *app` - The `nstd` application.
+///
+/// # Returns
+///
+/// `NSTDAppHandle handle` - A handle to the application's event loop.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_app_handle(app: &NSTDApp) -> NSTDAppHandle {
+    &app.event_loop
 }
 
 /// Returns a mutable reference to an `NSTDApp`'s event table.

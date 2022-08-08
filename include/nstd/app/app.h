@@ -2,6 +2,7 @@
 #define NSTD_APP_APP_H
 #include "../nstd.h"
 #include "events.h"
+#include "handle.h"
 NSTDCPPSTART
 
 /// An application event loop.
@@ -27,6 +28,17 @@ typedef struct {
 ///
 /// This function must be called on the "main" thread, otherwise a panic may occurr.
 NSTDAPI NSTDApp nstd_app_new();
+
+/// Returns a handle to an `NSTDApp`'s event loop.
+///
+/// # Parameters:
+///
+/// - `const NSTDApp *app` - The `nstd` application.
+///
+/// # Returns
+///
+/// `NSTDAppHandle handle` - A handle to the application's event loop.
+NSTDAPI NSTDAppHandle nstd_app_handle(const NSTDApp *app);
 
 /// Returns a mutable reference to an `NSTDApp`'s event table.
 ///
