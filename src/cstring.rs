@@ -9,9 +9,9 @@ use crate::{
         slice::NSTDSliceConst,
     },
     vec::{
-        nstd_vec_as_mut_ptr, nstd_vec_as_ptr, nstd_vec_as_slice, nstd_vec_clone, nstd_vec_extend,
-        nstd_vec_get_mut, nstd_vec_len, nstd_vec_new_with_cap, nstd_vec_pop, nstd_vec_push,
-        NSTDVec,
+        nstd_vec_as_mut_ptr, nstd_vec_as_ptr, nstd_vec_as_slice, nstd_vec_cap, nstd_vec_clone,
+        nstd_vec_extend, nstd_vec_get_mut, nstd_vec_len, nstd_vec_new_with_cap, nstd_vec_pop,
+        nstd_vec_push, NSTDVec,
     },
     NSTDUSize,
 };
@@ -192,6 +192,23 @@ pub extern "C" fn nstd_cstring_len(cstring: &NSTDCString) -> NSTDUSize {
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_cstring_len_with_null(cstring: &NSTDCString) -> NSTDUSize {
     nstd_vec_len(&cstring.bytes)
+}
+
+/// Returns a C string's capacity.
+///
+/// This is the max number of *bytes* the C string can contain without reallocating.
+///
+/// # Parameters:
+///
+/// - `const NSTDCString *cstring` - The C string.
+///
+/// # Returns
+///
+/// `NSTDUSize cap` - The C string's capacity.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_cstring_cap(cstring: &NSTDCString) -> NSTDUSize {
+    nstd_vec_cap(&cstring.bytes)
 }
 
 /// Appends an `NSTDChar` to the end of an `NSTDCString`.

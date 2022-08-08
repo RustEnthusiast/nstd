@@ -10,8 +10,9 @@ use crate::{
         },
     },
     vec::{
-        nstd_vec_as_ptr, nstd_vec_as_slice, nstd_vec_as_slice_mut, nstd_vec_clone, nstd_vec_extend,
-        nstd_vec_len, nstd_vec_new, nstd_vec_new_with_cap, nstd_vec_truncate, NSTDVec,
+        nstd_vec_as_ptr, nstd_vec_as_slice, nstd_vec_as_slice_mut, nstd_vec_cap, nstd_vec_clone,
+        nstd_vec_extend, nstd_vec_len, nstd_vec_new, nstd_vec_new_with_cap, nstd_vec_truncate,
+        NSTDVec,
     },
     NSTDFloat32, NSTDFloat64, NSTDISize, NSTDInt16, NSTDInt32, NSTDInt64, NSTDInt8, NSTDUInt16,
     NSTDUInt32, NSTDUInt64, NSTDUInt8, NSTDUSize, NSTDUnichar,
@@ -198,6 +199,23 @@ pub extern "C" fn nstd_string_len(string: &NSTDString) -> NSTDUSize {
     let str = nstd_string_as_str(string);
     // Managed string data is always valid here when used correctly.
     unsafe { nstd_core_str_const_len(&str) }
+}
+
+/// Returns a string's capacity.
+///
+/// This is the max number of *bytes* the string can contain without reallocating.
+///
+/// # Parameters:
+///
+/// - `const NSTDString *string` - The string.
+///
+/// # Returns
+///
+/// `NSTDUSize cap` - The string's capacity.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_string_cap(string: &NSTDString) -> NSTDUSize {
+    nstd_vec_cap(&string.bytes)
 }
 
 /// Pushes an `NSTDUnichar` onto the end of a string.

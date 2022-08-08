@@ -122,6 +122,19 @@ NSTDAPI NSTDVec nstd_cstring_to_bytes(NSTDCString cstring);
 /// `NSTDUSize len` - The length of the C string without it's null byte.
 NSTDAPI NSTDUSize nstd_cstring_len(const NSTDCString *cstring);
 
+/// Returns a C string's capacity.
+///
+/// This is the max number of *bytes* the C string can contain without reallocating.
+///
+/// # Parameters:
+///
+/// - `const NSTDCString *cstring` - The C string.
+///
+/// # Returns
+///
+/// `NSTDUSize cap` - The C string's capacity.
+NSTDAPI NSTDUSize nstd_cstring_cap(const NSTDCString *cstring);
+
 /// Returns the number of `char`s in a C string, including the null terminator.
 ///
 /// # Parameters:

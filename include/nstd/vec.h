@@ -79,6 +79,19 @@ NSTDAPI NSTDVec nstd_vec_clone(const NSTDVec *vec);
 /// `NSTDUSize len` - The length of the vector.
 NSTDAPI NSTDUSize nstd_vec_len(const NSTDVec *vec);
 
+/// Returns a vector's capacity.
+///
+/// This is the max number of values the vector can contain without reallocating.
+///
+/// # Parameters:
+///
+/// - `const NSTDVec *vec` - The vector.
+///
+/// # Returns
+///
+/// `NSTDUSize cap` - The vector's capacity.
+NSTDAPI NSTDUSize nstd_vec_cap(const NSTDVec *vec);
+
 /// Returns the amount of bytes each value in a vector occupies.
 ///
 /// # Parameters:

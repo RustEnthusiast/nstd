@@ -215,6 +215,23 @@ pub extern "C" fn nstd_vec_len(vec: &NSTDVec) -> NSTDUSize {
     vec.len
 }
 
+/// Returns a vector's capacity.
+///
+/// This is the max number of values the vector can contain without reallocating.
+///
+/// # Parameters:
+///
+/// - `const NSTDVec *vec` - The vector.
+///
+/// # Returns
+///
+/// `NSTDUSize cap` - The vector's capacity.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_vec_cap(vec: &NSTDVec) -> NSTDUSize {
+    vec.cap
+}
+
 /// Returns the amount of bytes each value in a vector occupies.
 ///
 /// # Parameters:

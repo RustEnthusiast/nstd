@@ -116,6 +116,19 @@ NSTDAPI NSTDVec nstd_string_to_bytes(NSTDString string);
 /// `NSTDUSize len` - The length of the string.
 NSTDAPI NSTDUSize nstd_string_len(const NSTDString *string);
 
+/// Returns a string's capacity.
+///
+/// This is the max number of *bytes* the string can contain without reallocating.
+///
+/// # Parameters:
+///
+/// - `const NSTDString *string` - The string.
+///
+/// # Returns
+///
+/// `NSTDUSize cap` - The string's capacity.
+NSTDAPI NSTDUSize nstd_string_cap(const NSTDString *string);
+
 /// Pushes an `NSTDUnichar` onto the end of a string.
 ///
 /// # Parameters:
