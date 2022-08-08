@@ -15,3 +15,6 @@ if __name__ == "__main__":
             cmd = f"cargo check --quiet --no-default-features {feature_tag} {target_tag}"
             print(f"Running {cmd}...")
             os.system(cmd)
+    cmd = "cargo clippy --quiet --all-features"
+    print(f"Running {cmd}...")
+    os.system(cmd)

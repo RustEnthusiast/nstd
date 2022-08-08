@@ -21,6 +21,7 @@ impl NSTDSharedPtr {
     /// Returns the number of pointers sharing the object.
     #[inline]
     fn ptrs(&self) -> *mut usize {
+        // SAFETY: Shared pointers are always non-null.
         unsafe { self.ptr.add(nstd_shared_ptr_size(self)).cast() }
     }
 }
@@ -28,6 +29,7 @@ impl Drop for NSTDSharedPtr {
     /// [NSTDSharedPtr]'s destructor.
     #[inline]
     fn drop(&mut self) {
+        // SAFETY: Shared pointers are always non-null.
         unsafe {
             // Update the pointer count.
             let ptrs = self.ptrs();
@@ -96,6 +98,7 @@ pub unsafe extern "C" fn nstd_shared_ptr_new(
 /// This operation will panic if allocating fails.
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_shared_ptr_new_zeroed(element_size: NSTDUSize) -> NSTDSharedPtr {
+    // SAFETY: The allocated memory is validated after allocation.
     unsafe {
         // Allocate a region of memory for the object and the pointer count.
         let buffer_size = element_size + USIZE_SIZE;
@@ -125,6 +128,7 @@ pub extern "C" fn nstd_shared_ptr_new_zeroed(element_size: NSTDUSize) -> NSTDSha
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_shared_ptr_share(shared_ptr: &NSTDSharedPtr) -> NSTDSharedPtr {
+    // SAFETY: Shared pointers are always non-null.
     unsafe {
         // Update the pointer count.
         let ptrs = shared_ptr.ptrs();
@@ -149,6 +153,7 @@ pub extern "C" fn nstd_shared_ptr_share(shared_ptr: &NSTDSharedPtr) -> NSTDShare
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_shared_ptr_owners(shared_ptr: &NSTDSharedPtr) -> NSTDUSize {
+    // SAFETY: Shared pointers are always non-null.
     unsafe { *shared_ptr.ptrs() }
 }
 

@@ -60,6 +60,7 @@ pub extern "C" fn nstd_cstring_new() -> NSTDCString {
 pub extern "C" fn nstd_cstring_new_with_cap(cap: NSTDUSize) -> NSTDCString {
     let mut bytes = nstd_vec_new_with_cap(1, cap);
     let nul: NSTDChar = 0;
+    // SAFETY: `nul` is stored on the stack.
     unsafe { assert!(nstd_vec_push(&mut bytes, addr_of!(nul).cast()) == 0) };
     NSTDCString { bytes }
 }
@@ -226,6 +227,7 @@ pub extern "C" fn nstd_cstring_cap(cstring: &NSTDCString) -> NSTDUSize {
 /// This operation panics if `chr` cannot be appended to the C string.
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_cstring_push(cstring: &mut NSTDCString, chr: NSTDChar) {
+    // SAFETY: C strings always contain an exclusive null byte at the end.
     unsafe {
         if chr != 0 {
             // Push a new null byte onto the end of the C string.
@@ -293,6 +295,7 @@ pub extern "C" fn nstd_cstring_pop(cstring: &mut NSTDCString) -> NSTDChar {
     let mut ret = 0;
     let len = nstd_cstring_len(cstring);
     if len > 0 {
+        // SAFETY: The C string's length is at least 1.
         unsafe {
             // Write the last character in the C string to the return value.
             let last = nstd_vec_get_mut(&mut cstring.bytes, len - 1).cast();

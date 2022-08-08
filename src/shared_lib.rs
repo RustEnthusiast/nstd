@@ -104,10 +104,8 @@ pub extern "C" fn nstd_shared_lib_free(lib: NSTDSharedLib) {}
 /// # Safety
 ///
 /// Undefined behavior may occur if `symbol`'s data is invalid.
-unsafe fn get<'a, T>(
-    lib: &'a NSTDSharedLib,
-    symbol: *const NSTDChar,
-) -> Result<Symbol<'a, T>, Error> {
+#[inline]
+unsafe fn get<T>(lib: &NSTDSharedLib, symbol: *const NSTDChar) -> Result<Symbol<T>, Error> {
     let symbol_len = nstd_core_cstr_raw_len_with_null(symbol);
     let symbol_name = std::slice::from_raw_parts(symbol.cast(), symbol_len);
     lib.get(symbol_name)

@@ -103,6 +103,7 @@ impl Drop for NSTDVec {
     fn drop(&mut self) {
         if !self.ptr.is_null() {
             let buffer_len = self.buffer_byte_len();
+            // SAFETY: The vector has allocated.
             unsafe { nstd_alloc_deallocate(&mut self.ptr, buffer_len) };
         }
     }
@@ -159,6 +160,7 @@ pub extern "C" fn nstd_vec_new_with_cap(element_size: NSTDUSize, mut cap: NSTDUS
     assert!(element_size != 0);
     assert!(cap != 0);
     // Attempt to allocate the memory buffer.
+    // SAFETY: Both `element_size` & `cap` are above 0.
     let mem = unsafe { nstd_alloc_allocate(cap * element_size) };
     if mem.is_null() {
         cap = 0;
@@ -190,9 +192,8 @@ pub extern "C" fn nstd_vec_clone(vec: &NSTDVec) -> NSTDVec {
     if !vec.ptr.is_null() && vec.len > 0 {
         let mut cloned = nstd_vec_new_with_cap(vec.stride, vec.len);
         assert!(!cloned.ptr.is_null());
-        unsafe {
-            nstd_core_mem_copy(cloned.ptr.cast(), vec.ptr.cast(), vec.byte_len());
-        }
+        // SAFETY: Both vectors are non-null.
+        unsafe { nstd_core_mem_copy(cloned.ptr.cast(), vec.ptr.cast(), vec.byte_len()) };
         cloned.len = vec.len;
         cloned
     } else {
@@ -328,6 +329,7 @@ pub extern "C" fn nstd_vec_as_mut_ptr(vec: &mut NSTDVec) -> NSTDAnyMut {
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_vec_get(vec: &NSTDVec, pos: NSTDUSize) -> NSTDAnyConst {
     match pos < vec.len {
+        // SAFETY: `pos` is a valid index.
         true => unsafe { vec.ptr.add(pos * vec.stride) },
         false => NSTD_NULL,
     }
@@ -406,6 +408,7 @@ pub unsafe extern "C" fn nstd_vec_push(vec: &mut NSTDVec, value: NSTDAnyConst) -
 pub extern "C" fn nstd_vec_pop(vec: &mut NSTDVec) -> NSTDAnyConst {
     if vec.len > 0 {
         vec.len -= 1;
+        // SAFETY: The vector is non-null.
         return unsafe { vec.end() };
     }
     NSTD_NULL
@@ -484,6 +487,7 @@ pub extern "C" fn nstd_vec_remove(vec: &mut NSTDVec, index: NSTDUSize) -> NSTDEr
         let stride = vec.stride;
         let bytes_to_copy = (vec.len - index - 1) * stride;
         let idxpos = index * stride;
+        // SAFETY: The vector's data is valid for the shift.
         unsafe {
             let idxptr = vec.ptr.add(idxpos).cast::<NSTDByte>();
             let src = idxptr.add(stride);
@@ -582,6 +586,7 @@ pub extern "C" fn nstd_vec_reserve(vec: &mut NSTDVec, size: NSTDUSize) -> NSTDEr
     let bytes_to_alloc = size * vec.stride;
     // Checking if the vector is null and needs to make it's first allocation.
     if vec.ptr.is_null() {
+        // SAFETY: `bytes_to_alloc` is above 0.
         let mem = unsafe { nstd_alloc_allocate(bytes_to_alloc) };
         if !mem.is_null() {
             vec.ptr = mem;
@@ -592,8 +597,12 @@ pub extern "C" fn nstd_vec_reserve(vec: &mut NSTDVec, size: NSTDUSize) -> NSTDEr
     }
     // Otherwise increase the vector's capacity.
     else {
+        // This can't be 0 because the vector is non-null.
+        // After an nstd vector has allocated it will always have at least one value allocated.
+        // An example of this behavior can be seen in `nstd_vec_shrink`.
         let current_byte_len = vec.buffer_byte_len();
         let new_byte_len = current_byte_len + bytes_to_alloc;
+        // SAFETY: The vector is non-null & the lengths are above 0.
         let errc = unsafe { nstd_alloc_reallocate(&mut vec.ptr, current_byte_len, new_byte_len) };
         // On success increase the buffer length.
         if errc == 0 {
@@ -624,6 +633,7 @@ pub extern "C" fn nstd_vec_shrink(vec: &mut NSTDVec) -> NSTDErrorCode {
         let current_len = vec.buffer_byte_len();
         // Make sure to allocate at least one element to avoid undefined behavior.
         let new_len = vec.byte_len().max(vec.stride);
+        // SAFETY: The vector is non-null & the lengths are above 0.
         errc = unsafe { nstd_alloc_reallocate(&mut vec.ptr, current_len, new_len) };
         if errc == 0 {
             // The buffer's new length is at least 1.

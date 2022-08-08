@@ -197,7 +197,7 @@ pub extern "C" fn nstd_string_to_bytes(string: NSTDString) -> NSTDVec {
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_string_len(string: &NSTDString) -> NSTDUSize {
     let str = nstd_string_as_str(string);
-    // Managed string data is always valid here when used correctly.
+    // SAFETY: The string's data is valid here.
     unsafe { nstd_core_str_const_len(&str) }
 }
 
@@ -236,6 +236,7 @@ pub extern "C" fn nstd_string_push(string: &mut NSTDString, chr: NSTDUnichar) ->
         let mut buf = [0; 4];
         chr.encode_utf8(&mut buf);
         let buf = nstd_core_slice_const_new(buf.as_ptr().cast(), 1, chr.len_utf8());
+        // SAFETY: `buf`'s data is stored on the stack.
         return unsafe { nstd_vec_extend(&mut string.bytes, &buf) };
     }
     1

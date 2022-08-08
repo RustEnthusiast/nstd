@@ -18,6 +18,7 @@ impl Drop for NSTDHeapPtr {
     /// [NSTDHeapPtr]'s destructor.
     #[inline]
     fn drop(&mut self) {
+        // SAFETY: Heap pointers are always non-null.
         unsafe { nstd_alloc_deallocate(&mut self.ptr, self.size) };
     }
 }
@@ -74,6 +75,7 @@ pub unsafe extern "C" fn nstd_heap_ptr_new(
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_heap_ptr_new_zeroed(element_size: NSTDUSize) -> NSTDHeapPtr {
     assert!(element_size != 0);
+    // SAFETY: `element_size` is not 0.
     let mem = unsafe { nstd_alloc_allocate_zeroed(element_size) };
     assert!(!mem.is_null());
     NSTDHeapPtr {
@@ -99,8 +101,10 @@ pub extern "C" fn nstd_heap_ptr_new_zeroed(element_size: NSTDUSize) -> NSTDHeapP
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_heap_ptr_clone(hptr: &NSTDHeapPtr) -> NSTDHeapPtr {
     let size = nstd_heap_ptr_size(hptr);
+    // SAFETY: `size` is not 0.
     let mem = unsafe { nstd_alloc_allocate(size) };
     assert!(!mem.is_null());
+    // SAFETY: Both pointers are non-null.
     unsafe { nstd_core_mem_copy(mem.cast(), hptr.ptr.cast(), size) };
     NSTDHeapPtr { ptr: mem, size }
 }
