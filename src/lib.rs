@@ -36,6 +36,9 @@ pub(crate) mod test;
 #[cfg(feature = "nstd_vec")]
 #[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_vec")))]
 pub mod vec;
+#[cfg(feature = "nstd_window")]
+#[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_window")))]
+pub mod window;
 use ::core::ffi::c_void;
 
 /// A null pointer value constant.

@@ -34,6 +34,7 @@ Rust syntax).
     - `shared_ptr` - A reference counting smart pointer.
     - `string` - Dynamically sized UTF-8 encoded byte string.
     - `vec` - A dynamically sized contiguous sequence of values.
+    - `window` - An `nstd` application window.
 
 # Platform support
 `nstd.core` should support anything that rustc supports.

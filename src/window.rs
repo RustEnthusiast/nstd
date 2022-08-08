@@ -1,0 +1,1 @@
+//! An `nstd` application window.

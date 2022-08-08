@@ -27,6 +27,7 @@ nstd_shared_lib = ["libloading", "nstd_core", "std"]
 nstd_shared_ptr = ["nstd_alloc", "nstd_core"]
 nstd_string = ["nstd_core", "nstd_vec"]
 nstd_vec = ["nstd_alloc", "nstd_core"]
+nstd_window = []
 
 [dependencies]
 cty = { version = "0.2", optional = true }
