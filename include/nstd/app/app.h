@@ -61,10 +61,12 @@ NSTDAPI NSTDAppEvents *nstd_app_events(NSTDApp *app);
 ///
 /// - `NSTDApp app` - The `nstd` application to run.
 ///
+/// - `NSTDAnyMut data` - Custom user data to pass to each app event.
+///
 /// # Safety
 ///
 /// This function's caller must guarantee validity of the `app`'s event callbacks.
-NSTDAPI void nstd_app_run(NSTDApp app);
+NSTDAPI void nstd_app_run(NSTDApp app, NSTDAnyMut data);
 
 /// Frees an instance of `NSTDApp`. The application's event loop must not be ran after this is
 /// called.

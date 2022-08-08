@@ -1,7 +1,9 @@
 //! An application event loop.
+pub mod data;
 pub mod events;
 pub mod handle;
-use self::{events::NSTDAppEvents, handle::NSTDAppHandle};
+use self::{data::NSTDAppData, events::NSTDAppEvents, handle::NSTDAppHandle};
+use crate::NSTDAnyMut;
 use winit::{event::Event, event_loop::EventLoop};
 
 /// An application event loop.
@@ -76,23 +78,29 @@ pub extern "C" fn nstd_app_events(app: &mut NSTDApp) -> &mut NSTDAppEvents {
 ///
 /// - `NSTDApp app` - The `nstd` application to run.
 ///
+/// - `NSTDAnyMut data` - Custom user data to pass to each app event.
+///
 /// # Safety
 ///
 /// This function's caller must guarantee validity of the `app`'s event callbacks.
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_app_run(app: NSTDApp) -> ! {
+pub unsafe extern "C" fn nstd_app_run(app: NSTDApp, data: NSTDAnyMut) -> ! {
     // Dispatch the `start` event.
     if let Some(start) = app.events.start {
-        start(&app.event_loop);
+        let start_app_data = NSTDAppData::new(&app.event_loop, data);
+        start(&start_app_data);
     }
     // Run the winit event loop.
-    app.event_loop.run(move |event, handle, _| match event {
-        Event::LoopDestroyed => {
-            if let Some(exit) = app.events.exit {
-                exit(handle);
+    app.event_loop.run(move |event, handle, _| {
+        let app_data = NSTDAppData::new(handle, data);
+        match event {
+            Event::LoopDestroyed => {
+                if let Some(exit) = app.events.exit {
+                    exit(&app_data);
+                }
             }
+            _ => (),
         }
-        _ => (),
     })
 }
 
