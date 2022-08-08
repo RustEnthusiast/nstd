@@ -37,6 +37,28 @@ pub unsafe extern "C" fn nstd_core_mem_compare(
     (buf1 == buf2).into()
 }
 
+/// Zeros out a memory buffer.
+///
+/// # Parameters:
+///
+/// - `NSTDByte *buf` - A pointer to the first byte in the memory buffer.
+///
+/// - `NSTDUSize size` - The number of bytes to set to 0.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if the caller does not ensure that the memory
+/// buffer is at least `size` bytes in size.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_core_mem_zero(buf: *mut NSTDByte, size: NSTDUSize) {
+    let mut i = 0;
+    while i < size {
+        *buf.add(i) = 0;
+        i += 1;
+    }
+}
+
 /// Fills the memory buffer `buf` with byte `fill`.
 ///
 /// # Parameters:
