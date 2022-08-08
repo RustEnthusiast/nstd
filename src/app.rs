@@ -96,6 +96,13 @@ pub unsafe extern "C" fn nstd_app_run(app: NSTDApp, data: NSTDAnyMut) -> ! {
         let app_data = NSTDAppData::new(handle, data);
         // Dispatch events.
         match event {
+            // All other events have been processed.
+            Event::MainEventsCleared => {
+                if let Some(update) = app.events.update {
+                    update(&app_data);
+                }
+            }
+            // The event loop is being exited.
             Event::LoopDestroyed => {
                 if let Some(exit) = app.events.exit {
                     exit(&app_data);
