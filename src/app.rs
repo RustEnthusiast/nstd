@@ -91,8 +91,10 @@ pub unsafe extern "C" fn nstd_app_run(app: NSTDApp, data: NSTDAnyMut) -> ! {
         start(&start_app_data);
     }
     // Run the winit event loop.
-    app.event_loop.run(move |event, handle, _| {
+    app.event_loop.run(move |event, handle, control_flow| {
+        // Instantiate a new instance of `NSTDAppData`.
         let app_data = NSTDAppData::new(handle, data);
+        // Dispatch events.
         match event {
             Event::LoopDestroyed => {
                 if let Some(exit) = app.events.exit {
@@ -101,6 +103,8 @@ pub unsafe extern "C" fn nstd_app_run(app: NSTDApp, data: NSTDAnyMut) -> ! {
             }
             _ => (),
         }
+        // Set the `winit` event loop's control flow.
+        *control_flow = app_data.control_flow.into_inner().into();
     })
 }
 
