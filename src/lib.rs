@@ -7,6 +7,9 @@
 #[cfg(feature = "nstd_alloc")]
 #[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_alloc")))]
 pub mod alloc;
+#[cfg(feature = "nstd_app")]
+#[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_app")))]
+pub mod app;
 #[cfg(feature = "nstd_core")]
 #[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_core")))]
 pub mod core;

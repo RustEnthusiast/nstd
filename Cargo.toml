@@ -15,6 +15,7 @@ default = ["std", "nstd_core"]
 std = []
 clib = []
 nstd_alloc = ["nstd_core", "nstd_os_windows_alloc"]
+nstd_app = ["std", "winit"]
 nstd_core = ["cty"]
 nstd_cstring = ["nstd_core", "nstd_vec"]
 nstd_heap_ptr = ["nstd_alloc", "nstd_core"]
@@ -32,6 +33,7 @@ nstd_window = []
 [dependencies]
 cty = { version = "0.2", optional = true }
 libloading = { version = "0.7", optional = true }
+winit = { version = "0.27", optional = true }
 
 [target.'cfg(target_os = "windows")'.dependencies]
 windows-sys = { version = "0.36", optional = true }
