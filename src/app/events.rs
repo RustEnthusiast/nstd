@@ -6,11 +6,16 @@ use crate::app::handle::NSTDAppHandle;
 pub struct NSTDAppEvents {
     /// Called once before starting the application event loop.
     pub start: Option<unsafe extern "C" fn(NSTDAppHandle)>,
+    /// Called once before exiting the application event loop.
+    pub exit: Option<unsafe extern "C" fn(NSTDAppHandle)>,
 }
 impl NSTDAppEvents {
     /// Creates a new, all null, events structure.
     #[inline]
     pub(crate) fn new() -> Self {
-        Self { start: None }
+        Self {
+            start: None,
+            exit: None,
+        }
     }
 }

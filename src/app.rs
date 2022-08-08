@@ -2,7 +2,7 @@
 pub mod events;
 pub mod handle;
 use self::{events::NSTDAppEvents, handle::NSTDAppHandle};
-use winit::event_loop::EventLoop;
+use winit::{event::Event, event_loop::EventLoop};
 
 /// An application event loop.
 #[repr(C)]
@@ -79,7 +79,6 @@ pub extern "C" fn nstd_app_events(app: &mut NSTDApp) -> &mut NSTDAppEvents {
 /// # Safety
 ///
 /// This function's caller must guarantee validity of the `app`'s event callbacks.
-#[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_app_run(app: NSTDApp) -> ! {
     // Dispatch the `start` event.
@@ -87,7 +86,14 @@ pub unsafe extern "C" fn nstd_app_run(app: NSTDApp) -> ! {
         start(&app.event_loop);
     }
     // Run the winit event loop.
-    app.event_loop.run(|_, _, _| {})
+    app.event_loop.run(move |event, handle, _| match event {
+        Event::LoopDestroyed => {
+            if let Some(exit) = app.events.exit {
+                exit(handle);
+            }
+        }
+        _ => (),
+    })
 }
 
 /// Frees an instance of `NSTDApp`. The application's event loop must not be ran after this is
