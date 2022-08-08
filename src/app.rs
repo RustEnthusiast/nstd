@@ -4,21 +4,13 @@ pub mod handle;
 use self::events::NSTDAppEvents;
 use winit::event_loop::EventLoop;
 
-/// Application data that cannot be stored on the stack.
-#[derive(Debug, Default)]
-struct App {
-    /// The underlying [winit] event loop.
-    event_loop: EventLoop<()>,
-}
-
 /// An application event loop.
 #[repr(C)]
-#[derive(Debug)]
 pub struct NSTDApp {
     /// The application event callback function pointers.
     events: NSTDAppEvents,
-    /// Application data that cannot live on the stack.
-    data: Box<App>,
+    /// The underlying event loop.
+    event_loop: Box<EventLoop<()>>,
 }
 
 /// Creates a new `nstd` application.
@@ -40,7 +32,7 @@ pub struct NSTDApp {
 pub extern "C" fn nstd_app_new() -> NSTDApp {
     NSTDApp {
         events: NSTDAppEvents::new(),
-        data: Box::default(),
+        event_loop: Box::default(),
     }
 }
 
@@ -77,10 +69,10 @@ pub extern "C" fn nstd_app_events(app: &mut NSTDApp) -> &mut NSTDAppEvents {
 pub unsafe extern "C" fn nstd_app_run(app: NSTDApp) -> ! {
     // Dispatch the `start` event.
     if let Some(start) = app.events.start {
-        start(&*app.data.event_loop);
+        start(&app.event_loop);
     }
     // Run the winit event loop.
-    app.data.event_loop.run(|_, _, _| {})
+    app.event_loop.run(|_, _, _| {})
 }
 
 /// Frees an instance of `NSTDApp`. The application's event loop must not be ran after this is

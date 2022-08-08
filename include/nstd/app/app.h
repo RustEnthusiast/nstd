@@ -8,8 +8,8 @@ NSTDCPPSTART
 typedef struct {
     /// The application event callback function pointers.
     NSTDAppEvents events;
-    /// Application data that cannot live on the stack.
-    NSTDAnyMut data;
+    /// The underlying event loop.
+    NSTDAnyMut event_loop;
 } NSTDApp;
 
 /// Creates a new `nstd` application.

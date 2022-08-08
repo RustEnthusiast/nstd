@@ -3,7 +3,6 @@ use crate::app::handle::NSTDAppHandle;
 
 /// Contains callback based events through function pointers.
 #[repr(C)]
-#[derive(Debug)]
 pub struct NSTDAppEvents {
     /// Called once before starting the application event loop.
     pub start: Option<unsafe extern "C" fn(NSTDAppHandle)>,

@@ -2,4 +2,4 @@
 use winit::event_loop::EventLoopWindowTarget;
 
 /// A handle to the application event loop.
-pub type NSTDAppHandle = *const EventLoopWindowTarget<()>;
+pub type NSTDAppHandle<'a> = &'a EventLoopWindowTarget<()>;
