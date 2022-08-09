@@ -1,5 +1,6 @@
 #ifndef NSTD_FS_FILE_H
 #define NSTD_FS_FILE_H
+#include "../core/slice.h"
 #include "../core/str.h"
 #include "../io/io.h"
 #include "../nstd.h"
@@ -44,6 +45,43 @@ typedef NSTDAnyMut NSTDFile;
 ///
 /// This operation can cause undefined behavior if `name`'s data is invalid.
 NSTDAPI NSTDFile nstd_fs_file_open(const NSTDStrConst *name, NSTDUInt8 mask, NSTDIOError *errc);
+
+/// Writes some data to a file & returns how many bytes were written.
+///
+/// # Parameters:
+///
+/// - `NSTDFile *file` - A handle to an open file.
+///
+/// - `const NSTDSliceConst *bytes` - The data to write to the file.
+///
+/// - `NSTDUSize *written` - Returns as the number of bytes written to the file.
+///
+/// # Returns
+///
+/// `NSTDIOError errc` - The I/O operation error code.
+///
+/// # Safety
+///
+/// This function's caller must guarantee validity of `bytes`.
+NSTDAPI NSTDIOError nstd_fs_file_write(NSTDFile *file, const NSTDSliceConst *bytes,
+NSTDUSize *written);
+
+/// Writes a whole buffer to a file.
+///
+/// # Parameters:
+///
+/// - `NSTDFile *file` - A handle to an open file.
+///
+/// - `const NSTDSliceConst *bytes` - The data to write to the file.
+///
+/// # Returns
+///
+/// `NSTDIOError errc` - The I/O operation error code.
+///
+/// # Safety
+///
+/// This function's caller must guarantee validity of `bytes`.
+NSTDAPI NSTDIOError nstd_fs_file_write_all(NSTDFile *file, const NSTDSliceConst *bytes);
 
 /// Closes a file handle.
 ///

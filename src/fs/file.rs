@@ -1,5 +1,9 @@
 //! A handle to an opened file.
-use crate::{core::str::NSTDStrConst, io::NSTDIOError, NSTDUInt8};
+use crate::{
+    core::{slice::NSTDSliceConst, str::NSTDStrConst},
+    io::NSTDIOError,
+    NSTDUInt8, NSTDUSize,
+};
 use std::fs::File;
 
 /// Creates the file upon opening if it does not already exist.
@@ -64,6 +68,57 @@ pub unsafe extern "C" fn nstd_fs_file_open(
             None
         }
     }
+}
+
+/// Writes some data to a file & returns how many bytes were written.
+///
+/// # Parameters:
+///
+/// - `NSTDFile *file` - A handle to an open file.
+///
+/// - `const NSTDSliceConst *bytes` - The data to write to the file.
+///
+/// - `NSTDUSize *written` - Returns as the number of bytes written to the file.
+///
+/// # Returns
+///
+/// `NSTDIOError errc` - The I/O operation error code.
+///
+/// # Safety
+///
+/// This function's caller must guarantee validity of `bytes`.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_fs_file_write(
+    file: &mut NSTDFile,
+    bytes: &NSTDSliceConst,
+    written: &mut NSTDUSize,
+) -> NSTDIOError {
+    crate::io::stdio::write(file, bytes, written)
+}
+
+/// Writes a whole buffer to a file.
+///
+/// # Parameters:
+///
+/// - `NSTDFile *file` - A handle to an open file.
+///
+/// - `const NSTDSliceConst *bytes` - The data to write to the file.
+///
+/// # Returns
+///
+/// `NSTDIOError errc` - The I/O operation error code.
+///
+/// # Safety
+///
+/// This function's caller must guarantee validity of `bytes`.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_fs_file_write_all(
+    file: &mut NSTDFile,
+    bytes: &NSTDSliceConst,
+) -> NSTDIOError {
+    crate::io::stdio::write_all(file, bytes)
 }
 
 /// Closes a file handle.
