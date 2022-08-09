@@ -1,8 +1,13 @@
 //! An application event loop.
+pub mod data;
 pub mod events;
 pub mod handle;
-use self::{events::NSTDAppEvents, handle::NSTDAppHandle};
-use winit::event_loop::EventLoop;
+use self::{data::NSTDAppData, events::NSTDAppEvents, handle::NSTDAppHandle};
+use crate::NSTDAnyMut;
+use winit::{
+    event::{Event, WindowEvent},
+    event_loop::EventLoop,
+};
 
 /// An application event loop.
 #[repr(C)]
@@ -31,7 +36,7 @@ pub struct NSTDApp {
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_app_new() -> NSTDApp {
     NSTDApp {
-        events: NSTDAppEvents::new(),
+        events: NSTDAppEvents::default(),
         event_loop: Box::default(),
     }
 }
@@ -76,18 +81,50 @@ pub extern "C" fn nstd_app_events(app: &mut NSTDApp) -> &mut NSTDAppEvents {
 ///
 /// - `NSTDApp app` - The `nstd` application to run.
 ///
+/// - `NSTDAnyMut data` - Custom user data to pass to each app event.
+///
 /// # Safety
 ///
 /// This function's caller must guarantee validity of the `app`'s event callbacks.
-#[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_app_run(app: NSTDApp) -> ! {
+pub unsafe extern "C" fn nstd_app_run(app: NSTDApp, data: NSTDAnyMut) -> ! {
     // Dispatch the `start` event.
     if let Some(start) = app.events.start {
-        start(&app.event_loop);
+        let start_app_data = NSTDAppData::new(&app.event_loop, data);
+        start(&start_app_data);
     }
     // Run the winit event loop.
-    app.event_loop.run(|_, _, _| {})
+    app.event_loop.run(move |event, handle, control_flow| {
+        // Instantiate a new instance of `NSTDAppData`.
+        let app_data = NSTDAppData::new(handle, data);
+        // Dispatch events.
+        match event {
+            // All other events have been processed.
+            Event::MainEventsCleared => {
+                if let Some(update) = app.events.update {
+                    update(&app_data);
+                }
+            }
+            // A window requests closing.
+            Event::WindowEvent {
+                window_id,
+                event: WindowEvent::CloseRequested,
+            } => {
+                if let Some(window_close_requested) = app.events.window_close_requested {
+                    window_close_requested(&app_data, &window_id);
+                }
+            }
+            // The event loop is being exited.
+            Event::LoopDestroyed => {
+                if let Some(exit) = app.events.exit {
+                    exit(&app_data);
+                }
+            }
+            _ => (),
+        }
+        // Set the `winit` event loop's control flow.
+        *control_flow = app_data.control_flow.into_inner().into();
+    })
 }
 
 /// Frees an instance of `NSTDApp`. The application's event loop must not be ran after this is
