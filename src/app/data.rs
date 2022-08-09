@@ -13,13 +13,13 @@ pub enum NSTDAppControlFlow {
     /// Poll for more events.
     NSTD_APP_CONTROL_FLOW_POLL,
 }
-impl Into<ControlFlow> for NSTDAppControlFlow {
+impl From<NSTDAppControlFlow> for ControlFlow {
     /// Creates a new instance of [ControlFlow] from an [NSTDAppControlFlow].
     #[inline]
-    fn into(self) -> ControlFlow {
-        match self {
-            Self::NSTD_APP_CONTROL_FLOW_EXIT => ControlFlow::Exit,
-            Self::NSTD_APP_CONTROL_FLOW_POLL => ControlFlow::Poll,
+    fn from(control_flow: NSTDAppControlFlow) -> ControlFlow {
+        match control_flow {
+            NSTDAppControlFlow::NSTD_APP_CONTROL_FLOW_EXIT => ControlFlow::Exit,
+            NSTDAppControlFlow::NSTD_APP_CONTROL_FLOW_POLL => ControlFlow::Poll,
         }
     }
 }

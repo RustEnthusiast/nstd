@@ -4,7 +4,10 @@ pub mod events;
 pub mod handle;
 use self::{data::NSTDAppData, events::NSTDAppEvents, handle::NSTDAppHandle};
 use crate::NSTDAnyMut;
-use winit::{event::Event, event_loop::EventLoop};
+use winit::{
+    event::{Event, WindowEvent},
+    event_loop::EventLoop,
+};
 
 /// An application event loop.
 #[repr(C)]
@@ -33,7 +36,7 @@ pub struct NSTDApp {
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_app_new() -> NSTDApp {
     NSTDApp {
-        events: NSTDAppEvents::new(),
+        events: NSTDAppEvents::default(),
         event_loop: Box::default(),
     }
 }
@@ -100,6 +103,15 @@ pub unsafe extern "C" fn nstd_app_run(app: NSTDApp, data: NSTDAnyMut) -> ! {
             Event::MainEventsCleared => {
                 if let Some(update) = app.events.update {
                     update(&app_data);
+                }
+            }
+            // A window requests closing.
+            Event::WindowEvent {
+                window_id,
+                event: WindowEvent::CloseRequested,
+            } => {
+                if let Some(window_close_requested) = app.events.window_close_requested {
+                    window_close_requested(&app_data, &window_id);
                 }
             }
             // The event loop is being exited.
