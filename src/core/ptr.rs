@@ -85,6 +85,21 @@ pub extern "C" fn nstd_core_ptr_mut_new(obj: NSTDAnyMut, size: NSTDUSize) -> NST
     NSTDPtrMut { raw: obj, size }
 }
 
+/// Creates an immutable version of a mutable pointer.
+///
+/// # Parameters:
+///
+/// - `const NSTDPtrMut *ptr` - The mutable pointer.
+///
+/// # Returns
+///
+/// `NSTDPtrConst ptr_const` - The immutable copy of `ptr`.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_core_ptr_mut_as_const(ptr: &NSTDPtrMut) -> NSTDPtrConst {
+    nstd_core_ptr_const_new(ptr.raw, ptr.size)
+}
+
 /// Returns the size of the object being pointed to.
 ///
 /// # Parameters:

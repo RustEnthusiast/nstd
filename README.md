@@ -60,7 +60,7 @@ ideal. I am always looking for ways to make this API as safe as sanely possible,
 issue if you have any ideas on how we can do so, it would be greatly appreciated.
 
 # How to build
-`nstd` let's you decide what features you want to use. Any module that falls under the top level
+`nstd` let you decide what features you want to use. Any module that falls under the top level
 module has a dedicated feature flag, for example `nstd.core` has the feature flag `nstd_core` and
 `nstd.alloc` has the feature flag `nstd_alloc`. Each module can also have additional features, for
 example `nstd.os` has the additional `nstd_os_windows_alloc` feature for memory allocation on

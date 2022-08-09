@@ -431,6 +431,17 @@ NSTDAPI NSTDStrMut nstd_core_str_mut_from_bytes(NSTDSliceMut *bytes);
 /// while the returned string slice is in use.
 NSTDAPI NSTDStrMut nstd_core_str_mut_from_bytes_unchecked(NSTDSliceMut *bytes);
 
+/// Creates an immutable version of a mutable string slice.
+///
+/// # Parameters:
+///
+/// - `const NSTDStrMut *str` - The mutable string slice.
+///
+/// # Returns
+///
+/// `NSTDStrConst str_const` - The immutable copy of `str`.
+NSTDAPI NSTDStrConst nstd_core_str_mut_as_const(const NSTDStrMut *str);
+
 /// Returns an immutable byte slice over `str`'s data.
 ///
 /// # Parameters:
