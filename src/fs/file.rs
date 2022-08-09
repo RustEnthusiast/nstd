@@ -121,6 +121,21 @@ pub unsafe extern "C" fn nstd_fs_file_write_all(
     crate::io::stdio::write_all(file, bytes)
 }
 
+/// Flushes a file stream.
+///
+/// # Parameters:
+///
+/// - `NSTDFile *file` - The file stream.
+///
+/// # Returns
+///
+/// `NSTDIOError errc` - The I/O operation error code.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_fs_file_flush(file: &mut NSTDFile) -> NSTDIOError {
+    crate::io::stdio::flush(file)
+}
+
 /// Closes a file handle.
 ///
 /// # Parameters:

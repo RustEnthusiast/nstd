@@ -83,6 +83,17 @@ NSTDUSize *written);
 /// This function's caller must guarantee validity of `bytes`.
 NSTDAPI NSTDIOError nstd_fs_file_write_all(NSTDFile *file, const NSTDSliceConst *bytes);
 
+/// Flushes a file stream.
+///
+/// # Parameters:
+///
+/// - `NSTDFile *file` - The file stream.
+///
+/// # Returns
+///
+/// `NSTDIOError errc` - The I/O operation error code.
+NSTDAPI NSTDIOError nstd_fs_file_flush(NSTDFile *file);
+
 /// Closes a file handle.
 ///
 /// # Parameters:
