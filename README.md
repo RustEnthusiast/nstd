@@ -33,6 +33,7 @@ Rust syntax).
     - `shared_lib` - Access symbols from loaded shared libraries.
     - `shared_ptr` - A reference counting smart pointer.
     - `string` - Dynamically sized UTF-8 encoded byte string.
+    - `thread` - Thread spawning, joining, and detaching.
     - `vec` - A dynamically sized contiguous sequence of values.
 
 # Platform support
