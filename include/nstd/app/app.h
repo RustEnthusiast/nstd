@@ -26,7 +26,7 @@ typedef struct {
 ///
 /// # Panics
 ///
-/// This function must be called on the "main" thread, otherwise a panic may occurr.
+/// This function must be called on the "main" thread, otherwise a panic may occur.
 NSTDAPI NSTDApp nstd_app_new();
 
 /// Returns a handle to an `NSTDApp`'s event loop.

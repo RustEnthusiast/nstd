@@ -5,7 +5,7 @@ pub mod handle;
 use self::{data::NSTDAppData, events::NSTDAppEvents, handle::NSTDAppHandle};
 use crate::NSTDAnyMut;
 use winit::{
-    event::{Event, WindowEvent},
+    event::{DeviceEvent, Event, WindowEvent},
     event_loop::EventLoop,
 };
 
@@ -31,7 +31,7 @@ pub struct NSTDApp {
 ///
 /// # Panics
 ///
-/// This function must be called on the "main" thread, otherwise a panic may occurr.
+/// This function must be called on the "main" thread, otherwise a panic may occur.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_app_new() -> NSTDApp {
@@ -105,6 +105,22 @@ pub unsafe extern "C" fn nstd_app_run(app: NSTDApp, data: NSTDAnyMut) -> ! {
                     update(&app_data);
                 }
             }
+            // A device event was received.
+            Event::DeviceEvent { device_id, event } => match event {
+                // A device was connected to the system.
+                DeviceEvent::Added => {
+                    if let Some(device_added) = app.events.device_added {
+                        device_added(&app_data, &device_id);
+                    }
+                }
+                // A device was disconnected from the system.
+                DeviceEvent::Removed => {
+                    if let Some(device_removed) = app.events.device_removed {
+                        device_removed(&app_data, &device_id);
+                    }
+                }
+                _ => (),
+            },
             // A window requests closing.
             Event::WindowEvent {
                 window_id,
