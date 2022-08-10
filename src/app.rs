@@ -2,10 +2,14 @@
 pub mod data;
 pub mod events;
 pub mod handle;
-use self::{data::NSTDAppData, events::NSTDAppEvents, handle::NSTDAppHandle};
+use self::{
+    data::NSTDAppData,
+    events::{NSTDAppEvents, NSTDButtonState, NSTDScrollDelta},
+    handle::NSTDAppHandle,
+};
 use crate::NSTDAnyMut;
 use winit::{
-    event::{DeviceEvent, Event, WindowEvent},
+    event::{DeviceEvent, Event, MouseScrollDelta, WindowEvent},
     event_loop::EventLoop,
 };
 
@@ -117,6 +121,39 @@ pub unsafe extern "C" fn nstd_app_run(app: NSTDApp, data: NSTDAnyMut) -> ! {
                 DeviceEvent::Removed => {
                     if let Some(device_removed) = app.events.device_removed {
                         device_removed(&app_data, &device_id);
+                    }
+                }
+                // A mouse device was moved.
+                DeviceEvent::MouseMotion { delta } => {
+                    if let Some(mouse_moved) = app.events.mouse_moved {
+                        mouse_moved(&app_data, &device_id, delta.0, -delta.1);
+                    }
+                }
+                // A scroll wheel was scrolled.
+                DeviceEvent::MouseWheel { delta } => {
+                    if let Some(mouse_scrolled) = app.events.mouse_scrolled {
+                        let (x, y, delta_t) = match delta {
+                            MouseScrollDelta::LineDelta(x, y) => {
+                                (x as f64, y as f64, NSTDScrollDelta::NSTD_SCROLL_DELTA_LINE)
+                            }
+                            MouseScrollDelta::PixelDelta(scroll) => {
+                                (scroll.x, scroll.y, NSTDScrollDelta::NSTD_SCROLL_DELTA_PIXEL)
+                            }
+                        };
+                        mouse_scrolled(&app_data, &device_id, x, y, delta_t);
+                    }
+                }
+                // There was motion on some analog axis.
+                DeviceEvent::Motion { axis, value } => {
+                    if let Some(axis_motion) = app.events.axis_motion {
+                        axis_motion(&app_data, &device_id, &axis, value);
+                    }
+                }
+                // A button's state was changed.
+                DeviceEvent::Button { button, state } => {
+                    if let Some(button_changed) = app.events.button_changed {
+                        let state = NSTDButtonState::from(state);
+                        button_changed(&app_data, &device_id, &button, state);
                     }
                 }
                 _ => (),
