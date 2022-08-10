@@ -4,12 +4,12 @@ pub mod events;
 pub mod handle;
 use self::{
     data::NSTDAppData,
-    events::{NSTDAppEvents, NSTDButtonState, NSTDScrollDelta},
+    events::{NSTDAppEvents, NSTDScrollDelta},
     handle::NSTDAppHandle,
 };
 use crate::NSTDAnyMut;
 use winit::{
-    event::{DeviceEvent, Event, MouseScrollDelta, WindowEvent},
+    event::{DeviceEvent, ElementState, Event, MouseScrollDelta, WindowEvent},
     event_loop::EventLoop,
 };
 
@@ -152,8 +152,11 @@ pub unsafe extern "C" fn nstd_app_run(app: NSTDApp, data: NSTDAnyMut) -> ! {
                 // A button's state was changed.
                 DeviceEvent::Button { button, state } => {
                     if let Some(button_changed) = app.events.button_changed {
-                        let state = NSTDButtonState::from(state);
-                        button_changed(&app_data, &device_id, &button, state);
+                        let is_down = match state {
+                            ElementState::Pressed => true,
+                            ElementState::Released => false,
+                        };
+                        button_changed(&app_data, &device_id, &button, is_down.into());
                     }
                 }
                 _ => (),

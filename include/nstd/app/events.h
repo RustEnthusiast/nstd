@@ -23,14 +23,6 @@ typedef enum {
     NSTD_SCROLL_DELTA_PIXEL
 } NSTDScrollDelta;
 
-/// Describes the state of a button.
-typedef enum {
-    /// The button is up.
-    NSTD_BUTTON_STATE_RELEASED,
-    /// The button is pressed down.
-    NSTD_BUTTON_STATE_PRESSED,
-} NSTDButtonState;
-
 /// Contains callback based events through function pointers.
 typedef struct {
     /// Called once before starting the application event loop.
@@ -53,7 +45,7 @@ typedef struct {
     /// Some touchpads can return a negative y value.
     void (*axis_motion)(const NSTDAppData *, NSTDDeviceID, NSTDAnalogAxisID, NSTDFloat64);
     /// Called when a button, such as a mouse button's state changes.
-    void (*button_changed)(const NSTDAppData *, NSTDDeviceID, NSTDButtonID, NSTDButtonState);
+    void (*button_changed)(const NSTDAppData *, NSTDDeviceID, NSTDButtonID, NSTDBool);
     /// A window requests closing.
     void (*window_close_requested)(const NSTDAppData *, NSTDWindowID);
     /// Called once before exiting the application event loop.

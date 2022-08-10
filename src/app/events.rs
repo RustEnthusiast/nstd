@@ -1,7 +1,7 @@
 //! Contains callback based events through function pointers.
-use crate::{app::data::NSTDAppData, NSTDFloat64};
+use crate::{app::data::NSTDAppData, NSTDBool, NSTDFloat64};
 use winit::{
-    event::{AxisId, ButtonId, DeviceId, ElementState},
+    event::{AxisId, ButtonId, DeviceId},
     window::WindowId,
 };
 
@@ -26,27 +26,6 @@ pub enum NSTDScrollDelta {
     NSTD_SCROLL_DELTA_LINE,
     /// The scroll was measured in pixels.
     NSTD_SCROLL_DELTA_PIXEL,
-}
-
-/// Describes the state of a button.
-#[repr(C)]
-#[derive(Clone, Copy, Debug)]
-#[allow(non_camel_case_types)]
-pub enum NSTDButtonState {
-    /// The button is up.
-    NSTD_BUTTON_STATE_RELEASED,
-    /// The button is pressed down.
-    NSTD_BUTTON_STATE_PRESSED,
-}
-impl From<ElementState> for NSTDButtonState {
-    /// Creates an [NSTDButtonState] from a [winit] [ElementState].
-    #[inline]
-    fn from(state: ElementState) -> Self {
-        match state {
-            ElementState::Released => Self::NSTD_BUTTON_STATE_RELEASED,
-            ElementState::Pressed => Self::NSTD_BUTTON_STATE_PRESSED,
-        }
-    }
 }
 
 /// Contains callback based events through function pointers.
@@ -77,7 +56,7 @@ pub struct NSTDAppEvents {
         Option<unsafe extern "C" fn(&NSTDAppData, NSTDDeviceID, NSTDAnalogAxisID, NSTDFloat64)>,
     /// Called when a button, such as a mouse button's state changes.
     pub button_changed:
-        Option<unsafe extern "C" fn(&NSTDAppData, NSTDDeviceID, NSTDButtonID, NSTDButtonState)>,
+        Option<unsafe extern "C" fn(&NSTDAppData, NSTDDeviceID, NSTDButtonID, NSTDBool)>,
     /// A window requests closing.
     pub window_close_requested: Option<unsafe extern "C" fn(&NSTDAppData, NSTDWindowID)>,
     /// Called once before exiting the application event loop.
