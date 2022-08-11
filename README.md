@@ -9,6 +9,9 @@ Rust syntax).
 - `nstd` - A cross-platform, fast, and safe general purpose C library written in Rust.
     - `alloc` - Low level memory allocation.
     - `app` - An application event loop.
+        - `data` - Application data passed to each event.
+        - `events` - Contains callback based events through function pointers.
+        - `handle` - A handle to the application event loop.
     - `core` - Provides core functionality for `nstd`.
         - `cstr` - Unowned C string slices.
             - `raw` - Raw C string processing.
