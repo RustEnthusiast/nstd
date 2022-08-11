@@ -151,23 +151,23 @@ pub unsafe extern "C" fn nstd_app_run(app: NSTDApp, data: NSTDAnyMut) -> ! {
                 }
                 // A button's state was changed.
                 DeviceEvent::Button { button, state } => {
-                    if let Some(button_changed) = app.events.button_changed {
+                    if let Some(button_input) = app.events.button_input {
                         let is_down = match state {
                             ElementState::Pressed => true,
                             ElementState::Released => false,
                         };
-                        button_changed(&app_data, &device_id, &button, is_down.into());
+                        button_input(&app_data, &device_id, &button, is_down.into());
                     }
                 }
                 // There was some keyboard input.
                 DeviceEvent::Key(input) => {
-                    if let Some(key_changed) = app.events.key_changed {
+                    if let Some(key_input) = app.events.key_input {
                         let key = NSTDKey::from(input.virtual_keycode);
                         let is_down = match input.state {
                             ElementState::Pressed => true,
                             ElementState::Released => false,
                         };
-                        key_changed(&app_data, &device_id, key, input.scancode, is_down.into());
+                        key_input(&app_data, &device_id, key, input.scancode, is_down.into());
                     }
                 }
                 _ => (),

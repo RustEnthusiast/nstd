@@ -288,10 +288,10 @@ pub struct NSTDAppEvents {
     pub axis_motion:
         Option<unsafe extern "C" fn(&NSTDAppData, NSTDDeviceID, NSTDAnalogAxisID, NSTDFloat64)>,
     /// Called when a button, such as a mouse button's state changes.
-    pub button_changed:
+    pub button_input:
         Option<unsafe extern "C" fn(&NSTDAppData, NSTDDeviceID, NSTDButtonID, NSTDBool)>,
     /// Called when a keyboard key is pressed or unpressed.
-    pub key_changed:
+    pub key_input:
         Option<unsafe extern "C" fn(&NSTDAppData, NSTDDeviceID, NSTDKey, NSTDUInt32, NSTDBool)>,
     /// A window requests closing.
     pub window_close_requested: Option<unsafe extern "C" fn(&NSTDAppData, NSTDWindowID)>,

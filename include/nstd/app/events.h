@@ -193,9 +193,9 @@ typedef struct {
     /// Some touchpads can return a negative y value.
     void (*axis_motion)(const NSTDAppData *, NSTDDeviceID, NSTDAnalogAxisID, NSTDFloat64);
     /// Called when a button, such as a mouse button's state changes.
-    void (*button_changed)(const NSTDAppData *, NSTDDeviceID, NSTDButtonID, NSTDBool);
+    void (*button_input)(const NSTDAppData *, NSTDDeviceID, NSTDButtonID, NSTDBool);
     /// Called when a keyboard key is pressed or unpressed.
-    void (*key_changed)(const NSTDAppData *, NSTDDeviceID, NSTDKey, NSTDUInt32, NSTDBool);
+    void (*key_input)(const NSTDAppData *, NSTDDeviceID, NSTDKey, NSTDUInt32, NSTDBool);
     /// A window requests closing.
     void (*window_close_requested)(const NSTDAppData *, NSTDWindowID);
     /// Called once before exiting the application event loop.
