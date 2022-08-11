@@ -4,7 +4,7 @@ pub mod events;
 pub mod handle;
 use self::{
     data::NSTDAppData,
-    events::{NSTDAppEvents, NSTDScrollDelta},
+    events::{NSTDAppEvents, NSTDKey, NSTDScrollDelta},
     handle::NSTDAppHandle,
 };
 use crate::NSTDAnyMut;
@@ -157,6 +157,17 @@ pub unsafe extern "C" fn nstd_app_run(app: NSTDApp, data: NSTDAnyMut) -> ! {
                             ElementState::Released => false,
                         };
                         button_changed(&app_data, &device_id, &button, is_down.into());
+                    }
+                }
+                // There was some keyboard input.
+                DeviceEvent::Key(input) => {
+                    if let Some(key_changed) = app.events.key_changed {
+                        let key = NSTDKey::from(input.virtual_keycode);
+                        let is_down = match input.state {
+                            ElementState::Pressed => true,
+                            ElementState::Released => false,
+                        };
+                        key_changed(&app_data, &device_id, key, input.scancode, is_down.into());
                     }
                 }
                 _ => (),
