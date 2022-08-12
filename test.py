@@ -1,6 +1,6 @@
 import os
 
-FEATURES = ("nstd_alloc", "nstd_core", "nstd_cstring", "nstd_heap_ptr", "nstd_io",
+FEATURES = ("nstd_alloc", "nstd_core", "nstd_cstring", "nstd_heap_ptr", "nstd_image", "nstd_io",
             "nstd_os_windows_alloc", "nstd_shared_lib", "nstd_shared_ptr", "nstd_string",
             "nstd_vec")
 
