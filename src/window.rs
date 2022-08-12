@@ -1,5 +1,5 @@
 //! An `nstd` application window.
-use crate::app::handle::NSTDAppHandle;
+use crate::{app::handle::NSTDAppHandle, core::str::NSTDStrConst};
 use winit::window::Window;
 
 /// An `nstd` application window.
@@ -22,6 +22,23 @@ pub type NSTDWindow = Box<Window>;
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_window_new(app: NSTDAppHandle) -> NSTDWindow {
     Box::new(Window::new(app).expect("Failed to create an nstd application window."))
+}
+
+/// Sets the title of a window.
+///
+/// # Parameters:
+///
+/// - `const NSTDWindow *window` - The window.
+///
+/// - `const NSTDStrConst *title` - The new title of the window.
+///
+/// # Safety
+///
+/// This function can cause undefined behavior if `title`'s data is invalid.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_window_set_title(window: &NSTDWindow, title: &NSTDStrConst) {
+    window.set_title(title.as_str())
 }
 
 /// Permanently closes & frees a window and it's data.
