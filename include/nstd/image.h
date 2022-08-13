@@ -51,6 +51,39 @@ typedef struct {
 /// This operation can cause undefined behavior if `buffer`'s data is invalid.
 NSTDAPI NSTDImage nstd_image_load(const NSTDSliceConst *buffer, NSTDImageError *errc);
 
+/// Returns an image's raw pixel data as a byte slice.
+///
+/// # Parameters:
+///
+/// - `const NSTDImage *img` - The image.
+///
+/// # Returns
+///
+/// `NSTDSliceConst bytes` - The image's raw pixel data.
+NSTDAPI NSTDSliceConst nstd_image_as_bytes(const NSTDImage *img);
+
+/// Returns the width of an image.
+///
+/// # Parameters:
+///
+/// - `const NSTDImage *img` - The image.
+///
+/// # Returns
+///
+/// `NSTDUInt32 width` - The width of the image.
+NSTDAPI NSTDUInt32 nstd_image_width(const NSTDImage *img);
+
+/// Returns the height of an image.
+///
+/// # Parameters:
+///
+/// - `const NSTDImage *img` - The image.
+///
+/// # Returns
+///
+/// `NSTDUInt32 height` - The height of the image.
+NSTDAPI NSTDUInt32 nstd_image_height(const NSTDImage *img);
+
 /// Frees image data.
 ///
 /// # Parameters:

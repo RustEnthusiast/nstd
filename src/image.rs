@@ -1,5 +1,9 @@
 //! Multi-format image processing.
-use crate::{core::slice::NSTDSliceConst, io::NSTDIOError};
+use crate::{
+    core::slice::{nstd_core_slice_const_new, NSTDSliceConst},
+    io::NSTDIOError,
+    NSTDUInt32,
+};
 use image::{error::ImageError, DynamicImage};
 
 /// An image of any format.
@@ -83,6 +87,52 @@ pub unsafe extern "C" fn nstd_image_load(
             None
         }
     }
+}
+
+/// Returns an image's raw pixel data as a byte slice.
+///
+/// # Parameters:
+///
+/// - `const NSTDImage *img` - The image.
+///
+/// # Returns
+///
+/// `NSTDSliceConst bytes` - The image's raw pixel data.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_image_as_bytes(img: &NSTDImage) -> NSTDSliceConst {
+    let bytes = img.as_bytes();
+    nstd_core_slice_const_new(bytes.as_ptr().cast(), 1, bytes.len())
+}
+
+/// Returns the width of an image.
+///
+/// # Parameters:
+///
+/// - `const NSTDImage *img` - The image.
+///
+/// # Returns
+///
+/// `NSTDUInt32 width` - The width of the image.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_image_width(img: &NSTDImage) -> NSTDUInt32 {
+    img.width()
+}
+
+/// Returns the height of an image.
+///
+/// # Parameters:
+///
+/// - `const NSTDImage *img` - The image.
+///
+/// # Returns
+///
+/// `NSTDUInt32 height` - The height of the image.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_image_height(img: &NSTDImage) -> NSTDUInt32 {
+    img.height()
 }
 
 /// Frees image data.
