@@ -2,6 +2,7 @@
 #define NSTD_WINDOW_H
 #include "app/handle.h"
 #include "core/str.h"
+#include "image.h"
 #include "nstd.h"
 NSTDCPPSTART
 
@@ -35,6 +36,15 @@ NSTDAPI NSTDWindow nstd_window_new(NSTDAppHandle app);
 ///
 /// This function can cause undefined behavior if `title`'s data is invalid.
 NSTDAPI void nstd_window_set_title(const NSTDWindow *window, const NSTDStrConst *title);
+
+/// Sets a window's icon to an RGBA image.
+///
+/// # Parameters:
+///
+/// - `const NSTDWindow *window` - The window.
+///
+/// - `const NSTDImage *icon` - The image to set as the window icon.
+NSTDAPI void nstd_window_set_icon(const NSTDWindow *window, const NSTDImage *icon);
 
 /// Permanently closes & frees a window and it's data.
 ///
