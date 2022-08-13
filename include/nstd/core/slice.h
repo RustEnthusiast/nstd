@@ -1,6 +1,7 @@
 #ifndef NSTD_CORE_SLICE_H
 #define NSTD_CORE_SLICE_H
 #include "../nstd.h"
+#include "def.h"
 #include "ptr.h"
 NSTDCPPSTART
 
@@ -138,6 +139,17 @@ typedef struct {
 ///
 /// `NSTDSliceMut slice` - The new slice.
 NSTDAPI NSTDSliceMut nstd_core_slice_mut_new(NSTDAnyMut ptr, NSTDUSize element_size, NSTDUSize len);
+
+/// Creates an immutable version of a mutable slice.
+///
+/// # Parameters:
+///
+/// - `const NSTDSliceMut *slice` - The mutable slice.
+///
+/// # Returns
+///
+/// `NSTDSliceConst slice_const` - The immutable copy of `slice`.
+NSTDAPI NSTDSliceConst nstd_core_slice_mut_as_const(const NSTDSliceMut *slice);
 
 /// Returns a raw pointer to the slice's memory.
 ///
@@ -284,14 +296,20 @@ NSTDAPI NSTDBool nstd_core_slice_mut_compare(const NSTDSliceMut *s1, const NSTDS
 ///
 /// - `const NSTDSliceConst *src` - The slice to copy data from.
 ///
-/// # Panics
+/// # Returns
 ///
-/// This function panics if the byte length of `dest` is less than the byte length of `src`.
+/// `NSTDErrorCode errc` - Nonzero on error.
+///
+/// # Possible errors
+///
+/// - `1` - The two buffer's lengths do not match.
+///
+/// - `2` - The two buffer's strides do not match.
 ///
 /// # Safety
 ///
 /// This function can cause undefined behavior if either `dest` or `src`'s data is invalid.
-NSTDAPI void nstd_core_slice_mut_copy(NSTDSliceMut *dest, const NSTDSliceConst *src);
+NSTDAPI NSTDErrorCode nstd_core_slice_mut_copy(NSTDSliceMut *dest, const NSTDSliceConst *src);
 
 NSTDCPPEND
 #endif

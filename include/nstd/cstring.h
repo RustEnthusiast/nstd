@@ -111,6 +111,41 @@ NSTDAPI const NSTDChar *nstd_cstring_as_ptr(const NSTDCString *cstring);
 /// `NSTDVec bytes` - The C string's raw data.
 NSTDAPI NSTDVec nstd_cstring_to_bytes(NSTDCString cstring);
 
+/// Returns the number of `char`s in a C string, excluding the null terminator.
+///
+/// # Parameters:
+///
+/// - `const NSTDCString *cstring` - The C string.
+///
+/// # Returns
+///
+/// `NSTDUSize len` - The length of the C string without it's null byte.
+NSTDAPI NSTDUSize nstd_cstring_len(const NSTDCString *cstring);
+
+/// Returns a C string's capacity.
+///
+/// This is the max number of *bytes* the C string can contain without reallocating.
+///
+/// # Parameters:
+///
+/// - `const NSTDCString *cstring` - The C string.
+///
+/// # Returns
+///
+/// `NSTDUSize cap` - The C string's capacity.
+NSTDAPI NSTDUSize nstd_cstring_cap(const NSTDCString *cstring);
+
+/// Returns the number of `char`s in a C string, including the null terminator.
+///
+/// # Parameters:
+///
+/// - `const NSTDCString *cstring` - The C string.
+///
+/// # Returns
+///
+/// `NSTDUSize len` - The length of the C string including it's null byte.
+NSTDAPI NSTDUSize nstd_cstring_len_with_null(const NSTDCString *cstring);
+
 /// Appends an `NSTDChar` to the end of an `NSTDCString`.
 ///
 /// This will have no effect if `chr` is a null byte (0).

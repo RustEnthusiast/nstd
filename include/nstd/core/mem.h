@@ -25,6 +25,20 @@ NSTDCPPSTART
 /// than `num`.
 NSTDAPI NSTDBool nstd_core_mem_compare(const NSTDByte *buf1, const NSTDByte *buf2, NSTDUSize num);
 
+/// Zeros out a memory buffer.
+///
+/// # Parameters:
+///
+/// - `NSTDByte *buf` - A pointer to the first byte in the memory buffer.
+///
+/// - `NSTDUSize size` - The number of bytes to set to 0.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if the caller does not ensure that the memory
+/// buffer is at least `size` bytes in size.
+NSTDAPI void nstd_core_mem_zero(NSTDByte *buf, NSTDUSize size);
+
 /// Fills the memory buffer `buf` with byte `fill`.
 ///
 /// # Parameters:

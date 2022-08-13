@@ -1,13 +1,14 @@
 #ifndef NSTD_SHARED_PTR_H
 #define NSTD_SHARED_PTR_H
-#include "core/ptr.h"
 #include "nstd.h"
 NSTDCPPSTART
 
 /// A reference counting smart pointer.
 typedef struct {
-    /// A pointer to private data about the shared object.
-    NSTDPtrMut ptr;
+    /// A raw pointer to private data about the shared object.
+    NSTDAnyMut ptr;
+    /// The size of the shared pointer's memory buffer.
+    NSTDUSize size;
 } NSTDSharedPtr;
 
 /// Creates a new initialized instance of a shared pointer.

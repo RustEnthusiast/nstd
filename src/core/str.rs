@@ -597,6 +597,23 @@ pub unsafe extern "C" fn nstd_core_str_mut_from_bytes_unchecked(
     }
 }
 
+/// Creates an immutable version of a mutable string slice.
+///
+/// # Parameters:
+///
+/// - `const NSTDStrMut *str` - The mutable string slice.
+///
+/// # Returns
+///
+/// `NSTDStrConst str_const` - The immutable copy of `str`.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_core_str_mut_as_const(str: &NSTDStrMut) -> NSTDStrConst {
+    let bytes = nstd_core_str_mut_as_bytes(str);
+    // SAFETY: String slices are UTF-8 encoded.
+    unsafe { nstd_core_str_const_from_bytes_unchecked(&bytes) }
+}
+
 /// Returns an immutable byte slice over `str`'s data.
 ///
 /// # Parameters:

@@ -9,9 +9,9 @@ use crate::{
         slice::NSTDSliceConst,
     },
     vec::{
-        nstd_vec_as_mut_ptr, nstd_vec_as_ptr, nstd_vec_as_slice, nstd_vec_clone, nstd_vec_extend,
-        nstd_vec_get_mut, nstd_vec_len, nstd_vec_new_with_cap, nstd_vec_pop, nstd_vec_push,
-        NSTDVec,
+        nstd_vec_as_mut_ptr, nstd_vec_as_ptr, nstd_vec_as_slice, nstd_vec_cap, nstd_vec_clone,
+        nstd_vec_extend, nstd_vec_get_mut, nstd_vec_len, nstd_vec_new_with_cap, nstd_vec_pop,
+        nstd_vec_push, NSTDVec,
     },
     NSTDUSize,
 };
@@ -60,6 +60,7 @@ pub extern "C" fn nstd_cstring_new() -> NSTDCString {
 pub extern "C" fn nstd_cstring_new_with_cap(cap: NSTDUSize) -> NSTDCString {
     let mut bytes = nstd_vec_new_with_cap(1, cap);
     let nul: NSTDChar = 0;
+    // SAFETY: `nul` is stored on the stack.
     unsafe { assert!(nstd_vec_push(&mut bytes, addr_of!(nul).cast()) == 0) };
     NSTDCString { bytes }
 }
@@ -164,6 +165,53 @@ pub extern "C" fn nstd_cstring_to_bytes(cstring: NSTDCString) -> NSTDVec {
     cstring.bytes
 }
 
+/// Returns the number of `char`s in a C string, excluding the null terminator.
+///
+/// # Parameters:
+///
+/// - `const NSTDCString *cstring` - The C string.
+///
+/// # Returns
+///
+/// `NSTDUSize len` - The length of the C string without it's null byte.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_cstring_len(cstring: &NSTDCString) -> NSTDUSize {
+    nstd_vec_len(&cstring.bytes) - 1
+}
+
+/// Returns the number of `char`s in a C string, including the null terminator.
+///
+/// # Parameters:
+///
+/// - `const NSTDCString *cstring` - The C string.
+///
+/// # Returns
+///
+/// `NSTDUSize len` - The length of the C string including it's null byte.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_cstring_len_with_null(cstring: &NSTDCString) -> NSTDUSize {
+    nstd_vec_len(&cstring.bytes)
+}
+
+/// Returns a C string's capacity.
+///
+/// This is the max number of *bytes* the C string can contain without reallocating.
+///
+/// # Parameters:
+///
+/// - `const NSTDCString *cstring` - The C string.
+///
+/// # Returns
+///
+/// `NSTDUSize cap` - The C string's capacity.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_cstring_cap(cstring: &NSTDCString) -> NSTDUSize {
+    nstd_vec_cap(&cstring.bytes)
+}
+
 /// Appends an `NSTDChar` to the end of an `NSTDCString`.
 ///
 /// This will have no effect if `chr` is a null byte (0).
@@ -179,6 +227,7 @@ pub extern "C" fn nstd_cstring_to_bytes(cstring: NSTDCString) -> NSTDVec {
 /// This operation panics if `chr` cannot be appended to the C string.
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_cstring_push(cstring: &mut NSTDCString, chr: NSTDChar) {
+    // SAFETY: C strings always contain an exclusive null byte at the end.
     unsafe {
         if chr != 0 {
             // Push a new null byte onto the end of the C string.
@@ -244,12 +293,12 @@ pub unsafe extern "C" fn nstd_cstring_push_cstr(
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_cstring_pop(cstring: &mut NSTDCString) -> NSTDChar {
     let mut ret = 0;
-    let len = nstd_vec_len(&cstring.bytes);
-    if len > 1 {
+    let len = nstd_cstring_len(cstring);
+    if len > 0 {
+        // SAFETY: The C string's length is at least 1.
         unsafe {
             // Write the last character in the C string to the return value.
-            let lastpos = len - 2;
-            let last = nstd_vec_get_mut(&mut cstring.bytes, lastpos).cast();
+            let last = nstd_vec_get_mut(&mut cstring.bytes, len - 1).cast();
             ret = *last;
             // Set the last byte to null.
             *last = 0;

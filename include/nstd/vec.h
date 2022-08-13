@@ -7,10 +7,14 @@ NSTDCPPSTART
 
 /// A dynamically sized contiguous sequence of values.
 typedef struct {
-    /// The underlying memory buffer.
-    NSTDSliceMut buffer;
+    /// A raw pointer to the vector's memory buffer.
+    NSTDAnyMut ptr;
+    /// The number of bytes each value in the vector takes up.
+    NSTDUSize stride;
     /// The number of active elements in the vector.
     NSTDUSize len;
+    /// The number of values allocated in the memory buffer.
+    NSTDUSize cap;
 } NSTDVec;
 
 /// Creates a new vector without allocating any resources.
@@ -74,6 +78,19 @@ NSTDAPI NSTDVec nstd_vec_clone(const NSTDVec *vec);
 ///
 /// `NSTDUSize len` - The length of the vector.
 NSTDAPI NSTDUSize nstd_vec_len(const NSTDVec *vec);
+
+/// Returns a vector's capacity.
+///
+/// This is the max number of values the vector can contain without reallocating.
+///
+/// # Parameters:
+///
+/// - `const NSTDVec *vec` - The vector.
+///
+/// # Returns
+///
+/// `NSTDUSize cap` - The vector's capacity.
+NSTDAPI NSTDUSize nstd_vec_cap(const NSTDVec *vec);
 
 /// Returns the amount of bytes each value in a vector occupies.
 ///

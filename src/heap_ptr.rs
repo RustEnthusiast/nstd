@@ -1,10 +1,7 @@
 //! A pointer type for single value heap allocation.
 use crate::{
     alloc::{nstd_alloc_allocate, nstd_alloc_allocate_zeroed, nstd_alloc_deallocate},
-    core::{
-        mem::nstd_core_mem_copy,
-        ptr::{nstd_core_ptr_mut_new, nstd_core_ptr_mut_size, NSTDPtrMut},
-    },
+    core::mem::nstd_core_mem_copy,
     NSTDAnyConst, NSTDAnyMut, NSTDUSize,
 };
 
@@ -12,15 +9,17 @@ use crate::{
 #[repr(C)]
 #[derive(Debug, Hash, PartialEq, Eq)]
 pub struct NSTDHeapPtr {
-    /// A pointer to the value on the heap.
-    ptr: NSTDPtrMut,
+    /// A raw pointer to the value on the heap.
+    ptr: NSTDAnyMut,
+    /// The size of the object in bytes.
+    size: NSTDUSize,
 }
 impl Drop for NSTDHeapPtr {
     /// [NSTDHeapPtr]'s destructor.
     #[inline]
     fn drop(&mut self) {
-        let size = nstd_heap_ptr_size(self);
-        unsafe { nstd_alloc_deallocate(&mut self.ptr.raw, size) };
+        // SAFETY: Heap pointers are always non-null.
+        unsafe { nstd_alloc_deallocate(&mut self.ptr, self.size) };
     }
 }
 
@@ -54,7 +53,8 @@ pub unsafe extern "C" fn nstd_heap_ptr_new(
     assert!(!mem.is_null());
     nstd_core_mem_copy(mem.cast(), init.cast(), element_size);
     NSTDHeapPtr {
-        ptr: nstd_core_ptr_mut_new(mem, element_size),
+        ptr: mem,
+        size: element_size,
     }
 }
 
@@ -75,10 +75,12 @@ pub unsafe extern "C" fn nstd_heap_ptr_new(
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_heap_ptr_new_zeroed(element_size: NSTDUSize) -> NSTDHeapPtr {
     assert!(element_size != 0);
+    // SAFETY: `element_size` is not 0.
     let mem = unsafe { nstd_alloc_allocate_zeroed(element_size) };
     assert!(!mem.is_null());
     NSTDHeapPtr {
-        ptr: nstd_core_ptr_mut_new(mem, element_size),
+        ptr: mem,
+        size: element_size,
     }
 }
 
@@ -99,12 +101,12 @@ pub extern "C" fn nstd_heap_ptr_new_zeroed(element_size: NSTDUSize) -> NSTDHeapP
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_heap_ptr_clone(hptr: &NSTDHeapPtr) -> NSTDHeapPtr {
     let size = nstd_heap_ptr_size(hptr);
+    // SAFETY: `size` is not 0.
     let mem = unsafe { nstd_alloc_allocate(size) };
     assert!(!mem.is_null());
-    unsafe { nstd_core_mem_copy(mem.cast(), hptr.ptr.raw.cast(), size) };
-    NSTDHeapPtr {
-        ptr: nstd_core_ptr_mut_new(mem, size),
-    }
+    // SAFETY: Both pointers are non-null.
+    unsafe { nstd_core_mem_copy(mem.cast(), hptr.ptr.cast(), size) };
+    NSTDHeapPtr { ptr: mem, size }
 }
 
 /// Returns the size of the heap allocated object.
@@ -119,7 +121,7 @@ pub extern "C" fn nstd_heap_ptr_clone(hptr: &NSTDHeapPtr) -> NSTDHeapPtr {
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_heap_ptr_size(hptr: &NSTDHeapPtr) -> NSTDUSize {
-    nstd_core_ptr_mut_size(&hptr.ptr)
+    hptr.size
 }
 
 /// Returns an immutable raw pointer to the object on the heap.
@@ -134,7 +136,7 @@ pub extern "C" fn nstd_heap_ptr_size(hptr: &NSTDHeapPtr) -> NSTDUSize {
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_heap_ptr_get(hptr: &NSTDHeapPtr) -> NSTDAnyConst {
-    hptr.ptr.raw
+    hptr.ptr
 }
 
 /// Returns a raw pointer to the object on the heap.
@@ -149,7 +151,7 @@ pub extern "C" fn nstd_heap_ptr_get(hptr: &NSTDHeapPtr) -> NSTDAnyConst {
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_heap_ptr_get_mut(hptr: &mut NSTDHeapPtr) -> NSTDAnyMut {
-    hptr.ptr.raw
+    hptr.ptr
 }
 
 /// Frees an instance of `NSTDHeapPtr`.
