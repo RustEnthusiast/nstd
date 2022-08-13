@@ -279,6 +279,23 @@ pub extern "C" fn nstd_core_slice_mut_new(
     }
 }
 
+/// Creates an immutable version of a mutable slice.
+///
+/// # Parameters:
+///
+/// - `const NSTDSliceMut *slice` - The mutable slice.
+///
+/// # Returns
+///
+/// `NSTDSliceConst slice_const` - The immutable copy of `slice`.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_core_slice_mut_as_const(slice: &NSTDSliceMut) -> NSTDSliceConst {
+    let ptr = nstd_core_slice_mut_as_ptr_const(slice);
+    let stride = nstd_core_slice_mut_stride(slice);
+    nstd_core_slice_const_new(ptr, stride, slice.len)
+}
+
 /// Returns a raw pointer to the slice's memory.
 ///
 /// # Parameters:

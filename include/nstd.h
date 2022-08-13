@@ -5,6 +5,7 @@
 #include "nstd/core.h"
 #include "nstd/cstring.h"
 #include "nstd/heap_ptr.h"
+#include "nstd/image.h"
 #include "nstd/io.h"
 #include "nstd/nstd.h"
 #include "nstd/os.h"

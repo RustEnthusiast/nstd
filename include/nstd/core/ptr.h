@@ -67,6 +67,17 @@ typedef struct {
 /// `NSTDPtrMut ptr` - A new instance of `NSTDPtrMut` that points to `obj`.
 NSTDAPI NSTDPtrMut nstd_core_ptr_mut_new(NSTDAnyMut obj, NSTDUSize size);
 
+/// Creates an immutable version of a mutable pointer.
+///
+/// # Parameters:
+///
+/// - `const NSTDPtrMut *ptr` - The mutable pointer.
+///
+/// # Returns
+///
+/// `NSTDPtrConst ptr_const` - The immutable copy of `ptr`.
+NSTDAPI NSTDPtrConst nstd_core_ptr_mut_as_const(const NSTDPtrMut *ptr);
+
 /// Returns the size of the object being pointed to.
 ///
 /// # Parameters:

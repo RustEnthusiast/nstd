@@ -140,6 +140,17 @@ typedef struct {
 /// `NSTDSliceMut slice` - The new slice.
 NSTDAPI NSTDSliceMut nstd_core_slice_mut_new(NSTDAnyMut ptr, NSTDUSize element_size, NSTDUSize len);
 
+/// Creates an immutable version of a mutable slice.
+///
+/// # Parameters:
+///
+/// - `const NSTDSliceMut *slice` - The mutable slice.
+///
+/// # Returns
+///
+/// `NSTDSliceConst slice_const` - The immutable copy of `slice`.
+NSTDAPI NSTDSliceConst nstd_core_slice_mut_as_const(const NSTDSliceMut *slice);
+
 /// Returns a raw pointer to the slice's memory.
 ///
 /// # Parameters:
