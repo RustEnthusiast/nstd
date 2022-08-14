@@ -125,6 +125,40 @@ gen_deterministic!(
     nstd_core_cty_is_control,
     is_control
 );
+gen_deterministic!(
+    /// Determines whether or not `chr` is punctuation.
+    ///
+    /// # Note
+    ///
+    /// This only works with ASCII characters.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDUnichar chr` - The character to check.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDBool is_punctuation` - `NSTD_TRUE` if `chr` is punctuation.
+    nstd_core_cty_is_punctuation,
+    is_ascii_punctuation
+);
+gen_deterministic!(
+    /// Determines whether or not `chr` is a graphic character.
+    ///
+    /// # Note
+    ///
+    /// This only works with ASCII characters.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDUnichar chr` - The character to check.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDBool is_graphic` - `NSTD_TRUE` if `chr` is a graphic character.
+    nstd_core_cty_is_graphic,
+    is_ascii_graphic
+);
 
 /// Determines whether or not `chr` is a digit, depending on `radix`.
 ///

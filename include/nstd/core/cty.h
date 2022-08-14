@@ -81,6 +81,36 @@ NSTDAPI NSTDBool nstd_core_cty_is_whitespace(NSTDUnichar chr);
 /// `NSTDBool is_control` - `NSTD_TRUE` if `chr` is a control character.
 NSTDAPI NSTDBool nstd_core_cty_is_control(NSTDUnichar chr);
 
+/// Determines whether or not `chr` is punctuation.
+///
+/// # Note
+///
+/// This only works with ASCII characters.
+///
+/// # Parameters:
+///
+/// - `NSTDUnichar chr` - The character to check.
+///
+/// # Returns
+///
+/// `NSTDBool is_punctuation` - `NSTD_TRUE` if `chr` is punctuation.
+NSTDAPI NSTDBool nstd_core_cty_is_punctuation(NSTDUnichar chr);
+
+/// Determines whether or not `chr` is a graphic character.
+///
+/// # Note
+///
+/// This only works with ASCII characters.
+///
+/// # Parameters:
+///
+/// - `NSTDUnichar chr` - The character to check.
+///
+/// # Returns
+///
+/// `NSTDBool is_graphic` - `NSTD_TRUE` if `chr` is a graphic character.
+NSTDAPI NSTDBool nstd_core_cty_is_graphic(NSTDUnichar chr);
+
 /// Determines whether or not `chr` is a digit, depending on `radix`.
 ///
 /// # Parameters:
