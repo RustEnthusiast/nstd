@@ -210,7 +210,7 @@ pub extern "C" fn nstd_math_acos_f64(x: NSTDFloat64) -> NSTDFloat64 {
     x.acos()
 }
 
-/// Computes the arc tangent of `x`.
+/// Computes the arctangent of `x`.
 ///
 /// # Parameters:
 ///
@@ -218,13 +218,13 @@ pub extern "C" fn nstd_math_acos_f64(x: NSTDFloat64) -> NSTDFloat64 {
 ///
 /// # Returns
 ///
-/// `NSTDFloat32 atan` - The arc tangent value of `x`.
+/// `NSTDFloat32 atan` - The arctangent value of `x`.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_math_atan_f32(x: NSTDFloat32) -> NSTDFloat32 {
     x.atan()
 }
-/// Computes the arc tangent of `x`.
+/// Computes the arctangent of `x`.
 ///
 /// # Parameters:
 ///
@@ -232,9 +232,42 @@ pub extern "C" fn nstd_math_atan_f32(x: NSTDFloat32) -> NSTDFloat32 {
 ///
 /// # Returns
 ///
-/// `NSTDFloat64 atan` - The arc tangent value of `x`.
+/// `NSTDFloat64 atan` - The arctangent value of `x`.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_math_atan_f64(x: NSTDFloat64) -> NSTDFloat64 {
     x.atan()
+}
+
+/// Computes the four quadrant arctangent of `x` & `y`.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat32 x` - The value.
+///
+/// - `NSTDFloat32 y` - The second value.
+///
+/// # Returns
+///
+/// `NSTDFloat32 atan2` - The four quadrant arctangent of `x` & `y`.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_math_atan2_f32(x: NSTDFloat32, y: NSTDFloat32) -> NSTDFloat32 {
+    x.atan2(y)
+}
+/// Computes the four quadrant arctangent of `x` & `y`.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat64 x` - The value.
+///
+/// - `NSTDFloat64 y` - The second value.
+///
+/// # Returns
+///
+/// `NSTDFloat64 atan2` - The four quadrant arctangent of `x` & `y`.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_math_atan2_f64(x: NSTDFloat64, y: NSTDFloat64) -> NSTDFloat64 {
+    x.atan2(y)
 }

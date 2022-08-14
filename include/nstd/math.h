@@ -154,7 +154,7 @@ NSTDAPI NSTDFloat32 nstd_math_acos_f32(NSTDFloat32 x);
 /// `NSTDFloat64 acos` - The arc cosine value of `x`.
 NSTDAPI NSTDFloat64 nstd_math_acos_f64(NSTDFloat64 x);
 
-/// Computes the arc tangent of `x`.
+/// Computes the arctangent of `x`.
 ///
 /// # Parameters:
 ///
@@ -162,9 +162,9 @@ NSTDAPI NSTDFloat64 nstd_math_acos_f64(NSTDFloat64 x);
 ///
 /// # Returns
 ///
-/// `NSTDFloat32 atan` - The arc tangent value of `x`.
+/// `NSTDFloat32 atan` - The arctangent value of `x`.
 NSTDAPI NSTDFloat32 nstd_math_atan_f32(NSTDFloat32 x);
-/// Computes the arc tangent of `x`.
+/// Computes the arctangent of `x`.
 ///
 /// # Parameters:
 ///
@@ -172,8 +172,33 @@ NSTDAPI NSTDFloat32 nstd_math_atan_f32(NSTDFloat32 x);
 ///
 /// # Returns
 ///
-/// `NSTDFloat64 atan` - The arc tangent value of `x`.
+/// `NSTDFloat64 atan` - The arctangent value of `x`.
 NSTDAPI NSTDFloat64 nstd_math_atan_f64(NSTDFloat64 x);
+
+/// Computes the four quadrant arctangent of `x` & `y`.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat32 x` - The value.
+///
+/// - `NSTDFloat32 y` - The second value.
+///
+/// # Returns
+///
+/// `NSTDFloat32 atan2` - The four quadrant arctangent of `x` & `y`.
+NSTDAPI NSTDFloat32 nstd_math_atan2_f32(NSTDFloat32 x, NSTDFloat32 y);
+/// Computes the four quadrant arctangent of `x` & `y`.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat64 x` - The value.
+///
+/// - `NSTDFloat64 y` - The second value.
+///
+/// # Returns
+///
+/// `NSTDFloat64 atan2` - The four quadrant arctangent of `x` & `y`.
+NSTDAPI NSTDFloat64 nstd_math_atan2_f64(NSTDFloat64 x, NSTDFloat64 y);
 
 NSTDCPPEND
 #endif
