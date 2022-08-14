@@ -329,3 +329,90 @@ pub extern "C" fn nstd_math_atan2_f32(x: NSTDFloat32, y: NSTDFloat32) -> NSTDFlo
 pub extern "C" fn nstd_math_atan2_f64(x: NSTDFloat64, y: NSTDFloat64) -> NSTDFloat64 {
     x.atan2(y)
 }
+
+/// Computes the hyperbolic sine of `x`.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat32 x` - The value.
+///
+/// # Returns
+///
+/// `NSTDFloat32 sinh` - The hyperbolic sine of `x`.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_math_sinh_f32(x: NSTDFloat32) -> NSTDFloat32 {
+    x.sinh()
+}
+/// Computes the hyperbolic sine of `x`.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat64 x` - The value.
+///
+/// # Returns
+///
+/// `NSTDFloat64 sinh` - The hyperbolic sine of `x`.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_math_sinh_f64(x: NSTDFloat64) -> NSTDFloat64 {
+    x.sinh()
+}
+
+/// Computes the hyperbolic cosine of `x`.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat32 x` - The value.
+///
+/// # Returns
+///
+/// `NSTDFloat32 cosh` - The hyperbolic cosine of `x`.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_math_cosh_f32(x: NSTDFloat32) -> NSTDFloat32 {
+    x.cosh()
+}
+/// Computes the hyperbolic cosine of `x`.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat64 x` - The value.
+///
+/// # Returns
+///
+/// `NSTDFloat64 cosh` - The hyperbolic cosine of `x`.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_math_cosh_f64(x: NSTDFloat64) -> NSTDFloat64 {
+    x.cosh()
+}
+
+/// Computes the hyperbolic tangent of `x`.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat32 x` - The value.
+///
+/// # Returns
+///
+/// `NSTDFloat32 tanh` - The hyperbolic tangent of `x`.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_math_tanh_f32(x: NSTDFloat32) -> NSTDFloat32 {
+    x.tanh()
+}
+/// Computes the hyperbolic tangent of `x`.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat64 x` - The value.
+///
+/// # Returns
+///
+/// `NSTDFloat64 tanh` - The hyperbolic tangent of `x`.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_math_tanh_f64(x: NSTDFloat64) -> NSTDFloat64 {
+    x.tanh()
+}

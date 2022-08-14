@@ -242,5 +242,68 @@ NSTDAPI NSTDFloat32 nstd_math_atan2_f32(NSTDFloat32 x, NSTDFloat32 y);
 /// `NSTDFloat64 atan2` - The four quadrant arctangent of `x` & `y`.
 NSTDAPI NSTDFloat64 nstd_math_atan2_f64(NSTDFloat64 x, NSTDFloat64 y);
 
+/// Computes the hyperbolic sine of `x`.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat32 x` - The value.
+///
+/// # Returns
+///
+/// `NSTDFloat32 sinh` - The hyperbolic sine of `x`.
+NSTDAPI NSTDFloat32 nstd_math_sinh_f32(NSTDFloat32 x);
+/// Computes the hyperbolic sine of `x`.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat64 x` - The value.
+///
+/// # Returns
+///
+/// `NSTDFloat64 sinh` - The hyperbolic sine of `x`.
+NSTDAPI NSTDFloat64 nstd_math_sinh_f64(NSTDFloat64 x);
+
+/// Computes the hyperbolic cosine of `x`.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat32 x` - The value.
+///
+/// # Returns
+///
+/// `NSTDFloat32 cosh` - The hyperbolic cosine of `x`.
+NSTDAPI NSTDFloat32 nstd_math_cosh_f32(NSTDFloat32 x);
+/// Computes the hyperbolic cosine of `x`.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat64 x` - The value.
+///
+/// # Returns
+///
+/// `NSTDFloat64 cosh` - The hyperbolic cosine of `x`.
+NSTDAPI NSTDFloat64 nstd_math_cosh_f64(NSTDFloat64 x);
+
+/// Computes the hyperbolic tangent of `x`.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat32 x` - The value.
+///
+/// # Returns
+///
+/// `NSTDFloat32 tanh` - The hyperbolic tangent of `x`.
+NSTDAPI NSTDFloat32 nstd_math_tanh_f32(NSTDFloat32 x);
+/// Computes the hyperbolic tangent of `x`.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat64 x` - The value.
+///
+/// # Returns
+///
+/// `NSTDFloat64 tanh` - The hyperbolic tangent of `x`.
+NSTDAPI NSTDFloat64 nstd_math_tanh_f64(NSTDFloat64 x);
+
 NSTDCPPEND
 #endif
