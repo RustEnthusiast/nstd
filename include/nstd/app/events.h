@@ -200,6 +200,8 @@ typedef struct {
     void (*window_resized)(const NSTDAppData *, NSTDWindowID, NSTDUInt32, NSTDUInt32);
     /// Called when a window is moved.
     void (*window_moved)(const NSTDAppData *, NSTDWindowID, NSTDInt32, NSTDInt32);
+    /// Focus for a window changed.
+    void (*window_focus_changed)(const NSTDAppData *, NSTDWindowID, NSTDBool);
     /// A window requests closing.
     void (*window_close_requested)(const NSTDAppData *, NSTDWindowID);
     /// Called when a window is closed.

@@ -299,6 +299,8 @@ pub struct NSTDAppEvents {
     /// Called when a window is moved.
     pub window_moved:
         Option<unsafe extern "C" fn(&NSTDAppData, NSTDWindowID, NSTDInt32, NSTDInt32)>,
+    /// Focus for a window changed.
+    pub window_focus_changed: Option<unsafe extern "C" fn(&NSTDAppData, NSTDWindowID, NSTDBool)>,
     /// A window requests closing.
     pub window_close_requested: Option<unsafe extern "C" fn(&NSTDAppData, NSTDWindowID)>,
     /// Called when a window is closed.

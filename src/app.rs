@@ -186,6 +186,12 @@ pub unsafe extern "C" fn nstd_app_run(app: NSTDApp, data: NSTDAnyMut) -> ! {
                         window_moved(&app_data, &window_id, pos.x, pos.y);
                     }
                 }
+                // A window's focus has changed.
+                WindowEvent::Focused(is_focused) => {
+                    if let Some(window_focus_changed) = app.events.window_focus_changed {
+                        window_focus_changed(&app_data, &window_id, is_focused.into());
+                    }
+                }
                 // A window requests closing.
                 WindowEvent::CloseRequested => {
                     if let Some(window_close_requested) = app.events.window_close_requested {
