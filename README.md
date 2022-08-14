@@ -27,6 +27,7 @@ Rust syntax).
         - `stderr` - A handle to the standard error stream.
         - `stdin` - A handle to the standard input stream.
         - `stdout` - A handle to the standard output stream.
+    - `math` - High level math operations.
     - `os` - Operating system specific functionality.
         - `windows` - OS support for Windows.
             - `alloc` - Low level memory allocation for Windows.
