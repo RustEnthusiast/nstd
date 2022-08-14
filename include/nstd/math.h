@@ -49,5 +49,68 @@ NSTDAPI NSTDFloat32 nstd_math_sqrt_f32(NSTDFloat32 x);
 /// `NSTDFloat64 sqrt` - The square root of `x`.
 NSTDAPI NSTDFloat64 nstd_math_sqrt_f64(NSTDFloat64 x);
 
+/// Computes the sine of `x`.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat32 x` - The value.
+///
+/// # Returns
+///
+/// `NSTDFloat32 sin` - The sine value of `x`.
+NSTDAPI NSTDFloat32 nstd_math_sin_f32(NSTDFloat32 x);
+/// Computes the sine of `x`.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat64 x` - The value.
+///
+/// # Returns
+///
+/// `NSTDFloat64 sin` - The sine value of `x`.
+NSTDAPI NSTDFloat64 nstd_math_sin_f64(NSTDFloat64 x);
+
+/// Computes the cosine of `x`.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat32 x` - The value.
+///
+/// # Returns
+///
+/// `NSTDFloat32 cos` - The cosine value of `x`.
+NSTDAPI NSTDFloat32 nstd_math_cos_f32(NSTDFloat32 x);
+/// Computes the cosine of `x`.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat64 x` - The value.
+///
+/// # Returns
+///
+/// `NSTDFloat64 cos` - The cosine value of `x`.
+NSTDAPI NSTDFloat64 nstd_math_cos_f64(NSTDFloat64 x);
+
+/// Computes the tangent of `x`.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat32 x` - The value.
+///
+/// # Returns
+///
+/// `NSTDFloat32 tan` - The tangent value of `x`.
+NSTDAPI NSTDFloat32 nstd_math_tan_f32(NSTDFloat32 x);
+/// Computes the tangent of `x`.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat64 x` - The value.
+///
+/// # Returns
+///
+/// `NSTDFloat64 tan` - The tangent value of `x`.
+NSTDAPI NSTDFloat64 nstd_math_tan_f64(NSTDFloat64 x);
+
 NSTDCPPEND
 #endif
