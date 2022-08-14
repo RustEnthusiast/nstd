@@ -3,6 +3,27 @@
 #include "nstd.h"
 NSTDCPPSTART
 
+/// Returns the absolute value of `x`.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat32 x` - The value.
+///
+/// # Returns
+///
+/// `NSTDFloat32 abs` - The absolute value of `x`.
+NSTDAPI NSTDFloat32 nstd_math_abs_f32(NSTDFloat32 x);
+/// Returns the absolute value of `x`.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat64 x` - The value.
+///
+/// # Returns
+///
+/// `NSTDFloat64 abs` - The absolute value of `x`.
+NSTDAPI NSTDFloat64 nstd_math_abs_f64(NSTDFloat64 x);
+
 /// Rounds the value `x` down to the closest integral value.
 ///
 /// # Parameters:

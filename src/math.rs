@@ -3,6 +3,35 @@
 //! This library provides access to math functions that require the use of the "std" feature.
 use crate::{NSTDFloat32, NSTDFloat64, NSTDInt32};
 
+/// Returns the absolute value of `x`.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat32 x` - The value.
+///
+/// # Returns
+///
+/// `NSTDFloat32 abs` - The absolute value of `x`.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_math_abs_f32(x: NSTDFloat32) -> NSTDFloat32 {
+    x.abs()
+}
+/// Returns the absolute value of `x`.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat64 x` - The value.
+///
+/// # Returns
+///
+/// `NSTDFloat64 abs` - The absolute value of `x`.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_math_abs_f64(x: NSTDFloat64) -> NSTDFloat64 {
+    x.abs()
+}
+
 /// Rounds the value `x` down to the closest integral value.
 ///
 /// # Parameters:
