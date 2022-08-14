@@ -1,5 +1,5 @@
 //! Contains callback based events through function pointers.
-use crate::{app::data::NSTDAppData, NSTDBool, NSTDFloat64, NSTDUInt32};
+use crate::{app::data::NSTDAppData, NSTDBool, NSTDFloat64, NSTDInt32, NSTDUInt32};
 use winit::{
     event::{AxisId, ButtonId, DeviceId, VirtualKeyCode},
     window::WindowId,
@@ -293,8 +293,16 @@ pub struct NSTDAppEvents {
     /// Called when a keyboard key is pressed or unpressed.
     pub key_input:
         Option<unsafe extern "C" fn(&NSTDAppData, NSTDDeviceID, NSTDKey, NSTDUInt32, NSTDBool)>,
+    /// Called when a window is resized.
+    pub window_resized:
+        Option<unsafe extern "C" fn(&NSTDAppData, NSTDWindowID, NSTDUInt32, NSTDUInt32)>,
+    /// Called when a window is moved.
+    pub window_moved:
+        Option<unsafe extern "C" fn(&NSTDAppData, NSTDWindowID, NSTDInt32, NSTDInt32)>,
     /// A window requests closing.
     pub window_close_requested: Option<unsafe extern "C" fn(&NSTDAppData, NSTDWindowID)>,
+    /// Called when a window is closed.
+    pub window_closed: Option<unsafe extern "C" fn(&NSTDAppData, NSTDWindowID)>,
     /// Called once before exiting the application event loop.
     pub exit: Option<unsafe extern "C" fn(&NSTDAppData)>,
 }

@@ -196,8 +196,14 @@ typedef struct {
     void (*button_input)(const NSTDAppData *, NSTDDeviceID, NSTDButtonID, NSTDBool);
     /// Called when a keyboard key is pressed or unpressed.
     void (*key_input)(const NSTDAppData *, NSTDDeviceID, NSTDKey, NSTDUInt32, NSTDBool);
+    /// Called when a window is resized.
+    void (*window_resized)(const NSTDAppData *, NSTDWindowID, NSTDUInt32, NSTDUInt32);
+    /// Called when a window is moved.
+    void (*window_moved)(const NSTDAppData *, NSTDWindowID, NSTDInt32, NSTDInt32);
     /// A window requests closing.
     void (*window_close_requested)(const NSTDAppData *, NSTDWindowID);
+    /// Called when a window is closed.
+    void (*window_closed)(const NSTDAppData *, NSTDWindowID);
     /// Called once before exiting the application event loop.
     void (*exit)(const NSTDAppData *);
 } NSTDAppEvents;

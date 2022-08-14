@@ -172,15 +172,34 @@ pub unsafe extern "C" fn nstd_app_run(app: NSTDApp, data: NSTDAnyMut) -> ! {
                 }
                 _ => (),
             },
-            // A window requests closing.
-            Event::WindowEvent {
-                window_id,
-                event: WindowEvent::CloseRequested,
-            } => {
-                if let Some(window_close_requested) = app.events.window_close_requested {
-                    window_close_requested(&app_data, &window_id);
+            // A window event was received.
+            Event::WindowEvent { window_id, event } => match event {
+                // A window was resized.
+                WindowEvent::Resized(size) => {
+                    if let Some(window_resized) = app.events.window_resized {
+                        window_resized(&app_data, &window_id, size.width, size.height);
+                    }
                 }
-            }
+                // A window was moved.
+                WindowEvent::Moved(pos) => {
+                    if let Some(window_moved) = app.events.window_moved {
+                        window_moved(&app_data, &window_id, pos.x, pos.y);
+                    }
+                }
+                // A window requests closing.
+                WindowEvent::CloseRequested => {
+                    if let Some(window_close_requested) = app.events.window_close_requested {
+                        window_close_requested(&app_data, &window_id);
+                    }
+                }
+                // A window was permanently closed.
+                WindowEvent::Destroyed => {
+                    if let Some(window_closed) = app.events.window_closed {
+                        window_closed(&app_data, &window_id);
+                    }
+                }
+                _ => (),
+            },
             // The event loop is being exited.
             Event::LoopDestroyed => {
                 if let Some(exit) = app.events.exit {
