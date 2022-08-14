@@ -3,6 +3,48 @@
 #include "nstd.h"
 NSTDCPPSTART
 
+/// Rounds the value `x` down to the closest integral value.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat32 x` - The value.
+///
+/// # Returns
+///
+/// `NSTDFloat32 value` - The value rounded down to the nearest integral value.
+NSTDAPI NSTDFloat32 nstd_math_floor_f32(NSTDFloat32 x);
+/// Rounds the value `x` down to the closest integral value.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat64 x` - The value.
+///
+/// # Returns
+///
+/// `NSTDFloat64 value` - The value rounded down to the nearest integral value.
+NSTDAPI NSTDFloat64 nstd_math_floor_f64(NSTDFloat64 x);
+
+/// Rounds the value `x` up to the closest integral value.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat32 x` - The value.
+///
+/// # Returns
+///
+/// `NSTDFloat32 value` - The value rounded up to the nearest integral value.
+NSTDAPI NSTDFloat32 nstd_math_ceil_f32(NSTDFloat32 x);
+/// Rounds the value `x` up to the closest integral value.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat64 x` - The value.
+///
+/// # Returns
+///
+/// `NSTDFloat64 value` - The value rounded up to the nearest integral value.
+NSTDAPI NSTDFloat64 nstd_math_ceil_f64(NSTDFloat64 x);
+
 /// Raises `x` to an integral power.
 ///
 /// # Parameters:

@@ -3,6 +3,64 @@
 //! This library provides access to math functions that require the use of the "std" feature.
 use crate::{NSTDFloat32, NSTDFloat64, NSTDInt32};
 
+/// Rounds the value `x` down to the closest integral value.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat32 x` - The value.
+///
+/// # Returns
+///
+/// `NSTDFloat32 value` - The value rounded down to the nearest integral value.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_math_floor_f32(x: NSTDFloat32) -> NSTDFloat32 {
+    x.floor()
+}
+/// Rounds the value `x` down to the closest integral value.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat64 x` - The value.
+///
+/// # Returns
+///
+/// `NSTDFloat64 value` - The value rounded down to the nearest integral value.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_math_floor_f64(x: NSTDFloat64) -> NSTDFloat64 {
+    x.floor()
+}
+
+/// Rounds the value `x` up to the closest integral value.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat32 x` - The value.
+///
+/// # Returns
+///
+/// `NSTDFloat32 value` - The value rounded up to the nearest integral value.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_math_ceil_f32(x: NSTDFloat32) -> NSTDFloat32 {
+    x.ceil()
+}
+/// Rounds the value `x` up to the closest integral value.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat64 x` - The value.
+///
+/// # Returns
+///
+/// `NSTDFloat64 value` - The value rounded up to the nearest integral value.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_math_ceil_f64(x: NSTDFloat64) -> NSTDFloat64 {
+    x.ceil()
+}
+
 /// Raises `x` to an integral power.
 ///
 /// # Parameters:
