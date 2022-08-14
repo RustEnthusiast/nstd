@@ -112,5 +112,68 @@ NSTDAPI NSTDFloat32 nstd_math_tan_f32(NSTDFloat32 x);
 /// `NSTDFloat64 tan` - The tangent value of `x`.
 NSTDAPI NSTDFloat64 nstd_math_tan_f64(NSTDFloat64 x);
 
+/// Computes the arc sine of `x`.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat32 x` - The value.
+///
+/// # Returns
+///
+/// `NSTDFloat32 asin` - The arc sine value of `x`.
+NSTDAPI NSTDFloat32 nstd_math_asin_f32(NSTDFloat32 x);
+/// Computes the arc sine of `x`.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat64 x` - The value.
+///
+/// # Returns
+///
+/// `NSTDFloat64 asin` - The arc sine value of `x`.
+NSTDAPI NSTDFloat64 nstd_math_asin_f64(NSTDFloat64 x);
+
+/// Computes the arc cosine of `x`.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat32 x` - The value.
+///
+/// # Returns
+///
+/// `NSTDFloat32 acos` - The arc cosine value of `x`.
+NSTDAPI NSTDFloat32 nstd_math_acos_f32(NSTDFloat32 x);
+/// Computes the arc cosine of `x`.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat64 x` - The value.
+///
+/// # Returns
+///
+/// `NSTDFloat64 acos` - The arc cosine value of `x`.
+NSTDAPI NSTDFloat64 nstd_math_acos_f64(NSTDFloat64 x);
+
+/// Computes the arc tangent of `x`.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat32 x` - The value.
+///
+/// # Returns
+///
+/// `NSTDFloat32 atan` - The arc tangent value of `x`.
+NSTDAPI NSTDFloat32 nstd_math_atan_f32(NSTDFloat32 x);
+/// Computes the arc tangent of `x`.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat64 x` - The value.
+///
+/// # Returns
+///
+/// `NSTDFloat64 atan` - The arc tangent value of `x`.
+NSTDAPI NSTDFloat64 nstd_math_atan_f64(NSTDFloat64 x);
+
 NSTDCPPEND
 #endif

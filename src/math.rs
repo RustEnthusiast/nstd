@@ -151,3 +151,90 @@ pub extern "C" fn nstd_math_tan_f32(x: NSTDFloat32) -> NSTDFloat32 {
 pub extern "C" fn nstd_math_tan_f64(x: NSTDFloat64) -> NSTDFloat64 {
     x.tan()
 }
+
+/// Computes the arc sine of `x`.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat32 x` - The value.
+///
+/// # Returns
+///
+/// `NSTDFloat32 asin` - The arc sine value of `x`.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_math_asin_f32(x: NSTDFloat32) -> NSTDFloat32 {
+    x.asin()
+}
+/// Computes the arc sine of `x`.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat64 x` - The value.
+///
+/// # Returns
+///
+/// `NSTDFloat64 asin` - The arc sine value of `x`.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_math_asin_f64(x: NSTDFloat64) -> NSTDFloat64 {
+    x.asin()
+}
+
+/// Computes the arc cosine of `x`.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat32 x` - The value.
+///
+/// # Returns
+///
+/// `NSTDFloat32 acos` - The arc cosine value of `x`.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_math_acos_f32(x: NSTDFloat32) -> NSTDFloat32 {
+    x.acos()
+}
+/// Computes the arc cosine of `x`.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat64 x` - The value.
+///
+/// # Returns
+///
+/// `NSTDFloat64 acos` - The arc cosine value of `x`.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_math_acos_f64(x: NSTDFloat64) -> NSTDFloat64 {
+    x.acos()
+}
+
+/// Computes the arc tangent of `x`.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat32 x` - The value.
+///
+/// # Returns
+///
+/// `NSTDFloat32 atan` - The arc tangent value of `x`.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_math_atan_f32(x: NSTDFloat32) -> NSTDFloat32 {
+    x.atan()
+}
+/// Computes the arc tangent of `x`.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat64 x` - The value.
+///
+/// # Returns
+///
+/// `NSTDFloat64 atan` - The arc tangent value of `x`.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_math_atan_f64(x: NSTDFloat64) -> NSTDFloat64 {
+    x.atan()
+}
