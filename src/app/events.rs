@@ -1,7 +1,7 @@
 //! Contains callback based events through function pointers.
 use crate::{app::data::NSTDAppData, NSTDBool, NSTDFloat64, NSTDInt32, NSTDUInt32};
 use winit::{
-    event::{AxisId, ButtonId, DeviceId, VirtualKeyCode},
+    event::{AxisId, ButtonId, DeviceId, MouseScrollDelta, TouchPhase, VirtualKeyCode},
     window::WindowId,
 };
 
@@ -27,6 +27,19 @@ pub enum NSTDScrollDelta {
     /// The scroll was measured in pixels.
     NSTD_SCROLL_DELTA_PIXEL,
 }
+impl NSTDScrollDelta {
+    /// Converts a [MouseScrollDelta] into an [NSTDScrollDelta], returning the X & Y delta as the
+    /// first two tuple elements.
+    #[inline]
+    pub(crate) fn from_winit(delta: MouseScrollDelta) -> (f64, f64, Self) {
+        match delta {
+            MouseScrollDelta::LineDelta(x, y) => (x as f64, y as f64, Self::NSTD_SCROLL_DELTA_LINE),
+            MouseScrollDelta::PixelDelta(scroll) => {
+                (scroll.x, scroll.y, Self::NSTD_SCROLL_DELTA_PIXEL)
+            }
+        }
+    }
+}
 
 /// Describes a touch-screen's state.
 #[repr(C)]
@@ -41,6 +54,18 @@ pub enum NSTDTouchState {
     NSTD_TOUCH_STATE_ENDED,
     /// The touch event has been cancelled.
     NSTD_TOUCH_STATE_CANCELLED,
+}
+impl NSTDTouchState {
+    /// Converts a [TouchPhase] into an [NSTDTouchState].
+    #[inline]
+    pub(crate) fn from_winit(phase: TouchPhase) -> Self {
+        match phase {
+            TouchPhase::Started => Self::NSTD_TOUCH_STATE_STARTED,
+            TouchPhase::Moved => Self::NSTD_TOUCH_STATE_MOVED,
+            TouchPhase::Ended => Self::NSTD_TOUCH_STATE_ENDED,
+            TouchPhase::Cancelled => Self::NSTD_TOUCH_STATE_CANCELLED,
+        }
+    }
 }
 
 /// Represents a key on a keyboard.
@@ -316,6 +341,18 @@ pub struct NSTDAppEvents {
         Option<unsafe extern "C" fn(&NSTDAppData, NSTDWindowID, NSTDInt32, NSTDInt32)>,
     /// Focus for a window changed.
     pub window_focus_changed: Option<unsafe extern "C" fn(&NSTDAppData, NSTDWindowID, NSTDBool)>,
+    /// Called when a scroll device is scrolled over a window.
+    pub window_scrolled: Option<
+        unsafe extern "C" fn(
+            &NSTDAppData,
+            NSTDWindowID,
+            NSTDDeviceID,
+            NSTDFloat64,
+            NSTDFloat64,
+            NSTDScrollDelta,
+            NSTDTouchState,
+        ),
+    >,
     /// Called when the cursor is moved over a window.
     pub window_cursor_moved: Option<
         unsafe extern "C" fn(&NSTDAppData, NSTDWindowID, NSTDDeviceID, NSTDFloat64, NSTDFloat64),

@@ -4,12 +4,12 @@ pub mod events;
 pub mod handle;
 use self::{
     data::NSTDAppData,
-    events::{NSTDAppEvents, NSTDKey, NSTDScrollDelta},
+    events::{NSTDAppEvents, NSTDKey, NSTDScrollDelta, NSTDTouchState},
     handle::NSTDAppHandle,
 };
 use crate::NSTDAnyMut;
 use winit::{
-    event::{DeviceEvent, ElementState, Event, MouseScrollDelta, WindowEvent},
+    event::{DeviceEvent, ElementState, Event, WindowEvent},
     event_loop::EventLoop,
 };
 
@@ -132,14 +132,7 @@ pub unsafe extern "C" fn nstd_app_run(app: NSTDApp, data: NSTDAnyMut) -> ! {
                 // A scroll wheel was scrolled.
                 DeviceEvent::MouseWheel { delta } => {
                     if let Some(mouse_scrolled) = app.events.mouse_scrolled {
-                        let (x, y, delta_t) = match delta {
-                            MouseScrollDelta::LineDelta(x, y) => {
-                                (x as f64, y as f64, NSTDScrollDelta::NSTD_SCROLL_DELTA_LINE)
-                            }
-                            MouseScrollDelta::PixelDelta(scroll) => {
-                                (scroll.x, scroll.y, NSTDScrollDelta::NSTD_SCROLL_DELTA_PIXEL)
-                            }
-                        };
+                        let (x, y, delta_t) = NSTDScrollDelta::from_winit(delta);
                         mouse_scrolled(&app_data, &device_id, x, y, delta_t);
                     }
                 }
@@ -152,10 +145,7 @@ pub unsafe extern "C" fn nstd_app_run(app: NSTDApp, data: NSTDAnyMut) -> ! {
                 // A button's state was changed.
                 DeviceEvent::Button { button, state } => {
                     if let Some(button_input) = app.events.button_input {
-                        let is_down = match state {
-                            ElementState::Pressed => true,
-                            ElementState::Released => false,
-                        };
+                        let is_down = state == ElementState::Pressed;
                         button_input(&app_data, &device_id, &button, is_down.into());
                     }
                 }
@@ -163,10 +153,7 @@ pub unsafe extern "C" fn nstd_app_run(app: NSTDApp, data: NSTDAnyMut) -> ! {
                 DeviceEvent::Key(input) => {
                     if let Some(key_input) = app.events.key_input {
                         let key = NSTDKey::from(input.virtual_keycode);
-                        let is_down = match input.state {
-                            ElementState::Pressed => true,
-                            ElementState::Released => false,
-                        };
+                        let is_down = input.state == ElementState::Pressed;
                         key_input(&app_data, &device_id, key, input.scancode, is_down.into());
                     }
                 }
@@ -190,6 +177,19 @@ pub unsafe extern "C" fn nstd_app_run(app: NSTDApp, data: NSTDAnyMut) -> ! {
                 WindowEvent::Focused(is_focused) => {
                     if let Some(window_focus_changed) = app.events.window_focus_changed {
                         window_focus_changed(&app_data, &window_id, is_focused.into());
+                    }
+                }
+                // A window was scrolled.
+                WindowEvent::MouseWheel {
+                    device_id,
+                    delta,
+                    phase,
+                    ..
+                } => {
+                    if let Some(window_scrolled) = app.events.window_scrolled {
+                        let (x, y, delta_t) = NSTDScrollDelta::from_winit(delta);
+                        let touch = NSTDTouchState::from_winit(phase);
+                        window_scrolled(&app_data, &window_id, &device_id, x, y, delta_t, touch);
                     }
                 }
                 // The cursor was moved over a window.
