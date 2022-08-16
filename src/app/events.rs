@@ -28,6 +28,21 @@ pub enum NSTDScrollDelta {
     NSTD_SCROLL_DELTA_PIXEL,
 }
 
+/// Describes a touch-screen's state.
+#[repr(C)]
+#[derive(Clone, Copy, Debug)]
+#[allow(non_camel_case_types)]
+pub enum NSTDTouchState {
+    /// The touch event has just started.
+    NSTD_TOUCH_STATE_STARTED,
+    /// The touch position has been moved.
+    NSTD_TOUCH_STATE_MOVED,
+    /// The touch event has ended.
+    NSTD_TOUCH_STATE_ENDED,
+    /// The touch event has been cancelled.
+    NSTD_TOUCH_STATE_CANCELLED,
+}
+
 /// Represents a key on a keyboard.
 #[repr(C)]
 #[derive(Clone, Copy, Debug, Hash)]
