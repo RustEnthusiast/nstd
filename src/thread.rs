@@ -1,6 +1,6 @@
 //! Thread spawning, joining, and detaching.
-use crate::{core::def::NSTDErrorCode, NSTDAnyMut};
-use std::thread::JoinHandle;
+use crate::{core::def::NSTDErrorCode, NSTDAnyMut, NSTDFloat64};
+use std::{thread::JoinHandle, time::Duration};
 
 /// A handle to a running thread.
 pub type NSTDThread = Box<JoinHandle<NSTDErrorCode>>;
@@ -11,8 +11,8 @@ pub type NSTDThread = Box<JoinHandle<NSTDErrorCode>>;
 ///
 /// - `NSTDErrorCode (*thread_fn)(NSTDAnyMut)` - The thread function.
 ///
-/// - `NSTDAnyMut data` - Data to pass to the thread. This will only be passed on platforms that
-/// support atomic pointers, on other platforms `NSTD_NULL` will be passed.
+/// - `NSTDAnyMut data` - Data to pass to the thread. This will only be passed to `thread_fn` on
+/// platforms that support atomic pointers, on other platforms `NSTD_NULL` will be passed.
 ///
 /// # Returns
 ///
@@ -41,6 +41,17 @@ pub extern "C" fn nstd_thread_spawn(
         }
     }
     None
+}
+
+/// Puts the current thread to sleep for a specified number of seconds.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat64 secs` - The number of seconds to put the thread to sleep for.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_thread_sleep(secs: NSTDFloat64) {
+    std::thread::sleep(Duration::from_secs_f64(secs));
 }
 
 /// Joins a thread by it's handle.

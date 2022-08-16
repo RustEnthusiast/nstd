@@ -13,13 +13,20 @@ typedef NSTDAnyMut NSTDThread;
 ///
 /// - `NSTDErrorCode (*thread_fn)(NSTDAnyMut)` - The thread function.
 ///
-/// - `NSTDAnyMut data` - Data to pass to the thread. This will only be passed on platforms that
-/// support atomic pointers, on other platforms `NSTD_NULL` will be passed.
+/// - `NSTDAnyMut data` - Data to pass to the thread. This will only be passed to `thread_fn` on
+/// platforms that support atomic pointers, on other platforms `NSTD_NULL` will be passed.
 ///
 /// # Returns
 ///
 /// `NSTDThread thread` - A handle to the new thread.
 NSTDAPI NSTDThread nstd_thread_spawn(NSTDErrorCode (*thread_fn)(NSTDAnyMut), NSTDAnyMut data);
+
+/// Puts the current thread to sleep for a specified number of seconds.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat64 secs` - The number of seconds to put the thread to sleep for.
+NSTDAPI void nstd_thread_sleep(NSTDFloat64 secs);
 
 /// Joins a thread by it's handle.
 ///
