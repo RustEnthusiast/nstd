@@ -50,5 +50,50 @@ NSTDAPI NSTDIOError nstd_fs_create_dir(const NSTDStrConst *name);
 /// This operation can cause undefined behavior if `name`'s data is invalid.
 NSTDAPI NSTDIOError nstd_fs_create_dirs(const NSTDStrConst *name);
 
+/// Removes a file from the file system.
+///
+/// # Parameters:
+///
+/// - `const NSTDStrConst *name` - The name of the file to delete.
+///
+/// # Returns
+///
+/// `NSTDIOError errc` - The I/O operation error code.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if `name`'s data is invalid.
+NSTDAPI NSTDIOError nstd_fs_remove_file(const NSTDStrConst *name);
+
+/// Removes a directory from the file system.
+///
+/// # Parameters:
+///
+/// - `const NSTDStrConst *name` - The name of the directory to delete.
+///
+/// # Returns
+///
+/// `NSTDIOError errc` - The I/O operation error code.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if `name`'s data is invalid.
+NSTDAPI NSTDIOError nstd_fs_remove_dir(const NSTDStrConst *name);
+
+/// Recursively removes a directory on the file system.
+///
+/// # Parameters:
+///
+/// - `const NSTDStrConst *name` - A path to the directory to remove.
+///
+/// # Returns
+///
+/// `NSTDIOError errc` - The I/O operation error code.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if `name`'s data is invalid.
+NSTDAPI NSTDIOError nstd_fs_remove_dirs(const NSTDStrConst *name);
+
 NSTDCPPEND
 #endif
