@@ -1,7 +1,12 @@
 //! A handle to an opened file.
 use crate::{
-    core::{slice::NSTDSliceConst, str::NSTDStrConst},
+    core::{
+        slice::{NSTDSliceConst, NSTDSliceMut},
+        str::NSTDStrConst,
+    },
     io::NSTDIOError,
+    string::NSTDString,
+    vec::NSTDVec,
     NSTDUInt8, NSTDUSize,
 };
 use std::fs::File;
@@ -134,6 +139,118 @@ pub unsafe extern "C" fn nstd_fs_file_write_all(
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_fs_file_flush(file: &mut NSTDFile) -> NSTDIOError {
     crate::io::stdio::flush(file)
+}
+
+/// Reads some data from an open file into a buffer.
+///
+/// # Parameters:
+///
+/// - `NSTDFile *file` - A handle to the opened file.
+///
+/// - `NSTDSliceMut *buffer` - The buffer to start filling with data from the file.
+///
+/// - `NSTDUSize *read` - Returns as the number of bytes read from the file.
+///
+/// # Returns
+///
+/// `NSTDIOError errc` - The I/O operation error code.
+///
+/// # Safety
+///
+/// `buffer`'s data must be valid for writes.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_fs_file_read(
+    file: &mut NSTDFile,
+    buffer: &mut NSTDSliceMut,
+    read: &mut NSTDUSize,
+) -> NSTDIOError {
+    crate::io::stdio::read(file, buffer, read)
+}
+
+/// Continuously reads data from `file` into a buffer until EOF is reached.
+///
+/// # Note
+///
+/// If extending the buffer fails, an error code of `NSTD_IO_ERROR_OUT_OF_MEMORY` will be returned.
+/// This does not mean `read` will return as 0 in this case.
+///
+/// # Parameters:
+///
+/// - `NSTDFile *file` - A handle to the file.
+///
+/// - `NSTDVec *buffer` - The buffer to be extended with data from the file.
+///
+/// - `NSTDUSize *read` - Returns as the number of bytes read from the file.
+///
+/// # Returns
+///
+/// `NSTDIOError errc` - The I/O operation error code.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_fs_file_read_all(
+    file: &mut NSTDFile,
+    buffer: &mut NSTDVec,
+    read: &mut NSTDUSize,
+) -> NSTDIOError {
+    crate::io::stdio::read_all(file, buffer, read)
+}
+
+/// Continuously reads UTF-8 data from `file` into a string buffer until EOF is reached.
+///
+/// # Note
+///
+/// If extending the buffer fails, an error code of `NSTD_IO_ERROR_OUT_OF_MEMORY` will be returned.
+/// This does not mean `read` will return as 0 in this case.
+///
+/// # Parameters:
+///
+/// - `NSTDFile *file` - A handle to the file.
+///
+/// - `NSTDString *buffer` - The buffer to be extended with data from the file.
+///
+/// - `NSTDUSize *read` - Returns as the number of bytes read from the file.
+///
+/// # Returns
+///
+/// `NSTDIOError errc` - The I/O operation error code.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_fs_file_read_to_string(
+    file: &mut NSTDFile,
+    buffer: &mut NSTDString,
+    read: &mut NSTDUSize,
+) -> NSTDIOError {
+    crate::io::stdio::read_to_string(file, buffer, read)
+}
+
+/// Reads enough data from `file` to fill the entirety of `buffer`.
+///
+/// # Note
+///
+/// This function will return an error code of `NSTD_IO_ERROR_INVALID_INPUT` if the buffer's
+/// element size is not 1.
+///
+/// # Parameters:
+///
+/// - `NSTDFile *file` - A handle to the file.
+///
+/// - `NSTDSliceMut *buffer` - The buffer to fill with data from the file.
+///
+/// # Returns
+///
+/// `NSTDIOError errc` - The I/O operation error code.
+///
+/// # Safety
+///
+/// `buffer` must be valid for writes.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_fs_file_read_exact(
+    file: &mut NSTDFile,
+    buffer: &mut NSTDSliceMut,
+) -> NSTDIOError {
+    crate::io::stdio::read_exact(file, buffer)
 }
 
 /// Closes a file handle.

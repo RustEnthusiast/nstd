@@ -4,6 +4,8 @@
 #include "../core/str.h"
 #include "../io/io.h"
 #include "../nstd.h"
+#include "../string.h"
+#include "../vec.h"
 NSTDCPPSTART
 
 /// Creates the file upon opening if it does not already exist.
@@ -93,6 +95,88 @@ NSTDAPI NSTDIOError nstd_fs_file_write_all(NSTDFile *file, const NSTDSliceConst 
 ///
 /// `NSTDIOError errc` - The I/O operation error code.
 NSTDAPI NSTDIOError nstd_fs_file_flush(NSTDFile *file);
+
+/// Reads some data from an open file into a buffer.
+///
+/// # Parameters:
+///
+/// - `NSTDFile *file` - A handle to the opened file.
+///
+/// - `NSTDSliceMut *buffer` - The buffer to start filling with data from the file.
+///
+/// - `NSTDUSize *read` - Returns as the number of bytes read from the file.
+///
+/// # Returns
+///
+/// `NSTDIOError errc` - The I/O operation error code.
+///
+/// # Safety
+///
+/// `buffer`'s data must be valid for writes.
+NSTDAPI NSTDIOError nstd_fs_file_read(NSTDFile *file, NSTDSliceMut *buffer, NSTDUSize *read);
+
+/// Continuously reads data from `file` into a buffer until EOF is reached.
+///
+/// # Note
+///
+/// If extending the buffer fails, an error code of `NSTD_IO_ERROR_OUT_OF_MEMORY` will be returned.
+/// This does not mean `read` will return as 0 in this case.
+///
+/// # Parameters:
+///
+/// - `NSTDFile *file` - A handle to the file.
+///
+/// - `NSTDVec *buffer` - The buffer to be extended with data from the file.
+///
+/// - `NSTDUSize *read` - Returns as the number of bytes read from the file.
+///
+/// # Returns
+///
+/// `NSTDIOError errc` - The I/O operation error code.
+NSTDAPI NSTDIOError nstd_fs_file_read_all(NSTDFile *file, NSTDVec *buffer, NSTDUSize *read);
+
+/// Continuously reads UTF-8 data from `file` into a string buffer until EOF is reached.
+///
+/// # Note
+///
+/// If extending the buffer fails, an error code of `NSTD_IO_ERROR_OUT_OF_MEMORY` will be returned.
+/// This does not mean `read` will return as 0 in this case.
+///
+/// # Parameters:
+///
+/// - `NSTDFile *file` - A handle to the file.
+///
+/// - `NSTDString *buffer` - The buffer to be extended with data from the file.
+///
+/// - `NSTDUSize *read` - Returns as the number of bytes read from the file.
+///
+/// # Returns
+///
+/// `NSTDIOError errc` - The I/O operation error code.
+NSTDAPI NSTDIOError nstd_fs_file_read_to_string(NSTDFile *file, NSTDString *buffer,
+NSTDUSize *read);
+
+/// Reads enough data from `file` to fill the entirety of `buffer`.
+///
+/// # Note
+///
+/// This function will return an error code of `NSTD_IO_ERROR_INVALID_INPUT` if the buffer's
+/// element size is not 1.
+///
+/// # Parameters:
+///
+/// - `NSTDFile *file` - A handle to the file.
+///
+/// - `NSTDSliceMut *buffer` - The buffer to fill with data from the file.
+///
+/// # Returns
+///
+/// `NSTDIOError errc` - The I/O operation error code.
+///
+/// # Safety
+///
+/// `buffer` must be valid for writes.
+NSTDAPI NSTDIOError nstd_fs_file_read_exact(NSTDFile *file, NSTDSliceMut *buffer);
 
 /// Closes a file handle.
 ///
