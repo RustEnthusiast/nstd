@@ -301,6 +301,15 @@ pub struct NSTDAppEvents {
         Option<unsafe extern "C" fn(&NSTDAppData, NSTDWindowID, NSTDInt32, NSTDInt32)>,
     /// Focus for a window changed.
     pub window_focus_changed: Option<unsafe extern "C" fn(&NSTDAppData, NSTDWindowID, NSTDBool)>,
+    /// Called when the cursor is moved over a window.
+    pub window_cursor_moved: Option<
+        unsafe extern "C" fn(&NSTDAppData, NSTDWindowID, NSTDDeviceID, NSTDFloat64, NSTDFloat64),
+    >,
+    /// The cursor entered a window.
+    pub window_cursor_entered:
+        Option<unsafe extern "C" fn(&NSTDAppData, NSTDWindowID, NSTDDeviceID)>,
+    /// The cursor left a window.
+    pub window_cursor_left: Option<unsafe extern "C" fn(&NSTDAppData, NSTDWindowID, NSTDDeviceID)>,
     /// A window requests closing.
     pub window_close_requested: Option<unsafe extern "C" fn(&NSTDAppData, NSTDWindowID)>,
     /// Called when a window is closed.

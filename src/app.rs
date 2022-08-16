@@ -192,6 +192,28 @@ pub unsafe extern "C" fn nstd_app_run(app: NSTDApp, data: NSTDAnyMut) -> ! {
                         window_focus_changed(&app_data, &window_id, is_focused.into());
                     }
                 }
+                // The cursor was moved over a window.
+                WindowEvent::CursorMoved {
+                    device_id,
+                    position: pos,
+                    ..
+                } => {
+                    if let Some(window_cursor_moved) = app.events.window_cursor_moved {
+                        window_cursor_moved(&app_data, &window_id, &device_id, pos.x, pos.y);
+                    }
+                }
+                // The cursor entered a window.
+                WindowEvent::CursorEntered { device_id } => {
+                    if let Some(window_cursor_entered) = app.events.window_cursor_entered {
+                        window_cursor_entered(&app_data, &window_id, &device_id);
+                    }
+                }
+                // The cursor left a window.
+                WindowEvent::CursorLeft { device_id } => {
+                    if let Some(window_cursor_left) = app.events.window_cursor_left {
+                        window_cursor_left(&app_data, &window_id, &device_id);
+                    }
+                }
                 // A window requests closing.
                 WindowEvent::CloseRequested => {
                     if let Some(window_close_requested) = app.events.window_close_requested {
