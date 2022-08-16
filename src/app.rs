@@ -4,7 +4,7 @@ pub mod events;
 pub mod handle;
 use self::{
     data::NSTDAppData,
-    events::{NSTDAppEvents, NSTDKey, NSTDScrollDelta, NSTDTouchState},
+    events::{NSTDAppEvents, NSTDKey, NSTDMouseInput, NSTDScrollDelta, NSTDTouchState},
     handle::NSTDAppHandle,
 };
 use crate::NSTDAnyMut;
@@ -177,6 +177,19 @@ pub unsafe extern "C" fn nstd_app_run(app: NSTDApp, data: NSTDAnyMut) -> ! {
                 WindowEvent::Focused(is_focused) => {
                     if let Some(window_focus_changed) = app.events.window_focus_changed {
                         window_focus_changed(&app_data, &window_id, is_focused.into());
+                    }
+                }
+                // A window received mouse button input.
+                WindowEvent::MouseInput {
+                    device_id,
+                    state,
+                    button,
+                    ..
+                } => {
+                    if let Some(window_mouse_input) = app.events.window_mouse_input {
+                        let input = NSTDMouseInput::from_winit(button);
+                        let is_down = (state == ElementState::Pressed).into();
+                        window_mouse_input(&app_data, &window_id, &device_id, &input, is_down);
                     }
                 }
                 // A window was scrolled.

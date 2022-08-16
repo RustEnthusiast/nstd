@@ -35,6 +35,26 @@ typedef enum {
     NSTD_TOUCH_STATE_CANCELLED
 } NSTDTouchState;
 
+/// Represents a mouse button.
+typedef enum {
+    /// The left mouse button.
+    NSTD_MOUSE_BUTTON_LEFT,
+    /// The middle mouse button.
+    NSTD_MOUSE_BUTTON_MIDDLE,
+    /// The right mouse button.
+    NSTD_MOUSE_BUTTON_RIGHT,
+    /// An extra mouse button.
+    NSTD_MOUSE_BUTTON_OTHER,
+} NSTDMouseButton;
+
+/// Represents some type of mouse button input.
+typedef struct {
+    /// The mouse button that received input.
+    NSTDMouseButton button;
+    /// The ID of the mouse button that received input.
+    NSTDUInt16 id;
+} NSTDMouseInput;
+
 /// Represents a key on a keyboard.
 typedef enum {
     /// An unknown keyboard key.
@@ -214,6 +234,9 @@ typedef struct {
     void (*window_moved)(const NSTDAppData *, NSTDWindowID, NSTDInt32, NSTDInt32);
     /// Focus for a window changed.
     void (*window_focus_changed)(const NSTDAppData *, NSTDWindowID, NSTDBool);
+    /// Mouse input was received.
+    void (*window_mouse_input)(const NSTDAppData *, NSTDWindowID, NSTDDeviceID,
+    const NSTDMouseInput *, NSTDBool);
     /// Called when a scroll device is scrolled over a window.
     void (*window_scrolled)(const NSTDAppData *, NSTDWindowID, NSTDDeviceID,
     NSTDFloat64, NSTDFloat64, NSTDScrollDelta, NSTDTouchState);

@@ -1,7 +1,9 @@
 //! Contains callback based events through function pointers.
-use crate::{app::data::NSTDAppData, NSTDBool, NSTDFloat64, NSTDInt32, NSTDUInt32};
+use crate::{app::data::NSTDAppData, NSTDBool, NSTDFloat64, NSTDInt32, NSTDUInt16, NSTDUInt32};
 use winit::{
-    event::{AxisId, ButtonId, DeviceId, MouseScrollDelta, TouchPhase, VirtualKeyCode},
+    event::{
+        AxisId, ButtonId, DeviceId, MouseButton, MouseScrollDelta, TouchPhase, VirtualKeyCode,
+    },
     window::WindowId,
 };
 
@@ -64,6 +66,54 @@ impl NSTDTouchState {
             TouchPhase::Moved => Self::NSTD_TOUCH_STATE_MOVED,
             TouchPhase::Ended => Self::NSTD_TOUCH_STATE_ENDED,
             TouchPhase::Cancelled => Self::NSTD_TOUCH_STATE_CANCELLED,
+        }
+    }
+}
+
+/// Represents a mouse button.
+#[repr(C)]
+#[derive(Clone, Copy, Debug, Hash, PartialEq, Eq)]
+#[allow(non_camel_case_types)]
+pub enum NSTDMouseButton {
+    /// The left mouse button.
+    NSTD_MOUSE_BUTTON_LEFT,
+    /// The middle mouse button.
+    NSTD_MOUSE_BUTTON_MIDDLE,
+    /// The right mouse button.
+    NSTD_MOUSE_BUTTON_RIGHT,
+    /// An extra mouse button.
+    NSTD_MOUSE_BUTTON_OTHER,
+}
+
+/// Represents some type of mouse button input.
+#[repr(C)]
+#[derive(Clone, Copy, Debug, Hash)]
+pub struct NSTDMouseInput {
+    /// The mouse button that received input.
+    pub button: NSTDMouseButton,
+    /// The ID of the mouse button that received input.
+    pub id: NSTDUInt16,
+}
+impl NSTDMouseInput {
+    /// Converts [winit] [MouseButton] into [NSTDMouseInput].
+    pub(crate) fn from_winit(button: MouseButton) -> Self {
+        match button {
+            MouseButton::Left => Self {
+                button: NSTDMouseButton::NSTD_MOUSE_BUTTON_LEFT,
+                id: 0,
+            },
+            MouseButton::Middle => Self {
+                button: NSTDMouseButton::NSTD_MOUSE_BUTTON_MIDDLE,
+                id: 1,
+            },
+            MouseButton::Right => Self {
+                button: NSTDMouseButton::NSTD_MOUSE_BUTTON_RIGHT,
+                id: 2,
+            },
+            MouseButton::Other(id) => Self {
+                button: NSTDMouseButton::NSTD_MOUSE_BUTTON_OTHER,
+                id,
+            },
         }
     }
 }
@@ -341,6 +391,10 @@ pub struct NSTDAppEvents {
         Option<unsafe extern "C" fn(&NSTDAppData, NSTDWindowID, NSTDInt32, NSTDInt32)>,
     /// Focus for a window changed.
     pub window_focus_changed: Option<unsafe extern "C" fn(&NSTDAppData, NSTDWindowID, NSTDBool)>,
+    /// Mouse input was received.
+    pub window_mouse_input: Option<
+        unsafe extern "C" fn(&NSTDAppData, NSTDWindowID, NSTDDeviceID, &NSTDMouseInput, NSTDBool),
+    >,
     /// Called when a scroll device is scrolled over a window.
     pub window_scrolled: Option<
         unsafe extern "C" fn(
