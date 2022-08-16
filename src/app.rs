@@ -152,7 +152,7 @@ pub unsafe extern "C" fn nstd_app_run(app: NSTDApp, data: NSTDAnyMut) -> ! {
                 // There was some keyboard input.
                 DeviceEvent::Key(input) => {
                     if let Some(key_input) = app.events.key_input {
-                        let key = NSTDKey::from(input.virtual_keycode);
+                        let key = NSTDKey::from_winit(input.virtual_keycode);
                         let is_down = input.state == ElementState::Pressed;
                         key_input(&app_data, &device_id, key, input.scancode, is_down.into());
                     }
@@ -190,6 +190,17 @@ pub unsafe extern "C" fn nstd_app_run(app: NSTDApp, data: NSTDAnyMut) -> ! {
                         let input = NSTDMouseInput::from_winit(button);
                         let is_down = (state == ElementState::Pressed).into();
                         window_mouse_input(&app_data, &window_id, &device_id, &input, is_down);
+                    }
+                }
+                // A window received key input.
+                WindowEvent::KeyboardInput {
+                    device_id, input, ..
+                } => {
+                    if let Some(window_key_input) = app.events.window_key_input {
+                        let key = NSTDKey::from_winit(input.virtual_keycode);
+                        let is_down = (input.state == ElementState::Pressed).into();
+                        let scancode = input.scancode;
+                        window_key_input(&app_data, &window_id, &device_id, key, scancode, is_down);
                     }
                 }
                 // A window was scrolled.

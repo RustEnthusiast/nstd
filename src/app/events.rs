@@ -268,9 +268,9 @@ pub enum NSTDKey {
     /// The right alt key.
     NSTD_KEY_RIGHT_ALT,
 }
-impl From<Option<VirtualKeyCode>> for NSTDKey {
+impl NSTDKey {
     /// Converts a [VirtualKeyCode] into an [NSTDKey].
-    fn from(key: Option<VirtualKeyCode>) -> Self {
+    pub(crate) fn from_winit(key: Option<VirtualKeyCode>) -> Self {
         if let Some(key) = key {
             return match key {
                 VirtualKeyCode::Escape => NSTDKey::NSTD_KEY_ESCAPE,
@@ -394,6 +394,17 @@ pub struct NSTDAppEvents {
     /// Mouse input was received.
     pub window_mouse_input: Option<
         unsafe extern "C" fn(&NSTDAppData, NSTDWindowID, NSTDDeviceID, &NSTDMouseInput, NSTDBool),
+    >,
+    /// Called when a window receives key input.
+    pub window_key_input: Option<
+        unsafe extern "C" fn(
+            &NSTDAppData,
+            NSTDWindowID,
+            NSTDDeviceID,
+            NSTDKey,
+            NSTDUInt32,
+            NSTDBool,
+        ),
     >,
     /// Called when a scroll device is scrolled over a window.
     pub window_scrolled: Option<
