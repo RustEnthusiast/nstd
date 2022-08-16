@@ -1,5 +1,7 @@
 //! Contains callback based events through function pointers.
-use crate::{app::data::NSTDAppData, NSTDBool, NSTDFloat64, NSTDInt32, NSTDUInt16, NSTDUInt32};
+use crate::{
+    app::data::NSTDAppData, NSTDBool, NSTDFloat64, NSTDInt32, NSTDUInt16, NSTDUInt32, NSTDUnichar,
+};
 use winit::{
     event::{
         AxisId, ButtonId, DeviceId, MouseButton, MouseScrollDelta, TouchPhase, VirtualKeyCode,
@@ -406,6 +408,8 @@ pub struct NSTDAppEvents {
             NSTDBool,
         ),
     >,
+    /// Called when a window receives a character.
+    pub window_received_char: Option<unsafe extern "C" fn(&NSTDAppData, NSTDWindowID, NSTDUnichar)>,
     /// Called when a scroll device is scrolled over a window.
     pub window_scrolled: Option<
         unsafe extern "C" fn(

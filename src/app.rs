@@ -203,6 +203,12 @@ pub unsafe extern "C" fn nstd_app_run(app: NSTDApp, data: NSTDAnyMut) -> ! {
                         window_key_input(&app_data, &window_id, &device_id, key, scancode, is_down);
                     }
                 }
+                // A window received character input.
+                WindowEvent::ReceivedCharacter(chr) => {
+                    if let Some(window_received_char) = app.events.window_received_char {
+                        window_received_char(&app_data, &window_id, chr.into());
+                    }
+                }
                 // A window was scrolled.
                 WindowEvent::MouseWheel {
                     device_id,

@@ -240,6 +240,8 @@ typedef struct {
     /// Called when a window receives key input.
     void (*window_key_input)(const NSTDAppData *, NSTDWindowID, NSTDDeviceID, NSTDKey, NSTDUInt32,
     NSTDBool);
+    /// Called when a window receives a character.
+    void (*window_received_char)(const NSTDAppData *, NSTDWindowID, NSTDUnichar);
     /// Called when a scroll device is scrolled over a window.
     void (*window_scrolled)(const NSTDAppData *, NSTDWindowID, NSTDDeviceID,
     NSTDFloat64, NSTDFloat64, NSTDScrollDelta, NSTDTouchState);
