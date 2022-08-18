@@ -84,7 +84,7 @@ NSTDAPI void nstd_window_set_position(const NSTDWindow *window, NSTDWindowPositi
 /// `NSTDWindowPosition pos` - The position of the window.
 NSTDAPI NSTDWindowPosition nstd_window_get_position(const NSTDWindow *window);
 
-/// Sets the size of a window.
+/// Sets the size of a window's client area.
 ///
 /// # Parameters:
 ///
@@ -92,6 +92,28 @@ NSTDAPI NSTDWindowPosition nstd_window_get_position(const NSTDWindow *window);
 ///
 /// - `NSTDWindowSize size` - The new size of the window.
 NSTDAPI void nstd_window_set_size(const NSTDWindow *window, NSTDWindowSize size);
+
+/// Gets the size of a window's client area.
+///
+/// # Parameters:
+///
+/// - `const NSTDWindow *window` - The window.
+///
+/// # Returns
+///
+/// `NSTDWindowSize size` - The size of the window.
+NSTDAPI NSTDWindowSize nstd_window_get_size(const NSTDWindow *window);
+
+/// Gets the full size of a window.
+///
+/// # Parameters:
+///
+/// - `const NSTDWindow *window` - The window.
+///
+/// # Returns
+///
+/// `NSTDWindowSize size` - The size of the window.
+NSTDAPI NSTDWindowSize nstd_window_get_outer_size(const NSTDWindow *window);
 
 /// Permanently closes & frees a window and it's data.
 ///

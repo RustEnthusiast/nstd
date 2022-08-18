@@ -121,7 +121,7 @@ pub extern "C" fn nstd_window_get_position(window: &NSTDWindow) -> NSTDWindowPos
     NSTDWindowPosition { x: 0, y: 0 }
 }
 
-/// Sets the size of a window.
+/// Sets the size of a window's client area.
 ///
 /// # Parameters:
 ///
@@ -132,6 +132,44 @@ pub extern "C" fn nstd_window_get_position(window: &NSTDWindow) -> NSTDWindowPos
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_window_set_size(window: &NSTDWindow, size: NSTDWindowSize) {
     window.set_inner_size(PhysicalSize::new(size.width, size.height));
+}
+
+/// Gets the size of a window's client area.
+///
+/// # Parameters:
+///
+/// - `const NSTDWindow *window` - The window.
+///
+/// # Returns
+///
+/// `NSTDWindowSize size` - The size of the window.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_window_get_size(window: &NSTDWindow) -> NSTDWindowSize {
+    let size = window.inner_size();
+    NSTDWindowSize {
+        width: size.width,
+        height: size.height,
+    }
+}
+
+/// Gets the full size of a window.
+///
+/// # Parameters:
+///
+/// - `const NSTDWindow *window` - The window.
+///
+/// # Returns
+///
+/// `NSTDWindowSize size` - The size of the window.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_window_get_outer_size(window: &NSTDWindow) -> NSTDWindowSize {
+    let size = window.outer_size();
+    NSTDWindowSize {
+        width: size.width,
+        height: size.height,
+    }
 }
 
 /// Permanently closes & frees a window and it's data.
