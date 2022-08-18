@@ -9,6 +9,14 @@ NSTDCPPSTART
 /// An `nstd` application window.
 typedef NSTDAnyMut NSTDWindow;
 
+/// Describes the position of a window.
+typedef struct {
+    /// The position of the window from the left of the screen.
+    NSTDInt32 x;
+    /// The position of the window from the top of the screen.
+    NSTDInt32 y;
+} NSTDWindowPosition;
+
 /// Creates a new window attached to `app`'s event loop.
 ///
 /// # Parameters:
@@ -45,6 +53,15 @@ NSTDAPI void nstd_window_set_title(const NSTDWindow *window, const NSTDStrConst 
 ///
 /// - `const NSTDImage *icon` - The image to set as the window icon.
 NSTDAPI void nstd_window_set_icon(const NSTDWindow *window, const NSTDImage *icon);
+
+/// Sets the position of a window.
+///
+/// # Parameters:
+///
+/// - `const NSTDWindow *window` - The window.
+///
+/// - `NSTDWindowPosition pos` - The position of the window.
+NSTDAPI void nstd_window_set_position(const NSTDWindow *window, NSTDWindowPosition pos);
 
 /// Permanently closes & frees a window and it's data.
 ///

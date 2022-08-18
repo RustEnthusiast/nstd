@@ -3,11 +3,25 @@ use crate::{
     app::handle::NSTDAppHandle,
     core::str::NSTDStrConst,
     image::{nstd_image_as_bytes, nstd_image_height, nstd_image_width, NSTDImage},
+    NSTDInt32,
 };
-use winit::window::{Icon, Window};
+use winit::{
+    dpi::PhysicalPosition,
+    window::{Icon, Window},
+};
 
 /// An `nstd` application window.
 pub type NSTDWindow = Box<Window>;
+
+/// Describes the position of a window.
+#[repr(C)]
+#[derive(Clone, Copy, Debug, Default, Hash)]
+pub struct NSTDWindowPosition {
+    /// The position of the window from the left of the screen.
+    pub x: NSTDInt32,
+    /// The position of the window from the top of the screen.
+    pub y: NSTDInt32,
+}
 
 /// Creates a new window attached to `app`'s event loop.
 ///
@@ -62,6 +76,19 @@ pub extern "C" fn nstd_window_set_icon(window: &NSTDWindow, icon: &NSTDImage) {
     // SAFETY: `icon` owns the data.
     let rgba = Vec::from(unsafe { bytes.as_slice() });
     window.set_window_icon(Icon::from_rgba(rgba, width, height).ok());
+}
+
+/// Sets the position of a window.
+///
+/// # Parameters:
+///
+/// - `const NSTDWindow *window` - The window.
+///
+/// - `NSTDWindowPosition pos` - The position of the window.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_window_set_position(window: &NSTDWindow, pos: NSTDWindowPosition) {
+    window.set_outer_position(PhysicalPosition::new(pos.x, pos.y));
 }
 
 /// Permanently closes & frees a window and it's data.
