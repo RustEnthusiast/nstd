@@ -161,6 +161,21 @@ pub unsafe extern "C" fn nstd_app_run(app: NSTDApp, data: NSTDAnyMut) -> ! {
             },
             // A window event was received.
             Event::WindowEvent { window_id, event } => match event {
+                // A window's scale factor has changed.
+                WindowEvent::ScaleFactorChanged {
+                    scale_factor,
+                    new_inner_size,
+                } => {
+                    if let Some(window_dpi_changed) = app.events.window_dpi_changed {
+                        window_dpi_changed(
+                            &app_data,
+                            &window_id,
+                            scale_factor,
+                            &mut new_inner_size.width,
+                            &mut new_inner_size.height,
+                        );
+                    }
+                }
                 // A window was resized.
                 WindowEvent::Resized(size) => {
                     if let Some(window_resized) = app.events.window_resized {

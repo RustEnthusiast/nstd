@@ -228,6 +228,9 @@ typedef struct {
     void (*button_input)(const NSTDAppData *, NSTDDeviceID, NSTDButtonID, NSTDBool);
     /// Called when a keyboard key is pressed or unpressed.
     void (*key_input)(const NSTDAppData *, NSTDDeviceID, NSTDKey, NSTDUInt32, NSTDBool);
+    /// Called when a window's scale factor changes.
+    void (*window_dpi_changed)(const NSTDAppData *, NSTDWindowID, NSTDFloat64,
+    NSTDUInt32 *, NSTDUInt32 *);
     /// Called when a window is resized.
     void (*window_resized)(const NSTDAppData *, NSTDWindowID, NSTDUInt32, NSTDUInt32);
     /// Called when a window is moved.

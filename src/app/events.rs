@@ -385,6 +385,16 @@ pub struct NSTDAppEvents {
     /// Called when a keyboard key is pressed or unpressed.
     pub key_input:
         Option<unsafe extern "C" fn(&NSTDAppData, NSTDDeviceID, NSTDKey, NSTDUInt32, NSTDBool)>,
+    /// Called when a window's scale factor changes.
+    pub window_dpi_changed: Option<
+        unsafe extern "C" fn(
+            &NSTDAppData,
+            NSTDWindowID,
+            NSTDFloat64,
+            &mut NSTDUInt32,
+            &mut NSTDUInt32,
+        ),
+    >,
     /// Called when a window is resized.
     pub window_resized:
         Option<unsafe extern "C" fn(&NSTDAppData, NSTDWindowID, NSTDUInt32, NSTDUInt32)>,
