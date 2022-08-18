@@ -71,6 +71,19 @@ NSTDAPI void nstd_window_set_icon(const NSTDWindow *window, const NSTDImage *ico
 /// - `NSTDWindowPosition pos` - The position of the window.
 NSTDAPI void nstd_window_set_position(const NSTDWindow *window, NSTDWindowPosition pos);
 
+/// Gets the position of a window.
+///
+/// This always returns an x and y value of 0 on unsupported platforms.
+///
+/// # Parameters:
+///
+/// - `const NSTDWindow *window` - The window.
+///
+/// # Returns
+///
+/// `NSTDWindowPosition pos` - The position of the window.
+NSTDAPI NSTDWindowPosition nstd_window_get_position(const NSTDWindow *window);
+
 /// Sets the size of a window.
 ///
 /// # Parameters:

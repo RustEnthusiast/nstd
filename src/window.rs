@@ -101,6 +101,26 @@ pub extern "C" fn nstd_window_set_position(window: &NSTDWindow, pos: NSTDWindowP
     window.set_outer_position(PhysicalPosition::new(pos.x, pos.y));
 }
 
+/// Gets the position of a window.
+///
+/// This always returns an x and y value of 0 on unsupported platforms.
+///
+/// # Parameters:
+///
+/// - `const NSTDWindow *window` - The window.
+///
+/// # Returns
+///
+/// `NSTDWindowPosition pos` - The position of the window.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_window_get_position(window: &NSTDWindow) -> NSTDWindowPosition {
+    if let Ok(pos) = window.outer_position() {
+        return NSTDWindowPosition { x: pos.x, y: pos.y };
+    }
+    NSTDWindowPosition { x: 0, y: 0 }
+}
+
 /// Sets the size of a window.
 ///
 /// # Parameters:
