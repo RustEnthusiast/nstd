@@ -14,18 +14,18 @@ crate-type = ["cdylib", "rlib", "staticlib"]
 default = ["std", "nstd_core"]
 std = []
 clib = []
-nstd_alloc = ["nstd_core", "nstd_os_windows_alloc"]
+nstd_alloc = ["nstd_os_windows_alloc"]
 nstd_core = ["cty"]
-nstd_cstring = ["nstd_core", "nstd_vec"]
+nstd_cstring = ["nstd_alloc", "nstd_core", "nstd_vec"]
 nstd_heap_ptr = ["nstd_alloc", "nstd_core"]
-nstd_io = ["nstd_core", "nstd_string", "nstd_vec", "std"]
+nstd_io = ["nstd_alloc", "nstd_core", "nstd_string", "nstd_vec", "std"]
 nstd_os = []
 nstd_os_windows_alloc = [
-    "nstd_os", "nstd_core", "windows-sys/Win32_Foundation", "windows-sys/Win32_System_Memory"
+    "nstd_alloc", "nstd_os", "windows-sys/Win32_Foundation", "windows-sys/Win32_System_Memory"
 ]
 nstd_shared_lib = ["libloading", "nstd_core", "std"]
 nstd_shared_ptr = ["nstd_alloc", "nstd_core"]
-nstd_string = ["nstd_core", "nstd_vec"]
+nstd_string = ["nstd_alloc", "nstd_core", "nstd_vec"]
 nstd_vec = ["nstd_alloc", "nstd_core"]
 
 [dependencies]

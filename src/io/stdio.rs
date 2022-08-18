@@ -1,5 +1,6 @@
 //! Contains common I/O operations for [Read] & [Write] with `nstd` types.
 use crate::{
+    alloc::NSTDAllocError,
     core::{
         slice::{
             nstd_core_slice_const_new, nstd_core_slice_const_stride, nstd_core_slice_mut_stride,
@@ -126,7 +127,7 @@ pub(crate) fn read_all<R: Read>(
             let bytes = nstd_core_slice_const_new(buf.as_ptr().cast(), 1, buf.len());
             // SAFETY: `bytes` refers to `buf`'s data, which is still valid here.
             match unsafe { nstd_vec_extend(buffer, &bytes) } {
-                0 => NSTDIOError::NSTD_IO_ERROR_NONE,
+                NSTDAllocError::NSTD_ALLOC_ERROR_NONE => NSTDIOError::NSTD_IO_ERROR_NONE,
                 _ => NSTDIOError::NSTD_IO_ERROR_OUT_OF_MEMORY,
             }
         }
@@ -160,7 +161,7 @@ pub(crate) fn read_to_string<R: Read>(
             unsafe {
                 let str = nstd_core_str_const_from_bytes_unchecked(&bytes);
                 match nstd_string_push_str(buffer, &str) {
-                    0 => NSTDIOError::NSTD_IO_ERROR_NONE,
+                    NSTDAllocError::NSTD_ALLOC_ERROR_NONE => NSTDIOError::NSTD_IO_ERROR_NONE,
                     _ => NSTDIOError::NSTD_IO_ERROR_OUT_OF_MEMORY,
                 }
             }

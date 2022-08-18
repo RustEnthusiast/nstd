@@ -1,5 +1,5 @@
 //! Process heap management for Windows.
-use crate::{core::def::NSTDErrorCode, NSTDAnyMut, NSTDISize, NSTDUSize, NSTD_NULL};
+use crate::{alloc::NSTDAllocError, NSTDAnyMut, NSTDISize, NSTDUSize, NSTD_NULL};
 use windows_sys::Win32::System::Memory::{
     GetProcessHeap, HeapAlloc, HeapCreate, HeapDestroy, HeapFree, HeapReAlloc, HEAP_ZERO_MEMORY,
 };
@@ -102,7 +102,7 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_heap_allocate_zeroed(
 ///
 /// # Returns
 ///
-/// `NSTDErrorCode errc` - Nonzero if reallocating fails.
+/// `NSTDAllocError errc` - The allocation operation error code.
 ///
 /// # Safety
 ///
@@ -113,13 +113,13 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_heap_reallocate(
     heap: NSTDWindowsHeapHandle,
     ptr: &mut NSTDAnyMut,
     size: NSTDUSize,
-) -> NSTDErrorCode {
+) -> NSTDAllocError {
     let new_mem = HeapReAlloc(heap, 0, *ptr, size);
     if !new_mem.is_null() {
         *ptr = new_mem;
-        return 0;
+        return NSTDAllocError::NSTD_ALLOC_ERROR_NONE;
     }
-    1
+    NSTDAllocError::NSTD_ALLOC_ERROR_OUT_OF_MEMORY
 }
 
 /// Deallocates a block of memory on a heap.
@@ -132,7 +132,7 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_heap_reallocate(
 ///
 /// # Returns
 ///
-/// `NSTDErrorCode errc` - Nonzero on error.
+/// `NSTDAllocError errc` - The allocation operation error code.
 ///
 /// # Safety
 ///
@@ -142,12 +142,12 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_heap_reallocate(
 pub unsafe extern "C" fn nstd_os_windows_alloc_heap_deallocate(
     heap: NSTDWindowsHeapHandle,
     ptr: &mut NSTDAnyMut,
-) -> NSTDErrorCode {
+) -> NSTDAllocError {
     if HeapFree(heap, 0, *ptr) != 0 {
         *ptr = NSTD_NULL;
-        return 0;
+        return NSTDAllocError::NSTD_ALLOC_ERROR_NONE;
     }
-    1
+    NSTDAllocError::NSTD_ALLOC_ERROR_MEMORY_NOT_FOUND
 }
 
 /// Destroys a private heap.
@@ -158,7 +158,7 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_heap_deallocate(
 ///
 /// # Returns
 ///
-/// `NSTDErrorCode errc` - Nonzero if destroying the heap fails.
+/// `NSTDAllocError errc` - The allocation operation error code.
 ///
 /// # Safety
 ///
@@ -167,10 +167,10 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_heap_deallocate(
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_os_windows_alloc_heap_free(
     heap: &mut NSTDWindowsHeapHandle,
-) -> NSTDErrorCode {
+) -> NSTDAllocError {
     if HeapDestroy(*heap) != 0 {
         *heap = 0;
-        return 0;
+        return NSTDAllocError::NSTD_ALLOC_ERROR_NONE;
     }
-    1
+    NSTDAllocError::NSTD_ALLOC_ERROR_HEAP_NOT_FOUND
 }

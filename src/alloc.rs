@@ -1,7 +1,22 @@
 //! Low level memory allocation.
 #[cfg(not(target_os = "windows"))]
 extern crate alloc;
-use crate::{core::def::NSTDErrorCode, NSTDAnyMut, NSTDUSize};
+use crate::{NSTDAnyMut, NSTDUSize};
+
+/// Describes an error returned from allocation functions.
+#[repr(C)]
+#[derive(Clone, Copy, Debug, Hash, PartialEq, Eq)]
+#[allow(non_camel_case_types)]
+pub enum NSTDAllocError {
+    /// No error occurred.
+    NSTD_ALLOC_ERROR_NONE,
+    /// Allocating or reallocating failed.
+    NSTD_ALLOC_ERROR_OUT_OF_MEMORY,
+    /// Deallocating memory failed.
+    NSTD_ALLOC_ERROR_MEMORY_NOT_FOUND,
+    /// Getting a handle to a heap failed.
+    NSTD_ALLOC_ERROR_HEAP_NOT_FOUND,
+}
 
 /// Allocates a block of memory on the heap.
 /// The number of bytes to be allocated is specified by `size`.
@@ -76,7 +91,7 @@ pub unsafe extern "C" fn nstd_alloc_allocate_zeroed(size: NSTDUSize) -> NSTDAnyM
 ///
 /// # Returns
 ///
-/// `NSTDErrorCode errc` - Nonzero on error.
+/// `NSTDAllocError errc` - The allocation operation error code.
 ///
 /// # Safety
 ///
@@ -89,7 +104,7 @@ pub unsafe extern "C" fn nstd_alloc_reallocate(
     ptr: &mut NSTDAnyMut,
     size: NSTDUSize,
     new_size: NSTDUSize,
-) -> NSTDErrorCode {
+) -> NSTDAllocError {
     #[cfg(not(target_os = "windows"))]
     {
         use alloc::alloc::Layout;
@@ -97,9 +112,9 @@ pub unsafe extern "C" fn nstd_alloc_reallocate(
         let new_mem = alloc::alloc::realloc((*ptr).cast(), layout, new_size);
         if !new_mem.is_null() {
             *ptr = new_mem.cast();
-            return 0;
+            return NSTDAllocError::NSTD_ALLOC_ERROR_NONE;
         }
-        1
+        NSTDAllocError::NSTD_ALLOC_ERROR_OUT_OF_MEMORY
     }
     #[cfg(target_os = "windows")]
     {

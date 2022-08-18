@@ -1,8 +1,19 @@
 #ifndef NSTD_ALLOC_H
 #define NSTD_ALLOC_H
-#include "core/def.h"
 #include "nstd.h"
 NSTDCPPSTART
+
+/// Describes an error returned from allocation functions.
+typedef enum {
+    /// No error occurred.
+    NSTD_ALLOC_ERROR_NONE,
+    /// Allocating or reallocating failed.
+    NSTD_ALLOC_ERROR_OUT_OF_MEMORY,
+    /// Deallocating memory failed.
+    NSTD_ALLOC_ERROR_MEMORY_NOT_FOUND,
+    /// Getting a handle to a heap failed.
+    NSTD_ALLOC_ERROR_HEAP_NOT_FOUND,
+} NSTDAllocError;
 
 /// Allocates a block of memory on the heap.
 /// The number of bytes to be allocated is specified by `size`.
@@ -51,13 +62,13 @@ NSTDAPI NSTDAnyMut nstd_alloc_allocate_zeroed(NSTDUSize size);
 ///
 /// # Returns
 ///
-/// `NSTDErrorCode errc` - Nonzero on error.
+/// `NSTDAllocError errc` - The allocation operation error code.
 ///
 /// # Safety
 ///
 /// This operation is unsafe because the behavior is undefined if `ptr` is not a value returned by
 /// `nstd_alloc_allocate[_zeroed]`.
-NSTDAPI NSTDErrorCode nstd_alloc_reallocate(NSTDAnyMut *ptr, NSTDUSize size, NSTDUSize new_size);
+NSTDAPI NSTDAllocError nstd_alloc_reallocate(NSTDAnyMut *ptr, NSTDUSize size, NSTDUSize new_size);
 
 /// Deallocates a block of memory previously allocated by `nstd_alloc_allocate[_zeroed]`.
 ///

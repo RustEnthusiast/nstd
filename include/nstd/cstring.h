@@ -1,5 +1,6 @@
 #ifndef NSTD_CSTRING_H
 #define NSTD_CSTRING_H
+#include "alloc.h"
 #include "core/cstr.h"
 #include "core/def.h"
 #include "core/slice.h"
@@ -171,7 +172,7 @@ NSTDAPI void nstd_cstring_push(NSTDCString *cstring, NSTDChar chr);
 ///
 /// # Returns
 ///
-/// `NSTDErrorCode errc` - Nonzero if reserving memory for the push fails.
+/// `NSTDAllocError errc` - The allocation operation error code.
 ///
 /// # Panics
 ///
@@ -184,7 +185,7 @@ NSTDAPI void nstd_cstring_push(NSTDCString *cstring, NSTDChar chr);
 /// # Safety
 ///
 /// This operation can cause undefined behavior in the case that `cstr`'s data is invalid.
-NSTDAPI NSTDErrorCode nstd_cstring_push_cstr(NSTDCString *cstring, const NSTDCStrConst *cstr);
+NSTDAPI NSTDAllocError nstd_cstring_push_cstr(NSTDCString *cstring, const NSTDCStrConst *cstr);
 
 /// Removes the last character from a C string and returns it.
 ///

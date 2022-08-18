@@ -1,6 +1,6 @@
 #ifndef NSTD_OS_WINDOWS_ALLOC_ALLOC_H
 #define NSTD_OS_WINDOWS_ALLOC_ALLOC_H
-#include "../../../core/def.h"
+#include "../../../alloc.h"
 #include "../../../nstd.h"
 NSTDCPPSTART
 
@@ -49,12 +49,12 @@ NSTDAPI NSTDAnyMut nstd_os_windows_alloc_allocate_zeroed(NSTDUSize size);
 ///
 /// # Returns
 ///
-/// `NSTDErrorCode errc` - Nonzero on error.
+/// `NSTDAllocError errc` - The allocation operation error code.
 ///
 /// # Safety
 ///
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heaprealloc>.
-NSTDAPI NSTDErrorCode nstd_os_windows_alloc_reallocate(NSTDAnyMut *ptr, NSTDUSize new_size);
+NSTDAPI NSTDAllocError nstd_os_windows_alloc_reallocate(NSTDAnyMut *ptr, NSTDUSize new_size);
 
 /// Deallocates a block of memory previously allocated by
 /// `nstd_os_windows_alloc_allocate[_zeroed]`.
@@ -65,12 +65,12 @@ NSTDAPI NSTDErrorCode nstd_os_windows_alloc_reallocate(NSTDAnyMut *ptr, NSTDUSiz
 ///
 /// # Returns
 ///
-/// `NSTDErrorCode errc` - Nonzero on error.
+/// `NSTDAllocError errc` - The allocation operation error code.
 ///
 /// # Safety
 ///
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapfree>.
-NSTDAPI NSTDErrorCode nstd_os_windows_alloc_deallocate(NSTDAnyMut *ptr);
+NSTDAPI NSTDAllocError nstd_os_windows_alloc_deallocate(NSTDAnyMut *ptr);
 
 NSTDCPPEND
 #endif

@@ -1,6 +1,6 @@
 //! A dynamically sized contiguous sequence of values.
 use crate::{
-    alloc::{nstd_alloc_allocate, nstd_alloc_deallocate, nstd_alloc_reallocate},
+    alloc::{nstd_alloc_allocate, nstd_alloc_deallocate, nstd_alloc_reallocate, NSTDAllocError},
     core::{
         def::{NSTDByte, NSTDErrorCode},
         mem::{nstd_core_mem_copy, nstd_core_mem_copy_overlapping},
@@ -89,12 +89,12 @@ impl NSTDVec {
 
     /// Attempts to reserve some memory for the vector if needed.
     #[inline]
-    fn try_reserve(&mut self) -> NSTDErrorCode {
+    fn try_reserve(&mut self) -> NSTDAllocError {
         if self.len == self.cap {
             let additional = 1 + self.cap / 2;
             return nstd_vec_reserve(self, additional);
         }
-        0
+        NSTDAllocError::NSTD_ALLOC_ERROR_NONE
     }
 }
 impl Drop for NSTDVec {
@@ -369,7 +369,7 @@ pub extern "C" fn nstd_vec_get_mut(vec: &mut NSTDVec, pos: NSTDUSize) -> NSTDAny
 ///
 /// # Returns
 ///
-/// `NSTDErrorCode errc` - Nonzero on error.
+/// `NSTDAllocError errc` - The allocation operation error code.
 ///
 /// # Safety
 ///
@@ -377,11 +377,11 @@ pub extern "C" fn nstd_vec_get_mut(vec: &mut NSTDVec, pos: NSTDUSize) -> NSTDAny
 /// pushed onto the vector is not equal to `vec`'s stride.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_vec_push(vec: &mut NSTDVec, value: NSTDAnyConst) -> NSTDErrorCode {
+pub unsafe extern "C" fn nstd_vec_push(vec: &mut NSTDVec, value: NSTDAnyConst) -> NSTDAllocError {
     // Attempt to reserve space for the push.
     let errc = vec.try_reserve();
     // On success: copy bytes to the end of the vector.
-    if errc == 0 {
+    if errc == NSTDAllocError::NSTD_ALLOC_ERROR_NONE {
         nstd_core_mem_copy(vec.end().cast(), value.cast(), vec.stride);
         vec.len += 1;
     }
@@ -449,7 +449,7 @@ pub unsafe extern "C" fn nstd_vec_insert(
         1
     }
     // Attempt to reserve space for the insert.
-    else if vec.try_reserve() != 0 {
+    else if vec.try_reserve() != NSTDAllocError::NSTD_ALLOC_ERROR_NONE {
         2
     }
     // Insert the value.
@@ -513,7 +513,7 @@ pub extern "C" fn nstd_vec_remove(vec: &mut NSTDVec, index: NSTDUSize) -> NSTDEr
 ///
 /// # Returns
 ///
-/// `NSTDErrorCode errc` - Nonzero if reserving memory for the extension fails.
+/// `NSTDAllocError errc` - The allocation operation error code.
 ///
 /// # Panics
 ///
@@ -526,18 +526,18 @@ pub extern "C" fn nstd_vec_remove(vec: &mut NSTDVec, index: NSTDUSize) -> NSTDEr
 pub unsafe extern "C" fn nstd_vec_extend(
     vec: &mut NSTDVec,
     values: &NSTDSliceConst,
-) -> NSTDErrorCode {
+) -> NSTDAllocError {
     // Ensure value sizes are the same for both the vector and the slice.
     assert!(vec.stride == nstd_core_slice_const_stride(values));
     // Making sure there's enough space for the extension.
-    let mut errc = 0;
+    let mut errc = NSTDAllocError::NSTD_ALLOC_ERROR_NONE;
     let reserved = vec.cap - vec.len;
     if reserved < values.len {
         let additional = values.len - reserved;
         errc = nstd_vec_reserve(vec, additional);
     }
     // On success copy bytes to the end of the vector.
-    if errc == 0 {
+    if errc == NSTDAllocError::NSTD_ALLOC_ERROR_NONE {
         nstd_core_mem_copy(vec.end().cast(), values.ptr.raw.cast(), values.byte_len());
         vec.len += values.len;
     }
@@ -574,13 +574,13 @@ pub extern "C" fn nstd_vec_truncate(vec: &mut NSTDVec, len: NSTDUSize) {
 ///
 /// # Returns
 ///
-/// `NSTDErrorCode errc` - Nonzero on error.
+/// `NSTDAllocError errc` - The allocation operation error code.
 ///
 /// # Panics
 ///
 /// This operation will panic if `size` is zero.
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_vec_reserve(vec: &mut NSTDVec, size: NSTDUSize) -> NSTDErrorCode {
+pub extern "C" fn nstd_vec_reserve(vec: &mut NSTDVec, size: NSTDUSize) -> NSTDAllocError {
     assert!(size != 0);
     // Calculate the number of bytes to allocate.
     let bytes_to_alloc = size * vec.stride;
@@ -591,9 +591,9 @@ pub extern "C" fn nstd_vec_reserve(vec: &mut NSTDVec, size: NSTDUSize) -> NSTDEr
         if !mem.is_null() {
             vec.ptr = mem;
             vec.cap = size;
-            return 0;
+            return NSTDAllocError::NSTD_ALLOC_ERROR_NONE;
         }
-        1
+        NSTDAllocError::NSTD_ALLOC_ERROR_OUT_OF_MEMORY
     }
     // Otherwise increase the vector's capacity.
     else {
@@ -605,7 +605,7 @@ pub extern "C" fn nstd_vec_reserve(vec: &mut NSTDVec, size: NSTDUSize) -> NSTDEr
         // SAFETY: The vector is non-null & the lengths are above 0.
         let errc = unsafe { nstd_alloc_reallocate(&mut vec.ptr, current_byte_len, new_byte_len) };
         // On success increase the buffer length.
-        if errc == 0 {
+        if errc == NSTDAllocError::NSTD_ALLOC_ERROR_NONE {
             vec.cap += size;
         }
         errc
@@ -614,33 +614,29 @@ pub extern "C" fn nstd_vec_reserve(vec: &mut NSTDVec, size: NSTDUSize) -> NSTDEr
 
 /// Decreases a vector's capacity to match it's length.
 ///
-/// # Note
-///
-/// This will return an error code of `0` if the vector is "null".
-///
 /// # Parameters:
 ///
 /// - `NSTDVec *vec` - The vector.
 ///
 /// # Returns
 ///
-/// `NSTDErrorCode errc` - Nonzero on error.
+/// `NSTDAllocError errc` - The allocation operation error code.
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_vec_shrink(vec: &mut NSTDVec) -> NSTDErrorCode {
-    let mut errc = 0;
+pub extern "C" fn nstd_vec_shrink(vec: &mut NSTDVec) -> NSTDAllocError {
     // Make sure the vector is non-null and it's capacity is greater than it's length.
     if !vec.ptr.is_null() && vec.len < vec.cap {
         let current_len = vec.buffer_byte_len();
         // Make sure to allocate at least one element to avoid undefined behavior.
         let new_len = vec.byte_len().max(vec.stride);
         // SAFETY: The vector is non-null & the lengths are above 0.
-        errc = unsafe { nstd_alloc_reallocate(&mut vec.ptr, current_len, new_len) };
-        if errc == 0 {
+        let errc = unsafe { nstd_alloc_reallocate(&mut vec.ptr, current_len, new_len) };
+        if errc == NSTDAllocError::NSTD_ALLOC_ERROR_NONE {
             // The buffer's new length is at least 1.
             vec.cap = vec.len.max(1);
         }
+        return errc;
     }
-    errc
+    NSTDAllocError::NSTD_ALLOC_ERROR_NONE
 }
 
 /// Frees an instance of `NSTDVec`.

@@ -1,11 +1,12 @@
 //! A dynamically sized, null terminated, C string.
 use crate::{
+    alloc::NSTDAllocError,
     core::{
         cstr::{
             nstd_core_cstr_const_as_bytes, nstd_core_cstr_const_get_null, nstd_core_cstr_const_new,
             nstd_core_cstr_mut_new, NSTDCStrConst, NSTDCStrMut,
         },
-        def::{NSTDChar, NSTDErrorCode},
+        def::NSTDChar,
         slice::NSTDSliceConst,
     },
     vec::{
@@ -61,7 +62,10 @@ pub extern "C" fn nstd_cstring_new_with_cap(cap: NSTDUSize) -> NSTDCString {
     let mut bytes = nstd_vec_new_with_cap(1, cap);
     let nul: NSTDChar = 0;
     // SAFETY: `nul` is stored on the stack.
-    unsafe { assert!(nstd_vec_push(&mut bytes, addr_of!(nul).cast()) == 0) };
+    unsafe {
+        let errc = nstd_vec_push(&mut bytes, addr_of!(nul).cast());
+        assert!(errc == NSTDAllocError::NSTD_ALLOC_ERROR_NONE);
+    }
     NSTDCString { bytes }
 }
 
@@ -233,7 +237,8 @@ pub extern "C" fn nstd_cstring_push(cstring: &mut NSTDCString, chr: NSTDChar) {
             // Push a new null byte onto the end of the C string.
             let nulpos = nstd_vec_len(&cstring.bytes) - 1;
             let mut nul = nstd_vec_get_mut(&mut cstring.bytes, nulpos).cast::<NSTDChar>();
-            assert!(nstd_vec_push(&mut cstring.bytes, nul.cast()) == 0);
+            let errc = nstd_vec_push(&mut cstring.bytes, nul.cast());
+            assert!(errc == NSTDAllocError::NSTD_ALLOC_ERROR_NONE);
             // Write `chr` over the old null byte.
             nul = nstd_vec_get_mut(&mut cstring.bytes, nulpos).cast();
             *nul = chr;
@@ -251,7 +256,7 @@ pub extern "C" fn nstd_cstring_push(cstring: &mut NSTDCString, chr: NSTDChar) {
 ///
 /// # Returns
 ///
-/// `NSTDErrorCode errc` - Nonzero if reserving memory for the push fails.
+/// `NSTDAllocError errc` - The allocation operation error code.
 ///
 /// # Panics
 ///
@@ -268,7 +273,7 @@ pub extern "C" fn nstd_cstring_push(cstring: &mut NSTDCString, chr: NSTDChar) {
 pub unsafe extern "C" fn nstd_cstring_push_cstr(
     cstring: &mut NSTDCString,
     cstr: &NSTDCStrConst,
-) -> NSTDErrorCode {
+) -> NSTDAllocError {
     // Make sure the C string slice doesn't contain a null byte.
     assert!(nstd_core_cstr_const_get_null(cstr).is_null());
     // Pop the old null byte.
@@ -277,7 +282,8 @@ pub unsafe extern "C" fn nstd_cstring_push_cstr(
     let bytes = nstd_core_cstr_const_as_bytes(cstr);
     let errc = nstd_vec_extend(&mut cstring.bytes, &bytes);
     // Push a new null byte.
-    assert!(nstd_vec_push(&mut cstring.bytes, addr_of!(nul).cast()) == 0);
+    let pusherrc = nstd_vec_push(&mut cstring.bytes, addr_of!(nul).cast());
+    assert!(pusherrc == NSTDAllocError::NSTD_ALLOC_ERROR_NONE);
     errc
 }
 

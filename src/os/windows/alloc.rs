@@ -5,7 +5,7 @@ use self::heap::{
     nstd_os_windows_alloc_heap_deallocate, nstd_os_windows_alloc_heap_default,
     nstd_os_windows_alloc_heap_reallocate,
 };
-use crate::{core::def::NSTDErrorCode, NSTDAnyMut, NSTDUSize, NSTD_NULL};
+use crate::{alloc::NSTDAllocError, NSTDAnyMut, NSTDUSize, NSTD_NULL};
 
 /// Allocates a new block of memory on the current process' heap.
 ///
@@ -66,7 +66,7 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_allocate_zeroed(size: NSTDUSize) 
 ///
 /// # Returns
 ///
-/// `NSTDErrorCode errc` - Nonzero on error.
+/// `NSTDAllocError errc` - The allocation operation error code.
 ///
 /// # Safety
 ///
@@ -76,9 +76,9 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_allocate_zeroed(size: NSTDUSize) 
 pub unsafe extern "C" fn nstd_os_windows_alloc_reallocate(
     ptr: &mut NSTDAnyMut,
     new_size: NSTDUSize,
-) -> NSTDErrorCode {
+) -> NSTDAllocError {
     match nstd_os_windows_alloc_heap_default() {
-        0 => 1,
+        0 => NSTDAllocError::NSTD_ALLOC_ERROR_HEAP_NOT_FOUND,
         heap => nstd_os_windows_alloc_heap_reallocate(heap, ptr, new_size),
     }
 }
@@ -92,16 +92,16 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_reallocate(
 ///
 /// # Returns
 ///
-/// `NSTDErrorCode errc` - Nonzero on error.
+/// `NSTDAllocError errc` - The allocation operation error code.
 ///
 /// # Safety
 ///
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapfree>.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_os_windows_alloc_deallocate(ptr: &mut NSTDAnyMut) -> NSTDErrorCode {
+pub unsafe extern "C" fn nstd_os_windows_alloc_deallocate(ptr: &mut NSTDAnyMut) -> NSTDAllocError {
     match nstd_os_windows_alloc_heap_default() {
-        0 => 1,
+        0 => NSTDAllocError::NSTD_ALLOC_ERROR_HEAP_NOT_FOUND,
         heap => nstd_os_windows_alloc_heap_deallocate(heap, ptr),
     }
 }

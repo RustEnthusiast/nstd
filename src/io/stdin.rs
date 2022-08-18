@@ -1,5 +1,6 @@
 //! A handle to the standard input stream.
 use crate::{
+    alloc::NSTDAllocError,
     core::{
         slice::{nstd_core_slice_const_new, NSTDSliceMut},
         str::nstd_core_str_const_from_bytes_unchecked,
@@ -170,7 +171,7 @@ pub extern "C" fn nstd_io_stdin_read_line(
             unsafe {
                 let str = nstd_core_str_const_from_bytes_unchecked(&bytes);
                 match nstd_string_push_str(buffer, &str) {
-                    0 => NSTDIOError::NSTD_IO_ERROR_NONE,
+                    NSTDAllocError::NSTD_ALLOC_ERROR_NONE => NSTDIOError::NSTD_IO_ERROR_NONE,
                     _ => NSTDIOError::NSTD_IO_ERROR_OUT_OF_MEMORY,
                 }
             }

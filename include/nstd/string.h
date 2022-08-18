@@ -1,5 +1,6 @@
 #ifndef NSTD_STRING_H
 #define NSTD_STRING_H
+#include "alloc.h"
 #include "core/def.h"
 #include "core/slice.h"
 #include "core/str.h"
@@ -152,12 +153,12 @@ NSTDAPI NSTDErrorCode nstd_string_push(NSTDString *string, NSTDUnichar chr);
 ///
 /// # Returns
 ///
-/// `NSTDErrorCode errc` - Nonzero on error.
+/// `NSTDAllocError errc` - The allocation operation error code.
 ///
 /// # Safety
 ///
 /// This function will cause undefined behavior in the case where `str`'s data is no longer valid.
-NSTDAPI NSTDErrorCode nstd_string_push_str(NSTDString *string, const NSTDStrConst *str);
+NSTDAPI NSTDAllocError nstd_string_push_str(NSTDString *string, const NSTDStrConst *str);
 
 /// Removes the last character from a string and returns it.
 ///

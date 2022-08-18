@@ -1,6 +1,6 @@
 #ifndef NSTD_OS_WINDOWS_ALLOC_HEAP_H
 #define NSTD_OS_WINDOWS_ALLOC_HEAP_H
-#include "../../../core/def.h"
+#include "../../../alloc.h"
 #include "../../../nstd.h"
 NSTDCPPSTART
 
@@ -81,12 +81,12 @@ NSTDUSize size);
 ///
 /// # Returns
 ///
-/// `NSTDErrorCode errc` - Nonzero if reallocating fails.
+/// `NSTDAllocError errc` - The allocation operation error code.
 ///
 /// # Safety
 ///
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heaprealloc>.
-NSTDAPI NSTDErrorCode nstd_os_windows_alloc_heap_reallocate(NSTDWindowsHeapHandle heap,
+NSTDAPI NSTDAllocError nstd_os_windows_alloc_heap_reallocate(NSTDWindowsHeapHandle heap,
 NSTDAnyMut *ptr, NSTDUSize size);
 
 /// Deallocates a block of memory on a heap.
@@ -99,12 +99,12 @@ NSTDAnyMut *ptr, NSTDUSize size);
 ///
 /// # Returns
 ///
-/// `NSTDErrorCode errc` - Nonzero on error.
+/// `NSTDAllocError errc` - The allocation operation error code.
 ///
 /// # Safety
 ///
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapfree>.
-NSTDAPI NSTDErrorCode nstd_os_windows_alloc_heap_deallocate(NSTDWindowsHeapHandle heap,
+NSTDAPI NSTDAllocError nstd_os_windows_alloc_heap_deallocate(NSTDWindowsHeapHandle heap,
 NSTDAnyMut *ptr);
 
 /// Destroys a private heap.
@@ -115,12 +115,12 @@ NSTDAnyMut *ptr);
 ///
 /// # Returns
 ///
-/// `NSTDErrorCode errc` - Nonzero if destroying the heap fails.
+/// `NSTDAllocError errc` - The allocation operation error code.
 ///
 /// # Safety
 ///
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapdestroy>.
-NSTDAPI NSTDErrorCode nstd_os_windows_alloc_heap_free(NSTDWindowsHeapHandle *heap);
+NSTDAPI NSTDAllocError nstd_os_windows_alloc_heap_free(NSTDWindowsHeapHandle *heap);
 
 NSTDCPPEND
 #endif

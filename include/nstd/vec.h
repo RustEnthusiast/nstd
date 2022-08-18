@@ -1,5 +1,6 @@
 #ifndef NSTD_VEC_H
 #define NSTD_VEC_H
+#include "alloc.h"
 #include "core/def.h"
 #include "core/slice.h"
 #include "nstd.h"
@@ -196,13 +197,13 @@ NSTDAPI NSTDAnyMut nstd_vec_get_mut(NSTDVec *vec, NSTDUSize pos);
 ///
 /// # Returns
 ///
-/// `NSTDErrorCode errc` - Nonzero on error.
+/// `NSTDAllocError errc` - The allocation operation error code.
 ///
 /// # Safety
 ///
 /// This operation is unsafe because undefined behavior can occur if the size of the value being
 /// pushed onto the vector is not equal to `vec`'s stride.
-NSTDAPI NSTDErrorCode nstd_vec_push(NSTDVec *vec, NSTDAnyConst value);
+NSTDAPI NSTDAllocError nstd_vec_push(NSTDVec *vec, NSTDAnyConst value);
 
 /// Removes the last value of a vector and returns a pointer to it.
 ///
@@ -270,7 +271,7 @@ NSTDAPI NSTDErrorCode nstd_vec_remove(NSTDVec *vec, NSTDUSize index);
 ///
 /// # Returns
 ///
-/// `NSTDErrorCode errc` - Nonzero if reserving memory for the extension fails.
+/// `NSTDAllocError errc` - The allocation operation error code.
 ///
 /// # Panics
 ///
@@ -279,7 +280,7 @@ NSTDAPI NSTDErrorCode nstd_vec_remove(NSTDVec *vec, NSTDUSize index);
 /// # Safety
 ///
 /// This operation can cause undefined behavior if `values`'s data is invalid.
-NSTDAPI NSTDErrorCode nstd_vec_extend(NSTDVec *vec, const NSTDSliceConst *values);
+NSTDAPI NSTDAllocError nstd_vec_extend(NSTDVec *vec, const NSTDSliceConst *values);
 
 /// Shortens a vector, keeping the first `len` elements.
 ///
@@ -305,18 +306,14 @@ NSTDAPI void nstd_vec_truncate(NSTDVec *vec, NSTDUSize len);
 ///
 /// # Returns
 ///
-/// `NSTDErrorCode errc` - Nonzero on error.
+/// `NSTDAllocError errc` - The allocation operation error code.
 ///
 /// # Panics
 ///
 /// This operation will panic if `size` is zero.
-NSTDAPI NSTDErrorCode nstd_vec_reserve(NSTDVec *vec, NSTDUSize size);
+NSTDAPI NSTDAllocError nstd_vec_reserve(NSTDVec *vec, NSTDUSize size);
 
 /// Decreases a vector's capacity to match it's length.
-///
-/// # Note
-///
-/// This will return an error code of `0` if the vector is "null".
 ///
 /// # Parameters:
 ///
@@ -324,8 +321,8 @@ NSTDAPI NSTDErrorCode nstd_vec_reserve(NSTDVec *vec, NSTDUSize size);
 ///
 /// # Returns
 ///
-/// `NSTDErrorCode errc` - Nonzero on error.
-NSTDAPI NSTDErrorCode nstd_vec_shrink(NSTDVec *vec);
+/// `NSTDAllocError errc` - The allocation operation error code.
+NSTDAPI NSTDAllocError nstd_vec_shrink(NSTDVec *vec);
 
 /// Frees an instance of `NSTDVec`.
 ///

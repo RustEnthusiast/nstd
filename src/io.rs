@@ -4,6 +4,7 @@ pub mod stdin;
 pub(crate) mod stdio;
 pub mod stdout;
 use crate::{
+    alloc::NSTDAllocError,
     core::{
         slice::nstd_core_slice_const_new,
         str::{nstd_core_str_const_from_bytes_unchecked, NSTDStrConst},
@@ -179,7 +180,7 @@ pub extern "C" fn nstd_io_read_line(buffer: &mut NSTDString) -> NSTDIOError {
         let bytes = nstd_core_slice_const_new(input.as_ptr().cast(), 1, input.len());
         let str = nstd_core_str_const_from_bytes_unchecked(&bytes);
         match nstd_string_push_str(buffer, &str) {
-            0 => NSTDIOError::NSTD_IO_ERROR_NONE,
+            NSTDAllocError::NSTD_ALLOC_ERROR_NONE => NSTDIOError::NSTD_IO_ERROR_NONE,
             _ => NSTDIOError::NSTD_IO_ERROR_OUT_OF_MEMORY,
         }
     }
