@@ -1,4 +1,5 @@
 //! Dynamically sized UTF-8 encoded byte string.
+extern crate alloc;
 use crate::{
     alloc::NSTDAllocError,
     core::{
@@ -18,6 +19,7 @@ use crate::{
     NSTDFloat32, NSTDFloat64, NSTDISize, NSTDInt16, NSTDInt32, NSTDInt64, NSTDInt8, NSTDUInt16,
     NSTDUInt32, NSTDUInt64, NSTDUInt8, NSTDUSize, NSTDUnichar,
 };
+use alloc::string::ToString;
 
 /// Generates the `nstd_string_from_[i|u|f]*` functions.
 macro_rules! gen_from_primitive {
