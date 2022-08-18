@@ -328,3 +328,178 @@ gen_clamp!(
     nstd_core_math_clamp_isize,
     NSTDISize
 );
+
+/// Generates the `div_ceil` functions.
+macro_rules! gen_div_ceil {
+    (
+        $(#[$meta:meta])*
+        $name: ident, $T: ty
+    ) => {
+        $(#[$meta])*
+        /// # Panics
+        ///
+        /// This operation will panic if `y` is 0.
+        #[inline]
+        #[cfg_attr(feature = "clib", no_mangle)]
+        #[allow(unused_comparisons)]
+        pub extern "C" fn $name(x: $T, y: $T) -> $T {
+            let d = x / y;
+            let r = x % y;
+            if r != 0 {
+                d + 1
+            } else {
+                d
+            }
+        }
+    };
+}
+gen_div_ceil!(
+    /// Divides two numbers and rounds the result up to the next integer.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDUInt8 x` - The first value.
+    ///
+    /// - `NSTDUInt8 y` - The second value.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDUInt8 v` - The divided value, rounded up.
+    nstd_core_math_div_ceil_u8,
+    NSTDUInt8
+);
+gen_div_ceil!(
+    /// Divides two numbers and rounds the result up to the next integer.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDInt8 x` - The first value.
+    ///
+    /// - `NSTDInt8 y` - The second value.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDInt8 v` - The divided value, rounded up.
+    nstd_core_math_div_ceil_i8,
+    NSTDInt8
+);
+gen_div_ceil!(
+    /// Divides two numbers and rounds the result up to the next integer.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDUInt16 x` - The first value.
+    ///
+    /// - `NSTDUInt16 y` - The second value.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDUInt16 v` - The divided value, rounded up.
+    nstd_core_math_div_ceil_u16,
+    NSTDUInt16
+);
+gen_div_ceil!(
+    /// Divides two numbers and rounds the result up to the next integer.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDInt16 x` - The first value.
+    ///
+    /// - `NSTDInt16 y` - The second value.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDInt16 v` - The divided value, rounded up.
+    nstd_core_math_div_ceil_i16,
+    NSTDInt16
+);
+gen_div_ceil!(
+    /// Divides two numbers and rounds the result up to the next integer.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDUInt32 x` - The first value.
+    ///
+    /// - `NSTDUInt32 y` - The second value.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDUInt32 v` - The divided value, rounded up.
+    nstd_core_math_div_ceil_u32,
+    NSTDUInt32
+);
+gen_div_ceil!(
+    /// Divides two numbers and rounds the result up to the next integer.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDInt32 x` - The first value.
+    ///
+    /// - `NSTDInt32 y` - The second value.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDInt32 v` - The divided value, rounded up.
+    nstd_core_math_div_ceil_i32,
+    NSTDInt32
+);
+gen_div_ceil!(
+    /// Divides two numbers and rounds the result up to the next integer.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDUInt64 x` - The first value.
+    ///
+    /// - `NSTDUInt64 y` - The second value.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDUInt64 v` - The divided value, rounded up.
+    nstd_core_math_div_ceil_u64,
+    NSTDUInt64
+);
+gen_div_ceil!(
+    /// Divides two numbers and rounds the result up to the next integer.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDInt64 x` - The first value.
+    ///
+    /// - `NSTDInt64 y` - The second value.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDInt64 v` - The divided value, rounded up.
+    nstd_core_math_div_ceil_i64,
+    NSTDInt64
+);
+gen_div_ceil!(
+    /// Divides two numbers and rounds the result up to the next integer.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDUSize x` - The first value.
+    ///
+    /// - `NSTDUSize y` - The second value.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDUSize v` - The divided value, rounded up.
+    nstd_core_math_div_ceil_usize,
+    NSTDUSize
+);
+gen_div_ceil!(
+    /// Divides two numbers and rounds the result up to the next integer.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDISize x` - The first value.
+    ///
+    /// - `NSTDISize y` - The second value.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDISize v` - The divided value, rounded up.
+    nstd_core_math_div_ceil_isize,
+    NSTDISize
+);

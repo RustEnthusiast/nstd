@@ -262,5 +262,166 @@ NSTDAPI NSTDUSize nstd_core_math_clamp_usize(NSTDUSize x, NSTDUSize min, NSTDUSi
 /// Panics if `min` > `max`.
 NSTDAPI NSTDISize nstd_core_math_clamp_isize(NSTDISize x, NSTDISize min, NSTDISize max);
 
+/// Divides two numbers and rounds the result up to the next integer.
+///
+/// # Parameters:
+///
+/// - `NSTDUInt8 x` - The first value.
+///
+/// - `NSTDUInt8 y` - The second value.
+///
+/// # Returns
+///
+/// `NSTDUInt8 v` - The divided value, rounded up.
+///
+/// # Panics
+///
+/// This operation will panic if `y` is 0.
+NSTDAPI NSTDUInt8 nstd_core_math_div_ceil_u8(NSTDUInt8 x, NSTDUInt8 y);
+/// Divides two numbers and rounds the result up to the next integer.
+///
+/// # Parameters:
+///
+/// - `NSTDInt8 x` - The first value.
+///
+/// - `NSTDInt8 y` - The second value.
+///
+/// # Returns
+///
+/// `NSTDInt8 v` - The divided value, rounded up.
+///
+/// # Panics
+///
+/// This operation will panic if `y` is 0.
+NSTDAPI NSTDInt8 nstd_core_math_div_ceil_i8(NSTDInt8 x, NSTDInt8 y);
+/// Divides two numbers and rounds the result up to the next integer.
+///
+/// # Parameters:
+///
+/// - `NSTDUInt16 x` - The first value.
+///
+/// - `NSTDUInt16 y` - The second value.
+///
+/// # Returns
+///
+/// `NSTDUInt16 v` - The divided value, rounded up.
+///
+/// # Panics
+///
+/// This operation will panic if `y` is 0.
+NSTDAPI NSTDUInt16 nstd_core_math_div_ceil_u16(NSTDUInt16 x, NSTDUInt16 y);
+/// Divides two numbers and rounds the result up to the next integer.
+///
+/// # Parameters:
+///
+/// - `NSTDInt16 x` - The first value.
+///
+/// - `NSTDInt16 y` - The second value.
+///
+/// # Returns
+///
+/// `NSTDInt16 v` - The divided value, rounded up.
+///
+/// # Panics
+///
+/// This operation will panic if `y` is 0.
+NSTDAPI NSTDInt16 nstd_core_math_div_ceil_i16(NSTDInt16 x, NSTDInt16 y);
+/// Divides two numbers and rounds the result up to the next integer.
+///
+/// # Parameters:
+///
+/// - `NSTDUInt32 x` - The first value.
+///
+/// - `NSTDUInt32 y` - The second value.
+///
+/// # Returns
+///
+/// `NSTDUInt32 v` - The divided value, rounded up.
+///
+/// # Panics
+///
+/// This operation will panic if `y` is 0.
+NSTDAPI NSTDUInt32 nstd_core_math_div_ceil_u32(NSTDUInt32 x, NSTDUInt32 y);
+/// Divides two numbers and rounds the result up to the next integer.
+///
+/// # Parameters:
+///
+/// - `NSTDInt32 x` - The first value.
+///
+/// - `NSTDInt32 y` - The second value.
+///
+/// # Returns
+///
+/// `NSTDInt32 v` - The divided value, rounded up.
+///
+/// # Panics
+///
+/// This operation will panic if `y` is 0.
+NSTDAPI NSTDInt32 nstd_core_math_div_ceil_i32(NSTDInt32 x, NSTDInt32 y);
+/// Divides two numbers and rounds the result up to the next integer.
+///
+/// # Parameters:
+///
+/// - `NSTDUInt64 x` - The first value.
+///
+/// - `NSTDUInt64 y` - The second value.
+///
+/// # Returns
+///
+/// `NSTDUInt64 v` - The divided value, rounded up.
+///
+/// # Panics
+///
+/// This operation will panic if `y` is 0.
+NSTDAPI NSTDUInt64 nstd_core_math_div_ceil_u64(NSTDUInt64 x, NSTDUInt64 y);
+/// Divides two numbers and rounds the result up to the next integer.
+///
+/// # Parameters:
+///
+/// - `NSTDInt64 x` - The first value.
+///
+/// - `NSTDInt64 y` - The second value.
+///
+/// # Returns
+///
+/// `NSTDInt64 v` - The divided value, rounded up.
+///
+/// # Panics
+///
+/// This operation will panic if `y` is 0.
+NSTDAPI NSTDInt64 nstd_core_math_div_ceil_i64(NSTDInt64 x, NSTDInt64 y);
+/// Divides two numbers and rounds the result up to the next integer.
+///
+/// # Parameters:
+///
+/// - `NSTDUSize x` - The first value.
+///
+/// - `NSTDUSize y` - The second value.
+///
+/// # Returns
+///
+/// `NSTDUSize v` - The divided value, rounded up.
+///
+/// # Panics
+///
+/// This operation will panic if `y` is 0.
+NSTDAPI NSTDUSize nstd_core_math_div_ceil_usize(NSTDUSize x, NSTDUSize y);
+/// Divides two numbers and rounds the result up to the next integer.
+///
+/// # Parameters:
+///
+/// - `NSTDISize x` - The first value.
+///
+/// - `NSTDISize y` - The second value.
+///
+/// # Returns
+///
+/// `NSTDISize v` - The divided value, rounded up.
+///
+/// # Panics
+///
+/// This operation will panic if `y` is 0.
+NSTDAPI NSTDISize nstd_core_math_div_ceil_isize(NSTDISize x, NSTDISize y);
+
 NSTDCPPEND
 #endif
