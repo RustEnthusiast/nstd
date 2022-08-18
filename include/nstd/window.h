@@ -17,6 +17,14 @@ typedef struct {
     NSTDInt32 y;
 } NSTDWindowPosition;
 
+/// Describes the size of a window.
+typedef struct {
+    /// The width of the window.
+    NSTDUInt32 width;
+    /// The height of the window.
+    NSTDUInt32 height;
+} NSTDWindowSize;
+
 /// Creates a new window attached to `app`'s event loop.
 ///
 /// # Parameters:
@@ -62,6 +70,15 @@ NSTDAPI void nstd_window_set_icon(const NSTDWindow *window, const NSTDImage *ico
 ///
 /// - `NSTDWindowPosition pos` - The position of the window.
 NSTDAPI void nstd_window_set_position(const NSTDWindow *window, NSTDWindowPosition pos);
+
+/// Sets the size of a window.
+///
+/// # Parameters:
+///
+/// - `const NSTDWindow *window` - The window.
+///
+/// - `NSTDWindowSize size` - The new size of the window.
+NSTDAPI void nstd_window_set_size(const NSTDWindow *window, NSTDWindowSize size);
 
 /// Permanently closes & frees a window and it's data.
 ///

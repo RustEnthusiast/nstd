@@ -3,10 +3,10 @@ use crate::{
     app::handle::NSTDAppHandle,
     core::str::NSTDStrConst,
     image::{nstd_image_as_bytes, nstd_image_height, nstd_image_width, NSTDImage},
-    NSTDInt32,
+    NSTDInt32, NSTDUInt32,
 };
 use winit::{
-    dpi::PhysicalPosition,
+    dpi::{PhysicalPosition, PhysicalSize},
     window::{Icon, Window},
 };
 
@@ -21,6 +21,16 @@ pub struct NSTDWindowPosition {
     pub x: NSTDInt32,
     /// The position of the window from the top of the screen.
     pub y: NSTDInt32,
+}
+
+/// Describes the size of a window.
+#[repr(C)]
+#[derive(Clone, Copy, Debug, Default, Hash)]
+pub struct NSTDWindowSize {
+    /// The width of the window.
+    pub width: NSTDUInt32,
+    /// The height of the window.
+    pub height: NSTDUInt32,
 }
 
 /// Creates a new window attached to `app`'s event loop.
@@ -89,6 +99,19 @@ pub extern "C" fn nstd_window_set_icon(window: &NSTDWindow, icon: &NSTDImage) {
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_window_set_position(window: &NSTDWindow, pos: NSTDWindowPosition) {
     window.set_outer_position(PhysicalPosition::new(pos.x, pos.y));
+}
+
+/// Sets the size of a window.
+///
+/// # Parameters:
+///
+/// - `const NSTDWindow *window` - The window.
+///
+/// - `NSTDWindowSize size` - The new size of the window.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_window_set_size(window: &NSTDWindow, size: NSTDWindowSize) {
+    window.set_inner_size(PhysicalSize::new(size.width, size.height));
 }
 
 /// Permanently closes & frees a window and it's data.
