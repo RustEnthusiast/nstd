@@ -1,7 +1,13 @@
 [package]
-name = "nstd"
-version = "0.0.0"
+name = "nstd-sys"
+version = "0.1.0"
 edition = "2021"
+license = "MIT"
+homepage = "https://github.com/RustEnthusiast/nstd"
+repository = "https://github.com/RustEnthusiast/nstd"
+description = "Cross platform general purpose C library written in Rust."
+readme = "README.md"
+exclude = ["include"]
 
 [package.metadata.docs.rs]
 all-features = true
