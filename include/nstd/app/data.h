@@ -2,7 +2,6 @@
 #define NSTD_APP_DATA_H
 #include "../nstd.h"
 #include "handle.h"
-NSTDCPPSTART
 
 /// Represents the control flow of an `nstd` application.
 typedef enum {
@@ -22,19 +21,4 @@ typedef struct {
     NSTDAnyMut data;
 } NSTDAppData;
 
-/// Sets an `nstd` application's control flow through it's `NSTDAppData`.
-///
-/// # Note
-///
-/// This will have no effect in the `start` event.
-///
-/// # Parameters:
-///
-/// - `const NSTDAppData *app_data` - The application data.
-///
-/// - `NSTDAppControlFlow control_flow` - The new application control flow.
-NSTDAPI void nstd_app_data_set_control_flow(const NSTDAppData *app_data,
-NSTDAppControlFlow control_flow);
-
-NSTDCPPEND
 #endif

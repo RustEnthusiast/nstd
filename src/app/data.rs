@@ -45,23 +45,3 @@ impl<'a> NSTDAppData<'a> {
         }
     }
 }
-
-/// Sets an `nstd` application's control flow through it's `NSTDAppData`.
-///
-/// # Note
-///
-/// This will have no effect in the `start` event.
-///
-/// # Parameters:
-///
-/// - `const NSTDAppData *app_data` - The application data.
-///
-/// - `NSTDAppControlFlow control_flow` - The new application control flow.
-#[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_app_data_set_control_flow(
-    app_data: &NSTDAppData,
-    control_flow: NSTDAppControlFlow,
-) {
-    app_data.control_flow.set(control_flow);
-}
