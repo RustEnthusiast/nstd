@@ -1,6 +1,7 @@
 #ifndef NSTD_APP_APP_H
 #define NSTD_APP_APP_H
 #include "../nstd.h"
+#include "data.h"
 #include "events.h"
 #include "handle.h"
 NSTDCPPSTART
@@ -75,6 +76,13 @@ NSTDAPI void nstd_app_run(NSTDApp app, NSTDAnyMut data);
 ///
 /// - `NSTDApp app` - The `nstd` application.
 NSTDAPI void nstd_app_free(NSTDApp app);
+
+/// Signals an `NSTDApp`'s event loop to exit.
+///
+/// # Parameters:
+///
+/// - `const NSTDAppData *app` - The application data received from an event.
+NSTDAPI void nstd_app_exit(const NSTDAppData *app);
 
 NSTDCPPEND
 #endif

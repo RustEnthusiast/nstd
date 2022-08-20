@@ -3,7 +3,7 @@ pub mod data;
 pub mod events;
 pub mod handle;
 use self::{
-    data::NSTDAppData,
+    data::{NSTDAppControlFlow, NSTDAppData},
     events::{NSTDAppEvents, NSTDKey, NSTDMouseInput, NSTDScrollDelta, NSTDTouchState},
     handle::NSTDAppHandle,
 };
@@ -296,3 +296,15 @@ pub unsafe extern "C" fn nstd_app_run(app: NSTDApp, data: NSTDAnyMut) -> ! {
 #[cfg_attr(feature = "clib", no_mangle)]
 #[allow(unused_variables)]
 pub extern "C" fn nstd_app_free(app: NSTDApp) {}
+
+/// Signals an `NSTDApp`'s event loop to exit.
+///
+/// # Parameters:
+///
+/// - `const NSTDAppData *app` - The application data received from an event.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_app_exit(app: &NSTDAppData) {
+    app.control_flow
+        .set(NSTDAppControlFlow::NSTD_APP_CONTROL_FLOW_EXIT);
+}
