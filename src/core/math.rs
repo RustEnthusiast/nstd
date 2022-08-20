@@ -345,7 +345,7 @@ macro_rules! gen_div_ceil {
         pub extern "C" fn $name(x: $T, y: $T) -> $T {
             let d = x / y;
             let r = x % y;
-            if r != 0 {
+            if (r > 0 && y > 0) || (r < 0 && y < 0) {
                 d + 1
             } else {
                 d
