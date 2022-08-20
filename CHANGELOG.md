@@ -1,7 +1,8 @@
-# TBD
+# 0.1.1
 ### `nstd`
 - Renamed `NSTD[I|U]Size` to `NSTD[U]Int`.
-- Fixed `div_ceil` functions returning the incorrect value.
+### `nstd.core`
+- Fixed `math.div_ceil` functions returning the incorrect value.
 
 # 0.1.0
 ### `nstd`
