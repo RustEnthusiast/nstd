@@ -22,7 +22,7 @@
 
 /// A null pointer value constant.
 #ifndef NSTDCPP
-#define NSTD_NULL 0
+#define NSTD_NULL NULL
 #else
 #define NSTD_NULL nullptr
 #endif
