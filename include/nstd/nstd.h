@@ -33,9 +33,9 @@
 #define NSTD_TRUE 1
 
 /// An integral type who's size matches the target architecture's pointer size.
-typedef ptrdiff_t NSTDISize;
+typedef ptrdiff_t NSTDInt;
 /// An unsigned integral type who's size matches the target architecture's pointer size.
-typedef size_t NSTDUSize;
+typedef size_t NSTDUInt;
 
 /// An 8-bit signed integer type.
 typedef int_least8_t NSTDInt8;

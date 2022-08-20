@@ -5,13 +5,13 @@ use self::heap::{
     nstd_os_windows_alloc_heap_deallocate, nstd_os_windows_alloc_heap_default,
     nstd_os_windows_alloc_heap_reallocate,
 };
-use crate::{alloc::NSTDAllocError, NSTDAnyMut, NSTDUSize, NSTD_NULL};
+use crate::{alloc::NSTDAllocError, NSTDAnyMut, NSTDUInt, NSTD_NULL};
 
 /// Allocates a new block of memory on the current process' heap.
 ///
 /// # Parameters:
 ///
-/// - `NSTDUSize size` - The number of bytes to allocate.
+/// - `NSTDUInt size` - The number of bytes to allocate.
 ///
 /// # Returns
 ///
@@ -22,7 +22,7 @@ use crate::{alloc::NSTDAllocError, NSTDAnyMut, NSTDUSize, NSTD_NULL};
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapalloc>.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_os_windows_alloc_allocate(size: NSTDUSize) -> NSTDAnyMut {
+pub unsafe extern "C" fn nstd_os_windows_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
     match nstd_os_windows_alloc_heap_default() {
         0 => NSTD_NULL,
         heap => nstd_os_windows_alloc_heap_allocate(heap, size),
@@ -33,7 +33,7 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_allocate(size: NSTDUSize) -> NSTD
 ///
 /// # Parameters:
 ///
-/// - `NSTDUSize size` - The number of bytes to allocate.
+/// - `NSTDUInt size` - The number of bytes to allocate.
 ///
 /// # Returns
 ///
@@ -44,7 +44,7 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_allocate(size: NSTDUSize) -> NSTD
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapalloc>.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_os_windows_alloc_allocate_zeroed(size: NSTDUSize) -> NSTDAnyMut {
+pub unsafe extern "C" fn nstd_os_windows_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMut {
     match nstd_os_windows_alloc_heap_default() {
         0 => NSTD_NULL,
         heap => nstd_os_windows_alloc_heap_allocate_zeroed(heap, size),
@@ -62,7 +62,7 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_allocate_zeroed(size: NSTDUSize) 
 ///
 /// - `NSTDAnyMut *ptr` - A pointer to the allocated memory.
 ///
-/// - `NSTDUSize new_size` - The number of bytes to reallocate.
+/// - `NSTDUInt new_size` - The number of bytes to reallocate.
 ///
 /// # Returns
 ///
@@ -75,7 +75,7 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_allocate_zeroed(size: NSTDUSize) 
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_os_windows_alloc_reallocate(
     ptr: &mut NSTDAnyMut,
-    new_size: NSTDUSize,
+    new_size: NSTDUInt,
 ) -> NSTDAllocError {
     match nstd_os_windows_alloc_heap_default() {
         0 => NSTDAllocError::NSTD_ALLOC_ERROR_HEAP_NOT_FOUND,

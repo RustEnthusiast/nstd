@@ -10,7 +10,7 @@ typedef struct {
     /// A pointer to the first element in the slice.
     NSTDPtrConst ptr;
     /// The number of elements in the slice.
-    NSTDUSize len;
+    NSTDUInt len;
 } NSTDSliceConst;
 
 /// Creates a new slice from raw data.
@@ -19,15 +19,15 @@ typedef struct {
 ///
 /// - `NSTDAnyConst ptr` - A pointer to the first element in the sequence.
 ///
-/// - `NSTDUSize element_size` - The number of bytes each element occupies.
+/// - `NSTDUInt element_size` - The number of bytes each element occupies.
 ///
-/// - `NSTDUSize len` - The number of elements in the sequence.
+/// - `NSTDUInt len` - The number of elements in the sequence.
 ///
 /// # Returns
 ///
 /// `NSTDSliceConst slice` - The new slice.
-NSTDAPI NSTDSliceConst nstd_core_slice_const_new(NSTDAnyConst ptr, NSTDUSize element_size,
-NSTDUSize len);
+NSTDAPI NSTDSliceConst nstd_core_slice_const_new(NSTDAnyConst ptr, NSTDUInt element_size,
+NSTDUInt len);
 
 /// Returns a raw pointer to the slice's memory.
 ///
@@ -48,8 +48,8 @@ NSTDAPI NSTDAnyConst nstd_core_slice_const_as_ptr(const NSTDSliceConst *slice);
 ///
 /// # Returns
 ///
-/// `NSTDUSize len` - The length of the slice.
-NSTDAPI NSTDUSize nstd_core_slice_const_len(const NSTDSliceConst *slice);
+/// `NSTDUInt len` - The length of the slice.
+NSTDAPI NSTDUInt nstd_core_slice_const_len(const NSTDSliceConst *slice);
 
 /// Returns the amount of bytes each value in a slice occupies.
 ///
@@ -59,8 +59,8 @@ NSTDAPI NSTDUSize nstd_core_slice_const_len(const NSTDSliceConst *slice);
 ///
 /// # Returns
 ///
-/// `NSTDUSize stride` - The size of each value in the slice.
-NSTDAPI NSTDUSize nstd_core_slice_const_stride(const NSTDSliceConst *slice);
+/// `NSTDUInt stride` - The size of each value in the slice.
+NSTDAPI NSTDUInt nstd_core_slice_const_stride(const NSTDSliceConst *slice);
 
 /// Returns an immutable pointer to the element at index `pos` in `slice`.
 ///
@@ -68,13 +68,13 @@ NSTDAPI NSTDUSize nstd_core_slice_const_stride(const NSTDSliceConst *slice);
 ///
 /// - `const NSTDSliceConst *slice` - The slice to read an element from.
 ///
-/// - `NSTDUSize pos` - The position of the element to get, starting at 0.
+/// - `NSTDUInt pos` - The position of the element to get, starting at 0.
 ///
 /// # Returns
 ///
 /// `NSTDAnyConst element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out
 /// of the slice's boundaries.
-NSTDAPI NSTDAnyConst nstd_core_slice_const_get(const NSTDSliceConst *slice, NSTDUSize pos);
+NSTDAPI NSTDAnyConst nstd_core_slice_const_get(const NSTDSliceConst *slice, NSTDUInt pos);
 
 /// Returns an immutable pointer to the first element in the slice.
 ///
@@ -122,7 +122,7 @@ typedef struct {
     /// A pointer to the first element in the slice.
     NSTDPtrMut ptr;
     /// The number of elements in the slice.
-    NSTDUSize len;
+    NSTDUInt len;
 } NSTDSliceMut;
 
 /// Creates a new slice from raw data.
@@ -131,14 +131,14 @@ typedef struct {
 ///
 /// - `NSTDAnyMut ptr` - A pointer to the first element in the sequence.
 ///
-/// - `NSTDUSize element_size` - The number of bytes each element occupies.
+/// - `NSTDUInt element_size` - The number of bytes each element occupies.
 ///
-/// - `NSTDUSize len` - The number of elements in the sequence.
+/// - `NSTDUInt len` - The number of elements in the sequence.
 ///
 /// # Returns
 ///
 /// `NSTDSliceMut slice` - The new slice.
-NSTDAPI NSTDSliceMut nstd_core_slice_mut_new(NSTDAnyMut ptr, NSTDUSize element_size, NSTDUSize len);
+NSTDAPI NSTDSliceMut nstd_core_slice_mut_new(NSTDAnyMut ptr, NSTDUInt element_size, NSTDUInt len);
 
 /// Creates an immutable version of a mutable slice.
 ///
@@ -181,8 +181,8 @@ NSTDAPI NSTDAnyConst nstd_core_slice_mut_as_ptr_const(const NSTDSliceMut *slice)
 ///
 /// # Returns
 ///
-/// `NSTDUSize len` - The length of the slice.
-NSTDAPI NSTDUSize nstd_core_slice_mut_len(const NSTDSliceMut *slice);
+/// `NSTDUInt len` - The length of the slice.
+NSTDAPI NSTDUInt nstd_core_slice_mut_len(const NSTDSliceMut *slice);
 
 /// Returns the amount of bytes each value in a slice occupies.
 ///
@@ -192,8 +192,8 @@ NSTDAPI NSTDUSize nstd_core_slice_mut_len(const NSTDSliceMut *slice);
 ///
 /// # Returns
 ///
-/// `NSTDUSize stride` - The size of each value in the slice.
-NSTDAPI NSTDUSize nstd_core_slice_mut_stride(const NSTDSliceMut *slice);
+/// `NSTDUInt stride` - The size of each value in the slice.
+NSTDAPI NSTDUInt nstd_core_slice_mut_stride(const NSTDSliceMut *slice);
 
 /// Returns a pointer to the element at index `pos` in `slice`.
 ///
@@ -201,13 +201,13 @@ NSTDAPI NSTDUSize nstd_core_slice_mut_stride(const NSTDSliceMut *slice);
 ///
 /// - `NSTDSliceMut *slice` - The slice to read an element from.
 ///
-/// - `NSTDUSize pos` - The position of the element to get, starting at 0.
+/// - `NSTDUInt pos` - The position of the element to get, starting at 0.
 ///
 /// # Returns
 ///
 /// `NSTDAnyMut element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out of
 /// the slice's boundaries.
-NSTDAPI NSTDAnyMut nstd_core_slice_mut_get(NSTDSliceMut *slice, NSTDUSize pos);
+NSTDAPI NSTDAnyMut nstd_core_slice_mut_get(NSTDSliceMut *slice, NSTDUInt pos);
 
 /// Returns an immutable pointer to the element at index `pos` in `slice`.
 ///
@@ -215,13 +215,13 @@ NSTDAPI NSTDAnyMut nstd_core_slice_mut_get(NSTDSliceMut *slice, NSTDUSize pos);
 ///
 /// - `const NSTDSliceMut *slice` - The slice to read an element from.
 ///
-/// - `NSTDUSize pos` - The position of the element to get, starting at 0.
+/// - `NSTDUInt pos` - The position of the element to get, starting at 0.
 ///
 /// # Returns
 ///
 /// `NSTDAnyConst element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out
 /// of the slice's boundaries.
-NSTDAPI NSTDAnyConst nstd_core_slice_mut_get_const(const NSTDSliceMut *slice, NSTDUSize pos);
+NSTDAPI NSTDAnyConst nstd_core_slice_mut_get_const(const NSTDSliceMut *slice, NSTDUInt pos);
 
 /// Returns a pointer to the first element in the slice.
 ///

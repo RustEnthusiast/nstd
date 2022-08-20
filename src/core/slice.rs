@@ -9,7 +9,7 @@ use crate::{
             nstd_core_ptr_mut_size, NSTDPtrConst, NSTDPtrMut,
         },
     },
-    NSTDAnyConst, NSTDAnyMut, NSTDBool, NSTDUSize, NSTD_NULL,
+    NSTDAnyConst, NSTDAnyMut, NSTDBool, NSTDUInt, NSTD_NULL,
 };
 
 /// An immutable view into a sequence of values in memory.
@@ -19,7 +19,7 @@ pub struct NSTDSliceConst {
     /// A pointer to the first element in the slice.
     pub(crate) ptr: NSTDPtrConst,
     /// The number of elements in the slice.
-    pub(crate) len: NSTDUSize,
+    pub(crate) len: NSTDUInt,
 }
 impl NSTDSliceConst {
     /// Returns the number of bytes that this slice covers.
@@ -50,9 +50,9 @@ impl NSTDSliceConst {
 ///
 /// - `NSTDAnyConst ptr` - A pointer to the first element in the sequence.
 ///
-/// - `NSTDUSize element_size` - The number of bytes each element occupies.
+/// - `NSTDUInt element_size` - The number of bytes each element occupies.
 ///
-/// - `NSTDUSize len` - The number of elements in the sequence.
+/// - `NSTDUInt len` - The number of elements in the sequence.
 ///
 /// # Returns
 ///
@@ -61,8 +61,8 @@ impl NSTDSliceConst {
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_slice_const_new(
     ptr: NSTDAnyConst,
-    element_size: NSTDUSize,
-    len: NSTDUSize,
+    element_size: NSTDUInt,
+    len: NSTDUInt,
 ) -> NSTDSliceConst {
     NSTDSliceConst {
         ptr: nstd_core_ptr_const_new(ptr, element_size),
@@ -93,10 +93,10 @@ pub extern "C" fn nstd_core_slice_const_as_ptr(slice: &NSTDSliceConst) -> NSTDAn
 ///
 /// # Returns
 ///
-/// `NSTDUSize len` - The length of the slice.
+/// `NSTDUInt len` - The length of the slice.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_slice_const_len(slice: &NSTDSliceConst) -> NSTDUSize {
+pub extern "C" fn nstd_core_slice_const_len(slice: &NSTDSliceConst) -> NSTDUInt {
     slice.len
 }
 
@@ -108,10 +108,10 @@ pub extern "C" fn nstd_core_slice_const_len(slice: &NSTDSliceConst) -> NSTDUSize
 ///
 /// # Returns
 ///
-/// `NSTDUSize stride` - The size of each value in the slice.
+/// `NSTDUInt stride` - The size of each value in the slice.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_slice_const_stride(slice: &NSTDSliceConst) -> NSTDUSize {
+pub extern "C" fn nstd_core_slice_const_stride(slice: &NSTDSliceConst) -> NSTDUInt {
     nstd_core_ptr_const_size(&slice.ptr)
 }
 
@@ -121,7 +121,7 @@ pub extern "C" fn nstd_core_slice_const_stride(slice: &NSTDSliceConst) -> NSTDUS
 ///
 /// - `const NSTDSliceConst *slice` - The slice to read an element from.
 ///
-/// - `NSTDUSize pos` - The position of the element to get, starting at 0.
+/// - `NSTDUInt pos` - The position of the element to get, starting at 0.
 ///
 /// # Returns
 ///
@@ -129,10 +129,7 @@ pub extern "C" fn nstd_core_slice_const_stride(slice: &NSTDSliceConst) -> NSTDUS
 /// of the slice's boundaries.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_slice_const_get(
-    slice: &NSTDSliceConst,
-    pos: NSTDUSize,
-) -> NSTDAnyConst {
+pub extern "C" fn nstd_core_slice_const_get(slice: &NSTDSliceConst, pos: NSTDUInt) -> NSTDAnyConst {
     match pos < slice.len {
         // SAFETY: We've checked `pos`, and the returned pointer is already unsafe to access.
         true => unsafe {
@@ -212,7 +209,7 @@ pub struct NSTDSliceMut {
     /// A pointer to the first element in the slice.
     pub(crate) ptr: NSTDPtrMut,
     /// The number of elements in the slice.
-    pub(crate) len: NSTDUSize,
+    pub(crate) len: NSTDUInt,
 }
 impl NSTDSliceMut {
     /// Returns the number of bytes that this slice covers.
@@ -259,9 +256,9 @@ impl NSTDSliceMut {
 ///
 /// - `NSTDAnyMut ptr` - A pointer to the first element in the sequence.
 ///
-/// - `NSTDUSize element_size` - The number of bytes each element occupies.
+/// - `NSTDUInt element_size` - The number of bytes each element occupies.
 ///
-/// - `NSTDUSize len` - The number of elements in the sequence.
+/// - `NSTDUInt len` - The number of elements in the sequence.
 ///
 /// # Returns
 ///
@@ -270,8 +267,8 @@ impl NSTDSliceMut {
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_slice_mut_new(
     ptr: NSTDAnyMut,
-    element_size: NSTDUSize,
-    len: NSTDUSize,
+    element_size: NSTDUInt,
+    len: NSTDUInt,
 ) -> NSTDSliceMut {
     NSTDSliceMut {
         ptr: nstd_core_ptr_mut_new(ptr, element_size),
@@ -334,10 +331,10 @@ pub extern "C" fn nstd_core_slice_mut_as_ptr_const(slice: &NSTDSliceMut) -> NSTD
 ///
 /// # Returns
 ///
-/// `NSTDUSize len` - The length of the slice.
+/// `NSTDUInt len` - The length of the slice.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_slice_mut_len(slice: &NSTDSliceMut) -> NSTDUSize {
+pub extern "C" fn nstd_core_slice_mut_len(slice: &NSTDSliceMut) -> NSTDUInt {
     slice.len
 }
 
@@ -349,10 +346,10 @@ pub extern "C" fn nstd_core_slice_mut_len(slice: &NSTDSliceMut) -> NSTDUSize {
 ///
 /// # Returns
 ///
-/// `NSTDUSize stride` - The size of each value in the slice.
+/// `NSTDUInt stride` - The size of each value in the slice.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_slice_mut_stride(slice: &NSTDSliceMut) -> NSTDUSize {
+pub extern "C" fn nstd_core_slice_mut_stride(slice: &NSTDSliceMut) -> NSTDUInt {
     nstd_core_ptr_mut_size(&slice.ptr)
 }
 
@@ -362,7 +359,7 @@ pub extern "C" fn nstd_core_slice_mut_stride(slice: &NSTDSliceMut) -> NSTDUSize 
 ///
 /// - `NSTDSliceMut *slice` - The slice to read an element from.
 ///
-/// - `NSTDUSize pos` - The position of the element to get, starting at 0.
+/// - `NSTDUInt pos` - The position of the element to get, starting at 0.
 ///
 /// # Returns
 ///
@@ -370,7 +367,7 @@ pub extern "C" fn nstd_core_slice_mut_stride(slice: &NSTDSliceMut) -> NSTDUSize 
 /// the slice's boundaries.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_slice_mut_get(slice: &mut NSTDSliceMut, pos: NSTDUSize) -> NSTDAnyMut {
+pub extern "C" fn nstd_core_slice_mut_get(slice: &mut NSTDSliceMut, pos: NSTDUInt) -> NSTDAnyMut {
     nstd_core_slice_mut_get_const(slice, pos) as NSTDAnyMut
 }
 
@@ -380,7 +377,7 @@ pub extern "C" fn nstd_core_slice_mut_get(slice: &mut NSTDSliceMut, pos: NSTDUSi
 ///
 /// - `const NSTDSliceMut *slice` - The slice to read an element from.
 ///
-/// - `NSTDUSize pos` - The position of the element to get, starting at 0.
+/// - `NSTDUInt pos` - The position of the element to get, starting at 0.
 ///
 /// # Returns
 ///
@@ -390,7 +387,7 @@ pub extern "C" fn nstd_core_slice_mut_get(slice: &mut NSTDSliceMut, pos: NSTDUSi
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_slice_mut_get_const(
     slice: &NSTDSliceMut,
-    pos: NSTDUSize,
+    pos: NSTDUInt,
 ) -> NSTDAnyConst {
     match pos < slice.len {
         // SAFETY: We've checked `pos`, and the returned pointer is already unsafe to access.

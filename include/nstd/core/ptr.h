@@ -8,7 +8,7 @@ typedef struct {
     /// A raw pointer to the data.
     NSTDAnyConst raw;
     /// The size of the object being pointed to.
-    NSTDUSize size;
+    NSTDUInt size;
 } NSTDPtrConst;
 
 /// Creates a new instance of `NSTDPtrConst`.
@@ -17,12 +17,12 @@ typedef struct {
 ///
 /// - `NSTDAnyConst obj` - The object to point to.
 ///
-/// - `NSTDUSize size` - The number of bytes that `obj`'s type occupies.
+/// - `NSTDUInt size` - The number of bytes that `obj`'s type occupies.
 ///
 /// # Returns
 ///
 /// `NSTDPtrConst ptr` - A new instance of `NSTDPtrConst` that points to `obj`.
-NSTDAPI NSTDPtrConst nstd_core_ptr_const_new(NSTDAnyConst obj, NSTDUSize size);
+NSTDAPI NSTDPtrConst nstd_core_ptr_const_new(NSTDAnyConst obj, NSTDUInt size);
 
 /// Returns the size of the object being pointed to.
 ///
@@ -32,8 +32,8 @@ NSTDAPI NSTDPtrConst nstd_core_ptr_const_new(NSTDAnyConst obj, NSTDUSize size);
 ///
 /// # Returns
 ///
-/// `NSTDUSize size` - The size of the object pointed to by `ptr`.
-NSTDAPI NSTDUSize nstd_core_ptr_const_size(const NSTDPtrConst *ptr);
+/// `NSTDUInt size` - The size of the object pointed to by `ptr`.
+NSTDAPI NSTDUInt nstd_core_ptr_const_size(const NSTDPtrConst *ptr);
 
 /// Returns a raw immutable pointer to the object pointed to by `ptr`.
 ///
@@ -51,7 +51,7 @@ typedef struct {
     /// A raw pointer to the data.
     NSTDAnyMut raw;
     /// The size of the object being pointed to.
-    NSTDUSize size;
+    NSTDUInt size;
 } NSTDPtrMut;
 
 /// Creates a new instance of `NSTDPtrMut`.
@@ -60,12 +60,12 @@ typedef struct {
 ///
 /// - `NSTDAnyMut obj` - The object to point to.
 ///
-/// - `NSTDUSize size` - The number of bytes that `obj`'s type occupies.
+/// - `NSTDUInt size` - The number of bytes that `obj`'s type occupies.
 ///
 /// # Returns
 ///
 /// `NSTDPtrMut ptr` - A new instance of `NSTDPtrMut` that points to `obj`.
-NSTDAPI NSTDPtrMut nstd_core_ptr_mut_new(NSTDAnyMut obj, NSTDUSize size);
+NSTDAPI NSTDPtrMut nstd_core_ptr_mut_new(NSTDAnyMut obj, NSTDUInt size);
 
 /// Creates an immutable version of a mutable pointer.
 ///
@@ -86,8 +86,8 @@ NSTDAPI NSTDPtrConst nstd_core_ptr_mut_as_const(const NSTDPtrMut *ptr);
 ///
 /// # Returns
 ///
-/// `NSTDUSize size` - The size of the object pointed to by `ptr`.
-NSTDAPI NSTDUSize nstd_core_ptr_mut_size(const NSTDPtrMut *ptr);
+/// `NSTDUInt size` - The size of the object pointed to by `ptr`.
+NSTDAPI NSTDUInt nstd_core_ptr_mut_size(const NSTDPtrMut *ptr);
 
 /// Returns a raw pointer to the object pointed to by `ptr`.
 ///

@@ -31,7 +31,7 @@ NSTDAPI NSTDCString nstd_cstring_new();
 ///
 /// # Parameters:
 ///
-/// - `NSTDUSize cap` - The number of bytes to allocate ahead of time.
+/// - `NSTDUInt cap` - The number of bytes to allocate ahead of time.
 ///
 /// # Returns
 ///
@@ -40,7 +40,7 @@ NSTDAPI NSTDCString nstd_cstring_new();
 /// # Panics
 ///
 /// This function will panic if either `cap` is zero or allocating fails.
-NSTDAPI NSTDCString nstd_cstring_new_with_cap(NSTDUSize cap);
+NSTDAPI NSTDCString nstd_cstring_new_with_cap(NSTDUInt cap);
 
 /// Creates a deep copy of an `NSTDCString`.
 ///
@@ -120,8 +120,8 @@ NSTDAPI NSTDVec nstd_cstring_to_bytes(NSTDCString cstring);
 ///
 /// # Returns
 ///
-/// `NSTDUSize len` - The length of the C string without it's null byte.
-NSTDAPI NSTDUSize nstd_cstring_len(const NSTDCString *cstring);
+/// `NSTDUInt len` - The length of the C string without it's null byte.
+NSTDAPI NSTDUInt nstd_cstring_len(const NSTDCString *cstring);
 
 /// Returns a C string's capacity.
 ///
@@ -133,8 +133,8 @@ NSTDAPI NSTDUSize nstd_cstring_len(const NSTDCString *cstring);
 ///
 /// # Returns
 ///
-/// `NSTDUSize cap` - The C string's capacity.
-NSTDAPI NSTDUSize nstd_cstring_cap(const NSTDCString *cstring);
+/// `NSTDUInt cap` - The C string's capacity.
+NSTDAPI NSTDUInt nstd_cstring_cap(const NSTDCString *cstring);
 
 /// Returns the number of `char`s in a C string, including the null terminator.
 ///
@@ -144,8 +144,8 @@ NSTDAPI NSTDUSize nstd_cstring_cap(const NSTDCString *cstring);
 ///
 /// # Returns
 ///
-/// `NSTDUSize len` - The length of the C string including it's null byte.
-NSTDAPI NSTDUSize nstd_cstring_len_with_null(const NSTDCString *cstring);
+/// `NSTDUInt len` - The length of the C string including it's null byte.
+NSTDAPI NSTDUInt nstd_cstring_len_with_null(const NSTDCString *cstring);
 
 /// Appends an `NSTDChar` to the end of an `NSTDCString`.
 ///

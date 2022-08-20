@@ -11,7 +11,7 @@ use crate::{
     io::NSTDIOError,
     string::{nstd_string_push_str, NSTDString},
     vec::{nstd_vec_extend, nstd_vec_stride, NSTDVec},
-    NSTDUSize,
+    NSTDUInt,
 };
 use std::io::{Read, Write};
 
@@ -25,7 +25,7 @@ use std::io::{Read, Write};
 pub(crate) unsafe fn write<W: Write>(
     stream: &mut W,
     bytes: &NSTDSliceConst,
-    written: &mut NSTDUSize,
+    written: &mut NSTDUInt,
 ) -> NSTDIOError {
     // Make sure the slice's element size is 1.
     if nstd_core_slice_const_stride(bytes) != 1 {
@@ -81,7 +81,7 @@ pub(crate) fn flush<W: Write>(stream: &mut W) -> NSTDIOError {
 pub(crate) unsafe fn read<R: Read>(
     stream: &mut R,
     buffer: &mut NSTDSliceMut,
-    read: &mut NSTDUSize,
+    read: &mut NSTDUInt,
 ) -> NSTDIOError {
     // Make sure the buffer's element size is 1.
     if nstd_core_slice_mut_stride(buffer) != 1 {
@@ -112,7 +112,7 @@ pub(crate) unsafe fn read<R: Read>(
 pub(crate) fn read_all<R: Read>(
     stream: &mut R,
     buffer: &mut NSTDVec,
-    read: &mut NSTDUSize,
+    read: &mut NSTDUInt,
 ) -> NSTDIOError {
     // Make sure the buffer's element size is 1.
     if nstd_vec_stride(buffer) != 1 {
@@ -149,7 +149,7 @@ pub(crate) fn read_all<R: Read>(
 pub(crate) fn read_to_string<R: Read>(
     stream: &mut R,
     buffer: &mut NSTDString,
-    read: &mut NSTDUSize,
+    read: &mut NSTDUInt,
 ) -> NSTDIOError {
     // Attempt to read data into `buffer`.
     let mut buf = String::new();

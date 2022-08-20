@@ -1,5 +1,5 @@
 //! A sized pointer to some arbitrary type.
-use crate::{core::mem::nstd_core_mem_copy, NSTDAnyConst, NSTDAnyMut, NSTDUSize};
+use crate::{core::mem::nstd_core_mem_copy, NSTDAnyConst, NSTDAnyMut, NSTDUInt};
 
 /// A sized immutable pointer to some arbitrary type.
 #[repr(C)]
@@ -8,7 +8,7 @@ pub struct NSTDPtrConst {
     /// A raw pointer to the data.
     pub(crate) raw: NSTDAnyConst,
     /// The size of the object being pointed to.
-    size: NSTDUSize,
+    size: NSTDUInt,
 }
 
 /// Creates a new instance of `NSTDPtrConst`.
@@ -17,14 +17,14 @@ pub struct NSTDPtrConst {
 ///
 /// - `NSTDAnyConst obj` - The object to point to.
 ///
-/// - `NSTDUSize size` - The number of bytes that `obj`'s type occupies.
+/// - `NSTDUInt size` - The number of bytes that `obj`'s type occupies.
 ///
 /// # Returns
 ///
 /// `NSTDPtrConst ptr` - A new instance of `NSTDPtrConst` that points to `obj`.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_ptr_const_new(obj: NSTDAnyConst, size: NSTDUSize) -> NSTDPtrConst {
+pub extern "C" fn nstd_core_ptr_const_new(obj: NSTDAnyConst, size: NSTDUInt) -> NSTDPtrConst {
     NSTDPtrConst { raw: obj, size }
 }
 
@@ -36,10 +36,10 @@ pub extern "C" fn nstd_core_ptr_const_new(obj: NSTDAnyConst, size: NSTDUSize) ->
 ///
 /// # Returns
 ///
-/// `NSTDUSize size` - The size of the object pointed to by `ptr`.
+/// `NSTDUInt size` - The size of the object pointed to by `ptr`.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_ptr_const_size(ptr: &NSTDPtrConst) -> NSTDUSize {
+pub extern "C" fn nstd_core_ptr_const_size(ptr: &NSTDPtrConst) -> NSTDUInt {
     ptr.size
 }
 
@@ -65,7 +65,7 @@ pub struct NSTDPtrMut {
     /// A raw pointer to the data.
     pub(crate) raw: NSTDAnyMut,
     /// The size of the object being pointed to.
-    size: NSTDUSize,
+    size: NSTDUInt,
 }
 
 /// Creates a new instance of `NSTDPtrMut`.
@@ -74,14 +74,14 @@ pub struct NSTDPtrMut {
 ///
 /// - `NSTDAnyMut obj` - The object to point to.
 ///
-/// - `NSTDUSize size` - The number of bytes that `obj`'s type occupies.
+/// - `NSTDUInt size` - The number of bytes that `obj`'s type occupies.
 ///
 /// # Returns
 ///
 /// `NSTDPtrMut ptr` - A new instance of `NSTDPtrMut` that points to `obj`.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_ptr_mut_new(obj: NSTDAnyMut, size: NSTDUSize) -> NSTDPtrMut {
+pub extern "C" fn nstd_core_ptr_mut_new(obj: NSTDAnyMut, size: NSTDUInt) -> NSTDPtrMut {
     NSTDPtrMut { raw: obj, size }
 }
 
@@ -108,10 +108,10 @@ pub extern "C" fn nstd_core_ptr_mut_as_const(ptr: &NSTDPtrMut) -> NSTDPtrConst {
 ///
 /// # Returns
 ///
-/// `NSTDUSize size` - The size of the object pointed to by `ptr`.
+/// `NSTDUInt size` - The size of the object pointed to by `ptr`.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_ptr_mut_size(ptr: &NSTDPtrMut) -> NSTDUSize {
+pub extern "C" fn nstd_core_ptr_mut_size(ptr: &NSTDPtrMut) -> NSTDUInt {
     ptr.size
 }
 

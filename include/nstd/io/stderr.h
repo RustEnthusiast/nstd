@@ -29,7 +29,7 @@ NSTDAPI NSTDStderr nstd_io_stderr();
 ///
 /// - `const NSTDSliceConst *bytes` - The data to be written to stderr.
 ///
-/// - `NSTDUSize *written` - Returns as the number of bytes written.
+/// - `NSTDUInt *written` - Returns as the number of bytes written.
 ///
 /// # Returns
 ///
@@ -39,7 +39,7 @@ NSTDAPI NSTDStderr nstd_io_stderr();
 ///
 /// This function can cause undefined behavior if `bytes`'s data is invalid.
 NSTDAPI NSTDIOError nstd_io_stderr_write(NSTDStderr *handle, const NSTDSliceConst *bytes,
-NSTDUSize *written);
+NSTDUInt *written);
 
 /// Writes an entire buffer to the standard error stream.
 ///

@@ -1,5 +1,5 @@
 //! A handle to the standard error stream.
-use crate::{core::slice::NSTDSliceConst, io::NSTDIOError, NSTDUSize};
+use crate::{core::slice::NSTDSliceConst, io::NSTDIOError, NSTDUInt};
 use std::io::Stderr;
 
 /// A handle to the standard error stream.
@@ -30,7 +30,7 @@ pub extern "C" fn nstd_io_stderr() -> NSTDStderr {
 ///
 /// - `const NSTDSliceConst *bytes` - The data to be written to stderr.
 ///
-/// - `NSTDUSize *written` - Returns as the number of bytes written.
+/// - `NSTDUInt *written` - Returns as the number of bytes written.
 ///
 /// # Returns
 ///
@@ -44,7 +44,7 @@ pub extern "C" fn nstd_io_stderr() -> NSTDStderr {
 pub unsafe extern "C" fn nstd_io_stderr_write(
     handle: &mut NSTDStderr,
     bytes: &NSTDSliceConst,
-    written: &mut NSTDUSize,
+    written: &mut NSTDUInt,
 ) -> NSTDIOError {
     crate::io::stdio::write(handle, bytes, written)
 }

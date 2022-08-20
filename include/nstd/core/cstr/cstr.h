@@ -10,7 +10,7 @@ typedef struct {
     /// A pointer to the first character in the C string.
     const NSTDChar *ptr;
     /// The length of the C string slice.
-    NSTDUSize len;
+    NSTDUInt len;
 } NSTDCStrConst;
 
 /// Creates a new C string slice from a raw pointer and a size.
@@ -19,12 +19,12 @@ typedef struct {
 ///
 /// - `const NSTDChar *raw` - A pointer to the first character to be in the C string slice.
 ///
-/// - `NSTDUSize len` - The length of the C string slice.
+/// - `NSTDUInt len` - The length of the C string slice.
 ///
 /// # Returns
 ///
 /// `NSTDCStrConst cstr` - The new C string slice, referencing `raw`'s data.
-NSTDAPI NSTDCStrConst nstd_core_cstr_const_new(const NSTDChar *raw, NSTDUSize len);
+NSTDAPI NSTDCStrConst nstd_core_cstr_const_new(const NSTDChar *raw, NSTDUInt len);
 
 /// Creates a new instance of `NSTDCStrConst` from a raw C string, excluding the null byte.
 ///
@@ -78,8 +78,8 @@ NSTDAPI const NSTDChar *nstd_core_cstr_const_as_ptr(const NSTDCStrConst *cstr);
 ///
 /// # Returns
 ///
-/// `NSTDUSize len` - The length of the C string slice.
-NSTDAPI NSTDUSize nstd_core_cstr_const_len(const NSTDCStrConst *cstr);
+/// `NSTDUInt len` - The length of the C string slice.
+NSTDAPI NSTDUInt nstd_core_cstr_const_len(const NSTDCStrConst *cstr);
 
 /// Determines whether or not a C string slice is null terminated. This will return false if the C
 /// string slice contains any null bytes in the middle.
@@ -116,19 +116,19 @@ NSTDAPI const NSTDChar *nstd_core_cstr_const_get_null(const NSTDCStrConst *cstr)
 ///
 /// - `const NSTDCStrConst *cstr` - The C string.
 ///
-/// - `NSTDUSize pos` - The position of the character to get.
+/// - `NSTDUInt pos` - The position of the character to get.
 ///
 /// # Returns
 ///
 /// `const NSTDChar *chr` - A pointer to the character at `pos`, or null on error.
-NSTDAPI const NSTDChar *nstd_core_cstr_const_get(const NSTDCStrConst *cstr, NSTDUSize pos);
+NSTDAPI const NSTDChar *nstd_core_cstr_const_get(const NSTDCStrConst *cstr, NSTDUInt pos);
 
 /// A mutable slice of a C string.
 typedef struct {
     /// A pointer to the first character in the C string.
     NSTDChar *ptr;
     /// The length of the C string slice.
-    NSTDUSize len;
+    NSTDUInt len;
 } NSTDCStrMut;
 
 /// Creates a new C string slice from a raw pointer and a size.
@@ -137,12 +137,12 @@ typedef struct {
 ///
 /// - `NSTDChar *raw` - A pointer to the first character to be in the C string slice.
 ///
-/// - `NSTDUSize len` - The length of the C string slice.
+/// - `NSTDUInt len` - The length of the C string slice.
 ///
 /// # Returns
 ///
 /// `NSTDCStrMut cstr` - The new C string slice, referencing `raw`'s data.
-NSTDAPI NSTDCStrMut nstd_core_cstr_mut_new(NSTDChar *raw, NSTDUSize len);
+NSTDAPI NSTDCStrMut nstd_core_cstr_mut_new(NSTDChar *raw, NSTDUInt len);
 
 /// Creates a new instance of `NSTDCStrMut` from a raw C string, excluding the null byte.
 ///
@@ -218,8 +218,8 @@ NSTDAPI const NSTDChar *nstd_core_cstr_mut_as_ptr_const(const NSTDCStrMut *cstr)
 ///
 /// # Returns
 ///
-/// `NSTDUSize len` - The length of the C string slice.
-NSTDAPI NSTDUSize nstd_core_cstr_mut_len(const NSTDCStrMut *cstr);
+/// `NSTDUInt len` - The length of the C string slice.
+NSTDAPI NSTDUInt nstd_core_cstr_mut_len(const NSTDCStrMut *cstr);
 
 /// Determines whether or not a C string slice is null terminated. This will return false if the C
 /// string slice contains any null bytes in the middle.
@@ -268,12 +268,12 @@ NSTDAPI const NSTDChar *nstd_core_cstr_mut_get_null_const(const NSTDCStrConst *c
 ///
 /// - `NSTDCStrMut *cstr` - The C string.
 ///
-/// - `NSTDUSize pos` - The position of the character to get.
+/// - `NSTDUInt pos` - The position of the character to get.
 ///
 /// # Returns
 ///
 /// `NSTDChar *chr` - A pointer to the character at `pos`, or null on error.
-NSTDAPI NSTDChar *nstd_core_cstr_mut_get(NSTDCStrMut *cstr, NSTDUSize pos);
+NSTDAPI NSTDChar *nstd_core_cstr_mut_get(NSTDCStrMut *cstr, NSTDUInt pos);
 
 /// Return an immutable pointer the character at `pos` in `cstr`.
 ///
@@ -281,12 +281,12 @@ NSTDAPI NSTDChar *nstd_core_cstr_mut_get(NSTDCStrMut *cstr, NSTDUSize pos);
 ///
 /// - `const NSTDCStrMut *cstr` - The C string.
 ///
-/// - `NSTDUSize pos` - The position of the character to get.
+/// - `NSTDUInt pos` - The position of the character to get.
 ///
 /// # Returns
 ///
 /// `const NSTDChar *chr` - A pointer to the character at `pos`, or null on error.
-NSTDAPI const NSTDChar *nstd_core_cstr_mut_get_const(const NSTDCStrMut *cstr, NSTDUSize pos);
+NSTDAPI const NSTDChar *nstd_core_cstr_mut_get_const(const NSTDCStrMut *cstr, NSTDUInt pos);
 
 NSTDCPPEND
 #endif

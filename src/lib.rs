@@ -47,9 +47,9 @@ pub const NSTD_FALSE: NSTDBool = 0;
 pub const NSTD_TRUE: NSTDBool = 1;
 
 /// An integral type who's size matches the target architecture's pointer size.
-pub type NSTDISize = isize;
+pub type NSTDInt = isize;
 /// An unsigned integral type who's size matches the target architecture's pointer size.
-pub type NSTDUSize = usize;
+pub type NSTDUInt = usize;
 
 /// An 8-bit signed integer type.
 pub type NSTDInt8 = i8;

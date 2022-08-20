@@ -1,7 +1,7 @@
 //! Low level math operations.
 use crate::{
-    NSTDFloat32, NSTDFloat64, NSTDISize, NSTDInt16, NSTDInt32, NSTDInt64, NSTDInt8, NSTDUInt16,
-    NSTDUInt32, NSTDUInt64, NSTDUInt8, NSTDUSize,
+    NSTDFloat32, NSTDFloat64, NSTDInt, NSTDInt16, NSTDInt32, NSTDInt64, NSTDInt8, NSTDUInt,
+    NSTDUInt16, NSTDUInt32, NSTDUInt64, NSTDUInt8,
 };
 
 /// Converts radians to degrees.
@@ -123,21 +123,42 @@ gen_clamp!(
     ///
     /// # Parameters:
     ///
-    /// - `NSTDUInt8 x` - The value to clamp.
+    /// - `NSTDInt x` - The value to clamp.
     ///
-    /// - `NSTDUInt8 min` - The minimum clamp value.
+    /// - `NSTDInt min` - The minimum clamp value.
     ///
-    /// - `NSTDUInt8 max` - The maximum clamp value.
+    /// - `NSTDInt max` - The maximum clamp value.
     ///
     /// # Returns
     ///
-    /// `NSTDUInt8 v` - The clamped value.
+    /// `NSTDInt v` - The clamped value.
     ///
     /// # Panics
     ///
     /// Panics if `min` > `max`.
-    nstd_core_math_clamp_u8,
-    NSTDUInt8
+    nstd_core_math_clamp_int,
+    NSTDInt
+);
+gen_clamp!(
+    /// Clamps the value `x` to the bounds `min` and `max`.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDUInt x` - The value to clamp.
+    ///
+    /// - `NSTDUInt min` - The minimum clamp value.
+    ///
+    /// - `NSTDUInt max` - The maximum clamp value.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDUInt v` - The clamped value.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `min` > `max`.
+    nstd_core_math_clamp_uint,
+    NSTDUInt
 );
 gen_clamp!(
     /// Clamps the value `x` to the bounds `min` and `max`.
@@ -165,21 +186,21 @@ gen_clamp!(
     ///
     /// # Parameters:
     ///
-    /// - `NSTDUInt16 x` - The value to clamp.
+    /// - `NSTDUInt8 x` - The value to clamp.
     ///
-    /// - `NSTDUInt16 min` - The minimum clamp value.
+    /// - `NSTDUInt8 min` - The minimum clamp value.
     ///
-    /// - `NSTDUInt16 max` - The maximum clamp value.
+    /// - `NSTDUInt8 max` - The maximum clamp value.
     ///
     /// # Returns
     ///
-    /// `NSTDUInt16 v` - The clamped value.
+    /// `NSTDUInt8 v` - The clamped value.
     ///
     /// # Panics
     ///
     /// Panics if `min` > `max`.
-    nstd_core_math_clamp_u16,
-    NSTDUInt16
+    nstd_core_math_clamp_u8,
+    NSTDUInt8
 );
 gen_clamp!(
     /// Clamps the value `x` to the bounds `min` and `max`.
@@ -207,21 +228,21 @@ gen_clamp!(
     ///
     /// # Parameters:
     ///
-    /// - `NSTDUInt32 x` - The value to clamp.
+    /// - `NSTDUInt16 x` - The value to clamp.
     ///
-    /// - `NSTDUInt32 min` - The minimum clamp value.
+    /// - `NSTDUInt16 min` - The minimum clamp value.
     ///
-    /// - `NSTDUInt32 max` - The maximum clamp value.
+    /// - `NSTDUInt16 max` - The maximum clamp value.
     ///
     /// # Returns
     ///
-    /// `NSTDUInt32 v` - The clamped value.
+    /// `NSTDUInt16 v` - The clamped value.
     ///
     /// # Panics
     ///
     /// Panics if `min` > `max`.
-    nstd_core_math_clamp_u32,
-    NSTDUInt32
+    nstd_core_math_clamp_u16,
+    NSTDUInt16
 );
 gen_clamp!(
     /// Clamps the value `x` to the bounds `min` and `max`.
@@ -249,21 +270,21 @@ gen_clamp!(
     ///
     /// # Parameters:
     ///
-    /// - `NSTDUInt64 x` - The value to clamp.
+    /// - `NSTDUInt32 x` - The value to clamp.
     ///
-    /// - `NSTDUInt64 min` - The minimum clamp value.
+    /// - `NSTDUInt32 min` - The minimum clamp value.
     ///
-    /// - `NSTDUInt64 max` - The maximum clamp value.
+    /// - `NSTDUInt32 max` - The maximum clamp value.
     ///
     /// # Returns
     ///
-    /// `NSTDUInt64 v` - The clamped value.
+    /// `NSTDUInt32 v` - The clamped value.
     ///
     /// # Panics
     ///
     /// Panics if `min` > `max`.
-    nstd_core_math_clamp_u64,
-    NSTDUInt64
+    nstd_core_math_clamp_u32,
+    NSTDUInt32
 );
 gen_clamp!(
     /// Clamps the value `x` to the bounds `min` and `max`.
@@ -291,42 +312,21 @@ gen_clamp!(
     ///
     /// # Parameters:
     ///
-    /// - `NSTDUSize x` - The value to clamp.
+    /// - `NSTDUInt64 x` - The value to clamp.
     ///
-    /// - `NSTDUSize min` - The minimum clamp value.
+    /// - `NSTDUInt64 min` - The minimum clamp value.
     ///
-    /// - `NSTDUSize max` - The maximum clamp value.
+    /// - `NSTDUInt64 max` - The maximum clamp value.
     ///
     /// # Returns
     ///
-    /// `NSTDUSize v` - The clamped value.
+    /// `NSTDUInt64 v` - The clamped value.
     ///
     /// # Panics
     ///
     /// Panics if `min` > `max`.
-    nstd_core_math_clamp_usize,
-    NSTDUSize
-);
-gen_clamp!(
-    /// Clamps the value `x` to the bounds `min` and `max`.
-    ///
-    /// # Parameters:
-    ///
-    /// - `NSTDISize x` - The value to clamp.
-    ///
-    /// - `NSTDISize min` - The minimum clamp value.
-    ///
-    /// - `NSTDISize max` - The maximum clamp value.
-    ///
-    /// # Returns
-    ///
-    /// `NSTDISize v` - The clamped value.
-    ///
-    /// # Panics
-    ///
-    /// Panics if `min` > `max`.
-    nstd_core_math_clamp_isize,
-    NSTDISize
+    nstd_core_math_clamp_u64,
+    NSTDUInt64
 );
 
 /// Generates the `div_ceil` functions.
@@ -358,15 +358,30 @@ gen_div_ceil!(
     ///
     /// # Parameters:
     ///
-    /// - `NSTDUInt8 x` - The first value.
+    /// - `NSTDInt x` - The first value.
     ///
-    /// - `NSTDUInt8 y` - The second value.
+    /// - `NSTDInt y` - The second value.
     ///
     /// # Returns
     ///
-    /// `NSTDUInt8 v` - The divided value, rounded up.
-    nstd_core_math_div_ceil_u8,
-    NSTDUInt8
+    /// `NSTDInt v` - The divided value, rounded up.
+    nstd_core_math_div_ceil_int,
+    NSTDInt
+);
+gen_div_ceil!(
+    /// Divides two numbers and rounds the result up to the next integer.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDUInt x` - The first value.
+    ///
+    /// - `NSTDUInt y` - The second value.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDUInt v` - The divided value, rounded up.
+    nstd_core_math_div_ceil_uint,
+    NSTDUInt
 );
 gen_div_ceil!(
     /// Divides two numbers and rounds the result up to the next integer.
@@ -388,15 +403,15 @@ gen_div_ceil!(
     ///
     /// # Parameters:
     ///
-    /// - `NSTDUInt16 x` - The first value.
+    /// - `NSTDUInt8 x` - The first value.
     ///
-    /// - `NSTDUInt16 y` - The second value.
+    /// - `NSTDUInt8 y` - The second value.
     ///
     /// # Returns
     ///
-    /// `NSTDUInt16 v` - The divided value, rounded up.
-    nstd_core_math_div_ceil_u16,
-    NSTDUInt16
+    /// `NSTDUInt8 v` - The divided value, rounded up.
+    nstd_core_math_div_ceil_u8,
+    NSTDUInt8
 );
 gen_div_ceil!(
     /// Divides two numbers and rounds the result up to the next integer.
@@ -418,15 +433,15 @@ gen_div_ceil!(
     ///
     /// # Parameters:
     ///
-    /// - `NSTDUInt32 x` - The first value.
+    /// - `NSTDUInt16 x` - The first value.
     ///
-    /// - `NSTDUInt32 y` - The second value.
+    /// - `NSTDUInt16 y` - The second value.
     ///
     /// # Returns
     ///
-    /// `NSTDUInt32 v` - The divided value, rounded up.
-    nstd_core_math_div_ceil_u32,
-    NSTDUInt32
+    /// `NSTDUInt16 v` - The divided value, rounded up.
+    nstd_core_math_div_ceil_u16,
+    NSTDUInt16
 );
 gen_div_ceil!(
     /// Divides two numbers and rounds the result up to the next integer.
@@ -448,15 +463,15 @@ gen_div_ceil!(
     ///
     /// # Parameters:
     ///
-    /// - `NSTDUInt64 x` - The first value.
+    /// - `NSTDUInt32 x` - The first value.
     ///
-    /// - `NSTDUInt64 y` - The second value.
+    /// - `NSTDUInt32 y` - The second value.
     ///
     /// # Returns
     ///
-    /// `NSTDUInt64 v` - The divided value, rounded up.
-    nstd_core_math_div_ceil_u64,
-    NSTDUInt64
+    /// `NSTDUInt32 v` - The divided value, rounded up.
+    nstd_core_math_div_ceil_u32,
+    NSTDUInt32
 );
 gen_div_ceil!(
     /// Divides two numbers and rounds the result up to the next integer.
@@ -478,28 +493,13 @@ gen_div_ceil!(
     ///
     /// # Parameters:
     ///
-    /// - `NSTDUSize x` - The first value.
+    /// - `NSTDUInt64 x` - The first value.
     ///
-    /// - `NSTDUSize y` - The second value.
-    ///
-    /// # Returns
-    ///
-    /// `NSTDUSize v` - The divided value, rounded up.
-    nstd_core_math_div_ceil_usize,
-    NSTDUSize
-);
-gen_div_ceil!(
-    /// Divides two numbers and rounds the result up to the next integer.
-    ///
-    /// # Parameters:
-    ///
-    /// - `NSTDISize x` - The first value.
-    ///
-    /// - `NSTDISize y` - The second value.
+    /// - `NSTDUInt64 y` - The second value.
     ///
     /// # Returns
     ///
-    /// `NSTDISize v` - The divided value, rounded up.
-    nstd_core_math_div_ceil_isize,
-    NSTDISize
+    /// `NSTDUInt64 v` - The divided value, rounded up.
+    nstd_core_math_div_ceil_u64,
+    NSTDUInt64
 );

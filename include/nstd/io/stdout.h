@@ -29,7 +29,7 @@ NSTDAPI NSTDStdout nstd_io_stdout();
 ///
 /// - `const NSTDSliceConst *bytes` - The data to be written to stdout.
 ///
-/// - `NSTDUSize *written` - Returns as the number of bytes written.
+/// - `NSTDUInt *written` - Returns as the number of bytes written.
 ///
 /// # Returns
 ///
@@ -39,7 +39,7 @@ NSTDAPI NSTDStdout nstd_io_stdout();
 ///
 /// This function can cause undefined behavior if `bytes`'s data is invalid.
 NSTDAPI NSTDIOError nstd_io_stdout_write(NSTDStdout *handle, const NSTDSliceConst *bytes,
-NSTDUSize *written);
+NSTDUInt *written);
 
 /// Writes an entire buffer to the standard output stream.
 ///

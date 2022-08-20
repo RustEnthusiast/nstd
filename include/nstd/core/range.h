@@ -5,16 +5,16 @@
 /// A half-open (low inclusive, high exclusive) arch-bit unsigned numerical range.
 typedef struct {
     /// The lower bound of the range (inclusive).
-    NSTDUSize start;
+    NSTDUInt start;
     /// The higher bound of the range (exclusive).
-    NSTDUSize end;
+    NSTDUInt end;
 } NSTDURange;
 /// A half-open (low inclusive, high exclusive) arch-bit signed numerical range.
 typedef struct {
     /// The lower bound of the range (inclusive).
-    NSTDISize start;
+    NSTDInt start;
     /// The higher bound of the range (exclusive).
-    NSTDISize end;
+    NSTDInt end;
 } NSTDIRange;
 
 /// A half-open (low inclusive, high exclusive) 8-bit unsigned numerical range.

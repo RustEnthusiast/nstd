@@ -20,7 +20,7 @@ typedef enum {
 ///
 /// # Parameters:
 ///
-/// - `NSTDUSize size` - The number of bytes to allocate on the heap.
+/// - `NSTDUInt size` - The number of bytes to allocate on the heap.
 ///
 /// # Returns
 ///
@@ -29,13 +29,13 @@ typedef enum {
 /// # Safety
 ///
 /// This operation is unsafe because the behavior is undefined if `size` is zero.
-NSTDAPI NSTDAnyMut nstd_alloc_allocate(NSTDUSize size);
+NSTDAPI NSTDAnyMut nstd_alloc_allocate(NSTDUInt size);
 
 /// Allocates a block of zero-initialized memory on the heap.
 ///
 /// # Parameters:
 ///
-/// - `NSTDUSize size` - The number of bytes to allocate on the heap.
+/// - `NSTDUInt size` - The number of bytes to allocate on the heap.
 ///
 /// # Returns
 ///
@@ -44,7 +44,7 @@ NSTDAPI NSTDAnyMut nstd_alloc_allocate(NSTDUSize size);
 /// # Safety
 ///
 /// This operation is unsafe because the behavior is undefined if `size` is zero.
-NSTDAPI NSTDAnyMut nstd_alloc_allocate_zeroed(NSTDUSize size);
+NSTDAPI NSTDAnyMut nstd_alloc_allocate_zeroed(NSTDUInt size);
 
 /// Reallocates a block of memory previously allocated by `nstd_alloc_allocate[_zeroed]`.
 ///
@@ -56,9 +56,9 @@ NSTDAPI NSTDAnyMut nstd_alloc_allocate_zeroed(NSTDUSize size);
 ///
 /// - `NSTDAnyMut *ptr` - A pointer to the allocated memory.
 ///
-/// - `NSTDUSize size` - The number of bytes currently allocated.
+/// - `NSTDUInt size` - The number of bytes currently allocated.
 ///
-/// - `NSTDUSize new_size` - The number of bytes to reallocate.
+/// - `NSTDUInt new_size` - The number of bytes to reallocate.
 ///
 /// # Returns
 ///
@@ -68,7 +68,7 @@ NSTDAPI NSTDAnyMut nstd_alloc_allocate_zeroed(NSTDUSize size);
 ///
 /// This operation is unsafe because the behavior is undefined if `ptr` is not a value returned by
 /// `nstd_alloc_allocate[_zeroed]`.
-NSTDAPI NSTDAllocError nstd_alloc_reallocate(NSTDAnyMut *ptr, NSTDUSize size, NSTDUSize new_size);
+NSTDAPI NSTDAllocError nstd_alloc_reallocate(NSTDAnyMut *ptr, NSTDUInt size, NSTDUInt new_size);
 
 /// Deallocates a block of memory previously allocated by `nstd_alloc_allocate[_zeroed]`.
 ///
@@ -76,13 +76,13 @@ NSTDAPI NSTDAllocError nstd_alloc_reallocate(NSTDAnyMut *ptr, NSTDUSize size, NS
 ///
 /// - `NSTDAnyMut *ptr` - A pointer to the allocated memory, once freed the pointer is set to null.
 ///
-/// - `NSTDUSize size` - The number of bytes to free.
+/// - `NSTDUInt size` - The number of bytes to free.
 ///
 /// # Safety
 ///
 /// This operation is unsafe because the behavior is undefined if `ptr` is not a value returned by
 /// `nstd_alloc_allocate[_zeroed]`.
-NSTDAPI void nstd_alloc_deallocate(NSTDAnyMut *ptr, NSTDUSize size);
+NSTDAPI void nstd_alloc_deallocate(NSTDAnyMut *ptr, NSTDUInt size);
 
 NSTDCPPEND
 #endif

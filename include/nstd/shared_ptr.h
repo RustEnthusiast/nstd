@@ -8,14 +8,14 @@ typedef struct {
     /// A raw pointer to private data about the shared object.
     NSTDAnyMut ptr;
     /// The size of the shared pointer's memory buffer.
-    NSTDUSize size;
+    NSTDUInt size;
 } NSTDSharedPtr;
 
 /// Creates a new initialized instance of a shared pointer.
 ///
 /// # Parameters:
 ///
-/// - `NSTDUSize element_size` - The size of the shared object.
+/// - `NSTDUInt element_size` - The size of the shared object.
 ///
 /// - `NSTDAnyConst init` - A pointer to the object to initialize the shared pointer with.
 ///
@@ -30,13 +30,13 @@ typedef struct {
 /// # Safety
 ///
 /// This operation is unsafe because passing `init` as a null pointer can cause undefined behavior.
-NSTDAPI NSTDSharedPtr nstd_shared_ptr_new(NSTDUSize element_size, NSTDAnyConst init);
+NSTDAPI NSTDSharedPtr nstd_shared_ptr_new(NSTDUInt element_size, NSTDAnyConst init);
 
 /// Creates a new zero-initialized instance of a shared pointer.
 ///
 /// # Parameters:
 ///
-/// - `NSTDUSize element_size` - The size of the shared object.
+/// - `NSTDUInt element_size` - The size of the shared object.
 ///
 /// # Returns
 ///
@@ -45,7 +45,7 @@ NSTDAPI NSTDSharedPtr nstd_shared_ptr_new(NSTDUSize element_size, NSTDAnyConst i
 /// # Panics
 ///
 /// This operation will panic if allocating fails.
-NSTDAPI NSTDSharedPtr nstd_shared_ptr_new_zeroed(NSTDUSize element_size);
+NSTDAPI NSTDSharedPtr nstd_shared_ptr_new_zeroed(NSTDUInt element_size);
 
 /// Shares `shared_ptr`.
 ///
@@ -66,8 +66,8 @@ NSTDAPI NSTDSharedPtr nstd_shared_ptr_share(const NSTDSharedPtr *shared_ptr);
 ///
 /// # Returns
 ///
-/// `NSTDUSize owners` - The number of pointers that share `shared_ptr`'s data.
-NSTDAPI NSTDUSize nstd_shared_ptr_owners(const NSTDSharedPtr *shared_ptr);
+/// `NSTDUInt owners` - The number of pointers that share `shared_ptr`'s data.
+NSTDAPI NSTDUInt nstd_shared_ptr_owners(const NSTDSharedPtr *shared_ptr);
 
 /// Returns the size of the shared object.
 ///
@@ -77,8 +77,8 @@ NSTDAPI NSTDUSize nstd_shared_ptr_owners(const NSTDSharedPtr *shared_ptr);
 ///
 /// # Returns
 ///
-/// `NSTDUSize size` - The size of the shared object.
-NSTDAPI NSTDUSize nstd_shared_ptr_size(const NSTDSharedPtr *shared_ptr);
+/// `NSTDUInt size` - The size of the shared object.
+NSTDAPI NSTDUInt nstd_shared_ptr_size(const NSTDSharedPtr *shared_ptr);
 
 /// Returns an immutable raw pointer to the shared object.
 ///

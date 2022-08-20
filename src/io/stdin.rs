@@ -8,7 +8,7 @@ use crate::{
     io::NSTDIOError,
     string::{nstd_string_push_str, NSTDString},
     vec::NSTDVec,
-    NSTDUSize,
+    NSTDUInt,
 };
 use std::io::Stdin;
 
@@ -39,7 +39,7 @@ pub extern "C" fn nstd_io_stdin() -> NSTDStdin {
 ///
 /// - `NSTDSliceMut *buffer` - The buffer to fill with data from stdin.
 ///
-/// - `NSTDUSize *read` - Returns as the number of bytes read from stdin.
+/// - `NSTDUInt *read` - Returns as the number of bytes read from stdin.
 ///
 /// # Returns
 ///
@@ -53,7 +53,7 @@ pub extern "C" fn nstd_io_stdin() -> NSTDStdin {
 pub unsafe extern "C" fn nstd_io_stdin_read(
     handle: &mut NSTDStdin,
     buffer: &mut NSTDSliceMut,
-    read: &mut NSTDUSize,
+    read: &mut NSTDUInt,
 ) -> NSTDIOError {
     crate::io::stdio::read(handle, buffer, read)
 }
@@ -71,7 +71,7 @@ pub unsafe extern "C" fn nstd_io_stdin_read(
 ///
 /// - `NSTDVec *buffer` - The buffer to be extended with data from stdin.
 ///
-/// - `NSTDUSize *read` - Returns as the number of bytes read from stdin.
+/// - `NSTDUInt *read` - Returns as the number of bytes read from stdin.
 ///
 /// # Returns
 ///
@@ -81,7 +81,7 @@ pub unsafe extern "C" fn nstd_io_stdin_read(
 pub extern "C" fn nstd_io_stdin_read_all(
     handle: &mut NSTDStdin,
     buffer: &mut NSTDVec,
-    read: &mut NSTDUSize,
+    read: &mut NSTDUInt,
 ) -> NSTDIOError {
     crate::io::stdio::read_all(handle, buffer, read)
 }
@@ -99,7 +99,7 @@ pub extern "C" fn nstd_io_stdin_read_all(
 ///
 /// - `NSTDString *buffer` - The buffer to be extended with data from stdin.
 ///
-/// - `NSTDUSize *read` - Returns as the number of bytes read from stdin.
+/// - `NSTDUInt *read` - Returns as the number of bytes read from stdin.
 ///
 /// # Returns
 ///
@@ -109,7 +109,7 @@ pub extern "C" fn nstd_io_stdin_read_all(
 pub extern "C" fn nstd_io_stdin_read_to_string(
     handle: &mut NSTDStdin,
     buffer: &mut NSTDString,
-    read: &mut NSTDUSize,
+    read: &mut NSTDUInt,
 ) -> NSTDIOError {
     crate::io::stdio::read_to_string(handle, buffer, read)
 }
@@ -151,7 +151,7 @@ pub unsafe extern "C" fn nstd_io_stdin_read_exact(
 ///
 /// - `NSTDString *buffer` - The string buffer to extend with a line from stdin.
 ///
-/// - `NSTDUSize *read` - Returns as the number of bytes read from stdin.
+/// - `NSTDUInt *read` - Returns as the number of bytes read from stdin.
 ///
 /// # Returns
 ///
@@ -160,7 +160,7 @@ pub unsafe extern "C" fn nstd_io_stdin_read_exact(
 pub extern "C" fn nstd_io_stdin_read_line(
     handle: &mut NSTDStdin,
     buffer: &mut NSTDString,
-    read: &mut NSTDUSize,
+    read: &mut NSTDUInt,
 ) -> NSTDIOError {
     let mut buf = String::new();
     match handle.read_line(&mut buf) {

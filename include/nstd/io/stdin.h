@@ -30,7 +30,7 @@ NSTDAPI NSTDStdin nstd_io_stdin();
 ///
 /// - `NSTDSliceMut *buffer` - The buffer to fill with data from stdin.
 ///
-/// - `NSTDUSize *read` - Returns as the number of bytes read from stdin.
+/// - `NSTDUInt *read` - Returns as the number of bytes read from stdin.
 ///
 /// # Returns
 ///
@@ -39,7 +39,7 @@ NSTDAPI NSTDStdin nstd_io_stdin();
 /// # Safety
 ///
 /// `buffer`'s data must be valid for writes.
-NSTDAPI NSTDIOError nstd_io_stdin_read(NSTDStdin *handle, NSTDSliceMut *buffer, NSTDUSize *read);
+NSTDAPI NSTDIOError nstd_io_stdin_read(NSTDStdin *handle, NSTDSliceMut *buffer, NSTDUInt *read);
 
 /// Continuously reads data from stdin into a buffer until EOF is reached.
 ///
@@ -54,12 +54,12 @@ NSTDAPI NSTDIOError nstd_io_stdin_read(NSTDStdin *handle, NSTDSliceMut *buffer, 
 ///
 /// - `NSTDVec *buffer` - The buffer to be extended with data from stdin.
 ///
-/// - `NSTDUSize *read` - Returns as the number of bytes read from stdin.
+/// - `NSTDUInt *read` - Returns as the number of bytes read from stdin.
 ///
 /// # Returns
 ///
 /// `NSTDIOError errc` - The I/O operation error code.
-NSTDAPI NSTDIOError nstd_io_stdin_read_all(NSTDStdin *handle, NSTDVec *buffer, NSTDUSize *read);
+NSTDAPI NSTDIOError nstd_io_stdin_read_all(NSTDStdin *handle, NSTDVec *buffer, NSTDUInt *read);
 
 /// Continuously reads UTF-8 data from stdin into a string buffer until EOF is reached.
 ///
@@ -74,13 +74,13 @@ NSTDAPI NSTDIOError nstd_io_stdin_read_all(NSTDStdin *handle, NSTDVec *buffer, N
 ///
 /// - `NSTDString *buffer` - The buffer to be extended with data from stdin.
 ///
-/// - `NSTDUSize *read` - Returns as the number of bytes read from stdin.
+/// - `NSTDUInt *read` - Returns as the number of bytes read from stdin.
 ///
 /// # Returns
 ///
 /// `NSTDIOError errc` - The I/O operation error code.
 NSTDAPI NSTDIOError nstd_io_stdin_read_to_string(NSTDStdin *handle, NSTDString *buffer,
-NSTDUSize *read);
+NSTDUInt *read);
 
 /// Reads enough data from stdin to fill the entirety of `buffer`.
 ///
@@ -112,13 +112,13 @@ NSTDAPI NSTDIOError nstd_io_stdin_read_exact(NSTDStdin *handle, NSTDSliceMut *bu
 ///
 /// - `NSTDString *buffer` - The string buffer to extend with a line from stdin.
 ///
-/// - `NSTDUSize *read` - Returns as the number of bytes read from stdin.
+/// - `NSTDUInt *read` - Returns as the number of bytes read from stdin.
 ///
 /// # Returns
 ///
 /// `NSTDIOError errc` - The I/O operation error code.
 NSTDAPI NSTDIOError nstd_io_stdin_read_line(NSTDStdin *handle, NSTDString *buffer,
-NSTDUSize *read);
+NSTDUInt *read);
 
 /// Frees an instance of `NSTDStdin`.
 ///

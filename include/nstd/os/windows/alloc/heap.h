@@ -5,7 +5,7 @@
 NSTDCPPSTART
 
 /// A handle to a process heap.
-typedef NSTDISize NSTDWindowsHeapHandle;
+typedef NSTDInt NSTDWindowsHeapHandle;
 
 /// Returns a handle to the default heap of the current process.
 ///
@@ -22,7 +22,7 @@ NSTDAPI NSTDWindowsHeapHandle nstd_os_windows_alloc_heap_default();
 ///
 /// # Parameters:
 ///
-/// - `NSTDUSize size` - The initial size of the heap, in bytes. If this parameter is 0,
+/// - `NSTDUInt size` - The initial size of the heap, in bytes. If this parameter is 0,
 /// the heap gets one page.
 ///
 /// # Returns
@@ -32,7 +32,7 @@ NSTDAPI NSTDWindowsHeapHandle nstd_os_windows_alloc_heap_default();
 /// # Safety
 ///
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapcreate>.
-NSTDAPI NSTDWindowsHeapHandle nstd_os_windows_alloc_heap_new(NSTDUSize size);
+NSTDAPI NSTDWindowsHeapHandle nstd_os_windows_alloc_heap_new(NSTDUInt size);
 
 /// Allocates a block of memory on a heap.
 ///
@@ -40,7 +40,7 @@ NSTDAPI NSTDWindowsHeapHandle nstd_os_windows_alloc_heap_new(NSTDUSize size);
 ///
 /// - `NSTDWindowsHeapHandle heap` - A handle to the heap to allocate on.
 ///
-/// - `NSTDUSize size` - The number of bytes to allocate.
+/// - `NSTDUInt size` - The number of bytes to allocate.
 ///
 /// # Returns
 ///
@@ -49,7 +49,7 @@ NSTDAPI NSTDWindowsHeapHandle nstd_os_windows_alloc_heap_new(NSTDUSize size);
 /// # Safety
 ///
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapalloc>.
-NSTDAPI NSTDAnyMut nstd_os_windows_alloc_heap_allocate(NSTDWindowsHeapHandle heap, NSTDUSize size);
+NSTDAPI NSTDAnyMut nstd_os_windows_alloc_heap_allocate(NSTDWindowsHeapHandle heap, NSTDUInt size);
 
 /// Allocates a zero-initialized block of memory on a heap.
 ///
@@ -57,7 +57,7 @@ NSTDAPI NSTDAnyMut nstd_os_windows_alloc_heap_allocate(NSTDWindowsHeapHandle hea
 ///
 /// - `NSTDWindowsHeapHandle heap` - A handle to the heap to allocate on.
 ///
-/// - `NSTDUSize size` - The number of bytes to allocate.
+/// - `NSTDUInt size` - The number of bytes to allocate.
 ///
 /// # Returns
 ///
@@ -67,7 +67,7 @@ NSTDAPI NSTDAnyMut nstd_os_windows_alloc_heap_allocate(NSTDWindowsHeapHandle hea
 ///
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapalloc>.
 NSTDAPI NSTDAnyMut nstd_os_windows_alloc_heap_allocate_zeroed(NSTDWindowsHeapHandle heap,
-NSTDUSize size);
+NSTDUInt size);
 
 /// Reallocates a block of memory on a heap.
 ///
@@ -77,7 +77,7 @@ NSTDUSize size);
 ///
 /// - `NSTDAnyMut *ptr` - A pointer to the memory to reallocate.
 ///
-/// - `NSTDUSize size` - The number of bytes to reallocate.
+/// - `NSTDUInt size` - The number of bytes to reallocate.
 ///
 /// # Returns
 ///
@@ -87,7 +87,7 @@ NSTDUSize size);
 ///
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heaprealloc>.
 NSTDAPI NSTDAllocError nstd_os_windows_alloc_heap_reallocate(NSTDWindowsHeapHandle heap,
-NSTDAnyMut *ptr, NSTDUSize size);
+NSTDAnyMut *ptr, NSTDUInt size);
 
 /// Deallocates a block of memory on a heap.
 ///

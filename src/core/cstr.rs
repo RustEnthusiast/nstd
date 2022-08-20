@@ -6,7 +6,7 @@ use crate::{
         def::NSTDChar,
         slice::{nstd_core_slice_const_new, NSTDSliceConst},
     },
-    NSTDBool, NSTDUSize, NSTD_FALSE, NSTD_NULL,
+    NSTDBool, NSTDUInt, NSTD_FALSE, NSTD_NULL,
 };
 
 /// An immutable slice of a C string.
@@ -16,7 +16,7 @@ pub struct NSTDCStrConst {
     /// A pointer to the first character in the C string.
     ptr: *const NSTDChar,
     /// The length of the C string slice.
-    len: NSTDUSize,
+    len: NSTDUInt,
 }
 impl NSTDCStrConst {
     /// Interprets a C string slice as a byte slice.
@@ -37,14 +37,14 @@ impl NSTDCStrConst {
 ///
 /// - `const NSTDChar *raw` - A pointer to the first character to be in the C string slice.
 ///
-/// - `NSTDUSize len` - The length of the C string slice.
+/// - `NSTDUInt len` - The length of the C string slice.
 ///
 /// # Returns
 ///
 /// `NSTDCStrConst cstr` - The new C string slice, referencing `raw`'s data.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_cstr_const_new(raw: *const NSTDChar, len: NSTDUSize) -> NSTDCStrConst {
+pub extern "C" fn nstd_core_cstr_const_new(raw: *const NSTDChar, len: NSTDUInt) -> NSTDCStrConst {
     NSTDCStrConst { ptr: raw, len }
 }
 
@@ -124,10 +124,10 @@ pub extern "C" fn nstd_core_cstr_const_as_ptr(cstr: &NSTDCStrConst) -> *const NS
 ///
 /// # Returns
 ///
-/// `NSTDUSize len` - The length of the C string slice.
+/// `NSTDUInt len` - The length of the C string slice.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_cstr_const_len(cstr: &NSTDCStrConst) -> NSTDUSize {
+pub extern "C" fn nstd_core_cstr_const_len(cstr: &NSTDCStrConst) -> NSTDUInt {
     cstr.len
 }
 
@@ -189,17 +189,14 @@ pub extern "C" fn nstd_core_cstr_const_get_null(cstr: &NSTDCStrConst) -> *const 
 ///
 /// - `const NSTDCStrConst *cstr` - The C string.
 ///
-/// - `NSTDUSize pos` - The position of the character to get.
+/// - `NSTDUInt pos` - The position of the character to get.
 ///
 /// # Returns
 ///
 /// `const NSTDChar *chr` - A pointer to the character at `pos`, or null on error.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_cstr_const_get(
-    cstr: &NSTDCStrConst,
-    pos: NSTDUSize,
-) -> *const NSTDChar {
+pub extern "C" fn nstd_core_cstr_const_get(cstr: &NSTDCStrConst, pos: NSTDUInt) -> *const NSTDChar {
     match pos < cstr.len {
         // SAFETY: We've checked `pos`, and the returned pointer is already unsafe to access.
         true => unsafe { cstr.ptr.add(pos) },
@@ -214,7 +211,7 @@ pub struct NSTDCStrMut {
     /// A pointer to the first character in the C string.
     ptr: *mut NSTDChar,
     /// The length of the C string slice.
-    len: NSTDUSize,
+    len: NSTDUInt,
 }
 
 /// Creates a new C string slice from a raw pointer and a size.
@@ -223,14 +220,14 @@ pub struct NSTDCStrMut {
 ///
 /// - `NSTDChar *raw` - A pointer to the first character to be in the C string slice.
 ///
-/// - `NSTDUSize len` - The length of the C string slice.
+/// - `NSTDUInt len` - The length of the C string slice.
 ///
 /// # Returns
 ///
 /// `NSTDCStrMut cstr` - The new C string slice, referencing `raw`'s data.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_cstr_mut_new(raw: *mut NSTDChar, len: NSTDUSize) -> NSTDCStrMut {
+pub extern "C" fn nstd_core_cstr_mut_new(raw: *mut NSTDChar, len: NSTDUInt) -> NSTDCStrMut {
     NSTDCStrMut { ptr: raw, len }
 }
 
@@ -340,10 +337,10 @@ pub extern "C" fn nstd_core_cstr_mut_as_ptr_const(cstr: &NSTDCStrMut) -> *const 
 ///
 /// # Returns
 ///
-/// `NSTDUSize len` - The length of the C string slice.
+/// `NSTDUInt len` - The length of the C string slice.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_cstr_mut_len(cstr: &NSTDCStrMut) -> NSTDUSize {
+pub extern "C" fn nstd_core_cstr_mut_len(cstr: &NSTDCStrMut) -> NSTDUInt {
     cstr.len
 }
 
@@ -408,14 +405,14 @@ pub extern "C" fn nstd_core_cstr_mut_get_null_const(cstr: &NSTDCStrMut) -> *cons
 ///
 /// - `NSTDCStrMut *cstr` - The C string.
 ///
-/// - `NSTDUSize pos` - The position of the character to get.
+/// - `NSTDUInt pos` - The position of the character to get.
 ///
 /// # Returns
 ///
 /// `NSTDChar *chr` - A pointer to the character at `pos`, or null on error.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_cstr_mut_get(cstr: &mut NSTDCStrMut, pos: NSTDUSize) -> *mut NSTDChar {
+pub extern "C" fn nstd_core_cstr_mut_get(cstr: &mut NSTDCStrMut, pos: NSTDUInt) -> *mut NSTDChar {
     nstd_core_cstr_mut_get_const(cstr, pos) as *mut NSTDChar
 }
 
@@ -425,7 +422,7 @@ pub extern "C" fn nstd_core_cstr_mut_get(cstr: &mut NSTDCStrMut, pos: NSTDUSize)
 ///
 /// - `const NSTDCStrMut *cstr` - The C string.
 ///
-/// - `NSTDUSize pos` - The position of the character to get.
+/// - `NSTDUInt pos` - The position of the character to get.
 ///
 /// # Returns
 ///
@@ -434,7 +431,7 @@ pub extern "C" fn nstd_core_cstr_mut_get(cstr: &mut NSTDCStrMut, pos: NSTDUSize)
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_cstr_mut_get_const(
     cstr: &NSTDCStrMut,
-    pos: NSTDUSize,
+    pos: NSTDUInt,
 ) -> *const NSTDChar {
     match pos < cstr.len {
         // SAFETY: We've checked `pos`, and the returned pointer is already unsafe to access.

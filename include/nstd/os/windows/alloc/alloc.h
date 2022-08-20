@@ -8,7 +8,7 @@ NSTDCPPSTART
 ///
 /// # Parameters:
 ///
-/// - `NSTDUSize size` - The number of bytes to allocate.
+/// - `NSTDUInt size` - The number of bytes to allocate.
 ///
 /// # Returns
 ///
@@ -17,13 +17,13 @@ NSTDCPPSTART
 /// # Safety
 ///
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapalloc>.
-NSTDAPI NSTDAnyMut nstd_os_windows_alloc_allocate(NSTDUSize size);
+NSTDAPI NSTDAnyMut nstd_os_windows_alloc_allocate(NSTDUInt size);
 
 /// Allocates a new block of zero-initialized memory on the current process' heap.
 ///
 /// # Parameters:
 ///
-/// - `NSTDUSize size` - The number of bytes to allocate.
+/// - `NSTDUInt size` - The number of bytes to allocate.
 ///
 /// # Returns
 ///
@@ -32,7 +32,7 @@ NSTDAPI NSTDAnyMut nstd_os_windows_alloc_allocate(NSTDUSize size);
 /// # Safety
 ///
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapalloc>.
-NSTDAPI NSTDAnyMut nstd_os_windows_alloc_allocate_zeroed(NSTDUSize size);
+NSTDAPI NSTDAnyMut nstd_os_windows_alloc_allocate_zeroed(NSTDUInt size);
 
 /// Reallocates a block of memory previously allocated by
 /// `nstd_os_windows_alloc_allocate[_zeroed]`.
@@ -45,7 +45,7 @@ NSTDAPI NSTDAnyMut nstd_os_windows_alloc_allocate_zeroed(NSTDUSize size);
 ///
 /// - `NSTDAnyMut *ptr` - A pointer to the allocated memory.
 ///
-/// - `NSTDUSize new_size` - The number of bytes to reallocate.
+/// - `NSTDUInt new_size` - The number of bytes to reallocate.
 ///
 /// # Returns
 ///
@@ -54,7 +54,7 @@ NSTDAPI NSTDAnyMut nstd_os_windows_alloc_allocate_zeroed(NSTDUSize size);
 /// # Safety
 ///
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heaprealloc>.
-NSTDAPI NSTDAllocError nstd_os_windows_alloc_reallocate(NSTDAnyMut *ptr, NSTDUSize new_size);
+NSTDAPI NSTDAllocError nstd_os_windows_alloc_reallocate(NSTDAnyMut *ptr, NSTDUInt new_size);
 
 /// Deallocates a block of memory previously allocated by
 /// `nstd_os_windows_alloc_allocate[_zeroed]`.

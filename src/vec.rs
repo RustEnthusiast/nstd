@@ -9,7 +9,7 @@ use crate::{
             NSTDSliceConst, NSTDSliceMut,
         },
     },
-    NSTDAnyConst, NSTDAnyMut, NSTDUSize, NSTD_NULL,
+    NSTDAnyConst, NSTDAnyMut, NSTDUInt, NSTD_NULL,
 };
 
 /// A dynamically sized contiguous sequence of values.
@@ -19,11 +19,11 @@ pub struct NSTDVec {
     /// A raw pointer to the vector's memory buffer.
     ptr: NSTDAnyMut,
     /// The number of bytes each value in the vector takes up.
-    stride: NSTDUSize,
+    stride: NSTDUInt,
     /// The number of active elements in the vector.
-    len: NSTDUSize,
+    len: NSTDUInt,
     /// The number of values allocated in the memory buffer.
-    cap: NSTDUSize,
+    cap: NSTDUInt,
 }
 impl NSTDVec {
     /// Creates a new [NSTDVec] from a Rust slice.
@@ -113,7 +113,7 @@ impl Drop for NSTDVec {
 ///
 /// # Parameters:
 ///
-/// - `NSTDUSize element_size` - The size in bytes of each value in the vector.
+/// - `NSTDUInt element_size` - The size in bytes of each value in the vector.
 ///
 /// # Returns
 ///
@@ -124,7 +124,7 @@ impl Drop for NSTDVec {
 /// This function will panic if `element_size` is zero.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_vec_new(element_size: NSTDUSize) -> NSTDVec {
+pub extern "C" fn nstd_vec_new(element_size: NSTDUInt) -> NSTDVec {
     assert!(element_size != 0);
     NSTDVec {
         ptr: NSTD_NULL,
@@ -142,9 +142,9 @@ pub extern "C" fn nstd_vec_new(element_size: NSTDUSize) -> NSTDVec {
 ///
 /// # Parameters:
 ///
-/// - `NSTDUSize element_size` - The size in bytes of each value in the vector.
+/// - `NSTDUInt element_size` - The size in bytes of each value in the vector.
 ///
-/// - `NSTDUSize cap` - The initial capacity for the vector.
+/// - `NSTDUInt cap` - The initial capacity for the vector.
 ///
 /// # Returns
 ///
@@ -155,7 +155,7 @@ pub extern "C" fn nstd_vec_new(element_size: NSTDUSize) -> NSTDVec {
 /// This function will panic if either `element_size` or `cap` are zero.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_vec_new_with_cap(element_size: NSTDUSize, mut cap: NSTDUSize) -> NSTDVec {
+pub extern "C" fn nstd_vec_new_with_cap(element_size: NSTDUInt, mut cap: NSTDUInt) -> NSTDVec {
     // Ensure that neither `element_size` or `cap` are zero.
     assert!(element_size != 0);
     assert!(cap != 0);
@@ -209,10 +209,10 @@ pub extern "C" fn nstd_vec_clone(vec: &NSTDVec) -> NSTDVec {
 ///
 /// # Returns
 ///
-/// `NSTDUSize len` - The length of the vector.
+/// `NSTDUInt len` - The length of the vector.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_vec_len(vec: &NSTDVec) -> NSTDUSize {
+pub extern "C" fn nstd_vec_len(vec: &NSTDVec) -> NSTDUInt {
     vec.len
 }
 
@@ -226,10 +226,10 @@ pub extern "C" fn nstd_vec_len(vec: &NSTDVec) -> NSTDUSize {
 ///
 /// # Returns
 ///
-/// `NSTDUSize cap` - The vector's capacity.
+/// `NSTDUInt cap` - The vector's capacity.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_vec_cap(vec: &NSTDVec) -> NSTDUSize {
+pub extern "C" fn nstd_vec_cap(vec: &NSTDVec) -> NSTDUInt {
     vec.cap
 }
 
@@ -241,10 +241,10 @@ pub extern "C" fn nstd_vec_cap(vec: &NSTDVec) -> NSTDUSize {
 ///
 /// # Returns
 ///
-/// `NSTDUSize stride` - The size of each value in the vector.
+/// `NSTDUInt stride` - The size of each value in the vector.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_vec_stride(vec: &NSTDVec) -> NSTDUSize {
+pub extern "C" fn nstd_vec_stride(vec: &NSTDVec) -> NSTDUInt {
     vec.stride
 }
 
@@ -319,7 +319,7 @@ pub extern "C" fn nstd_vec_as_mut_ptr(vec: &mut NSTDVec) -> NSTDAnyMut {
 ///
 /// - `const NSTDVec *vec` - The vector to read an element from.
 ///
-/// - `NSTDUSize pos` - The position of the element to get, starting at 0.
+/// - `NSTDUInt pos` - The position of the element to get, starting at 0.
 ///
 /// # Returns
 ///
@@ -327,7 +327,7 @@ pub extern "C" fn nstd_vec_as_mut_ptr(vec: &mut NSTDVec) -> NSTDAnyMut {
 /// of the vector's boundaries.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_vec_get(vec: &NSTDVec, pos: NSTDUSize) -> NSTDAnyConst {
+pub extern "C" fn nstd_vec_get(vec: &NSTDVec, pos: NSTDUInt) -> NSTDAnyConst {
     match pos < vec.len {
         // SAFETY: `pos` is a valid index.
         true => unsafe { vec.ptr.add(pos * vec.stride) },
@@ -346,7 +346,7 @@ pub extern "C" fn nstd_vec_get(vec: &NSTDVec, pos: NSTDUSize) -> NSTDAnyConst {
 ///
 /// - `NSTDVec *vec` - The vector to read an element from.
 ///
-/// - `NSTDUSize pos` - The position of the element to get, starting at 0.
+/// - `NSTDUInt pos` - The position of the element to get, starting at 0.
 ///
 /// # Returns
 ///
@@ -354,7 +354,7 @@ pub extern "C" fn nstd_vec_get(vec: &NSTDVec, pos: NSTDUSize) -> NSTDAnyConst {
 /// the vector's boundaries.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_vec_get_mut(vec: &mut NSTDVec, pos: NSTDUSize) -> NSTDAnyMut {
+pub extern "C" fn nstd_vec_get_mut(vec: &mut NSTDVec, pos: NSTDUInt) -> NSTDAnyMut {
     nstd_vec_get(vec, pos) as NSTDAnyMut
 }
 
@@ -422,7 +422,7 @@ pub extern "C" fn nstd_vec_pop(vec: &mut NSTDVec) -> NSTDAnyConst {
 ///
 /// - `NSTDAnyConst value` - A pointer to the value to insert into the vector.
 ///
-/// - `NSTDUSize index` - The index at which to insert the value.
+/// - `NSTDUInt index` - The index at which to insert the value.
 ///
 /// # Returns
 ///
@@ -442,7 +442,7 @@ pub extern "C" fn nstd_vec_pop(vec: &mut NSTDVec) -> NSTDAnyConst {
 pub unsafe extern "C" fn nstd_vec_insert(
     vec: &mut NSTDVec,
     value: NSTDAnyConst,
-    index: NSTDUSize,
+    index: NSTDUInt,
 ) -> NSTDErrorCode {
     // Make sure `index` is valid.
     if index > vec.len {
@@ -474,13 +474,13 @@ pub unsafe extern "C" fn nstd_vec_insert(
 ///
 /// - `NSTDVec *vec` - The vector.
 ///
-/// - `NSTDUSize index` - The index of the element to remove.
+/// - `NSTDUInt index` - The index of the element to remove.
 ///
 /// # Returns
 ///
 /// `NSTDErrorCode errc` - Nonzero if `index` is invalid.
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_vec_remove(vec: &mut NSTDVec, index: NSTDUSize) -> NSTDErrorCode {
+pub extern "C" fn nstd_vec_remove(vec: &mut NSTDVec, index: NSTDUInt) -> NSTDErrorCode {
     // Make sure `index` is valid. This also ensures that `vec.len` is at least 1.
     if index < vec.len {
         // Move bytes after `index` to the left by one element.
@@ -554,10 +554,10 @@ pub unsafe extern "C" fn nstd_vec_extend(
 ///
 /// - `NSTDVec *vec` - The vector to truncate.
 ///
-/// - `NSTDUSize len` - The number of elements to keep.
+/// - `NSTDUInt len` - The number of elements to keep.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_vec_truncate(vec: &mut NSTDVec, len: NSTDUSize) {
+pub extern "C" fn nstd_vec_truncate(vec: &mut NSTDVec, len: NSTDUInt) {
     if vec.len > len {
         vec.len = len;
     }
@@ -570,7 +570,7 @@ pub extern "C" fn nstd_vec_truncate(vec: &mut NSTDVec, len: NSTDUSize) {
 ///
 /// - `NSTDVec *vec` - The vector to reserve space for.
 ///
-/// - `NSTDUSize size` - The number of additional elements to allocate for.
+/// - `NSTDUInt size` - The number of additional elements to allocate for.
 ///
 /// # Returns
 ///
@@ -580,7 +580,7 @@ pub extern "C" fn nstd_vec_truncate(vec: &mut NSTDVec, len: NSTDUSize) {
 ///
 /// This operation will panic if `size` is zero.
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_vec_reserve(vec: &mut NSTDVec, size: NSTDUSize) -> NSTDAllocError {
+pub extern "C" fn nstd_vec_reserve(vec: &mut NSTDVec, size: NSTDUInt) -> NSTDAllocError {
     assert!(size != 0);
     // Calculate the number of bytes to allocate.
     let bytes_to_alloc = size * vec.stride;

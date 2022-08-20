@@ -14,7 +14,7 @@ use crate::{
         nstd_vec_extend, nstd_vec_get_mut, nstd_vec_len, nstd_vec_new_with_cap, nstd_vec_pop,
         nstd_vec_push, NSTDVec,
     },
-    NSTDUSize,
+    NSTDUInt,
 };
 use core::ptr::addr_of;
 
@@ -47,7 +47,7 @@ pub extern "C" fn nstd_cstring_new() -> NSTDCString {
 ///
 /// # Parameters:
 ///
-/// - `NSTDUSize cap` - The number of bytes to allocate ahead of time.
+/// - `NSTDUInt cap` - The number of bytes to allocate ahead of time.
 ///
 /// # Returns
 ///
@@ -58,7 +58,7 @@ pub extern "C" fn nstd_cstring_new() -> NSTDCString {
 /// This function will panic if either `cap` is zero or allocating fails.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_cstring_new_with_cap(cap: NSTDUSize) -> NSTDCString {
+pub extern "C" fn nstd_cstring_new_with_cap(cap: NSTDUInt) -> NSTDCString {
     let mut bytes = nstd_vec_new_with_cap(1, cap);
     let nul: NSTDChar = 0;
     // SAFETY: `nul` is stored on the stack.
@@ -177,10 +177,10 @@ pub extern "C" fn nstd_cstring_to_bytes(cstring: NSTDCString) -> NSTDVec {
 ///
 /// # Returns
 ///
-/// `NSTDUSize len` - The length of the C string without it's null byte.
+/// `NSTDUInt len` - The length of the C string without it's null byte.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_cstring_len(cstring: &NSTDCString) -> NSTDUSize {
+pub extern "C" fn nstd_cstring_len(cstring: &NSTDCString) -> NSTDUInt {
     nstd_vec_len(&cstring.bytes) - 1
 }
 
@@ -192,10 +192,10 @@ pub extern "C" fn nstd_cstring_len(cstring: &NSTDCString) -> NSTDUSize {
 ///
 /// # Returns
 ///
-/// `NSTDUSize len` - The length of the C string including it's null byte.
+/// `NSTDUInt len` - The length of the C string including it's null byte.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_cstring_len_with_null(cstring: &NSTDCString) -> NSTDUSize {
+pub extern "C" fn nstd_cstring_len_with_null(cstring: &NSTDCString) -> NSTDUInt {
     nstd_vec_len(&cstring.bytes)
 }
 
@@ -209,10 +209,10 @@ pub extern "C" fn nstd_cstring_len_with_null(cstring: &NSTDCString) -> NSTDUSize
 ///
 /// # Returns
 ///
-/// `NSTDUSize cap` - The C string's capacity.
+/// `NSTDUInt cap` - The C string's capacity.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_cstring_cap(cstring: &NSTDCString) -> NSTDUSize {
+pub extern "C" fn nstd_cstring_cap(cstring: &NSTDCString) -> NSTDUInt {
     nstd_vec_cap(&cstring.bytes)
 }
 

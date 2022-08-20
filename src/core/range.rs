@@ -1,7 +1,7 @@
 //! A half-open (low inclusive, high exclusive) numerical range.
 use crate::{
-    NSTDFloat32, NSTDFloat64, NSTDISize, NSTDInt16, NSTDInt32, NSTDInt64, NSTDInt8, NSTDUInt16,
-    NSTDUInt32, NSTDUInt64, NSTDUInt8, NSTDUSize,
+    NSTDFloat32, NSTDFloat64, NSTDInt, NSTDInt16, NSTDInt32, NSTDInt64, NSTDInt8, NSTDUInt,
+    NSTDUInt16, NSTDUInt32, NSTDUInt64, NSTDUInt8,
 };
 
 /// Generates the `NSTD*Range*` structs.
@@ -24,12 +24,12 @@ macro_rules! gen_range_struct {
 gen_range_struct!(
     /// A half-open (low inclusive, high exclusive) arch-bit unsigned numerical range.
     NSTDURange,
-    NSTDUSize
+    NSTDUInt
 );
 gen_range_struct!(
     /// A half-open (low inclusive, high exclusive) arch-bit signed numerical range.
     NSTDIRange,
-    NSTDISize
+    NSTDInt
 );
 gen_range_struct!(
     /// A half-open (low inclusive, high exclusive) 8-bit unsigned numerical range.

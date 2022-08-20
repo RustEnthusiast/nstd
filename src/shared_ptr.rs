@@ -2,7 +2,7 @@
 use crate::{
     alloc::{nstd_alloc_allocate, nstd_alloc_allocate_zeroed, nstd_alloc_deallocate},
     core::mem::nstd_core_mem_copy,
-    NSTDAnyConst, NSTDAnyMut, NSTDUSize,
+    NSTDAnyConst, NSTDAnyMut, NSTDUInt,
 };
 
 /// The size (in bytes) of [usize].
@@ -15,7 +15,7 @@ pub struct NSTDSharedPtr {
     /// A raw pointer to private data about the shared object.
     ptr: NSTDAnyMut,
     /// The size of the shared pointer's memory buffer.
-    size: NSTDUSize,
+    size: NSTDUInt,
 }
 impl NSTDSharedPtr {
     /// Returns the number of pointers sharing the object.
@@ -46,7 +46,7 @@ impl Drop for NSTDSharedPtr {
 ///
 /// # Parameters:
 ///
-/// - `NSTDUSize element_size` - The size of the shared object.
+/// - `NSTDUInt element_size` - The size of the shared object.
 ///
 /// - `NSTDAnyConst init` - A pointer to the object to initialize the shared pointer with.
 ///
@@ -63,7 +63,7 @@ impl Drop for NSTDSharedPtr {
 /// This operation is unsafe because passing `init` as a null pointer can cause undefined behavior.
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_shared_ptr_new(
-    element_size: NSTDUSize,
+    element_size: NSTDUInt,
     init: NSTDAnyConst,
 ) -> NSTDSharedPtr {
     // Allocate a region of memory for the object and the pointer count.
@@ -87,7 +87,7 @@ pub unsafe extern "C" fn nstd_shared_ptr_new(
 ///
 /// # Parameters:
 ///
-/// - `NSTDUSize element_size` - The size of the shared object.
+/// - `NSTDUInt element_size` - The size of the shared object.
 ///
 /// # Returns
 ///
@@ -97,7 +97,7 @@ pub unsafe extern "C" fn nstd_shared_ptr_new(
 ///
 /// This operation will panic if allocating fails.
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_shared_ptr_new_zeroed(element_size: NSTDUSize) -> NSTDSharedPtr {
+pub extern "C" fn nstd_shared_ptr_new_zeroed(element_size: NSTDUInt) -> NSTDSharedPtr {
     // SAFETY: The allocated memory is validated after allocation.
     unsafe {
         // Allocate a region of memory for the object and the pointer count.
@@ -149,10 +149,10 @@ pub extern "C" fn nstd_shared_ptr_share(shared_ptr: &NSTDSharedPtr) -> NSTDShare
 ///
 /// # Returns
 ///
-/// `NSTDUSize owners` - The number of pointers that share `shared_ptr`'s data.
+/// `NSTDUInt owners` - The number of pointers that share `shared_ptr`'s data.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_shared_ptr_owners(shared_ptr: &NSTDSharedPtr) -> NSTDUSize {
+pub extern "C" fn nstd_shared_ptr_owners(shared_ptr: &NSTDSharedPtr) -> NSTDUInt {
     // SAFETY: Shared pointers are always non-null.
     unsafe { *shared_ptr.ptrs() }
 }
@@ -165,10 +165,10 @@ pub extern "C" fn nstd_shared_ptr_owners(shared_ptr: &NSTDSharedPtr) -> NSTDUSiz
 ///
 /// # Returns
 ///
-/// `NSTDUSize size` - The size of the shared object.
+/// `NSTDUInt size` - The size of the shared object.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_shared_ptr_size(shared_ptr: &NSTDSharedPtr) -> NSTDUSize {
+pub extern "C" fn nstd_shared_ptr_size(shared_ptr: &NSTDSharedPtr) -> NSTDUInt {
     shared_ptr.size - USIZE_SIZE
 }
 
