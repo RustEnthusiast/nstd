@@ -84,6 +84,19 @@ NSTDAPI void nstd_window_set_position(const NSTDWindow *window, NSTDWindowPositi
 /// `NSTDWindowPosition pos` - The position of the window.
 NSTDAPI NSTDWindowPosition nstd_window_get_position(const NSTDWindow *window);
 
+/// Gets the position of a window's client area on the display.
+///
+/// This always returns an x and y value of 0 on unsupported platforms.
+///
+/// # Parameters:
+///
+/// - `const NSTDWindow *window` - The window.
+///
+/// # Returns
+///
+/// `NSTDWindowPosition pos` - The position of the window's client area.
+NSTDAPI NSTDWindowPosition nstd_window_get_inner_position(const NSTDWindow *window);
+
 /// Sets the size of a window's client area.
 ///
 /// # Parameters:

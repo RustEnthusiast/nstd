@@ -121,6 +121,26 @@ pub extern "C" fn nstd_window_get_position(window: &NSTDWindow) -> NSTDWindowPos
     NSTDWindowPosition { x: 0, y: 0 }
 }
 
+/// Gets the position of a window's client area on the display.
+///
+/// This always returns an x and y value of 0 on unsupported platforms.
+///
+/// # Parameters:
+///
+/// - `const NSTDWindow *window` - The window.
+///
+/// # Returns
+///
+/// `NSTDWindowPosition pos` - The position of the window's client area.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_window_get_inner_position(window: &NSTDWindow) -> NSTDWindowPosition {
+    if let Ok(pos) = window.inner_position() {
+        return NSTDWindowPosition { x: pos.x, y: pos.y };
+    }
+    NSTDWindowPosition { x: 0, y: 0 }
+}
+
 /// Sets the size of a window's client area.
 ///
 /// # Parameters:
