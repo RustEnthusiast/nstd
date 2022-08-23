@@ -1,3 +1,7 @@
+# TBD
+### `nstd.core`
+- Renamed `fty` functions.
+
 # 0.1.1
 ### `nstd`
 - Renamed `NSTD[I|U]Size` to `NSTD[U]Int`.
