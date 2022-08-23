@@ -134,3 +134,27 @@ pub unsafe extern "C" fn nstd_fs_remove_dirs(name: &NSTDStrConst) -> NSTDIOError
     }
     NSTDIOError::NSTD_IO_ERROR_NONE
 }
+
+/// Renames a file or directory, replacing the destination if it already exists.
+///
+/// # Parameters:
+///
+/// - `const NSTDStrConst *from` - The original name of the file/directory.
+///
+/// - `const NSTDStrConst *to` - The new name of the file/dir.
+///
+/// # Returns
+///
+/// `NSTDIOError errc` - The I/O operation error code.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if either `to` or `from`'s data is invalid.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_fs_rename(from: &NSTDStrConst, to: &NSTDStrConst) -> NSTDIOError {
+    if let Err(err) = std::fs::rename(from.as_str(), to.as_str()) {
+        return NSTDIOError::from_err(err.kind());
+    }
+    NSTDIOError::NSTD_IO_ERROR_NONE
+}
