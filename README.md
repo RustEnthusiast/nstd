@@ -71,11 +71,11 @@ the `clib` feature flag. The `std` feature flag enables Rust standard library su
 `nstd_core` are enabled by default.
 
 For example:
-```
+```sh
 cargo build --release --features "clib nstd_alloc nstd_vec"
 ```
 
 To build with all features:
-```
+```sh
 cargo build --release --all-features
 ```
