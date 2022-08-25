@@ -204,6 +204,21 @@ pub extern "C" fn nstd_string_len(string: &NSTDString) -> NSTDUInt {
     unsafe { nstd_core_str_const_len(&str) }
 }
 
+/// Returns the number of bytes a string contains.
+///
+/// # Parameters:
+///
+/// - `const NSTDString *string` - The string.
+///
+/// # Returns
+///
+/// `NSTDUInt byte_len` - The number of bytes in the string.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_string_byte_len(string: &NSTDString) -> NSTDUInt {
+    nstd_vec_len(&string.bytes)
+}
+
 /// Returns a string's capacity.
 ///
 /// This is the max number of *bytes* the string can contain without reallocating.

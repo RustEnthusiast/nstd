@@ -117,6 +117,17 @@ NSTDAPI NSTDVec nstd_string_to_bytes(NSTDString string);
 /// `NSTDUInt len` - The length of the string.
 NSTDAPI NSTDUInt nstd_string_len(const NSTDString *string);
 
+/// Returns the number of bytes a string contains.
+///
+/// # Parameters:
+///
+/// - `const NSTDString *string` - The string.
+///
+/// # Returns
+///
+/// `NSTDUInt byte_len` - The number of bytes in the string.
+NSTDAPI NSTDUInt nstd_string_byte_len(const NSTDString *string);
+
 /// Returns a string's capacity.
 ///
 /// This is the max number of *bytes* the string can contain without reallocating.
