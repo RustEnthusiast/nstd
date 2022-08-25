@@ -1,6 +1,7 @@
 # TBD
 ### `nstd.core`
 - Renamed `fty` functions.
+- Added `nstd_core_str_[const|mut]_byte_len`.
 
 # 0.1.1
 ### `nstd`

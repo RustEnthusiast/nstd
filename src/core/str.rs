@@ -8,8 +8,9 @@ use crate::{
         def::{NSTDByte, NSTDErrorCode},
         range::NSTDURange,
         slice::{
-            nstd_core_slice_const_as_ptr, nstd_core_slice_const_new, nstd_core_slice_const_stride,
-            nstd_core_slice_mut_as_ptr_const, nstd_core_slice_mut_new, nstd_core_slice_mut_stride,
+            nstd_core_slice_const_as_ptr, nstd_core_slice_const_len, nstd_core_slice_const_new,
+            nstd_core_slice_const_stride, nstd_core_slice_mut_as_ptr_const,
+            nstd_core_slice_mut_len, nstd_core_slice_mut_new, nstd_core_slice_mut_stride,
             NSTDSliceConst, NSTDSliceMut,
         },
     },
@@ -206,6 +207,21 @@ pub extern "C" fn nstd_core_str_const_as_ptr(str: &NSTDStrConst) -> *const NSTDB
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_const_len(str: &NSTDStrConst) -> NSTDUInt {
     str.as_str().chars().count()
+}
+
+/// Returns the number of bytes a string slice contains.
+///
+/// # Parameters:
+///
+/// - `const NSTDStrConst *str` - The string slice.
+///
+/// # Returns
+///
+/// `NSTDUInt byte_len` - The number of bytes in the string slice.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_core_str_const_byte_len(str: &NSTDStrConst) -> NSTDUInt {
+    nstd_core_slice_const_len(&str.bytes)
 }
 
 /// Gets the `NSTDUnichar` at index `pos` in `str`.
@@ -661,6 +677,21 @@ pub extern "C" fn nstd_core_str_mut_as_ptr(str: &NSTDStrMut) -> *const NSTDByte 
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_mut_len(str: &NSTDStrMut) -> NSTDUInt {
     str.as_str().chars().count()
+}
+
+/// Returns the number of bytes a string slice contains.
+///
+/// # Parameters:
+///
+/// - `const NSTDStrMut *str` - The string slice.
+///
+/// # Returns
+///
+/// `NSTDUInt byte_len` - The number of bytes in the string slice.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_core_str_mut_byte_len(str: &NSTDStrMut) -> NSTDUInt {
+    nstd_core_slice_mut_len(&str.bytes)
 }
 
 /// Gets the `NSTDUnichar` at index `pos` in `str`.

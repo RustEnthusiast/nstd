@@ -116,6 +116,17 @@ NSTDAPI const NSTDByte *nstd_core_str_const_as_ptr(const NSTDStrConst *str);
 /// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 NSTDAPI NSTDUInt nstd_core_str_const_len(const NSTDStrConst *str);
 
+/// Returns the number of bytes a string slice contains.
+///
+/// # Parameters:
+///
+/// - `const NSTDStrConst *str` - The string slice.
+///
+/// # Returns
+///
+/// `NSTDUInt byte_len` - The number of bytes in the string slice.
+NSTDAPI NSTDUInt nstd_core_str_const_byte_len(const NSTDStrConst *str);
+
 /// Gets the `NSTDUnichar` at index `pos` in `str`.
 ///
 /// # Note
@@ -478,6 +489,17 @@ NSTDAPI const NSTDByte *nstd_core_str_mut_as_ptr(const NSTDStrMut *str);
 ///
 /// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 NSTDAPI NSTDUInt nstd_core_str_mut_len(const NSTDStrMut *str);
+
+/// Returns the number of bytes a string slice contains.
+///
+/// # Parameters:
+///
+/// - `const NSTDStrMut *str` - The string slice.
+///
+/// # Returns
+///
+/// `NSTDUInt byte_len` - The number of bytes in the string slice.
+NSTDAPI NSTDUInt nstd_core_str_mut_byte_len(const NSTDStrMut *str);
 
 /// Gets the `NSTDUnichar` at index `pos` in `str`.
 ///
