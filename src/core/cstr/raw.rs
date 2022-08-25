@@ -18,11 +18,34 @@ use crate::{core::def::NSTDChar, NSTDBool, NSTDUInt, NSTD_FALSE, NSTD_TRUE};
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_cstr_raw_len(cstr: *const NSTDChar) -> NSTDUInt {
-    let mut i = 0;
-    while *cstr.add(i) != 0 {
-        i += 1;
+    #[cfg(not(any(target_arch = "x86", target_arch = "x86_64")))]
+    {
+        let mut i = 0;
+        while *cstr.add(i) != 0 {
+            i += 1;
+        }
+        i
     }
-    i
+    #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
+    {
+        use core::arch::asm;
+        let i;
+        asm!(
+            // Initialize `i` to zero.
+            "xor {i}, {i}",
+            // Iterate through each character, incrementing `cstr` & `i`, until the null byte is
+            // reached.
+            "2:",
+            "cmp byte ptr [{cstr} + {i}], 0",
+            "je 3f",
+            "inc {i}",
+            "jne 2b",
+            "3:",
+            cstr = in(reg) cstr,
+            i = out(reg) i,
+        );
+        i
+    }
 }
 
 /// Gets the length of a null terminated C string, including the null byte.
