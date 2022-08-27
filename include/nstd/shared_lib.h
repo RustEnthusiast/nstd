@@ -12,7 +12,7 @@ typedef NSTDAnyMut NSTDSharedLib;
 ///
 /// # Parameters:
 ///
-/// - `const NSTDStrConst *path` - A path to the shared library.
+/// - `const NSTDStr *path` - A path to the shared library.
 ///
 /// # Returns
 ///
@@ -21,7 +21,7 @@ typedef NSTDAnyMut NSTDSharedLib;
 /// # Safety
 ///
 /// See <https://docs.rs/libloading/latest/libloading/struct.Library.html#method.new>.
-NSTDAPI NSTDSharedLib nstd_shared_lib_load(const NSTDStrConst *path);
+NSTDAPI NSTDSharedLib nstd_shared_lib_load(const NSTDStr *path);
 
 /// Gets a pointer to a function or static variable in a dynamically loaded library by symbol name.
 ///
@@ -33,12 +33,12 @@ NSTDAPI NSTDSharedLib nstd_shared_lib_load(const NSTDStrConst *path);
 ///
 /// # Returns
 ///
-/// `NSTDAnyConst ptr` - A pointer to the function or variable.
+/// `NSTDAny ptr` - A pointer to the function or variable.
 ///
 /// # Safety
 ///
 /// Undefined behavior may occur if `symbol`'s data is invalid.
-NSTDAPI NSTDAnyConst nstd_shared_lib_get(const NSTDSharedLib *lib, const NSTDChar *symbol);
+NSTDAPI NSTDAny nstd_shared_lib_get(const NSTDSharedLib *lib, const NSTDChar *symbol);
 
 /// Gets a mutable pointer to a function or static variable in a dynamically loaded library by
 /// symbol name.

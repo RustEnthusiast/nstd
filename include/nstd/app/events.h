@@ -4,16 +4,16 @@
 #include "data.h"
 
 /// A window's unique identifier.
-typedef NSTDAnyConst NSTDWindowID;
+typedef NSTDAny NSTDWindowID;
 
 /// A device's unique identifier.
-typedef NSTDAnyConst NSTDDeviceID;
+typedef NSTDAny NSTDDeviceID;
 
 /// Identifier for an analog axis on a device.
-typedef NSTDAnyConst NSTDAnalogAxisID;
+typedef NSTDAny NSTDAnalogAxisID;
 
 /// A button's unique identifier.
-typedef NSTDAnyConst NSTDButtonID;
+typedef NSTDAny NSTDButtonID;
 
 /// Describes a mouse wheel's scroll delta.
 typedef enum {

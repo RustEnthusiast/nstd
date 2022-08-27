@@ -3,6 +3,6 @@
 #include "../nstd.h"
 
 /// A handle to the application event loop.
-typedef NSTDAnyConst NSTDAppHandle;
+typedef NSTDAny NSTDAppHandle;
 
 #endif
