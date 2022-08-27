@@ -46,12 +46,12 @@ NSTDAPI NSTDWindow nstd_window_new(NSTDAppHandle app);
 ///
 /// - `const NSTDWindow *window` - The window.
 ///
-/// - `const NSTDStrConst *title` - The new title of the window.
+/// - `const NSTDStr *title` - The new title of the window.
 ///
 /// # Safety
 ///
 /// This function can cause undefined behavior if `title`'s data is invalid.
-NSTDAPI void nstd_window_set_title(const NSTDWindow *window, const NSTDStrConst *title);
+NSTDAPI void nstd_window_set_title(const NSTDWindow *window, const NSTDStr *title);
 
 /// Sets a window's icon to an RGBA image.
 ///

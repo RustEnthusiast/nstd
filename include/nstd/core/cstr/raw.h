@@ -12,13 +12,13 @@ NSTDCPPSTART
 ///
 /// # Returns
 ///
-/// `NSTDUSize len` - The length of the C string, excluding the null byte.
+/// `NSTDUInt len` - The length of the C string, excluding the null byte.
 ///
 /// # Safety
 ///
 /// The C string's buffer may not be large enough to contain the null byte, resulting in an
 /// incorrect length.
-NSTDAPI NSTDUSize nstd_core_cstr_raw_len(const NSTDChar *cstr);
+NSTDAPI NSTDUInt nstd_core_cstr_raw_len(const NSTDChar *cstr);
 
 /// Gets the length of a null terminated C string, including the null byte.
 ///
@@ -28,13 +28,13 @@ NSTDAPI NSTDUSize nstd_core_cstr_raw_len(const NSTDChar *cstr);
 ///
 /// # Returns
 ///
-/// `NSTDUSize len` - The length of the C string, including the null byte.
+/// `NSTDUInt len` - The length of the C string, including the null byte.
 ///
 /// # Safety
 ///
 /// The C string's buffer may not be large enough to contain the null byte, resulting in an
 /// incorrect length.
-NSTDAPI NSTDUSize nstd_core_cstr_raw_len_with_null(const NSTDChar *cstr);
+NSTDAPI NSTDUInt nstd_core_cstr_raw_len_with_null(const NSTDChar *cstr);
 
 /// Compares two C strings, returning `NSTD_TRUE` if they are lexicographically equal.
 ///

@@ -1,5 +1,5 @@
 //! Raw C string processing.
-use crate::{core::def::NSTDChar, NSTDBool, NSTDUSize, NSTD_FALSE, NSTD_TRUE};
+use crate::{core::def::NSTDChar, NSTDBool, NSTDUInt, NSTD_FALSE, NSTD_TRUE};
 
 /// Gets the length of a null terminated C string, excluding the null byte.
 ///
@@ -9,7 +9,7 @@ use crate::{core::def::NSTDChar, NSTDBool, NSTDUSize, NSTD_FALSE, NSTD_TRUE};
 ///
 /// # Returns
 ///
-/// `NSTDUSize len` - The length of the C string, excluding the null byte.
+/// `NSTDUInt len` - The length of the C string, excluding the null byte.
 ///
 /// # Safety
 ///
@@ -17,12 +17,35 @@ use crate::{core::def::NSTDChar, NSTDBool, NSTDUSize, NSTD_FALSE, NSTD_TRUE};
 /// incorrect length.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_cstr_raw_len(cstr: *const NSTDChar) -> NSTDUSize {
-    let mut i = 0;
-    while *cstr.add(i) != 0 {
-        i += 1;
+pub unsafe extern "C" fn nstd_core_cstr_raw_len(cstr: *const NSTDChar) -> NSTDUInt {
+    #[cfg(not(any(target_arch = "x86", target_arch = "x86_64")))]
+    {
+        let mut i = 0;
+        while *cstr.add(i) != 0 {
+            i += 1;
+        }
+        i
     }
-    i
+    #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
+    {
+        use core::arch::asm;
+        let i;
+        asm!(
+            // Initialize `i` to zero.
+            "xor {i}, {i}",
+            // Iterate through each character, incrementing `cstr` & `i`, until the null byte is
+            // reached.
+            "2:",
+            "cmp byte ptr [{cstr} + {i}], 0",
+            "je 3f",
+            "inc {i}",
+            "jne 2b",
+            "3:",
+            cstr = in(reg) cstr,
+            i = out(reg) i,
+        );
+        i
+    }
 }
 
 /// Gets the length of a null terminated C string, including the null byte.
@@ -33,7 +56,7 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_len(cstr: *const NSTDChar) -> NSTDUS
 ///
 /// # Returns
 ///
-/// `NSTDUSize len` - The length of the C string, including the null byte.
+/// `NSTDUInt len` - The length of the C string, including the null byte.
 ///
 /// # Safety
 ///
@@ -41,7 +64,7 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_len(cstr: *const NSTDChar) -> NSTDUS
 /// incorrect length.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_cstr_raw_len_with_null(cstr: *const NSTDChar) -> NSTDUSize {
+pub unsafe extern "C" fn nstd_core_cstr_raw_len_with_null(cstr: *const NSTDChar) -> NSTDUInt {
     nstd_core_cstr_raw_len(cstr) + 1
 }
 

@@ -8,7 +8,7 @@ use crate::{NSTDFloat32, NSTDFloat64};
 /// `NSTDFloat32 min` - The smallest finite value representable by `NSTDFloat32`.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_fty_f32_min() -> NSTDFloat32 {
+pub extern "C" fn nstd_core_fty_min_f32() -> NSTDFloat32 {
     NSTDFloat32::MIN
 }
 /// Returns the largest finite value representable by `NSTDFloat32`.
@@ -18,7 +18,7 @@ pub extern "C" fn nstd_core_fty_f32_min() -> NSTDFloat32 {
 /// `NSTDFloat32 max` - The largest finite value representable by `NSTDFloat32`.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_fty_f32_max() -> NSTDFloat32 {
+pub extern "C" fn nstd_core_fty_max_f32() -> NSTDFloat32 {
     NSTDFloat32::MAX
 }
 /// Returns the smallest finite value representable by `NSTDFloat64`.
@@ -28,7 +28,7 @@ pub extern "C" fn nstd_core_fty_f32_max() -> NSTDFloat32 {
 /// `NSTDFloat64 min` - The smallest finite value representable by `NSTDFloat64`.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_fty_f64_min() -> NSTDFloat64 {
+pub extern "C" fn nstd_core_fty_min_f64() -> NSTDFloat64 {
     NSTDFloat64::MIN
 }
 /// Returns the largest finite value representable by `NSTDFloat64`.
@@ -38,7 +38,7 @@ pub extern "C" fn nstd_core_fty_f64_min() -> NSTDFloat64 {
 /// `NSTDFloat64 max` - The largest finite value representable by `NSTDFloat64`.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_fty_f64_max() -> NSTDFloat64 {
+pub extern "C" fn nstd_core_fty_max_f64() -> NSTDFloat64 {
     NSTDFloat64::MAX
 }
 
@@ -49,7 +49,7 @@ pub extern "C" fn nstd_core_fty_f64_max() -> NSTDFloat64 {
 /// `NSTDFloat32 nan` - NaN represented as `NSTDFloat32`.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_fty_f32_nan() -> NSTDFloat32 {
+pub extern "C" fn nstd_core_fty_nan_f32() -> NSTDFloat32 {
     NSTDFloat32::NAN
 }
 /// Returns NaN represented as `NSTDFloat64`.
@@ -59,7 +59,7 @@ pub extern "C" fn nstd_core_fty_f32_nan() -> NSTDFloat32 {
 /// `NSTDFloat64 nan` - NaN represented as `NSTDFloat64`.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_fty_f64_nan() -> NSTDFloat64 {
+pub extern "C" fn nstd_core_fty_nan_f64() -> NSTDFloat64 {
     NSTDFloat64::NAN
 }
 
@@ -70,7 +70,7 @@ pub extern "C" fn nstd_core_fty_f64_nan() -> NSTDFloat64 {
 /// `NSTDFloat32 inf` - Infinity represented as `NSTDFloat32`.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_fty_f32_inf() -> NSTDFloat32 {
+pub extern "C" fn nstd_core_fty_inf_f32() -> NSTDFloat32 {
     NSTDFloat32::INFINITY
 }
 /// Returns infinity represented as `NSTDFloat64`.
@@ -80,7 +80,7 @@ pub extern "C" fn nstd_core_fty_f32_inf() -> NSTDFloat32 {
 /// `NSTDFloat64 inf` - Infinity represented as `NSTDFloat64`.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_fty_f64_inf() -> NSTDFloat64 {
+pub extern "C" fn nstd_core_fty_inf_f64() -> NSTDFloat64 {
     NSTDFloat64::INFINITY
 }
 
@@ -91,7 +91,7 @@ pub extern "C" fn nstd_core_fty_f64_inf() -> NSTDFloat64 {
 /// `NSTDFloat32 neg_inf` - Negative infinity represented as `NSTDFloat32`.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_fty_f32_neg_inf() -> NSTDFloat32 {
+pub extern "C" fn nstd_core_fty_neg_inf_f32() -> NSTDFloat32 {
     NSTDFloat32::NEG_INFINITY
 }
 /// Returns negative infinity represented as `NSTDFloat64`.
@@ -101,6 +101,6 @@ pub extern "C" fn nstd_core_fty_f32_neg_inf() -> NSTDFloat32 {
 /// `NSTDFloat64 neg_inf` - Negative infinity represented as `NSTDFloat64`.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_fty_f64_neg_inf() -> NSTDFloat64 {
+pub extern "C" fn nstd_core_fty_neg_inf_f64() -> NSTDFloat64 {
     NSTDFloat64::NEG_INFINITY
 }

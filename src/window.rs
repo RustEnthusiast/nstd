@@ -1,7 +1,7 @@
 //! An `nstd` application window.
 use crate::{
     app::handle::NSTDAppHandle,
-    core::str::NSTDStrConst,
+    core::str::NSTDStr,
     image::{nstd_image_as_bytes, nstd_image_height, nstd_image_width, NSTDImage},
     NSTDInt32, NSTDUInt32,
 };
@@ -60,14 +60,14 @@ pub extern "C" fn nstd_window_new(app: NSTDAppHandle) -> NSTDWindow {
 ///
 /// - `const NSTDWindow *window` - The window.
 ///
-/// - `const NSTDStrConst *title` - The new title of the window.
+/// - `const NSTDStr *title` - The new title of the window.
 ///
 /// # Safety
 ///
 /// This function can cause undefined behavior if `title`'s data is invalid.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_window_set_title(window: &NSTDWindow, title: &NSTDStrConst) {
+pub unsafe extern "C" fn nstd_window_set_title(window: &NSTDWindow, title: &NSTDStr) {
     window.set_title(title.as_str())
 }
 

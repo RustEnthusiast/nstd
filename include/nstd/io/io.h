@@ -55,7 +55,7 @@ typedef enum {
 ///
 /// # Parameters:
 ///
-/// - `const NSTDStrConst *output` - The string slice to write to stdout.
+/// - `const NSTDStr *output` - The string slice to write to stdout.
 ///
 /// # Returns
 ///
@@ -65,13 +65,13 @@ typedef enum {
 ///
 /// The provided string slice's data must be valid, else this function can cause garbage bytes to
 /// be written to stdout.
-NSTDAPI NSTDIOError nstd_io_print(const NSTDStrConst *output);
+NSTDAPI NSTDIOError nstd_io_print(const NSTDStr *output);
 
 /// Writes a string slice to stdout followed by a new line.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDStrConst *output` - The string slice to write to stdout.
+/// - `const NSTDStr *output` - The string slice to write to stdout.
 ///
 /// # Returns
 ///
@@ -81,7 +81,7 @@ NSTDAPI NSTDIOError nstd_io_print(const NSTDStrConst *output);
 ///
 /// The provided string slice's data must be valid, else this function can cause garbage bytes to
 /// be written to stdout.
-NSTDAPI NSTDIOError nstd_io_print_line(const NSTDStrConst *output);
+NSTDAPI NSTDIOError nstd_io_print_line(const NSTDStr *output);
 
 /// Reads a line of UTF-8 input from stdin and pushes it onto `buffer` without the newline.
 ///

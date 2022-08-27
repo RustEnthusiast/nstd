@@ -81,6 +81,53 @@ NSTDAPI NSTDBool nstd_core_cty_is_whitespace(NSTDUnichar chr);
 /// `NSTDBool is_control` - `NSTD_TRUE` if `chr` is a control character.
 NSTDAPI NSTDBool nstd_core_cty_is_control(NSTDUnichar chr);
 
+/// Determines whether or not `chr` is punctuation.
+///
+/// # Note
+///
+/// This only works with ASCII characters.
+///
+/// # Parameters:
+///
+/// - `NSTDUnichar chr` - The character to check.
+///
+/// # Returns
+///
+/// `NSTDBool is_punctuation` - `NSTD_TRUE` if `chr` is punctuation.
+NSTDAPI NSTDBool nstd_core_cty_is_punctuation(NSTDUnichar chr);
+
+/// Determines whether or not `chr` is a graphic character.
+///
+/// # Note
+///
+/// This only works with ASCII characters.
+///
+/// # Parameters:
+///
+/// - `NSTDUnichar chr` - The character to check.
+///
+/// # Returns
+///
+/// `NSTDBool is_graphic` - `NSTD_TRUE` if `chr` is a graphic character.
+NSTDAPI NSTDBool nstd_core_cty_is_graphic(NSTDUnichar chr);
+
+/// Determines whether or not `chr` is a digit, depending on `radix`.
+///
+/// # Parameters:
+///
+/// - `NSTDUnichar chr` - The character to check.
+///
+/// - `NSTDUInt32 radix` - The base.
+///
+/// # Returns
+///
+/// `NSTDBool is_digit` - `NSTD_TRUE` if `chr` is a digit.
+///
+/// # Panics
+///
+/// This operation will panic if `radix` is larger than 36.
+NSTDAPI NSTDBool nstd_core_cty_is_digit(NSTDUnichar chr, NSTDUInt32 radix);
+
 /// Returns the lowercase version of `chr` or `chr` if there is no lowercase version.
 ///
 /// # Note
