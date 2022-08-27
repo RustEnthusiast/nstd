@@ -85,20 +85,38 @@ NSTDAPI NSTDFloat64 nstd_core_math_clamp_f64(NSTDFloat64 x, NSTDFloat64 min, NST
 ///
 /// # Parameters:
 ///
-/// - `NSTDUInt8 x` - The value to clamp.
+/// - `NSTDInt x` - The value to clamp.
 ///
-/// - `NSTDUInt8 min` - The minimum clamp value.
+/// - `NSTDInt min` - The minimum clamp value.
 ///
-/// - `NSTDUInt8 max` - The maximum clamp value.
+/// - `NSTDInt max` - The maximum clamp value.
 ///
 /// # Returns
 ///
-/// `NSTDUInt8 v` - The clamped value.
+/// `NSTDInt v` - The clamped value.
 ///
 /// # Panics
 ///
 /// Panics if `min` > `max`.
-NSTDAPI NSTDUInt8 nstd_core_math_clamp_u8(NSTDUInt8 x, NSTDUInt8 min, NSTDUInt8 max);
+NSTDAPI NSTDInt nstd_core_math_clamp_int(NSTDInt x, NSTDInt min, NSTDInt max);
+/// Clamps the value `x` to the bounds `min` and `max`.
+///
+/// # Parameters:
+///
+/// - `NSTDUInt x` - The value to clamp.
+///
+/// - `NSTDUInt min` - The minimum clamp value.
+///
+/// - `NSTDUInt max` - The maximum clamp value.
+///
+/// # Returns
+///
+/// `NSTDUInt v` - The clamped value.
+///
+/// # Panics
+///
+/// Panics if `min` > `max`.
+NSTDAPI NSTDUInt nstd_core_math_clamp_uint(NSTDUInt x, NSTDUInt min, NSTDUInt max);
 /// Clamps the value `x` to the bounds `min` and `max`.
 ///
 /// # Parameters:
@@ -121,20 +139,20 @@ NSTDAPI NSTDInt8 nstd_core_math_clamp_i8(NSTDInt8 x, NSTDInt8 min, NSTDInt8 max)
 ///
 /// # Parameters:
 ///
-/// - `NSTDUInt16 x` - The value to clamp.
+/// - `NSTDUInt8 x` - The value to clamp.
 ///
-/// - `NSTDUInt16 min` - The minimum clamp value.
+/// - `NSTDUInt8 min` - The minimum clamp value.
 ///
-/// - `NSTDUInt16 max` - The maximum clamp value.
+/// - `NSTDUInt8 max` - The maximum clamp value.
 ///
 /// # Returns
 ///
-/// `NSTDUInt16 v` - The clamped value.
+/// `NSTDUInt8 v` - The clamped value.
 ///
 /// # Panics
 ///
 /// Panics if `min` > `max`.
-NSTDAPI NSTDUInt16 nstd_core_math_clamp_u16(NSTDUInt16 x, NSTDUInt16 min, NSTDUInt16 max);
+NSTDAPI NSTDUInt8 nstd_core_math_clamp_u8(NSTDUInt8 x, NSTDUInt8 min, NSTDUInt8 max);
 /// Clamps the value `x` to the bounds `min` and `max`.
 ///
 /// # Parameters:
@@ -157,20 +175,20 @@ NSTDAPI NSTDInt16 nstd_core_math_clamp_i16(NSTDInt16 x, NSTDInt16 min, NSTDInt16
 ///
 /// # Parameters:
 ///
-/// - `NSTDUInt32 x` - The value to clamp.
+/// - `NSTDUInt16 x` - The value to clamp.
 ///
-/// - `NSTDUInt32 min` - The minimum clamp value.
+/// - `NSTDUInt16 min` - The minimum clamp value.
 ///
-/// - `NSTDUInt32 max` - The maximum clamp value.
+/// - `NSTDUInt16 max` - The maximum clamp value.
 ///
 /// # Returns
 ///
-/// `NSTDUInt32 v` - The clamped value.
+/// `NSTDUInt16 v` - The clamped value.
 ///
 /// # Panics
 ///
 /// Panics if `min` > `max`.
-NSTDAPI NSTDUInt32 nstd_core_math_clamp_u32(NSTDUInt32 x, NSTDUInt32 min, NSTDUInt32 max);
+NSTDAPI NSTDUInt16 nstd_core_math_clamp_u16(NSTDUInt16 x, NSTDUInt16 min, NSTDUInt16 max);
 /// Clamps the value `x` to the bounds `min` and `max`.
 ///
 /// # Parameters:
@@ -193,20 +211,20 @@ NSTDAPI NSTDInt32 nstd_core_math_clamp_i32(NSTDInt32 x, NSTDInt32 min, NSTDInt32
 ///
 /// # Parameters:
 ///
-/// - `NSTDUInt64 x` - The value to clamp.
+/// - `NSTDUInt32 x` - The value to clamp.
 ///
-/// - `NSTDUInt64 min` - The minimum clamp value.
+/// - `NSTDUInt32 min` - The minimum clamp value.
 ///
-/// - `NSTDUInt64 max` - The maximum clamp value.
+/// - `NSTDUInt32 max` - The maximum clamp value.
 ///
 /// # Returns
 ///
-/// `NSTDUInt64 v` - The clamped value.
+/// `NSTDUInt32 v` - The clamped value.
 ///
 /// # Panics
 ///
 /// Panics if `min` > `max`.
-NSTDAPI NSTDUInt64 nstd_core_math_clamp_u64(NSTDUInt64 x, NSTDUInt64 min, NSTDUInt64 max);
+NSTDAPI NSTDUInt32 nstd_core_math_clamp_u32(NSTDUInt32 x, NSTDUInt32 min, NSTDUInt32 max);
 /// Clamps the value `x` to the bounds `min` and `max`.
 ///
 /// # Parameters:
@@ -229,38 +247,181 @@ NSTDAPI NSTDInt64 nstd_core_math_clamp_i64(NSTDInt64 x, NSTDInt64 min, NSTDInt64
 ///
 /// # Parameters:
 ///
-/// - `NSTDUSize x` - The value to clamp.
+/// - `NSTDUInt64 x` - The value to clamp.
 ///
-/// - `NSTDUSize min` - The minimum clamp value.
+/// - `NSTDUInt64 min` - The minimum clamp value.
 ///
-/// - `NSTDUSize max` - The maximum clamp value.
+/// - `NSTDUInt64 max` - The maximum clamp value.
 ///
 /// # Returns
 ///
-/// `NSTDUSize v` - The clamped value.
+/// `NSTDUInt64 v` - The clamped value.
 ///
 /// # Panics
 ///
 /// Panics if `min` > `max`.
-NSTDAPI NSTDUSize nstd_core_math_clamp_usize(NSTDUSize x, NSTDUSize min, NSTDUSize max);
-/// Clamps the value `x` to the bounds `min` and `max`.
+NSTDAPI NSTDUInt64 nstd_core_math_clamp_u64(NSTDUInt64 x, NSTDUInt64 min, NSTDUInt64 max);
+
+/// Divides two numbers and rounds the result up to the next integer.
 ///
 /// # Parameters:
 ///
-/// - `NSTDISize x` - The value to clamp.
+/// - `NSTDInt x` - The first value.
 ///
-/// - `NSTDISize min` - The minimum clamp value.
-///
-/// - `NSTDISize max` - The maximum clamp value.
+/// - `NSTDInt y` - The second value.
 ///
 /// # Returns
 ///
-/// `NSTDISize v` - The clamped value.
+/// `NSTDInt v` - The divided value, rounded up.
 ///
 /// # Panics
 ///
-/// Panics if `min` > `max`.
-NSTDAPI NSTDISize nstd_core_math_clamp_isize(NSTDISize x, NSTDISize min, NSTDISize max);
+/// This operation will panic if `y` is 0.
+NSTDAPI NSTDInt nstd_core_math_div_ceil_int(NSTDInt x, NSTDInt y);
+/// Divides two numbers and rounds the result up to the next integer.
+///
+/// # Parameters:
+///
+/// - `NSTDUInt x` - The first value.
+///
+/// - `NSTDUInt y` - The second value.
+///
+/// # Returns
+///
+/// `NSTDUInt v` - The divided value, rounded up.
+///
+/// # Panics
+///
+/// This operation will panic if `y` is 0.
+NSTDAPI NSTDUInt nstd_core_math_div_ceil_uint(NSTDUInt x, NSTDUInt y);
+/// Divides two numbers and rounds the result up to the next integer.
+///
+/// # Parameters:
+///
+/// - `NSTDInt8 x` - The first value.
+///
+/// - `NSTDInt8 y` - The second value.
+///
+/// # Returns
+///
+/// `NSTDInt8 v` - The divided value, rounded up.
+///
+/// # Panics
+///
+/// This operation will panic if `y` is 0.
+NSTDAPI NSTDInt8 nstd_core_math_div_ceil_i8(NSTDInt8 x, NSTDInt8 y);
+/// Divides two numbers and rounds the result up to the next integer.
+///
+/// # Parameters:
+///
+/// - `NSTDUInt8 x` - The first value.
+///
+/// - `NSTDUInt8 y` - The second value.
+///
+/// # Returns
+///
+/// `NSTDUInt8 v` - The divided value, rounded up.
+///
+/// # Panics
+///
+/// This operation will panic if `y` is 0.
+NSTDAPI NSTDUInt8 nstd_core_math_div_ceil_u8(NSTDUInt8 x, NSTDUInt8 y);
+/// Divides two numbers and rounds the result up to the next integer.
+///
+/// # Parameters:
+///
+/// - `NSTDInt16 x` - The first value.
+///
+/// - `NSTDInt16 y` - The second value.
+///
+/// # Returns
+///
+/// `NSTDInt16 v` - The divided value, rounded up.
+///
+/// # Panics
+///
+/// This operation will panic if `y` is 0.
+NSTDAPI NSTDInt16 nstd_core_math_div_ceil_i16(NSTDInt16 x, NSTDInt16 y);
+/// Divides two numbers and rounds the result up to the next integer.
+///
+/// # Parameters:
+///
+/// - `NSTDUInt16 x` - The first value.
+///
+/// - `NSTDUInt16 y` - The second value.
+///
+/// # Returns
+///
+/// `NSTDUInt16 v` - The divided value, rounded up.
+///
+/// # Panics
+///
+/// This operation will panic if `y` is 0.
+NSTDAPI NSTDUInt16 nstd_core_math_div_ceil_u16(NSTDUInt16 x, NSTDUInt16 y);
+/// Divides two numbers and rounds the result up to the next integer.
+///
+/// # Parameters:
+///
+/// - `NSTDInt32 x` - The first value.
+///
+/// - `NSTDInt32 y` - The second value.
+///
+/// # Returns
+///
+/// `NSTDInt32 v` - The divided value, rounded up.
+///
+/// # Panics
+///
+/// This operation will panic if `y` is 0.
+NSTDAPI NSTDInt32 nstd_core_math_div_ceil_i32(NSTDInt32 x, NSTDInt32 y);
+/// Divides two numbers and rounds the result up to the next integer.
+///
+/// # Parameters:
+///
+/// - `NSTDUInt32 x` - The first value.
+///
+/// - `NSTDUInt32 y` - The second value.
+///
+/// # Returns
+///
+/// `NSTDUInt32 v` - The divided value, rounded up.
+///
+/// # Panics
+///
+/// This operation will panic if `y` is 0.
+NSTDAPI NSTDUInt32 nstd_core_math_div_ceil_u32(NSTDUInt32 x, NSTDUInt32 y);
+/// Divides two numbers and rounds the result up to the next integer.
+///
+/// # Parameters:
+///
+/// - `NSTDInt64 x` - The first value.
+///
+/// - `NSTDInt64 y` - The second value.
+///
+/// # Returns
+///
+/// `NSTDInt64 v` - The divided value, rounded up.
+///
+/// # Panics
+///
+/// This operation will panic if `y` is 0.
+NSTDAPI NSTDInt64 nstd_core_math_div_ceil_i64(NSTDInt64 x, NSTDInt64 y);
+/// Divides two numbers and rounds the result up to the next integer.
+///
+/// # Parameters:
+///
+/// - `NSTDUInt64 x` - The first value.
+///
+/// - `NSTDUInt64 y` - The second value.
+///
+/// # Returns
+///
+/// `NSTDUInt64 v` - The divided value, rounded up.
+///
+/// # Panics
+///
+/// This operation will panic if `y` is 0.
+NSTDAPI NSTDUInt64 nstd_core_math_div_ceil_u64(NSTDUInt64 x, NSTDUInt64 y);
 
 NSTDCPPEND
 #endif

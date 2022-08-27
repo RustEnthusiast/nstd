@@ -1,5 +1,5 @@
 //! A handle to the standard output stream.
-use crate::{core::slice::NSTDSliceConst, io::NSTDIOError, NSTDUSize};
+use crate::{core::slice::NSTDSlice, io::NSTDIOError, NSTDUInt};
 use std::io::Stdout;
 
 /// A handle to the standard output stream.
@@ -28,9 +28,9 @@ pub extern "C" fn nstd_io_stdout() -> NSTDStdout {
 ///
 /// - `NSTDStdout *handle` - A handle to stdout.
 ///
-/// - `const NSTDSliceConst *bytes` - The data to be written to stdout.
+/// - `const NSTDSlice *bytes` - The data to be written to stdout.
 ///
-/// - `NSTDUSize *written` - Returns as the number of bytes written.
+/// - `NSTDUInt *written` - Returns as the number of bytes written.
 ///
 /// # Returns
 ///
@@ -43,8 +43,8 @@ pub extern "C" fn nstd_io_stdout() -> NSTDStdout {
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_io_stdout_write(
     handle: &mut NSTDStdout,
-    bytes: &NSTDSliceConst,
-    written: &mut NSTDUSize,
+    bytes: &NSTDSlice,
+    written: &mut NSTDUInt,
 ) -> NSTDIOError {
     crate::io::stdio::write(handle, bytes, written)
 }
@@ -60,7 +60,7 @@ pub unsafe extern "C" fn nstd_io_stdout_write(
 ///
 /// - `NSTDStdout *handle` - A handle to stdout.
 ///
-/// - `const NSTDSliceConst *bytes` - The data to be written to stdout.
+/// - `const NSTDSlice *bytes` - The data to be written to stdout.
 ///
 /// # Returns
 ///
@@ -73,7 +73,7 @@ pub unsafe extern "C" fn nstd_io_stdout_write(
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_io_stdout_write_all(
     handle: &mut NSTDStdout,
-    bytes: &NSTDSliceConst,
+    bytes: &NSTDSlice,
 ) -> NSTDIOError {
     crate::io::stdio::write_all(handle, bytes)
 }
