@@ -1,14 +1,29 @@
 //! Low level memory allocation.
 #[cfg(not(target_os = "windows"))]
 extern crate alloc;
-use crate::{core::def::NSTDErrorCode, NSTDAnyMut, NSTDUSize};
+use crate::{NSTDAnyMut, NSTDUInt};
+
+/// Describes an error returned from allocation functions.
+#[repr(C)]
+#[derive(Clone, Copy, Debug, Hash, PartialEq, Eq)]
+#[allow(non_camel_case_types)]
+pub enum NSTDAllocError {
+    /// No error occurred.
+    NSTD_ALLOC_ERROR_NONE,
+    /// Allocating or reallocating failed.
+    NSTD_ALLOC_ERROR_OUT_OF_MEMORY,
+    /// Deallocating memory failed.
+    NSTD_ALLOC_ERROR_MEMORY_NOT_FOUND,
+    /// Getting a handle to a heap failed.
+    NSTD_ALLOC_ERROR_HEAP_NOT_FOUND,
+}
 
 /// Allocates a block of memory on the heap.
 /// The number of bytes to be allocated is specified by `size`.
 ///
 /// # Parameters:
 ///
-/// - `NSTDUSize size` - The number of bytes to allocate on the heap.
+/// - `NSTDUInt size` - The number of bytes to allocate on the heap.
 ///
 /// # Returns
 ///
@@ -19,7 +34,7 @@ use crate::{core::def::NSTDErrorCode, NSTDAnyMut, NSTDUSize};
 /// This operation is unsafe because the behavior is undefined if `size` is zero.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_alloc_allocate(size: NSTDUSize) -> NSTDAnyMut {
+pub unsafe extern "C" fn nstd_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
     #[cfg(not(target_os = "windows"))]
     {
         use alloc::alloc::Layout;
@@ -36,7 +51,7 @@ pub unsafe extern "C" fn nstd_alloc_allocate(size: NSTDUSize) -> NSTDAnyMut {
 ///
 /// # Parameters:
 ///
-/// - `NSTDUSize size` - The number of bytes to allocate on the heap.
+/// - `NSTDUInt size` - The number of bytes to allocate on the heap.
 ///
 /// # Returns
 ///
@@ -47,7 +62,7 @@ pub unsafe extern "C" fn nstd_alloc_allocate(size: NSTDUSize) -> NSTDAnyMut {
 /// This operation is unsafe because the behavior is undefined if `size` is zero.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_alloc_allocate_zeroed(size: NSTDUSize) -> NSTDAnyMut {
+pub unsafe extern "C" fn nstd_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMut {
     #[cfg(not(target_os = "windows"))]
     {
         use alloc::alloc::Layout;
@@ -70,13 +85,13 @@ pub unsafe extern "C" fn nstd_alloc_allocate_zeroed(size: NSTDUSize) -> NSTDAnyM
 ///
 /// - `NSTDAnyMut *ptr` - A pointer to the allocated memory.
 ///
-/// - `NSTDUSize size` - The number of bytes currently allocated.
+/// - `NSTDUInt size` - The number of bytes currently allocated.
 ///
-/// - `NSTDUSize new_size` - The number of bytes to reallocate.
+/// - `NSTDUInt new_size` - The number of bytes to reallocate.
 ///
 /// # Returns
 ///
-/// `NSTDErrorCode errc` - Nonzero on error.
+/// `NSTDAllocError errc` - The allocation operation error code.
 ///
 /// # Safety
 ///
@@ -87,9 +102,9 @@ pub unsafe extern "C" fn nstd_alloc_allocate_zeroed(size: NSTDUSize) -> NSTDAnyM
 #[cfg_attr(target_os = "windows", allow(unused_variables))]
 pub unsafe extern "C" fn nstd_alloc_reallocate(
     ptr: &mut NSTDAnyMut,
-    size: NSTDUSize,
-    new_size: NSTDUSize,
-) -> NSTDErrorCode {
+    size: NSTDUInt,
+    new_size: NSTDUInt,
+) -> NSTDAllocError {
     #[cfg(not(target_os = "windows"))]
     {
         use alloc::alloc::Layout;
@@ -97,9 +112,9 @@ pub unsafe extern "C" fn nstd_alloc_reallocate(
         let new_mem = alloc::alloc::realloc((*ptr).cast(), layout, new_size);
         if !new_mem.is_null() {
             *ptr = new_mem.cast();
-            return 0;
+            return NSTDAllocError::NSTD_ALLOC_ERROR_NONE;
         }
-        1
+        NSTDAllocError::NSTD_ALLOC_ERROR_OUT_OF_MEMORY
     }
     #[cfg(target_os = "windows")]
     {
@@ -113,7 +128,7 @@ pub unsafe extern "C" fn nstd_alloc_reallocate(
 ///
 /// - `NSTDAnyMut *ptr` - A pointer to the allocated memory, once freed the pointer is set to null.
 ///
-/// - `NSTDUSize size` - The number of bytes to free.
+/// - `NSTDUInt size` - The number of bytes to free.
 ///
 /// # Safety
 ///
@@ -122,7 +137,7 @@ pub unsafe extern "C" fn nstd_alloc_reallocate(
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 #[cfg_attr(target_os = "windows", allow(unused_variables))]
-pub unsafe extern "C" fn nstd_alloc_deallocate(ptr: &mut NSTDAnyMut, size: NSTDUSize) {
+pub unsafe extern "C" fn nstd_alloc_deallocate(ptr: &mut NSTDAnyMut, size: NSTDUInt) {
     #[cfg(not(target_os = "windows"))]
     {
         use crate::NSTD_NULL;

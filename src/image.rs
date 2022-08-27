@@ -1,6 +1,6 @@
 //! Multi-format image processing.
 use crate::{
-    core::slice::{nstd_core_slice_const_new, NSTDSliceConst},
+    core::slice::{nstd_core_slice_new, NSTDSlice},
     io::NSTDIOError,
     NSTDUInt32,
 };
@@ -60,7 +60,7 @@ impl NSTDImageError {
 ///
 /// # Parameters:
 ///
-/// - `const NSTDSliceConst *buffer` - The image buffer.
+/// - `const NSTDSlice *buffer` - The image buffer.
 ///
 /// - `NSTDImageError *errc` - Returns as the image operation's error code.
 ///
@@ -77,7 +77,7 @@ impl NSTDImageError {
 /// This operation can cause undefined behavior if `buffer`'s data is invalid.
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_image_load(
-    buffer: &NSTDSliceConst,
+    buffer: &NSTDSlice,
     errc: &mut NSTDImageError,
 ) -> Option<NSTDImage> {
     match image::load_from_memory(buffer.as_slice()) {
@@ -97,12 +97,12 @@ pub unsafe extern "C" fn nstd_image_load(
 ///
 /// # Returns
 ///
-/// `NSTDSliceConst bytes` - The image's raw pixel data.
+/// `NSTDSlice bytes` - The image's raw pixel data.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_image_as_bytes(img: &NSTDImage) -> NSTDSliceConst {
+pub extern "C" fn nstd_image_as_bytes(img: &NSTDImage) -> NSTDSlice {
     let bytes = img.as_bytes();
-    nstd_core_slice_const_new(bytes.as_ptr().cast(), 1, bytes.len())
+    nstd_core_slice_new(bytes.as_ptr().cast(), 1, bytes.len())
 }
 
 /// Returns the width of an image.

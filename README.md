@@ -31,6 +31,7 @@ Rust syntax).
     - `os` - Operating system specific functionality.
         - `windows` - OS support for Windows.
             - `alloc` - Low level memory allocation for Windows.
+                - `heap` - Process heap management for Windows.
     - `shared_lib` - Access symbols from loaded shared libraries.
     - `shared_ptr` - A reference counting smart pointer.
     - `string` - Dynamically sized UTF-8 encoded byte string.
@@ -71,11 +72,11 @@ the `clib` feature flag. The `std` feature flag enables Rust standard library su
 `nstd_core` are enabled by default.
 
 For example:
-```
+```sh
 cargo build --release --features "clib nstd_alloc nstd_vec"
 ```
 
 To build with all features:
-```
+```sh
 cargo build --release --all-features
 ```

@@ -27,9 +27,9 @@ NSTDAPI NSTDStderr nstd_io_stderr();
 ///
 /// - `NSTDStderr *handle` - A handle to stderr.
 ///
-/// - `const NSTDSliceConst *bytes` - The data to be written to stderr.
+/// - `const NSTDSlice *bytes` - The data to be written to stderr.
 ///
-/// - `NSTDUSize *written` - Returns as the number of bytes written.
+/// - `NSTDUInt *written` - Returns as the number of bytes written.
 ///
 /// # Returns
 ///
@@ -38,8 +38,8 @@ NSTDAPI NSTDStderr nstd_io_stderr();
 /// # Safety
 ///
 /// This function can cause undefined behavior if `bytes`'s data is invalid.
-NSTDAPI NSTDIOError nstd_io_stderr_write(NSTDStderr *handle, const NSTDSliceConst *bytes,
-NSTDUSize *written);
+NSTDAPI NSTDIOError nstd_io_stderr_write(NSTDStderr *handle, const NSTDSlice *bytes,
+NSTDUInt *written);
 
 /// Writes an entire buffer to the standard error stream.
 ///
@@ -52,7 +52,7 @@ NSTDUSize *written);
 ///
 /// - `NSTDStderr *handle` - A handle to stderr.
 ///
-/// - `const NSTDSliceConst *bytes` - The data to be written to stderr.
+/// - `const NSTDSlice *bytes` - The data to be written to stderr.
 ///
 /// # Returns
 ///
@@ -61,7 +61,7 @@ NSTDUSize *written);
 /// # Safety
 ///
 /// This function can cause undefined behavior if `bytes`'s data is invalid.
-NSTDAPI NSTDIOError nstd_io_stderr_write_all(NSTDStderr *handle, const NSTDSliceConst *bytes);
+NSTDAPI NSTDIOError nstd_io_stderr_write_all(NSTDStderr *handle, const NSTDSlice *bytes);
 
 /// Flushes the standard error stream.
 ///
