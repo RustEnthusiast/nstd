@@ -10,64 +10,64 @@ NSTDCPPSTART
 /// An immutable unowned view into a UTF-8 encoded byte string.
 typedef struct {
     /// A view into the UTF-8 encoded buffer.
-    NSTDSliceConst bytes;
-} NSTDStrConst;
+    NSTDSlice bytes;
+} NSTDStr;
 
-/// Creates a new instance of `NSTDStrConst` from a C string slice.
+/// Creates a new instance of `NSTDStr` from a C string slice.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDCStrConst *cstr` - The C string slice to wrap.
+/// - `const NSTDCStr *cstr` - The C string slice to wrap.
 ///
 /// # Returns
 ///
-/// `NSTDStrConst str` - The new `NSTDStrConst` instance.
+/// `NSTDStr str` - The new `NSTDStr` instance.
 ///
 /// # Panics
 ///
 /// This function will panic if `cstr`'s data is not valid UTF-8.
-NSTDAPI NSTDStrConst nstd_core_str_const_from_cstr(const NSTDCStrConst *cstr);
+NSTDAPI NSTDStr nstd_core_str_from_cstr(const NSTDCStr *cstr);
 
-/// Creates a new instance of `NSTDStrConst` from a C string slice.
+/// Creates a new instance of `NSTDStr` from a C string slice.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDCStrConst *cstr` - The C string slice to wrap.
+/// - `const NSTDCStr *cstr` - The C string slice to wrap.
 ///
 /// # Returns
 ///
-/// `NSTDStrConst str` - The new `NSTDStrConst` instance.
+/// `NSTDStr str` - The new `NSTDStr` instance.
 ///
 /// # Safety
 ///
 /// This function does not check to ensure that `cstr` is valid UTF-8. `cstr`'s data must remain
 /// valid while the returned string slice is in use.
-NSTDAPI NSTDStrConst nstd_core_str_const_from_cstr_unchecked(const NSTDCStrConst *cstr);
+NSTDAPI NSTDStr nstd_core_str_from_cstr_unchecked(const NSTDCStr *cstr);
 
 /// Creates a string slice from raw bytes.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDSliceConst *bytes` - The UTF-8 encoded byte slice.
+/// - `const NSTDSlice *bytes` - The UTF-8 encoded byte slice.
 ///
 /// # Returns
 ///
-/// `NSTDStrConst str` - The new string slice.
+/// `NSTDStr str` - The new string slice.
 ///
 /// # Panics
 ///
 /// This operation will panic if `bytes`'s stride is not 1, or `bytes` is not valid UTF-8.
-NSTDAPI NSTDStrConst nstd_core_str_const_from_bytes(const NSTDSliceConst *bytes);
+NSTDAPI NSTDStr nstd_core_str_from_bytes(const NSTDSlice *bytes);
 
 /// Creates a string slice from raw bytes, without checking for UTF-8.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDSliceConst *bytes` - The UTF-8 encoded byte slice.
+/// - `const NSTDSlice *bytes` - The UTF-8 encoded byte slice.
 ///
 /// # Returns
 ///
-/// `NSTDStrConst str` - The new string slice.
+/// `NSTDStr str` - The new string slice.
 ///
 /// # Panics
 ///
@@ -77,35 +77,35 @@ NSTDAPI NSTDStrConst nstd_core_str_const_from_bytes(const NSTDSliceConst *bytes)
 ///
 /// This function does not check to ensure that `bytes` are valid UTF-8.`bytes` must remain valid
 /// while the returned string slice is in use.
-NSTDAPI NSTDStrConst nstd_core_str_const_from_bytes_unchecked(const NSTDSliceConst *bytes);
+NSTDAPI NSTDStr nstd_core_str_from_bytes_unchecked(const NSTDSlice *bytes);
 
 /// Returns an immutable byte slice over `str`'s data.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDStrConst *str` - The string slice.
+/// - `const NSTDStr *str` - The string slice.
 ///
 /// # Returns
 ///
-/// `NSTDSliceConst bytes` - An immutable byte slice over `str`'s data.
-NSTDAPI NSTDSliceConst nstd_core_str_const_as_bytes(const NSTDStrConst *str);
+/// `NSTDSlice bytes` - An immutable byte slice over `str`'s data.
+NSTDAPI NSTDSlice nstd_core_str_as_bytes(const NSTDStr *str);
 
 /// Returns a raw pointer to a string slice's memory.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDStrConst *str` - The string slice.
+/// - `const NSTDStr *str` - The string slice.
 ///
 /// # Returns
 ///
 /// `const NSTDByte *ptr` - A raw pointer to a string slice's memory.
-NSTDAPI const NSTDByte *nstd_core_str_const_as_ptr(const NSTDStrConst *str);
+NSTDAPI const NSTDByte *nstd_core_str_as_ptr(const NSTDStr *str);
 
 /// Returns the number of Unicode characters in a string slice.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDStrConst *str` - The string slice.
+/// - `const NSTDStr *str` - The string slice.
 ///
 /// # Returns
 ///
@@ -114,18 +114,18 @@ NSTDAPI const NSTDByte *nstd_core_str_const_as_ptr(const NSTDStrConst *str);
 /// # Safety
 ///
 /// This operation can cause undefined behavior in the event that `str`'s data is invalid.
-NSTDAPI NSTDUInt nstd_core_str_const_len(const NSTDStrConst *str);
+NSTDAPI NSTDUInt nstd_core_str_len(const NSTDStr *str);
 
 /// Returns the number of bytes a string slice contains.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDStrConst *str` - The string slice.
+/// - `const NSTDStr *str` - The string slice.
 ///
 /// # Returns
 ///
 /// `NSTDUInt byte_len` - The number of bytes in the string slice.
-NSTDAPI NSTDUInt nstd_core_str_const_byte_len(const NSTDStrConst *str);
+NSTDAPI NSTDUInt nstd_core_str_byte_len(const NSTDStr *str);
 
 /// Gets the `NSTDUnichar` at index `pos` in `str`.
 ///
@@ -135,7 +135,7 @@ NSTDAPI NSTDUInt nstd_core_str_const_byte_len(const NSTDStrConst *str);
 ///
 /// # Parameters:
 ///
-/// - `const NSTDStrConst *str` - The string slice to index.
+/// - `const NSTDStr *str` - The string slice to index.
 ///
 /// - `NSTDUInt pos` - The index of the character to get.
 ///
@@ -147,7 +147,7 @@ NSTDAPI NSTDUInt nstd_core_str_const_byte_len(const NSTDStrConst *str);
 /// # Safety
 ///
 /// This operation could cause undefined behavior if `str`'s data is invalid.
-NSTDAPI NSTDUnichar nstd_core_str_const_get_char(const NSTDStrConst *str, NSTDUInt pos);
+NSTDAPI NSTDUnichar nstd_core_str_get_char(const NSTDStr *str, NSTDUInt pos);
 
 /// Creates a substring of an existing string slice.
 ///
@@ -158,13 +158,13 @@ NSTDAPI NSTDUnichar nstd_core_str_const_get_char(const NSTDStrConst *str, NSTDUI
 ///
 /// # Parameters:
 ///
-/// - `const NSTDStrConst *str` - The string slice to create the new substring from.
+/// - `const NSTDStr *str` - The string slice to create the new substring from.
 ///
 /// - `NSTDURange range` - The bounds of the new substring (indexed by bytes).
 ///
 /// # Returns
 ///
-/// `NSTDStrConst substr` - The new substring.
+/// `NSTDStr substr` - The new substring.
 ///
 /// # Panics
 ///
@@ -175,13 +175,13 @@ NSTDAPI NSTDUnichar nstd_core_str_const_get_char(const NSTDStrConst *str, NSTDUI
 /// - `range.start` is greater than `range.end`.
 ///
 /// - The substring bytes are not valid UTF-8.
-NSTDAPI NSTDStrConst nstd_core_str_const_substr(const NSTDStrConst *str, NSTDURange range);
+NSTDAPI NSTDStr nstd_core_str_substr(const NSTDStr *str, NSTDURange range);
 
 /// Attempts to parse a string slice as an `NSTDFloat32`.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDStrConst *str` - The string slice.
+/// - `const NSTDStr *str` - The string slice.
 ///
 /// - `NSTDErrorCode *errc` - Set to nonzero on error.
 ///
@@ -192,12 +192,12 @@ NSTDAPI NSTDStrConst nstd_core_str_const_substr(const NSTDStrConst *str, NSTDURa
 /// # Safety:
 ///
 /// This operation can cause undefined behavior if `str`'s data is invalid.
-NSTDAPI NSTDFloat32 nstd_core_str_const_to_f32(const NSTDStrConst *str, NSTDErrorCode *errc);
+NSTDAPI NSTDFloat32 nstd_core_str_to_f32(const NSTDStr *str, NSTDErrorCode *errc);
 /// Attempts to parse a string slice as an `NSTDFloat64`.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDStrConst *str` - The string slice.
+/// - `const NSTDStr *str` - The string slice.
 ///
 /// - `NSTDErrorCode *errc` - Set to nonzero on error.
 ///
@@ -208,12 +208,12 @@ NSTDAPI NSTDFloat32 nstd_core_str_const_to_f32(const NSTDStrConst *str, NSTDErro
 /// # Safety:
 ///
 /// This operation can cause undefined behavior if `str`'s data is invalid.
-NSTDAPI NSTDFloat64 nstd_core_str_const_to_f64(const NSTDStrConst *str, NSTDErrorCode *errc);
+NSTDAPI NSTDFloat64 nstd_core_str_to_f64(const NSTDStr *str, NSTDErrorCode *errc);
 /// Attempts to parse a string slice as an `NSTDInt`.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDStrConst *str` - The string slice.
+/// - `const NSTDStr *str` - The string slice.
 ///
 /// - `NSTDErrorCode *errc` - Set to nonzero on error.
 ///
@@ -224,12 +224,12 @@ NSTDAPI NSTDFloat64 nstd_core_str_const_to_f64(const NSTDStrConst *str, NSTDErro
 /// # Safety:
 ///
 /// This operation can cause undefined behavior if `str`'s data is invalid.
-NSTDAPI NSTDInt nstd_core_str_const_to_int(const NSTDStrConst *str, NSTDErrorCode *errc);
+NSTDAPI NSTDInt nstd_core_str_to_int(const NSTDStr *str, NSTDErrorCode *errc);
 /// Attempts to parse a string slice as an `NSTDUInt`.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDStrConst *str` - The string slice.
+/// - `const NSTDStr *str` - The string slice.
 ///
 /// - `NSTDErrorCode *errc` - Set to nonzero on error.
 ///
@@ -240,12 +240,12 @@ NSTDAPI NSTDInt nstd_core_str_const_to_int(const NSTDStrConst *str, NSTDErrorCod
 /// # Safety:
 ///
 /// This operation can cause undefined behavior if `str`'s data is invalid.
-NSTDAPI NSTDUInt nstd_core_str_const_to_uint(const NSTDStrConst *str, NSTDErrorCode *errc);
+NSTDAPI NSTDUInt nstd_core_str_to_uint(const NSTDStr *str, NSTDErrorCode *errc);
 /// Attempts to parse a string slice as an `NSTDInt8`.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDStrConst *str` - The string slice.
+/// - `const NSTDStr *str` - The string slice.
 ///
 /// - `NSTDErrorCode *errc` - Set to nonzero on error.
 ///
@@ -256,12 +256,12 @@ NSTDAPI NSTDUInt nstd_core_str_const_to_uint(const NSTDStrConst *str, NSTDErrorC
 /// # Safety:
 ///
 /// This operation can cause undefined behavior if `str`'s data is invalid.
-NSTDAPI NSTDInt8 nstd_core_str_const_to_i8(const NSTDStrConst *str, NSTDErrorCode *errc);
+NSTDAPI NSTDInt8 nstd_core_str_to_i8(const NSTDStr *str, NSTDErrorCode *errc);
 /// Attempts to parse a string slice as an `NSTDUInt8`.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDStrConst *str` - The string slice.
+/// - `const NSTDStr *str` - The string slice.
 ///
 /// - `NSTDErrorCode *errc` - Set to nonzero on error.
 ///
@@ -272,12 +272,12 @@ NSTDAPI NSTDInt8 nstd_core_str_const_to_i8(const NSTDStrConst *str, NSTDErrorCod
 /// # Safety:
 ///
 /// This operation can cause undefined behavior if `str`'s data is invalid.
-NSTDAPI NSTDUInt8 nstd_core_str_const_to_u8(const NSTDStrConst *str, NSTDErrorCode *errc);
+NSTDAPI NSTDUInt8 nstd_core_str_to_u8(const NSTDStr *str, NSTDErrorCode *errc);
 /// Attempts to parse a string slice as an `NSTDInt16`.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDStrConst *str` - The string slice.
+/// - `const NSTDStr *str` - The string slice.
 ///
 /// - `NSTDErrorCode *errc` - Set to nonzero on error.
 ///
@@ -288,12 +288,12 @@ NSTDAPI NSTDUInt8 nstd_core_str_const_to_u8(const NSTDStrConst *str, NSTDErrorCo
 /// # Safety:
 ///
 /// This operation can cause undefined behavior if `str`'s data is invalid.
-NSTDAPI NSTDInt16 nstd_core_str_const_to_i16(const NSTDStrConst *str, NSTDErrorCode *errc);
+NSTDAPI NSTDInt16 nstd_core_str_to_i16(const NSTDStr *str, NSTDErrorCode *errc);
 /// Attempts to parse a string slice as an `NSTDUInt16`.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDStrConst *str` - The string slice.
+/// - `const NSTDStr *str` - The string slice.
 ///
 /// - `NSTDErrorCode *errc` - Set to nonzero on error.
 ///
@@ -304,12 +304,12 @@ NSTDAPI NSTDInt16 nstd_core_str_const_to_i16(const NSTDStrConst *str, NSTDErrorC
 /// # Safety:
 ///
 /// This operation can cause undefined behavior if `str`'s data is invalid.
-NSTDAPI NSTDUInt16 nstd_core_str_const_to_u16(const NSTDStrConst *str, NSTDErrorCode *errc);
+NSTDAPI NSTDUInt16 nstd_core_str_to_u16(const NSTDStr *str, NSTDErrorCode *errc);
 /// Attempts to parse a string slice as an `NSTDInt32`.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDStrConst *str` - The string slice.
+/// - `const NSTDStr *str` - The string slice.
 ///
 /// - `NSTDErrorCode *errc` - Set to nonzero on error.
 ///
@@ -320,12 +320,12 @@ NSTDAPI NSTDUInt16 nstd_core_str_const_to_u16(const NSTDStrConst *str, NSTDError
 /// # Safety:
 ///
 /// This operation can cause undefined behavior if `str`'s data is invalid.
-NSTDAPI NSTDInt32 nstd_core_str_const_to_i32(const NSTDStrConst *str, NSTDErrorCode *errc);
+NSTDAPI NSTDInt32 nstd_core_str_to_i32(const NSTDStr *str, NSTDErrorCode *errc);
 /// Attempts to parse a string slice as an `NSTDUInt32`.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDStrConst *str` - The string slice.
+/// - `const NSTDStr *str` - The string slice.
 ///
 /// - `NSTDErrorCode *errc` - Set to nonzero on error.
 ///
@@ -336,12 +336,12 @@ NSTDAPI NSTDInt32 nstd_core_str_const_to_i32(const NSTDStrConst *str, NSTDErrorC
 /// # Safety:
 ///
 /// This operation can cause undefined behavior if `str`'s data is invalid.
-NSTDAPI NSTDUInt32 nstd_core_str_const_to_u32(const NSTDStrConst *str, NSTDErrorCode *errc);
+NSTDAPI NSTDUInt32 nstd_core_str_to_u32(const NSTDStr *str, NSTDErrorCode *errc);
 /// Attempts to parse a string slice as an `NSTDInt64`.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDStrConst *str` - The string slice.
+/// - `const NSTDStr *str` - The string slice.
 ///
 /// - `NSTDErrorCode *errc` - Set to nonzero on error.
 ///
@@ -352,12 +352,12 @@ NSTDAPI NSTDUInt32 nstd_core_str_const_to_u32(const NSTDStrConst *str, NSTDError
 /// # Safety:
 ///
 /// This operation can cause undefined behavior if `str`'s data is invalid.
-NSTDAPI NSTDInt64 nstd_core_str_const_to_i64(const NSTDStrConst *str, NSTDErrorCode *errc);
+NSTDAPI NSTDInt64 nstd_core_str_to_i64(const NSTDStr *str, NSTDErrorCode *errc);
 /// Attempts to parse a string slice as an `NSTDUInt64`.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDStrConst *str` - The string slice.
+/// - `const NSTDStr *str` - The string slice.
 ///
 /// - `NSTDErrorCode *errc` - Set to nonzero on error.
 ///
@@ -368,7 +368,7 @@ NSTDAPI NSTDInt64 nstd_core_str_const_to_i64(const NSTDStrConst *str, NSTDErrorC
 /// # Safety:
 ///
 /// This operation can cause undefined behavior if `str`'s data is invalid.
-NSTDAPI NSTDUInt64 nstd_core_str_const_to_u64(const NSTDStrConst *str, NSTDErrorCode *errc);
+NSTDAPI NSTDUInt64 nstd_core_str_to_u64(const NSTDStr *str, NSTDErrorCode *errc);
 
 /// An unowned view into a UTF-8 encoded byte string.
 typedef struct {
@@ -450,8 +450,8 @@ NSTDAPI NSTDStrMut nstd_core_str_mut_from_bytes_unchecked(NSTDSliceMut *bytes);
 ///
 /// # Returns
 ///
-/// `NSTDStrConst str_const` - The immutable copy of `str`.
-NSTDAPI NSTDStrConst nstd_core_str_mut_as_const(const NSTDStrMut *str);
+/// `NSTDStr str_const` - The immutable copy of `str`.
+NSTDAPI NSTDStr nstd_core_str_mut_as_const(const NSTDStrMut *str);
 
 /// Returns an immutable byte slice over `str`'s data.
 ///
@@ -461,8 +461,8 @@ NSTDAPI NSTDStrConst nstd_core_str_mut_as_const(const NSTDStrMut *str);
 ///
 /// # Returns
 ///
-/// `NSTDSliceConst bytes` - An immutable byte slice over `str`'s data.
-NSTDAPI NSTDSliceConst nstd_core_str_mut_as_bytes(const NSTDStrMut *str);
+/// `NSTDSlice bytes` - An immutable byte slice over `str`'s data.
+NSTDAPI NSTDSlice nstd_core_str_mut_as_bytes(const NSTDStrMut *str);
 
 /// Returns an immutable raw pointer to a string slice's memory.
 ///

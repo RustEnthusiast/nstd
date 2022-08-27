@@ -88,7 +88,7 @@ pub type NSTDUnichar = NSTDChar32;
 ///
 /// Accessing any data through this pointer type is unsafe. Raw pointers have no way of knowing if
 /// the data being pointed to is or isn't valid.
-pub type NSTDAnyConst = *const c_void;
+pub type NSTDAny = *const c_void;
 /// A void pointer (a pointer to some arbitrary type).
 ///
 /// # Safety

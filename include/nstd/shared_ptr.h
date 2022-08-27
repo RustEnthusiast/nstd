@@ -17,7 +17,7 @@ typedef struct {
 ///
 /// - `NSTDUInt element_size` - The size of the shared object.
 ///
-/// - `NSTDAnyConst init` - A pointer to the object to initialize the shared pointer with.
+/// - `NSTDAny init` - A pointer to the object to initialize the shared pointer with.
 ///
 /// # Returns
 ///
@@ -30,7 +30,7 @@ typedef struct {
 /// # Safety
 ///
 /// This operation is unsafe because passing `init` as a null pointer can cause undefined behavior.
-NSTDAPI NSTDSharedPtr nstd_shared_ptr_new(NSTDUInt element_size, NSTDAnyConst init);
+NSTDAPI NSTDSharedPtr nstd_shared_ptr_new(NSTDUInt element_size, NSTDAny init);
 
 /// Creates a new zero-initialized instance of a shared pointer.
 ///
@@ -88,8 +88,8 @@ NSTDAPI NSTDUInt nstd_shared_ptr_size(const NSTDSharedPtr *shared_ptr);
 ///
 /// # Returns
 ///
-/// `NSTDAnyConst ptr` - A raw pointer to the shared object.
-NSTDAPI NSTDAnyConst nstd_shared_ptr_get(const NSTDSharedPtr *shared_ptr);
+/// `NSTDAny ptr` - A raw pointer to the shared object.
+NSTDAPI NSTDAny nstd_shared_ptr_get(const NSTDSharedPtr *shared_ptr);
 
 /// Frees an instance of `NSTDSharedPtr`.
 ///

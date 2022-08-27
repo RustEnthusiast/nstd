@@ -27,7 +27,7 @@ NSTDAPI NSTDStdout nstd_io_stdout();
 ///
 /// - `NSTDStdout *handle` - A handle to stdout.
 ///
-/// - `const NSTDSliceConst *bytes` - The data to be written to stdout.
+/// - `const NSTDSlice *bytes` - The data to be written to stdout.
 ///
 /// - `NSTDUInt *written` - Returns as the number of bytes written.
 ///
@@ -38,7 +38,7 @@ NSTDAPI NSTDStdout nstd_io_stdout();
 /// # Safety
 ///
 /// This function can cause undefined behavior if `bytes`'s data is invalid.
-NSTDAPI NSTDIOError nstd_io_stdout_write(NSTDStdout *handle, const NSTDSliceConst *bytes,
+NSTDAPI NSTDIOError nstd_io_stdout_write(NSTDStdout *handle, const NSTDSlice *bytes,
 NSTDUInt *written);
 
 /// Writes an entire buffer to the standard output stream.
@@ -52,7 +52,7 @@ NSTDUInt *written);
 ///
 /// - `NSTDStdout *handle` - A handle to stdout.
 ///
-/// - `const NSTDSliceConst *bytes` - The data to be written to stdout.
+/// - `const NSTDSlice *bytes` - The data to be written to stdout.
 ///
 /// # Returns
 ///
@@ -61,7 +61,7 @@ NSTDUInt *written);
 /// # Safety
 ///
 /// This function can cause undefined behavior if `bytes`'s data is invalid.
-NSTDAPI NSTDIOError nstd_io_stdout_write_all(NSTDStdout *handle, const NSTDSliceConst *bytes);
+NSTDAPI NSTDIOError nstd_io_stdout_write_all(NSTDStdout *handle, const NSTDSlice *bytes);
 
 /// Flushes the standard output stream.
 ///

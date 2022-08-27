@@ -112,8 +112,8 @@ NSTDAPI NSTDUInt nstd_vec_stride(const NSTDVec *vec);
 ///
 /// # Returns
 ///
-/// `NSTDSliceConst slice` - An *immutable* view into the vector.
-NSTDAPI NSTDSliceConst nstd_vec_as_slice(const NSTDVec *vec);
+/// `NSTDSlice slice` - An *immutable* view into the vector.
+NSTDAPI NSTDSlice nstd_vec_as_slice(const NSTDVec *vec);
 
 /// Returns a slice containing all of a vector's active elements.
 ///
@@ -134,8 +134,8 @@ NSTDAPI NSTDSliceMut nstd_vec_as_slice_mut(NSTDVec *vec);
 ///
 /// # Returns
 ///
-/// `NSTDAnyConst ptr` - A pointer to the vector's raw data.
-NSTDAPI NSTDAnyConst nstd_vec_as_ptr(const NSTDVec *vec);
+/// `NSTDAny ptr` - A pointer to the vector's raw data.
+NSTDAPI NSTDAny nstd_vec_as_ptr(const NSTDVec *vec);
 
 /// Returns a pointer to a vector's raw data.
 ///
@@ -163,9 +163,9 @@ NSTDAPI NSTDAnyMut nstd_vec_as_mut_ptr(NSTDVec *vec);
 ///
 /// # Returns
 ///
-/// `NSTDAnyConst element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out
+/// `NSTDAny element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out
 /// of the vector's boundaries.
-NSTDAPI NSTDAnyConst nstd_vec_get(const NSTDVec *vec, NSTDUInt pos);
+NSTDAPI NSTDAny nstd_vec_get(const NSTDVec *vec, NSTDUInt pos);
 
 /// Returns a pointer to the element at index `pos` in `vec`.
 ///
@@ -193,7 +193,7 @@ NSTDAPI NSTDAnyMut nstd_vec_get_mut(NSTDVec *vec, NSTDUInt pos);
 ///
 /// - `NSTDVec *vec` - The vector.
 ///
-/// - `NSTDAnyConst value` - A pointer to the value to push onto the vector.
+/// - `NSTDAny value` - A pointer to the value to push onto the vector.
 ///
 /// # Returns
 ///
@@ -203,7 +203,7 @@ NSTDAPI NSTDAnyMut nstd_vec_get_mut(NSTDVec *vec, NSTDUInt pos);
 ///
 /// This operation is unsafe because undefined behavior can occur if the size of the value being
 /// pushed onto the vector is not equal to `vec`'s stride.
-NSTDAPI NSTDAllocError nstd_vec_push(NSTDVec *vec, NSTDAnyConst value);
+NSTDAPI NSTDAllocError nstd_vec_push(NSTDVec *vec, NSTDAny value);
 
 /// Removes the last value of a vector and returns a pointer to it.
 ///
@@ -218,9 +218,9 @@ NSTDAPI NSTDAllocError nstd_vec_push(NSTDVec *vec, NSTDAnyConst value);
 ///
 /// # Returns
 ///
-/// - `NSTDAnyConst value` - A pointer to the value that was popped off the stack, or null if the
+/// - `NSTDAny value` - A pointer to the value that was popped off the stack, or null if the
 /// vector is empty.
-NSTDAPI NSTDAnyConst nstd_vec_pop(NSTDVec *vec);
+NSTDAPI NSTDAny nstd_vec_pop(NSTDVec *vec);
 
 /// Attempts to insert a value into a vector at `index`.
 ///
@@ -228,7 +228,7 @@ NSTDAPI NSTDAnyConst nstd_vec_pop(NSTDVec *vec);
 ///
 /// - `NSTDVec *vec` - The vector.
 ///
-/// - `NSTDAnyConst value` - A pointer to the value to insert into the vector.
+/// - `NSTDAny value` - A pointer to the value to insert into the vector.
 ///
 /// - `NSTDUInt index` - The index at which to insert the value.
 ///
@@ -246,7 +246,7 @@ NSTDAPI NSTDAnyConst nstd_vec_pop(NSTDVec *vec);
 ///
 /// This operation is unsafe because undefined behavior can occur if the size of the value being
 /// inserted into the vector is not equal to `vec`'s stride.
-NSTDAPI NSTDErrorCode nstd_vec_insert(NSTDVec *vec, NSTDAnyConst value, NSTDUInt index);
+NSTDAPI NSTDErrorCode nstd_vec_insert(NSTDVec *vec, NSTDAny value, NSTDUInt index);
 
 /// Removes the element at `index` in a vector.
 ///
@@ -267,7 +267,7 @@ NSTDAPI NSTDErrorCode nstd_vec_remove(NSTDVec *vec, NSTDUInt index);
 ///
 /// - `NSTDVec *vec` - The vector to extend.
 ///
-/// - `const NSTDSliceConst *values` - A slice of values to push onto the vector.
+/// - `const NSTDSlice *values` - A slice of values to push onto the vector.
 ///
 /// # Returns
 ///
@@ -280,7 +280,7 @@ NSTDAPI NSTDErrorCode nstd_vec_remove(NSTDVec *vec, NSTDUInt index);
 /// # Safety
 ///
 /// This operation can cause undefined behavior if `values`'s data is invalid.
-NSTDAPI NSTDAllocError nstd_vec_extend(NSTDVec *vec, const NSTDSliceConst *values);
+NSTDAPI NSTDAllocError nstd_vec_extend(NSTDVec *vec, const NSTDSlice *values);
 
 /// Shortens a vector, keeping the first `len` elements.
 ///

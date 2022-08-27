@@ -2,7 +2,7 @@
 use crate::{
     alloc::{nstd_alloc_allocate, nstd_alloc_allocate_zeroed, nstd_alloc_deallocate},
     core::mem::nstd_core_mem_copy,
-    NSTDAnyConst, NSTDAnyMut, NSTDUInt,
+    NSTDAny, NSTDAnyMut, NSTDUInt,
 };
 
 /// The size (in bytes) of [usize].
@@ -48,7 +48,7 @@ impl Drop for NSTDSharedPtr {
 ///
 /// - `NSTDUInt element_size` - The size of the shared object.
 ///
-/// - `NSTDAnyConst init` - A pointer to the object to initialize the shared pointer with.
+/// - `NSTDAny init` - A pointer to the object to initialize the shared pointer with.
 ///
 /// # Returns
 ///
@@ -64,7 +64,7 @@ impl Drop for NSTDSharedPtr {
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_shared_ptr_new(
     element_size: NSTDUInt,
-    init: NSTDAnyConst,
+    init: NSTDAny,
 ) -> NSTDSharedPtr {
     // Allocate a region of memory for the object and the pointer count.
     let buffer_size = element_size + USIZE_SIZE;
@@ -180,10 +180,10 @@ pub extern "C" fn nstd_shared_ptr_size(shared_ptr: &NSTDSharedPtr) -> NSTDUInt {
 ///
 /// # Returns
 ///
-/// `NSTDAnyConst ptr` - A raw pointer to the shared object.
+/// `NSTDAny ptr` - A raw pointer to the shared object.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_shared_ptr_get(shared_ptr: &NSTDSharedPtr) -> NSTDAnyConst {
+pub extern "C" fn nstd_shared_ptr_get(shared_ptr: &NSTDSharedPtr) -> NSTDAny {
     shared_ptr.ptr
 }
 

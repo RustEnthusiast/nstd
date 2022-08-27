@@ -1,5 +1,5 @@
 //! A handle to the standard error stream.
-use crate::{core::slice::NSTDSliceConst, io::NSTDIOError, NSTDUInt};
+use crate::{core::slice::NSTDSlice, io::NSTDIOError, NSTDUInt};
 use std::io::Stderr;
 
 /// A handle to the standard error stream.
@@ -28,7 +28,7 @@ pub extern "C" fn nstd_io_stderr() -> NSTDStderr {
 ///
 /// - `NSTDStderr *handle` - A handle to stderr.
 ///
-/// - `const NSTDSliceConst *bytes` - The data to be written to stderr.
+/// - `const NSTDSlice *bytes` - The data to be written to stderr.
 ///
 /// - `NSTDUInt *written` - Returns as the number of bytes written.
 ///
@@ -43,7 +43,7 @@ pub extern "C" fn nstd_io_stderr() -> NSTDStderr {
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_io_stderr_write(
     handle: &mut NSTDStderr,
-    bytes: &NSTDSliceConst,
+    bytes: &NSTDSlice,
     written: &mut NSTDUInt,
 ) -> NSTDIOError {
     crate::io::stdio::write(handle, bytes, written)
@@ -60,7 +60,7 @@ pub unsafe extern "C" fn nstd_io_stderr_write(
 ///
 /// - `NSTDStderr *handle` - A handle to stderr.
 ///
-/// - `const NSTDSliceConst *bytes` - The data to be written to stderr.
+/// - `const NSTDSlice *bytes` - The data to be written to stderr.
 ///
 /// # Returns
 ///
@@ -73,7 +73,7 @@ pub unsafe extern "C" fn nstd_io_stderr_write(
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_io_stderr_write_all(
     handle: &mut NSTDStderr,
-    bytes: &NSTDSliceConst,
+    bytes: &NSTDSlice,
 ) -> NSTDIOError {
     crate::io::stdio::write_all(handle, bytes)
 }

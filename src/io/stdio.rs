@@ -3,10 +3,10 @@ use crate::{
     alloc::NSTDAllocError,
     core::{
         slice::{
-            nstd_core_slice_const_new, nstd_core_slice_const_stride, nstd_core_slice_mut_stride,
-            NSTDSliceConst, NSTDSliceMut,
+            nstd_core_slice_mut_stride, nstd_core_slice_new, nstd_core_slice_stride, NSTDSlice,
+            NSTDSliceMut,
         },
-        str::nstd_core_str_const_from_bytes_unchecked,
+        str::nstd_core_str_from_bytes_unchecked,
     },
     io::NSTDIOError,
     string::{nstd_string_push_str, NSTDString},
@@ -24,11 +24,11 @@ use std::io::{Read, Write};
 /// This function can cause undefined behavior if `bytes`'s data is invalid.
 pub(crate) unsafe fn write<W: Write>(
     stream: &mut W,
-    bytes: &NSTDSliceConst,
+    bytes: &NSTDSlice,
     written: &mut NSTDUInt,
 ) -> NSTDIOError {
     // Make sure the slice's element size is 1.
-    if nstd_core_slice_const_stride(bytes) != 1 {
+    if nstd_core_slice_stride(bytes) != 1 {
         *written = 0;
         return NSTDIOError::NSTD_IO_ERROR_INVALID_INPUT;
     }
@@ -50,9 +50,9 @@ pub(crate) unsafe fn write<W: Write>(
 /// # Safety
 ///
 /// This function can cause undefined behavior if `bytes`'s data is invalid.
-pub(crate) unsafe fn write_all<W: Write>(stream: &mut W, bytes: &NSTDSliceConst) -> NSTDIOError {
+pub(crate) unsafe fn write_all<W: Write>(stream: &mut W, bytes: &NSTDSlice) -> NSTDIOError {
     // Make sure the slice's element size is 1.
-    if nstd_core_slice_const_stride(bytes) != 1 {
+    if nstd_core_slice_stride(bytes) != 1 {
         return NSTDIOError::NSTD_IO_ERROR_INVALID_INPUT;
     }
     // Attempt to write the bytes to stdout.
@@ -124,7 +124,7 @@ pub(crate) fn read_all<R: Read>(
     match stream.read_to_end(&mut buf) {
         Ok(r) => {
             *read = r;
-            let bytes = nstd_core_slice_const_new(buf.as_ptr().cast(), 1, buf.len());
+            let bytes = nstd_core_slice_new(buf.as_ptr().cast(), 1, buf.len());
             // SAFETY: `bytes` refers to `buf`'s data, which is still valid here.
             match unsafe { nstd_vec_extend(buffer, &bytes) } {
                 NSTDAllocError::NSTD_ALLOC_ERROR_NONE => NSTDIOError::NSTD_IO_ERROR_NONE,
@@ -156,10 +156,10 @@ pub(crate) fn read_to_string<R: Read>(
     match stream.read_to_string(&mut buf) {
         Ok(r) => {
             *read = r;
-            let bytes = nstd_core_slice_const_new(buf.as_ptr().cast(), 1, buf.len());
+            let bytes = nstd_core_slice_new(buf.as_ptr().cast(), 1, buf.len());
             // SAFETY: `bytes` refers to `buf`'s data, which is still valid UTF-8 here.
             unsafe {
-                let str = nstd_core_str_const_from_bytes_unchecked(&bytes);
+                let str = nstd_core_str_from_bytes_unchecked(&bytes);
                 match nstd_string_push_str(buffer, &str) {
                     NSTDAllocError::NSTD_ALLOC_ERROR_NONE => NSTDIOError::NSTD_IO_ERROR_NONE,
                     _ => NSTDIOError::NSTD_IO_ERROR_OUT_OF_MEMORY,

@@ -3,11 +3,11 @@ use crate::{
     alloc::NSTDAllocError,
     core::{
         cstr::{
-            nstd_core_cstr_const_as_bytes, nstd_core_cstr_const_get_null, nstd_core_cstr_const_new,
-            nstd_core_cstr_mut_new, NSTDCStrConst, NSTDCStrMut,
+            nstd_core_cstr_as_bytes, nstd_core_cstr_get_null, nstd_core_cstr_mut_new,
+            nstd_core_cstr_new, NSTDCStr, NSTDCStrMut,
         },
         def::NSTDChar,
-        slice::NSTDSliceConst,
+        slice::NSTDSlice,
     },
     vec::{
         nstd_vec_as_mut_ptr, nstd_vec_as_ptr, nstd_vec_as_slice, nstd_vec_cap, nstd_vec_clone,
@@ -98,13 +98,13 @@ pub extern "C" fn nstd_cstring_clone(cstring: &NSTDCString) -> NSTDCString {
 ///
 /// # Returns
 ///
-/// `NSTDCStrConst cstr` - The new C string slice.
+/// `NSTDCStr cstr` - The new C string slice.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_cstring_as_cstr(cstring: &NSTDCString) -> NSTDCStrConst {
+pub extern "C" fn nstd_cstring_as_cstr(cstring: &NSTDCString) -> NSTDCStr {
     let ptr = nstd_vec_as_ptr(&cstring.bytes).cast();
     let len = nstd_vec_len(&cstring.bytes);
-    nstd_core_cstr_const_new(ptr, len)
+    nstd_core_cstr_new(ptr, len)
 }
 
 /// Creates a C string slice containing the contents of `cstring`.
@@ -132,10 +132,10 @@ pub extern "C" fn nstd_cstring_as_cstr_mut(cstring: &mut NSTDCString) -> NSTDCSt
 ///
 /// # Returns
 ///
-/// `NSTDSliceConst bytes` - The C string's active data.
+/// `NSTDSlice bytes` - The C string's active data.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_cstring_as_bytes(cstring: &NSTDCString) -> NSTDSliceConst {
+pub extern "C" fn nstd_cstring_as_bytes(cstring: &NSTDCString) -> NSTDSlice {
     nstd_vec_as_slice(&cstring.bytes)
 }
 
@@ -252,7 +252,7 @@ pub extern "C" fn nstd_cstring_push(cstring: &mut NSTDCString, chr: NSTDChar) {
 ///
 /// - `NSTDCString *cstring` - The C string.
 ///
-/// - `const NSTDCStrConst *cstr` - The C string slice to append to the end of `cstring`.
+/// - `const NSTDCStr *cstr` - The C string slice to append to the end of `cstring`.
 ///
 /// # Returns
 ///
@@ -272,14 +272,14 @@ pub extern "C" fn nstd_cstring_push(cstring: &mut NSTDCString, chr: NSTDChar) {
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_cstring_push_cstr(
     cstring: &mut NSTDCString,
-    cstr: &NSTDCStrConst,
+    cstr: &NSTDCStr,
 ) -> NSTDAllocError {
     // Make sure the C string slice doesn't contain a null byte.
-    assert!(nstd_core_cstr_const_get_null(cstr).is_null());
+    assert!(nstd_core_cstr_get_null(cstr).is_null());
     // Pop the old null byte.
     let nul = *nstd_vec_pop(&mut cstring.bytes).cast::<NSTDChar>();
     // Append the C string slice.
-    let bytes = nstd_core_cstr_const_as_bytes(cstr);
+    let bytes = nstd_core_cstr_as_bytes(cstr);
     let errc = nstd_vec_extend(&mut cstring.bytes, &bytes);
     // Push a new null byte.
     let pusherrc = nstd_vec_push(&mut cstring.bytes, addr_of!(nul).cast());

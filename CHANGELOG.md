@@ -1,7 +1,10 @@
 # TBD
+### `nstd`
+- Removed `Const` postfix from `NSTDAnyConst`.
 ### `nstd.core`
 - Renamed `fty` functions.
-- Added `nstd_core_str_[const|mut]_byte_len`.
+- Added `nstd_core_str[_mut]_byte_len`.
+- Removed `Const` postfix from `NSTD[Ptr|Slice|Str|CStr]Const`.
 ### `nstd.string`
 - Added `nstd_string_byte_len`.
 

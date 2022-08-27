@@ -17,7 +17,7 @@ typedef struct {
 ///
 /// - `NSTDUInt element_size` - The size (in bytes) of the heap object.
 ///
-/// - `NSTDAnyConst init` - A pointer to the object to initialize the heap object with.
+/// - `NSTDAny init` - A pointer to the object to initialize the heap object with.
 ///
 /// # Returns
 ///
@@ -30,7 +30,7 @@ typedef struct {
 /// # Safety
 ///
 /// This operation is unsafe because passing `init` as a null pointer can cause undefined behavior.
-NSTDAPI NSTDHeapPtr nstd_heap_ptr_new(NSTDUInt element_size, NSTDAnyConst init);
+NSTDAPI NSTDHeapPtr nstd_heap_ptr_new(NSTDUInt element_size, NSTDAny init);
 
 /// Creates a new zero-initialized heap allocated object.
 ///
@@ -81,8 +81,8 @@ NSTDAPI NSTDUInt nstd_heap_ptr_size(const NSTDHeapPtr *hptr);
 ///
 /// # Returns
 ///
-/// `NSTDAnyConst ptr` - A raw pointer to the object on the heap.
-NSTDAPI NSTDAnyConst nstd_heap_ptr_get(const NSTDHeapPtr *hptr);
+/// `NSTDAny ptr` - A raw pointer to the object on the heap.
+NSTDAPI NSTDAny nstd_heap_ptr_get(const NSTDHeapPtr *hptr);
 
 /// Returns a raw pointer to the object on the heap.
 ///

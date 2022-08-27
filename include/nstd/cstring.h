@@ -65,8 +65,8 @@ NSTDAPI NSTDCString nstd_cstring_clone(const NSTDCString *cstring);
 ///
 /// # Returns
 ///
-/// `NSTDCStrConst cstr` - The new C string slice.
-NSTDAPI NSTDCStrConst nstd_cstring_as_cstr(const NSTDCString *cstring);
+/// `NSTDCStr cstr` - The new C string slice.
+NSTDAPI NSTDCStr nstd_cstring_as_cstr(const NSTDCString *cstring);
 
 /// Creates a C string slice containing the contents of `cstring`.
 ///
@@ -87,8 +87,8 @@ NSTDAPI NSTDCStrMut nstd_cstring_as_cstr_mut(NSTDCString *cstring);
 ///
 /// # Returns
 ///
-/// `NSTDSliceConst bytes` - The C string's active data.
-NSTDAPI NSTDSliceConst nstd_cstring_as_bytes(const NSTDCString *cstring);
+/// `NSTDSlice bytes` - The C string's active data.
+NSTDAPI NSTDSlice nstd_cstring_as_bytes(const NSTDCString *cstring);
 
 /// Returns a raw pointer to a C string's memory.
 ///
@@ -168,7 +168,7 @@ NSTDAPI void nstd_cstring_push(NSTDCString *cstring, NSTDChar chr);
 ///
 /// - `NSTDCString *cstring` - The C string.
 ///
-/// - `const NSTDCStrConst *cstr` - The C string slice to append to the end of `cstring`.
+/// - `const NSTDCStr *cstr` - The C string slice to append to the end of `cstring`.
 ///
 /// # Returns
 ///
@@ -185,7 +185,7 @@ NSTDAPI void nstd_cstring_push(NSTDCString *cstring, NSTDChar chr);
 /// # Safety
 ///
 /// This operation can cause undefined behavior in the case that `cstr`'s data is invalid.
-NSTDAPI NSTDAllocError nstd_cstring_push_cstr(NSTDCString *cstring, const NSTDCStrConst *cstr);
+NSTDAPI NSTDAllocError nstd_cstring_push_cstr(NSTDCString *cstring, const NSTDCStr *cstr);
 
 /// Removes the last character from a C string and returns it.
 ///

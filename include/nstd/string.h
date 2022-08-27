@@ -59,8 +59,8 @@ NSTDAPI NSTDString nstd_string_clone(const NSTDString *string);
 ///
 /// # Returns
 ///
-/// `NSTDStrConst str` - The new string slice.
-NSTDAPI NSTDStrConst nstd_string_as_str(const NSTDString *string);
+/// `NSTDStr str` - The new string slice.
+NSTDAPI NSTDStr nstd_string_as_str(const NSTDString *string);
 
 /// Creates a string slice containing the contents of `string`.
 ///
@@ -81,8 +81,8 @@ NSTDAPI NSTDStrMut nstd_string_as_str_mut(NSTDString *string);
 ///
 /// # Returns
 ///
-/// `NSTDSliceConst bytes` - The string's active data.
-NSTDAPI NSTDSliceConst nstd_string_as_bytes(const NSTDString *string);
+/// `NSTDSlice bytes` - The string's active data.
+NSTDAPI NSTDSlice nstd_string_as_bytes(const NSTDString *string);
 
 /// Returns a raw pointer to a string's memory.
 ///
@@ -160,7 +160,7 @@ NSTDAPI NSTDErrorCode nstd_string_push(NSTDString *string, NSTDUnichar chr);
 ///
 /// - `NSTDString *string` - The string.
 ///
-/// - `const NSTDStrConst *str` - The string slice to append to the end of `string`.
+/// - `const NSTDStr *str` - The string slice to append to the end of `string`.
 ///
 /// # Returns
 ///
@@ -169,7 +169,7 @@ NSTDAPI NSTDErrorCode nstd_string_push(NSTDString *string, NSTDUnichar chr);
 /// # Safety
 ///
 /// This function will cause undefined behavior in the case where `str`'s data is no longer valid.
-NSTDAPI NSTDAllocError nstd_string_push_str(NSTDString *string, const NSTDStrConst *str);
+NSTDAPI NSTDAllocError nstd_string_push_str(NSTDString *string, const NSTDStr *str);
 
 /// Removes the last character from a string and returns it.
 ///

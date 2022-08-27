@@ -1,45 +1,45 @@
 //! A sized pointer to some arbitrary type.
-use crate::{core::mem::nstd_core_mem_copy, NSTDAnyConst, NSTDAnyMut, NSTDUInt};
+use crate::{core::mem::nstd_core_mem_copy, NSTDAny, NSTDAnyMut, NSTDUInt};
 
 /// A sized immutable pointer to some arbitrary type.
 #[repr(C)]
 #[derive(Clone, Copy, Debug, Hash, PartialEq, Eq)]
-pub struct NSTDPtrConst {
+pub struct NSTDPtr {
     /// A raw pointer to the data.
-    pub(crate) raw: NSTDAnyConst,
+    pub(crate) raw: NSTDAny,
     /// The size of the object being pointed to.
     size: NSTDUInt,
 }
 
-/// Creates a new instance of `NSTDPtrConst`.
+/// Creates a new instance of `NSTDPtr`.
 ///
 /// # Parameters:
 ///
-/// - `NSTDAnyConst obj` - The object to point to.
+/// - `NSTDAny obj` - The object to point to.
 ///
 /// - `NSTDUInt size` - The number of bytes that `obj`'s type occupies.
 ///
 /// # Returns
 ///
-/// `NSTDPtrConst ptr` - A new instance of `NSTDPtrConst` that points to `obj`.
+/// `NSTDPtr ptr` - A new instance of `NSTDPtr` that points to `obj`.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_ptr_const_new(obj: NSTDAnyConst, size: NSTDUInt) -> NSTDPtrConst {
-    NSTDPtrConst { raw: obj, size }
+pub extern "C" fn nstd_core_ptr_new(obj: NSTDAny, size: NSTDUInt) -> NSTDPtr {
+    NSTDPtr { raw: obj, size }
 }
 
 /// Returns the size of the object being pointed to.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDPtrConst *ptr` - The pointer.
+/// - `const NSTDPtr *ptr` - The pointer.
 ///
 /// # Returns
 ///
 /// `NSTDUInt size` - The size of the object pointed to by `ptr`.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_ptr_const_size(ptr: &NSTDPtrConst) -> NSTDUInt {
+pub extern "C" fn nstd_core_ptr_size(ptr: &NSTDPtr) -> NSTDUInt {
     ptr.size
 }
 
@@ -47,14 +47,14 @@ pub extern "C" fn nstd_core_ptr_const_size(ptr: &NSTDPtrConst) -> NSTDUInt {
 ///
 /// # Parameters:
 ///
-/// - `const NSTDPtrConst *ptr` - The higher level pointer.
+/// - `const NSTDPtr *ptr` - The higher level pointer.
 ///
 /// # Returns
 ///
-/// `NSTDAnyConst raw` - A raw pointer to the object.
+/// `NSTDAny raw` - A raw pointer to the object.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_ptr_const_get(ptr: &NSTDPtrConst) -> NSTDAnyConst {
+pub extern "C" fn nstd_core_ptr_get(ptr: &NSTDPtr) -> NSTDAny {
     ptr.raw
 }
 
@@ -93,11 +93,11 @@ pub extern "C" fn nstd_core_ptr_mut_new(obj: NSTDAnyMut, size: NSTDUInt) -> NSTD
 ///
 /// # Returns
 ///
-/// `NSTDPtrConst ptr_const` - The immutable copy of `ptr`.
+/// `NSTDPtr ptr_const` - The immutable copy of `ptr`.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_ptr_mut_as_const(ptr: &NSTDPtrMut) -> NSTDPtrConst {
-    nstd_core_ptr_const_new(ptr.raw, ptr.size)
+pub extern "C" fn nstd_core_ptr_mut_as_const(ptr: &NSTDPtrMut) -> NSTDPtr {
+    nstd_core_ptr_new(ptr.raw, ptr.size)
 }
 
 /// Returns the size of the object being pointed to.
@@ -138,10 +138,10 @@ pub extern "C" fn nstd_core_ptr_mut_get(ptr: &mut NSTDPtrMut) -> NSTDAnyMut {
 ///
 /// # Returns
 ///
-/// `NSTDAnyConst raw` - A raw pointer to the object.
+/// `NSTDAny raw` - A raw pointer to the object.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_ptr_mut_get_const(ptr: &NSTDPtrMut) -> NSTDAnyConst {
+pub extern "C" fn nstd_core_ptr_mut_get_const(ptr: &NSTDPtrMut) -> NSTDAny {
     ptr.raw
 }
 
@@ -156,13 +156,13 @@ pub extern "C" fn nstd_core_ptr_mut_get_const(ptr: &NSTDPtrMut) -> NSTDAnyConst 
 ///
 /// - `NSTDPtrMut *ptr` - The pointer to write to.
 ///
-/// - `NSTDAnyConst obj` - A pointer to the object to write to `ptr`.
+/// - `NSTDAny obj` - A pointer to the object to write to `ptr`.
 ///
 /// # Safety
 ///
 /// This operation is highly unsafe because there is no way of knowing if `obj`'s data is valid.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_ptr_mut_write(ptr: &mut NSTDPtrMut, obj: NSTDAnyConst) {
+pub unsafe extern "C" fn nstd_core_ptr_mut_write(ptr: &mut NSTDPtrMut, obj: NSTDAny) {
     nstd_core_mem_copy(ptr.raw.cast(), obj.cast(), ptr.size);
 }

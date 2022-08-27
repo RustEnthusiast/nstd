@@ -4,11 +4,10 @@ use crate::{
     alloc::NSTDAllocError,
     core::{
         def::{NSTDByte, NSTDErrorCode},
-        slice::{nstd_core_slice_const_new, NSTDSliceConst},
+        slice::{nstd_core_slice_new, NSTDSlice},
         str::{
-            nstd_core_str_const_as_bytes, nstd_core_str_const_from_bytes_unchecked,
-            nstd_core_str_const_len, nstd_core_str_mut_from_bytes_unchecked, NSTDStrConst,
-            NSTDStrMut,
+            nstd_core_str_as_bytes, nstd_core_str_from_bytes_unchecked, nstd_core_str_len,
+            nstd_core_str_mut_from_bytes_unchecked, NSTDStr, NSTDStrMut,
         },
     },
     vec::{
@@ -116,13 +115,13 @@ pub extern "C" fn nstd_string_clone(string: &NSTDString) -> NSTDString {
 ///
 /// # Returns
 ///
-/// `NSTDStrConst str` - The new string slice.
+/// `NSTDStr str` - The new string slice.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_string_as_str(string: &NSTDString) -> NSTDStrConst {
+pub extern "C" fn nstd_string_as_str(string: &NSTDString) -> NSTDStr {
     let bytes = nstd_vec_as_slice(&string.bytes);
     // SAFETY: The string's bytes are always be UTF-8 encoded.
-    unsafe { nstd_core_str_const_from_bytes_unchecked(&bytes) }
+    unsafe { nstd_core_str_from_bytes_unchecked(&bytes) }
 }
 
 /// Creates a string slice containing the contents of `string`.
@@ -150,10 +149,10 @@ pub extern "C" fn nstd_string_as_str_mut(string: &mut NSTDString) -> NSTDStrMut 
 ///
 /// # Returns
 ///
-/// `NSTDSliceConst bytes` - The string's active data.
+/// `NSTDSlice bytes` - The string's active data.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_string_as_bytes(string: &NSTDString) -> NSTDSliceConst {
+pub extern "C" fn nstd_string_as_bytes(string: &NSTDString) -> NSTDSlice {
     nstd_vec_as_slice(&string.bytes)
 }
 
@@ -201,7 +200,7 @@ pub extern "C" fn nstd_string_to_bytes(string: NSTDString) -> NSTDVec {
 pub extern "C" fn nstd_string_len(string: &NSTDString) -> NSTDUInt {
     let str = nstd_string_as_str(string);
     // SAFETY: The string's data is valid here.
-    unsafe { nstd_core_str_const_len(&str) }
+    unsafe { nstd_core_str_len(&str) }
 }
 
 /// Returns the number of bytes a string contains.
@@ -253,7 +252,7 @@ pub extern "C" fn nstd_string_push(string: &mut NSTDString, chr: NSTDUnichar) ->
     if let Some(chr) = char::from_u32(chr) {
         let mut buf = [0; 4];
         chr.encode_utf8(&mut buf);
-        let buf = nstd_core_slice_const_new(buf.as_ptr().cast(), 1, chr.len_utf8());
+        let buf = nstd_core_slice_new(buf.as_ptr().cast(), 1, chr.len_utf8());
         // SAFETY: `buf`'s data is stored on the stack.
         let errc = unsafe { nstd_vec_extend(&mut string.bytes, &buf) };
         return (errc != NSTDAllocError::NSTD_ALLOC_ERROR_NONE).into();
@@ -267,7 +266,7 @@ pub extern "C" fn nstd_string_push(string: &mut NSTDString, chr: NSTDUnichar) ->
 ///
 /// - `NSTDString *string` - The string.
 ///
-/// - `const NSTDStrConst *str` - The string slice to append to the end of `string`.
+/// - `const NSTDStr *str` - The string slice to append to the end of `string`.
 ///
 /// # Returns
 ///
@@ -280,9 +279,9 @@ pub extern "C" fn nstd_string_push(string: &mut NSTDString, chr: NSTDUnichar) ->
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_string_push_str(
     string: &mut NSTDString,
-    str: &NSTDStrConst,
+    str: &NSTDStr,
 ) -> NSTDAllocError {
-    let str_bytes = nstd_core_str_const_as_bytes(str);
+    let str_bytes = nstd_core_str_as_bytes(str);
     nstd_vec_extend(&mut string.bytes, &str_bytes)
 }
 

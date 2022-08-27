@@ -6,8 +6,8 @@ pub mod stdout;
 use crate::{
     alloc::NSTDAllocError,
     core::{
-        slice::nstd_core_slice_const_new,
-        str::{nstd_core_str_const_from_bytes_unchecked, NSTDStrConst},
+        slice::nstd_core_slice_new,
+        str::{nstd_core_str_from_bytes_unchecked, NSTDStr},
     },
     string::{nstd_string_pop, nstd_string_push_str, NSTDString},
 };
@@ -93,7 +93,7 @@ impl NSTDIOError {
 ///
 /// # Parameters:
 ///
-/// - `const NSTDStrConst *output` - The string slice to write to stdout.
+/// - `const NSTDStr *output` - The string slice to write to stdout.
 ///
 /// # Returns
 ///
@@ -104,7 +104,7 @@ impl NSTDIOError {
 /// The provided string slice's data must be valid, else this function can cause garbage bytes to
 /// be written to stdout.
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_io_print(output: &NSTDStrConst) -> NSTDIOError {
+pub unsafe extern "C" fn nstd_io_print(output: &NSTDStr) -> NSTDIOError {
     let mut stdout = std::io::stdout();
     if let Err(err) = stdout.write_all(output.as_str().as_bytes()) {
         return NSTDIOError::from_err(err.kind());
@@ -118,7 +118,7 @@ pub unsafe extern "C" fn nstd_io_print(output: &NSTDStrConst) -> NSTDIOError {
 ///
 /// # Parameters:
 ///
-/// - `const NSTDStrConst *output` - The string slice to write to stdout.
+/// - `const NSTDStr *output` - The string slice to write to stdout.
 ///
 /// # Returns
 ///
@@ -129,7 +129,7 @@ pub unsafe extern "C" fn nstd_io_print(output: &NSTDStrConst) -> NSTDIOError {
 /// The provided string slice's data must be valid, else this function can cause garbage bytes to
 /// be written to stdout.
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_io_print_line(output: &NSTDStrConst) -> NSTDIOError {
+pub unsafe extern "C" fn nstd_io_print_line(output: &NSTDStr) -> NSTDIOError {
     let mut stdout = std::io::stdout();
     if let Err(err) = stdout.write_all(output.as_str().as_bytes()) {
         return NSTDIOError::from_err(err.kind());
@@ -177,8 +177,8 @@ pub extern "C" fn nstd_io_read_line(buffer: &mut NSTDString) -> NSTDIOError {
     // SAFETY: Rust strings are UTF-8 encoded.
     unsafe {
         // Extend the string buffer with the input from stdin.
-        let bytes = nstd_core_slice_const_new(input.as_ptr().cast(), 1, input.len());
-        let str = nstd_core_str_const_from_bytes_unchecked(&bytes);
+        let bytes = nstd_core_slice_new(input.as_ptr().cast(), 1, input.len());
+        let str = nstd_core_str_from_bytes_unchecked(&bytes);
         match nstd_string_push_str(buffer, &str) {
             NSTDAllocError::NSTD_ALLOC_ERROR_NONE => NSTDIOError::NSTD_IO_ERROR_NONE,
             _ => NSTDIOError::NSTD_IO_ERROR_OUT_OF_MEMORY,

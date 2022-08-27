@@ -74,7 +74,7 @@ typedef NSTDChar32 NSTDUnichar;
 ///
 /// Accessing any data through this pointer type is unsafe. Raw pointers have no way of knowing if
 /// the data being pointed to is or isn't valid.
-typedef const void *NSTDAnyConst;
+typedef const void *NSTDAny;
 /// A void pointer (a pointer to some arbitrary type).
 ///
 /// # Safety

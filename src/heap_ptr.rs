@@ -2,7 +2,7 @@
 use crate::{
     alloc::{nstd_alloc_allocate, nstd_alloc_allocate_zeroed, nstd_alloc_deallocate},
     core::mem::nstd_core_mem_copy,
-    NSTDAnyConst, NSTDAnyMut, NSTDUInt,
+    NSTDAny, NSTDAnyMut, NSTDUInt,
 };
 
 /// A pointer type for single value heap allocation.
@@ -29,7 +29,7 @@ impl Drop for NSTDHeapPtr {
 ///
 /// - `NSTDUInt element_size` - The size (in bytes) of the heap object.
 ///
-/// - `NSTDAnyConst init` - A pointer to the object to initialize the heap object with.
+/// - `NSTDAny init` - A pointer to the object to initialize the heap object with.
 ///
 /// # Returns
 ///
@@ -44,10 +44,7 @@ impl Drop for NSTDHeapPtr {
 /// This operation is unsafe because passing `init` as a null pointer can cause undefined behavior.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_heap_ptr_new(
-    element_size: NSTDUInt,
-    init: NSTDAnyConst,
-) -> NSTDHeapPtr {
+pub unsafe extern "C" fn nstd_heap_ptr_new(element_size: NSTDUInt, init: NSTDAny) -> NSTDHeapPtr {
     assert!(element_size != 0);
     let mem = nstd_alloc_allocate(element_size);
     assert!(!mem.is_null());
@@ -132,10 +129,10 @@ pub extern "C" fn nstd_heap_ptr_size(hptr: &NSTDHeapPtr) -> NSTDUInt {
 ///
 /// # Returns
 ///
-/// `NSTDAnyConst ptr` - A raw pointer to the object on the heap.
+/// `NSTDAny ptr` - A raw pointer to the object on the heap.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_heap_ptr_get(hptr: &NSTDHeapPtr) -> NSTDAnyConst {
+pub extern "C" fn nstd_heap_ptr_get(hptr: &NSTDHeapPtr) -> NSTDAny {
     hptr.ptr
 }
 

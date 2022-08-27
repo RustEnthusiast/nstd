@@ -2,16 +2,15 @@
 use crate::{
     core::{
         cstr::{
-            nstd_core_cstr_const_as_bytes, nstd_core_cstr_mut_as_ptr, nstd_core_cstr_mut_len,
-            NSTDCStrConst, NSTDCStrMut,
+            nstd_core_cstr_as_bytes, nstd_core_cstr_mut_as_ptr, nstd_core_cstr_mut_len, NSTDCStr,
+            NSTDCStrMut,
         },
         def::{NSTDByte, NSTDErrorCode},
         range::NSTDURange,
         slice::{
-            nstd_core_slice_const_as_ptr, nstd_core_slice_const_len, nstd_core_slice_const_new,
-            nstd_core_slice_const_stride, nstd_core_slice_mut_as_ptr_const,
+            nstd_core_slice_as_ptr, nstd_core_slice_len, nstd_core_slice_mut_as_ptr_const,
             nstd_core_slice_mut_len, nstd_core_slice_mut_new, nstd_core_slice_mut_stride,
-            NSTDSliceConst, NSTDSliceMut,
+            nstd_core_slice_new, nstd_core_slice_stride, NSTDSlice, NSTDSliceMut,
         },
     },
     NSTDFloat32, NSTDFloat64, NSTDInt, NSTDInt16, NSTDInt32, NSTDInt64, NSTDInt8, NSTDUInt,
@@ -44,12 +43,12 @@ macro_rules! gen_to_primitive {
 /// An immutable unowned view into a UTF-8 encoded byte string.
 #[repr(C)]
 #[derive(Clone, Copy, Debug, Hash)]
-pub struct NSTDStrConst {
+pub struct NSTDStr {
     /// A view into the UTF-8 encoded buffer.
-    bytes: NSTDSliceConst,
+    bytes: NSTDSlice,
 }
-impl NSTDStrConst {
-    /// Creates a Rust string slice from this [NSTDStrConst].
+impl NSTDStr {
+    /// Creates a Rust string slice from this [NSTDStr].
     ///
     /// # Safety
     ///
@@ -60,37 +59,37 @@ impl NSTDStrConst {
     }
 }
 
-/// Creates a new instance of `NSTDStrConst` from a C string slice.
+/// Creates a new instance of `NSTDStr` from a C string slice.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDCStrConst *cstr` - The C string slice to wrap.
+/// - `const NSTDCStr *cstr` - The C string slice to wrap.
 ///
 /// # Returns
 ///
-/// `NSTDStrConst str` - The new `NSTDStrConst` instance.
+/// `NSTDStr str` - The new `NSTDStr` instance.
 ///
 /// # Panics
 ///
 /// This function will panic if `cstr`'s data is not valid UTF-8.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_str_const_from_cstr(cstr: &NSTDCStrConst) -> NSTDStrConst {
-    let bytes = nstd_core_cstr_const_as_bytes(cstr);
+pub extern "C" fn nstd_core_str_from_cstr(cstr: &NSTDCStr) -> NSTDStr {
+    let bytes = nstd_core_cstr_as_bytes(cstr);
     // SAFETY: The returned string slice is already unsafe to access.
     core::str::from_utf8(unsafe { bytes.as_slice() }).expect("Invalid UTF-8 bytes");
-    NSTDStrConst { bytes }
+    NSTDStr { bytes }
 }
 
-/// Creates a new instance of `NSTDStrConst` from a C string slice.
+/// Creates a new instance of `NSTDStr` from a C string slice.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDCStrConst *cstr` - The C string slice to wrap.
+/// - `const NSTDCStr *cstr` - The C string slice to wrap.
 ///
 /// # Returns
 ///
-/// `NSTDStrConst str` - The new `NSTDStrConst` instance.
+/// `NSTDStr str` - The new `NSTDStr` instance.
 ///
 /// # Safety
 ///
@@ -98,11 +97,9 @@ pub extern "C" fn nstd_core_str_const_from_cstr(cstr: &NSTDCStrConst) -> NSTDStr
 /// valid while the returned string slice is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_str_const_from_cstr_unchecked(
-    cstr: &NSTDCStrConst,
-) -> NSTDStrConst {
-    NSTDStrConst {
-        bytes: nstd_core_cstr_const_as_bytes(cstr),
+pub unsafe extern "C" fn nstd_core_str_from_cstr_unchecked(cstr: &NSTDCStr) -> NSTDStr {
+    NSTDStr {
+        bytes: nstd_core_cstr_as_bytes(cstr),
     }
 }
 
@@ -110,23 +107,23 @@ pub unsafe extern "C" fn nstd_core_str_const_from_cstr_unchecked(
 ///
 /// # Parameters:
 ///
-/// - `const NSTDSliceConst *bytes` - The UTF-8 encoded byte slice.
+/// - `const NSTDSlice *bytes` - The UTF-8 encoded byte slice.
 ///
 /// # Returns
 ///
-/// `NSTDStrConst str` - The new string slice.
+/// `NSTDStr str` - The new string slice.
 ///
 /// # Panics
 ///
 /// This operation will panic if `bytes`'s stride is not 1, or `bytes` is not valid UTF-8.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_str_const_from_bytes(bytes: &NSTDSliceConst) -> NSTDStrConst {
+pub extern "C" fn nstd_core_str_from_bytes(bytes: &NSTDSlice) -> NSTDStr {
     // SAFETY: The returned string slice is already unsafe to access.
     core::str::from_utf8(unsafe { bytes.as_slice() }).expect("Invalid UTF-8 bytes");
-    let stride = nstd_core_slice_const_stride(bytes);
-    NSTDStrConst {
-        bytes: nstd_core_slice_const_new(bytes.ptr.raw, stride, bytes.len),
+    let stride = nstd_core_slice_stride(bytes);
+    NSTDStr {
+        bytes: nstd_core_slice_new(bytes.ptr.raw, stride, bytes.len),
     }
 }
 
@@ -134,11 +131,11 @@ pub extern "C" fn nstd_core_str_const_from_bytes(bytes: &NSTDSliceConst) -> NSTD
 ///
 /// # Parameters:
 ///
-/// - `const NSTDSliceConst *bytes` - The UTF-8 encoded byte slice.
+/// - `const NSTDSlice *bytes` - The UTF-8 encoded byte slice.
 ///
 /// # Returns
 ///
-/// `NSTDStrConst str` - The new string slice.
+/// `NSTDStr str` - The new string slice.
 ///
 /// # Panics
 ///
@@ -150,13 +147,11 @@ pub extern "C" fn nstd_core_str_const_from_bytes(bytes: &NSTDSliceConst) -> NSTD
 /// while the returned string slice is in use.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_str_const_from_bytes_unchecked(
-    bytes: &NSTDSliceConst,
-) -> NSTDStrConst {
-    let stride = nstd_core_slice_const_stride(bytes);
+pub unsafe extern "C" fn nstd_core_str_from_bytes_unchecked(bytes: &NSTDSlice) -> NSTDStr {
+    let stride = nstd_core_slice_stride(bytes);
     assert!(stride == 1);
-    NSTDStrConst {
-        bytes: nstd_core_slice_const_new(bytes.ptr.raw, stride, bytes.len),
+    NSTDStr {
+        bytes: nstd_core_slice_new(bytes.ptr.raw, stride, bytes.len),
     }
 }
 
@@ -164,37 +159,37 @@ pub unsafe extern "C" fn nstd_core_str_const_from_bytes_unchecked(
 ///
 /// # Parameters:
 ///
-/// - `const NSTDStrConst *str` - The string slice.
+/// - `const NSTDStr *str` - The string slice.
 ///
 /// # Returns
 ///
-/// `NSTDSliceConst bytes` - An immutable byte slice over `str`'s data.
+/// `NSTDSlice bytes` - An immutable byte slice over `str`'s data.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_str_const_as_bytes(str: &NSTDStrConst) -> NSTDSliceConst {
-    nstd_core_slice_const_new(str.bytes.ptr.raw.cast(), 1, str.bytes.len)
+pub extern "C" fn nstd_core_str_as_bytes(str: &NSTDStr) -> NSTDSlice {
+    nstd_core_slice_new(str.bytes.ptr.raw.cast(), 1, str.bytes.len)
 }
 
 /// Returns a raw pointer to a string slice's memory.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDStrConst *str` - The string slice.
+/// - `const NSTDStr *str` - The string slice.
 ///
 /// # Returns
 ///
 /// `const NSTDByte *ptr` - A raw pointer to a string slice's memory.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_str_const_as_ptr(str: &NSTDStrConst) -> *const NSTDByte {
-    nstd_core_slice_const_as_ptr(&str.bytes).cast()
+pub extern "C" fn nstd_core_str_as_ptr(str: &NSTDStr) -> *const NSTDByte {
+    nstd_core_slice_as_ptr(&str.bytes).cast()
 }
 
 /// Returns the number of Unicode characters in a string slice.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDStrConst *str` - The string slice.
+/// - `const NSTDStr *str` - The string slice.
 ///
 /// # Returns
 ///
@@ -205,7 +200,7 @@ pub extern "C" fn nstd_core_str_const_as_ptr(str: &NSTDStrConst) -> *const NSTDB
 /// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_str_const_len(str: &NSTDStrConst) -> NSTDUInt {
+pub unsafe extern "C" fn nstd_core_str_len(str: &NSTDStr) -> NSTDUInt {
     str.as_str().chars().count()
 }
 
@@ -213,15 +208,15 @@ pub unsafe extern "C" fn nstd_core_str_const_len(str: &NSTDStrConst) -> NSTDUInt
 ///
 /// # Parameters:
 ///
-/// - `const NSTDStrConst *str` - The string slice.
+/// - `const NSTDStr *str` - The string slice.
 ///
 /// # Returns
 ///
 /// `NSTDUInt byte_len` - The number of bytes in the string slice.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_str_const_byte_len(str: &NSTDStrConst) -> NSTDUInt {
-    nstd_core_slice_const_len(&str.bytes)
+pub extern "C" fn nstd_core_str_byte_len(str: &NSTDStr) -> NSTDUInt {
+    nstd_core_slice_len(&str.bytes)
 }
 
 /// Gets the `NSTDUnichar` at index `pos` in `str`.
@@ -232,7 +227,7 @@ pub extern "C" fn nstd_core_str_const_byte_len(str: &NSTDStrConst) -> NSTDUInt {
 ///
 /// # Parameters:
 ///
-/// - `const NSTDStrConst *str` - The string slice to index.
+/// - `const NSTDStr *str` - The string slice to index.
 ///
 /// - `NSTDUInt pos` - The index of the character to get.
 ///
@@ -246,10 +241,7 @@ pub extern "C" fn nstd_core_str_const_byte_len(str: &NSTDStrConst) -> NSTDUInt {
 /// This operation could cause undefined behavior if `str`'s data is invalid.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_str_const_get_char(
-    str: &NSTDStrConst,
-    pos: NSTDUInt,
-) -> NSTDUnichar {
+pub unsafe extern "C" fn nstd_core_str_get_char(str: &NSTDStr, pos: NSTDUInt) -> NSTDUnichar {
     match str.as_str().chars().nth(pos) {
         Some(chr) => chr as NSTDUnichar,
         _ => char::REPLACEMENT_CHARACTER as NSTDUnichar,
@@ -265,13 +257,13 @@ pub unsafe extern "C" fn nstd_core_str_const_get_char(
 ///
 /// # Parameters:
 ///
-/// - `const NSTDStrConst *str` - The string slice to create the new substring from.
+/// - `const NSTDStr *str` - The string slice to create the new substring from.
 ///
 /// - `NSTDURange range` - The bounds of the new substring (indexed by bytes).
 ///
 /// # Returns
 ///
-/// `NSTDStrConst substr` - The new substring.
+/// `NSTDStr substr` - The new substring.
 ///
 /// # Panics
 ///
@@ -283,18 +275,15 @@ pub unsafe extern "C" fn nstd_core_str_const_get_char(
 ///
 /// - The substring bytes are not valid UTF-8.
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_str_const_substr(
-    str: &NSTDStrConst,
-    range: NSTDURange,
-) -> NSTDStrConst {
+pub extern "C" fn nstd_core_str_substr(str: &NSTDStr, range: NSTDURange) -> NSTDStr {
     // Make sure the range is valid for the bounds of `str`.
     assert!(range.end <= str.bytes.len);
     assert!(range.start <= range.end);
     // Create the byte slice with `range` and use it to create the new string slice.
     // SAFETY: The returned string slice is already unsafe to access.
     let start = unsafe { str.bytes.ptr.raw.add(range.start) };
-    let bytes = nstd_core_slice_const_new(start, 1, range.end - range.start);
-    nstd_core_str_const_from_bytes(&bytes)
+    let bytes = nstd_core_slice_new(start, 1, range.end - range.start);
+    nstd_core_str_from_bytes(&bytes)
 }
 
 gen_to_primitive!(
@@ -302,15 +291,15 @@ gen_to_primitive!(
     ///
     /// # Parameters:
     ///
-    /// - `const NSTDStrConst *str` - The string slice.
+    /// - `const NSTDStr *str` - The string slice.
     ///
     /// - `NSTDErrorCode *errc` - Set to nonzero on error.
     ///
     /// # Returns
     ///
     /// `NSTDFloat32 v` - The parsed 32-bit floating-point value.
-    nstd_core_str_const_to_f32,
-    NSTDStrConst,
+    nstd_core_str_to_f32,
+    NSTDStr,
     NSTDFloat32
 );
 gen_to_primitive!(
@@ -318,15 +307,15 @@ gen_to_primitive!(
     ///
     /// # Parameters:
     ///
-    /// - `const NSTDStrConst *str` - The string slice.
+    /// - `const NSTDStr *str` - The string slice.
     ///
     /// - `NSTDErrorCode *errc` - Set to nonzero on error.
     ///
     /// # Returns
     ///
     /// `NSTDFloat64 v` - The parsed 64-bit floating-point value.
-    nstd_core_str_const_to_f64,
-    NSTDStrConst,
+    nstd_core_str_to_f64,
+    NSTDStr,
     NSTDFloat64
 );
 gen_to_primitive!(
@@ -334,15 +323,15 @@ gen_to_primitive!(
     ///
     /// # Parameters:
     ///
-    /// - `const NSTDStrConst *str` - The string slice.
+    /// - `const NSTDStr *str` - The string slice.
     ///
     /// - `NSTDErrorCode *errc` - Set to nonzero on error.
     ///
     /// # Returns
     ///
     /// `NSTDInt v` - The parsed arch-bit signed integral value.
-    nstd_core_str_const_to_int,
-    NSTDStrConst,
+    nstd_core_str_to_int,
+    NSTDStr,
     NSTDInt
 );
 gen_to_primitive!(
@@ -350,15 +339,15 @@ gen_to_primitive!(
     ///
     /// # Parameters:
     ///
-    /// - `const NSTDStrConst *str` - The string slice.
+    /// - `const NSTDStr *str` - The string slice.
     ///
     /// - `NSTDErrorCode *errc` - Set to nonzero on error.
     ///
     /// # Returns
     ///
     /// `NSTDUInt v` - The parsed arch-bit unsigned integral value.
-    nstd_core_str_const_to_uint,
-    NSTDStrConst,
+    nstd_core_str_to_uint,
+    NSTDStr,
     NSTDUInt
 );
 gen_to_primitive!(
@@ -366,15 +355,15 @@ gen_to_primitive!(
     ///
     /// # Parameters:
     ///
-    /// - `const NSTDStrConst *str` - The string slice.
+    /// - `const NSTDStr *str` - The string slice.
     ///
     /// - `NSTDErrorCode *errc` - Set to nonzero on error.
     ///
     /// # Returns
     ///
     /// `NSTDInt8 v` - The parsed 8-bit signed integral value.
-    nstd_core_str_const_to_i8,
-    NSTDStrConst,
+    nstd_core_str_to_i8,
+    NSTDStr,
     NSTDInt8
 );
 gen_to_primitive!(
@@ -382,15 +371,15 @@ gen_to_primitive!(
     ///
     /// # Parameters:
     ///
-    /// - `const NSTDStrConst *str` - The string slice.
+    /// - `const NSTDStr *str` - The string slice.
     ///
     /// - `NSTDErrorCode *errc` - Set to nonzero on error.
     ///
     /// # Returns
     ///
     /// `NSTDUInt8 v` - The parsed 8-bit unsigned integral value.
-    nstd_core_str_const_to_u8,
-    NSTDStrConst,
+    nstd_core_str_to_u8,
+    NSTDStr,
     NSTDUInt8
 );
 gen_to_primitive!(
@@ -398,15 +387,15 @@ gen_to_primitive!(
     ///
     /// # Parameters:
     ///
-    /// - `const NSTDStrConst *str` - The string slice.
+    /// - `const NSTDStr *str` - The string slice.
     ///
     /// - `NSTDErrorCode *errc` - Set to nonzero on error.
     ///
     /// # Returns
     ///
     /// `NSTDInt16 v` - The parsed 16-bit signed integral value.
-    nstd_core_str_const_to_i16,
-    NSTDStrConst,
+    nstd_core_str_to_i16,
+    NSTDStr,
     NSTDInt16
 );
 gen_to_primitive!(
@@ -414,15 +403,15 @@ gen_to_primitive!(
     ///
     /// # Parameters:
     ///
-    /// - `const NSTDStrConst *str` - The string slice.
+    /// - `const NSTDStr *str` - The string slice.
     ///
     /// - `NSTDErrorCode *errc` - Set to nonzero on error.
     ///
     /// # Returns
     ///
     /// `NSTDUInt16 v` - The parsed 16-bit unsigned integral value.
-    nstd_core_str_const_to_u16,
-    NSTDStrConst,
+    nstd_core_str_to_u16,
+    NSTDStr,
     NSTDUInt16
 );
 gen_to_primitive!(
@@ -430,15 +419,15 @@ gen_to_primitive!(
     ///
     /// # Parameters:
     ///
-    /// - `const NSTDStrConst *str` - The string slice.
+    /// - `const NSTDStr *str` - The string slice.
     ///
     /// - `NSTDErrorCode *errc` - Set to nonzero on error.
     ///
     /// # Returns
     ///
     /// `NSTDInt32 v` - The parsed 32-bit signed integral value.
-    nstd_core_str_const_to_i32,
-    NSTDStrConst,
+    nstd_core_str_to_i32,
+    NSTDStr,
     NSTDInt32
 );
 gen_to_primitive!(
@@ -446,15 +435,15 @@ gen_to_primitive!(
     ///
     /// # Parameters:
     ///
-    /// - `const NSTDStrConst *str` - The string slice.
+    /// - `const NSTDStr *str` - The string slice.
     ///
     /// - `NSTDErrorCode *errc` - Set to nonzero on error.
     ///
     /// # Returns
     ///
     /// `NSTDUInt32 v` - The parsed 32-bit unsigned integral value.
-    nstd_core_str_const_to_u32,
-    NSTDStrConst,
+    nstd_core_str_to_u32,
+    NSTDStr,
     NSTDUInt32
 );
 gen_to_primitive!(
@@ -462,15 +451,15 @@ gen_to_primitive!(
     ///
     /// # Parameters:
     ///
-    /// - `const NSTDStrConst *str` - The string slice.
+    /// - `const NSTDStr *str` - The string slice.
     ///
     /// - `NSTDErrorCode *errc` - Set to nonzero on error.
     ///
     /// # Returns
     ///
     /// `NSTDInt64 v` - The parsed 64-bit signed integral value.
-    nstd_core_str_const_to_i64,
-    NSTDStrConst,
+    nstd_core_str_to_i64,
+    NSTDStr,
     NSTDInt64
 );
 gen_to_primitive!(
@@ -478,15 +467,15 @@ gen_to_primitive!(
     ///
     /// # Parameters:
     ///
-    /// - `const NSTDStrConst *str` - The string slice.
+    /// - `const NSTDStr *str` - The string slice.
     ///
     /// - `NSTDErrorCode *errc` - Set to nonzero on error.
     ///
     /// # Returns
     ///
     /// `NSTDUInt64 v` - The parsed 64-bit unsigned integral value.
-    nstd_core_str_const_to_u64,
-    NSTDStrConst,
+    nstd_core_str_to_u64,
+    NSTDStr,
     NSTDUInt64
 );
 
@@ -621,13 +610,13 @@ pub unsafe extern "C" fn nstd_core_str_mut_from_bytes_unchecked(
 ///
 /// # Returns
 ///
-/// `NSTDStrConst str_const` - The immutable copy of `str`.
+/// `NSTDStr str_const` - The immutable copy of `str`.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_str_mut_as_const(str: &NSTDStrMut) -> NSTDStrConst {
+pub extern "C" fn nstd_core_str_mut_as_const(str: &NSTDStrMut) -> NSTDStr {
     let bytes = nstd_core_str_mut_as_bytes(str);
     // SAFETY: String slices are UTF-8 encoded.
-    unsafe { nstd_core_str_const_from_bytes_unchecked(&bytes) }
+    unsafe { nstd_core_str_from_bytes_unchecked(&bytes) }
 }
 
 /// Returns an immutable byte slice over `str`'s data.
@@ -638,11 +627,11 @@ pub extern "C" fn nstd_core_str_mut_as_const(str: &NSTDStrMut) -> NSTDStrConst {
 ///
 /// # Returns
 ///
-/// `NSTDSliceConst bytes` - An immutable byte slice over `str`'s data.
+/// `NSTDSlice bytes` - An immutable byte slice over `str`'s data.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_str_mut_as_bytes(str: &NSTDStrMut) -> NSTDSliceConst {
-    nstd_core_slice_const_new(str.bytes.ptr.raw.cast(), 1, str.bytes.len)
+pub extern "C" fn nstd_core_str_mut_as_bytes(str: &NSTDStrMut) -> NSTDSlice {
+    nstd_core_slice_new(str.bytes.ptr.raw.cast(), 1, str.bytes.len)
 }
 
 /// Returns an immutable raw pointer to a string slice's memory.

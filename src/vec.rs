@@ -5,11 +5,11 @@ use crate::{
         def::{NSTDByte, NSTDErrorCode},
         mem::{nstd_core_mem_copy, nstd_core_mem_copy_overlapping},
         slice::{
-            nstd_core_slice_const_new, nstd_core_slice_const_stride, nstd_core_slice_mut_new,
-            NSTDSliceConst, NSTDSliceMut,
+            nstd_core_slice_mut_new, nstd_core_slice_new, nstd_core_slice_stride, NSTDSlice,
+            NSTDSliceMut,
         },
     },
-    NSTDAnyConst, NSTDAnyMut, NSTDUInt, NSTD_NULL,
+    NSTDAny, NSTDAnyMut, NSTDUInt, NSTD_NULL,
 };
 
 /// A dynamically sized contiguous sequence of values.
@@ -256,11 +256,11 @@ pub extern "C" fn nstd_vec_stride(vec: &NSTDVec) -> NSTDUInt {
 ///
 /// # Returns
 ///
-/// `NSTDSliceConst slice` - An *immutable* view into the vector.
+/// `NSTDSlice slice` - An *immutable* view into the vector.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_vec_as_slice(vec: &NSTDVec) -> NSTDSliceConst {
-    nstd_core_slice_const_new(vec.ptr, vec.stride, vec.len)
+pub extern "C" fn nstd_vec_as_slice(vec: &NSTDVec) -> NSTDSlice {
+    nstd_core_slice_new(vec.ptr, vec.stride, vec.len)
 }
 
 /// Returns a slice containing all of a vector's active elements.
@@ -286,10 +286,10 @@ pub extern "C" fn nstd_vec_as_slice_mut(vec: &mut NSTDVec) -> NSTDSliceMut {
 ///
 /// # Returns
 ///
-/// `NSTDAnyConst ptr` - A pointer to the vector's raw data.
+/// `NSTDAny ptr` - A pointer to the vector's raw data.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_vec_as_ptr(vec: &NSTDVec) -> NSTDAnyConst {
+pub extern "C" fn nstd_vec_as_ptr(vec: &NSTDVec) -> NSTDAny {
     vec.ptr
 }
 
@@ -323,11 +323,11 @@ pub extern "C" fn nstd_vec_as_mut_ptr(vec: &mut NSTDVec) -> NSTDAnyMut {
 ///
 /// # Returns
 ///
-/// `NSTDAnyConst element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out
+/// `NSTDAny element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out
 /// of the vector's boundaries.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_vec_get(vec: &NSTDVec, pos: NSTDUInt) -> NSTDAnyConst {
+pub extern "C" fn nstd_vec_get(vec: &NSTDVec, pos: NSTDUInt) -> NSTDAny {
     match pos < vec.len {
         // SAFETY: `pos` is a valid index.
         true => unsafe { vec.ptr.add(pos * vec.stride) },
@@ -365,7 +365,7 @@ pub extern "C" fn nstd_vec_get_mut(vec: &mut NSTDVec, pos: NSTDUInt) -> NSTDAnyM
 ///
 /// - `NSTDVec *vec` - The vector.
 ///
-/// - `NSTDAnyConst value` - A pointer to the value to push onto the vector.
+/// - `NSTDAny value` - A pointer to the value to push onto the vector.
 ///
 /// # Returns
 ///
@@ -377,7 +377,7 @@ pub extern "C" fn nstd_vec_get_mut(vec: &mut NSTDVec, pos: NSTDUInt) -> NSTDAnyM
 /// pushed onto the vector is not equal to `vec`'s stride.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_vec_push(vec: &mut NSTDVec, value: NSTDAnyConst) -> NSTDAllocError {
+pub unsafe extern "C" fn nstd_vec_push(vec: &mut NSTDVec, value: NSTDAny) -> NSTDAllocError {
     // Attempt to reserve space for the push.
     let errc = vec.try_reserve();
     // On success: copy bytes to the end of the vector.
@@ -401,11 +401,11 @@ pub unsafe extern "C" fn nstd_vec_push(vec: &mut NSTDVec, value: NSTDAnyConst) -
 ///
 /// # Returns
 ///
-/// - `NSTDAnyConst value` - A pointer to the value that was popped off the stack, or null if the
+/// - `NSTDAny value` - A pointer to the value that was popped off the stack, or null if the
 /// vector is empty.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_vec_pop(vec: &mut NSTDVec) -> NSTDAnyConst {
+pub extern "C" fn nstd_vec_pop(vec: &mut NSTDVec) -> NSTDAny {
     if vec.len > 0 {
         vec.len -= 1;
         // SAFETY: The vector is non-null.
@@ -420,7 +420,7 @@ pub extern "C" fn nstd_vec_pop(vec: &mut NSTDVec) -> NSTDAnyConst {
 ///
 /// - `NSTDVec *vec` - The vector.
 ///
-/// - `NSTDAnyConst value` - A pointer to the value to insert into the vector.
+/// - `NSTDAny value` - A pointer to the value to insert into the vector.
 ///
 /// - `NSTDUInt index` - The index at which to insert the value.
 ///
@@ -441,7 +441,7 @@ pub extern "C" fn nstd_vec_pop(vec: &mut NSTDVec) -> NSTDAnyConst {
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_vec_insert(
     vec: &mut NSTDVec,
-    value: NSTDAnyConst,
+    value: NSTDAny,
     index: NSTDUInt,
 ) -> NSTDErrorCode {
     // Make sure `index` is valid.
@@ -509,7 +509,7 @@ pub extern "C" fn nstd_vec_remove(vec: &mut NSTDVec, index: NSTDUInt) -> NSTDErr
 ///
 /// - `NSTDVec *vec` - The vector to extend.
 ///
-/// - `const NSTDSliceConst *values` - A slice of values to push onto the vector.
+/// - `const NSTDSlice *values` - A slice of values to push onto the vector.
 ///
 /// # Returns
 ///
@@ -523,12 +523,9 @@ pub extern "C" fn nstd_vec_remove(vec: &mut NSTDVec, index: NSTDUInt) -> NSTDErr
 ///
 /// This operation can cause undefined behavior if `values`'s data is invalid.
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_vec_extend(
-    vec: &mut NSTDVec,
-    values: &NSTDSliceConst,
-) -> NSTDAllocError {
+pub unsafe extern "C" fn nstd_vec_extend(vec: &mut NSTDVec, values: &NSTDSlice) -> NSTDAllocError {
     // Ensure value sizes are the same for both the vector and the slice.
-    assert!(vec.stride == nstd_core_slice_const_stride(values));
+    assert!(vec.stride == nstd_core_slice_stride(values));
     // Making sure there's enough space for the extension.
     let mut errc = NSTDAllocError::NSTD_ALLOC_ERROR_NONE;
     let reserved = vec.cap - vec.len;
