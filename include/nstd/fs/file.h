@@ -23,7 +23,7 @@ NSTDCPPSTART
 /// Open a file in writing mode without overwriting saved data.
 #define NSTD_FILE_APPEND 0b00001000
 
-/// Open a file in truncate mode, this will set the file's length to 0 upon openning.
+/// Open a file in truncate mode, this will set the file's length to 0 upon opening.
 #define NSTD_FILE_TRUNC 0b00010000
 
 /// A handle to an opened file.
@@ -33,7 +33,7 @@ typedef NSTDAnyMut NSTDFile;
 ///
 /// # Parameters:
 ///
-/// - `const NSTDStrConst *name` - The name of the file to create.
+/// - `const NSTDStr *name` - The name of the file to create.
 ///
 /// - `NSTDUInt8 mask` - A bit mask for toggling the file's different open options.
 ///
@@ -41,12 +41,12 @@ typedef NSTDAnyMut NSTDFile;
 ///
 /// # Returns
 ///
-/// `NSTDFile file` - A handle to the opened file, or null if an error occurrs.
+/// `NSTDFile file` - A handle to the opened file, or null if an error occurs.
 ///
 /// # Safety
 ///
 /// This operation can cause undefined behavior if `name`'s data is invalid.
-NSTDAPI NSTDFile nstd_fs_file_open(const NSTDStrConst *name, NSTDUInt8 mask, NSTDIOError *errc);
+NSTDAPI NSTDFile nstd_fs_file_open(const NSTDStr *name, NSTDUInt8 mask, NSTDIOError *errc);
 
 /// Writes some data to a file & returns how many bytes were written.
 ///
@@ -54,9 +54,9 @@ NSTDAPI NSTDFile nstd_fs_file_open(const NSTDStrConst *name, NSTDUInt8 mask, NST
 ///
 /// - `NSTDFile *file` - A handle to an open file.
 ///
-/// - `const NSTDSliceConst *bytes` - The data to write to the file.
+/// - `const NSTDSlice *bytes` - The data to write to the file.
 ///
-/// - `NSTDUSize *written` - Returns as the number of bytes written to the file.
+/// - `NSTDUInt *written` - Returns as the number of bytes written to the file.
 ///
 /// # Returns
 ///
@@ -65,8 +65,7 @@ NSTDAPI NSTDFile nstd_fs_file_open(const NSTDStrConst *name, NSTDUInt8 mask, NST
 /// # Safety
 ///
 /// This function's caller must guarantee validity of `bytes`.
-NSTDAPI NSTDIOError nstd_fs_file_write(NSTDFile *file, const NSTDSliceConst *bytes,
-NSTDUSize *written);
+NSTDAPI NSTDIOError nstd_fs_file_write(NSTDFile *file, const NSTDSlice *bytes, NSTDUInt *written);
 
 /// Writes a whole buffer to a file.
 ///
@@ -74,7 +73,7 @@ NSTDUSize *written);
 ///
 /// - `NSTDFile *file` - A handle to an open file.
 ///
-/// - `const NSTDSliceConst *bytes` - The data to write to the file.
+/// - `const NSTDSlice *bytes` - The data to write to the file.
 ///
 /// # Returns
 ///
@@ -83,7 +82,7 @@ NSTDUSize *written);
 /// # Safety
 ///
 /// This function's caller must guarantee validity of `bytes`.
-NSTDAPI NSTDIOError nstd_fs_file_write_all(NSTDFile *file, const NSTDSliceConst *bytes);
+NSTDAPI NSTDIOError nstd_fs_file_write_all(NSTDFile *file, const NSTDSlice *bytes);
 
 /// Flushes a file stream.
 ///
@@ -104,7 +103,7 @@ NSTDAPI NSTDIOError nstd_fs_file_flush(NSTDFile *file);
 ///
 /// - `NSTDSliceMut *buffer` - The buffer to start filling with data from the file.
 ///
-/// - `NSTDUSize *read` - Returns as the number of bytes read from the file.
+/// - `NSTDUInt *read` - Returns as the number of bytes read from the file.
 ///
 /// # Returns
 ///
@@ -113,7 +112,7 @@ NSTDAPI NSTDIOError nstd_fs_file_flush(NSTDFile *file);
 /// # Safety
 ///
 /// `buffer`'s data must be valid for writes.
-NSTDAPI NSTDIOError nstd_fs_file_read(NSTDFile *file, NSTDSliceMut *buffer, NSTDUSize *read);
+NSTDAPI NSTDIOError nstd_fs_file_read(NSTDFile *file, NSTDSliceMut *buffer, NSTDUInt *read);
 
 /// Continuously reads data from `file` into a buffer until EOF is reached.
 ///
@@ -128,12 +127,12 @@ NSTDAPI NSTDIOError nstd_fs_file_read(NSTDFile *file, NSTDSliceMut *buffer, NSTD
 ///
 /// - `NSTDVec *buffer` - The buffer to be extended with data from the file.
 ///
-/// - `NSTDUSize *read` - Returns as the number of bytes read from the file.
+/// - `NSTDUInt *read` - Returns as the number of bytes read from the file.
 ///
 /// # Returns
 ///
 /// `NSTDIOError errc` - The I/O operation error code.
-NSTDAPI NSTDIOError nstd_fs_file_read_all(NSTDFile *file, NSTDVec *buffer, NSTDUSize *read);
+NSTDAPI NSTDIOError nstd_fs_file_read_all(NSTDFile *file, NSTDVec *buffer, NSTDUInt *read);
 
 /// Continuously reads UTF-8 data from `file` into a string buffer until EOF is reached.
 ///
@@ -148,13 +147,12 @@ NSTDAPI NSTDIOError nstd_fs_file_read_all(NSTDFile *file, NSTDVec *buffer, NSTDU
 ///
 /// - `NSTDString *buffer` - The buffer to be extended with data from the file.
 ///
-/// - `NSTDUSize *read` - Returns as the number of bytes read from the file.
+/// - `NSTDUInt *read` - Returns as the number of bytes read from the file.
 ///
 /// # Returns
 ///
 /// `NSTDIOError errc` - The I/O operation error code.
-NSTDAPI NSTDIOError nstd_fs_file_read_to_string(NSTDFile *file, NSTDString *buffer,
-NSTDUSize *read);
+NSTDAPI NSTDIOError nstd_fs_file_read_to_string(NSTDFile *file, NSTDString *buffer, NSTDUInt *read);
 
 /// Reads enough data from `file` to fill the entirety of `buffer`.
 ///

@@ -1,13 +1,13 @@
 //! A handle to an opened file.
 use crate::{
     core::{
-        slice::{NSTDSliceConst, NSTDSliceMut},
-        str::NSTDStrConst,
+        slice::{NSTDSlice, NSTDSliceMut},
+        str::NSTDStr,
     },
     io::NSTDIOError,
     string::NSTDString,
     vec::NSTDVec,
-    NSTDUInt8, NSTDUSize,
+    NSTDUInt, NSTDUInt8,
 };
 use std::fs::File;
 
@@ -26,7 +26,7 @@ pub const NSTD_FILE_WRITE: NSTDUInt8 = 0b00000100;
 /// Open a file in writing mode without overwriting saved data.
 pub const NSTD_FILE_APPEND: NSTDUInt8 = 0b00001000;
 
-/// Open a file in truncate mode, this will set the file's length to 0 upon openning.
+/// Open a file in truncate mode, this will set the file's length to 0 upon opening.
 pub const NSTD_FILE_TRUNC: NSTDUInt8 = 0b00010000;
 
 /// A handle to an opened file.
@@ -36,7 +36,7 @@ pub type NSTDFile = Box<File>;
 ///
 /// # Parameters:
 ///
-/// - `const NSTDStrConst *name` - The name of the file to create.
+/// - `const NSTDStr *name` - The name of the file to create.
 ///
 /// - `NSTDUInt8 mask` - A bit mask for toggling the file's different open options.
 ///
@@ -44,14 +44,14 @@ pub type NSTDFile = Box<File>;
 ///
 /// # Returns
 ///
-/// `NSTDFile file` - A handle to the opened file, or null if an error occurrs.
+/// `NSTDFile file` - A handle to the opened file, or null if an error occurs.
 ///
 /// # Safety
 ///
 /// This operation can cause undefined behavior if `name`'s data is invalid.
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_fs_file_open(
-    name: &NSTDStrConst,
+    name: &NSTDStr,
     mask: NSTDUInt8,
     errc: &mut NSTDIOError,
 ) -> Option<NSTDFile> {
@@ -81,9 +81,9 @@ pub unsafe extern "C" fn nstd_fs_file_open(
 ///
 /// - `NSTDFile *file` - A handle to an open file.
 ///
-/// - `const NSTDSliceConst *bytes` - The data to write to the file.
+/// - `const NSTDSlice *bytes` - The data to write to the file.
 ///
-/// - `NSTDUSize *written` - Returns as the number of bytes written to the file.
+/// - `NSTDUInt *written` - Returns as the number of bytes written to the file.
 ///
 /// # Returns
 ///
@@ -96,8 +96,8 @@ pub unsafe extern "C" fn nstd_fs_file_open(
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_fs_file_write(
     file: &mut NSTDFile,
-    bytes: &NSTDSliceConst,
-    written: &mut NSTDUSize,
+    bytes: &NSTDSlice,
+    written: &mut NSTDUInt,
 ) -> NSTDIOError {
     crate::io::stdio::write(file, bytes, written)
 }
@@ -108,7 +108,7 @@ pub unsafe extern "C" fn nstd_fs_file_write(
 ///
 /// - `NSTDFile *file` - A handle to an open file.
 ///
-/// - `const NSTDSliceConst *bytes` - The data to write to the file.
+/// - `const NSTDSlice *bytes` - The data to write to the file.
 ///
 /// # Returns
 ///
@@ -121,7 +121,7 @@ pub unsafe extern "C" fn nstd_fs_file_write(
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_fs_file_write_all(
     file: &mut NSTDFile,
-    bytes: &NSTDSliceConst,
+    bytes: &NSTDSlice,
 ) -> NSTDIOError {
     crate::io::stdio::write_all(file, bytes)
 }
@@ -149,7 +149,7 @@ pub extern "C" fn nstd_fs_file_flush(file: &mut NSTDFile) -> NSTDIOError {
 ///
 /// - `NSTDSliceMut *buffer` - The buffer to start filling with data from the file.
 ///
-/// - `NSTDUSize *read` - Returns as the number of bytes read from the file.
+/// - `NSTDUInt *read` - Returns as the number of bytes read from the file.
 ///
 /// # Returns
 ///
@@ -163,7 +163,7 @@ pub extern "C" fn nstd_fs_file_flush(file: &mut NSTDFile) -> NSTDIOError {
 pub unsafe extern "C" fn nstd_fs_file_read(
     file: &mut NSTDFile,
     buffer: &mut NSTDSliceMut,
-    read: &mut NSTDUSize,
+    read: &mut NSTDUInt,
 ) -> NSTDIOError {
     crate::io::stdio::read(file, buffer, read)
 }
@@ -181,7 +181,7 @@ pub unsafe extern "C" fn nstd_fs_file_read(
 ///
 /// - `NSTDVec *buffer` - The buffer to be extended with data from the file.
 ///
-/// - `NSTDUSize *read` - Returns as the number of bytes read from the file.
+/// - `NSTDUInt *read` - Returns as the number of bytes read from the file.
 ///
 /// # Returns
 ///
@@ -191,7 +191,7 @@ pub unsafe extern "C" fn nstd_fs_file_read(
 pub extern "C" fn nstd_fs_file_read_all(
     file: &mut NSTDFile,
     buffer: &mut NSTDVec,
-    read: &mut NSTDUSize,
+    read: &mut NSTDUInt,
 ) -> NSTDIOError {
     crate::io::stdio::read_all(file, buffer, read)
 }
@@ -209,7 +209,7 @@ pub extern "C" fn nstd_fs_file_read_all(
 ///
 /// - `NSTDString *buffer` - The buffer to be extended with data from the file.
 ///
-/// - `NSTDUSize *read` - Returns as the number of bytes read from the file.
+/// - `NSTDUInt *read` - Returns as the number of bytes read from the file.
 ///
 /// # Returns
 ///
@@ -219,7 +219,7 @@ pub extern "C" fn nstd_fs_file_read_all(
 pub extern "C" fn nstd_fs_file_read_to_string(
     file: &mut NSTDFile,
     buffer: &mut NSTDString,
-    read: &mut NSTDUSize,
+    read: &mut NSTDUInt,
 ) -> NSTDIOError {
     crate::io::stdio::read_to_string(file, buffer, read)
 }

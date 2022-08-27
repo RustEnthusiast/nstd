@@ -1,5 +1,5 @@
 //! Contains mostly unsafe functions for interacting with raw memory.
-use crate::{core::def::NSTDByte, NSTDBool, NSTDUSize, NSTD_TRUE};
+use crate::{core::def::NSTDByte, NSTDBool, NSTDUInt, NSTD_TRUE};
 
 /// Compares two memory buffers of `num` bytes.
 ///
@@ -9,7 +9,7 @@ use crate::{core::def::NSTDByte, NSTDBool, NSTDUSize, NSTD_TRUE};
 ///
 /// - `const NSTDByte *buf2` - A pointer to the second memory buffer.
 ///
-/// - `NSTDUSize num` - The number of bytes to compare.
+/// - `NSTDUInt num` - The number of bytes to compare.
 ///
 /// # Returns
 ///
@@ -25,7 +25,7 @@ use crate::{core::def::NSTDByte, NSTDBool, NSTDUSize, NSTD_TRUE};
 pub unsafe extern "C" fn nstd_core_mem_compare(
     buf1: *const NSTDByte,
     buf2: *const NSTDByte,
-    num: NSTDUSize,
+    num: NSTDUInt,
 ) -> NSTDBool {
     // If the two pointers point to the same buffer, or `num` is 0, return true.
     if buf1 == buf2 || num == 0 {
@@ -37,13 +37,35 @@ pub unsafe extern "C" fn nstd_core_mem_compare(
     (buf1 == buf2).into()
 }
 
+/// Zeros out a memory buffer.
+///
+/// # Parameters:
+///
+/// - `NSTDByte *buf` - A pointer to the first byte in the memory buffer.
+///
+/// - `NSTDUInt size` - The number of bytes to set to 0.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if the caller does not ensure that the memory
+/// buffer is at least `size` bytes in size.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_core_mem_zero(buf: *mut NSTDByte, size: NSTDUInt) {
+    let mut i = 0;
+    while i < size {
+        *buf.add(i) = 0;
+        i += 1;
+    }
+}
+
 /// Fills the memory buffer `buf` with byte `fill`.
 ///
 /// # Parameters:
 ///
 /// - `NSTDByte *buf` - The memory buffer to fill.
 ///
-/// - `NSTDUSize size` - The size of the memory buffer.
+/// - `NSTDUInt size` - The size of the memory buffer.
 ///
 /// - `NSTDByte fill` - The byte value to fill the memory buffer with.
 ///
@@ -53,7 +75,7 @@ pub unsafe extern "C" fn nstd_core_mem_compare(
 /// buffer is at least `size` bytes in size.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_mem_fill(buf: *mut NSTDByte, size: NSTDUSize, fill: NSTDByte) {
+pub unsafe extern "C" fn nstd_core_mem_fill(buf: *mut NSTDByte, size: NSTDUInt, fill: NSTDByte) {
     let mut i = 0;
     while i < size {
         *buf.add(i) = fill;
@@ -69,7 +91,7 @@ pub unsafe extern "C" fn nstd_core_mem_fill(buf: *mut NSTDByte, size: NSTDUSize,
 ///
 /// - `const NSTDByte *src` - A pointer to the memory buffer to copy from.
 ///
-/// - `NSTDUSize num` - The number of bytes to copy from `src` to `dest`.
+/// - `NSTDUInt num` - The number of bytes to copy from `src` to `dest`.
 ///
 /// # Safety
 ///
@@ -81,7 +103,7 @@ pub unsafe extern "C" fn nstd_core_mem_fill(buf: *mut NSTDByte, size: NSTDUSize,
 pub unsafe extern "C" fn nstd_core_mem_copy(
     dest: *mut NSTDByte,
     src: *const NSTDByte,
-    num: NSTDUSize,
+    num: NSTDUInt,
 ) {
     core::ptr::copy_nonoverlapping(src, dest, num);
 }
@@ -95,7 +117,7 @@ pub unsafe extern "C" fn nstd_core_mem_copy(
 ///
 /// - `const NSTDByte *src` - A pointer to the memory buffer to copy from.
 ///
-/// - `NSTDUSize num` - The number of bytes to copy from `src` to `dest`.
+/// - `NSTDUInt num` - The number of bytes to copy from `src` to `dest`.
 ///
 /// # Safety
 ///
@@ -107,7 +129,7 @@ pub unsafe extern "C" fn nstd_core_mem_copy(
 pub unsafe extern "C" fn nstd_core_mem_copy_overlapping(
     dest: *mut NSTDByte,
     src: *const NSTDByte,
-    num: NSTDUSize,
+    num: NSTDUInt,
 ) {
     core::ptr::copy(src, dest, num);
 }
@@ -120,7 +142,7 @@ pub unsafe extern "C" fn nstd_core_mem_copy_overlapping(
 ///
 /// - `NSTDByte *y` - A pointer to the second memory buffer.
 ///
-/// - `NSTDUSize num` - The number of bytes to swap.
+/// - `NSTDUInt num` - The number of bytes to swap.
 ///
 /// # Safety
 ///
@@ -129,6 +151,6 @@ pub unsafe extern "C" fn nstd_core_mem_copy_overlapping(
 /// of a buffer.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_mem_swap(x: *mut NSTDByte, y: *mut NSTDByte, num: NSTDUSize) {
+pub unsafe extern "C" fn nstd_core_mem_swap(x: *mut NSTDByte, y: *mut NSTDByte, num: NSTDUInt) {
     core::ptr::swap_nonoverlapping(x, y, num);
 }

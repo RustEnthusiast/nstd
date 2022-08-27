@@ -32,6 +32,7 @@ Rust syntax).
     - `os` - Operating system specific functionality.
         - `windows` - OS support for Windows.
             - `alloc` - Low level memory allocation for Windows.
+                - `heap` - Process heap management for Windows.
     - `shared_lib` - Access symbols from loaded shared libraries.
     - `shared_ptr` - A reference counting smart pointer.
     - `string` - Dynamically sized UTF-8 encoded byte string.
@@ -62,7 +63,7 @@ ideal. I am always looking for ways to make this API as safe as sanely possible,
 issue if you have any ideas on how we can do so, it would be greatly appreciated.
 
 # How to build
-`nstd` let's you decide what features you want to use. Any module that falls under the top level
+`nstd` let you decide what features you want to use. Any module that falls under the top level
 module has a dedicated feature flag, for example `nstd.core` has the feature flag `nstd_core` and
 `nstd.alloc` has the feature flag `nstd_alloc`. Each module can also have additional features, for
 example `nstd.os` has the additional `nstd_os_windows_alloc` feature for memory allocation on
@@ -72,11 +73,11 @@ the `clib` feature flag. The `std` feature flag enables Rust standard library su
 `nstd_core` are enabled by default.
 
 For example:
-```
+```sh
 cargo build --release --features "clib nstd_alloc nstd_vec"
 ```
 
 To build with all features:
-```
+```sh
 cargo build --release --all-features
 ```

@@ -9,7 +9,7 @@ NSTDCPPSTART
 ///
 /// # Parameters:
 ///
-/// - `const NSTDStrConst *name` - The name of the new file.
+/// - `const NSTDStr *name` - The name of the new file.
 ///
 /// # Returns
 ///
@@ -18,13 +18,13 @@ NSTDCPPSTART
 /// # Safety
 ///
 /// This operation can cause undefined behavior if `name`'s data is invalid.
-NSTDAPI NSTDIOError nstd_fs_create_file(const NSTDStrConst *name);
+NSTDAPI NSTDIOError nstd_fs_create_file(const NSTDStr *name);
 
 /// Creates a new directory on the file system.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDStrConst *name` - The name of the new directory.
+/// - `const NSTDStr *name` - The name of the new directory.
 ///
 /// # Returns
 ///
@@ -33,13 +33,13 @@ NSTDAPI NSTDIOError nstd_fs_create_file(const NSTDStrConst *name);
 /// # Safety
 ///
 /// This operation can cause undefined behavior if `name`'s data is invalid.
-NSTDAPI NSTDIOError nstd_fs_create_dir(const NSTDStrConst *name);
+NSTDAPI NSTDIOError nstd_fs_create_dir(const NSTDStr *name);
 
 /// Recursively creates new directories on the file system.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDStrConst *name` - A path to the new directory.
+/// - `const NSTDStr *name` - A path to the new directory.
 ///
 /// # Returns
 ///
@@ -48,13 +48,13 @@ NSTDAPI NSTDIOError nstd_fs_create_dir(const NSTDStrConst *name);
 /// # Safety
 ///
 /// This operation can cause undefined behavior if `name`'s data is invalid.
-NSTDAPI NSTDIOError nstd_fs_create_dirs(const NSTDStrConst *name);
+NSTDAPI NSTDIOError nstd_fs_create_dirs(const NSTDStr *name);
 
 /// Removes a file from the file system.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDStrConst *name` - The name of the file to delete.
+/// - `const NSTDStr *name` - The name of the file to delete.
 ///
 /// # Returns
 ///
@@ -63,13 +63,13 @@ NSTDAPI NSTDIOError nstd_fs_create_dirs(const NSTDStrConst *name);
 /// # Safety
 ///
 /// This operation can cause undefined behavior if `name`'s data is invalid.
-NSTDAPI NSTDIOError nstd_fs_remove_file(const NSTDStrConst *name);
+NSTDAPI NSTDIOError nstd_fs_remove_file(const NSTDStr *name);
 
 /// Removes a directory from the file system.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDStrConst *name` - The name of the directory to delete.
+/// - `const NSTDStr *name` - The name of the directory to delete.
 ///
 /// # Returns
 ///
@@ -78,13 +78,13 @@ NSTDAPI NSTDIOError nstd_fs_remove_file(const NSTDStrConst *name);
 /// # Safety
 ///
 /// This operation can cause undefined behavior if `name`'s data is invalid.
-NSTDAPI NSTDIOError nstd_fs_remove_dir(const NSTDStrConst *name);
+NSTDAPI NSTDIOError nstd_fs_remove_dir(const NSTDStr *name);
 
 /// Recursively removes a directory on the file system.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDStrConst *name` - A path to the directory to remove.
+/// - `const NSTDStr *name` - A path to the directory to remove.
 ///
 /// # Returns
 ///
@@ -93,15 +93,15 @@ NSTDAPI NSTDIOError nstd_fs_remove_dir(const NSTDStrConst *name);
 /// # Safety
 ///
 /// This operation can cause undefined behavior if `name`'s data is invalid.
-NSTDAPI NSTDIOError nstd_fs_remove_dirs(const NSTDStrConst *name);
+NSTDAPI NSTDIOError nstd_fs_remove_dirs(const NSTDStr *name);
 
 /// Renames a file or directory, replacing the destination if it already exists.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDStrConst *from` - The original name of the file/directory.
+/// - `const NSTDStr *from` - The original name of the file/directory.
 ///
-/// - `const NSTDStrConst *to` - The new name of the file/dir.
+/// - `const NSTDStr *to` - The new name of the file/dir.
 ///
 /// # Returns
 ///
@@ -110,7 +110,7 @@ NSTDAPI NSTDIOError nstd_fs_remove_dirs(const NSTDStrConst *name);
 /// # Safety
 ///
 /// This operation can cause undefined behavior if either `to` or `from`'s data is invalid.
-NSTDAPI NSTDIOError nstd_fs_rename(const NSTDStrConst *from, const NSTDStrConst *to);
+NSTDAPI NSTDIOError nstd_fs_rename(const NSTDStr *from, const NSTDStr *to);
 
 NSTDCPPEND
 #endif

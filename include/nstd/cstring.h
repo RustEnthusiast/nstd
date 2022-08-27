@@ -1,5 +1,6 @@
 #ifndef NSTD_CSTRING_H
 #define NSTD_CSTRING_H
+#include "alloc.h"
 #include "core/cstr.h"
 #include "core/def.h"
 #include "core/slice.h"
@@ -30,7 +31,7 @@ NSTDAPI NSTDCString nstd_cstring_new();
 ///
 /// # Parameters:
 ///
-/// - `NSTDUSize cap` - The number of bytes to allocate ahead of time.
+/// - `NSTDUInt cap` - The number of bytes to allocate ahead of time.
 ///
 /// # Returns
 ///
@@ -39,7 +40,7 @@ NSTDAPI NSTDCString nstd_cstring_new();
 /// # Panics
 ///
 /// This function will panic if either `cap` is zero or allocating fails.
-NSTDAPI NSTDCString nstd_cstring_new_with_cap(NSTDUSize cap);
+NSTDAPI NSTDCString nstd_cstring_new_with_cap(NSTDUInt cap);
 
 /// Creates a deep copy of an `NSTDCString`.
 ///
@@ -64,8 +65,8 @@ NSTDAPI NSTDCString nstd_cstring_clone(const NSTDCString *cstring);
 ///
 /// # Returns
 ///
-/// `NSTDCStrConst cstr` - The new C string slice.
-NSTDAPI NSTDCStrConst nstd_cstring_as_cstr(const NSTDCString *cstring);
+/// `NSTDCStr cstr` - The new C string slice.
+NSTDAPI NSTDCStr nstd_cstring_as_cstr(const NSTDCString *cstring);
 
 /// Creates a C string slice containing the contents of `cstring`.
 ///
@@ -86,8 +87,8 @@ NSTDAPI NSTDCStrMut nstd_cstring_as_cstr_mut(NSTDCString *cstring);
 ///
 /// # Returns
 ///
-/// `NSTDSliceConst bytes` - The C string's active data.
-NSTDAPI NSTDSliceConst nstd_cstring_as_bytes(const NSTDCString *cstring);
+/// `NSTDSlice bytes` - The C string's active data.
+NSTDAPI NSTDSlice nstd_cstring_as_bytes(const NSTDCString *cstring);
 
 /// Returns a raw pointer to a C string's memory.
 ///
@@ -111,6 +112,41 @@ NSTDAPI const NSTDChar *nstd_cstring_as_ptr(const NSTDCString *cstring);
 /// `NSTDVec bytes` - The C string's raw data.
 NSTDAPI NSTDVec nstd_cstring_to_bytes(NSTDCString cstring);
 
+/// Returns the number of `char`s in a C string, excluding the null terminator.
+///
+/// # Parameters:
+///
+/// - `const NSTDCString *cstring` - The C string.
+///
+/// # Returns
+///
+/// `NSTDUInt len` - The length of the C string without it's null byte.
+NSTDAPI NSTDUInt nstd_cstring_len(const NSTDCString *cstring);
+
+/// Returns a C string's capacity.
+///
+/// This is the max number of *bytes* the C string can contain without reallocating.
+///
+/// # Parameters:
+///
+/// - `const NSTDCString *cstring` - The C string.
+///
+/// # Returns
+///
+/// `NSTDUInt cap` - The C string's capacity.
+NSTDAPI NSTDUInt nstd_cstring_cap(const NSTDCString *cstring);
+
+/// Returns the number of `char`s in a C string, including the null terminator.
+///
+/// # Parameters:
+///
+/// - `const NSTDCString *cstring` - The C string.
+///
+/// # Returns
+///
+/// `NSTDUInt len` - The length of the C string including it's null byte.
+NSTDAPI NSTDUInt nstd_cstring_len_with_null(const NSTDCString *cstring);
+
 /// Appends an `NSTDChar` to the end of an `NSTDCString`.
 ///
 /// This will have no effect if `chr` is a null byte (0).
@@ -132,11 +168,11 @@ NSTDAPI void nstd_cstring_push(NSTDCString *cstring, NSTDChar chr);
 ///
 /// - `NSTDCString *cstring` - The C string.
 ///
-/// - `const NSTDCStrConst *cstr` - The C string slice to append to the end of `cstring`.
+/// - `const NSTDCStr *cstr` - The C string slice to append to the end of `cstring`.
 ///
 /// # Returns
 ///
-/// `NSTDErrorCode errc` - Nonzero if reserving memory for the push fails.
+/// `NSTDAllocError errc` - The allocation operation error code.
 ///
 /// # Panics
 ///
@@ -149,7 +185,7 @@ NSTDAPI void nstd_cstring_push(NSTDCString *cstring, NSTDChar chr);
 /// # Safety
 ///
 /// This operation can cause undefined behavior in the case that `cstr`'s data is invalid.
-NSTDAPI NSTDErrorCode nstd_cstring_push_cstr(NSTDCString *cstring, const NSTDCStrConst *cstr);
+NSTDAPI NSTDAllocError nstd_cstring_push_cstr(NSTDCString *cstring, const NSTDCStr *cstr);
 
 /// Removes the last character from a C string and returns it.
 ///

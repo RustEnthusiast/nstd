@@ -1,13 +1,13 @@
 //! Provides access to the file system.
 pub mod file;
-use crate::{core::str::NSTDStrConst, io::NSTDIOError};
+use crate::{core::str::NSTDStr, io::NSTDIOError};
 use std::fs::File;
 
 /// Creates a new file on the file system.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDStrConst *name` - The name of the new file.
+/// - `const NSTDStr *name` - The name of the new file.
 ///
 /// # Returns
 ///
@@ -18,7 +18,7 @@ use std::fs::File;
 /// This operation can cause undefined behavior if `name`'s data is invalid.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_fs_create_file(name: &NSTDStrConst) -> NSTDIOError {
+pub unsafe extern "C" fn nstd_fs_create_file(name: &NSTDStr) -> NSTDIOError {
     if let Err(err) = File::create(name.as_str()) {
         return NSTDIOError::from_err(err.kind());
     }
@@ -29,7 +29,7 @@ pub unsafe extern "C" fn nstd_fs_create_file(name: &NSTDStrConst) -> NSTDIOError
 ///
 /// # Parameters:
 ///
-/// - `const NSTDStrConst *name` - The name of the new directory.
+/// - `const NSTDStr *name` - The name of the new directory.
 ///
 /// # Returns
 ///
@@ -40,7 +40,7 @@ pub unsafe extern "C" fn nstd_fs_create_file(name: &NSTDStrConst) -> NSTDIOError
 /// This operation can cause undefined behavior if `name`'s data is invalid.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_fs_create_dir(name: &NSTDStrConst) -> NSTDIOError {
+pub unsafe extern "C" fn nstd_fs_create_dir(name: &NSTDStr) -> NSTDIOError {
     if let Err(err) = std::fs::create_dir(name.as_str()) {
         return NSTDIOError::from_err(err.kind());
     }
@@ -51,7 +51,7 @@ pub unsafe extern "C" fn nstd_fs_create_dir(name: &NSTDStrConst) -> NSTDIOError 
 ///
 /// # Parameters:
 ///
-/// - `const NSTDStrConst *name` - A path to the new directory.
+/// - `const NSTDStr *name` - A path to the new directory.
 ///
 /// # Returns
 ///
@@ -62,7 +62,7 @@ pub unsafe extern "C" fn nstd_fs_create_dir(name: &NSTDStrConst) -> NSTDIOError 
 /// This operation can cause undefined behavior if `name`'s data is invalid.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_fs_create_dirs(name: &NSTDStrConst) -> NSTDIOError {
+pub unsafe extern "C" fn nstd_fs_create_dirs(name: &NSTDStr) -> NSTDIOError {
     if let Err(err) = std::fs::create_dir_all(name.as_str()) {
         return NSTDIOError::from_err(err.kind());
     }
@@ -73,7 +73,7 @@ pub unsafe extern "C" fn nstd_fs_create_dirs(name: &NSTDStrConst) -> NSTDIOError
 ///
 /// # Parameters:
 ///
-/// - `const NSTDStrConst *name` - The name of the file to delete.
+/// - `const NSTDStr *name` - The name of the file to delete.
 ///
 /// # Returns
 ///
@@ -84,7 +84,7 @@ pub unsafe extern "C" fn nstd_fs_create_dirs(name: &NSTDStrConst) -> NSTDIOError
 /// This operation can cause undefined behavior if `name`'s data is invalid.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_fs_remove_file(name: &NSTDStrConst) -> NSTDIOError {
+pub unsafe extern "C" fn nstd_fs_remove_file(name: &NSTDStr) -> NSTDIOError {
     if let Err(err) = std::fs::remove_file(name.as_str()) {
         return NSTDIOError::from_err(err.kind());
     }
@@ -95,7 +95,7 @@ pub unsafe extern "C" fn nstd_fs_remove_file(name: &NSTDStrConst) -> NSTDIOError
 ///
 /// # Parameters:
 ///
-/// - `const NSTDStrConst *name` - The name of the directory to delete.
+/// - `const NSTDStr *name` - The name of the directory to delete.
 ///
 /// # Returns
 ///
@@ -106,7 +106,7 @@ pub unsafe extern "C" fn nstd_fs_remove_file(name: &NSTDStrConst) -> NSTDIOError
 /// This operation can cause undefined behavior if `name`'s data is invalid.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_fs_remove_dir(name: &NSTDStrConst) -> NSTDIOError {
+pub unsafe extern "C" fn nstd_fs_remove_dir(name: &NSTDStr) -> NSTDIOError {
     if let Err(err) = std::fs::remove_dir(name.as_str()) {
         return NSTDIOError::from_err(err.kind());
     }
@@ -117,7 +117,7 @@ pub unsafe extern "C" fn nstd_fs_remove_dir(name: &NSTDStrConst) -> NSTDIOError 
 ///
 /// # Parameters:
 ///
-/// - `const NSTDStrConst *name` - A path to the directory to remove.
+/// - `const NSTDStr *name` - A path to the directory to remove.
 ///
 /// # Returns
 ///
@@ -128,7 +128,7 @@ pub unsafe extern "C" fn nstd_fs_remove_dir(name: &NSTDStrConst) -> NSTDIOError 
 /// This operation can cause undefined behavior if `name`'s data is invalid.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_fs_remove_dirs(name: &NSTDStrConst) -> NSTDIOError {
+pub unsafe extern "C" fn nstd_fs_remove_dirs(name: &NSTDStr) -> NSTDIOError {
     if let Err(err) = std::fs::remove_dir_all(name.as_str()) {
         return NSTDIOError::from_err(err.kind());
     }
@@ -139,9 +139,9 @@ pub unsafe extern "C" fn nstd_fs_remove_dirs(name: &NSTDStrConst) -> NSTDIOError
 ///
 /// # Parameters:
 ///
-/// - `const NSTDStrConst *from` - The original name of the file/directory.
+/// - `const NSTDStr *from` - The original name of the file/directory.
 ///
-/// - `const NSTDStrConst *to` - The new name of the file/dir.
+/// - `const NSTDStr *to` - The new name of the file/dir.
 ///
 /// # Returns
 ///
@@ -152,7 +152,7 @@ pub unsafe extern "C" fn nstd_fs_remove_dirs(name: &NSTDStrConst) -> NSTDIOError
 /// This operation can cause undefined behavior if either `to` or `from`'s data is invalid.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_fs_rename(from: &NSTDStrConst, to: &NSTDStrConst) -> NSTDIOError {
+pub unsafe extern "C" fn nstd_fs_rename(from: &NSTDStr, to: &NSTDStr) -> NSTDIOError {
     if let Err(err) = std::fs::rename(from.as_str(), to.as_str()) {
         return NSTDIOError::from_err(err.kind());
     }

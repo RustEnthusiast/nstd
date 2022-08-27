@@ -12,7 +12,7 @@ NSTDCPPSTART
 ///
 /// - `const NSTDByte *buf2` - A pointer to the second memory buffer.
 ///
-/// - `NSTDUSize num` - The number of bytes to compare.
+/// - `NSTDUInt num` - The number of bytes to compare.
 ///
 /// # Returns
 ///
@@ -23,7 +23,21 @@ NSTDCPPSTART
 /// This function is highly unsafe as it does not know how large either of the memory buffers
 /// actually are, which can lead to undefined behavior if either of the buffers' length are less
 /// than `num`.
-NSTDAPI NSTDBool nstd_core_mem_compare(const NSTDByte *buf1, const NSTDByte *buf2, NSTDUSize num);
+NSTDAPI NSTDBool nstd_core_mem_compare(const NSTDByte *buf1, const NSTDByte *buf2, NSTDUInt num);
+
+/// Zeros out a memory buffer.
+///
+/// # Parameters:
+///
+/// - `NSTDByte *buf` - A pointer to the first byte in the memory buffer.
+///
+/// - `NSTDUInt size` - The number of bytes to set to 0.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if the caller does not ensure that the memory
+/// buffer is at least `size` bytes in size.
+NSTDAPI void nstd_core_mem_zero(NSTDByte *buf, NSTDUInt size);
 
 /// Fills the memory buffer `buf` with byte `fill`.
 ///
@@ -31,7 +45,7 @@ NSTDAPI NSTDBool nstd_core_mem_compare(const NSTDByte *buf1, const NSTDByte *buf
 ///
 /// - `NSTDByte *buf` - The memory buffer to fill.
 ///
-/// - `NSTDUSize size` - The size of the memory buffer.
+/// - `NSTDUInt size` - The size of the memory buffer.
 ///
 /// - `NSTDByte fill` - The byte value to fill the memory buffer with.
 ///
@@ -39,7 +53,7 @@ NSTDAPI NSTDBool nstd_core_mem_compare(const NSTDByte *buf1, const NSTDByte *buf
 ///
 /// This operation can cause undefined behavior if the caller does not ensure that the memory
 /// buffer is at least `size` bytes in size.
-NSTDAPI void nstd_core_mem_fill(NSTDByte *buf, NSTDUSize size, NSTDByte fill);
+NSTDAPI void nstd_core_mem_fill(NSTDByte *buf, NSTDUInt size, NSTDByte fill);
 
 /// Copies `num` bytes from `src` to `dest`.
 ///
@@ -49,14 +63,14 @@ NSTDAPI void nstd_core_mem_fill(NSTDByte *buf, NSTDUSize size, NSTDByte fill);
 ///
 /// - `const NSTDByte *src` - A pointer to the memory buffer to copy from.
 ///
-/// - `NSTDUSize num` - The number of bytes to copy from `src` to `dest`.
+/// - `NSTDUInt num` - The number of bytes to copy from `src` to `dest`.
 ///
 /// # Safety
 ///
 /// This function is highly unsafe as it does not know how large either of the memory buffers are,
 /// quickly leading to undefined behavior if this function ends up reading or writing past the end
 /// of a buffer.
-NSTDAPI void nstd_core_mem_copy(NSTDByte *dest, const NSTDByte *src, NSTDUSize num);
+NSTDAPI void nstd_core_mem_copy(NSTDByte *dest, const NSTDByte *src, NSTDUInt num);
 
 /// Copies `num` bytes from `src` to `dest`. Unlike `nstd_core_mem_copy` this operation can be used
 /// when the two memory buffers overlap.
@@ -67,14 +81,14 @@ NSTDAPI void nstd_core_mem_copy(NSTDByte *dest, const NSTDByte *src, NSTDUSize n
 ///
 /// - `const NSTDByte *src` - A pointer to the memory buffer to copy from.
 ///
-/// - `NSTDUSize num` - The number of bytes to copy from `src` to `dest`.
+/// - `NSTDUInt num` - The number of bytes to copy from `src` to `dest`.
 ///
 /// # Safety
 ///
 /// This function is highly unsafe as it does not know how large either of the memory buffers are,
 /// quickly leading to undefined behavior if this function ends up reading or writing past the end
 /// of a buffer.
-NSTDAPI void nstd_core_mem_copy_overlapping(NSTDByte *dest, const NSTDByte *src, NSTDUSize num);
+NSTDAPI void nstd_core_mem_copy_overlapping(NSTDByte *dest, const NSTDByte *src, NSTDUInt num);
 
 /// Swaps `num` bytes between the memory buffers `x` and `y`.
 ///
@@ -84,14 +98,14 @@ NSTDAPI void nstd_core_mem_copy_overlapping(NSTDByte *dest, const NSTDByte *src,
 ///
 /// - `NSTDByte *y` - A pointer to the second memory buffer.
 ///
-/// - `NSTDUSize num` - The number of bytes to swap.
+/// - `NSTDUInt num` - The number of bytes to swap.
 ///
 /// # Safety
 ///
 /// This function is highly unsafe as it does not know how large either of the memory buffers are,
 /// quickly leading to undefined behavior if this function ends up reading or writing past the end
 /// of a buffer.
-NSTDAPI void nstd_core_mem_swap(NSTDByte *x, NSTDByte *y, NSTDUSize num);
+NSTDAPI void nstd_core_mem_swap(NSTDByte *x, NSTDByte *y, NSTDUInt num);
 
 NSTDCPPEND
 #endif

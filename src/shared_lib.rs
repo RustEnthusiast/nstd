@@ -4,8 +4,8 @@
 //!
 //! This module is only functional on Windows and Unix systems.
 use crate::{
-    core::{cstr::raw::nstd_core_cstr_raw_len_with_null, def::NSTDChar, str::NSTDStrConst},
-    NSTDAnyConst, NSTDAnyMut, NSTD_NULL,
+    core::{cstr::raw::nstd_core_cstr_raw_len_with_null, def::NSTDChar, str::NSTDStr},
+    NSTDAny, NSTDAnyMut, NSTD_NULL,
 };
 use libloading::{Error, Library, Symbol};
 
@@ -16,7 +16,7 @@ pub type NSTDSharedLib = Box<Library>;
 ///
 /// # Parameters:
 ///
-/// - `const NSTDStrConst *path` - A path to the shared library.
+/// - `const NSTDStr *path` - A path to the shared library.
 ///
 /// # Returns
 ///
@@ -27,7 +27,7 @@ pub type NSTDSharedLib = Box<Library>;
 /// See <https://docs.rs/libloading/latest/libloading/struct.Library.html#method.new>.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_shared_lib_load(path: &NSTDStrConst) -> Option<NSTDSharedLib> {
+pub unsafe extern "C" fn nstd_shared_lib_load(path: &NSTDStr) -> Option<NSTDSharedLib> {
     match Library::new(path.as_str()) {
         Ok(lib) => Some(Box::new(lib)),
         _ => None,
@@ -44,7 +44,7 @@ pub unsafe extern "C" fn nstd_shared_lib_load(path: &NSTDStrConst) -> Option<NST
 ///
 /// # Returns
 ///
-/// `NSTDAnyConst ptr` - A pointer to the function or variable.
+/// `NSTDAny ptr` - A pointer to the function or variable.
 ///
 /// # Safety
 ///
@@ -54,7 +54,7 @@ pub unsafe extern "C" fn nstd_shared_lib_load(path: &NSTDStrConst) -> Option<NST
 pub unsafe extern "C" fn nstd_shared_lib_get(
     lib: &NSTDSharedLib,
     symbol: *const NSTDChar,
-) -> NSTDAnyConst {
+) -> NSTDAny {
     match get(lib, symbol) {
         Ok(ptr) => *ptr,
         _ => NSTD_NULL,
@@ -104,10 +104,8 @@ pub extern "C" fn nstd_shared_lib_free(lib: NSTDSharedLib) {}
 /// # Safety
 ///
 /// Undefined behavior may occur if `symbol`'s data is invalid.
-unsafe fn get<'a, T>(
-    lib: &'a NSTDSharedLib,
-    symbol: *const NSTDChar,
-) -> Result<Symbol<'a, T>, Error> {
+#[inline]
+unsafe fn get<T>(lib: &NSTDSharedLib, symbol: *const NSTDChar) -> Result<Symbol<T>, Error> {
     let symbol_len = nstd_core_cstr_raw_len_with_null(symbol);
     let symbol_name = std::slice::from_raw_parts(symbol.cast(), symbol_len);
     lib.get(symbol_name)

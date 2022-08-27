@@ -1,5 +1,6 @@
 #ifndef NSTD_STRING_H
 #define NSTD_STRING_H
+#include "alloc.h"
 #include "core/def.h"
 #include "core/slice.h"
 #include "core/str.h"
@@ -24,7 +25,7 @@ NSTDAPI NSTDString nstd_string_new();
 ///
 /// # Parameters:
 ///
-/// - `NSTDUSize cap` - The number of bytes to allocate ahead of time.
+/// - `NSTDUInt cap` - The number of bytes to allocate ahead of time.
 ///
 /// # Returns
 ///
@@ -33,7 +34,7 @@ NSTDAPI NSTDString nstd_string_new();
 /// # Panics
 ///
 /// This function will panic if `cap` is zero.
-NSTDAPI NSTDString nstd_string_new_with_cap(NSTDUSize cap);
+NSTDAPI NSTDString nstd_string_new_with_cap(NSTDUInt cap);
 
 /// Creates a deep copy of a string.
 ///
@@ -58,8 +59,8 @@ NSTDAPI NSTDString nstd_string_clone(const NSTDString *string);
 ///
 /// # Returns
 ///
-/// `NSTDStrConst str` - The new string slice.
-NSTDAPI NSTDStrConst nstd_string_as_str(const NSTDString *string);
+/// `NSTDStr str` - The new string slice.
+NSTDAPI NSTDStr nstd_string_as_str(const NSTDString *string);
 
 /// Creates a string slice containing the contents of `string`.
 ///
@@ -80,8 +81,8 @@ NSTDAPI NSTDStrMut nstd_string_as_str_mut(NSTDString *string);
 ///
 /// # Returns
 ///
-/// `NSTDSliceConst bytes` - The string's active data.
-NSTDAPI NSTDSliceConst nstd_string_as_bytes(const NSTDString *string);
+/// `NSTDSlice bytes` - The string's active data.
+NSTDAPI NSTDSlice nstd_string_as_bytes(const NSTDString *string);
 
 /// Returns a raw pointer to a string's memory.
 ///
@@ -113,8 +114,32 @@ NSTDAPI NSTDVec nstd_string_to_bytes(NSTDString string);
 ///
 /// # Returns
 ///
-/// `NSTDUSize len` - The length of the string.
-NSTDAPI NSTDUSize nstd_string_len(const NSTDString *string);
+/// `NSTDUInt len` - The length of the string.
+NSTDAPI NSTDUInt nstd_string_len(const NSTDString *string);
+
+/// Returns the number of bytes a string contains.
+///
+/// # Parameters:
+///
+/// - `const NSTDString *string` - The string.
+///
+/// # Returns
+///
+/// `NSTDUInt byte_len` - The number of bytes in the string.
+NSTDAPI NSTDUInt nstd_string_byte_len(const NSTDString *string);
+
+/// Returns a string's capacity.
+///
+/// This is the max number of *bytes* the string can contain without reallocating.
+///
+/// # Parameters:
+///
+/// - `const NSTDString *string` - The string.
+///
+/// # Returns
+///
+/// `NSTDUInt cap` - The string's capacity.
+NSTDAPI NSTDUInt nstd_string_cap(const NSTDString *string);
 
 /// Pushes an `NSTDUnichar` onto the end of a string.
 ///
@@ -135,16 +160,16 @@ NSTDAPI NSTDErrorCode nstd_string_push(NSTDString *string, NSTDUnichar chr);
 ///
 /// - `NSTDString *string` - The string.
 ///
-/// - `const NSTDStrConst *str` - The string slice to append to the end of `string`.
+/// - `const NSTDStr *str` - The string slice to append to the end of `string`.
 ///
 /// # Returns
 ///
-/// `NSTDErrorCode errc` - Nonzero on error.
+/// `NSTDAllocError errc` - The allocation operation error code.
 ///
 /// # Safety
 ///
 /// This function will cause undefined behavior in the case where `str`'s data is no longer valid.
-NSTDAPI NSTDErrorCode nstd_string_push_str(NSTDString *string, const NSTDStrConst *str);
+NSTDAPI NSTDAllocError nstd_string_push_str(NSTDString *string, const NSTDStr *str);
 
 /// Removes the last character from a string and returns it.
 ///
@@ -156,6 +181,138 @@ NSTDAPI NSTDErrorCode nstd_string_push_str(NSTDString *string, const NSTDStrCons
 ///
 /// `NSTDUnichar chr` - The removed character, or the Unicode replacement character on error.
 NSTDAPI NSTDUnichar nstd_string_pop(NSTDString *string);
+
+/// Creates a new `NSTDString` from an `NSTDFloat32`.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat32 v` - The 32-bit floating-point value.
+///
+/// # Returns
+///
+/// `NSTDString string` - The 32-bit floating-point value as a string.
+NSTDAPI NSTDString nstd_string_from_f32(NSTDFloat32 v);
+
+/// Creates a new `NSTDString` from an `NSTDFloat64`.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat64 v` - The 64-bit floating-point value.
+///
+/// # Returns
+///
+/// `NSTDString string` - The 64-bit floating-point value as a string.
+NSTDAPI NSTDString nstd_string_from_f64(NSTDFloat64 v);
+
+/// Creates a new `NSTDString` from an `NSTDInt`.
+///
+/// # Parameters:
+///
+/// - `NSTDInt v` - The arch-bit signed integer value.
+///
+/// # Returns
+///
+/// `NSTDString string` - The arch-bit signed integer value as a string.
+NSTDAPI NSTDString nstd_string_from_int(NSTDInt v);
+
+/// Creates a new `NSTDString` from an `NSTDUInt`.
+///
+/// # Parameters:
+///
+/// - `NSTDUInt v` - The arch-bit unsigned integer value.
+///
+/// # Returns
+///
+/// `NSTDString string` - The arch-bit unsigned integer value as a string.
+NSTDAPI NSTDString nstd_string_from_uint(NSTDUInt v);
+
+/// Creates a new `NSTDString` from an `NSTDInt8`.
+///
+/// # Parameters:
+///
+/// - `NSTDInt8 v` - The 8-bit signed integer value.
+///
+/// # Returns
+///
+/// `NSTDString string` - The 8-bit signed integer value as a string.
+NSTDAPI NSTDString nstd_string_from_i8(NSTDInt8 v);
+
+/// Creates a new `NSTDString` from an `NSTDUInt8`.
+///
+/// # Parameters:
+///
+/// - `NSTDUInt8 v` - The 8-bit unsigned integer value.
+///
+/// # Returns
+///
+/// `NSTDString string` - The 8-bit unsigned integer value as a string.
+NSTDAPI NSTDString nstd_string_from_u8(NSTDUInt8 v);
+
+/// Creates a new `NSTDString` from an `NSTDInt16`.
+///
+/// # Parameters:
+///
+/// - `NSTDInt16 v` - The 16-bit signed integer value.
+///
+/// # Returns
+///
+/// `NSTDString string` - The 16-bit signed integer value as a string.
+NSTDAPI NSTDString nstd_string_from_i16(NSTDInt16 v);
+
+/// Creates a new `NSTDString` from an `NSTDUInt16`.
+///
+/// # Parameters:
+///
+/// - `NSTDUInt16 v` - The 16-bit unsigned integer value.
+///
+/// # Returns
+///
+/// `NSTDString string` - The 16-bit unsigned integer value as a string.
+NSTDAPI NSTDString nstd_string_from_u16(NSTDUInt16 v);
+
+/// Creates a new `NSTDString` from an `NSTDInt32`.
+///
+/// # Parameters:
+///
+/// - `NSTDInt32 v` - The 32-bit signed integer value.
+///
+/// # Returns
+///
+/// `NSTDString string` - The 32-bit signed integer value as a string.
+NSTDAPI NSTDString nstd_string_from_i32(NSTDInt32 v);
+
+/// Creates a new `NSTDString` from an `NSTDUInt32`.
+///
+/// # Parameters:
+///
+/// - `NSTDUInt32 v` - The 32-bit unsigned integer value.
+///
+/// # Returns
+///
+/// `NSTDString string` - The 32-bit unsigned integer value as a string.
+NSTDAPI NSTDString nstd_string_from_u32(NSTDUInt32 v);
+
+/// Creates a new `NSTDString` from an `NSTDInt64`.
+///
+/// # Parameters:
+///
+/// - `NSTDInt64 v` - The 64-bit signed integer value.
+///
+/// # Returns
+///
+/// `NSTDString string` - The 64-bit signed integer value as a string.
+NSTDAPI NSTDString nstd_string_from_i64(NSTDInt64 v);
+
+/// Creates a new `NSTDString` from an `NSTDUInt64`.
+///
+/// # Parameters:
+///
+/// - `NSTDUInt64 v` - The 64-bit unsigned integer value.
+///
+/// # Returns
+///
+/// `NSTDString string` - The 64-bit unsigned integer value as a string.
+NSTDAPI NSTDString nstd_string_from_u64(NSTDUInt64 v);
 
 /// Frees an instance of `NSTDString`.
 ///

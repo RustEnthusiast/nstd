@@ -1,5 +1,6 @@
 #ifndef NSTD_VEC_H
 #define NSTD_VEC_H
+#include "alloc.h"
 #include "core/def.h"
 #include "core/slice.h"
 #include "nstd.h"
@@ -7,17 +8,21 @@ NSTDCPPSTART
 
 /// A dynamically sized contiguous sequence of values.
 typedef struct {
-    /// The underlying memory buffer.
-    NSTDSliceMut buffer;
+    /// A raw pointer to the vector's memory buffer.
+    NSTDAnyMut ptr;
+    /// The number of bytes each value in the vector takes up.
+    NSTDUInt stride;
     /// The number of active elements in the vector.
-    NSTDUSize len;
+    NSTDUInt len;
+    /// The number of values allocated in the memory buffer.
+    NSTDUInt cap;
 } NSTDVec;
 
 /// Creates a new vector without allocating any resources.
 ///
 /// # Parameters:
 ///
-/// - `NSTDUSize element_size` - The size in bytes of each value in the vector.
+/// - `NSTDUInt element_size` - The size in bytes of each value in the vector.
 ///
 /// # Returns
 ///
@@ -26,7 +31,7 @@ typedef struct {
 /// # Panics
 ///
 /// This function will panic if `element_size` is zero.
-NSTDAPI NSTDVec nstd_vec_new(NSTDUSize element_size);
+NSTDAPI NSTDVec nstd_vec_new(NSTDUInt element_size);
 
 /// Creates a new vector initialized with the given capacity.
 ///
@@ -36,9 +41,9 @@ NSTDAPI NSTDVec nstd_vec_new(NSTDUSize element_size);
 ///
 /// # Parameters:
 ///
-/// - `NSTDUSize element_size` - The size in bytes of each value in the vector.
+/// - `NSTDUInt element_size` - The size in bytes of each value in the vector.
 ///
-/// - `NSTDUSize cap` - The initial capacity for the vector.
+/// - `NSTDUInt cap` - The initial capacity for the vector.
 ///
 /// # Returns
 ///
@@ -47,7 +52,7 @@ NSTDAPI NSTDVec nstd_vec_new(NSTDUSize element_size);
 /// # Panics
 ///
 /// This function will panic if either `element_size` or `cap` are zero.
-NSTDAPI NSTDVec nstd_vec_new_with_cap(NSTDUSize element_size, NSTDUSize cap);
+NSTDAPI NSTDVec nstd_vec_new_with_cap(NSTDUInt element_size, NSTDUInt cap);
 
 /// Creates a new deep copy of `vec`.
 ///
@@ -72,8 +77,21 @@ NSTDAPI NSTDVec nstd_vec_clone(const NSTDVec *vec);
 ///
 /// # Returns
 ///
-/// `NSTDUSize len` - The length of the vector.
-NSTDAPI NSTDUSize nstd_vec_len(const NSTDVec *vec);
+/// `NSTDUInt len` - The length of the vector.
+NSTDAPI NSTDUInt nstd_vec_len(const NSTDVec *vec);
+
+/// Returns a vector's capacity.
+///
+/// This is the max number of values the vector can contain without reallocating.
+///
+/// # Parameters:
+///
+/// - `const NSTDVec *vec` - The vector.
+///
+/// # Returns
+///
+/// `NSTDUInt cap` - The vector's capacity.
+NSTDAPI NSTDUInt nstd_vec_cap(const NSTDVec *vec);
 
 /// Returns the amount of bytes each value in a vector occupies.
 ///
@@ -83,8 +101,8 @@ NSTDAPI NSTDUSize nstd_vec_len(const NSTDVec *vec);
 ///
 /// # Returns
 ///
-/// `NSTDUSize stride` - The size of each value in the vector.
-NSTDAPI NSTDUSize nstd_vec_stride(const NSTDVec *vec);
+/// `NSTDUInt stride` - The size of each value in the vector.
+NSTDAPI NSTDUInt nstd_vec_stride(const NSTDVec *vec);
 
 /// Returns an immutable slice containing all of a vector's active elements.
 ///
@@ -94,8 +112,8 @@ NSTDAPI NSTDUSize nstd_vec_stride(const NSTDVec *vec);
 ///
 /// # Returns
 ///
-/// `NSTDSliceConst slice` - An *immutable* view into the vector.
-NSTDAPI NSTDSliceConst nstd_vec_as_slice(const NSTDVec *vec);
+/// `NSTDSlice slice` - An *immutable* view into the vector.
+NSTDAPI NSTDSlice nstd_vec_as_slice(const NSTDVec *vec);
 
 /// Returns a slice containing all of a vector's active elements.
 ///
@@ -116,8 +134,8 @@ NSTDAPI NSTDSliceMut nstd_vec_as_slice_mut(NSTDVec *vec);
 ///
 /// # Returns
 ///
-/// `NSTDAnyConst ptr` - A pointer to the vector's raw data.
-NSTDAPI NSTDAnyConst nstd_vec_as_ptr(const NSTDVec *vec);
+/// `NSTDAny ptr` - A pointer to the vector's raw data.
+NSTDAPI NSTDAny nstd_vec_as_ptr(const NSTDVec *vec);
 
 /// Returns a pointer to a vector's raw data.
 ///
@@ -141,13 +159,13 @@ NSTDAPI NSTDAnyMut nstd_vec_as_mut_ptr(NSTDVec *vec);
 ///
 /// - `const NSTDVec *vec` - The vector to read an element from.
 ///
-/// - `NSTDUSize pos` - The position of the element to get, starting at 0.
+/// - `NSTDUInt pos` - The position of the element to get, starting at 0.
 ///
 /// # Returns
 ///
-/// `NSTDAnyConst element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out
+/// `NSTDAny element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out
 /// of the vector's boundaries.
-NSTDAPI NSTDAnyConst nstd_vec_get(const NSTDVec *vec, NSTDUSize pos);
+NSTDAPI NSTDAny nstd_vec_get(const NSTDVec *vec, NSTDUInt pos);
 
 /// Returns a pointer to the element at index `pos` in `vec`.
 ///
@@ -160,13 +178,13 @@ NSTDAPI NSTDAnyConst nstd_vec_get(const NSTDVec *vec, NSTDUSize pos);
 ///
 /// - `NSTDVec *vec` - The vector to read an element from.
 ///
-/// - `NSTDUSize pos` - The position of the element to get, starting at 0.
+/// - `NSTDUInt pos` - The position of the element to get, starting at 0.
 ///
 /// # Returns
 ///
 /// `NSTDAnyMut element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out of
 /// the vector's boundaries.
-NSTDAPI NSTDAnyMut nstd_vec_get_mut(NSTDVec *vec, NSTDUSize pos);
+NSTDAPI NSTDAnyMut nstd_vec_get_mut(NSTDVec *vec, NSTDUInt pos);
 
 /// Pushes a value onto a vector by copying bytes to the end of the vector's buffer. The number of
 /// bytes to push is determined by `vec`'s stride.
@@ -175,17 +193,17 @@ NSTDAPI NSTDAnyMut nstd_vec_get_mut(NSTDVec *vec, NSTDUSize pos);
 ///
 /// - `NSTDVec *vec` - The vector.
 ///
-/// - `NSTDAnyConst value` - A pointer to the value to push onto the vector.
+/// - `NSTDAny value` - A pointer to the value to push onto the vector.
 ///
 /// # Returns
 ///
-/// `NSTDErrorCode errc` - Nonzero on error.
+/// `NSTDAllocError errc` - The allocation operation error code.
 ///
 /// # Safety
 ///
 /// This operation is unsafe because undefined behavior can occur if the size of the value being
 /// pushed onto the vector is not equal to `vec`'s stride.
-NSTDAPI NSTDErrorCode nstd_vec_push(NSTDVec *vec, NSTDAnyConst value);
+NSTDAPI NSTDAllocError nstd_vec_push(NSTDVec *vec, NSTDAny value);
 
 /// Removes the last value of a vector and returns a pointer to it.
 ///
@@ -200,9 +218,9 @@ NSTDAPI NSTDErrorCode nstd_vec_push(NSTDVec *vec, NSTDAnyConst value);
 ///
 /// # Returns
 ///
-/// - `NSTDAnyConst value` - A pointer to the value that was popped off the stack, or null if the
+/// - `NSTDAny value` - A pointer to the value that was popped off the stack, or null if the
 /// vector is empty.
-NSTDAPI NSTDAnyConst nstd_vec_pop(NSTDVec *vec);
+NSTDAPI NSTDAny nstd_vec_pop(NSTDVec *vec);
 
 /// Attempts to insert a value into a vector at `index`.
 ///
@@ -210,9 +228,9 @@ NSTDAPI NSTDAnyConst nstd_vec_pop(NSTDVec *vec);
 ///
 /// - `NSTDVec *vec` - The vector.
 ///
-/// - `NSTDAnyConst value` - A pointer to the value to insert into the vector.
+/// - `NSTDAny value` - A pointer to the value to insert into the vector.
 ///
-/// - `NSTDUSize index` - The index at which to insert the value.
+/// - `NSTDUInt index` - The index at which to insert the value.
 ///
 /// # Returns
 ///
@@ -228,7 +246,7 @@ NSTDAPI NSTDAnyConst nstd_vec_pop(NSTDVec *vec);
 ///
 /// This operation is unsafe because undefined behavior can occur if the size of the value being
 /// inserted into the vector is not equal to `vec`'s stride.
-NSTDAPI NSTDErrorCode nstd_vec_insert(NSTDVec *vec, NSTDAnyConst value, NSTDUSize index);
+NSTDAPI NSTDErrorCode nstd_vec_insert(NSTDVec *vec, NSTDAny value, NSTDUInt index);
 
 /// Removes the element at `index` in a vector.
 ///
@@ -236,12 +254,12 @@ NSTDAPI NSTDErrorCode nstd_vec_insert(NSTDVec *vec, NSTDAnyConst value, NSTDUSiz
 ///
 /// - `NSTDVec *vec` - The vector.
 ///
-/// - `NSTDUSize index` - The index of the element to remove.
+/// - `NSTDUInt index` - The index of the element to remove.
 ///
 /// # Returns
 ///
 /// `NSTDErrorCode errc` - Nonzero if `index` is invalid.
-NSTDAPI NSTDErrorCode nstd_vec_remove(NSTDVec *vec, NSTDUSize index);
+NSTDAPI NSTDErrorCode nstd_vec_remove(NSTDVec *vec, NSTDUInt index);
 
 /// Pushes a series of values onto a vector.
 ///
@@ -249,11 +267,11 @@ NSTDAPI NSTDErrorCode nstd_vec_remove(NSTDVec *vec, NSTDUSize index);
 ///
 /// - `NSTDVec *vec` - The vector to extend.
 ///
-/// - `const NSTDSliceConst *values` - A slice of values to push onto the vector.
+/// - `const NSTDSlice *values` - A slice of values to push onto the vector.
 ///
 /// # Returns
 ///
-/// `NSTDErrorCode errc` - Nonzero if reserving memory for the extension fails.
+/// `NSTDAllocError errc` - The allocation operation error code.
 ///
 /// # Panics
 ///
@@ -262,7 +280,7 @@ NSTDAPI NSTDErrorCode nstd_vec_remove(NSTDVec *vec, NSTDUSize index);
 /// # Safety
 ///
 /// This operation can cause undefined behavior if `values`'s data is invalid.
-NSTDAPI NSTDErrorCode nstd_vec_extend(NSTDVec *vec, const NSTDSliceConst *values);
+NSTDAPI NSTDAllocError nstd_vec_extend(NSTDVec *vec, const NSTDSlice *values);
 
 /// Shortens a vector, keeping the first `len` elements.
 ///
@@ -274,8 +292,8 @@ NSTDAPI NSTDErrorCode nstd_vec_extend(NSTDVec *vec, const NSTDSliceConst *values
 ///
 /// - `NSTDVec *vec` - The vector to truncate.
 ///
-/// - `NSTDUSize len` - The number of elements to keep.
-NSTDAPI void nstd_vec_truncate(NSTDVec *vec, NSTDUSize len);
+/// - `NSTDUInt len` - The number of elements to keep.
+NSTDAPI void nstd_vec_truncate(NSTDVec *vec, NSTDUInt len);
 
 /// Reserves some space on the heap for at least `size` more elements to be pushed onto a vector
 /// without making more allocations.
@@ -284,22 +302,18 @@ NSTDAPI void nstd_vec_truncate(NSTDVec *vec, NSTDUSize len);
 ///
 /// - `NSTDVec *vec` - The vector to reserve space for.
 ///
-/// - `NSTDUSize size` - The number of additional elements to allocate for.
+/// - `NSTDUInt size` - The number of additional elements to allocate for.
 ///
 /// # Returns
 ///
-/// `NSTDErrorCode errc` - Nonzero on error.
+/// `NSTDAllocError errc` - The allocation operation error code.
 ///
 /// # Panics
 ///
 /// This operation will panic if `size` is zero.
-NSTDAPI NSTDErrorCode nstd_vec_reserve(NSTDVec *vec, NSTDUSize size);
+NSTDAPI NSTDAllocError nstd_vec_reserve(NSTDVec *vec, NSTDUInt size);
 
 /// Decreases a vector's capacity to match it's length.
-///
-/// # Note
-///
-/// This will return an error code of `0` if the vector is "null".
 ///
 /// # Parameters:
 ///
@@ -307,8 +321,8 @@ NSTDAPI NSTDErrorCode nstd_vec_reserve(NSTDVec *vec, NSTDUSize size);
 ///
 /// # Returns
 ///
-/// `NSTDErrorCode errc` - Nonzero on error.
-NSTDAPI NSTDErrorCode nstd_vec_shrink(NSTDVec *vec);
+/// `NSTDAllocError errc` - The allocation operation error code.
+NSTDAPI NSTDAllocError nstd_vec_shrink(NSTDVec *vec);
 
 /// Frees an instance of `NSTDVec`.
 ///
