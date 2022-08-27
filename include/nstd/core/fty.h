@@ -8,64 +8,64 @@ NSTDCPPSTART
 /// # Returns
 ///
 /// `NSTDFloat32 min` - The smallest finite value representable by `NSTDFloat32`.
-NSTDAPI NSTDFloat32 nstd_core_fty_f32_min();
+NSTDAPI NSTDFloat32 nstd_core_fty_min_f32();
 /// Returns the largest finite value representable by `NSTDFloat32`.
 ///
 /// # Returns
 ///
 /// `NSTDFloat32 max` - The largest finite value representable by `NSTDFloat32`.
-NSTDAPI NSTDFloat32 nstd_core_fty_f32_max();
+NSTDAPI NSTDFloat32 nstd_core_fty_max_f32();
 /// Returns the smallest finite value representable by `NSTDFloat64`.
 ///
 /// # Returns
 ///
 /// `NSTDFloat64 min` - The smallest finite value representable by `NSTDFloat64`.
-NSTDAPI NSTDFloat64 nstd_core_fty_f64_min();
+NSTDAPI NSTDFloat64 nstd_core_fty_min_f64();
 /// Returns the largest finite value representable by `NSTDFloat64`.
 ///
 /// # Returns
 ///
 /// `NSTDFloat64 max` - The largest finite value representable by `NSTDFloat64`.
-NSTDAPI NSTDFloat64 nstd_core_fty_f64_max();
+NSTDAPI NSTDFloat64 nstd_core_fty_max_f64();
 
 /// Returns NaN represented as `NSTDFloat32`.
 ///
 /// # Returns
 ///
 /// `NSTDFloat32 nan` - NaN represented as `NSTDFloat32`.
-NSTDAPI NSTDFloat32 nstd_core_fty_f32_nan();
+NSTDAPI NSTDFloat32 nstd_core_fty_nan_f32();
 /// Returns NaN represented as `NSTDFloat64`.
 ///
 /// # Returns
 ///
 /// `NSTDFloat64 nan` - NaN represented as `NSTDFloat64`.
-NSTDAPI NSTDFloat64 nstd_core_fty_f64_nan();
+NSTDAPI NSTDFloat64 nstd_core_fty_nan_f64();
 
 /// Returns infinity represented as `NSTDFloat32`.
 ///
 /// # Returns
 ///
 /// `NSTDFloat32 inf` - Infinity represented as `NSTDFloat32`.
-NSTDAPI NSTDFloat32 nstd_core_fty_f32_inf();
+NSTDAPI NSTDFloat32 nstd_core_fty_inf_f32();
 /// Returns infinity represented as `NSTDFloat64`.
 ///
 /// # Returns
 ///
 /// `NSTDFloat64 inf` - Infinity represented as `NSTDFloat64`.
-NSTDAPI NSTDFloat64 nstd_core_fty_f64_inf();
+NSTDAPI NSTDFloat64 nstd_core_fty_inf_f64();
 
 /// Returns negative infinity represented as `NSTDFloat32`.
 ///
 /// # Returns
 ///
 /// `NSTDFloat32 neg_inf` - Negative infinity represented as `NSTDFloat32`.
-NSTDAPI NSTDFloat32 nstd_core_fty_f32_neg_inf();
+NSTDAPI NSTDFloat32 nstd_core_fty_neg_inf_f32();
 /// Returns negative infinity represented as `NSTDFloat64`.
 ///
 /// # Returns
 ///
 /// `NSTDFloat64 neg_inf` - Negative infinity represented as `NSTDFloat64`.
-NSTDAPI NSTDFloat64 nstd_core_fty_f64_neg_inf();
+NSTDAPI NSTDFloat64 nstd_core_fty_neg_inf_f64();
 
 NSTDCPPEND
 #endif

@@ -3,7 +3,7 @@
 //! # Note
 //!
 //! Functions in this module that return a boolean will always return false on error.
-use crate::{NSTDBool, NSTDUnichar, NSTD_FALSE};
+use crate::{NSTDBool, NSTDUInt32, NSTDUnichar, NSTD_FALSE};
 
 /// Returns the Unicode replacement character (�).
 ///
@@ -125,6 +125,64 @@ gen_deterministic!(
     nstd_core_cty_is_control,
     is_control
 );
+gen_deterministic!(
+    /// Determines whether or not `chr` is punctuation.
+    ///
+    /// # Note
+    ///
+    /// This only works with ASCII characters.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDUnichar chr` - The character to check.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDBool is_punctuation` - `NSTD_TRUE` if `chr` is punctuation.
+    nstd_core_cty_is_punctuation,
+    is_ascii_punctuation
+);
+gen_deterministic!(
+    /// Determines whether or not `chr` is a graphic character.
+    ///
+    /// # Note
+    ///
+    /// This only works with ASCII characters.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDUnichar chr` - The character to check.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDBool is_graphic` - `NSTD_TRUE` if `chr` is a graphic character.
+    nstd_core_cty_is_graphic,
+    is_ascii_graphic
+);
+
+/// Determines whether or not `chr` is a digit, depending on `radix`.
+///
+/// # Parameters:
+///
+/// - `NSTDUnichar chr` - The character to check.
+///
+/// - `NSTDUInt32 radix` - The base.
+///
+/// # Returns
+///
+/// `NSTDBool is_digit` - `NSTD_TRUE` if `chr` is a digit.
+///
+/// # Panics
+///
+/// This operation will panic if `radix` is larger than 36.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_core_cty_is_digit(chr: NSTDUnichar, radix: NSTDUInt32) -> NSTDBool {
+    match char::from_u32(chr) {
+        Some(chr) => chr.is_digit(radix).into(),
+        _ => NSTD_FALSE,
+    }
+}
 
 /// Returns the lowercase version of `chr` or `chr` if there is no lowercase version.
 ///

@@ -13,7 +13,7 @@ typedef NSTDAnyMut NSTDThread;
 /// This type is passed to the `nstd_thread_spawn_with_desc` function.
 typedef struct {
     /// The name of the thread.
-    NSTDStrConst name;
+    NSTDStr name;
     /// A pointer to the data to be passed to the thread.
     ///
     /// # Note
@@ -22,7 +22,7 @@ typedef struct {
     /// on other platforms `NSTD_NULL` will be passed.
     NSTDAnyMut data;
     /// The number of bytes that the thread's stack should have.
-    NSTDUSize stack_size;
+    NSTDUInt stack_size;
 } NSTDThreadDescriptor;
 
 /// Spawns a new thread and returns a handle to it.

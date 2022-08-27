@@ -1,7 +1,7 @@
 //! Thread spawning, joining, and detaching.
 use crate::{
-    core::{def::NSTDErrorCode, str::NSTDStrConst},
-    NSTDAnyMut, NSTDFloat64, NSTDUSize,
+    core::{def::NSTDErrorCode, str::NSTDStr},
+    NSTDAnyMut, NSTDFloat64, NSTDUInt,
 };
 use std::{
     thread::{Builder, JoinHandle},
@@ -18,7 +18,7 @@ pub type NSTDThread = Box<JoinHandle<NSTDErrorCode>>;
 #[derive(Clone, Copy, Debug)]
 pub struct NSTDThreadDescriptor {
     /// The name of the thread.
-    pub name: NSTDStrConst,
+    pub name: NSTDStr,
     /// A pointer to the data to be passed to the thread.
     ///
     /// # Note
@@ -27,7 +27,7 @@ pub struct NSTDThreadDescriptor {
     /// on other platforms `NSTD_NULL` will be passed.
     pub data: NSTDAnyMut,
     /// The number of bytes that the thread's stack should have.
-    pub stack_size: NSTDUSize,
+    pub stack_size: NSTDUInt,
 }
 
 /// Spawns a new thread and returns a handle to it.
