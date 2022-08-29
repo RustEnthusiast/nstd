@@ -7,7 +7,7 @@ use self::{
     events::{NSTDAppEvents, NSTDKey, NSTDMouseInput, NSTDScrollDelta, NSTDTouchState},
     handle::NSTDAppHandle,
 };
-use crate::NSTDAnyMut;
+use crate::{core::def::NSTDErrorCode, NSTDAnyMut};
 use winit::{
     event::{DeviceEvent, ElementState, Event, StartCause, WindowEvent},
     event_loop::{ControlFlow, EventLoop},
@@ -305,4 +305,17 @@ pub extern "C" fn nstd_app_free(app: NSTDApp) {}
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_app_exit(app: &NSTDAppData) {
     app.control_flow.set(ControlFlow::Exit);
+}
+
+/// Signals an `NSTDApp`'s event loop to exit with a specific error code.
+///
+/// # Parameters:
+///
+/// - `const NSTDAppData *app` - The application data received from an event.
+///
+/// - `NSTDErrorCode errc` - The error code to exit the application event loop with.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_app_exit_with_code(app: &NSTDAppData, errc: NSTDErrorCode) {
+    app.control_flow.set(ControlFlow::ExitWithCode(errc));
 }
