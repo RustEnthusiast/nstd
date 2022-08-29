@@ -3,14 +3,14 @@ pub mod data;
 pub mod events;
 pub mod handle;
 use self::{
-    data::{NSTDAppControlFlow, NSTDAppData},
+    data::NSTDAppData,
     events::{NSTDAppEvents, NSTDKey, NSTDMouseInput, NSTDScrollDelta, NSTDTouchState},
     handle::NSTDAppHandle,
 };
 use crate::NSTDAnyMut;
 use winit::{
     event::{DeviceEvent, ElementState, Event, StartCause, WindowEvent},
-    event_loop::EventLoop,
+    event_loop::{ControlFlow, EventLoop},
 };
 
 /// An application event loop.
@@ -95,7 +95,7 @@ pub unsafe extern "C" fn nstd_app_run(app: NSTDApp, data: NSTDAnyMut) -> ! {
     // Run the winit event loop.
     app.event_loop.run(move |event, handle, control_flow| {
         // Instantiate a new instance of `NSTDAppData`.
-        let app_data = &NSTDAppData::new(handle, data);
+        let app_data = &NSTDAppData::new(handle, control_flow, data);
         // Dispatch events.
         match event {
             // The event loop was just started.
@@ -282,8 +282,6 @@ pub unsafe extern "C" fn nstd_app_run(app: NSTDApp, data: NSTDAnyMut) -> ! {
             }
             _ => (),
         }
-        // Set the `winit` event loop's control flow.
-        *control_flow = app_data.control_flow.get().into();
     })
 }
 
@@ -306,6 +304,5 @@ pub extern "C" fn nstd_app_free(app: NSTDApp) {}
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_app_exit(app: &NSTDAppData) {
-    app.control_flow
-        .set(NSTDAppControlFlow::NSTD_APP_CONTROL_FLOW_EXIT);
+    app.control_flow.set(ControlFlow::Exit);
 }
