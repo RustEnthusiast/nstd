@@ -1,3 +1,7 @@
+# TBD
+### `nstd.core`
+- Removed `nstd_core_slice[_mut]_compare`.
+
 # 0.1.2
 ### `nstd`
 - Removed `Const` postfix from `NSTDAnyConst`.
