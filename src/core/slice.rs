@@ -234,6 +234,7 @@ impl NSTDSliceMut {
     ///
     /// The `NSTDSliceMut`'s data must remain valid while the returned slice is in use.
     #[inline]
+    #[allow(dead_code)]
     pub(crate) unsafe fn as_slice_mut<T>(&mut self) -> &mut [T] {
         assert!(nstd_core_slice_mut_stride(self) == core::mem::size_of::<T>());
         core::slice::from_raw_parts_mut(self.ptr.raw.cast(), nstd_core_slice_mut_len(self))
