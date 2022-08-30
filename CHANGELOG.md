@@ -1,4 +1,4 @@
-# TBD
+# 0.1.2
 ### `nstd`
 - Removed `Const` postfix from `NSTDAnyConst`.
 ### `nstd.core`
