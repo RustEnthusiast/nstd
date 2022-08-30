@@ -2,6 +2,7 @@
 ### `nstd`
 - Removed `Const` postfix from `NSTDAnyConst`.
 ### `nstd.core`
+- Fixed `NSTDSlice[Mut]::as_slice[_mut]` returning a slice of incorrect length.
 - Renamed `fty` functions.
 - Added `nstd_core_str[_mut]_byte_len`.
 - Removed `Const` postfix from `NSTD[Ptr|Slice|Str|CStr]Const`.

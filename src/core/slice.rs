@@ -40,7 +40,7 @@ impl NSTDSlice {
     #[inline]
     pub(crate) unsafe fn as_slice<T>(&self) -> &[T] {
         assert!(nstd_core_slice_stride(self) == core::mem::size_of::<T>());
-        core::slice::from_raw_parts(self.ptr.raw.cast(), self.byte_len())
+        core::slice::from_raw_parts(self.ptr.raw.cast(), nstd_core_slice_len(self))
     }
 }
 
@@ -209,12 +209,6 @@ pub struct NSTDSliceMut {
     pub(crate) len: NSTDUInt,
 }
 impl NSTDSliceMut {
-    /// Returns the number of bytes that this slice covers.
-    #[inline]
-    pub(crate) fn byte_len(&self) -> usize {
-        self.len * nstd_core_slice_mut_stride(self)
-    }
-
     /// Creates a Rust byte slice from this `NSTDSliceMut`.
     ///
     /// # Panics
@@ -227,7 +221,7 @@ impl NSTDSliceMut {
     #[inline]
     pub(crate) unsafe fn as_slice<T>(&self) -> &[T] {
         assert!(nstd_core_slice_mut_stride(self) == core::mem::size_of::<T>());
-        core::slice::from_raw_parts(self.ptr.raw.cast(), self.byte_len())
+        core::slice::from_raw_parts(self.ptr.raw.cast(), nstd_core_slice_mut_len(self))
     }
 
     /// Creates a mutable Rust byte slice from this `NSTDSliceMut`.
@@ -240,10 +234,9 @@ impl NSTDSliceMut {
     ///
     /// The `NSTDSliceMut`'s data must remain valid while the returned slice is in use.
     #[inline]
-    #[allow(dead_code)]
     pub(crate) unsafe fn as_slice_mut<T>(&mut self) -> &mut [T] {
         assert!(nstd_core_slice_mut_stride(self) == core::mem::size_of::<T>());
-        core::slice::from_raw_parts_mut(self.ptr.raw.cast(), self.byte_len())
+        core::slice::from_raw_parts_mut(self.ptr.raw.cast(), nstd_core_slice_mut_len(self))
     }
 }
 
