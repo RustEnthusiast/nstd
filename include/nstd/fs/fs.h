@@ -3,6 +3,7 @@
 #include "../core/str.h"
 #include "../io/io.h"
 #include "../nstd.h"
+#include "../string.h"
 NSTDCPPSTART
 
 /// Creates a new file on the file system.
@@ -111,6 +112,23 @@ NSTDAPI NSTDIOError nstd_fs_remove_dirs(const NSTDStr *name);
 ///
 /// This operation can cause undefined behavior if either `to` or `from`'s data is invalid.
 NSTDAPI NSTDIOError nstd_fs_rename(const NSTDStr *from, const NSTDStr *to);
+
+/// Returns the absolute path of a file system item.
+///
+/// # Parameters:
+///
+/// - `const NSTDStr *path` - A relative path to the file system item.
+///
+/// - `NSTDIOError *errc` - Returns as the I/O operation's error code.
+///
+/// # Returns
+///
+/// `NSTDString abs_path` - The absolute path of `path`.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if `path`'s data is invalid.
+NSTDAPI NSTDString nstd_fs_absolute(const NSTDStr *path, NSTDIOError *errc);
 
 NSTDCPPEND
 #endif

@@ -1,6 +1,10 @@
 //! Provides access to the file system.
 pub mod file;
-use crate::{core::str::NSTDStr, io::NSTDIOError};
+use crate::{
+    core::str::NSTDStr,
+    io::NSTDIOError,
+    string::{nstd_string_new, NSTDString},
+};
 use std::fs::File;
 
 /// Creates a new file on the file system.
@@ -157,4 +161,34 @@ pub unsafe extern "C" fn nstd_fs_rename(from: &NSTDStr, to: &NSTDStr) -> NSTDIOE
         return NSTDIOError::from_err(err.kind());
     }
     NSTDIOError::NSTD_IO_ERROR_NONE
+}
+
+/// Returns the absolute path of a file system item.
+///
+/// # Parameters:
+///
+/// - `const NSTDStr *path` - A relative path to the file system item.
+///
+/// - `NSTDIOError *errc` - Returns as the I/O operation's error code.
+///
+/// # Returns
+///
+/// `NSTDString abs_path` - The absolute path of `path`.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if `path`'s data is invalid.
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_fs_absolute(path: &NSTDStr, errc: &mut NSTDIOError) -> NSTDString {
+    match std::fs::canonicalize(path.as_str()) {
+        Ok(path) => match path.into_os_string().into_string() {
+            Ok(path) => {
+                *errc = NSTDIOError::NSTD_IO_ERROR_NONE;
+                return NSTDString::from_str(&path);
+            }
+            _ => *errc = NSTDIOError::NSTD_IO_ERROR_INVALID_DATA,
+        },
+        Err(err) => *errc = NSTDIOError::from_err(err.kind()),
+    }
+    nstd_string_new()
 }
