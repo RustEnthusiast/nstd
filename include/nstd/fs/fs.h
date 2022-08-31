@@ -4,6 +4,7 @@
 #include "../io/io.h"
 #include "../nstd.h"
 #include "../string.h"
+#include "../vec.h"
 NSTDCPPSTART
 
 /// Creates a new file on the file system.
@@ -95,6 +96,40 @@ NSTDAPI NSTDIOError nstd_fs_remove_dir(const NSTDStr *name);
 ///
 /// This operation can cause undefined behavior if `name`'s data is invalid.
 NSTDAPI NSTDIOError nstd_fs_remove_dirs(const NSTDStr *name);
+
+/// Reads the contents of a file into a vector of bytes.
+///
+/// # Parameters:
+///
+/// - `const NSTDStr *path` - A path to the file to read.
+///
+/// - `NSTDIOError *errc` - Returns as the I/O operation's error code.
+///
+/// # Returns
+///
+/// `NSTDVec contents` - The contents of the file, or empty on error.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if `path`'s data is invalid.
+NSTDAPI NSTDVec nstd_fs_read(const NSTDStr *path, NSTDIOError *errc);
+
+/// Reads the contents of a file into a string.
+///
+/// # Parameters:
+///
+/// - `const NSTDStr *path` - A path to the file to read.
+///
+/// - `NSTDIOError *errc` - Returns as the I/O operation's error code.
+///
+/// # Returns
+///
+/// `NSTDString contents` - The contents of the file, or empty on error.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if `path`'s data is invalid.
+NSTDAPI NSTDString nstd_fs_read_to_string(const NSTDStr *path, NSTDIOError *errc);
 
 /// Renames a file or directory, replacing the destination if it already exists.
 ///

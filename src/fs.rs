@@ -4,6 +4,7 @@ use crate::{
     core::str::NSTDStr,
     io::NSTDIOError,
     string::{nstd_string_new, NSTDString},
+    vec::{nstd_vec_new, NSTDVec},
 };
 use std::fs::File;
 
@@ -137,6 +138,63 @@ pub unsafe extern "C" fn nstd_fs_remove_dirs(name: &NSTDStr) -> NSTDIOError {
         return NSTDIOError::from_err(err.kind());
     }
     NSTDIOError::NSTD_IO_ERROR_NONE
+}
+
+/// Reads the contents of a file into a vector of bytes.
+///
+/// # Parameters:
+///
+/// - `const NSTDStr *path` - A path to the file to read.
+///
+/// - `NSTDIOError *errc` - Returns as the I/O operation's error code.
+///
+/// # Returns
+///
+/// `NSTDVec contents` - The contents of the file, or empty on error.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if `path`'s data is invalid.
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_fs_read(path: &NSTDStr, errc: &mut NSTDIOError) -> NSTDVec {
+    match std::fs::read(path.as_str()) {
+        Ok(contents) => {
+            *errc = NSTDIOError::NSTD_IO_ERROR_NONE;
+            return NSTDVec::from_slice(&contents);
+        }
+        Err(err) => *errc = NSTDIOError::from_err(err.kind()),
+    }
+    nstd_vec_new(1)
+}
+
+/// Reads the contents of a file into a string.
+///
+/// # Parameters:
+///
+/// - `const NSTDStr *path` - A path to the file to read.
+///
+/// - `NSTDIOError *errc` - Returns as the I/O operation's error code.
+///
+/// # Returns
+///
+/// `NSTDString contents` - The contents of the file, or empty on error.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if `path`'s data is invalid.
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_fs_read_to_string(
+    path: &NSTDStr,
+    errc: &mut NSTDIOError,
+) -> NSTDString {
+    match std::fs::read_to_string(path.as_str()) {
+        Ok(contents) => {
+            *errc = NSTDIOError::NSTD_IO_ERROR_NONE;
+            return NSTDString::from_str(&contents);
+        }
+        Err(err) => *errc = NSTDIOError::from_err(err.kind()),
+    }
+    nstd_string_new()
 }
 
 /// Renames a file or directory, replacing the destination if it already exists.
