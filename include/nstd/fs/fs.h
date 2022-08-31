@@ -113,6 +113,19 @@ NSTDAPI NSTDIOError nstd_fs_remove_dirs(const NSTDStr *name);
 /// This operation can cause undefined behavior if either `to` or `from`'s data is invalid.
 NSTDAPI NSTDIOError nstd_fs_rename(const NSTDStr *from, const NSTDStr *to);
 
+/// Copies the contents and permissions of one file to another.
+///
+/// # Parameters:
+///
+/// - `const NSTDStr *from` - The source file.
+///
+/// - `const NSTDStr *to` - The destination file.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if either `to` or `from`'s data is invalid.
+NSTDAPI NSTDIOError nstd_fs_copy(const NSTDStr *from, const NSTDStr *to);
+
 /// Returns the absolute path of a file system item.
 ///
 /// # Parameters:

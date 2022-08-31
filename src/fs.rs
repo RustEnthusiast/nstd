@@ -163,6 +163,26 @@ pub unsafe extern "C" fn nstd_fs_rename(from: &NSTDStr, to: &NSTDStr) -> NSTDIOE
     NSTDIOError::NSTD_IO_ERROR_NONE
 }
 
+/// Copies the contents and permissions of one file to another.
+///
+/// # Parameters:
+///
+/// - `const NSTDStr *from` - The source file.
+///
+/// - `const NSTDStr *to` - The destination file.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if either `to` or `from`'s data is invalid.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_fs_copy(from: &NSTDStr, to: &NSTDStr) -> NSTDIOError {
+    if let Err(err) = std::fs::copy(from.as_str(), to.as_str()) {
+        return NSTDIOError::from_err(err.kind());
+    }
+    NSTDIOError::NSTD_IO_ERROR_NONE
+}
+
 /// Returns the absolute path of a file system item.
 ///
 /// # Parameters:
