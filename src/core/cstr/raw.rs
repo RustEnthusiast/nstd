@@ -96,7 +96,7 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_compare(
     loop {
         if *cstr1 != *cstr2 {
             return NSTD_FALSE;
-        } else if *cstr1 == 0 && *cstr2 == 0 {
+        } else if *cstr1 == 0 {
             return NSTD_TRUE;
         }
         cstr1 = cstr1.add(1);
