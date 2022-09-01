@@ -1,5 +1,6 @@
 #ifndef NSTD_FS_FS_H
 #define NSTD_FS_FS_H
+#include "../core/slice.h"
 #include "../core/str.h"
 #include "../io/io.h"
 #include "../nstd.h"
@@ -130,6 +131,27 @@ NSTDAPI NSTDVec nstd_fs_read(const NSTDStr *path, NSTDIOError *errc);
 ///
 /// This operation can cause undefined behavior if `path`'s data is invalid.
 NSTDAPI NSTDString nstd_fs_read_to_string(const NSTDStr *path, NSTDIOError *errc);
+
+/// Overwrites the contents of a file.
+///
+/// # Parameters:
+///
+/// - `const NSTDStr *path` - A path to the file to write to.
+///
+/// - `const NSTDSlice *content` - The new content to write to the file.
+///
+/// # Returns
+///
+/// `NSTDIOError errc` - The I/O operation error code.
+///
+/// # Panics
+///
+/// This operation will panic if `content`'s stride is not 1.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if either `path` or `content`'s data is invalid.
+NSTDAPI NSTDIOError nstd_fs_write(const NSTDStr *path, const NSTDSlice *content);
 
 /// Renames a file or directory, replacing the destination if it already exists.
 ///

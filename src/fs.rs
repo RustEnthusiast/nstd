@@ -1,7 +1,7 @@
 //! Provides access to the file system.
 pub mod file;
 use crate::{
-    core::str::NSTDStr,
+    core::{slice::NSTDSlice, str::NSTDStr},
     io::NSTDIOError,
     string::{nstd_string_new, NSTDString},
     vec::{nstd_vec_new, NSTDVec},
@@ -195,6 +195,34 @@ pub unsafe extern "C" fn nstd_fs_read_to_string(
         Err(err) => *errc = NSTDIOError::from_err(err.kind()),
     }
     nstd_string_new()
+}
+
+/// Overwrites the contents of a file.
+///
+/// # Parameters:
+///
+/// - `const NSTDStr *path` - A path to the file to write to.
+///
+/// - `const NSTDSlice *content` - The new content to write to the file.
+///
+/// # Returns
+///
+/// `NSTDIOError errc` - The I/O operation error code.
+///
+/// # Panics
+///
+/// This operation will panic if `content`'s stride is not 1.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if either `path` or `content`'s data is invalid.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_fs_write(path: &NSTDStr, content: &NSTDSlice) -> NSTDIOError {
+    if let Err(err) = std::fs::write(path.as_str(), content.as_slice()) {
+        return NSTDIOError::from_err(err.kind());
+    }
+    NSTDIOError::NSTD_IO_ERROR_NONE
 }
 
 /// Renames a file or directory, replacing the destination if it already exists.
