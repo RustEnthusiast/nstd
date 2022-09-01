@@ -239,7 +239,7 @@ pub extern "C" fn nstd_math_tan_f64(x: NSTDFloat64) -> NSTDFloat64 {
     x.tan()
 }
 
-/// Computes the arc sine of `x`.
+/// Computes the arcsine of `x`.
 ///
 /// # Parameters:
 ///
@@ -247,13 +247,13 @@ pub extern "C" fn nstd_math_tan_f64(x: NSTDFloat64) -> NSTDFloat64 {
 ///
 /// # Returns
 ///
-/// `NSTDFloat32 asin` - The arc sine value of `x`.
+/// `NSTDFloat32 asin` - The arcsine value of `x`.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_math_asin_f32(x: NSTDFloat32) -> NSTDFloat32 {
     x.asin()
 }
-/// Computes the arc sine of `x`.
+/// Computes the arcsine of `x`.
 ///
 /// # Parameters:
 ///
@@ -261,14 +261,14 @@ pub extern "C" fn nstd_math_asin_f32(x: NSTDFloat32) -> NSTDFloat32 {
 ///
 /// # Returns
 ///
-/// `NSTDFloat64 asin` - The arc sine value of `x`.
+/// `NSTDFloat64 asin` - The arcsine value of `x`.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_math_asin_f64(x: NSTDFloat64) -> NSTDFloat64 {
     x.asin()
 }
 
-/// Computes the arc cosine of `x`.
+/// Computes the arccosine of `x`.
 ///
 /// # Parameters:
 ///
@@ -276,13 +276,13 @@ pub extern "C" fn nstd_math_asin_f64(x: NSTDFloat64) -> NSTDFloat64 {
 ///
 /// # Returns
 ///
-/// `NSTDFloat32 acos` - The arc cosine value of `x`.
+/// `NSTDFloat32 acos` - The arccosine value of `x`.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_math_acos_f32(x: NSTDFloat32) -> NSTDFloat32 {
     x.acos()
 }
-/// Computes the arc cosine of `x`.
+/// Computes the arccosine of `x`.
 ///
 /// # Parameters:
 ///
@@ -290,7 +290,7 @@ pub extern "C" fn nstd_math_acos_f32(x: NSTDFloat32) -> NSTDFloat32 {
 ///
 /// # Returns
 ///
-/// `NSTDFloat64 acos` - The arc cosine value of `x`.
+/// `NSTDFloat64 acos` - The arccosine value of `x`.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_math_acos_f64(x: NSTDFloat64) -> NSTDFloat64 {
