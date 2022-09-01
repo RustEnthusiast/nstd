@@ -118,7 +118,7 @@ pub unsafe extern "C" fn nstd_fs_remove_dir(name: &NSTDStr) -> NSTDIOError {
     NSTDIOError::NSTD_IO_ERROR_NONE
 }
 
-/// Recursively removes a directory on the file system.
+/// Recursively removes directories on the file system.
 ///
 /// # Parameters:
 ///

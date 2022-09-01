@@ -83,7 +83,7 @@ NSTDAPI NSTDIOError nstd_fs_remove_file(const NSTDStr *name);
 /// This operation can cause undefined behavior if `name`'s data is invalid.
 NSTDAPI NSTDIOError nstd_fs_remove_dir(const NSTDStr *name);
 
-/// Recursively removes a directory on the file system.
+/// Recursively removes directories on the file system.
 ///
 /// # Parameters:
 ///
