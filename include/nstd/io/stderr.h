@@ -3,7 +3,6 @@
 #include "../core/slice.h"
 #include "../nstd.h"
 #include "io.h"
-NSTDCPPSTART
 
 /// A handle to the standard error stream.
 typedef NSTDAnyMut NSTDStderr;
@@ -81,5 +80,4 @@ NSTDAPI NSTDIOError nstd_io_stderr_flush(NSTDStderr *handle);
 /// - `NSTDStderr handle` - A handle to the standard error stream.
 NSTDAPI void nstd_io_stderr_free(NSTDStderr handle);
 
-NSTDCPPEND
 #endif

@@ -5,7 +5,6 @@
 #include "data.h"
 #include "events.h"
 #include "handle.h"
-NSTDCPPSTART
 
 /// An application event loop.
 typedef struct {
@@ -94,5 +93,4 @@ NSTDAPI void nstd_app_exit(const NSTDAppData *app);
 /// - `NSTDErrorCode errc` - The error code to exit the application event loop with.
 NSTDAPI void nstd_app_exit_with_code(const NSTDAppData *app, NSTDErrorCode errc);
 
-NSTDCPPEND
 #endif
