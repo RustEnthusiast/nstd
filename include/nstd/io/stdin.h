@@ -5,7 +5,6 @@
 #include "../string.h"
 #include "../vec.h"
 #include "io.h"
-NSTDCPPSTART
 
 /// A handle to the standard input stream.
 typedef NSTDAnyMut NSTDStdin;
@@ -127,5 +126,4 @@ NSTDUInt *read);
 /// - `NSTDStdin handle` - A handle to the standard input stream.
 NSTDAPI void nstd_io_stdin_free(NSTDStdin handle);
 
-NSTDCPPEND
 #endif

@@ -3,7 +3,6 @@
 #include "../core/slice.h"
 #include "../nstd.h"
 #include "io.h"
-NSTDCPPSTART
 
 /// A handle to the standard output stream.
 typedef NSTDAnyMut NSTDStdout;
@@ -81,5 +80,4 @@ NSTDAPI NSTDIOError nstd_io_stdout_flush(NSTDStdout *handle);
 /// - `NSTDStdout handle` - A handle to the standard output stream.
 NSTDAPI void nstd_io_stdout_free(NSTDStdout handle);
 
-NSTDCPPEND
 #endif

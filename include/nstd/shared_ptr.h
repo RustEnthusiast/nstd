@@ -1,7 +1,6 @@
 #ifndef NSTD_SHARED_PTR_H
 #define NSTD_SHARED_PTR_H
 #include "nstd.h"
-NSTDCPPSTART
 
 /// A reference counting smart pointer.
 typedef struct {
@@ -98,5 +97,4 @@ NSTDAPI NSTDAny nstd_shared_ptr_get(const NSTDSharedPtr *shared_ptr);
 /// - `NSTDSharedPtr shared_ptr` - The shared object to free.
 NSTDAPI void nstd_shared_ptr_free(NSTDSharedPtr shared_ptr);
 
-NSTDCPPEND
 #endif

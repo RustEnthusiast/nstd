@@ -2,7 +2,6 @@
 #define NSTD_OS_WINDOWS_ALLOC_ALLOC_H
 #include "../../../alloc.h"
 #include "../../../nstd.h"
-NSTDCPPSTART
 
 /// Allocates a new block of memory on the current process' heap.
 ///
@@ -72,5 +71,4 @@ NSTDAPI NSTDAllocError nstd_os_windows_alloc_reallocate(NSTDAnyMut *ptr, NSTDUIn
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapfree>.
 NSTDAPI NSTDAllocError nstd_os_windows_alloc_deallocate(NSTDAnyMut *ptr);
 
-NSTDCPPEND
 #endif
