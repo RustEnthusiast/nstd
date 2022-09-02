@@ -1,7 +1,6 @@
 #ifndef NSTD_MATH_H
 #define NSTD_MATH_H
 #include "nstd.h"
-NSTDCPPSTART
 
 /// Returns the absolute value of `x`.
 ///
@@ -326,5 +325,4 @@ NSTDAPI NSTDFloat32 nstd_math_tanh_f32(NSTDFloat32 x);
 /// `NSTDFloat64 tanh` - The hyperbolic tangent of `x`.
 NSTDAPI NSTDFloat64 nstd_math_tanh_f64(NSTDFloat64 x);
 
-NSTDCPPEND
 #endif

@@ -3,7 +3,6 @@
 #include "core/def.h"
 #include "core/str.h"
 #include "nstd.h"
-NSTDCPPSTART
 
 /// A handle to a dynamically loaded library.
 typedef NSTDAnyMut NSTDSharedLib;
@@ -65,5 +64,4 @@ NSTDAPI NSTDAnyMut nstd_shared_lib_get_mut(NSTDSharedLib *lib, const NSTDChar *s
 /// - `NSTDSharedLib lib` - The library handle.
 NSTDAPI void nstd_shared_lib_free(NSTDSharedLib lib);
 
-NSTDCPPEND
 #endif

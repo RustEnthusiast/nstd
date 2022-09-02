@@ -6,7 +6,6 @@
 #include "core/slice.h"
 #include "nstd.h"
 #include "vec.h"
-NSTDCPPSTART
 
 /// A dynamically sized, null terminated, C string.
 ///
@@ -205,5 +204,4 @@ NSTDAPI NSTDChar nstd_cstring_pop(NSTDCString *cstring);
 /// - `NSTDCString cstring` - The C string to free.
 NSTDAPI void nstd_cstring_free(NSTDCString cstring);
 
-NSTDCPPEND
 #endif
