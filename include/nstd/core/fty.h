@@ -1,7 +1,6 @@
 #ifndef NSTD_CORE_FTY_H
 #define NSTD_CORE_FTY_H
 #include "../nstd.h"
-NSTDCPPSTART
 
 /// Returns the smallest finite value representable by `NSTDFloat32`.
 ///
@@ -67,5 +66,4 @@ NSTDAPI NSTDFloat32 nstd_core_fty_neg_inf_f32();
 /// `NSTDFloat64 neg_inf` - Negative infinity represented as `NSTDFloat64`.
 NSTDAPI NSTDFloat64 nstd_core_fty_neg_inf_f64();
 
-NSTDCPPEND
 #endif

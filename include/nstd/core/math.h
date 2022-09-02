@@ -1,7 +1,6 @@
 #ifndef NSTD_CORE_MATH_H
 #define NSTD_CORE_MATH_H
 #include "../nstd.h"
-NSTDCPPSTART
 
 /// Converts radians to degrees.
 ///
@@ -423,5 +422,4 @@ NSTDAPI NSTDInt64 nstd_core_math_div_ceil_i64(NSTDInt64 x, NSTDInt64 y);
 /// This operation will panic if `y` is 0.
 NSTDAPI NSTDUInt64 nstd_core_math_div_ceil_u64(NSTDUInt64 x, NSTDUInt64 y);
 
-NSTDCPPEND
 #endif

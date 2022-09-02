@@ -1,6 +1,6 @@
 [package]
 name = "nstd-sys"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 license = "MIT"
 homepage = "https://github.com/RustEnthusiast/nstd"
@@ -21,7 +21,7 @@ default = ["std", "nstd_core"]
 std = []
 clib = []
 nstd_alloc = ["nstd_os_windows_alloc"]
-nstd_app = ["std", "winit"]
+nstd_app = ["nstd_core", "std", "winit"]
 nstd_core = ["cty"]
 nstd_cstring = ["nstd_alloc", "nstd_core", "nstd_vec"]
 nstd_heap_ptr = ["nstd_alloc", "nstd_core"]

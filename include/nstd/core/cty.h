@@ -1,7 +1,6 @@
 #ifndef NSTD_CORE_CTY_H
 #define NSTD_CORE_CTY_H
 #include "../nstd.h"
-NSTDCPPSTART
 
 /// Returns the Unicode replacement character (�).
 ///
@@ -157,5 +156,4 @@ NSTDAPI NSTDUnichar nstd_core_cty_to_lowercase(NSTDUnichar chr);
 /// `NSTDUnichar uppercase` - The uppercase version of `chr`.
 NSTDAPI NSTDUnichar nstd_core_cty_to_uppercase(NSTDUnichar chr);
 
-NSTDCPPEND
 #endif

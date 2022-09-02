@@ -6,7 +6,6 @@
 #include "core/str.h"
 #include "nstd.h"
 #include "vec.h"
-NSTDCPPSTART
 
 /// Dynamically sized UTF-8 encoded byte string.
 typedef struct {
@@ -321,5 +320,4 @@ NSTDAPI NSTDString nstd_string_from_u64(NSTDUInt64 v);
 /// - `NSTDString string` - A pointer to the string to free.
 NSTDAPI void nstd_string_free(NSTDString string);
 
-NSTDCPPEND
 #endif

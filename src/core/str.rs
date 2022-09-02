@@ -195,6 +195,11 @@ pub extern "C" fn nstd_core_str_as_ptr(str: &NSTDStr) -> *const NSTDByte {
 ///
 /// `NSTDUInt len` - The length of the string slice.
 ///
+/// # Panics
+///
+/// This operation may panic in the event that `str`'s calculated length is greater than the
+/// highest number representable by `NSTDUInt`.
+///
 /// # Safety
 ///
 /// This operation can cause undefined behavior in the event that `str`'s data is invalid.
@@ -658,6 +663,11 @@ pub extern "C" fn nstd_core_str_mut_as_ptr(str: &NSTDStrMut) -> *const NSTDByte 
 /// # Returns
 ///
 /// `NSTDUInt len` - The length of the string slice.
+///
+/// # Panics
+///
+/// This operation may panic in the event that `str`'s calculated length is greater than the
+/// highest number representable by `NSTDUInt`.
 ///
 /// # Safety
 ///

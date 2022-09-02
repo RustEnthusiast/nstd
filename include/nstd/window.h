@@ -4,7 +4,6 @@
 #include "core/str.h"
 #include "image.h"
 #include "nstd.h"
-NSTDCPPSTART
 
 /// An `nstd` application window.
 typedef NSTDAnyMut NSTDWindow;
@@ -135,5 +134,4 @@ NSTDAPI NSTDWindowSize nstd_window_get_outer_size(const NSTDWindow *window);
 /// - `NSTDWindow window` - The window to close.
 NSTDAPI void nstd_window_close(NSTDWindow window);
 
-NSTDCPPEND
 #endif

@@ -1,10 +1,10 @@
 #ifndef NSTD_APP_APP_H
 #define NSTD_APP_APP_H
+#include "../core/def.h"
 #include "../nstd.h"
 #include "data.h"
 #include "events.h"
 #include "handle.h"
-NSTDCPPSTART
 
 /// An application event loop.
 typedef struct {
@@ -84,5 +84,13 @@ NSTDAPI void nstd_app_free(NSTDApp app);
 /// - `const NSTDAppData *app` - The application data received from an event.
 NSTDAPI void nstd_app_exit(const NSTDAppData *app);
 
-NSTDCPPEND
+/// Signals an `NSTDApp`'s event loop to exit with a specific error code.
+///
+/// # Parameters:
+///
+/// - `const NSTDAppData *app` - The application data received from an event.
+///
+/// - `NSTDErrorCode errc` - The error code to exit the application event loop with.
+NSTDAPI void nstd_app_exit_with_code(const NSTDAppData *app, NSTDErrorCode errc);
+
 #endif

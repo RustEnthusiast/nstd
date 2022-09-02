@@ -5,7 +5,6 @@
 #include "def.h"
 #include "range.h"
 #include "slice.h"
-NSTDCPPSTART
 
 /// An immutable unowned view into a UTF-8 encoded byte string.
 typedef struct {
@@ -110,6 +109,11 @@ NSTDAPI const NSTDByte *nstd_core_str_as_ptr(const NSTDStr *str);
 /// # Returns
 ///
 /// `NSTDUInt len` - The length of the string slice.
+///
+/// # Panics
+///
+/// This operation may panic in the event that `str`'s calculated length is greater than the
+/// highest number representable by `NSTDUInt`.
 ///
 /// # Safety
 ///
@@ -485,6 +489,11 @@ NSTDAPI const NSTDByte *nstd_core_str_mut_as_ptr(const NSTDStrMut *str);
 ///
 /// `NSTDUInt len` - The length of the string slice.
 ///
+/// # Panics
+///
+/// This operation may panic in the event that `str`'s calculated length is greater than the
+/// highest number representable by `NSTDUInt`.
+///
 /// # Safety
 ///
 /// This operation can cause undefined behavior in the event that `str`'s data is invalid.
@@ -744,5 +753,4 @@ NSTDAPI NSTDInt64 nstd_core_str_mut_to_i64(const NSTDStrMut *str, NSTDErrorCode 
 /// This operation can cause undefined behavior if `str`'s data is invalid.
 NSTDAPI NSTDUInt64 nstd_core_str_mut_to_u64(const NSTDStrMut *str, NSTDErrorCode *errc);
 
-NSTDCPPEND
 #endif
