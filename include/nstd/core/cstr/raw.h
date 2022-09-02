@@ -2,7 +2,6 @@
 #define NSTD_CORE_CSTR_RAW_H
 #include "../../nstd.h"
 #include "../def.h"
-NSTDCPPSTART
 
 /// Gets the length of a null terminated C string, excluding the null byte.
 ///
@@ -91,5 +90,4 @@ NSTDAPI void nstd_core_cstr_raw_copy(NSTDChar *dest, const NSTDChar *src);
 /// `dest`'s memory buffer.
 NSTDAPI void nstd_core_cstr_raw_copy_with_null(NSTDChar *dest, const NSTDChar *src);
 
-NSTDCPPEND
 #endif

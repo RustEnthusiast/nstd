@@ -4,7 +4,6 @@
 #include "core/def.h"
 #include "core/slice.h"
 #include "nstd.h"
-NSTDCPPSTART
 
 /// A dynamically sized contiguous sequence of values.
 typedef struct {
@@ -331,5 +330,4 @@ NSTDAPI NSTDAllocError nstd_vec_shrink(NSTDVec *vec);
 /// - `NSTDVec vec` - The vector to free.
 NSTDAPI void nstd_vec_free(NSTDVec vec);
 
-NSTDCPPEND
 #endif

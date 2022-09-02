@@ -9,7 +9,7 @@ use crate::{
             NSTDPtr, NSTDPtrMut,
         },
     },
-    NSTDAny, NSTDAnyMut, NSTDBool, NSTDUInt, NSTD_NULL,
+    NSTDAny, NSTDAnyMut, NSTDUInt, NSTD_NULL,
 };
 
 /// An immutable view into a sequence of values in memory.
@@ -40,7 +40,7 @@ impl NSTDSlice {
     #[inline]
     pub(crate) unsafe fn as_slice<T>(&self) -> &[T] {
         assert!(nstd_core_slice_stride(self) == core::mem::size_of::<T>());
-        core::slice::from_raw_parts(self.ptr.raw.cast(), self.byte_len())
+        core::slice::from_raw_parts(self.ptr.raw.cast(), nstd_core_slice_len(self))
     }
 }
 
@@ -178,27 +178,6 @@ pub extern "C" fn nstd_core_slice_last(slice: &NSTDSlice) -> NSTDAny {
     }
 }
 
-/// Compares two slices, returning true if the slices carry, or point to the same data.
-///
-/// # Parameters:
-///
-/// - `const NSTDSlice *s1` - The first slice to compare.
-///
-/// - `const NSTDSlice *s2` - The second slice to compare.
-///
-/// # Returns
-///
-/// `NSTDBool is_eq` - `NSTD_TRUE` if the two slices compare equal.
-///
-/// # Safety
-///
-/// This function can cause undefined behavior if either `s1` or `s2`'s data is invalid.
-#[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_slice_compare(s1: &NSTDSlice, s2: &NSTDSlice) -> NSTDBool {
-    (s1.as_slice::<u8>() == s2.as_slice::<u8>()).into()
-}
-
 /// A view into a sequence of values in memory.
 #[repr(C)]
 #[derive(Clone, Copy, Debug, Hash)]
@@ -209,12 +188,6 @@ pub struct NSTDSliceMut {
     pub(crate) len: NSTDUInt,
 }
 impl NSTDSliceMut {
-    /// Returns the number of bytes that this slice covers.
-    #[inline]
-    pub(crate) fn byte_len(&self) -> usize {
-        self.len * nstd_core_slice_mut_stride(self)
-    }
-
     /// Creates a Rust byte slice from this `NSTDSliceMut`.
     ///
     /// # Panics
@@ -227,7 +200,7 @@ impl NSTDSliceMut {
     #[inline]
     pub(crate) unsafe fn as_slice<T>(&self) -> &[T] {
         assert!(nstd_core_slice_mut_stride(self) == core::mem::size_of::<T>());
-        core::slice::from_raw_parts(self.ptr.raw.cast(), self.byte_len())
+        core::slice::from_raw_parts(self.ptr.raw.cast(), nstd_core_slice_mut_len(self))
     }
 
     /// Creates a mutable Rust byte slice from this `NSTDSliceMut`.
@@ -243,7 +216,7 @@ impl NSTDSliceMut {
     #[allow(dead_code)]
     pub(crate) unsafe fn as_slice_mut<T>(&mut self) -> &mut [T] {
         assert!(nstd_core_slice_mut_stride(self) == core::mem::size_of::<T>());
-        core::slice::from_raw_parts_mut(self.ptr.raw.cast(), self.byte_len())
+        core::slice::from_raw_parts_mut(self.ptr.raw.cast(), nstd_core_slice_mut_len(self))
     }
 }
 
@@ -461,30 +434,6 @@ pub extern "C" fn nstd_core_slice_mut_last_const(slice: &NSTDSliceMut) -> NSTDAn
         true => nstd_core_slice_mut_get_const(slice, slice.len - 1),
         false => NSTD_NULL,
     }
-}
-
-/// Compares two slices, returning true if the slices carry, or point to the same data.
-///
-/// # Parameters:
-///
-/// - `const NSTDSliceMut *s1` - The first slice to compare.
-///
-/// - `const NSTDSliceMut *s2` - The second slice to compare.
-///
-/// # Returns
-///
-/// `NSTDBool is_eq` - `NSTD_TRUE` if the two slices compare equal.
-///
-/// # Safety
-///
-/// This function can cause undefined behavior if either `s1` or `s2`'s data is invalid.
-#[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_slice_mut_compare(
-    s1: &NSTDSliceMut,
-    s2: &NSTDSliceMut,
-) -> NSTDBool {
-    (s1.as_slice::<u8>() == s2.as_slice::<u8>()).into()
 }
 
 /// Copies data into `dest` from `src`. The number of bytes copied is determined by `src`.
