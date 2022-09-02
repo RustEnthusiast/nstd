@@ -2,7 +2,6 @@
 #define NSTD_CORE_MEM_H
 #include "../nstd.h"
 #include "def.h"
-NSTDCPPSTART
 
 /// Compares two memory buffers of `num` bytes.
 ///
@@ -107,5 +106,4 @@ NSTDAPI void nstd_core_mem_copy_overlapping(NSTDByte *dest, const NSTDByte *src,
 /// of a buffer.
 NSTDAPI void nstd_core_mem_swap(NSTDByte *x, NSTDByte *y, NSTDUInt num);
 
-NSTDCPPEND
 #endif

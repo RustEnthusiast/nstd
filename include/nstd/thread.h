@@ -3,7 +3,6 @@
 #include "core/def.h"
 #include "core/str.h"
 #include "nstd.h"
-NSTDCPPSTART
 
 /// A handle to a running thread.
 typedef NSTDAnyMut NSTDThread;
@@ -87,5 +86,4 @@ NSTDAPI NSTDErrorCode nstd_thread_join(NSTDThread thread);
 /// - `NSTDThread thread` - The thread handle.
 NSTDAPI void nstd_thread_detach(NSTDThread thread);
 
-NSTDCPPEND
 #endif

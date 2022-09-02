@@ -3,7 +3,6 @@
 #include "../nstd.h"
 #include "def.h"
 #include "ptr.h"
-NSTDCPPSTART
 
 /// An immutable view into a sequence of values in memory.
 typedef struct {
@@ -99,23 +98,6 @@ NSTDAPI NSTDAny nstd_core_slice_first(const NSTDSlice *slice);
 /// `NSTDAny element` - A pointer to the last element in `slice` or `NSTD_NULL` if the
 /// slice is empty.
 NSTDAPI NSTDAny nstd_core_slice_last(const NSTDSlice *slice);
-
-/// Compares two slices, returning true if the slices carry, or point to the same data.
-///
-/// # Parameters:
-///
-/// - `const NSTDSlice *s1` - The first slice to compare.
-///
-/// - `const NSTDSlice *s2` - The second slice to compare.
-///
-/// # Returns
-///
-/// `NSTDBool is_eq` - `NSTD_TRUE` if the two slices compare equal.
-///
-/// # Safety
-///
-/// This function can cause undefined behavior if either `s1` or `s2`'s data is invalid.
-NSTDAPI NSTDBool nstd_core_slice_compare(const NSTDSlice *s1, const NSTDSlice *s2);
 
 /// A view into a sequence of values in memory.
 typedef struct {
@@ -271,23 +253,6 @@ NSTDAPI NSTDAnyMut nstd_core_slice_mut_last(NSTDSliceMut *slice);
 /// slice is empty.
 NSTDAPI NSTDAny nstd_core_slice_mut_last_const(const NSTDSliceMut *slice);
 
-/// Compares two slices, returning true if the slices carry, or point to the same data.
-///
-/// # Parameters:
-///
-/// - `const NSTDSliceMut *s1` - The first slice to compare.
-///
-/// - `const NSTDSliceMut *s2` - The second slice to compare.
-///
-/// # Returns
-///
-/// `NSTDBool is_eq` - `NSTD_TRUE` if the two slices compare equal.
-///
-/// # Safety
-///
-/// This function can cause undefined behavior if either `s1` or `s2`'s data is invalid.
-NSTDAPI NSTDBool nstd_core_slice_mut_compare(const NSTDSliceMut *s1, const NSTDSliceMut *s2);
-
 /// Copies data into `dest` from `src`. The number of bytes copied is determined by `src`.
 ///
 /// # Parameters:
@@ -311,5 +276,4 @@ NSTDAPI NSTDBool nstd_core_slice_mut_compare(const NSTDSliceMut *s1, const NSTDS
 /// This function can cause undefined behavior if either `dest` or `src`'s data is invalid.
 NSTDAPI NSTDErrorCode nstd_core_slice_mut_copy(NSTDSliceMut *dest, const NSTDSlice *src);
 
-NSTDCPPEND
 #endif

@@ -2,7 +2,6 @@
 #define NSTD_OS_WINDOWS_ALLOC_HEAP_H
 #include "../../../alloc.h"
 #include "../../../nstd.h"
-NSTDCPPSTART
 
 /// A handle to a process heap.
 typedef NSTDInt NSTDWindowsHeapHandle;
@@ -122,5 +121,4 @@ NSTDAnyMut *ptr);
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapdestroy>.
 NSTDAPI NSTDAllocError nstd_os_windows_alloc_heap_free(NSTDWindowsHeapHandle *heap);
 
-NSTDCPPEND
 #endif
