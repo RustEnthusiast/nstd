@@ -3,7 +3,6 @@
 #include "core/slice.h"
 #include "io/io.h"
 #include "nstd.h"
-NSTDCPPSTART
 
 /// An image of any format.
 typedef NSTDAnyMut NSTDImage;
@@ -91,5 +90,4 @@ NSTDAPI NSTDUInt32 nstd_image_height(const NSTDImage *img);
 /// - `NSTDImage img` - The image.
 NSTDAPI void nstd_image_free(NSTDImage img);
 
-NSTDCPPEND
 #endif
