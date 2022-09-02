@@ -3,7 +3,6 @@
 #include "../core/str.h"
 #include "../nstd.h"
 #include "../string.h"
-NSTDCPPSTART
 
 /// An error type for I/O operations.
 typedef enum {
@@ -105,5 +104,4 @@ NSTDAPI NSTDIOError nstd_io_read(NSTDString *buffer);
 /// `NSTDIOError errc` - The I/O operation error code.
 NSTDAPI NSTDIOError nstd_io_read_line(NSTDString *buffer);
 
-NSTDCPPEND
 #endif

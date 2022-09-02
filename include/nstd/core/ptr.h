@@ -1,7 +1,6 @@
 #ifndef NSTD_CORE_PTR_H
 #define NSTD_CORE_PTR_H
 #include "../nstd.h"
-NSTDCPPSTART
 
 /// A sized immutable pointer to some arbitrary type.
 typedef struct {
@@ -129,5 +128,4 @@ NSTDAPI NSTDAny nstd_core_ptr_mut_get_const(const NSTDPtrMut *ptr);
 /// This operation is highly unsafe because there is no way of knowing if `obj`'s data is valid.
 NSTDAPI void nstd_core_ptr_mut_write(NSTDPtrMut *ptr, NSTDAny obj);
 
-NSTDCPPEND
 #endif

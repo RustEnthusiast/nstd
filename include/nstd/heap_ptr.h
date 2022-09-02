@@ -1,7 +1,6 @@
 #ifndef NSTD_HEAP_PTR_H
 #define NSTD_HEAP_PTR_H
 #include "nstd.h"
-NSTDCPPSTART
 
 /// A pointer type for single value heap allocation.
 typedef struct {
@@ -102,5 +101,4 @@ NSTDAPI NSTDAnyMut nstd_heap_ptr_get_mut(NSTDHeapPtr *hptr);
 /// - `NSTDHeapPtr hptr` - A pointer to the heap object.
 NSTDAPI void nstd_heap_ptr_free(NSTDHeapPtr hptr);
 
-NSTDCPPEND
 #endif

@@ -1,4 +1,6 @@
 # TBD
+### `nstd`
+- Added `extern "C"` to `NSTDAPI` (removes `NSTDCPP[START|END]`).
 ### `nstd.core`
 - Removed `nstd_core_slice[_mut]_compare`.
 

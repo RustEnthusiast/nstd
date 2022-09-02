@@ -6,7 +6,6 @@
 #include "../nstd.h"
 #include "../string.h"
 #include "../vec.h"
-NSTDCPPSTART
 
 /// Creates a new file on the file system.
 ///
@@ -200,5 +199,4 @@ NSTDAPI NSTDIOError nstd_fs_copy(const NSTDStr *from, const NSTDStr *to);
 /// This operation can cause undefined behavior if `path`'s data is invalid.
 NSTDAPI NSTDString nstd_fs_absolute(const NSTDStr *path, NSTDIOError *errc);
 
-NSTDCPPEND
 #endif

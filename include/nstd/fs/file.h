@@ -6,7 +6,6 @@
 #include "../nstd.h"
 #include "../string.h"
 #include "../vec.h"
-NSTDCPPSTART
 
 /// Creates the file upon opening if it does not already exist.
 ///
@@ -183,5 +182,4 @@ NSTDAPI NSTDIOError nstd_fs_file_read_exact(NSTDFile *file, NSTDSliceMut *buffer
 /// - `NSTDFile file` - The file handle to close.
 NSTDAPI void nstd_fs_file_close(NSTDFile file);
 
-NSTDCPPEND
 #endif

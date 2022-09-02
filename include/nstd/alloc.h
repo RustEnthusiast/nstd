@@ -1,7 +1,6 @@
 #ifndef NSTD_ALLOC_H
 #define NSTD_ALLOC_H
 #include "nstd.h"
-NSTDCPPSTART
 
 /// Describes an error returned from allocation functions.
 typedef enum {
@@ -84,5 +83,4 @@ NSTDAPI NSTDAllocError nstd_alloc_reallocate(NSTDAnyMut *ptr, NSTDUInt size, NST
 /// `nstd_alloc_allocate[_zeroed]`.
 NSTDAPI void nstd_alloc_deallocate(NSTDAnyMut *ptr, NSTDUInt size);
 
-NSTDCPPEND
 #endif

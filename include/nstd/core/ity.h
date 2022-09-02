@@ -1,7 +1,6 @@
 #ifndef NSTD_CORE_ITY_H
 #define NSTD_CORE_ITY_H
 #include "../nstd.h"
-NSTDCPPSTART
 
 /// Returns the smallest value representable by `NSTDInt`.
 ///
@@ -124,5 +123,4 @@ NSTDAPI NSTDUInt64 nstd_core_ity_min_u64();
 /// `NSTDUInt64 max` - The largest value representable by `NSTDUInt64`.
 NSTDAPI NSTDUInt64 nstd_core_ity_max_u64();
 
-NSTDCPPEND
 #endif

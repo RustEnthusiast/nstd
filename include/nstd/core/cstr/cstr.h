@@ -3,7 +3,6 @@
 #include "../../nstd.h"
 #include "../def.h"
 #include "../slice.h"
-NSTDCPPSTART
 
 /// An immutable slice of a C string.
 typedef struct {
@@ -288,5 +287,4 @@ NSTDAPI NSTDChar *nstd_core_cstr_mut_get(NSTDCStrMut *cstr, NSTDUInt pos);
 /// `const NSTDChar *chr` - A pointer to the character at `pos`, or null on error.
 NSTDAPI const NSTDChar *nstd_core_cstr_mut_get_const(const NSTDCStrMut *cstr, NSTDUInt pos);
 
-NSTDCPPEND
 #endif

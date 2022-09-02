@@ -3,7 +3,6 @@
 #include "../nstd.h"
 #include "def.h"
 #include "ptr.h"
-NSTDCPPSTART
 
 /// An immutable view into a sequence of values in memory.
 typedef struct {
@@ -277,5 +276,4 @@ NSTDAPI NSTDAny nstd_core_slice_mut_last_const(const NSTDSliceMut *slice);
 /// This function can cause undefined behavior if either `dest` or `src`'s data is invalid.
 NSTDAPI NSTDErrorCode nstd_core_slice_mut_copy(NSTDSliceMut *dest, const NSTDSlice *src);
 
-NSTDCPPEND
 #endif
