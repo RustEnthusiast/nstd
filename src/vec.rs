@@ -5,8 +5,8 @@ use crate::{
         def::{NSTDByte, NSTDErrorCode},
         mem::{nstd_core_mem_copy, nstd_core_mem_copy_overlapping},
         slice::{
-            nstd_core_slice_mut_new, nstd_core_slice_new, nstd_core_slice_stride, NSTDSlice,
-            NSTDSliceMut,
+            nstd_core_slice_as_ptr, nstd_core_slice_len, nstd_core_slice_mut_new,
+            nstd_core_slice_new, nstd_core_slice_stride, NSTDSlice, NSTDSliceMut,
         },
     },
     NSTDAny, NSTDAnyMut, NSTDUInt, NSTD_NULL,
@@ -526,17 +526,19 @@ pub extern "C" fn nstd_vec_remove(vec: &mut NSTDVec, index: NSTDUInt) -> NSTDErr
 pub unsafe extern "C" fn nstd_vec_extend(vec: &mut NSTDVec, values: &NSTDSlice) -> NSTDAllocError {
     // Ensure value sizes are the same for both the vector and the slice.
     assert!(vec.stride == nstd_core_slice_stride(values));
+    let len = nstd_core_slice_len(values);
     // Making sure there's enough space for the extension.
     let mut errc = NSTDAllocError::NSTD_ALLOC_ERROR_NONE;
     let reserved = vec.cap - vec.len;
-    if reserved < values.len {
-        let additional = values.len - reserved;
+    if reserved < len {
+        let additional = len - reserved;
         errc = nstd_vec_reserve(vec, additional);
     }
     // On success copy bytes to the end of the vector.
     if errc == NSTDAllocError::NSTD_ALLOC_ERROR_NONE {
-        nstd_core_mem_copy(vec.end().cast(), values.ptr.raw.cast(), values.byte_len());
-        vec.len += values.len;
+        let ptr = nstd_core_slice_as_ptr(values).cast();
+        nstd_core_mem_copy(vec.end().cast(), ptr, values.byte_len());
+        vec.len += len;
     }
     errc
 }

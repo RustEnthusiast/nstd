@@ -17,9 +17,9 @@ use crate::{
 #[derive(Clone, Copy, Debug, Hash)]
 pub struct NSTDSlice {
     /// A pointer to the first element in the slice.
-    pub(crate) ptr: NSTDPtr,
+    ptr: NSTDPtr,
     /// The number of elements in the slice.
-    pub(crate) len: NSTDUInt,
+    len: NSTDUInt,
 }
 impl NSTDSlice {
     /// Returns the number of bytes that this slice covers.
@@ -183,9 +183,9 @@ pub extern "C" fn nstd_core_slice_last(slice: &NSTDSlice) -> NSTDAny {
 #[derive(Clone, Copy, Debug, Hash)]
 pub struct NSTDSliceMut {
     /// A pointer to the first element in the slice.
-    pub(crate) ptr: NSTDPtrMut,
+    ptr: NSTDPtrMut,
     /// The number of elements in the slice.
-    pub(crate) len: NSTDUInt,
+    len: NSTDUInt,
 }
 impl NSTDSliceMut {
     /// Creates a Rust byte slice from this `NSTDSliceMut`.
