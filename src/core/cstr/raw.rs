@@ -13,8 +13,8 @@ use crate::{core::def::NSTDChar, NSTDBool, NSTDUInt, NSTD_FALSE, NSTD_TRUE};
 ///
 /// # Safety
 ///
-/// The C string's buffer may not be large enough to contain the null byte, resulting in an
-/// incorrect length.
+/// This function makes access raw pointer data, which can cause undefined behavior in the event
+/// that `cstr`'s data is invalid.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_cstr_raw_len(cstr: *const NSTDChar) -> NSTDUInt {
@@ -60,8 +60,8 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_len(cstr: *const NSTDChar) -> NSTDUI
 ///
 /// # Safety
 ///
-/// The C string's buffer may not be large enough to contain the null byte, resulting in an
-/// incorrect length.
+/// This function makes access raw pointer data, which can cause undefined behavior in the event
+/// that `cstr`'s data is invalid.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_cstr_raw_len_with_null(cstr: *const NSTDChar) -> NSTDUInt {
@@ -82,7 +82,8 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_len_with_null(cstr: *const NSTDChar)
 ///
 /// # Safety
 ///
-/// This function is unsafe because the C string's null byte may be outside of it's memory buffer.
+/// This function makes access raw pointer data, which can cause undefined behavior in the event
+/// that either `cstr1` or `cstr2`'s data is invalid.
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_cstr_raw_compare(
     mut cstr1: *const NSTDChar,
@@ -109,7 +110,7 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_compare(
 /// # Note
 ///
 /// If you already know how many bytes should be copied, `nstd_core_mem_copy[_overlapped]` should
-/// be used instead.
+/// be used instead as it can minimize execution times.
 ///
 /// # Parameters:
 ///
@@ -119,8 +120,8 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_compare(
 ///
 /// # Safety
 ///
-/// This operation is highly unsafe because it cannot guarantee that it won't write past the end of
-/// `dest`'s memory buffer.
+/// This function reads from/writes to raw pointer data, which can cause undefined behavior in the
+/// event that either `dest` or `src`'s data is invalid.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_cstr_raw_copy(
@@ -139,7 +140,7 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_copy(
 /// # Note
 ///
 /// If you already know how many bytes should be copied, `nstd_core_mem_copy[_overlapped]` should
-/// be used instead.
+/// be used instead as it can minimize execution times.
 ///
 /// # Parameters:
 ///
@@ -149,8 +150,8 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_copy(
 ///
 /// # Safety
 ///
-/// This operation is highly unsafe because it cannot guarantee that it won't write past the end of
-/// `dest`'s memory buffer.
+/// This function reads from/writes to raw pointer data, which can cause undefined behavior in the
+/// event that either `dest` or `src`'s data is invalid.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_cstr_raw_copy_with_null(
