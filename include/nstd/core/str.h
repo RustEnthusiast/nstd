@@ -8,8 +8,10 @@
 
 /// An immutable unowned view into a UTF-8 encoded byte string.
 typedef struct {
-    /// A view into the UTF-8 encoded buffer.
-    NSTDSlice bytes;
+    /// A raw pointer to the string's data.
+    const NSTDByte *ptr;
+    /// The number of bytes in the string.
+    NSTDUInt len;
 } NSTDStr;
 
 /// Creates a new instance of `NSTDStr` from a C string slice.
@@ -376,8 +378,10 @@ NSTDAPI NSTDUInt64 nstd_core_str_to_u64(const NSTDStr *str, NSTDErrorCode *errc)
 
 /// An unowned view into a UTF-8 encoded byte string.
 typedef struct {
-    /// A view into the UTF-8 encoded buffer.
-    NSTDSliceMut bytes;
+    /// A raw pointer to the string's data.
+    NSTDByte *ptr;
+    /// The number of bytes in the string.
+    NSTDUInt len;
 } NSTDStrMut;
 
 /// Creates a new instance of `NSTDStrMut` from a C string slice.

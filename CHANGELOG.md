@@ -1,4 +1,4 @@
-# TBD
+# 0.1.3
 ### `nstd`
 - Added `extern "C"` to `NSTDAPI` (removes `NSTDCPP[START|END]`).
 ### `nstd.core`

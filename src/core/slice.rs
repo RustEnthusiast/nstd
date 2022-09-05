@@ -17,9 +17,9 @@ use crate::{
 #[derive(Clone, Copy, Debug, Hash)]
 pub struct NSTDSlice {
     /// A pointer to the first element in the slice.
-    pub(crate) ptr: NSTDPtr,
+    ptr: NSTDPtr,
     /// The number of elements in the slice.
-    pub(crate) len: NSTDUInt,
+    len: NSTDUInt,
 }
 impl NSTDSlice {
     /// Returns the number of bytes that this slice covers.
@@ -40,7 +40,8 @@ impl NSTDSlice {
     #[inline]
     pub(crate) unsafe fn as_slice<T>(&self) -> &[T] {
         assert!(nstd_core_slice_stride(self) == core::mem::size_of::<T>());
-        core::slice::from_raw_parts(self.ptr.raw.cast(), nstd_core_slice_len(self))
+        let ptr = nstd_core_slice_as_ptr(self).cast();
+        core::slice::from_raw_parts(ptr, nstd_core_slice_len(self))
     }
 }
 
@@ -134,7 +135,7 @@ pub extern "C" fn nstd_core_slice_get(slice: &NSTDSlice, pos: NSTDUInt) -> NSTDA
         // SAFETY: We've checked `pos`, and the returned pointer is already unsafe to access.
         true => unsafe {
             let stride = nstd_core_slice_stride(slice);
-            slice.ptr.raw.add(pos * stride)
+            nstd_core_slice_as_ptr(slice).add(pos * stride)
         },
         false => NSTD_NULL,
     }
@@ -154,7 +155,7 @@ pub extern "C" fn nstd_core_slice_get(slice: &NSTDSlice, pos: NSTDUInt) -> NSTDA
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_slice_first(slice: &NSTDSlice) -> NSTDAny {
     match slice.len > 0 {
-        true => slice.ptr.raw,
+        true => nstd_core_slice_as_ptr(slice),
         false => NSTD_NULL,
     }
 }
@@ -183,9 +184,9 @@ pub extern "C" fn nstd_core_slice_last(slice: &NSTDSlice) -> NSTDAny {
 #[derive(Clone, Copy, Debug, Hash)]
 pub struct NSTDSliceMut {
     /// A pointer to the first element in the slice.
-    pub(crate) ptr: NSTDPtrMut,
+    ptr: NSTDPtrMut,
     /// The number of elements in the slice.
-    pub(crate) len: NSTDUInt,
+    len: NSTDUInt,
 }
 impl NSTDSliceMut {
     /// Creates a Rust byte slice from this `NSTDSliceMut`.
@@ -200,7 +201,8 @@ impl NSTDSliceMut {
     #[inline]
     pub(crate) unsafe fn as_slice<T>(&self) -> &[T] {
         assert!(nstd_core_slice_mut_stride(self) == core::mem::size_of::<T>());
-        core::slice::from_raw_parts(self.ptr.raw.cast(), nstd_core_slice_mut_len(self))
+        let ptr = nstd_core_slice_mut_as_ptr_const(self).cast();
+        core::slice::from_raw_parts(ptr, nstd_core_slice_mut_len(self))
     }
 
     /// Creates a mutable Rust byte slice from this `NSTDSliceMut`.
@@ -216,7 +218,8 @@ impl NSTDSliceMut {
     #[allow(dead_code)]
     pub(crate) unsafe fn as_slice_mut<T>(&mut self) -> &mut [T] {
         assert!(nstd_core_slice_mut_stride(self) == core::mem::size_of::<T>());
-        core::slice::from_raw_parts_mut(self.ptr.raw.cast(), nstd_core_slice_mut_len(self))
+        let ptr = nstd_core_slice_mut_as_ptr(self).cast();
+        core::slice::from_raw_parts_mut(ptr, nstd_core_slice_mut_len(self))
     }
 }
 
@@ -360,7 +363,7 @@ pub extern "C" fn nstd_core_slice_mut_get_const(slice: &NSTDSliceMut, pos: NSTDU
         // SAFETY: We've checked `pos`, and the returned pointer is already unsafe to access.
         true => unsafe {
             let stride = nstd_core_slice_mut_stride(slice);
-            slice.ptr.raw.add(pos * stride)
+            nstd_core_slice_mut_as_ptr_const(slice).add(pos * stride)
         },
         false => NSTD_NULL,
     }
@@ -396,7 +399,7 @@ pub extern "C" fn nstd_core_slice_mut_first(slice: &mut NSTDSliceMut) -> NSTDAny
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_slice_mut_first_const(slice: &NSTDSliceMut) -> NSTDAny {
     match slice.len > 0 {
-        true => slice.ptr.raw,
+        true => nstd_core_slice_mut_as_ptr_const(slice),
         false => NSTD_NULL,
     }
 }
@@ -457,7 +460,6 @@ pub extern "C" fn nstd_core_slice_mut_last_const(slice: &NSTDSliceMut) -> NSTDAn
 /// # Safety
 ///
 /// This function can cause undefined behavior if either `dest` or `src`'s data is invalid.
-#[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_slice_mut_copy(
     dest: &mut NSTDSliceMut,
@@ -468,7 +470,10 @@ pub unsafe extern "C" fn nstd_core_slice_mut_copy(
     } else if nstd_core_slice_mut_stride(dest) != nstd_core_slice_stride(src) {
         2
     } else {
-        nstd_core_mem_copy(dest.ptr.raw.cast(), src.ptr.raw.cast(), src.byte_len());
+        let len = src.byte_len();
+        let dest = nstd_core_slice_mut_as_ptr(dest).cast();
+        let src = nstd_core_slice_as_ptr(src).cast();
+        nstd_core_mem_copy(dest, src, len);
         0
     }
 }

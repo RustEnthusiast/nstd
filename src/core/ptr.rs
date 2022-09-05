@@ -6,7 +6,7 @@ use crate::{core::mem::nstd_core_mem_copy, NSTDAny, NSTDAnyMut, NSTDUInt};
 #[derive(Clone, Copy, Debug, Hash, PartialEq, Eq)]
 pub struct NSTDPtr {
     /// A raw pointer to the data.
-    pub(crate) raw: NSTDAny,
+    raw: NSTDAny,
     /// The size of the object being pointed to.
     size: NSTDUInt,
 }
@@ -63,7 +63,7 @@ pub extern "C" fn nstd_core_ptr_get(ptr: &NSTDPtr) -> NSTDAny {
 #[derive(Clone, Copy, Debug, Hash, PartialEq, Eq)]
 pub struct NSTDPtrMut {
     /// A raw pointer to the data.
-    pub(crate) raw: NSTDAnyMut,
+    raw: NSTDAnyMut,
     /// The size of the object being pointed to.
     size: NSTDUInt,
 }

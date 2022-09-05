@@ -54,12 +54,18 @@ versioning occurs, the plan is to start adding official wrappers so developers f
 can easily use the API.
 
 # Safety notes
-`nstd` tries it's best to comply with Rust's safety. This means anything that can cause undefined
-behavior is considered unsafe (with the exception of functions that take Rusty references, which
-always assume a non-null argument). However `nstd` *is* a C library, and we do not have access to
-the borrow checker in C, and making every function that borrows data mutably "unsafe" would not be
-ideal. I am always looking for ways to make this API as safe as sanely possible, so please open an
-issue if you have any ideas on how we can do so, it would be greatly appreciated.
+
+- Raw pointers are unsafe to access.
+
+- Raw pointer data is unsafe to mutate.
+
+- Any function that may cause undefined behavior must be marked unsafe.
+
+- Any operation that makes a direct call on a C function pointer is considered unsafe.
+
+- References are assumed to be valid arguments (non-null/not dangling), and are safe to access.
+
+- Any function that may panic must document each case that it might do so.
 
 # How to build
 `nstd` let you decide what features you want to use. Any module that falls under the top level

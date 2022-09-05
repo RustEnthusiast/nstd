@@ -2,13 +2,13 @@
 use crate::{
     core::{
         cstr::{
-            nstd_core_cstr_as_bytes, nstd_core_cstr_mut_as_ptr, nstd_core_cstr_mut_len, NSTDCStr,
-            NSTDCStrMut,
+            nstd_core_cstr_as_ptr, nstd_core_cstr_len, nstd_core_cstr_mut_as_ptr,
+            nstd_core_cstr_mut_len, NSTDCStr, NSTDCStrMut,
         },
         def::{NSTDByte, NSTDErrorCode},
         range::NSTDURange,
         slice::{
-            nstd_core_slice_as_ptr, nstd_core_slice_len, nstd_core_slice_mut_as_ptr_const,
+            nstd_core_slice_as_ptr, nstd_core_slice_len, nstd_core_slice_mut_as_ptr,
             nstd_core_slice_mut_len, nstd_core_slice_mut_new, nstd_core_slice_mut_stride,
             nstd_core_slice_new, nstd_core_slice_stride, NSTDSlice, NSTDSliceMut,
         },
@@ -44,8 +44,10 @@ macro_rules! gen_to_primitive {
 #[repr(C)]
 #[derive(Clone, Copy, Debug, Hash)]
 pub struct NSTDStr {
-    /// A view into the UTF-8 encoded buffer.
-    bytes: NSTDSlice,
+    /// A raw pointer to the string's data.
+    ptr: *const NSTDByte,
+    /// The number of bytes in the string.
+    len: NSTDUInt,
 }
 impl NSTDStr {
     /// Creates a Rust string slice from this [NSTDStr].
@@ -55,7 +57,8 @@ impl NSTDStr {
     /// This string slice's data must remain valid while the returned string slice is in use.
     #[inline]
     pub(crate) unsafe fn as_str(&self) -> &str {
-        core::str::from_utf8_unchecked(self.bytes.as_slice())
+        let bytes = core::slice::from_raw_parts(self.ptr, self.len);
+        core::str::from_utf8_unchecked(bytes)
     }
 }
 
@@ -72,13 +75,16 @@ impl NSTDStr {
 /// # Panics
 ///
 /// This function will panic if `cstr`'s data is not valid UTF-8.
-#[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_str_from_cstr(cstr: &NSTDCStr) -> NSTDStr {
-    let bytes = nstd_core_cstr_as_bytes(cstr);
+    let ptr = nstd_core_cstr_as_ptr(cstr).cast();
+    let len = nstd_core_cstr_len(cstr);
     // SAFETY: The returned string slice is already unsafe to access.
-    core::str::from_utf8(unsafe { bytes.as_slice() }).expect("Invalid UTF-8 bytes");
-    NSTDStr { bytes }
+    unsafe {
+        let bytes = core::slice::from_raw_parts(ptr, len);
+        core::str::from_utf8(bytes).expect("Invalid UTF-8 bytes");
+        NSTDStr { ptr, len }
+    }
 }
 
 /// Creates a new instance of `NSTDStr` from a C string slice.
@@ -98,9 +104,9 @@ pub extern "C" fn nstd_core_str_from_cstr(cstr: &NSTDCStr) -> NSTDStr {
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_from_cstr_unchecked(cstr: &NSTDCStr) -> NSTDStr {
-    NSTDStr {
-        bytes: nstd_core_cstr_as_bytes(cstr),
-    }
+    let ptr = nstd_core_cstr_as_ptr(cstr).cast();
+    let len = nstd_core_cstr_len(cstr);
+    NSTDStr { ptr, len }
 }
 
 /// Creates a string slice from raw bytes.
@@ -121,10 +127,9 @@ pub unsafe extern "C" fn nstd_core_str_from_cstr_unchecked(cstr: &NSTDCStr) -> N
 pub extern "C" fn nstd_core_str_from_bytes(bytes: &NSTDSlice) -> NSTDStr {
     // SAFETY: The returned string slice is already unsafe to access.
     core::str::from_utf8(unsafe { bytes.as_slice() }).expect("Invalid UTF-8 bytes");
-    let stride = nstd_core_slice_stride(bytes);
-    NSTDStr {
-        bytes: nstd_core_slice_new(bytes.ptr.raw, stride, bytes.len),
-    }
+    let ptr = nstd_core_slice_as_ptr(bytes).cast();
+    let len = nstd_core_slice_len(bytes);
+    NSTDStr { ptr, len }
 }
 
 /// Creates a string slice from raw bytes, without checking for UTF-8.
@@ -148,11 +153,10 @@ pub extern "C" fn nstd_core_str_from_bytes(bytes: &NSTDSlice) -> NSTDStr {
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_from_bytes_unchecked(bytes: &NSTDSlice) -> NSTDStr {
-    let stride = nstd_core_slice_stride(bytes);
-    assert!(stride == 1);
-    NSTDStr {
-        bytes: nstd_core_slice_new(bytes.ptr.raw, stride, bytes.len),
-    }
+    assert!(nstd_core_slice_stride(bytes) == 1);
+    let ptr = nstd_core_slice_as_ptr(bytes).cast();
+    let len = nstd_core_slice_len(bytes);
+    NSTDStr { ptr, len }
 }
 
 /// Returns an immutable byte slice over `str`'s data.
@@ -167,7 +171,7 @@ pub unsafe extern "C" fn nstd_core_str_from_bytes_unchecked(bytes: &NSTDSlice) -
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_str_as_bytes(str: &NSTDStr) -> NSTDSlice {
-    nstd_core_slice_new(str.bytes.ptr.raw.cast(), 1, str.bytes.len)
+    nstd_core_slice_new(str.ptr.cast(), 1, str.len)
 }
 
 /// Returns a raw pointer to a string slice's memory.
@@ -182,7 +186,7 @@ pub extern "C" fn nstd_core_str_as_bytes(str: &NSTDStr) -> NSTDSlice {
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_str_as_ptr(str: &NSTDStr) -> *const NSTDByte {
-    nstd_core_slice_as_ptr(&str.bytes).cast()
+    str.ptr
 }
 
 /// Returns the number of Unicode characters in a string slice.
@@ -221,7 +225,7 @@ pub unsafe extern "C" fn nstd_core_str_len(str: &NSTDStr) -> NSTDUInt {
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_str_byte_len(str: &NSTDStr) -> NSTDUInt {
-    nstd_core_slice_len(&str.bytes)
+    str.len
 }
 
 /// Gets the `NSTDUnichar` at index `pos` in `str`.
@@ -282,11 +286,10 @@ pub unsafe extern "C" fn nstd_core_str_get_char(str: &NSTDStr, pos: NSTDUInt) ->
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_str_substr(str: &NSTDStr, range: NSTDURange) -> NSTDStr {
     // Make sure the range is valid for the bounds of `str`.
-    assert!(range.end <= str.bytes.len);
-    assert!(range.start <= range.end);
+    assert!(range.start <= range.end && range.end <= str.len);
     // Create the byte slice with `range` and use it to create the new string slice.
     // SAFETY: The returned string slice is already unsafe to access.
-    let start = unsafe { str.bytes.ptr.raw.add(range.start) };
+    let start = unsafe { str.ptr.add(range.start).cast() };
     let bytes = nstd_core_slice_new(start, 1, range.end - range.start);
     nstd_core_str_from_bytes(&bytes)
 }
@@ -488,8 +491,10 @@ gen_to_primitive!(
 #[repr(C)]
 #[derive(Clone, Copy, Debug, Hash)]
 pub struct NSTDStrMut {
-    /// A view into the UTF-8 encoded buffer.
-    bytes: NSTDSliceMut,
+    /// A raw pointer to the string's data.
+    ptr: *mut NSTDByte,
+    /// The number of bytes in the string.
+    len: NSTDUInt,
 }
 impl NSTDStrMut {
     /// Creates a Rust string slice from this [NSTDStrMut].
@@ -499,7 +504,8 @@ impl NSTDStrMut {
     /// This string slice's data must remain valid while the returned string slice is in use.
     #[inline]
     unsafe fn as_str(&self) -> &str {
-        core::str::from_utf8_unchecked(self.bytes.as_slice())
+        let bytes = core::slice::from_raw_parts(self.ptr, self.len);
+        core::str::from_utf8_unchecked(bytes)
     }
 }
 
@@ -516,15 +522,16 @@ impl NSTDStrMut {
 /// # Panics
 ///
 /// This function will panic if `cstr`'s data is not valid UTF-8.
-#[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_str_mut_from_cstr(cstr: &mut NSTDCStrMut) -> NSTDStrMut {
-    let ptr = nstd_core_cstr_mut_as_ptr(cstr);
+    let ptr = nstd_core_cstr_mut_as_ptr(cstr).cast();
     let len = nstd_core_cstr_mut_len(cstr);
-    let bytes = nstd_core_slice_mut_new(ptr.cast(), 1, len);
     // SAFETY: The returned string slice is already unsafe to access.
-    core::str::from_utf8(unsafe { bytes.as_slice() }).expect("Invalid UTF-8 bytes");
-    NSTDStrMut { bytes }
+    unsafe {
+        let bytes = core::slice::from_raw_parts(ptr, len);
+        core::str::from_utf8(bytes).expect("Invalid UTF-8 bytes");
+        NSTDStrMut { ptr, len }
+    }
 }
 
 /// Creates a new instance of `NSTDStrMut` from a C string slice.
@@ -548,9 +555,7 @@ pub unsafe extern "C" fn nstd_core_str_mut_from_cstr_unchecked(
 ) -> NSTDStrMut {
     let ptr = nstd_core_cstr_mut_as_ptr(cstr).cast();
     let len = nstd_core_cstr_mut_len(cstr);
-    NSTDStrMut {
-        bytes: nstd_core_slice_mut_new(ptr, 1, len),
-    }
+    NSTDStrMut { ptr, len }
 }
 
 /// Creates a string slice from raw bytes.
@@ -571,10 +576,9 @@ pub unsafe extern "C" fn nstd_core_str_mut_from_cstr_unchecked(
 pub extern "C" fn nstd_core_str_mut_from_bytes(bytes: &mut NSTDSliceMut) -> NSTDStrMut {
     // SAFETY: The returned string slice is already unsafe to access.
     core::str::from_utf8(unsafe { bytes.as_slice() }).expect("Invalid UTF-8 bytes");
-    let stride = nstd_core_slice_mut_stride(bytes);
-    NSTDStrMut {
-        bytes: nstd_core_slice_mut_new(bytes.ptr.raw, stride, bytes.len),
-    }
+    let ptr = nstd_core_slice_mut_as_ptr(bytes).cast();
+    let len = nstd_core_slice_mut_len(bytes);
+    NSTDStrMut { ptr, len }
 }
 
 /// Creates a string slice from raw bytes, without checking for UTF-8.
@@ -600,11 +604,10 @@ pub extern "C" fn nstd_core_str_mut_from_bytes(bytes: &mut NSTDSliceMut) -> NSTD
 pub unsafe extern "C" fn nstd_core_str_mut_from_bytes_unchecked(
     bytes: &mut NSTDSliceMut,
 ) -> NSTDStrMut {
-    let stride = nstd_core_slice_mut_stride(bytes);
-    assert!(stride == 1);
-    NSTDStrMut {
-        bytes: nstd_core_slice_mut_new(bytes.ptr.raw, stride, bytes.len),
-    }
+    assert!(nstd_core_slice_mut_stride(bytes) == 1);
+    let ptr = nstd_core_slice_mut_as_ptr(bytes).cast();
+    let len = nstd_core_slice_mut_len(bytes);
+    NSTDStrMut { ptr, len }
 }
 
 /// Creates an immutable version of a mutable string slice.
@@ -636,7 +639,7 @@ pub extern "C" fn nstd_core_str_mut_as_const(str: &NSTDStrMut) -> NSTDStr {
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_str_mut_as_bytes(str: &NSTDStrMut) -> NSTDSlice {
-    nstd_core_slice_new(str.bytes.ptr.raw.cast(), 1, str.bytes.len)
+    nstd_core_slice_new(str.ptr.cast(), 1, str.len)
 }
 
 /// Returns an immutable raw pointer to a string slice's memory.
@@ -651,7 +654,7 @@ pub extern "C" fn nstd_core_str_mut_as_bytes(str: &NSTDStrMut) -> NSTDSlice {
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_str_mut_as_ptr(str: &NSTDStrMut) -> *const NSTDByte {
-    nstd_core_slice_mut_as_ptr_const(&str.bytes).cast()
+    str.ptr
 }
 
 /// Returns the number of Unicode characters in a string slice.
@@ -690,7 +693,7 @@ pub unsafe extern "C" fn nstd_core_str_mut_len(str: &NSTDStrMut) -> NSTDUInt {
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_str_mut_byte_len(str: &NSTDStrMut) -> NSTDUInt {
-    nstd_core_slice_mut_len(&str.bytes)
+    str.len
 }
 
 /// Gets the `NSTDUnichar` at index `pos` in `str`.
@@ -754,11 +757,10 @@ pub unsafe extern "C" fn nstd_core_str_mut_get_char(
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_str_mut_substr(str: &mut NSTDStrMut, range: NSTDURange) -> NSTDStrMut {
     // Make sure the range is valid for the bounds of `str`.
-    assert!(range.end <= str.bytes.len);
-    assert!(range.start <= range.end);
+    assert!(range.start <= range.end && range.end <= str.len);
     // Create the byte slice with `range` and use it to create the new string slice.
     // SAFETY: The returned string slice is already unsafe to access.
-    let start = unsafe { str.bytes.ptr.raw.add(range.start) };
+    let start = unsafe { str.ptr.add(range.start).cast() };
     let mut bytes = nstd_core_slice_mut_new(start, 1, range.end - range.start);
     nstd_core_str_mut_from_bytes(&mut bytes)
 }
