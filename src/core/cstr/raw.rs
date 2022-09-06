@@ -30,20 +30,7 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_len(cstr: *const NSTDChar) -> NSTDUI
     {
         use core::arch::asm;
         let i;
-        asm!(
-            // Initialize `i` to zero.
-            "xor {i}, {i}",
-            // Iterate through each character, incrementing `cstr` & `i`, until the null byte is
-            // reached.
-            "2:",
-            "cmp byte ptr [{cstr} + {i}], 0",
-            "je 3f",
-            "inc {i}",
-            "jne 2b",
-            "3:",
-            cstr = in(reg) cstr,
-            i = out(reg) i,
-        );
+        asm!(include_str!("raw/len.asm"), cstr = in(reg) cstr, i = out(reg) i);
         i
     }
 }
