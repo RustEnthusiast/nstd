@@ -868,3 +868,46 @@ gen_div_ceil!(
     nstd_core_math_div_ceil_u64,
     NSTDUInt64
 );
+
+/// Generates the `div_floor` functions.
+macro_rules! gen_div_floor {
+    ($name: ident, $T: ty) => {
+        /// Divides two numbers and rounds the result down to the next integer.
+        ///
+        /// # Parameters:
+        ///
+        #[doc = concat!(" - `", stringify!($T), " x` - The first value.")]
+        ///
+        #[doc = concat!(" - `", stringify!($T), " y` - The second value.")]
+        ///
+        /// # Returns
+        ///
+        #[doc = concat!(" `", stringify!($T), " v` - The divided value, rounded down.")]
+        ///
+        /// # Panics
+        ///
+        /// This operation will panic if `y` is 0.
+        #[inline]
+        #[cfg_attr(feature = "clib", no_mangle)]
+        #[allow(unused_comparisons)]
+        pub extern "C" fn $name(x: $T, y: $T) -> $T {
+            let d = x / y;
+            let r = x % y;
+            if (r > 0 && y < 0) || (r < 0 && y > 0) {
+                d - 1
+            } else {
+                d
+            }
+        }
+    };
+}
+gen_div_floor!(nstd_core_math_div_floor_int, NSTDInt);
+gen_div_floor!(nstd_core_math_div_floor_uint, NSTDUInt);
+gen_div_floor!(nstd_core_math_div_floor_i8, NSTDInt8);
+gen_div_floor!(nstd_core_math_div_floor_u8, NSTDUInt8);
+gen_div_floor!(nstd_core_math_div_floor_i16, NSTDInt16);
+gen_div_floor!(nstd_core_math_div_floor_u16, NSTDUInt16);
+gen_div_floor!(nstd_core_math_div_floor_i32, NSTDInt32);
+gen_div_floor!(nstd_core_math_div_floor_u32, NSTDUInt32);
+gen_div_floor!(nstd_core_math_div_floor_i64, NSTDInt64);
+gen_div_floor!(nstd_core_math_div_floor_u64, NSTDUInt64);
