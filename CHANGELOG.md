@@ -1,5 +1,6 @@
 # TBD
 ### `nstd.core`
+- Added `nstd_core_math_pow_*`.
 - Added `nstd_core_math_abs_*`.
 
 # 0.1.3

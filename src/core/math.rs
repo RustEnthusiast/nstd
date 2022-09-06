@@ -182,6 +182,251 @@ gen_abs!(
     NSTDInt64
 );
 
+/// Generates the `pow` functions.
+macro_rules! gen_pow {
+    (
+        $(#[$meta:meta])*
+        $name: ident, $T: ty
+    ) => {
+        $(#[$meta])*
+        #[inline]
+        #[cfg_attr(feature = "clib", no_mangle)]
+        pub extern "C" fn $name(x: $T, exp: NSTDUInt32) -> $T {
+            x.pow(exp)
+        }
+    };
+}
+gen_pow!(
+    /// Raises the value `x` to the power of `exp`
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDInt x` - The value.
+    ///
+    /// - `NSTDUInt32 exp` - The exponent.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDInt pow` - `x` raised to the power of `exp`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_pow_int;
+    /// assert!(nstd_core_math_pow_int(2, 3) == 8);
+    /// assert!(nstd_core_math_pow_int(4, 5) == 1024);
+    /// ```
+    nstd_core_math_pow_int,
+    NSTDInt
+);
+gen_pow!(
+    /// Raises the value `x` to the power of `exp`
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDUInt x` - The value.
+    ///
+    /// - `NSTDUInt32 exp` - The exponent.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDUInt pow` - `x` raised to the power of `exp`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_pow_uint;
+    /// assert!(nstd_core_math_pow_uint(2, 3) == 8);
+    /// assert!(nstd_core_math_pow_uint(4, 5) == 1024);
+    /// ```
+    nstd_core_math_pow_uint,
+    NSTDUInt
+);
+gen_pow!(
+    /// Raises the value `x` to the power of `exp`
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDInt8 x` - The value.
+    ///
+    /// - `NSTDUInt32 exp` - The exponent.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDInt8 pow` - `x` raised to the power of `exp`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_pow_i8;
+    /// assert!(nstd_core_math_pow_i8(2, 3) == 8);
+    /// assert!(nstd_core_math_pow_i8(2, 5) == 32);
+    /// ```
+    nstd_core_math_pow_i8,
+    NSTDInt8
+);
+gen_pow!(
+    /// Raises the value `x` to the power of `exp`
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDUInt8 x` - The value.
+    ///
+    /// - `NSTDUInt32 exp` - The exponent.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDUInt8 pow` - `x` raised to the power of `exp`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_pow_u8;
+    /// assert!(nstd_core_math_pow_u8(2, 3) == 8);
+    /// assert!(nstd_core_math_pow_u8(2, 5) == 32);
+    /// ```
+    nstd_core_math_pow_u8,
+    NSTDUInt8
+);
+gen_pow!(
+    /// Raises the value `x` to the power of `exp`
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDInt16 x` - The value.
+    ///
+    /// - `NSTDUInt32 exp` - The exponent.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDInt16 pow` - `x` raised to the power of `exp`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_pow_i16;
+    /// assert!(nstd_core_math_pow_i16(2, 3) == 8);
+    /// assert!(nstd_core_math_pow_i16(4, 5) == 1024);
+    /// ```
+    nstd_core_math_pow_i16,
+    NSTDInt16
+);
+gen_pow!(
+    /// Raises the value `x` to the power of `exp`
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDUInt16 x` - The value.
+    ///
+    /// - `NSTDUInt32 exp` - The exponent.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDUInt16 pow` - `x` raised to the power of `exp`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_pow_u16;
+    /// assert!(nstd_core_math_pow_u16(2, 3) == 8);
+    /// assert!(nstd_core_math_pow_u16(4, 5) == 1024);
+    /// ```
+    nstd_core_math_pow_u16,
+    NSTDUInt16
+);
+gen_pow!(
+    /// Raises the value `x` to the power of `exp`
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDInt32 x` - The value.
+    ///
+    /// - `NSTDUInt32 exp` - The exponent.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDInt32 pow` - `x` raised to the power of `exp`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_pow_i32;
+    /// assert!(nstd_core_math_pow_i32(2, 3) == 8);
+    /// assert!(nstd_core_math_pow_i32(4, 5) == 1024);
+    /// ```
+    nstd_core_math_pow_i32,
+    NSTDInt32
+);
+gen_pow!(
+    /// Raises the value `x` to the power of `exp`
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDUInt32 x` - The value.
+    ///
+    /// - `NSTDUInt32 exp` - The exponent.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDUInt32 pow` - `x` raised to the power of `exp`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_pow_u32;
+    /// assert!(nstd_core_math_pow_u32(2, 3) == 8);
+    /// assert!(nstd_core_math_pow_u32(4, 5) == 1024);
+    /// ```
+    nstd_core_math_pow_u32,
+    NSTDUInt32
+);
+gen_pow!(
+    /// Raises the value `x` to the power of `exp`
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDInt64 x` - The value.
+    ///
+    /// - `NSTDUInt32 exp` - The exponent.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDInt64 pow` - `x` raised to the power of `exp`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_pow_i64;
+    /// assert!(nstd_core_math_pow_i64(2, 3) == 8);
+    /// assert!(nstd_core_math_pow_i64(4, 5) == 1024);
+    /// ```
+    nstd_core_math_pow_i64,
+    NSTDInt64
+);
+gen_pow!(
+    /// Raises the value `x` to the power of `exp`
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDUInt64 x` - The value.
+    ///
+    /// - `NSTDUInt32 exp` - The exponent.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDUInt64 pow` - `x` raised to the power of `exp`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_pow_u64;
+    /// assert!(nstd_core_math_pow_u64(2, 3) == 8);
+    /// assert!(nstd_core_math_pow_u64(4, 5) == 1024);
+    /// ```
+    nstd_core_math_pow_u64,
+    NSTDUInt64
+);
+
 /// Generates the `clamp` functions.
 macro_rules! gen_clamp {
     (

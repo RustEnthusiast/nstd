@@ -135,6 +135,207 @@ NSTDAPI NSTDInt32 nstd_core_math_abs_i32(NSTDInt32 x);
 /// ```
 NSTDAPI NSTDInt64 nstd_core_math_abs_i64(NSTDInt64 x);
 
+/// Raises the value `x` to the power of `exp`
+///
+/// # Parameters:
+///
+/// - `NSTDInt x` - The value.
+///
+/// - `NSTDUInt32 exp` - The exponent.
+///
+/// # Returns
+///
+/// `NSTDInt pow` - `x` raised to the power of `exp`.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::math::nstd_core_math_pow_int;
+/// assert!(nstd_core_math_pow_int(2, 3) == 8);
+/// assert!(nstd_core_math_pow_int(4, 5) == 1024);
+/// ```
+NSTDAPI NSTDInt nstd_core_math_pow_int(NSTDInt x, NSTDUInt32 exp);
+/// Raises the value `x` to the power of `exp`
+///
+/// # Parameters:
+///
+/// - `NSTDUInt x` - The value.
+///
+/// - `NSTDUInt32 exp` - The exponent.
+///
+/// # Returns
+///
+/// `NSTDUInt pow` - `x` raised to the power of `exp`.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::math::nstd_core_math_pow_uint;
+/// assert!(nstd_core_math_pow_uint(2, 3) == 8);
+/// assert!(nstd_core_math_pow_uint(4, 5) == 1024);
+/// ```
+NSTDAPI NSTDUInt nstd_core_math_pow_uint(NSTDUInt x, NSTDUInt32 exp);
+/// Raises the value `x` to the power of `exp`
+///
+/// # Parameters:
+///
+/// - `NSTDInt8 x` - The value.
+///
+/// - `NSTDUInt32 exp` - The exponent.
+///
+/// # Returns
+///
+/// `NSTDInt8 pow` - `x` raised to the power of `exp`.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::math::nstd_core_math_pow_i8;
+/// assert!(nstd_core_math_pow_i8(2, 3) == 8);
+/// assert!(nstd_core_math_pow_i8(2, 5) == 32);
+/// ```
+NSTDAPI NSTDInt8 nstd_core_math_pow_i8(NSTDInt8 x, NSTDUInt32 exp);
+/// Raises the value `x` to the power of `exp`
+///
+/// # Parameters:
+///
+/// - `NSTDUInt8 x` - The value.
+///
+/// - `NSTDUInt32 exp` - The exponent.
+///
+/// # Returns
+///
+/// `NSTDUInt8 pow` - `x` raised to the power of `exp`.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::math::nstd_core_math_pow_u8;
+/// assert!(nstd_core_math_pow_u8(2, 3) == 8);
+/// assert!(nstd_core_math_pow_u8(2, 5) == 32);
+/// ```
+NSTDAPI NSTDUInt8 nstd_core_math_pow_u8(NSTDUInt8 x, NSTDUInt32 exp);
+/// Raises the value `x` to the power of `exp`
+///
+/// # Parameters:
+///
+/// - `NSTDInt16 x` - The value.
+///
+/// - `NSTDUInt32 exp` - The exponent.
+///
+/// # Returns
+///
+/// `NSTDInt16 pow` - `x` raised to the power of `exp`.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::math::nstd_core_math_pow_i16;
+/// assert!(nstd_core_math_pow_i16(2, 3) == 8);
+/// assert!(nstd_core_math_pow_i16(2, 5) == 32);
+/// ```
+NSTDAPI NSTDInt16 nstd_core_math_pow_i16(NSTDInt16 x, NSTDUInt32 exp);
+/// Raises the value `x` to the power of `exp`
+///
+/// # Parameters:
+///
+/// - `NSTDUInt16 x` - The value.
+///
+/// - `NSTDUInt32 exp` - The exponent.
+///
+/// # Returns
+///
+/// `NSTDUInt16 pow` - `x` raised to the power of `exp`.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::math::nstd_core_math_pow_u16;
+/// assert!(nstd_core_math_pow_u16(2, 3) == 8);
+/// assert!(nstd_core_math_pow_u16(2, 5) == 32);
+/// ```
+NSTDAPI NSTDUInt16 nstd_core_math_pow_u16(NSTDUInt16 x, NSTDUInt32 exp);
+/// Raises the value `x` to the power of `exp`
+///
+/// # Parameters:
+///
+/// - `NSTDInt32 x` - The value.
+///
+/// - `NSTDUInt32 exp` - The exponent.
+///
+/// # Returns
+///
+/// `NSTDInt32 pow` - `x` raised to the power of `exp`.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::math::nstd_core_math_pow_i32;
+/// assert!(nstd_core_math_pow_i32(2, 3) == 8);
+/// assert!(nstd_core_math_pow_i32(2, 5) == 32);
+/// ```
+NSTDAPI NSTDInt32 nstd_core_math_pow_i32(NSTDInt32 x, NSTDUInt32 exp);
+/// Raises the value `x` to the power of `exp`
+///
+/// # Parameters:
+///
+/// - `NSTDUInt32 x` - The value.
+///
+/// - `NSTDUInt32 exp` - The exponent.
+///
+/// # Returns
+///
+/// `NSTDUInt32 pow` - `x` raised to the power of `exp`.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::math::nstd_core_math_pow_u32;
+/// assert!(nstd_core_math_pow_u32(2, 3) == 8);
+/// assert!(nstd_core_math_pow_u32(2, 5) == 32);
+/// ```
+NSTDAPI NSTDUInt32 nstd_core_math_pow_u32(NSTDUInt32 x, NSTDUInt32 exp);
+/// Raises the value `x` to the power of `exp`
+///
+/// # Parameters:
+///
+/// - `NSTDInt64 x` - The value.
+///
+/// - `NSTDUInt32 exp` - The exponent.
+///
+/// # Returns
+///
+/// `NSTDInt64 pow` - `x` raised to the power of `exp`.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::math::nstd_core_math_pow_i64;
+/// assert!(nstd_core_math_pow_i64(2, 3) == 8);
+/// assert!(nstd_core_math_pow_i64(2, 5) == 32);
+/// ```
+NSTDAPI NSTDInt64 nstd_core_math_pow_i64(NSTDInt64 x, NSTDUInt32 exp);
+/// Raises the value `x` to the power of `exp`
+///
+/// # Parameters:
+///
+/// - `NSTDUInt64 x` - The value.
+///
+/// - `NSTDUInt32 exp` - The exponent.
+///
+/// # Returns
+///
+/// `NSTDUInt64 pow` - `x` raised to the power of `exp`.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::math::nstd_core_math_pow_u64;
+/// assert!(nstd_core_math_pow_u64(2, 3) == 8);
+/// assert!(nstd_core_math_pow_u64(2, 5) == 32);
+/// ```
+NSTDAPI NSTDUInt64 nstd_core_math_pow_u64(NSTDUInt64 x, NSTDUInt32 exp);
+
 /// Clamps the value `x` to the bounds `min` and `max`.
 ///
 /// # Parameters:
