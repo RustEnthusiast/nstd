@@ -1,3 +1,7 @@
+# TBD
+### `nstd.core`
+- Added `nstd_core_math_abs_*`.
+
 # 0.1.3
 ### `nstd`
 - Added `extern "C"` to `NSTDAPI` (removes `NSTDCPP[START|END]`).

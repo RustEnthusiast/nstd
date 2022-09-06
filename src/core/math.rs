@@ -62,6 +62,126 @@ pub extern "C" fn nstd_core_math_rad_f64(deg: NSTDFloat64) -> NSTDFloat64 {
     deg.to_radians()
 }
 
+/// Generates the `abs` functions.
+macro_rules! gen_abs {
+    (
+        $(#[$meta:meta])*
+        $name: ident, $T: ty
+    ) => {
+        $(#[$meta])*
+        #[inline]
+        #[cfg_attr(feature = "clib", no_mangle)]
+        pub extern "C" fn $name(x: $T) -> $T {
+            x.abs()
+        }
+    };
+}
+gen_abs!(
+    /// Computes the absolute (positive) value of `x`.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDInt x` - The value.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDInt abs` - The absolute value of `x`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_abs_int;
+    /// assert!(nstd_core_math_abs_int(10) == 10);
+    /// assert!(nstd_core_math_abs_int(-10) == 10);
+    /// ```
+    nstd_core_math_abs_int,
+    NSTDInt
+);
+gen_abs!(
+    /// Computes the absolute (positive) value of `x`.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDInt8 x` - The value.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDInt8 abs` - The absolute value of `x`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_abs_i8;
+    /// assert!(nstd_core_math_abs_i8(10) == 10);
+    /// assert!(nstd_core_math_abs_i8(-10) == 10);
+    /// ```
+    nstd_core_math_abs_i8,
+    NSTDInt8
+);
+gen_abs!(
+    /// Computes the absolute (positive) value of `x`.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDInt16 x` - The value.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDInt16 abs` - The absolute value of `x`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_abs_i16;
+    /// assert!(nstd_core_math_abs_i16(10) == 10);
+    /// assert!(nstd_core_math_abs_i16(-10) == 10);
+    /// ```
+    nstd_core_math_abs_i16,
+    NSTDInt16
+);
+gen_abs!(
+    /// Computes the absolute (positive) value of `x`.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDInt32 x` - The value.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDInt32 abs` - The absolute value of `x`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_abs_i32;
+    /// assert!(nstd_core_math_abs_i32(10) == 10);
+    /// assert!(nstd_core_math_abs_i32(-10) == 10);
+    /// ```
+    nstd_core_math_abs_i32,
+    NSTDInt32
+);
+gen_abs!(
+    /// Computes the absolute (positive) value of `x`.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDInt64 x` - The value.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDInt64 abs` - The absolute value of `x`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_abs_i64;
+    /// assert!(nstd_core_math_abs_i64(10) == 10);
+    /// assert!(nstd_core_math_abs_i64(-10) == 10);
+    /// ```
+    nstd_core_math_abs_i64,
+    NSTDInt64
+);
+
 /// Generates the `clamp` functions.
 macro_rules! gen_clamp {
     (

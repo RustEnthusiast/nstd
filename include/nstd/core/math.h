@@ -44,6 +44,97 @@ NSTDAPI NSTDFloat32 nstd_core_math_rad_f32(NSTDFloat32 deg);
 /// `NSTDFloat64 rad` - The degrees value converted to radians.
 NSTDAPI NSTDFloat64 nstd_core_math_rad_f64(NSTDFloat64 deg);
 
+/// Computes the absolute (positive) value of `x`.
+///
+/// # Parameters:
+///
+/// - `NSTDInt x` - The value.
+///
+/// # Returns
+///
+/// `NSTDInt abs` - The absolute value of `x`.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::math::nstd_core_math_abs_int;
+/// assert!(nstd_core_math_abs_int(10) == 10);
+/// assert!(nstd_core_math_abs_int(-10) == 10);
+/// ```
+NSTDAPI NSTDInt nstd_core_math_abs_int(NSTDInt x);
+/// Computes the absolute (positive) value of `x`.
+///
+/// # Parameters:
+///
+/// - `NSTDInt8 x` - The value.
+///
+/// # Returns
+///
+/// `NSTDInt8 abs` - The absolute value of `x`.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::math::nstd_core_math_abs_i8;
+/// assert!(nstd_core_math_abs_i8(10) == 10);
+/// assert!(nstd_core_math_abs_i8(-10) == 10);
+/// ```
+NSTDAPI NSTDInt8 nstd_core_math_abs_i8(NSTDInt8 x);
+/// Computes the absolute (positive) value of `x`.
+///
+/// # Parameters:
+///
+/// - `NSTDInt16 x` - The value.
+///
+/// # Returns
+///
+/// `NSTDInt16 abs` - The absolute value of `x`.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::math::nstd_core_math_abs_i16;
+/// assert!(nstd_core_math_abs_i16(10) == 10);
+/// assert!(nstd_core_math_abs_i16(-10) == 10);
+/// ```
+NSTDAPI NSTDInt16 nstd_core_math_abs_i16(NSTDInt16 x);
+/// Computes the absolute (positive) value of `x`.
+///
+/// # Parameters:
+///
+/// - `NSTDInt32 x` - The value.
+///
+/// # Returns
+///
+/// `NSTDInt32 abs` - The absolute value of `x`.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::math::nstd_core_math_abs_i32;
+/// assert!(nstd_core_math_abs_i32(10) == 10);
+/// assert!(nstd_core_math_abs_i32(-10) == 10);
+/// ```
+NSTDAPI NSTDInt32 nstd_core_math_abs_i32(NSTDInt32 x);
+/// Computes the absolute (positive) value of `x`.
+///
+/// # Parameters:
+///
+/// - `NSTDInt64 x` - The value.
+///
+/// # Returns
+///
+/// `NSTDInt64 abs` - The absolute value of `x`.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::math::nstd_core_math_abs_i64;
+/// assert!(nstd_core_math_abs_i64(10) == 10);
+/// assert!(nstd_core_math_abs_i64(-10) == 10);
+/// ```
+NSTDAPI NSTDInt64 nstd_core_math_abs_i64(NSTDInt64 x);
+
 /// Clamps the value `x` to the bounds `min` and `max`.
 ///
 /// # Parameters:
