@@ -15,6 +15,15 @@ use crate::{core::def::NSTDChar, NSTDBool, NSTDUInt, NSTD_FALSE, NSTD_TRUE};
 ///
 /// This function makes access raw pointer data, which can cause undefined behavior in the event
 /// that `cstr`'s data is invalid.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::cstr::raw::nstd_core_cstr_raw_len;
+///
+/// let cstr = b"Hello, world!\0";
+/// assert!(unsafe { nstd_core_cstr_raw_len(cstr.as_ptr().cast()) } == 13);
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_cstr_raw_len(cstr: *const NSTDChar) -> NSTDUInt {
@@ -49,6 +58,15 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_len(cstr: *const NSTDChar) -> NSTDUI
 ///
 /// This function makes access raw pointer data, which can cause undefined behavior in the event
 /// that `cstr`'s data is invalid.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::cstr::raw::nstd_core_cstr_raw_len_with_null;
+///
+/// let cstr = b"Hello, world!\0";
+/// assert!(unsafe { nstd_core_cstr_raw_len_with_null(cstr.as_ptr().cast()) } == 14);
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_cstr_raw_len_with_null(cstr: *const NSTDChar) -> NSTDUInt {
@@ -71,6 +89,17 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_len_with_null(cstr: *const NSTDChar)
 ///
 /// This function makes access raw pointer data, which can cause undefined behavior in the event
 /// that either `cstr1` or `cstr2`'s data is invalid.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::{core::cstr::raw::nstd_core_cstr_raw_compare, NSTD_FALSE};
+///
+/// let cstr1 = b"Hello, world!\0".as_ptr().cast();
+/// let cstr2 = b"Hello world!\0".as_ptr().cast();
+///
+/// assert!(unsafe { nstd_core_cstr_raw_compare(cstr1, cstr2) } == NSTD_FALSE);
+/// ```
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_cstr_raw_compare(
     mut cstr1: *const NSTDChar,
@@ -109,6 +138,18 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_compare(
 ///
 /// This function reads from/writes to raw pointer data, which can cause undefined behavior in the
 /// event that either `dest` or `src`'s data is invalid.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::{cstr::raw::nstd_core_cstr_raw_copy, def::NSTDChar};
+///
+/// let cstr = b"Hello, world!\0";
+/// let mut buffer = [0u8; 14];
+///
+/// unsafe { nstd_core_cstr_raw_copy(buffer.as_mut_ptr().cast(), cstr.as_ptr().cast()) };
+/// assert!(&buffer == cstr);
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_cstr_raw_copy(
@@ -139,6 +180,19 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_copy(
 ///
 /// This function reads from/writes to raw pointer data, which can cause undefined behavior in the
 /// event that either `dest` or `src`'s data is invalid.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::{cstr::raw::nstd_core_cstr_raw_copy_with_null, def::NSTDChar};
+///
+/// let cstr = b"Hello, world!\0";
+/// let mut buffer = [u8::MAX; 14];
+///
+/// let buf_ptr = buffer.as_mut_ptr().cast();
+/// unsafe { nstd_core_cstr_raw_copy_with_null(buf_ptr, cstr.as_ptr().cast()) };
+/// assert!(&buffer == cstr);
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_cstr_raw_copy_with_null(
