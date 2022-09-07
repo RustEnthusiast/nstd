@@ -52,10 +52,19 @@ pub unsafe extern "C" fn nstd_core_mem_compare(
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_mem_zero(buf: *mut NSTDByte, size: NSTDUInt) {
-    let mut i = 0;
-    while i < size {
-        *buf.add(i) = 0;
-        i += 1;
+    #[cfg(not(any(target_arch = "x86", target_arch = "x86_64")))]
+    {
+        let mut i = 0;
+        while i < size {
+            *buf.add(i) = 0;
+            i += 1;
+        }
+    }
+    #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
+    {
+        use core::arch::asm;
+        let i = 0usize;
+        asm!(include_str!("mem/zero.asm"), buf = in(reg) buf, size = in(reg) size, i = in(reg) i);
     }
 }
 
