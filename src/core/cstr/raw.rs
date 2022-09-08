@@ -27,7 +27,7 @@ use crate::{core::def::NSTDChar, NSTDBool, NSTDUInt, NSTD_FALSE, NSTD_TRUE};
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_cstr_raw_len(cstr: *const NSTDChar) -> NSTDUInt {
-    #[cfg(not(any(target_arch = "x86", target_arch = "x86_64")))]
+    #[cfg(not(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64"))))]
     {
         let mut i = 0;
         while *cstr.add(i) != 0 {
@@ -35,7 +35,7 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_len(cstr: *const NSTDChar) -> NSTDUI
         }
         i
     }
-    #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
+    #[cfg(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64")))]
     {
         use core::arch::asm;
         let i;

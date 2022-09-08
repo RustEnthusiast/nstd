@@ -52,7 +52,7 @@ pub unsafe extern "C" fn nstd_core_mem_compare(
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_mem_zero(buf: *mut NSTDByte, size: NSTDUInt) {
-    #[cfg(not(any(target_arch = "x86", target_arch = "x86_64")))]
+    #[cfg(not(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64"))))]
     {
         let mut i = 0;
         while i < size {
@@ -60,7 +60,7 @@ pub unsafe extern "C" fn nstd_core_mem_zero(buf: *mut NSTDByte, size: NSTDUInt) 
             i += 1;
         }
     }
-    #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
+    #[cfg(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64")))]
     {
         use core::arch::asm;
         let i = 0usize;
@@ -85,7 +85,7 @@ pub unsafe extern "C" fn nstd_core_mem_zero(buf: *mut NSTDByte, size: NSTDUInt) 
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_mem_fill(buf: *mut NSTDByte, size: NSTDUInt, fill: NSTDByte) {
-    #[cfg(not(any(target_arch = "x86", target_arch = "x86_64")))]
+    #[cfg(not(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64"))))]
     {
         let mut i = 0;
         while i < size {
@@ -93,7 +93,7 @@ pub unsafe extern "C" fn nstd_core_mem_fill(buf: *mut NSTDByte, size: NSTDUInt, 
             i += 1;
         }
     }
-    #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
+    #[cfg(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64")))]
     {
         use core::arch::asm;
         let i = 0usize;
