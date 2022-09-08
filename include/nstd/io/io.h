@@ -1,7 +1,6 @@
 #ifndef NSTD_IO_IO_H
 #define NSTD_IO_IO_H
 #include "../core/str.h"
-#include "../nstd.h"
 #include "../string.h"
 
 /// An error type for I/O operations.
