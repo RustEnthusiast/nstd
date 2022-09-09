@@ -436,7 +436,7 @@ macro_rules! gen_clamp {
         $(#[$meta])*
         #[inline]
         #[cfg_attr(feature = "clib", no_mangle)]
-        pub extern "C" fn $name(x: $T, min: $T, max: $T) -> $T {
+        pub unsafe extern "C" fn $name(x: $T, min: $T, max: $T) -> $T {
             x.clamp(min, max)
         }
     };
@@ -459,6 +459,10 @@ gen_clamp!(
     /// # Panics
     ///
     /// Panics if `min` > `max`, `min` is NaN, or `max` is NaN.
+    ///
+    /// # Safety
+    ///
+    /// This operation can cause undefined behavior if it panics into non-Rust code.
     nstd_core_math_clamp_f32,
     NSTDFloat32
 );
@@ -480,6 +484,10 @@ gen_clamp!(
     /// # Panics
     ///
     /// Panics if `min` > `max`, `min` is NaN, or `max` is NaN.
+    ///
+    /// # Safety
+    ///
+    /// This operation can cause undefined behavior if it panics into non-Rust code.
     nstd_core_math_clamp_f64,
     NSTDFloat64
 );
@@ -501,6 +509,10 @@ gen_clamp!(
     /// # Panics
     ///
     /// Panics if `min` > `max`.
+    ///
+    /// # Safety
+    ///
+    /// This operation can cause undefined behavior if it panics into non-Rust code.
     nstd_core_math_clamp_int,
     NSTDInt
 );
@@ -522,6 +534,10 @@ gen_clamp!(
     /// # Panics
     ///
     /// Panics if `min` > `max`.
+    ///
+    /// # Safety
+    ///
+    /// This operation can cause undefined behavior if it panics into non-Rust code.
     nstd_core_math_clamp_uint,
     NSTDUInt
 );
@@ -543,6 +559,10 @@ gen_clamp!(
     /// # Panics
     ///
     /// Panics if `min` > `max`.
+    ///
+    /// # Safety
+    ///
+    /// This operation can cause undefined behavior if it panics into non-Rust code.
     nstd_core_math_clamp_i8,
     NSTDInt8
 );
@@ -564,6 +584,10 @@ gen_clamp!(
     /// # Panics
     ///
     /// Panics if `min` > `max`.
+    ///
+    /// # Safety
+    ///
+    /// This operation can cause undefined behavior if it panics into non-Rust code.
     nstd_core_math_clamp_u8,
     NSTDUInt8
 );
@@ -585,6 +609,10 @@ gen_clamp!(
     /// # Panics
     ///
     /// Panics if `min` > `max`.
+    ///
+    /// # Safety
+    ///
+    /// This operation can cause undefined behavior if it panics into non-Rust code.
     nstd_core_math_clamp_i16,
     NSTDInt16
 );
@@ -606,6 +634,10 @@ gen_clamp!(
     /// # Panics
     ///
     /// Panics if `min` > `max`.
+    ///
+    /// # Safety
+    ///
+    /// This operation can cause undefined behavior if it panics into non-Rust code.
     nstd_core_math_clamp_u16,
     NSTDUInt16
 );
@@ -627,6 +659,10 @@ gen_clamp!(
     /// # Panics
     ///
     /// Panics if `min` > `max`.
+    ///
+    /// # Safety
+    ///
+    /// This operation can cause undefined behavior if it panics into non-Rust code.
     nstd_core_math_clamp_i32,
     NSTDInt32
 );
@@ -648,6 +684,10 @@ gen_clamp!(
     /// # Panics
     ///
     /// Panics if `min` > `max`.
+    ///
+    /// # Safety
+    ///
+    /// This operation can cause undefined behavior if it panics into non-Rust code.
     nstd_core_math_clamp_u32,
     NSTDUInt32
 );
@@ -669,6 +709,10 @@ gen_clamp!(
     /// # Panics
     ///
     /// Panics if `min` > `max`.
+    ///
+    /// # Safety
+    ///
+    /// This operation can cause undefined behavior if it panics into non-Rust code.
     nstd_core_math_clamp_i64,
     NSTDInt64
 );
@@ -690,6 +734,10 @@ gen_clamp!(
     /// # Panics
     ///
     /// Panics if `min` > `max`.
+    ///
+    /// # Safety
+    ///
+    /// This operation can cause undefined behavior if it panics into non-Rust code.
     nstd_core_math_clamp_u64,
     NSTDUInt64
 );
@@ -704,10 +752,14 @@ macro_rules! gen_div_ceil {
         /// # Panics
         ///
         /// This operation will panic if `y` is 0.
+        ///
+        /// # Safety
+        ///
+        /// This operation can cause undefined behavior if it panics into non-Rust code.
         #[inline]
         #[cfg_attr(feature = "clib", no_mangle)]
         #[allow(unused_comparisons)]
-        pub extern "C" fn $name(x: $T, y: $T) -> $T {
+        pub unsafe extern "C" fn $name(x: $T, y: $T) -> $T {
             let d = x / y;
             let r = x % y;
             if (r > 0 && y > 0) || (r < 0 && y < 0) {
@@ -887,10 +939,14 @@ macro_rules! gen_div_floor {
         /// # Panics
         ///
         /// This operation will panic if `y` is 0.
+        ///
+        /// # Safety
+        ///
+        /// This operation can cause undefined behavior if it panics into non-Rust code.
         #[inline]
         #[cfg_attr(feature = "clib", no_mangle)]
         #[allow(unused_comparisons)]
-        pub extern "C" fn $name(x: $T, y: $T) -> $T {
+        pub unsafe extern "C" fn $name(x: $T, y: $T) -> $T {
             let d = x / y;
             let r = x % y;
             if (r > 0 && y < 0) || (r < 0 && y > 0) {

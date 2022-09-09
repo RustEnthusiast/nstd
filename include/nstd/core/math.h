@@ -353,6 +353,10 @@ NSTDAPI NSTDUInt64 nstd_core_math_pow_u64(NSTDUInt64 x, NSTDUInt32 exp);
 /// # Panics
 ///
 /// Panics if `min` > `max`, `min` is NaN, or `max` is NaN.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if it panics into non-Rust code.
 NSTDAPI NSTDFloat32 nstd_core_math_clamp_f32(NSTDFloat32 x, NSTDFloat32 min, NSTDFloat32 max);
 /// Clamps the value `x` to the bounds `min` and `max`.
 ///
@@ -371,6 +375,10 @@ NSTDAPI NSTDFloat32 nstd_core_math_clamp_f32(NSTDFloat32 x, NSTDFloat32 min, NST
 /// # Panics
 ///
 /// Panics if `min` > `max`, `min` is NaN, or `max` is NaN.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if it panics into non-Rust code.
 NSTDAPI NSTDFloat64 nstd_core_math_clamp_f64(NSTDFloat64 x, NSTDFloat64 min, NSTDFloat64 max);
 /// Clamps the value `x` to the bounds `min` and `max`.
 ///
@@ -389,6 +397,10 @@ NSTDAPI NSTDFloat64 nstd_core_math_clamp_f64(NSTDFloat64 x, NSTDFloat64 min, NST
 /// # Panics
 ///
 /// Panics if `min` > `max`.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if it panics into non-Rust code.
 NSTDAPI NSTDInt nstd_core_math_clamp_int(NSTDInt x, NSTDInt min, NSTDInt max);
 /// Clamps the value `x` to the bounds `min` and `max`.
 ///
@@ -407,6 +419,10 @@ NSTDAPI NSTDInt nstd_core_math_clamp_int(NSTDInt x, NSTDInt min, NSTDInt max);
 /// # Panics
 ///
 /// Panics if `min` > `max`.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if it panics into non-Rust code.
 NSTDAPI NSTDUInt nstd_core_math_clamp_uint(NSTDUInt x, NSTDUInt min, NSTDUInt max);
 /// Clamps the value `x` to the bounds `min` and `max`.
 ///
@@ -425,6 +441,10 @@ NSTDAPI NSTDUInt nstd_core_math_clamp_uint(NSTDUInt x, NSTDUInt min, NSTDUInt ma
 /// # Panics
 ///
 /// Panics if `min` > `max`.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if it panics into non-Rust code.
 NSTDAPI NSTDInt8 nstd_core_math_clamp_i8(NSTDInt8 x, NSTDInt8 min, NSTDInt8 max);
 /// Clamps the value `x` to the bounds `min` and `max`.
 ///
@@ -443,6 +463,10 @@ NSTDAPI NSTDInt8 nstd_core_math_clamp_i8(NSTDInt8 x, NSTDInt8 min, NSTDInt8 max)
 /// # Panics
 ///
 /// Panics if `min` > `max`.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if it panics into non-Rust code.
 NSTDAPI NSTDUInt8 nstd_core_math_clamp_u8(NSTDUInt8 x, NSTDUInt8 min, NSTDUInt8 max);
 /// Clamps the value `x` to the bounds `min` and `max`.
 ///
@@ -461,6 +485,10 @@ NSTDAPI NSTDUInt8 nstd_core_math_clamp_u8(NSTDUInt8 x, NSTDUInt8 min, NSTDUInt8 
 /// # Panics
 ///
 /// Panics if `min` > `max`.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if it panics into non-Rust code.
 NSTDAPI NSTDInt16 nstd_core_math_clamp_i16(NSTDInt16 x, NSTDInt16 min, NSTDInt16 max);
 /// Clamps the value `x` to the bounds `min` and `max`.
 ///
@@ -479,6 +507,10 @@ NSTDAPI NSTDInt16 nstd_core_math_clamp_i16(NSTDInt16 x, NSTDInt16 min, NSTDInt16
 /// # Panics
 ///
 /// Panics if `min` > `max`.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if it panics into non-Rust code.
 NSTDAPI NSTDUInt16 nstd_core_math_clamp_u16(NSTDUInt16 x, NSTDUInt16 min, NSTDUInt16 max);
 /// Clamps the value `x` to the bounds `min` and `max`.
 ///
@@ -497,6 +529,10 @@ NSTDAPI NSTDUInt16 nstd_core_math_clamp_u16(NSTDUInt16 x, NSTDUInt16 min, NSTDUI
 /// # Panics
 ///
 /// Panics if `min` > `max`.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if it panics into non-Rust code.
 NSTDAPI NSTDInt32 nstd_core_math_clamp_i32(NSTDInt32 x, NSTDInt32 min, NSTDInt32 max);
 /// Clamps the value `x` to the bounds `min` and `max`.
 ///
@@ -515,6 +551,10 @@ NSTDAPI NSTDInt32 nstd_core_math_clamp_i32(NSTDInt32 x, NSTDInt32 min, NSTDInt32
 /// # Panics
 ///
 /// Panics if `min` > `max`.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if it panics into non-Rust code.
 NSTDAPI NSTDUInt32 nstd_core_math_clamp_u32(NSTDUInt32 x, NSTDUInt32 min, NSTDUInt32 max);
 /// Clamps the value `x` to the bounds `min` and `max`.
 ///
@@ -533,6 +573,10 @@ NSTDAPI NSTDUInt32 nstd_core_math_clamp_u32(NSTDUInt32 x, NSTDUInt32 min, NSTDUI
 /// # Panics
 ///
 /// Panics if `min` > `max`.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if it panics into non-Rust code.
 NSTDAPI NSTDInt64 nstd_core_math_clamp_i64(NSTDInt64 x, NSTDInt64 min, NSTDInt64 max);
 /// Clamps the value `x` to the bounds `min` and `max`.
 ///
@@ -551,6 +595,10 @@ NSTDAPI NSTDInt64 nstd_core_math_clamp_i64(NSTDInt64 x, NSTDInt64 min, NSTDInt64
 /// # Panics
 ///
 /// Panics if `min` > `max`.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if it panics into non-Rust code.
 NSTDAPI NSTDUInt64 nstd_core_math_clamp_u64(NSTDUInt64 x, NSTDUInt64 min, NSTDUInt64 max);
 
 /// Divides two numbers and rounds the result up to the next integer.
@@ -568,6 +616,10 @@ NSTDAPI NSTDUInt64 nstd_core_math_clamp_u64(NSTDUInt64 x, NSTDUInt64 min, NSTDUI
 /// # Panics
 ///
 /// This operation will panic if `y` is 0.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if it panics into non-Rust code.
 NSTDAPI NSTDInt nstd_core_math_div_ceil_int(NSTDInt x, NSTDInt y);
 /// Divides two numbers and rounds the result up to the next integer.
 ///
@@ -584,6 +636,10 @@ NSTDAPI NSTDInt nstd_core_math_div_ceil_int(NSTDInt x, NSTDInt y);
 /// # Panics
 ///
 /// This operation will panic if `y` is 0.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if it panics into non-Rust code.
 NSTDAPI NSTDUInt nstd_core_math_div_ceil_uint(NSTDUInt x, NSTDUInt y);
 /// Divides two numbers and rounds the result up to the next integer.
 ///
@@ -600,6 +656,10 @@ NSTDAPI NSTDUInt nstd_core_math_div_ceil_uint(NSTDUInt x, NSTDUInt y);
 /// # Panics
 ///
 /// This operation will panic if `y` is 0.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if it panics into non-Rust code.
 NSTDAPI NSTDInt8 nstd_core_math_div_ceil_i8(NSTDInt8 x, NSTDInt8 y);
 /// Divides two numbers and rounds the result up to the next integer.
 ///
@@ -616,6 +676,10 @@ NSTDAPI NSTDInt8 nstd_core_math_div_ceil_i8(NSTDInt8 x, NSTDInt8 y);
 /// # Panics
 ///
 /// This operation will panic if `y` is 0.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if it panics into non-Rust code.
 NSTDAPI NSTDUInt8 nstd_core_math_div_ceil_u8(NSTDUInt8 x, NSTDUInt8 y);
 /// Divides two numbers and rounds the result up to the next integer.
 ///
@@ -632,6 +696,10 @@ NSTDAPI NSTDUInt8 nstd_core_math_div_ceil_u8(NSTDUInt8 x, NSTDUInt8 y);
 /// # Panics
 ///
 /// This operation will panic if `y` is 0.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if it panics into non-Rust code.
 NSTDAPI NSTDInt16 nstd_core_math_div_ceil_i16(NSTDInt16 x, NSTDInt16 y);
 /// Divides two numbers and rounds the result up to the next integer.
 ///
@@ -648,6 +716,10 @@ NSTDAPI NSTDInt16 nstd_core_math_div_ceil_i16(NSTDInt16 x, NSTDInt16 y);
 /// # Panics
 ///
 /// This operation will panic if `y` is 0.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if it panics into non-Rust code.
 NSTDAPI NSTDUInt16 nstd_core_math_div_ceil_u16(NSTDUInt16 x, NSTDUInt16 y);
 /// Divides two numbers and rounds the result up to the next integer.
 ///
@@ -664,6 +736,10 @@ NSTDAPI NSTDUInt16 nstd_core_math_div_ceil_u16(NSTDUInt16 x, NSTDUInt16 y);
 /// # Panics
 ///
 /// This operation will panic if `y` is 0.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if it panics into non-Rust code.
 NSTDAPI NSTDInt32 nstd_core_math_div_ceil_i32(NSTDInt32 x, NSTDInt32 y);
 /// Divides two numbers and rounds the result up to the next integer.
 ///
@@ -680,6 +756,10 @@ NSTDAPI NSTDInt32 nstd_core_math_div_ceil_i32(NSTDInt32 x, NSTDInt32 y);
 /// # Panics
 ///
 /// This operation will panic if `y` is 0.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if it panics into non-Rust code.
 NSTDAPI NSTDUInt32 nstd_core_math_div_ceil_u32(NSTDUInt32 x, NSTDUInt32 y);
 /// Divides two numbers and rounds the result up to the next integer.
 ///
@@ -696,6 +776,10 @@ NSTDAPI NSTDUInt32 nstd_core_math_div_ceil_u32(NSTDUInt32 x, NSTDUInt32 y);
 /// # Panics
 ///
 /// This operation will panic if `y` is 0.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if it panics into non-Rust code.
 NSTDAPI NSTDInt64 nstd_core_math_div_ceil_i64(NSTDInt64 x, NSTDInt64 y);
 /// Divides two numbers and rounds the result up to the next integer.
 ///
@@ -712,6 +796,10 @@ NSTDAPI NSTDInt64 nstd_core_math_div_ceil_i64(NSTDInt64 x, NSTDInt64 y);
 /// # Panics
 ///
 /// This operation will panic if `y` is 0.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if it panics into non-Rust code.
 NSTDAPI NSTDUInt64 nstd_core_math_div_ceil_u64(NSTDUInt64 x, NSTDUInt64 y);
 
 /// Divides two numbers and rounds the result down to the next integer.
@@ -729,6 +817,10 @@ NSTDAPI NSTDUInt64 nstd_core_math_div_ceil_u64(NSTDUInt64 x, NSTDUInt64 y);
 /// # Panics
 ///
 /// This operation will panic if `y` is 0.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if it panics into non-Rust code.
 NSTDAPI NSTDInt nstd_core_math_div_floor_int(NSTDInt x, NSTDInt y);
 /// Divides two numbers and rounds the result down to the next integer.
 ///
@@ -745,6 +837,10 @@ NSTDAPI NSTDInt nstd_core_math_div_floor_int(NSTDInt x, NSTDInt y);
 /// # Panics
 ///
 /// This operation will panic if `y` is 0.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if it panics into non-Rust code.
 NSTDAPI NSTDUInt nstd_core_math_div_floor_uint(NSTDUInt x, NSTDUInt y);
 /// Divides two numbers and rounds the result down to the next integer.
 ///
@@ -761,6 +857,10 @@ NSTDAPI NSTDUInt nstd_core_math_div_floor_uint(NSTDUInt x, NSTDUInt y);
 /// # Panics
 ///
 /// This operation will panic if `y` is 0.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if it panics into non-Rust code.
 NSTDAPI NSTDInt8 nstd_core_math_div_floor_i8(NSTDInt8 x, NSTDInt8 y);
 /// Divides two numbers and rounds the result down to the next integer.
 ///
@@ -777,6 +877,10 @@ NSTDAPI NSTDInt8 nstd_core_math_div_floor_i8(NSTDInt8 x, NSTDInt8 y);
 /// # Panics
 ///
 /// This operation will panic if `y` is 0.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if it panics into non-Rust code.
 NSTDAPI NSTDUInt8 nstd_core_math_div_floor_u8(NSTDUInt8 x, NSTDUInt8 y);
 /// Divides two numbers and rounds the result down to the next integer.
 ///
@@ -793,6 +897,10 @@ NSTDAPI NSTDUInt8 nstd_core_math_div_floor_u8(NSTDUInt8 x, NSTDUInt8 y);
 /// # Panics
 ///
 /// This operation will panic if `y` is 0.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if it panics into non-Rust code.
 NSTDAPI NSTDInt16 nstd_core_math_div_floor_i16(NSTDInt16 x, NSTDInt16 y);
 /// Divides two numbers and rounds the result down to the next integer.
 ///
@@ -809,6 +917,10 @@ NSTDAPI NSTDInt16 nstd_core_math_div_floor_i16(NSTDInt16 x, NSTDInt16 y);
 /// # Panics
 ///
 /// This operation will panic if `y` is 0.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if it panics into non-Rust code.
 NSTDAPI NSTDUInt16 nstd_core_math_div_floor_u16(NSTDUInt16 x, NSTDUInt16 y);
 /// Divides two numbers and rounds the result down to the next integer.
 ///
@@ -825,6 +937,10 @@ NSTDAPI NSTDUInt16 nstd_core_math_div_floor_u16(NSTDUInt16 x, NSTDUInt16 y);
 /// # Panics
 ///
 /// This operation will panic if `y` is 0.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if it panics into non-Rust code.
 NSTDAPI NSTDInt32 nstd_core_math_div_floor_i32(NSTDInt32 x, NSTDInt32 y);
 /// Divides two numbers and rounds the result down to the next integer.
 ///
@@ -841,6 +957,10 @@ NSTDAPI NSTDInt32 nstd_core_math_div_floor_i32(NSTDInt32 x, NSTDInt32 y);
 /// # Panics
 ///
 /// This operation will panic if `y` is 0.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if it panics into non-Rust code.
 NSTDAPI NSTDUInt32 nstd_core_math_div_floor_u32(NSTDUInt32 x, NSTDUInt32 y);
 /// Divides two numbers and rounds the result down to the next integer.
 ///
@@ -857,6 +977,10 @@ NSTDAPI NSTDUInt32 nstd_core_math_div_floor_u32(NSTDUInt32 x, NSTDUInt32 y);
 /// # Panics
 ///
 /// This operation will panic if `y` is 0.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if it panics into non-Rust code.
 NSTDAPI NSTDInt64 nstd_core_math_div_floor_i64(NSTDInt64 x, NSTDInt64 y);
 /// Divides two numbers and rounds the result down to the next integer.
 ///
@@ -873,6 +997,10 @@ NSTDAPI NSTDInt64 nstd_core_math_div_floor_i64(NSTDInt64 x, NSTDInt64 y);
 /// # Panics
 ///
 /// This operation will panic if `y` is 0.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior if it panics into non-Rust code.
 NSTDAPI NSTDUInt64 nstd_core_math_div_floor_u64(NSTDUInt64 x, NSTDUInt64 y);
 
 #endif
