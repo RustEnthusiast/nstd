@@ -2,6 +2,7 @@
 ### `nstd`
 - Added `asm` feature.
 ### `nstd.core`
+- `cty_is_digit` is now unsafe.
 - `cty_is_[graphic|punctuation]` now take `NSTDChar`.
 - Added `math_div_floor_*`.
 - Added `math_pow_*`.

@@ -206,6 +206,10 @@ gen_deterministic!(
 ///
 /// This operation will panic if `radix` is larger than 36.
 ///
+/// # Safety
+///
+/// This operation can cause undefined behavior if it panics into non-Rust code.
+///
 /// # Example
 ///
 /// ```
@@ -217,7 +221,7 @@ gen_deterministic!(
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_cty_is_digit(chr: NSTDUnichar, radix: NSTDUInt32) -> NSTDBool {
+pub unsafe extern "C" fn nstd_core_cty_is_digit(chr: NSTDUnichar, radix: NSTDUInt32) -> NSTDBool {
     match char::from_u32(chr) {
         Some(chr) => chr.is_digit(radix).into(),
         _ => NSTD_FALSE,

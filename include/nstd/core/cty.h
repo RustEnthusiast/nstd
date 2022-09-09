@@ -161,6 +161,10 @@ NSTDAPI NSTDBool nstd_core_cty_is_control(NSTDUnichar chr);
 ///
 /// This operation will panic if `radix` is larger than 36.
 ///
+/// # Safety
+///
+/// This operation can cause undefined behavior if it panics into non-Rust code.
+///
 /// # Example
 ///
 /// ```
