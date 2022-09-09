@@ -2,9 +2,10 @@
 ### `nstd`
 - Added `asm` feature.
 ### `nstd.core`
-- Added `nstd_core_math_div_floor_*`.
-- Added `nstd_core_math_pow_*`.
-- Added `nstd_core_math_abs_*`.
+- `cty_is_[graphic|punctuation]` now take `NSTDChar`.
+- Added `math_div_floor_*`.
+- Added `math_pow_*`.
+- Added `math_abs_*`.
 
 # 0.1.3
 ### `nstd`

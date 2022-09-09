@@ -3,7 +3,7 @@
 //! # Note
 //!
 //! Functions in this module that return a boolean will always return false on error.
-use crate::{NSTDBool, NSTDUInt32, NSTDUnichar, NSTD_FALSE};
+use crate::{core::def::NSTDChar, NSTDBool, NSTDUInt32, NSTDUnichar, NSTD_FALSE};
 
 /// Returns the Unicode replacement character (�).
 ///
@@ -61,7 +61,7 @@ gen_deterministic!(
     is_numeric
 );
 gen_deterministic!(
-    /// Determines whether or not `chr` is alphanumeric according to the Unicode standard.
+    /// Determines whether or not `chr` is alphabetic or numeric according to the Unicode standard.
     ///
     /// # Parameters:
     ///
@@ -69,7 +69,7 @@ gen_deterministic!(
     ///
     /// # Returns
     ///
-    /// `NSTDBool is_alphanumeric` - `NSTD_TRUE` if `chr` is alphanumeric.
+    /// `NSTDBool is_alphanumeric` - `NSTD_TRUE` if `chr` is alphabetic or numeric.
     nstd_core_cty_is_alphanumeric,
     is_alphanumeric
 );
@@ -125,40 +125,6 @@ gen_deterministic!(
     nstd_core_cty_is_control,
     is_control
 );
-gen_deterministic!(
-    /// Determines whether or not `chr` is punctuation.
-    ///
-    /// # Note
-    ///
-    /// This only works with ASCII characters.
-    ///
-    /// # Parameters:
-    ///
-    /// - `NSTDUnichar chr` - The character to check.
-    ///
-    /// # Returns
-    ///
-    /// `NSTDBool is_punctuation` - `NSTD_TRUE` if `chr` is punctuation.
-    nstd_core_cty_is_punctuation,
-    is_ascii_punctuation
-);
-gen_deterministic!(
-    /// Determines whether or not `chr` is a graphic character.
-    ///
-    /// # Note
-    ///
-    /// This only works with ASCII characters.
-    ///
-    /// # Parameters:
-    ///
-    /// - `NSTDUnichar chr` - The character to check.
-    ///
-    /// # Returns
-    ///
-    /// `NSTDBool is_graphic` - `NSTD_TRUE` if `chr` is a graphic character.
-    nstd_core_cty_is_graphic,
-    is_ascii_graphic
-);
 
 /// Determines whether or not `chr` is a digit, depending on `radix`.
 ///
@@ -184,7 +150,49 @@ pub extern "C" fn nstd_core_cty_is_digit(chr: NSTDUnichar, radix: NSTDUInt32) ->
     }
 }
 
-/// Returns the lowercase version of `chr` or `chr` if there is no lowercase version.
+/// Determines whether or not `chr` is punctuation.
+///
+/// # Note
+///
+/// This only works with ASCII characters.
+///
+/// # Parameters:
+///
+/// - `NSTDChar chr` - The character to check.
+///
+/// # Returns
+///
+/// `NSTDBool is_punctuation` - `NSTD_TRUE` if `chr` is punctuation.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_core_cty_is_punctuation(chr: NSTDChar) -> NSTDBool {
+    ((chr >= 0x21 && chr <= 0x2F)
+        || (chr >= 0x3A && chr <= 0x40)
+        || (chr >= 0x5B && chr <= 0x60)
+        || (chr >= 0x7B && chr <= 0x7E))
+        .into()
+}
+
+/// Determines whether or not `chr` is a graphic character.
+///
+/// # Note
+///
+/// This only works with ASCII characters.
+///
+/// # Parameters:
+///
+/// - `NSTDChar chr` - The character to check.
+///
+/// # Returns
+///
+/// `NSTDBool is_graphic` - `NSTD_TRUE` if `chr` is a graphic character.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_core_cty_is_graphic(chr: NSTDChar) -> NSTDBool {
+    (chr >= 0x21 && chr <= 0x7E).into()
+}
+
+/// Returns the lowercase version of `chr`, or `chr` if there is no lowercase version.
 ///
 /// # Note
 ///
@@ -205,7 +213,7 @@ pub extern "C" fn nstd_core_cty_to_lowercase(chr: NSTDUnichar) -> NSTDUnichar {
         _ => chr,
     }
 }
-/// Returns the uppercase version of `chr` or `chr` if there is no uppercase version.
+/// Returns the uppercase version of `chr`, or `chr` if there is no uppercase version.
 ///
 /// # Note
 ///
