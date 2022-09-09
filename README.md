@@ -66,6 +66,9 @@ can easily use the API.
 
 - Any function that may panic must document each case that it might do so.
 
+- Any function that may panic must be marked as unsafe, as it is undefined behavior to unwind from
+Rust code into foreign code.
+
 # How to build
 `nstd` let you decide what features you want to use. Any module that falls under the top level
 module has a dedicated feature flag, for example `nstd.core` has the feature flag `nstd_core` and
