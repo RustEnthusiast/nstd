@@ -63,8 +63,7 @@ pub unsafe extern "C" fn nstd_core_mem_zero(buf: *mut NSTDByte, size: NSTDUInt) 
     #[cfg(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64")))]
     {
         use core::arch::asm;
-        let i = 0usize;
-        asm!(include_str!("mem/zero.asm"), buf = in(reg) buf, size = in(reg) size, i = in(reg) i);
+        asm!(include_str!("mem/zero.asm"), buf = in(reg) buf, size = in(reg) size, i = out(reg) _);
     }
 }
 
@@ -96,13 +95,12 @@ pub unsafe extern "C" fn nstd_core_mem_fill(buf: *mut NSTDByte, size: NSTDUInt, 
     #[cfg(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64")))]
     {
         use core::arch::asm;
-        let i = 0usize;
         asm!(
             include_str!("mem/fill.asm"),
             buf = in(reg) buf,
             size = in(reg) size,
             fill = in(reg_byte) fill,
-            i = in(reg) i
+            i = out(reg) _
         );
     }
 }

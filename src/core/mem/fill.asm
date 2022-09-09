@@ -1,4 +1,4 @@
-    push {i}
+    xor {i}, {i}
 2:
     cmp {i}, {size}
     jge 3f
@@ -6,4 +6,3 @@
     inc {i}
     jmp 2b
 3:
-    pop {i}
