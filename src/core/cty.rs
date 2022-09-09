@@ -215,9 +215,11 @@ gen_deterministic!(
 /// ```
 /// use nstd_sys::core::cty::nstd_core_cty_is_digit;
 ///
-/// assert!(nstd_core_cty_is_digit('5'.into(), 16) != 0);
-/// assert!(nstd_core_cty_is_digit('E'.into(), 16) != 0);
-/// assert!(nstd_core_cty_is_digit('F'.into(), 10) == 0);
+/// unsafe {
+///     assert!(nstd_core_cty_is_digit('5'.into(), 16) != 0);
+///     assert!(nstd_core_cty_is_digit('E'.into(), 16) != 0);
+///     assert!(nstd_core_cty_is_digit('F'.into(), 10) == 0);
+/// }
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
@@ -253,11 +255,11 @@ pub unsafe extern "C" fn nstd_core_cty_is_digit(chr: NSTDUnichar, radix: NSTDUIn
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_cty_is_punctuation(chr: NSTDChar) -> NSTDBool {
-    ((chr >= 0x21 && chr <= 0x2F)
-        || (chr >= 0x3A && chr <= 0x40)
-        || (chr >= 0x5B && chr <= 0x60)
-        || (chr >= 0x7B && chr <= 0x7E))
-        .into()
+    ((0x21..=0x2F).contains(&chr)
+        || (0x3A..=0x40).contains(&chr)
+        || (0x5B..=0x60).contains(&chr)
+        || (0x7B..=0x7E).contains(&chr))
+    .into()
 }
 
 /// Determines whether or not `chr` is a graphic character.
@@ -285,7 +287,7 @@ pub extern "C" fn nstd_core_cty_is_punctuation(chr: NSTDChar) -> NSTDBool {
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_cty_is_graphic(chr: NSTDChar) -> NSTDBool {
-    (chr >= 0x21 && chr <= 0x7E).into()
+    (0x21..=0x7E).contains(&chr).into()
 }
 
 /// Returns the lowercase version of `chr`, or `chr` if there is no lowercase version.
