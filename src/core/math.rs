@@ -463,6 +463,18 @@ gen_clamp!(
     /// # Safety
     ///
     /// This operation can cause undefined behavior if it panics into non-Rust code.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_clamp_f32;
+    ///
+    /// unsafe {
+    ///     assert!(nstd_core_math_clamp_f32(2.5, 3.0, 5.0) == 3.0);
+    ///     assert!(nstd_core_math_clamp_f32(4.0, 3.0, 5.0) == 4.0);
+    ///     assert!(nstd_core_math_clamp_f32(7.5, 3.0, 5.0) == 5.0);
+    /// }
+    /// ```
     nstd_core_math_clamp_f32,
     NSTDFloat32
 );
@@ -488,6 +500,18 @@ gen_clamp!(
     /// # Safety
     ///
     /// This operation can cause undefined behavior if it panics into non-Rust code.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_clamp_f64;
+    ///
+    /// unsafe {
+    ///     assert!(nstd_core_math_clamp_f64(2.5, 3.0, 5.0) == 3.0);
+    ///     assert!(nstd_core_math_clamp_f64(4.0, 3.0, 5.0) == 4.0);
+    ///     assert!(nstd_core_math_clamp_f64(7.5, 3.0, 5.0) == 5.0);
+    /// }
+    /// ```
     nstd_core_math_clamp_f64,
     NSTDFloat64
 );
@@ -513,6 +537,18 @@ gen_clamp!(
     /// # Safety
     ///
     /// This operation can cause undefined behavior if it panics into non-Rust code.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_clamp_int;
+    ///
+    /// unsafe {
+    ///     assert!(nstd_core_math_clamp_int(2, 5, 10) == 5);
+    ///     assert!(nstd_core_math_clamp_int(8, 5, 10) == 8);
+    ///     assert!(nstd_core_math_clamp_int(14, 5, 10) == 10);
+    /// }
+    /// ```
     nstd_core_math_clamp_int,
     NSTDInt
 );
@@ -538,6 +574,18 @@ gen_clamp!(
     /// # Safety
     ///
     /// This operation can cause undefined behavior if it panics into non-Rust code.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_clamp_uint;
+    ///
+    /// unsafe {
+    ///     assert!(nstd_core_math_clamp_uint(2, 5, 10) == 5);
+    ///     assert!(nstd_core_math_clamp_uint(8, 5, 10) == 8);
+    ///     assert!(nstd_core_math_clamp_uint(14, 5, 10) == 10);
+    /// }
+    /// ```
     nstd_core_math_clamp_uint,
     NSTDUInt
 );
@@ -563,6 +611,18 @@ gen_clamp!(
     /// # Safety
     ///
     /// This operation can cause undefined behavior if it panics into non-Rust code.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_clamp_i8;
+    ///
+    /// unsafe {
+    ///     assert!(nstd_core_math_clamp_i8(2, 5, 10) == 5);
+    ///     assert!(nstd_core_math_clamp_i8(8, 5, 10) == 8);
+    ///     assert!(nstd_core_math_clamp_i8(14, 5, 10) == 10);
+    /// }
+    /// ```
     nstd_core_math_clamp_i8,
     NSTDInt8
 );
@@ -588,6 +648,18 @@ gen_clamp!(
     /// # Safety
     ///
     /// This operation can cause undefined behavior if it panics into non-Rust code.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_clamp_u8;
+    ///
+    /// unsafe {
+    ///     assert!(nstd_core_math_clamp_u8(2, 5, 10) == 5);
+    ///     assert!(nstd_core_math_clamp_u8(8, 5, 10) == 8);
+    ///     assert!(nstd_core_math_clamp_u8(14, 5, 10) == 10);
+    /// }
+    /// ```
     nstd_core_math_clamp_u8,
     NSTDUInt8
 );
@@ -613,6 +685,18 @@ gen_clamp!(
     /// # Safety
     ///
     /// This operation can cause undefined behavior if it panics into non-Rust code.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_clamp_i16;
+    ///
+    /// unsafe {
+    ///     assert!(nstd_core_math_clamp_i16(2, 5, 10) == 5);
+    ///     assert!(nstd_core_math_clamp_i16(8, 5, 10) == 8);
+    ///     assert!(nstd_core_math_clamp_i16(14, 5, 10) == 10);
+    /// }
+    /// ```
     nstd_core_math_clamp_i16,
     NSTDInt16
 );
@@ -638,6 +722,18 @@ gen_clamp!(
     /// # Safety
     ///
     /// This operation can cause undefined behavior if it panics into non-Rust code.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_clamp_u16;
+    ///
+    /// unsafe {
+    ///     assert!(nstd_core_math_clamp_u16(2, 5, 10) == 5);
+    ///     assert!(nstd_core_math_clamp_u16(8, 5, 10) == 8);
+    ///     assert!(nstd_core_math_clamp_u16(14, 5, 10) == 10);
+    /// }
+    /// ```
     nstd_core_math_clamp_u16,
     NSTDUInt16
 );
@@ -663,6 +759,18 @@ gen_clamp!(
     /// # Safety
     ///
     /// This operation can cause undefined behavior if it panics into non-Rust code.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_clamp_i32;
+    ///
+    /// unsafe {
+    ///     assert!(nstd_core_math_clamp_i32(2, 5, 10) == 5);
+    ///     assert!(nstd_core_math_clamp_i32(8, 5, 10) == 8);
+    ///     assert!(nstd_core_math_clamp_i32(14, 5, 10) == 10);
+    /// }
+    /// ```
     nstd_core_math_clamp_i32,
     NSTDInt32
 );
@@ -688,6 +796,18 @@ gen_clamp!(
     /// # Safety
     ///
     /// This operation can cause undefined behavior if it panics into non-Rust code.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_clamp_u32;
+    ///
+    /// unsafe {
+    ///     assert!(nstd_core_math_clamp_u32(2, 5, 10) == 5);
+    ///     assert!(nstd_core_math_clamp_u32(8, 5, 10) == 8);
+    ///     assert!(nstd_core_math_clamp_u32(14, 5, 10) == 10);
+    /// }
+    /// ```
     nstd_core_math_clamp_u32,
     NSTDUInt32
 );
@@ -713,6 +833,18 @@ gen_clamp!(
     /// # Safety
     ///
     /// This operation can cause undefined behavior if it panics into non-Rust code.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_clamp_i64;
+    ///
+    /// unsafe {
+    ///     assert!(nstd_core_math_clamp_i64(2, 5, 10) == 5);
+    ///     assert!(nstd_core_math_clamp_i64(8, 5, 10) == 8);
+    ///     assert!(nstd_core_math_clamp_i64(14, 5, 10) == 10);
+    /// }
+    /// ```
     nstd_core_math_clamp_i64,
     NSTDInt64
 );
@@ -738,6 +870,18 @@ gen_clamp!(
     /// # Safety
     ///
     /// This operation can cause undefined behavior if it panics into non-Rust code.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_clamp_u64;
+    ///
+    /// unsafe {
+    ///     assert!(nstd_core_math_clamp_u64(2, 5, 10) == 5);
+    ///     assert!(nstd_core_math_clamp_u64(8, 5, 10) == 8);
+    ///     assert!(nstd_core_math_clamp_u64(14, 5, 10) == 10);
+    /// }
+    /// ```
     nstd_core_math_clamp_u64,
     NSTDUInt64
 );
@@ -782,6 +926,18 @@ gen_div_ceil!(
     /// # Returns
     ///
     /// `NSTDInt v` - The divided value, rounded up.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_div_ceil_int;
+    ///
+    /// unsafe {
+    ///     assert!(nstd_core_math_div_ceil_int(8, 5) == 2);
+    ///     assert!(nstd_core_math_div_ceil_int(8, 3) == 3);
+    ///     assert!(nstd_core_math_div_ceil_int(8, 2) == 4);
+    /// }
+    /// ```
     nstd_core_math_div_ceil_int,
     NSTDInt
 );
@@ -797,6 +953,18 @@ gen_div_ceil!(
     /// # Returns
     ///
     /// `NSTDUInt v` - The divided value, rounded up.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_div_ceil_uint;
+    ///
+    /// unsafe {
+    ///     assert!(nstd_core_math_div_ceil_uint(8, 5) == 2);
+    ///     assert!(nstd_core_math_div_ceil_uint(8, 3) == 3);
+    ///     assert!(nstd_core_math_div_ceil_uint(8, 2) == 4);
+    /// }
+    /// ```
     nstd_core_math_div_ceil_uint,
     NSTDUInt
 );
@@ -812,6 +980,18 @@ gen_div_ceil!(
     /// # Returns
     ///
     /// `NSTDInt8 v` - The divided value, rounded up.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_div_ceil_i8;
+    ///
+    /// unsafe {
+    ///     assert!(nstd_core_math_div_ceil_i8(8, 5) == 2);
+    ///     assert!(nstd_core_math_div_ceil_i8(8, 3) == 3);
+    ///     assert!(nstd_core_math_div_ceil_i8(8, 2) == 4);
+    /// }
+    /// ```
     nstd_core_math_div_ceil_i8,
     NSTDInt8
 );
@@ -827,6 +1007,18 @@ gen_div_ceil!(
     /// # Returns
     ///
     /// `NSTDUInt8 v` - The divided value, rounded up.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_div_ceil_u8;
+    ///
+    /// unsafe {
+    ///     assert!(nstd_core_math_div_ceil_u8(8, 5) == 2);
+    ///     assert!(nstd_core_math_div_ceil_u8(8, 3) == 3);
+    ///     assert!(nstd_core_math_div_ceil_u8(8, 2) == 4);
+    /// }
+    /// ```
     nstd_core_math_div_ceil_u8,
     NSTDUInt8
 );
@@ -842,6 +1034,18 @@ gen_div_ceil!(
     /// # Returns
     ///
     /// `NSTDInt16 v` - The divided value, rounded up.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_div_ceil_i16;
+    ///
+    /// unsafe {
+    ///     assert!(nstd_core_math_div_ceil_i16(8, 5) == 2);
+    ///     assert!(nstd_core_math_div_ceil_i16(8, 3) == 3);
+    ///     assert!(nstd_core_math_div_ceil_i16(8, 2) == 4);
+    /// }
+    /// ```
     nstd_core_math_div_ceil_i16,
     NSTDInt16
 );
@@ -857,6 +1061,18 @@ gen_div_ceil!(
     /// # Returns
     ///
     /// `NSTDUInt16 v` - The divided value, rounded up.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_div_ceil_u16;
+    ///
+    /// unsafe {
+    ///     assert!(nstd_core_math_div_ceil_u16(8, 5) == 2);
+    ///     assert!(nstd_core_math_div_ceil_u16(8, 3) == 3);
+    ///     assert!(nstd_core_math_div_ceil_u16(8, 2) == 4);
+    /// }
+    /// ```
     nstd_core_math_div_ceil_u16,
     NSTDUInt16
 );
@@ -872,6 +1088,18 @@ gen_div_ceil!(
     /// # Returns
     ///
     /// `NSTDInt32 v` - The divided value, rounded up.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_div_ceil_i32;
+    ///
+    /// unsafe {
+    ///     assert!(nstd_core_math_div_ceil_i32(8, 5) == 2);
+    ///     assert!(nstd_core_math_div_ceil_i32(8, 3) == 3);
+    ///     assert!(nstd_core_math_div_ceil_i32(8, 2) == 4);
+    /// }
+    /// ```
     nstd_core_math_div_ceil_i32,
     NSTDInt32
 );
@@ -887,6 +1115,18 @@ gen_div_ceil!(
     /// # Returns
     ///
     /// `NSTDUInt32 v` - The divided value, rounded up.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_div_ceil_u32;
+    ///
+    /// unsafe {
+    ///     assert!(nstd_core_math_div_ceil_u32(8, 5) == 2);
+    ///     assert!(nstd_core_math_div_ceil_u32(8, 3) == 3);
+    ///     assert!(nstd_core_math_div_ceil_u32(8, 2) == 4);
+    /// }
+    /// ```
     nstd_core_math_div_ceil_u32,
     NSTDUInt32
 );
@@ -902,6 +1142,18 @@ gen_div_ceil!(
     /// # Returns
     ///
     /// `NSTDInt64 v` - The divided value, rounded up.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_div_ceil_i64;
+    ///
+    /// unsafe {
+    ///     assert!(nstd_core_math_div_ceil_i64(8, 5) == 2);
+    ///     assert!(nstd_core_math_div_ceil_i64(8, 3) == 3);
+    ///     assert!(nstd_core_math_div_ceil_i64(8, 2) == 4);
+    /// }
+    /// ```
     nstd_core_math_div_ceil_i64,
     NSTDInt64
 );
@@ -917,6 +1169,18 @@ gen_div_ceil!(
     /// # Returns
     ///
     /// `NSTDUInt64 v` - The divided value, rounded up.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_div_ceil_u64;
+    ///
+    /// unsafe {
+    ///     assert!(nstd_core_math_div_ceil_u64(8, 5) == 2);
+    ///     assert!(nstd_core_math_div_ceil_u64(8, 3) == 3);
+    ///     assert!(nstd_core_math_div_ceil_u64(8, 2) == 4);
+    /// }
+    /// ```
     nstd_core_math_div_ceil_u64,
     NSTDUInt64
 );
@@ -943,6 +1207,18 @@ macro_rules! gen_div_floor {
         /// # Safety
         ///
         /// This operation can cause undefined behavior if it panics into non-Rust code.
+        ///
+        /// # Example
+        ///
+        /// ```
+        #[doc = concat!("use nstd_sys::core::math::", stringify!($name), ";")]
+        ///
+        /// unsafe {
+        #[doc = concat!("    assert!(", stringify!($name), "(5, 2) == 2);")]
+        #[doc = concat!("    assert!(", stringify!($name), "(13, 4) == 3);")]
+        #[doc = concat!("    assert!(", stringify!($name), "(23, 5) == 4);")]
+        /// }
+        /// ```
         #[inline]
         #[cfg_attr(feature = "clib", no_mangle)]
         #[allow(unused_comparisons)]
