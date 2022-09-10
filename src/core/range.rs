@@ -23,17 +23,17 @@ macro_rules! gen_range_struct {
 }
 gen_range_struct!(
     /// A half-open (low inclusive, high exclusive) 32-bit floating point numerical range.
-    NSTDFRange32,
+    NSTDRangeF32,
     NSTDFloat32
 );
 gen_range_struct!(
     /// A half-open (low inclusive, high exclusive) 64-bit floating point numerical range.
-    NSTDFRange64,
+    NSTDRangeF64,
     NSTDFloat64
 );
 gen_range_struct!(
     /// A half-open (low inclusive, high exclusive) arch-bit signed numerical range.
-    NSTDIRange,
+    NSTDRange,
     NSTDInt
 );
 gen_range_struct!(
@@ -43,41 +43,41 @@ gen_range_struct!(
 );
 gen_range_struct!(
     /// A half-open (low inclusive, high exclusive) 8-bit signed numerical range.
-    NSTDIRange8,
+    NSTDRangeI8,
     NSTDInt8
 );
 gen_range_struct!(
     /// A half-open (low inclusive, high exclusive) 8-bit unsigned numerical range.
-    NSTDURange8,
+    NSTDRangeU8,
     NSTDUInt8
 );
 gen_range_struct!(
     /// A half-open (low inclusive, high exclusive) 16-bit signed numerical range.
-    NSTDIRange16,
+    NSTDRangeI16,
     NSTDInt16
 );
 gen_range_struct!(
     /// A half-open (low inclusive, high exclusive) 16-bit unsigned numerical range.
-    NSTDURange16,
+    NSTDRangeU16,
     NSTDUInt16
 );
 gen_range_struct!(
     /// A half-open (low inclusive, high exclusive) 32-bit signed numerical range.
-    NSTDIRange32,
+    NSTDRangeI32,
     NSTDInt32
 );
 gen_range_struct!(
     /// A half-open (low inclusive, high exclusive) 32-bit unsigned numerical range.
-    NSTDURange32,
+    NSTDRangeU32,
     NSTDUInt32
 );
 gen_range_struct!(
     /// A half-open (low inclusive, high exclusive) 64-bit signed numerical range.
-    NSTDIRange64,
+    NSTDRangeI64,
     NSTDInt64
 );
 gen_range_struct!(
     /// A half-open (low inclusive, high exclusive) 64-bit unsigned numerical range.
-    NSTDURange64,
+    NSTDRangeU64,
     NSTDUInt64
 );

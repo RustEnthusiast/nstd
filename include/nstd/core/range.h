@@ -8,14 +8,14 @@ typedef struct {
     NSTDFloat32 start;
     /// The higher bound of the range (exclusive).
     NSTDFloat32 end;
-} NSTDFRange32;
+} NSTDRangeF32;
 /// A half-open (low inclusive, high exclusive) 64-bit floating point numerical range.
 typedef struct {
     /// The lower bound of the range (inclusive).
     NSTDFloat64 start;
     /// The higher bound of the range (exclusive).
     NSTDFloat64 end;
-} NSTDFRange64;
+} NSTDRangeF64;
 
 /// A half-open (low inclusive, high exclusive) arch-bit signed numerical range.
 typedef struct {
@@ -23,7 +23,7 @@ typedef struct {
     NSTDInt start;
     /// The higher bound of the range (exclusive).
     NSTDInt end;
-} NSTDIRange;
+} NSTDRange;
 /// A half-open (low inclusive, high exclusive) arch-bit unsigned numerical range.
 typedef struct {
     /// The lower bound of the range (inclusive).
@@ -38,14 +38,14 @@ typedef struct {
     NSTDInt8 start;
     /// The higher bound of the range (exclusive).
     NSTDInt8 end;
-} NSTDIRange8;
+} NSTDRangeI8;
 /// A half-open (low inclusive, high exclusive) 8-bit unsigned numerical range.
 typedef struct {
     /// The lower bound of the range (inclusive).
     NSTDUInt8 start;
     /// The higher bound of the range (exclusive).
     NSTDUInt8 end;
-} NSTDURange8;
+} NSTDRangeU8;
 
 /// A half-open (low inclusive, high exclusive) 16-bit signed numerical range.
 typedef struct {
@@ -53,14 +53,14 @@ typedef struct {
     NSTDInt16 start;
     /// The higher bound of the range (exclusive).
     NSTDInt16 end;
-} NSTDIRange16;
+} NSTDRangeI16;
 /// A half-open (low inclusive, high exclusive) 16-bit unsigned numerical range.
 typedef struct {
     /// The lower bound of the range (inclusive).
     NSTDUInt16 start;
     /// The higher bound of the range (exclusive).
     NSTDUInt16 end;
-} NSTDURange16;
+} NSTDRangeU16;
 
 /// A half-open (low inclusive, high exclusive) 32-bit signed numerical range.
 typedef struct {
@@ -68,14 +68,14 @@ typedef struct {
     NSTDInt32 start;
     /// The higher bound of the range (exclusive).
     NSTDInt32 end;
-} NSTDIRange32;
+} NSTDRangeI32;
 /// A half-open (low inclusive, high exclusive) 32-bit unsigned numerical range.
 typedef struct {
     /// The lower bound of the range (inclusive).
     NSTDUInt32 start;
     /// The higher bound of the range (exclusive).
     NSTDUInt32 end;
-} NSTDURange32;
+} NSTDRangeU32;
 
 /// A half-open (low inclusive, high exclusive) 64-bit signed numerical range.
 typedef struct {
@@ -83,13 +83,13 @@ typedef struct {
     NSTDInt64 start;
     /// The higher bound of the range (exclusive).
     NSTDInt64 end;
-} NSTDIRange64;
+} NSTDRangeI64;
 /// A half-open (low inclusive, high exclusive) 64-bit unsigned numerical range.
 typedef struct {
     /// The lower bound of the range (inclusive).
     NSTDUInt64 start;
     /// The higher bound of the range (exclusive).
     NSTDUInt64 end;
-} NSTDURange64;
+} NSTDRangeU64;
 
 #endif
