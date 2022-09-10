@@ -20,6 +20,19 @@ use crate::{core::def::NSTDByte, NSTDBool, NSTDUInt, NSTD_TRUE};
 /// This function is highly unsafe as it does not know how large either of the memory buffers
 /// actually are, which can lead to undefined behavior if either of the buffers' length are less
 /// than `num`.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::{core::mem::nstd_core_mem_compare, NSTD_TRUE};
+///
+/// unsafe {
+///     let buf1 = [0u8; 12];
+///     let mut buf2 = [u8::MAX; 12];
+///     buf2.copy_from_slice(&buf1);
+///     assert!(nstd_core_mem_compare(buf1.as_ptr(), buf2.as_ptr(), 12) == NSTD_TRUE);
+/// }
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_mem_compare(
@@ -49,6 +62,18 @@ pub unsafe extern "C" fn nstd_core_mem_compare(
 ///
 /// This operation can cause undefined behavior if the caller does not ensure that the memory
 /// buffer is at least `size` bytes in size.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::mem::nstd_core_mem_zero;
+///
+/// unsafe {
+///     let mut buf = [u8::MAX; 10];
+///     nstd_core_mem_zero(buf.as_mut_ptr(), 10);
+///     assert!(buf == [0u8; 10]);
+/// }
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_mem_zero(buf: *mut NSTDByte, size: NSTDUInt) {
@@ -81,6 +106,18 @@ pub unsafe extern "C" fn nstd_core_mem_zero(buf: *mut NSTDByte, size: NSTDUInt) 
 ///
 /// This operation can cause undefined behavior if the caller does not ensure that the memory
 /// buffer is at least `size` bytes in size.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::mem::nstd_core_mem_fill;
+///
+/// unsafe {
+///     let mut buf = [u8::MAX; 10];
+///     nstd_core_mem_fill(buf.as_mut_ptr(), 10, 0);
+///     assert!(buf == [0u8; 10]);
+/// }
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_mem_fill(buf: *mut NSTDByte, size: NSTDUInt, fill: NSTDByte) {
@@ -120,6 +157,19 @@ pub unsafe extern "C" fn nstd_core_mem_fill(buf: *mut NSTDByte, size: NSTDUInt, 
 /// This function is highly unsafe as it does not know how large either of the memory buffers are,
 /// quickly leading to undefined behavior if this function ends up reading or writing past the end
 /// of a buffer.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::mem::nstd_core_mem_copy;
+///
+/// unsafe {
+///     let buf1 = [0u8; 25];
+///     let mut buf2 = [u8::MAX; 25];
+///     nstd_core_mem_copy(buf2.as_mut_ptr(), buf1.as_ptr(), 25);
+///     assert!(buf1 == buf2);
+/// }
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_mem_copy(
@@ -171,6 +221,19 @@ pub unsafe extern "C" fn nstd_core_mem_copy_overlapping(
 /// This function is highly unsafe as it does not know how large either of the memory buffers are,
 /// quickly leading to undefined behavior if this function ends up reading or writing past the end
 /// of a buffer.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::mem::nstd_core_mem_swap;
+///
+/// unsafe {
+///     let mut buf1 = [0u8; 25];
+///     let mut buf2 = [u8::MAX; 25];
+///     nstd_core_mem_swap(buf1.as_mut_ptr(), buf2.as_mut_ptr(), 25);
+///     assert!(buf1 == [u8::MAX; 25] && buf2 == [0u8; 25]);
+/// }
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_mem_swap(x: *mut NSTDByte, y: *mut NSTDByte, num: NSTDUInt) {

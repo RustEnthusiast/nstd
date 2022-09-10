@@ -22,6 +22,19 @@
 /// This function is highly unsafe as it does not know how large either of the memory buffers
 /// actually are, which can lead to undefined behavior if either of the buffers' length are less
 /// than `num`.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::{core::mem::nstd_core_mem_compare, NSTD_TRUE};
+///
+/// unsafe {
+///     let buf1 = [0u8; 12];
+///     let mut buf2 = [u8::MAX; 12];
+///     buf2.copy_from_slice(&buf1);
+///     assert!(nstd_core_mem_compare(buf1.as_ptr(), buf2.as_ptr(), 12) == NSTD_TRUE);
+/// }
+/// ```
 NSTDAPI NSTDBool nstd_core_mem_compare(const NSTDByte *buf1, const NSTDByte *buf2, NSTDUInt num);
 
 /// Zeros out a memory buffer.
@@ -36,6 +49,18 @@ NSTDAPI NSTDBool nstd_core_mem_compare(const NSTDByte *buf1, const NSTDByte *buf
 ///
 /// This operation can cause undefined behavior if the caller does not ensure that the memory
 /// buffer is at least `size` bytes in size.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::mem::nstd_core_mem_zero;
+///
+/// unsafe {
+///     let mut buf = [u8::MAX; 10];
+///     nstd_core_mem_zero(buf.as_mut_ptr(), 10);
+///     assert!(buf == [0u8; 10]);
+/// }
+/// ```
 NSTDAPI void nstd_core_mem_zero(NSTDByte *buf, NSTDUInt size);
 
 /// Fills the memory buffer `buf` with byte `fill`.
@@ -52,6 +77,18 @@ NSTDAPI void nstd_core_mem_zero(NSTDByte *buf, NSTDUInt size);
 ///
 /// This operation can cause undefined behavior if the caller does not ensure that the memory
 /// buffer is at least `size` bytes in size.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::mem::nstd_core_mem_fill;
+///
+/// unsafe {
+///     let mut buf = [u8::MAX; 10];
+///     nstd_core_mem_fill(buf.as_mut_ptr(), 10, 0);
+///     assert!(buf == [0u8; 10]);
+/// }
+/// ```
 NSTDAPI void nstd_core_mem_fill(NSTDByte *buf, NSTDUInt size, NSTDByte fill);
 
 /// Copies `num` bytes from `src` to `dest`.
@@ -69,6 +106,19 @@ NSTDAPI void nstd_core_mem_fill(NSTDByte *buf, NSTDUInt size, NSTDByte fill);
 /// This function is highly unsafe as it does not know how large either of the memory buffers are,
 /// quickly leading to undefined behavior if this function ends up reading or writing past the end
 /// of a buffer.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::mem::nstd_core_mem_copy;
+///
+/// unsafe {
+///     let buf1 = [0u8; 25];
+///     let mut buf2 = [u8::MAX; 25];
+///     nstd_core_mem_copy(buf2.as_mut_ptr(), buf1.as_ptr(), 25);
+///     assert!(buf1 == buf2);
+/// }
+/// ```
 NSTDAPI void nstd_core_mem_copy(NSTDByte *dest, const NSTDByte *src, NSTDUInt num);
 
 /// Copies `num` bytes from `src` to `dest`. Unlike `nstd_core_mem_copy` this operation can be used
@@ -104,6 +154,19 @@ NSTDAPI void nstd_core_mem_copy_overlapping(NSTDByte *dest, const NSTDByte *src,
 /// This function is highly unsafe as it does not know how large either of the memory buffers are,
 /// quickly leading to undefined behavior if this function ends up reading or writing past the end
 /// of a buffer.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::mem::nstd_core_mem_swap;
+///
+/// unsafe {
+///     let mut buf1 = [0u8; 25];
+///     let mut buf2 = [u8::MAX; 25];
+///     nstd_core_mem_swap(buf1.as_mut_ptr(), buf2.as_mut_ptr(), 25);
+///     assert!(buf1 == [u8::MAX; 25] && buf2 == [0u8; 25]);
+/// }
+/// ```
 NSTDAPI void nstd_core_mem_swap(NSTDByte *x, NSTDByte *y, NSTDUInt num);
 
 #endif
