@@ -32,6 +32,18 @@ NSTDAPI NSTDPtr nstd_core_ptr_new(NSTDAny obj, NSTDUInt size);
 /// # Returns
 ///
 /// `NSTDUInt size` - The size of the object pointed to by `ptr`.
+///
+/// # Examples
+///
+/// ```
+/// use core::ptr::addr_of;
+/// use nstd_sys::core::ptr::{nstd_core_ptr_new, nstd_core_ptr_size};
+///
+/// const VALUE_SIZE: usize = core::mem::size_of::<isize>();
+/// let x = 33isize;
+/// let ptr = nstd_core_ptr_new(addr_of!(x).cast(), VALUE_SIZE);
+/// assert!(nstd_core_ptr_size(&ptr) == VALUE_SIZE);
+/// ```
 NSTDAPI NSTDUInt nstd_core_ptr_size(const NSTDPtr *ptr);
 
 /// Returns a raw immutable pointer to the object pointed to by `ptr`.
@@ -43,6 +55,20 @@ NSTDAPI NSTDUInt nstd_core_ptr_size(const NSTDPtr *ptr);
 /// # Returns
 ///
 /// `NSTDAny raw` - A raw pointer to the object.
+///
+/// # Examples
+///
+/// ```
+/// use core::ptr::addr_of;
+/// use nstd_sys::core::ptr::{nstd_core_ptr_get, nstd_core_ptr_new};
+///
+/// const VALUE_SIZE: usize = core::mem::size_of::<u32>();
+/// let x = 45u32;
+/// let ptr = nstd_core_ptr_new(addr_of!(x).cast(), VALUE_SIZE);
+/// unsafe {
+///     assert!(*nstd_core_ptr_get(&ptr).cast::<u32>() == x);
+/// }
+/// ```
 NSTDAPI NSTDAny nstd_core_ptr_get(const NSTDPtr *ptr);
 
 /// A sized pointer to some arbitrary type.
@@ -86,6 +112,18 @@ NSTDAPI NSTDPtr nstd_core_ptr_mut_as_const(const NSTDPtrMut *ptr);
 /// # Returns
 ///
 /// `NSTDUInt size` - The size of the object pointed to by `ptr`.
+///
+/// # Examples
+///
+/// ```
+/// use core::ptr::addr_of_mut;
+/// use nstd_sys::core::ptr::{nstd_core_ptr_mut_new, nstd_core_ptr_mut_size};
+///
+/// const VALUE_SIZE: usize = core::mem::size_of::<isize>();
+/// let mut x = 33isize;
+/// let ptr = nstd_core_ptr_mut_new(addr_of_mut!(x).cast(), VALUE_SIZE);
+/// assert!(nstd_core_ptr_mut_size(&ptr) == VALUE_SIZE);
+/// ```
 NSTDAPI NSTDUInt nstd_core_ptr_mut_size(const NSTDPtrMut *ptr);
 
 /// Returns a raw pointer to the object pointed to by `ptr`.
@@ -97,6 +135,22 @@ NSTDAPI NSTDUInt nstd_core_ptr_mut_size(const NSTDPtrMut *ptr);
 /// # Returns
 ///
 /// `NSTDAnyMut raw` - A raw pointer to the object.
+///
+/// # Examples
+///
+/// ```
+/// use core::ptr::addr_of_mut;
+/// use nstd_sys::core::ptr::{nstd_core_ptr_mut_get, nstd_core_ptr_mut_new};
+///
+/// const VALUE_SIZE: usize = core::mem::size_of::<u32>();
+/// let mut x = 8u32;
+/// let mut ptr = nstd_core_ptr_mut_new(addr_of_mut!(x).cast(), VALUE_SIZE);
+/// unsafe {
+///     let x_ptr = nstd_core_ptr_mut_get(&mut ptr).cast();
+///     *x_ptr *= 2;
+///     assert!(x == *x_ptr);
+/// }
+/// ```
 NSTDAPI NSTDAnyMut nstd_core_ptr_mut_get(NSTDPtrMut *ptr);
 
 /// Returns a raw immutable pointer to the object pointed to by `ptr`.
@@ -108,6 +162,20 @@ NSTDAPI NSTDAnyMut nstd_core_ptr_mut_get(NSTDPtrMut *ptr);
 /// # Returns
 ///
 /// `NSTDAny raw` - A raw pointer to the object.
+///
+/// # Examples
+///
+/// ```
+/// use core::ptr::addr_of_mut;
+/// use nstd_sys::core::ptr::{nstd_core_ptr_mut_get_const, nstd_core_ptr_mut_new};
+///
+/// const VALUE_SIZE: usize = core::mem::size_of::<u32>();
+/// let mut x = 45u32;
+/// let ptr = nstd_core_ptr_mut_new(addr_of_mut!(x).cast(), VALUE_SIZE);
+/// unsafe {
+///     assert!(*nstd_core_ptr_mut_get_const(&ptr).cast::<u32>() == x);
+/// }
+/// ```
 NSTDAPI NSTDAny nstd_core_ptr_mut_get_const(const NSTDPtrMut *ptr);
 
 /// Writes data from `obj` to `ptr`. The number of bytes written is determined by `ptr.size`.
@@ -126,6 +194,24 @@ NSTDAPI NSTDAny nstd_core_ptr_mut_get_const(const NSTDPtrMut *ptr);
 /// # Safety
 ///
 /// This operation is highly unsafe because there is no way of knowing if `obj`'s data is valid.
+///
+/// # Examples
+///
+/// ```
+/// use core::ptr::{addr_of, addr_of_mut};
+/// use nstd_sys::core::ptr::{
+///     nstd_core_ptr_mut_get_const, nstd_core_ptr_mut_new, nstd_core_ptr_mut_write,
+/// };
+///
+/// const VALUE_SIZE: usize = core::mem::size_of::<i64>();
+/// let mut x = -69i64;
+/// let mut ptr = nstd_core_ptr_mut_new(addr_of_mut!(x).cast(), VALUE_SIZE);
+/// unsafe {
+///     let y = 420i64;
+///     nstd_core_ptr_mut_write(&mut ptr, addr_of!(y).cast());
+///     assert!(x == y);
+/// }
+/// ```
 NSTDAPI void nstd_core_ptr_mut_write(NSTDPtrMut *ptr, NSTDAny obj);
 
 #endif
