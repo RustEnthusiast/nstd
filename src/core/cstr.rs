@@ -57,13 +57,15 @@ pub extern "C" fn nstd_core_cstr_new(raw: *const NSTDChar, len: NSTDUInt) -> NST
 /// # Returns
 ///
 /// `NSTDCStr cstr` - The new C string slice, referencing `raw`'s data.
+///
+/// # Safety
+///
+/// This operation may attempt to access data that is unowned by the raw C string, which can lead
+/// to undefined behavior.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-#[allow(clippy::not_unsafe_ptr_arg_deref)]
-pub extern "C" fn nstd_core_cstr_from_raw(raw: *const NSTDChar) -> NSTDCStr {
-    // SAFETY: `NSTDCStr` is already unsafe to access, so there's no need for any kind of
-    // validation here.
-    let len = unsafe { nstd_core_cstr_raw_len(raw) };
+pub unsafe extern "C" fn nstd_core_cstr_from_raw(raw: *const NSTDChar) -> NSTDCStr {
+    let len = nstd_core_cstr_raw_len(raw);
     nstd_core_cstr_new(raw, len)
 }
 
@@ -76,13 +78,15 @@ pub extern "C" fn nstd_core_cstr_from_raw(raw: *const NSTDChar) -> NSTDCStr {
 /// # Returns
 ///
 /// `NSTDCStr cstr` - The new C string slice, referencing `raw`'s data.
+///
+/// # Safety
+///
+/// This operation may attempt to access data that is unowned by the raw C string, which can lead
+/// to undefined behavior.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-#[allow(clippy::not_unsafe_ptr_arg_deref)]
-pub extern "C" fn nstd_core_cstr_from_raw_with_null(raw: *const NSTDChar) -> NSTDCStr {
-    // SAFETY: `NSTDCStr` is already unsafe to access, so there's no need for any kind of
-    // validation here.
-    let len = unsafe { nstd_core_cstr_raw_len_with_null(raw) };
+pub unsafe extern "C" fn nstd_core_cstr_from_raw_with_null(raw: *const NSTDChar) -> NSTDCStr {
+    let len = nstd_core_cstr_raw_len_with_null(raw);
     nstd_core_cstr_new(raw, len)
 }
 
@@ -240,13 +244,15 @@ pub extern "C" fn nstd_core_cstr_mut_new(raw: *mut NSTDChar, len: NSTDUInt) -> N
 /// # Returns
 ///
 /// `NSTDCStrMut cstr` - The new C string slice, referencing `raw`'s data.
+///
+/// # Safety
+///
+/// This operation may attempt to access data that is unowned by the raw C string, which can lead
+/// to undefined behavior.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-#[allow(clippy::not_unsafe_ptr_arg_deref)]
-pub extern "C" fn nstd_core_cstr_mut_from_raw(raw: *mut NSTDChar) -> NSTDCStrMut {
-    // SAFETY: `NSTDCStrMut` is already unsafe to access, so there's no need for any kind of
-    // validation here.
-    let len = unsafe { nstd_core_cstr_raw_len(raw) };
+pub unsafe extern "C" fn nstd_core_cstr_mut_from_raw(raw: *mut NSTDChar) -> NSTDCStrMut {
+    let len = nstd_core_cstr_raw_len(raw);
     nstd_core_cstr_mut_new(raw, len)
 }
 
@@ -259,13 +265,15 @@ pub extern "C" fn nstd_core_cstr_mut_from_raw(raw: *mut NSTDChar) -> NSTDCStrMut
 /// # Returns
 ///
 /// `NSTDCStrMut cstr` - The new C string slice, referencing `raw`'s data.
+///
+/// # Safety
+///
+/// This operation may attempt to access data that is unowned by the raw C string, which can lead
+/// to undefined behavior.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-#[allow(clippy::not_unsafe_ptr_arg_deref)]
-pub extern "C" fn nstd_core_cstr_mut_from_raw_with_null(raw: *mut NSTDChar) -> NSTDCStrMut {
-    // SAFETY: `NSTDCStrMut` is already unsafe to access, so there's no need for any kind of
-    // validation here.
-    let len = unsafe { nstd_core_cstr_raw_len_with_null(raw) };
+pub unsafe extern "C" fn nstd_core_cstr_mut_from_raw_with_null(raw: *mut NSTDChar) -> NSTDCStrMut {
+    let len = nstd_core_cstr_raw_len_with_null(raw);
     nstd_core_cstr_mut_new(raw, len)
 }
 

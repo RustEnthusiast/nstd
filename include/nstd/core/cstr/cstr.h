@@ -34,6 +34,11 @@ NSTDAPI NSTDCStr nstd_core_cstr_new(const NSTDChar *raw, NSTDUInt len);
 /// # Returns
 ///
 /// `NSTDCStr cstr` - The new C string slice, referencing `raw`'s data.
+///
+/// # Safety
+///
+/// This operation may attempt to access data that is unowned by the raw C string, which can lead
+/// to undefined behavior.
 NSTDAPI NSTDCStr nstd_core_cstr_from_raw(const NSTDChar *raw);
 
 /// Creates a new instance of `NSTDCStr` from a raw C string, including the null byte.
@@ -45,6 +50,11 @@ NSTDAPI NSTDCStr nstd_core_cstr_from_raw(const NSTDChar *raw);
 /// # Returns
 ///
 /// `NSTDCStr cstr` - The new C string slice, referencing `raw`'s data.
+///
+/// # Safety
+///
+/// This operation may attempt to access data that is unowned by the raw C string, which can lead
+/// to undefined behavior.
 NSTDAPI NSTDCStr nstd_core_cstr_from_raw_with_null(const NSTDChar *raw);
 
 /// Returns a byte slice of a C string slice's data.
@@ -152,6 +162,11 @@ NSTDAPI NSTDCStrMut nstd_core_cstr_mut_new(NSTDChar *raw, NSTDUInt len);
 /// # Returns
 ///
 /// `NSTDCStrMut cstr` - The new C string slice, referencing `raw`'s data.
+///
+/// # Safety
+///
+/// This operation may attempt to access data that is unowned by the raw C string, which can lead
+/// to undefined behavior.
 NSTDAPI NSTDCStrMut nstd_core_cstr_mut_from_raw(NSTDChar *raw);
 
 /// Creates a new instance of `NSTDCStrMut` from a raw C string, including the null byte.
@@ -163,6 +178,11 @@ NSTDAPI NSTDCStrMut nstd_core_cstr_mut_from_raw(NSTDChar *raw);
 /// # Returns
 ///
 /// `NSTDCStrMut cstr` - The new C string slice, referencing `raw`'s data.
+///
+/// # Safety
+///
+/// This operation may attempt to access data that is unowned by the raw C string, which can lead
+/// to undefined behavior.
 NSTDAPI NSTDCStrMut nstd_core_cstr_mut_from_raw_with_null(NSTDChar *raw);
 
 /// Creates an immutable version of a mutable C string slice.

@@ -2,6 +2,7 @@
 ### `nstd`
 - Added `asm` feature.
 ### `nstd.core`
+- Made `cstr[_mut]_from_raw[_with_null]` unsafe.
 - Renamed range types.
 - `math_[clamp|div_ceil|div_floor]` are now unsafe.
 - `cty_is_digit` is now unsafe.
