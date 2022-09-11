@@ -117,6 +117,10 @@ NSTDAPI NSTDBool nstd_core_cstr_is_null_terminated(const NSTDCStr *cstr);
 ///
 /// `const NSTDChar *nul` - A pointer to the first null byte in `cstr`, or null ([NSTD_NULL]) if
 /// the C string slice doesn't contain a null byte.
+///
+/// # Safety
+///
+/// Undefined behavior may occur if `cstr`'s data is invalid.
 NSTDAPI const NSTDChar *nstd_core_cstr_get_null(const NSTDCStr *cstr);
 
 /// Return a pointer the character at `pos` in `cstr`.
@@ -267,6 +271,11 @@ NSTDAPI NSTDBool nstd_core_cstr_mut_is_null_terminated(const NSTDCStrMut *cstr);
 ///
 /// `NSTDChar *nul` - A pointer to the first null byte in `cstr`, or null ([NSTD_NULL]) if the C
 /// string slice doesn't contain a null byte.
+///
+/// # Safety
+///
+/// This operation may attempt to access data that is unowned by the raw C string, which can lead
+/// to undefined behavior.
 NSTDAPI NSTDChar *nstd_core_cstr_mut_get_null(NSTDCStrMut *cstr);
 
 /// Returns a pointer to the first null byte in a C string slice if present.
@@ -279,6 +288,11 @@ NSTDAPI NSTDChar *nstd_core_cstr_mut_get_null(NSTDCStrMut *cstr);
 ///
 /// `const NSTDChar *nul` - A pointer to the first null byte in `cstr`, or null ([NSTD_NULL]) if
 /// the C string slice doesn't contain a null byte.
+///
+/// # Safety
+///
+/// This operation may attempt to access data that is unowned by the raw C string, which can lead
+/// to undefined behavior.
 NSTDAPI const NSTDChar *nstd_core_cstr_mut_get_null_const(const NSTDCStr *cstr);
 
 /// Return a pointer the character at `pos` in `cstr`.
