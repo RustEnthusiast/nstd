@@ -3,5 +3,5 @@
     cmp byte ptr [{cstr} + {i}], 0
     je 3f
     inc {i}
-    jne 2b
+    jmp 2b
 3:
