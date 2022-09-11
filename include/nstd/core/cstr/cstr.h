@@ -105,6 +105,30 @@ NSTDAPI NSTDUInt nstd_core_cstr_len(const NSTDCStr *cstr);
 /// # Safety
 ///
 /// Undefined behavior may occur if `cstr`'s data is invalid.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::{
+///     core::cstr::{nstd_core_cstr_is_null_terminated, nstd_core_cstr_new},
+///     NSTD_FALSE, NSTD_TRUE,
+/// };
+///
+/// let nn_bytes = "Hello, world!";
+/// let nn_cstr = nstd_core_cstr_new(nn_bytes.as_ptr().cast(), nn_bytes.len());
+///
+/// let nt_bytes = "Hello, world!\0";
+/// let nt_cstr = nstd_core_cstr_new(nt_bytes.as_ptr().cast(), nt_bytes.len());
+///
+/// let mn_bytes = "Hello, \0world!";
+/// let mn_cstr = nstd_core_cstr_new(mn_bytes.as_ptr().cast(), mn_bytes.len());
+///
+/// unsafe {
+///     assert!(nstd_core_cstr_is_null_terminated(&nn_cstr) == NSTD_FALSE);
+///     assert!(nstd_core_cstr_is_null_terminated(&nt_cstr) == NSTD_TRUE);
+///     assert!(nstd_core_cstr_is_null_terminated(&mn_cstr) == NSTD_FALSE);
+/// }
+/// ```
 NSTDAPI NSTDBool nstd_core_cstr_is_null_terminated(const NSTDCStr *cstr);
 
 /// Returns a pointer to the first null byte in a C string slice if present.

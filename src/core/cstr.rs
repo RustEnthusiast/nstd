@@ -6,7 +6,7 @@ use crate::{
         def::NSTDChar,
         slice::{nstd_core_slice_new, NSTDSlice},
     },
-    NSTDBool, NSTDUInt, NSTD_FALSE,
+    NSTDBool, NSTDUInt,
 };
 
 /// An immutable slice of a C string.
@@ -150,16 +150,58 @@ pub extern "C" fn nstd_core_cstr_len(cstr: &NSTDCStr) -> NSTDUInt {
 /// # Safety
 ///
 /// Undefined behavior may occur if `cstr`'s data is invalid.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::{
+///     core::cstr::{nstd_core_cstr_is_null_terminated, nstd_core_cstr_new},
+///     NSTD_FALSE, NSTD_TRUE,
+/// };
+///
+/// let nn_bytes = "Hello, world!";
+/// let nn_cstr = nstd_core_cstr_new(nn_bytes.as_ptr().cast(), nn_bytes.len());
+///
+/// let nt_bytes = "Hello, world!\0";
+/// let nt_cstr = nstd_core_cstr_new(nt_bytes.as_ptr().cast(), nt_bytes.len());
+///
+/// let mn_bytes = "Hello, \0world!";
+/// let mn_cstr = nstd_core_cstr_new(mn_bytes.as_ptr().cast(), mn_bytes.len());
+///
+/// unsafe {
+///     assert!(nstd_core_cstr_is_null_terminated(&nn_cstr) == NSTD_FALSE);
+///     assert!(nstd_core_cstr_is_null_terminated(&nt_cstr) == NSTD_TRUE);
+///     assert!(nstd_core_cstr_is_null_terminated(&mn_cstr) == NSTD_FALSE);
+/// }
+/// ```
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_cstr_is_null_terminated(cstr: &NSTDCStr) -> NSTDBool {
-    let mut i = 0;
-    while i < cstr.len {
-        if *cstr.ptr.add(i) == 0 {
-            return (i == cstr.len - 1) as NSTDBool;
+    #[cfg(not(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64"))))]
+    {
+        use crate::NSTD_FALSE;
+        let mut i = 0;
+        while i < cstr.len {
+            if *cstr.ptr.add(i) == 0 {
+                return (i == cstr.len - 1) as NSTDBool;
+            }
+            i += 1;
         }
-        i += 1;
+        NSTD_FALSE
     }
-    NSTD_FALSE
+    #[cfg(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64")))]
+    {
+        use core::arch::asm;
+        let NSTDCStr { ptr, len } = *cstr;
+        let is_nt;
+        asm!(
+            include_str!("cstr/is_null_terminated.asm"),
+            ptr = in(reg) ptr,
+            len = in(reg) len,
+            is_nt = out(reg_byte) is_nt,
+            i = out(reg) _
+        );
+        is_nt
+    }
 }
 
 /// Returns a pointer to the first null byte in a C string slice if present.
