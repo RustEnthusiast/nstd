@@ -37,6 +37,41 @@
 /// ```
 NSTDAPI NSTDBool nstd_core_mem_compare(const NSTDByte *buf1, const NSTDByte *buf2, NSTDUInt num);
 
+/// Iterates through each byte in a raw memory buffer until `delim` is reached, returning a pointer
+/// to the delimiter byte if it is found.
+///
+/// # Parameters:
+///
+/// - `const NSTDByte *buf` - The memory buffer to search.
+///
+/// - `NSTDUInt size` - The number of bytes to search.
+///
+/// - `NSTDByte delim` - The delimiter byte.
+///
+/// # Returns
+///
+/// `const NSTDByte *delim_ptr` - A pointer to the delimiter byte, or null if it was not found.
+///
+/// # Safety
+///
+/// This operation makes access to raw pointer data, leading to undefined behavior if `buf`'s
+/// data is invalid.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::mem::nstd_core_mem_search;
+///
+/// let buffer = b"Hello, world!\0";
+/// let ptr = buffer.as_ptr().cast();
+/// unsafe {
+///     assert!(nstd_core_mem_search(ptr, buffer.len(), b'H') == ptr);
+///     assert!(nstd_core_mem_search(ptr, buffer.len(), b' ') == ptr.add(6));
+///     assert!(nstd_core_mem_search(ptr, buffer.len(), 0) == ptr.add(13));
+/// }
+/// ```
+NSTDAPI const NSTDByte *nstd_core_mem_search(const NSTDByte *buf, NSTDUInt size, NSTDByte delim);
+
 /// Zeros out a memory buffer.
 ///
 /// # Parameters:

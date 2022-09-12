@@ -4,6 +4,7 @@ use self::raw::{nstd_core_cstr_raw_len, nstd_core_cstr_raw_len_with_null};
 use crate::{
     core::{
         def::NSTDChar,
+        mem::nstd_core_mem_search,
         slice::{nstd_core_slice_new, NSTDSlice},
     },
     NSTDBool, NSTDUInt,
@@ -220,14 +221,7 @@ pub unsafe extern "C" fn nstd_core_cstr_is_null_terminated(cstr: &NSTDCStr) -> N
 /// Undefined behavior may occur if `cstr`'s data is invalid.
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_cstr_get_null(cstr: &NSTDCStr) -> *const NSTDChar {
-    let mut i = 0;
-    while i < cstr.len {
-        if *cstr.ptr.add(i) == 0 {
-            return cstr.ptr.add(i);
-        }
-        i += 1;
-    }
-    core::ptr::null()
+    nstd_core_mem_search(cstr.ptr.cast(), cstr.len, 0).cast()
 }
 
 /// Return a pointer the character at `pos` in `cstr`.
