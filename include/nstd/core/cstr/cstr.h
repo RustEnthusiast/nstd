@@ -91,7 +91,7 @@ NSTDAPI const NSTDChar *nstd_core_cstr_as_ptr(const NSTDCStr *cstr);
 NSTDAPI NSTDUInt nstd_core_cstr_len(const NSTDCStr *cstr);
 
 /// Determines whether or not a C string slice is null terminated. This will return false if the C
-/// string slice contains any null bytes in the middle.
+/// string slice contains any null bytes before the last byte.
 ///
 /// # Parameters:
 ///
@@ -131,7 +131,7 @@ NSTDAPI NSTDUInt nstd_core_cstr_len(const NSTDCStr *cstr);
 /// ```
 NSTDAPI NSTDBool nstd_core_cstr_is_null_terminated(const NSTDCStr *cstr);
 
-/// Returns a pointer to the first null byte in a C string slice if present.
+/// Returns a pointer to the first null byte in a C string slice if one is present.
 ///
 /// # Parameters:
 ///
@@ -139,8 +139,8 @@ NSTDAPI NSTDBool nstd_core_cstr_is_null_terminated(const NSTDCStr *cstr);
 ///
 /// # Returns
 ///
-/// `const NSTDChar *nul` - A pointer to the first null byte in `cstr`, or null ([NSTD_NULL]) if
-/// the C string slice doesn't contain a null byte.
+/// `const NSTDChar *nul` - A pointer to the first null byte in `cstr`, or null if the C string
+/// slice doesn't contain a null byte.
 ///
 /// # Safety
 ///
@@ -269,7 +269,7 @@ NSTDAPI const NSTDChar *nstd_core_cstr_mut_as_ptr_const(const NSTDCStrMut *cstr)
 NSTDAPI NSTDUInt nstd_core_cstr_mut_len(const NSTDCStrMut *cstr);
 
 /// Determines whether or not a C string slice is null terminated. This will return false if the C
-/// string slice contains any null bytes in the middle.
+/// string slice contains any null bytes before the last byte.
 ///
 /// # Parameters:
 ///
@@ -285,7 +285,7 @@ NSTDAPI NSTDUInt nstd_core_cstr_mut_len(const NSTDCStrMut *cstr);
 /// Undefined behavior may occur if `cstr`'s data is invalid.
 NSTDAPI NSTDBool nstd_core_cstr_mut_is_null_terminated(const NSTDCStrMut *cstr);
 
-/// Returns a pointer to the first null byte in a C string slice if present.
+/// Returns a pointer to the first null byte in a C string slice if one is present.
 ///
 /// # Parameters:
 ///
@@ -293,8 +293,8 @@ NSTDAPI NSTDBool nstd_core_cstr_mut_is_null_terminated(const NSTDCStrMut *cstr);
 ///
 /// # Returns
 ///
-/// `NSTDChar *nul` - A pointer to the first null byte in `cstr`, or null ([NSTD_NULL]) if the C
-/// string slice doesn't contain a null byte.
+/// `NSTDChar *nul` - A pointer to the first null byte in `cstr`, or null if the C string
+/// slice doesn't contain a null byte.
 ///
 /// # Safety
 ///
@@ -302,7 +302,7 @@ NSTDAPI NSTDBool nstd_core_cstr_mut_is_null_terminated(const NSTDCStrMut *cstr);
 /// to undefined behavior.
 NSTDAPI NSTDChar *nstd_core_cstr_mut_get_null(NSTDCStrMut *cstr);
 
-/// Returns a pointer to the first null byte in a C string slice if present.
+/// Returns an immutable pointer to the first null byte in a C string slice if one is present.
 ///
 /// # Parameters:
 ///
@@ -310,8 +310,8 @@ NSTDAPI NSTDChar *nstd_core_cstr_mut_get_null(NSTDCStrMut *cstr);
 ///
 /// # Returns
 ///
-/// `const NSTDChar *nul` - A pointer to the first null byte in `cstr`, or null ([NSTD_NULL]) if
-/// the C string slice doesn't contain a null byte.
+/// `const NSTDChar *nul` - A pointer to the first null byte in `cstr`, or null if the C string
+/// slice doesn't contain a null byte.
 ///
 /// # Safety
 ///
