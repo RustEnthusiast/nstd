@@ -45,6 +45,47 @@ NSTDAPI NSTDStr nstd_core_str_from_cstr(const NSTDCStr *cstr);
 /// valid while the returned string slice is in use.
 NSTDAPI NSTDStr nstd_core_str_from_cstr_unchecked(const NSTDCStr *cstr);
 
+/// Creates a new `NSTDStr` from a raw C string.
+///
+/// # Parameters:
+///
+/// - `const NSTDChar *cstr` - The raw C string to wrap.
+///
+/// # Returns
+///
+/// `NSTDStr str` - The new string slice.
+///
+/// # Panics
+///
+/// This function will panic if `cstr`'s data is not valid UTF-8.
+///
+/// # Safety
+///
+/// This function makes access raw pointer data, which can cause undefined behavior in the event
+/// that `cstr`'s data is invalid.
+NSTDAPI NSTDStr nstd_core_str_from_raw_cstr(const NSTDChar *cstr);
+
+/// Creates a new `NSTDStr` from a raw C string, including the null byte.
+///
+/// # Parameters:
+///
+/// - `const NSTDChar *cstr` - The raw C string to wrap.
+///
+/// # Returns
+///
+/// `NSTDStr str` - The new string slice.
+///
+/// # Panics
+///
+/// This function will panic if `cstr`'s data is not valid UTF-8.
+///
+/// # Safety
+///
+/// This function makes access to raw pointer data, which can cause undefined behavior in the event
+/// that `cstr`'s data is invalid.
+/// This operation does not ensure that `cstr` is valid UTF-8.
+NSTDAPI NSTDStr nstd_core_str_from_raw_cstr_with_null(const NSTDChar *cstr);
+
 /// Creates a string slice from raw bytes.
 ///
 /// # Parameters:
@@ -414,6 +455,47 @@ NSTDAPI NSTDStrMut nstd_core_str_mut_from_cstr(NSTDCStrMut *cstr);
 /// This function does not check to ensure that `cstr` is valid UTF-8. `cstr`'s data must remain
 /// valid while the returned string slice is in use.
 NSTDAPI NSTDStrMut nstd_core_str_mut_from_cstr_unchecked(NSTDCStrMut *cstr);
+
+/// Creates a new `NSTDStrMut` from a raw C string.
+///
+/// # Parameters:
+///
+/// - `NSTDChar *cstr` - The raw C string to wrap.
+///
+/// # Returns
+///
+/// `NSTDStrMut str` - The new string slice.
+///
+/// # Panics
+///
+/// This function will panic if `cstr`'s data is not valid UTF-8.
+///
+/// # Safety
+///
+/// This function makes access raw pointer data, which can cause undefined behavior in the event
+/// that `cstr`'s data is invalid.
+NSTDAPI NSTDStrMut nstd_core_str_mut_from_raw_cstr(NSTDChar *cstr);
+
+/// Creates a new `NSTDStrMut` from a raw C string, including the null byte.
+///
+/// # Parameters:
+///
+/// - `NSTDChar *cstr` - The raw C string to wrap.
+///
+/// # Returns
+///
+/// `NSTDStrMut str` - The new string slice.
+///
+/// # Panics
+///
+/// This function will panic if `cstr`'s data is not valid UTF-8.
+///
+/// # Safety
+///
+/// This function makes access to raw pointer data, which can cause undefined behavior in the event
+/// that `cstr`'s data is invalid.
+/// This operation does not ensure that `cstr` is valid UTF-8.
+NSTDAPI NSTDStrMut nstd_core_str_mut_from_raw_cstr_with_null(NSTDChar *cstr);
 
 /// Creates a string slice from raw bytes.
 ///

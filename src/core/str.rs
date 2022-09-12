@@ -3,9 +3,11 @@ use crate::{
     core::{
         cstr::{
             nstd_core_cstr_as_ptr, nstd_core_cstr_len, nstd_core_cstr_mut_as_ptr,
-            nstd_core_cstr_mut_len, NSTDCStr, NSTDCStrMut,
+            nstd_core_cstr_mut_len,
+            raw::{nstd_core_cstr_raw_len, nstd_core_cstr_raw_len_with_null},
+            NSTDCStr, NSTDCStrMut,
         },
-        def::{NSTDByte, NSTDErrorCode},
+        def::{NSTDByte, NSTDChar, NSTDErrorCode},
         range::NSTDURange,
         slice::{
             nstd_core_slice_as_ptr, nstd_core_slice_len, nstd_core_slice_mut_as_ptr,
@@ -106,6 +108,59 @@ pub extern "C" fn nstd_core_str_from_cstr(cstr: &NSTDCStr) -> NSTDStr {
 pub unsafe extern "C" fn nstd_core_str_from_cstr_unchecked(cstr: &NSTDCStr) -> NSTDStr {
     let ptr = nstd_core_cstr_as_ptr(cstr).cast();
     let len = nstd_core_cstr_len(cstr);
+    NSTDStr { ptr, len }
+}
+
+/// Creates a new `NSTDStr` from a raw C string.
+///
+/// # Parameters:
+///
+/// - `const NSTDChar *cstr` - The raw C string to wrap.
+///
+/// # Returns
+///
+/// `NSTDStr str` - The new string slice.
+///
+/// # Panics
+///
+/// This function will panic if `cstr`'s data is not valid UTF-8.
+///
+/// # Safety
+///
+/// This function makes access raw pointer data, which can cause undefined behavior in the event
+/// that `cstr`'s data is invalid.
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_core_str_from_raw_cstr(cstr: *const NSTDChar) -> NSTDStr {
+    let ptr = cstr.cast();
+    let len = nstd_core_cstr_raw_len(cstr);
+    let bytes = core::slice::from_raw_parts(ptr, len);
+    core::str::from_utf8(bytes).expect("Invalid UTF-8 bytes");
+    NSTDStr { ptr, len }
+}
+
+/// Creates a new `NSTDStr` from a raw C string, including the null byte.
+///
+/// # Parameters:
+///
+/// - `const NSTDChar *cstr` - The raw C string to wrap.
+///
+/// # Returns
+///
+/// `NSTDStr str` - The new string slice.
+///
+/// # Panics
+///
+/// This function will panic if `cstr`'s data is not valid UTF-8.
+///
+/// # Safety
+///
+/// This function makes access to raw pointer data, which can cause undefined behavior in the event
+/// that `cstr`'s data is invalid.
+/// This operation does not ensure that `cstr` is valid UTF-8.
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_core_str_from_raw_cstr_with_null(cstr: *const NSTDChar) -> NSTDStr {
+    let ptr = cstr.cast();
+    let len = nstd_core_cstr_raw_len_with_null(cstr);
     NSTDStr { ptr, len }
 }
 
@@ -555,6 +610,61 @@ pub unsafe extern "C" fn nstd_core_str_mut_from_cstr_unchecked(
 ) -> NSTDStrMut {
     let ptr = nstd_core_cstr_mut_as_ptr(cstr).cast();
     let len = nstd_core_cstr_mut_len(cstr);
+    NSTDStrMut { ptr, len }
+}
+
+/// Creates a new `NSTDStrMut` from a raw C string.
+///
+/// # Parameters:
+///
+/// - `NSTDChar *cstr` - The raw C string to wrap.
+///
+/// # Returns
+///
+/// `NSTDStrMut str` - The new string slice.
+///
+/// # Panics
+///
+/// This function will panic if `cstr`'s data is not valid UTF-8.
+///
+/// # Safety
+///
+/// This function makes access raw pointer data, which can cause undefined behavior in the event
+/// that `cstr`'s data is invalid.
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_core_str_mut_from_raw_cstr(cstr: *mut NSTDChar) -> NSTDStrMut {
+    let ptr = cstr.cast();
+    let len = nstd_core_cstr_raw_len(cstr);
+    let bytes = core::slice::from_raw_parts(ptr, len);
+    core::str::from_utf8(bytes).expect("Invalid UTF-8 bytes");
+    NSTDStrMut { ptr, len }
+}
+
+/// Creates a new `NSTDStrMut` from a raw C string, including the null byte.
+///
+/// # Parameters:
+///
+/// - `NSTDChar *cstr` - The raw C string to wrap.
+///
+/// # Returns
+///
+/// `NSTDStrMut str` - The new string slice.
+///
+/// # Panics
+///
+/// This function will panic if `cstr`'s data is not valid UTF-8.
+///
+/// # Safety
+///
+/// This function makes access to raw pointer data, which can cause undefined behavior in the event
+/// that `cstr`'s data is invalid.
+/// This operation does not ensure that `cstr` is valid UTF-8.
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_core_str_mut_from_raw_cstr_with_null(
+    cstr: *mut NSTDChar,
+) -> NSTDStrMut {
+    let ptr = cstr.cast();
+    let len = nstd_core_cstr_raw_len_with_null(cstr);
     NSTDStrMut { ptr, len }
 }
 

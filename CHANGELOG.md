@@ -2,6 +2,7 @@
 ### `nstd`
 - Added `asm` feature.
 ### `nstd.core`
+- Added `str[_mut]_from_raw_cstr[_with_null]`.
 - Made `cstr[_mut]_get_null[_const]` unsafe.
 - Made `cstr[_mut]_from_raw[_with_null]` unsafe.
 - Renamed range types.
