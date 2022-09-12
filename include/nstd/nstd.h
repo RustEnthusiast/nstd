@@ -1,13 +1,12 @@
 #ifndef NSTD_NSTD_H
 #define NSTD_NSTD_H
+#include "os/windows/windows.h"
+#include <stddef.h>
+#include <stdint.h>
 #ifdef __cplusplus
 #   define NSTDCPP __cplusplus
 #endif
-#if defined(__WINDOWS__)\
-    || defined(_WIN32)\
-    || defined(_WIN64)\
-    || defined(__WIN32__)\
-    || defined(__TOS_WIN__)
+#ifdef NSTD_OS_WINDOWS
 #   ifdef NSTDCPP
 #       define NSTDAPI __declspec(dllexport) extern "C"
 #   else
@@ -20,8 +19,6 @@
 #       define NSTDAPI
 #   endif
 #endif
-#include <stddef.h>
-#include <stdint.h>
 
 /// A null pointer value constant.
 #ifndef NSTDCPP

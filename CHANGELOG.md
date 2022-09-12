@@ -11,6 +11,8 @@
 - Added `math_div_floor_*`.
 - Added `math_pow_*`.
 - Added `math_abs_*`.
+### `nstd.os`
+- Added `NSTD_OS_WINDOWS` constant.
 
 # 0.1.3
 ### `nstd`
