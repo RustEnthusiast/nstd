@@ -1,6 +1,6 @@
 #ifndef NSTD_NSTD_H
 #define NSTD_NSTD_H
-#include "os/windows/windows.h"
+#include "os/os.h"
 #include <stddef.h>
 #include <stdint.h>
 #ifdef __cplusplus
