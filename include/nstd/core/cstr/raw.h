@@ -15,7 +15,7 @@
 ///
 /// # Safety
 ///
-/// This function makes access raw pointer data, which can cause undefined behavior in the event
+/// This function makes to access raw pointer data, which can cause undefined behavior in the event
 /// that `cstr`'s data is invalid.
 ///
 /// # Example
@@ -40,7 +40,7 @@ NSTDAPI NSTDUInt nstd_core_cstr_raw_len(const NSTDChar *cstr);
 ///
 /// # Safety
 ///
-/// This function makes access raw pointer data, which can cause undefined behavior in the event
+/// This function makes access to raw pointer data, which can cause undefined behavior in the event
 /// that `cstr`'s data is invalid.
 ///
 /// # Example

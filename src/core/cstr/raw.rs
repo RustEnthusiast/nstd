@@ -13,7 +13,7 @@ use crate::{core::def::NSTDChar, NSTDBool, NSTDUInt, NSTD_FALSE, NSTD_TRUE};
 ///
 /// # Safety
 ///
-/// This function makes access raw pointer data, which can cause undefined behavior in the event
+/// This function makes access to raw pointer data, which can cause undefined behavior in the event
 /// that `cstr`'s data is invalid.
 ///
 /// # Example
@@ -56,7 +56,7 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_len(cstr: *const NSTDChar) -> NSTDUI
 ///
 /// # Safety
 ///
-/// This function makes access raw pointer data, which can cause undefined behavior in the event
+/// This function makes access to raw pointer data, which can cause undefined behavior in the event
 /// that `cstr`'s data is invalid.
 ///
 /// # Example
