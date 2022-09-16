@@ -206,7 +206,7 @@ NSTDAPI NSTDBool nstd_core_cty_is_digit(NSTDUnichar chr, NSTDUInt32 radix);
 /// assert!(nstd_core_cty_is_punctuation(b'.' as NSTDChar) != 0);
 /// assert!(nstd_core_cty_is_punctuation(b'y' as NSTDChar) == 0);
 /// ```
-NSTDAPI NSTDBool nstd_core_cty_is_punctuation(NSTDChar chr);
+NSTDAPI NSTDBool nstd_core_cty_is_ascii_punctuation(NSTDChar chr);
 
 /// Determines whether or not `chr` is a graphic character.
 ///
@@ -230,7 +230,7 @@ NSTDAPI NSTDBool nstd_core_cty_is_punctuation(NSTDChar chr);
 /// assert!(nstd_core_cty_is_graphic(b'.' as NSTDChar) != 0);
 /// assert!(nstd_core_cty_is_graphic(b'\t' as NSTDChar) == 0);
 /// ```
-NSTDAPI NSTDBool nstd_core_cty_is_graphic(NSTDChar chr);
+NSTDAPI NSTDBool nstd_core_cty_is_ascii_graphic(NSTDChar chr);
 
 /// Returns the lowercase version of `chr`, or `chr` if there is no lowercase version.
 ///
@@ -256,7 +256,7 @@ NSTDAPI NSTDBool nstd_core_cty_is_graphic(NSTDChar chr);
 /// assert!(a == 'a');
 /// assert!(z == 'z');
 /// ```
-NSTDAPI NSTDUnichar nstd_core_cty_to_lowercase(NSTDUnichar chr);
+NSTDAPI NSTDUnichar nstd_core_cty_to_ascii_lowercase(NSTDUnichar chr);
 /// Returns the uppercase version of `chr`, or `chr` if there is no uppercase version.
 ///
 /// # Note
@@ -281,6 +281,6 @@ NSTDAPI NSTDUnichar nstd_core_cty_to_lowercase(NSTDUnichar chr);
 /// assert!(a == 'A');
 /// assert!(z == 'Z');
 /// ```
-NSTDAPI NSTDUnichar nstd_core_cty_to_uppercase(NSTDUnichar chr);
+NSTDAPI NSTDUnichar nstd_core_cty_to_ascii_uppercase(NSTDUnichar chr);
 
 #endif

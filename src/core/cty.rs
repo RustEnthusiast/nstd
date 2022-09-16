@@ -1,8 +1,4 @@
 //! Provides functions for examining and operating on character types.
-//!
-//! # Note
-//!
-//! Functions in this module that return a boolean will always return false on error.
 use crate::{core::def::NSTDChar, NSTDBool, NSTDUInt32, NSTDUnichar, NSTD_FALSE};
 
 /// Returns the Unicode replacement character (�).
@@ -262,7 +258,7 @@ pub unsafe extern "C" fn nstd_core_cty_is_digit(chr: NSTDUnichar, radix: NSTDUIn
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_cty_is_punctuation(chr: NSTDChar) -> NSTDBool {
+pub extern "C" fn nstd_core_cty_is_ascii_punctuation(chr: NSTDChar) -> NSTDBool {
     ((0x21..=0x2F).contains(&chr)
         || (0x3A..=0x40).contains(&chr)
         || (0x5B..=0x60).contains(&chr)
@@ -294,7 +290,7 @@ pub extern "C" fn nstd_core_cty_is_punctuation(chr: NSTDChar) -> NSTDBool {
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_cty_is_graphic(chr: NSTDChar) -> NSTDBool {
+pub extern "C" fn nstd_core_cty_is_ascii_graphic(chr: NSTDChar) -> NSTDBool {
     (0x21..=0x7E).contains(&chr).into()
 }
 
@@ -324,7 +320,7 @@ pub extern "C" fn nstd_core_cty_is_graphic(chr: NSTDChar) -> NSTDBool {
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_cty_to_lowercase(chr: NSTDUnichar) -> NSTDUnichar {
+pub extern "C" fn nstd_core_cty_to_ascii_lowercase(chr: NSTDUnichar) -> NSTDUnichar {
     match char::from_u32(chr) {
         Some(chr) => chr.to_ascii_lowercase().into(),
         _ => chr,
@@ -356,7 +352,7 @@ pub extern "C" fn nstd_core_cty_to_lowercase(chr: NSTDUnichar) -> NSTDUnichar {
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_cty_to_uppercase(chr: NSTDUnichar) -> NSTDUnichar {
+pub extern "C" fn nstd_core_cty_to_ascii_uppercase(chr: NSTDUnichar) -> NSTDUnichar {
     match char::from_u32(chr) {
         Some(chr) => chr.to_ascii_uppercase().into(),
         _ => chr,
