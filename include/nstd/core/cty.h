@@ -8,6 +8,14 @@
 /// # Returns
 ///
 /// `NSTDUnichar replacement_char` - The Unicode replacement character (�).
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::cty::nstd_core_cty_replacement_char;
+///
+/// assert!(nstd_core_cty_replacement_char() == char::REPLACEMENT_CHARACTER.into());
+/// ```
 NSTDAPI NSTDUnichar nstd_core_cty_replacement_char();
 
 /// Determines whether or not `chr` is alphabetic according to the Unicode standard.

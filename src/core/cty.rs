@@ -10,6 +10,14 @@ use crate::{core::def::NSTDChar, NSTDBool, NSTDUInt32, NSTDUnichar, NSTD_FALSE};
 /// # Returns
 ///
 /// `NSTDUnichar replacement_char` - The Unicode replacement character (�).
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::cty::nstd_core_cty_replacement_char;
+///
+/// assert!(nstd_core_cty_replacement_char() == char::REPLACEMENT_CHARACTER.into());
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_cty_replacement_char() -> NSTDUnichar {
