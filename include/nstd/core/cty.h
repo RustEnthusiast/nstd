@@ -155,6 +155,10 @@ NSTDAPI NSTDBool nstd_core_cty_is_control(NSTDUnichar chr);
 
 /// Determines whether or not `chr` is a digit, depending on `radix`.
 ///
+/// # Note
+///
+/// This will always return false when given a base greater than 36.
+///
 /// # Parameters:
 ///
 /// - `NSTDUnichar chr` - The character to check.
@@ -165,14 +169,6 @@ NSTDAPI NSTDBool nstd_core_cty_is_control(NSTDUnichar chr);
 ///
 /// `NSTDBool is_digit` - `NSTD_TRUE` if `chr` is a digit.
 ///
-/// # Panics
-///
-/// This operation will panic if `radix` is larger than 36.
-///
-/// # Safety
-///
-/// This operation can cause undefined behavior if it panics into non-Rust code.
-///
 /// # Example
 ///
 /// ```
@@ -181,6 +177,7 @@ NSTDAPI NSTDBool nstd_core_cty_is_control(NSTDUnichar chr);
 /// assert!(nstd_core_cty_is_digit('5'.into(), 16) != 0);
 /// assert!(nstd_core_cty_is_digit('E'.into(), 16) != 0);
 /// assert!(nstd_core_cty_is_digit('F'.into(), 10) == 0);
+/// assert!(nstd_core_cty_is_digit('9'.into(), 37) == 0);
 /// ```
 NSTDAPI NSTDBool nstd_core_cty_is_digit(NSTDUnichar chr, NSTDUInt32 radix);
 
@@ -201,10 +198,10 @@ NSTDAPI NSTDBool nstd_core_cty_is_digit(NSTDUnichar chr, NSTDUInt32 radix);
 /// # Example
 ///
 /// ```
-/// use nstd_sys::core::{cty::nstd_core_cty_is_punctuation, def::NSTDChar};
+/// use nstd_sys::core::{cty::nstd_core_cty_is_ascii_punctuation, def::NSTDChar};
 ///
-/// assert!(nstd_core_cty_is_punctuation(b'.' as NSTDChar) != 0);
-/// assert!(nstd_core_cty_is_punctuation(b'y' as NSTDChar) == 0);
+/// assert!(nstd_core_cty_is_ascii_punctuation(b'.' as NSTDChar) != 0);
+/// assert!(nstd_core_cty_is_ascii_punctuation(b'y' as NSTDChar) == 0);
 /// ```
 NSTDAPI NSTDBool nstd_core_cty_is_ascii_punctuation(NSTDChar chr);
 
@@ -225,10 +222,10 @@ NSTDAPI NSTDBool nstd_core_cty_is_ascii_punctuation(NSTDChar chr);
 /// # Example
 ///
 /// ```
-/// use nstd_sys::core::{cty::nstd_core_cty_is_graphic, def::NSTDChar};
+/// use nstd_sys::core::{cty::nstd_core_cty_is_ascii_graphic, def::NSTDChar};
 ///
-/// assert!(nstd_core_cty_is_graphic(b'.' as NSTDChar) != 0);
-/// assert!(nstd_core_cty_is_graphic(b'\t' as NSTDChar) == 0);
+/// assert!(nstd_core_cty_is_ascii_graphic(b'.' as NSTDChar) != 0);
+/// assert!(nstd_core_cty_is_ascii_graphic(b'\t' as NSTDChar) == 0);
 /// ```
 NSTDAPI NSTDBool nstd_core_cty_is_ascii_graphic(NSTDChar chr);
 
@@ -249,10 +246,10 @@ NSTDAPI NSTDBool nstd_core_cty_is_ascii_graphic(NSTDChar chr);
 /// # Example
 ///
 /// ```
-/// use nstd_sys::core::{cty::nstd_core_cty_to_lowercase, def::NSTDChar};
+/// use nstd_sys::core::{cty::nstd_core_cty_to_ascii_lowercase, def::NSTDChar};
 ///
-/// let a = char::from_u32(nstd_core_cty_to_lowercase('A'.into())).unwrap();
-/// let z = char::from_u32(nstd_core_cty_to_lowercase('Z'.into())).unwrap();
+/// let a = char::from_u32(nstd_core_cty_to_ascii_lowercase('A'.into())).unwrap();
+/// let z = char::from_u32(nstd_core_cty_to_ascii_lowercase('Z'.into())).unwrap();
 /// assert!(a == 'a');
 /// assert!(z == 'z');
 /// ```
@@ -274,10 +271,10 @@ NSTDAPI NSTDUnichar nstd_core_cty_to_ascii_lowercase(NSTDUnichar chr);
 /// # Example
 ///
 /// ```
-/// use nstd_sys::core::{cty::nstd_core_cty_to_uppercase, def::NSTDChar};
+/// use nstd_sys::core::{cty::nstd_core_cty_to_ascii_uppercase, def::NSTDChar};
 ///
-/// let a = char::from_u32(nstd_core_cty_to_uppercase('a'.into())).unwrap();
-/// let z = char::from_u32(nstd_core_cty_to_uppercase('z'.into())).unwrap();
+/// let a = char::from_u32(nstd_core_cty_to_ascii_uppercase('a'.into())).unwrap();
+/// let z = char::from_u32(nstd_core_cty_to_ascii_uppercase('z'.into())).unwrap();
 /// assert!(a == 'A');
 /// assert!(z == 'Z');
 /// ```
