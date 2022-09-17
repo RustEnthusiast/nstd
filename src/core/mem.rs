@@ -24,13 +24,21 @@ use crate::{core::def::NSTDByte, NSTDBool, NSTDUInt, NSTD_TRUE};
 /// # Example
 ///
 /// ```
-/// use nstd_sys::{core::mem::nstd_core_mem_compare, NSTD_TRUE};
+/// use nstd_sys::{
+///     core::mem::{nstd_core_mem_compare, nstd_core_mem_copy},
+///     NSTD_TRUE,
+/// };
+///
+/// let buf1 = [0u32; 12];
+/// let mut buf2 = [u32::MAX; 12];
+///
+/// let num = core::mem::size_of::<[u32; 12]>();
+/// let ptr1 = buf1.as_ptr().cast();
+/// let ptr2 = buf2.as_mut_ptr().cast();
 ///
 /// unsafe {
-///     let buf1 = [0u8; 12];
-///     let mut buf2 = [u8::MAX; 12];
-///     buf2.copy_from_slice(&buf1);
-///     assert!(nstd_core_mem_compare(buf1.as_ptr(), buf2.as_ptr(), 12) == NSTD_TRUE);
+///     nstd_core_mem_copy(ptr2, ptr1, num);
+///     assert!(nstd_core_mem_compare(ptr1, ptr2, num) == NSTD_TRUE);
 /// }
 /// ```
 #[inline]
@@ -85,18 +93,34 @@ pub unsafe extern "C" fn nstd_core_mem_compare(
 /// ```
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_mem_search(
-    buf: *const NSTDByte,
+    mut buf: *const NSTDByte,
     size: NSTDUInt,
     delim: NSTDByte,
 ) -> *const NSTDByte {
-    let mut i = 0;
-    while i < size {
-        if *buf.add(i) == delim {
-            return buf.add(i);
+    #[cfg(not(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64"))))]
+    {
+        let mut i = 0;
+        while i < size {
+            if *buf == delim {
+                return buf;
+            }
+            buf = buf.offset(1);
+            i += 1;
         }
-        i += 1;
+        core::ptr::null()
     }
-    core::ptr::null()
+    #[cfg(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64")))]
+    {
+        use core::arch::asm;
+        asm!(
+            include_str!("mem/search.asm"),
+            buf = inout(reg) buf,
+            size = in(reg) size,
+            delim = in(reg_byte) delim,
+            end = out(reg) _
+        );
+        buf
+    }
 }
 
 /// Zeros out a memory buffer.

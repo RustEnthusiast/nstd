@@ -26,13 +26,21 @@
 /// # Example
 ///
 /// ```
-/// use nstd_sys::{core::mem::nstd_core_mem_compare, NSTD_TRUE};
+/// use nstd_sys::{
+///     core::mem::{nstd_core_mem_compare, nstd_core_mem_copy},
+///     NSTD_TRUE,
+/// };
+///
+/// let buf1 = [0u32; 12];
+/// let mut buf2 = [u32::MAX; 12];
+///
+/// let num = core::mem::size_of::<[u32; 12]>();
+/// let ptr1 = buf1.as_ptr().cast();
+/// let ptr2 = buf2.as_mut_ptr().cast();
 ///
 /// unsafe {
-///     let buf1 = [0u8; 12];
-///     let mut buf2 = [u8::MAX; 12];
-///     buf2.copy_from_slice(&buf1);
-///     assert!(nstd_core_mem_compare(buf1.as_ptr(), buf2.as_ptr(), 12) == NSTD_TRUE);
+///     nstd_core_mem_copy(ptr2, ptr1, num);
+///     assert!(nstd_core_mem_compare(ptr1, ptr2, num) == NSTD_TRUE);
 /// }
 /// ```
 NSTDAPI NSTDBool nstd_core_mem_compare(const NSTDByte *buf1, const NSTDByte *buf2, NSTDUInt num);
