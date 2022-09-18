@@ -62,12 +62,11 @@ can easily use the API.
 
 - Any operation that makes a direct call on a C function pointer is considered unsafe.
 
-- References are assumed to be valid arguments (non-null/not dangling), and are safe to access.
-
-- Any function that may panic must document each case that it might do so.
-
 - Any function that may panic must be marked as unsafe, as it is undefined behavior to unwind from
 Rust code into foreign code.
+
+- Reference arguments are assumed to be valid (aligned, non-null, and non-dangling), and are safe
+to access.
 
 # How to build
 `nstd` let you decide what features you want to use. Any module that falls under the top level
