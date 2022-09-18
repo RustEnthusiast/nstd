@@ -103,7 +103,7 @@ NSTDAPI NSTDBool nstd_core_cstr_raw_compare(const NSTDChar *cstr1, const NSTDCha
 /// # Example
 ///
 /// ```
-/// use nstd_sys::core::{cstr::raw::nstd_core_cstr_raw_copy, def::NSTDChar};
+/// use nstd_sys::core::cstr::raw::nstd_core_cstr_raw_copy;
 ///
 /// let cstr = b"Hello, world!\0";
 /// let mut buffer = [0u8; 14];
@@ -134,7 +134,7 @@ NSTDAPI void nstd_core_cstr_raw_copy(NSTDChar *dest, const NSTDChar *src);
 /// # Example
 ///
 /// ```
-/// use nstd_sys::core::{cstr::raw::nstd_core_cstr_raw_copy_with_null, def::NSTDChar};
+/// use nstd_sys::core::cstr::raw::nstd_core_cstr_raw_copy_with_null;
 ///
 /// let cstr = b"Hello, world!\0";
 /// let mut buffer = [u8::MAX; 14];

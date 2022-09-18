@@ -142,7 +142,7 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_compare(
 /// # Example
 ///
 /// ```
-/// use nstd_sys::core::{cstr::raw::nstd_core_cstr_raw_copy, def::NSTDChar};
+/// use nstd_sys::core::cstr::raw::nstd_core_cstr_raw_copy;
 ///
 /// let cstr = b"Hello, world!\0";
 /// let mut buffer = [0u8; 14];
@@ -152,14 +152,31 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_compare(
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(
+    all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64")),
+    allow(unused_mut)
+)]
 pub unsafe extern "C" fn nstd_core_cstr_raw_copy(
     mut dest: *mut NSTDChar,
     mut src: *const NSTDChar,
 ) {
-    while *src != 0 {
-        *dest = *src;
-        dest = dest.add(1);
-        src = src.add(1);
+    #[cfg(not(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64"))))]
+    {
+        while *src != 0 {
+            *dest = *src;
+            dest = dest.offset(1);
+            src = src.offset(1);
+        }
+    }
+    #[cfg(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64")))]
+    {
+        use core::arch::asm;
+        asm!(
+            include_str!("raw/copy.asm"),
+            src = inout(reg) src => _,
+            dest = inout(reg) dest => _,
+            byte = out(reg_byte) _
+        );
     }
 }
 
@@ -184,7 +201,7 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_copy(
 /// # Example
 ///
 /// ```
-/// use nstd_sys::core::{cstr::raw::nstd_core_cstr_raw_copy_with_null, def::NSTDChar};
+/// use nstd_sys::core::cstr::raw::nstd_core_cstr_raw_copy_with_null;
 ///
 /// let cstr = b"Hello, world!\0";
 /// let mut buffer = [u8::MAX; 14];
@@ -195,15 +212,32 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_copy(
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(
+    all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64")),
+    allow(unused_mut)
+)]
 pub unsafe extern "C" fn nstd_core_cstr_raw_copy_with_null(
     mut dest: *mut NSTDChar,
     mut src: *const NSTDChar,
 ) {
-    while {
-        *dest = *src;
-        *src != 0
-    } {
-        dest = dest.add(1);
-        src = src.add(1);
+    #[cfg(not(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64"))))]
+    {
+        while {
+            *dest = *src;
+            *src != 0
+        } {
+            dest = dest.offset(1);
+            src = src.offset(1);
+        }
+    }
+    #[cfg(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64")))]
+    {
+        use core::arch::asm;
+        asm!(
+            include_str!("raw/copy_with_null.asm"),
+            src = inout(reg) src => _,
+            dest = inout(reg) dest => _,
+            byte = out(reg_byte) _
+        );
     }
 }
