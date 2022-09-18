@@ -149,12 +149,17 @@ pub unsafe extern "C" fn nstd_core_mem_search(
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_mem_zero(buf: *mut NSTDByte, size: NSTDUInt) {
+#[cfg_attr(
+    all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64")),
+    allow(unused_mut)
+)]
+pub unsafe extern "C" fn nstd_core_mem_zero(mut buf: *mut NSTDByte, size: NSTDUInt) {
     #[cfg(not(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64"))))]
     {
         let mut i = 0;
         while i < size {
-            *buf.add(i) = 0;
+            *buf = 0;
+            buf = buf.offset(1);
             i += 1;
         }
     }
@@ -193,12 +198,21 @@ pub unsafe extern "C" fn nstd_core_mem_zero(buf: *mut NSTDByte, size: NSTDUInt) 
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_mem_fill(buf: *mut NSTDByte, size: NSTDUInt, fill: NSTDByte) {
+#[cfg_attr(
+    all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64")),
+    allow(unused_mut)
+)]
+pub unsafe extern "C" fn nstd_core_mem_fill(
+    mut buf: *mut NSTDByte,
+    size: NSTDUInt,
+    fill: NSTDByte,
+) {
     #[cfg(not(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64"))))]
     {
         let mut i = 0;
         while i < size {
-            *buf.add(i) = fill;
+            *buf = fill;
+            buf = buf.offset(1);
             i += 1;
         }
     }
