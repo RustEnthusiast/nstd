@@ -26,11 +26,16 @@ use crate::{core::def::NSTDChar, NSTDBool, NSTDUInt, NSTD_FALSE, NSTD_TRUE};
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_cstr_raw_len(cstr: *const NSTDChar) -> NSTDUInt {
+#[cfg_attr(
+    all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64")),
+    allow(unused_mut)
+)]
+pub unsafe extern "C" fn nstd_core_cstr_raw_len(mut cstr: *const NSTDChar) -> NSTDUInt {
     #[cfg(not(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64"))))]
     {
         let mut i = 0;
-        while *cstr.add(i) != 0 {
+        while *cstr != 0 {
+            cstr = cstr.offset(1);
             i += 1;
         }
         i
@@ -110,15 +115,14 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_compare(
         return NSTD_TRUE;
     }
     // Otherwise compare them lexicographically.
-    loop {
-        if *cstr1 != *cstr2 {
-            return NSTD_FALSE;
-        } else if *cstr1 == 0 {
+    while *cstr1 == *cstr2 {
+        if *cstr1 == 0 {
             return NSTD_TRUE;
         }
-        cstr1 = cstr1.add(1);
-        cstr2 = cstr2.add(1);
+        cstr1 = cstr1.offset(1);
+        cstr2 = cstr2.offset(1);
     }
+    NSTD_FALSE
 }
 
 /// Copies the contents of `src` to `dest`, excluding the null terminator.
