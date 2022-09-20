@@ -49,7 +49,7 @@ impl NSTDSlice {
         assert!(nstd_core_slice_stride(self) == core::mem::size_of::<T>());
         assert!(self.byte_len() <= isize::MAX as usize);
         let ptr = nstd_core_slice_as_ptr(self).cast();
-        core::slice::from_raw_parts(ptr, nstd_core_slice_len(self))
+        core::slice::from_raw_parts(ptr, self.len)
     }
 }
 
@@ -311,7 +311,7 @@ impl NSTDSliceMut {
         assert!(nstd_core_slice_mut_stride(self) == core::mem::size_of::<T>());
         assert!(self.byte_len() <= isize::MAX as usize);
         let ptr = nstd_core_slice_mut_as_ptr_const(self).cast();
-        core::slice::from_raw_parts(ptr, nstd_core_slice_mut_len(self))
+        core::slice::from_raw_parts(ptr, self.len)
     }
 
     /// Creates a mutable Rust byte slice from this `NSTDSliceMut`.
@@ -336,7 +336,7 @@ impl NSTDSliceMut {
         assert!(nstd_core_slice_mut_stride(self) == core::mem::size_of::<T>());
         assert!(self.byte_len() <= isize::MAX as usize);
         let ptr = nstd_core_slice_mut_as_ptr(self).cast();
-        core::slice::from_raw_parts_mut(ptr, nstd_core_slice_mut_len(self))
+        core::slice::from_raw_parts_mut(ptr, self.len)
     }
 }
 
