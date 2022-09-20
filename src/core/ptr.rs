@@ -86,7 +86,7 @@ pub extern "C" fn nstd_core_ptr_get(ptr: &NSTDPtr) -> NSTDAny {
 
 /// A sized pointer to some arbitrary type.
 #[repr(C)]
-#[derive(Clone, Copy, Debug, Hash, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Hash)]
 pub struct NSTDPtrMut {
     /// A raw pointer to the data.
     raw: NSTDAnyMut,

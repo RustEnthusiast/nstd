@@ -18,7 +18,7 @@ Rust syntax).
         - `math` - Low level math operations.
         - `mem` - Contains mostly unsafe functions for interacting with raw memory.
         - `ptr` - A sized pointer to some arbitrary type.
-        - `range` - A half-open (low inclusive, high exclusive) numerical range.
+        - `range` - A numerical range.
         - `slice` - A view into a sequence of values in memory.
         - `str` - An unowned view into a UTF-8 encoded byte string.
     - `cstring` - A dynamically sized, null terminated, C string.
