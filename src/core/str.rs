@@ -156,11 +156,12 @@ pub unsafe extern "C" fn nstd_core_str_from_raw_cstr(cstr: *const NSTDChar) -> N
 ///
 /// This function makes access to raw pointer data, which can cause undefined behavior in the event
 /// that `cstr`'s data is invalid.
-/// This operation does not ensure that `cstr` is valid UTF-8.
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_from_raw_cstr_with_null(cstr: *const NSTDChar) -> NSTDStr {
     let ptr = cstr.cast();
     let len = nstd_core_cstr_raw_len_with_null(cstr);
+    let bytes = core::slice::from_raw_parts(ptr, len);
+    core::str::from_utf8(bytes).expect("Invalid UTF-8 bytes");
     NSTDStr { ptr, len }
 }
 

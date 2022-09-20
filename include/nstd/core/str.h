@@ -83,7 +83,6 @@ NSTDAPI NSTDStr nstd_core_str_from_raw_cstr(const NSTDChar *cstr);
 ///
 /// This function makes access to raw pointer data, which can cause undefined behavior in the event
 /// that `cstr`'s data is invalid.
-/// This operation does not ensure that `cstr` is valid UTF-8.
 NSTDAPI NSTDStr nstd_core_str_from_raw_cstr_with_null(const NSTDChar *cstr);
 
 /// Creates a string slice from raw bytes.
