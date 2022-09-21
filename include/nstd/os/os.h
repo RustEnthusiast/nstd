@@ -1,6 +1,14 @@
 #ifndef NSTD_OS_OS_H
 #define NSTD_OS_OS_H
 
+/// Constant that is only set if the target operating system is Linux.
+#if defined(linux)\
+    || defined(__linux)\
+    || defined(__linux__)\
+    || defined(__gnu_linux__)
+#define NSTD_OS_LINUX
+#endif
+
 /// Constant that is only set if the target operating system is Windows.
 #if defined(__WINDOWS__)\
     || defined(_WIN16)\

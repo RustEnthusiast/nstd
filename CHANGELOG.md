@@ -14,7 +14,7 @@
 - Added `math_pow_*`.
 - Added `math_abs_*`.
 ### `nstd.os`
-- Added `NSTD_OS_WINDOWS` constant.
+- Added `NSTD_OS_[LINUX|WINDOWS]` constants.
 
 # 0.1.3
 ### `nstd`
