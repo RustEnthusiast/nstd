@@ -2,6 +2,7 @@
 ### `nstd`
 - Added `asm` feature.
 ### `nstd.core`
+- Made `nstd_core_str[_mut]_from_cstr` unsafe.
 - Renamed `cty`'s ASCII functions (`is_punctuation`, `is_graphic`, `to_lowercase`, `to_uppercase`).
 - Added `mem_search`.
 - Added `str[_mut]_from_raw_cstr[_with_null]`.

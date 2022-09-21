@@ -14,7 +14,7 @@ typedef struct {
     NSTDUInt len;
 } NSTDStr;
 
-/// Creates a new instance of `NSTDStr` from a C string slice.
+/// Creates a new instance of an `NSTDStr` from a C string slice.
 ///
 /// # Parameters:
 ///
@@ -26,10 +26,20 @@ typedef struct {
 ///
 /// # Panics
 ///
-/// This function will panic if `cstr`'s data is not valid UTF-8.
+/// This function will panic in the following situations:
+///
+/// - `cstr`'s data is not valid UTF-8.
+///
+/// - `cstr`'s length is greater than `NSTDInt`'s max value.
+///
+/// # Safety
+///
+/// - `cstr`'s data must be valid for reads of at least `cstr.len` consecutive bytes.
+///
+/// - This operation can cause undefined behavior if it panics into non-Rust code.
 NSTDAPI NSTDStr nstd_core_str_from_cstr(const NSTDCStr *cstr);
 
-/// Creates a new instance of `NSTDStr` from a C string slice.
+/// Creates a new instance of an `NSTDStr` from a C string slice.
 ///
 /// # Parameters:
 ///
@@ -57,12 +67,18 @@ NSTDAPI NSTDStr nstd_core_str_from_cstr_unchecked(const NSTDCStr *cstr);
 ///
 /// # Panics
 ///
-/// This function will panic if `cstr`'s data is not valid UTF-8.
+/// This function will panic in the following situations:
+///
+/// - `cstr`'s data is not valid UTF-8.
+///
+/// - `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
-/// This function makes access raw pointer data, which can cause undefined behavior in the event
-/// that `cstr`'s data is invalid.
+/// - This function makes access to raw pointer data, which can cause undefined behavior in the
+/// event that `cstr`'s data is invalid.
+///
+/// - This operation can cause undefined behavior if it panics into non-Rust code.
 NSTDAPI NSTDStr nstd_core_str_from_raw_cstr(const NSTDChar *cstr);
 
 /// Creates a new `NSTDStr` from a raw C string, including the null byte.
@@ -77,12 +93,18 @@ NSTDAPI NSTDStr nstd_core_str_from_raw_cstr(const NSTDChar *cstr);
 ///
 /// # Panics
 ///
-/// This function will panic if `cstr`'s data is not valid UTF-8.
+/// This function will panic in the following situations:
+///
+/// - `cstr`'s data is not valid UTF-8.
+///
+/// - `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
-/// This function makes access to raw pointer data, which can cause undefined behavior in the event
-/// that `cstr`'s data is invalid.
+/// - This function makes access to raw pointer data, which can cause undefined behavior in the
+/// event that `cstr`'s data is invalid.
+///
+/// - This operation can cause undefined behavior if it panics into non-Rust code.
 NSTDAPI NSTDStr nstd_core_str_from_raw_cstr_with_null(const NSTDChar *cstr);
 
 /// Creates a string slice from raw bytes.
@@ -424,7 +446,7 @@ typedef struct {
     NSTDUInt len;
 } NSTDStrMut;
 
-/// Creates a new instance of `NSTDStrMut` from a C string slice.
+/// Creates a new instance of an `NSTDStrMut` from a C string slice.
 ///
 /// # Parameters:
 ///
@@ -436,10 +458,20 @@ typedef struct {
 ///
 /// # Panics
 ///
-/// This function will panic if `cstr`'s data is not valid UTF-8.
+/// This function will panic in the following situations:
+///
+/// - `cstr`'s data is not valid UTF-8.
+///
+/// - `cstr`'s length is greater than `NSTDInt`'s max value.
+///
+/// # Safety
+///
+/// - `cstr`'s data must be valid for reads of at least `cstr.len` consecutive bytes.
+///
+/// - This operation can cause undefined behavior if it panics into non-Rust code.
 NSTDAPI NSTDStrMut nstd_core_str_mut_from_cstr(NSTDCStrMut *cstr);
 
-/// Creates a new instance of `NSTDStrMut` from a C string slice.
+/// Creates a new instance of an `NSTDStrMut` from a C string slice.
 ///
 /// # Parameters:
 ///
@@ -467,12 +499,18 @@ NSTDAPI NSTDStrMut nstd_core_str_mut_from_cstr_unchecked(NSTDCStrMut *cstr);
 ///
 /// # Panics
 ///
-/// This function will panic if `cstr`'s data is not valid UTF-8.
+/// This function will panic in the following situations:
+///
+/// - `cstr`'s data is not valid UTF-8.
+///
+/// - `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
-/// This function makes access raw pointer data, which can cause undefined behavior in the event
-/// that `cstr`'s data is invalid.
+/// - This function makes access to raw pointer data, which can cause undefined behavior in the
+/// event that `cstr`'s data is invalid.
+///
+/// - This operation can cause undefined behavior if it panics into non-Rust code.
 NSTDAPI NSTDStrMut nstd_core_str_mut_from_raw_cstr(NSTDChar *cstr);
 
 /// Creates a new `NSTDStrMut` from a raw C string, including the null byte.
@@ -487,13 +525,18 @@ NSTDAPI NSTDStrMut nstd_core_str_mut_from_raw_cstr(NSTDChar *cstr);
 ///
 /// # Panics
 ///
-/// This function will panic if `cstr`'s data is not valid UTF-8.
+/// This function will panic in the following situations:
+///
+/// - `cstr`'s data is not valid UTF-8.
+///
+/// - `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
-/// This function makes access to raw pointer data, which can cause undefined behavior in the event
-/// that `cstr`'s data is invalid.
-/// This operation does not ensure that `cstr` is valid UTF-8.
+/// - This function makes access to raw pointer data, which can cause undefined behavior in the
+/// event that `cstr`'s data is invalid.
+///
+/// - This operation can cause undefined behavior if it panics into non-Rust code.
 NSTDAPI NSTDStrMut nstd_core_str_mut_from_raw_cstr_with_null(NSTDChar *cstr);
 
 /// Creates a string slice from raw bytes.

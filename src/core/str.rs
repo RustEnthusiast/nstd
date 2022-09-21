@@ -54,17 +54,23 @@ pub struct NSTDStr {
 impl NSTDStr {
     /// Creates a Rust string slice from this [NSTDStr].
     ///
+    /// # Panics
+    ///
+    /// This method will panic if the string slice's length is greater than `isize::MAX`.
+    ///
     /// # Safety
     ///
-    /// This string slice's data must remain valid while the returned string slice is in use.
+    /// This string slice's data must remain valid UTF-8 and left unmodified while the returned
+    /// string slice is in use.
     #[inline]
     pub(crate) unsafe fn as_str(&self) -> &str {
+        assert!(self.len <= isize::MAX as usize);
         let bytes = core::slice::from_raw_parts(self.ptr, self.len);
         core::str::from_utf8_unchecked(bytes)
     }
 }
 
-/// Creates a new instance of `NSTDStr` from a C string slice.
+/// Creates a new instance of an `NSTDStr` from a C string slice.
 ///
 /// # Parameters:
 ///
@@ -76,20 +82,28 @@ impl NSTDStr {
 ///
 /// # Panics
 ///
-/// This function will panic if `cstr`'s data is not valid UTF-8.
+/// This function will panic in the following situations:
+///
+/// - `cstr`'s data is not valid UTF-8.
+///
+/// - `cstr`'s length is greater than `NSTDInt`'s max value.
+///
+/// # Safety
+///
+/// - `cstr`'s data must be valid for reads of at least `cstr.len` consecutive bytes.
+///
+/// - This operation can cause undefined behavior if it panics into non-Rust code.
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_str_from_cstr(cstr: &NSTDCStr) -> NSTDStr {
+pub unsafe extern "C" fn nstd_core_str_from_cstr(cstr: &NSTDCStr) -> NSTDStr {
     let ptr = nstd_core_cstr_as_ptr(cstr).cast();
     let len = nstd_core_cstr_len(cstr);
-    // SAFETY: The returned string slice is already unsafe to access.
-    unsafe {
-        let bytes = core::slice::from_raw_parts(ptr, len);
-        core::str::from_utf8(bytes).expect("Invalid UTF-8 bytes");
-        NSTDStr { ptr, len }
-    }
+    assert!(len <= isize::MAX as usize);
+    let bytes = core::slice::from_raw_parts(ptr, len);
+    core::str::from_utf8(bytes).expect("Invalid UTF-8 bytes");
+    NSTDStr { ptr, len }
 }
 
-/// Creates a new instance of `NSTDStr` from a C string slice.
+/// Creates a new instance of an `NSTDStr` from a C string slice.
 ///
 /// # Parameters:
 ///
@@ -123,16 +137,23 @@ pub unsafe extern "C" fn nstd_core_str_from_cstr_unchecked(cstr: &NSTDCStr) -> N
 ///
 /// # Panics
 ///
-/// This function will panic if `cstr`'s data is not valid UTF-8.
+/// This function will panic in the following situations:
+///
+/// - `cstr`'s data is not valid UTF-8.
+///
+/// - `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
-/// This function makes access raw pointer data, which can cause undefined behavior in the event
-/// that `cstr`'s data is invalid.
+/// - This function makes access to raw pointer data, which can cause undefined behavior in the
+/// event that `cstr`'s data is invalid.
+///
+/// - This operation can cause undefined behavior if it panics into non-Rust code.
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_from_raw_cstr(cstr: *const NSTDChar) -> NSTDStr {
     let ptr = cstr.cast();
     let len = nstd_core_cstr_raw_len(cstr);
+    assert!(len <= isize::MAX as NSTDUInt);
     let bytes = core::slice::from_raw_parts(ptr, len);
     core::str::from_utf8(bytes).expect("Invalid UTF-8 bytes");
     NSTDStr { ptr, len }
@@ -150,16 +171,23 @@ pub unsafe extern "C" fn nstd_core_str_from_raw_cstr(cstr: *const NSTDChar) -> N
 ///
 /// # Panics
 ///
-/// This function will panic if `cstr`'s data is not valid UTF-8.
+/// This function will panic in the following situations:
+///
+/// - `cstr`'s data is not valid UTF-8.
+///
+/// - `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
-/// This function makes access to raw pointer data, which can cause undefined behavior in the event
-/// that `cstr`'s data is invalid.
+/// - This function makes access to raw pointer data, which can cause undefined behavior in the
+/// event that `cstr`'s data is invalid.
+///
+/// - This operation can cause undefined behavior if it panics into non-Rust code.
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_from_raw_cstr_with_null(cstr: *const NSTDChar) -> NSTDStr {
     let ptr = cstr.cast();
     let len = nstd_core_cstr_raw_len_with_null(cstr);
+    assert!(len <= isize::MAX as NSTDUInt);
     let bytes = core::slice::from_raw_parts(ptr, len);
     core::str::from_utf8(bytes).expect("Invalid UTF-8 bytes");
     NSTDStr { ptr, len }
@@ -555,17 +583,23 @@ pub struct NSTDStrMut {
 impl NSTDStrMut {
     /// Creates a Rust string slice from this [NSTDStrMut].
     ///
+    /// # Panics
+    ///
+    /// This method will panic if the string slice's length is greater than `isize::MAX`.
+    ///
     /// # Safety
     ///
-    /// This string slice's data must remain valid while the returned string slice is in use.
+    /// This string slice's data must remain valid UTF-8 and left unmodified while the returned
+    /// string slice is in use.
     #[inline]
     unsafe fn as_str(&self) -> &str {
+        assert!(self.len <= isize::MAX as usize);
         let bytes = core::slice::from_raw_parts(self.ptr, self.len);
         core::str::from_utf8_unchecked(bytes)
     }
 }
 
-/// Creates a new instance of `NSTDStrMut` from a C string slice.
+/// Creates a new instance of an `NSTDStrMut` from a C string slice.
 ///
 /// # Parameters:
 ///
@@ -577,20 +611,28 @@ impl NSTDStrMut {
 ///
 /// # Panics
 ///
-/// This function will panic if `cstr`'s data is not valid UTF-8.
+/// This function will panic in the following situations:
+///
+/// - `cstr`'s data is not valid UTF-8.
+///
+/// - `cstr`'s length is greater than `NSTDInt`'s max value.
+///
+/// # Safety
+///
+/// - `cstr`'s data must be valid for reads of at least `cstr.len` consecutive bytes.
+///
+/// - This operation can cause undefined behavior if it panics into non-Rust code.
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_str_mut_from_cstr(cstr: &mut NSTDCStrMut) -> NSTDStrMut {
+pub unsafe extern "C" fn nstd_core_str_mut_from_cstr(cstr: &mut NSTDCStrMut) -> NSTDStrMut {
     let ptr = nstd_core_cstr_mut_as_ptr(cstr).cast();
     let len = nstd_core_cstr_mut_len(cstr);
-    // SAFETY: The returned string slice is already unsafe to access.
-    unsafe {
-        let bytes = core::slice::from_raw_parts(ptr, len);
-        core::str::from_utf8(bytes).expect("Invalid UTF-8 bytes");
-        NSTDStrMut { ptr, len }
-    }
+    assert!(len <= isize::MAX as usize);
+    let bytes = core::slice::from_raw_parts(ptr, len);
+    core::str::from_utf8(bytes).expect("Invalid UTF-8 bytes");
+    NSTDStrMut { ptr, len }
 }
 
-/// Creates a new instance of `NSTDStrMut` from a C string slice.
+/// Creates a new instance of an `NSTDStrMut` from a C string slice.
 ///
 /// # Parameters:
 ///
@@ -626,16 +668,23 @@ pub unsafe extern "C" fn nstd_core_str_mut_from_cstr_unchecked(
 ///
 /// # Panics
 ///
-/// This function will panic if `cstr`'s data is not valid UTF-8.
+/// This function will panic in the following situations:
+///
+/// - `cstr`'s data is not valid UTF-8.
+///
+/// - `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
-/// This function makes access raw pointer data, which can cause undefined behavior in the event
-/// that `cstr`'s data is invalid.
+/// - This function makes access to raw pointer data, which can cause undefined behavior in the
+/// event that `cstr`'s data is invalid.
+///
+/// - This operation can cause undefined behavior if it panics into non-Rust code.
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_mut_from_raw_cstr(cstr: *mut NSTDChar) -> NSTDStrMut {
     let ptr = cstr.cast();
     let len = nstd_core_cstr_raw_len(cstr);
+    assert!(len <= isize::MAX as usize);
     let bytes = core::slice::from_raw_parts(ptr, len);
     core::str::from_utf8(bytes).expect("Invalid UTF-8 bytes");
     NSTDStrMut { ptr, len }
@@ -653,19 +702,27 @@ pub unsafe extern "C" fn nstd_core_str_mut_from_raw_cstr(cstr: *mut NSTDChar) ->
 ///
 /// # Panics
 ///
-/// This function will panic if `cstr`'s data is not valid UTF-8.
+/// This function will panic in the following situations:
+///
+/// - `cstr`'s data is not valid UTF-8.
+///
+/// - `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
-/// This function makes access to raw pointer data, which can cause undefined behavior in the event
-/// that `cstr`'s data is invalid.
-/// This operation does not ensure that `cstr` is valid UTF-8.
+/// - This function makes access to raw pointer data, which can cause undefined behavior in the
+/// event that `cstr`'s data is invalid.
+///
+/// - This operation can cause undefined behavior if it panics into non-Rust code.
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_mut_from_raw_cstr_with_null(
     cstr: *mut NSTDChar,
 ) -> NSTDStrMut {
     let ptr = cstr.cast();
     let len = nstd_core_cstr_raw_len_with_null(cstr);
+    assert!(len <= isize::MAX as usize);
+    let bytes = core::slice::from_raw_parts(ptr, len);
+    core::str::from_utf8(bytes).expect("Invalid UTF-8 bytes");
     NSTDStrMut { ptr, len }
 }
 

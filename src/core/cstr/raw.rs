@@ -92,7 +92,7 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_len_with_null(cstr: *const NSTDChar)
 ///
 /// # Safety
 ///
-/// This function makes access raw pointer data, which can cause undefined behavior in the event
+/// This function makes access to raw pointer data, which can cause undefined behavior in the event
 /// that either `cstr1` or `cstr2`'s data is invalid.
 ///
 /// # Example
