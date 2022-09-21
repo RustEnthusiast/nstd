@@ -22,12 +22,18 @@ pub struct NSTDCStr {
 impl NSTDCStr {
     /// Interprets a C string slice as a byte slice.
     ///
+    /// # Panics
+    ///
+    /// This operation will panic if the C string slice's length is greater than `isize::MAX`.
+    ///
     /// # Safety
     ///
-    /// This C string slice's data must remain valid while the returned byte slice is in use.
+    /// This C string slice's data must remain valid and unmodified while the returned byte slice
+    /// is in use.
     #[inline]
     #[allow(dead_code)]
     pub(crate) unsafe fn as_bytes(&self) -> &[u8] {
+        assert!(self.len <= isize::MAX as usize);
         core::slice::from_raw_parts(self.ptr.cast(), self.len)
     }
 }
@@ -148,9 +154,15 @@ pub extern "C" fn nstd_core_cstr_len(cstr: &NSTDCStr) -> NSTDUInt {
 /// `NSTDBool is_null_terminated` - Returns true if the C string slice contains a single null byte
 /// at the end.
 ///
+/// # Panics
+///
+/// This function will panic if `cstr`'s length is greater than `NSTDInt`'s maximum value.
+///
 /// # Safety
 ///
-/// Undefined behavior may occur if `cstr`'s data is invalid.
+/// - Undefined behavior may occur if `cstr`'s data is invalid.
+///
+/// - This operation can cause undefined behavior if it panics into non-Rust code.
 ///
 /// # Example
 ///
@@ -177,6 +189,7 @@ pub extern "C" fn nstd_core_cstr_len(cstr: &NSTDCStr) -> NSTDUInt {
 /// ```
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_cstr_is_null_terminated(cstr: &NSTDCStr) -> NSTDBool {
+    assert!(cstr.len <= isize::MAX as usize);
     #[cfg(not(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64"))))]
     {
         use crate::NSTD_FALSE;
@@ -219,6 +232,7 @@ pub unsafe extern "C" fn nstd_core_cstr_is_null_terminated(cstr: &NSTDCStr) -> N
 /// # Safety
 ///
 /// Undefined behavior may occur if `cstr`'s data is invalid.
+#[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_cstr_get_null(cstr: &NSTDCStr) -> *const NSTDChar {
     nstd_core_mem_search(cstr.ptr.cast(), cstr.len, 0).cast()
@@ -234,15 +248,16 @@ pub unsafe extern "C" fn nstd_core_cstr_get_null(cstr: &NSTDCStr) -> *const NSTD
 ///
 /// # Returns
 ///
-/// `const NSTDChar *chr` - A pointer to the character at `pos`, or null on error.
+/// `const NSTDChar *chr` - A pointer to the character at `pos`, or null if `pos` is out of the C
+/// string slice's boundaries.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_cstr_get(cstr: &NSTDCStr, pos: NSTDUInt) -> *const NSTDChar {
-    match pos < cstr.len {
-        // SAFETY: We've checked `pos`, and the returned pointer is already unsafe to access.
-        true => unsafe { cstr.ptr.add(pos) },
-        false => core::ptr::null(),
+    if pos < cstr.len && cstr.len <= isize::MAX as usize {
+        // SAFETY: We've checked `pos`.
+        return unsafe { cstr.ptr.add(pos) };
     }
+    core::ptr::null()
 }
 
 /// A mutable slice of a C string.
@@ -401,9 +416,39 @@ pub extern "C" fn nstd_core_cstr_mut_len(cstr: &NSTDCStrMut) -> NSTDUInt {
 /// `NSTDBool is_null_terminated` - Returns true if the C string slice contains a single null byte
 /// at the end.
 ///
+/// # Panics
+///
+/// This function will panic if `cstr`'s length is greater than `NSTDInt`'s maximum value.
+///
 /// # Safety
 ///
-/// Undefined behavior may occur if `cstr`'s data is invalid.
+/// - Undefined behavior may occur if `cstr`'s data is invalid.
+///
+/// - This operation can cause undefined behavior if it panics into non-Rust code.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::{
+///     core::cstr::{nstd_core_cstr_mut_is_null_terminated, nstd_core_cstr_mut_new},
+///     NSTD_FALSE, NSTD_TRUE,
+/// };
+///
+/// let mut nn_bytes = String::from("Hello, world!");
+/// let nn_cstr = nstd_core_cstr_mut_new(nn_bytes.as_mut_ptr().cast(), nn_bytes.len());
+///
+/// let mut nt_bytes = String::from("Hello, world!\0");
+/// let nt_cstr = nstd_core_cstr_mut_new(nt_bytes.as_mut_ptr().cast(), nt_bytes.len());
+///
+/// let mut mn_bytes = String::from("Hello, \0world!");
+/// let mn_cstr = nstd_core_cstr_mut_new(mn_bytes.as_mut_ptr().cast(), mn_bytes.len());
+///
+/// unsafe {
+///     assert!(nstd_core_cstr_mut_is_null_terminated(&nn_cstr) == NSTD_FALSE);
+///     assert!(nstd_core_cstr_mut_is_null_terminated(&nt_cstr) == NSTD_TRUE);
+///     assert!(nstd_core_cstr_mut_is_null_terminated(&mn_cstr) == NSTD_FALSE);
+/// }
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_cstr_mut_is_null_terminated(cstr: &NSTDCStrMut) -> NSTDBool {
@@ -464,7 +509,8 @@ pub unsafe extern "C" fn nstd_core_cstr_mut_get_null_const(cstr: &NSTDCStrMut) -
 ///
 /// # Returns
 ///
-/// `NSTDChar *chr` - A pointer to the character at `pos`, or null on error.
+/// `NSTDChar *chr` - A pointer to the character at `pos`, or null if `pos` is out of the C
+/// string slice's boundaries.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_cstr_mut_get(cstr: &mut NSTDCStrMut, pos: NSTDUInt) -> *mut NSTDChar {
@@ -481,16 +527,17 @@ pub extern "C" fn nstd_core_cstr_mut_get(cstr: &mut NSTDCStrMut, pos: NSTDUInt) 
 ///
 /// # Returns
 ///
-/// `const NSTDChar *chr` - A pointer to the character at `pos`, or null on error.
+/// `const NSTDChar *chr` - A pointer to the character at `pos`, or null if `pos` is out of the C
+/// string slice's boundaries.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_cstr_mut_get_const(
     cstr: &NSTDCStrMut,
     pos: NSTDUInt,
 ) -> *const NSTDChar {
-    match pos < cstr.len {
-        // SAFETY: We've checked `pos`, and the returned pointer is already unsafe to access.
-        true => unsafe { cstr.ptr.add(pos) },
-        false => core::ptr::null(),
+    if pos < cstr.len && cstr.len <= isize::MAX as usize {
+        // SAFETY: We've checked `pos`.
+        return unsafe { cstr.ptr.add(pos) };
     }
+    core::ptr::null_mut()
 }

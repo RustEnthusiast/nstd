@@ -102,9 +102,15 @@ NSTDAPI NSTDUInt nstd_core_cstr_len(const NSTDCStr *cstr);
 /// `NSTDBool is_null_terminated` - Returns true if the C string slice contains a single null byte
 /// at the end.
 ///
+/// # Panics
+///
+/// This function will panic if `cstr`'s length is greater than `NSTDInt`'s maximum value.
+///
 /// # Safety
 ///
-/// Undefined behavior may occur if `cstr`'s data is invalid.
+/// - Undefined behavior may occur if `cstr`'s data is invalid.
+///
+/// - This operation can cause undefined behavior if it panics into non-Rust code.
 ///
 /// # Example
 ///
@@ -157,7 +163,8 @@ NSTDAPI const NSTDChar *nstd_core_cstr_get_null(const NSTDCStr *cstr);
 ///
 /// # Returns
 ///
-/// `const NSTDChar *chr` - A pointer to the character at `pos`, or null on error.
+/// `const NSTDChar *chr` - A pointer to the character at `pos`, or null if `pos` is out of the C
+/// string slice's boundaries.
 NSTDAPI const NSTDChar *nstd_core_cstr_get(const NSTDCStr *cstr, NSTDUInt pos);
 
 /// A mutable slice of a C string.
@@ -280,9 +287,39 @@ NSTDAPI NSTDUInt nstd_core_cstr_mut_len(const NSTDCStrMut *cstr);
 /// `NSTDBool is_null_terminated` - Returns true if the C string slice contains a single null byte
 /// at the end.
 ///
+/// # Panics
+///
+/// This function will panic if `cstr`'s length is greater than `NSTDInt`'s maximum value.
+///
 /// # Safety
 ///
-/// Undefined behavior may occur if `cstr`'s data is invalid.
+/// - Undefined behavior may occur if `cstr`'s data is invalid.
+///
+/// - This operation can cause undefined behavior if it panics into non-Rust code.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::{
+///     core::cstr::{nstd_core_cstr_mut_is_null_terminated, nstd_core_cstr_mut_new},
+///     NSTD_FALSE, NSTD_TRUE,
+/// };
+///
+/// let mut nn_bytes = String::from("Hello, world!");
+/// let nn_cstr = nstd_core_cstr_mut_new(nn_bytes.as_mut_ptr().cast(), nn_bytes.len());
+///
+/// let mut nt_bytes = String::from("Hello, world!\0");
+/// let nt_cstr = nstd_core_cstr_mut_new(nt_bytes.as_mut_ptr().cast(), nt_bytes.len());
+///
+/// let mut mn_bytes = String::from("Hello, \0world!");
+/// let mn_cstr = nstd_core_cstr_mut_new(mn_bytes.as_mut_ptr().cast(), mn_bytes.len());
+///
+/// unsafe {
+///     assert!(nstd_core_cstr_mut_is_null_terminated(&nn_cstr) == NSTD_FALSE);
+///     assert!(nstd_core_cstr_mut_is_null_terminated(&nt_cstr) == NSTD_TRUE);
+///     assert!(nstd_core_cstr_mut_is_null_terminated(&mn_cstr) == NSTD_FALSE);
+/// }
+/// ```
 NSTDAPI NSTDBool nstd_core_cstr_mut_is_null_terminated(const NSTDCStrMut *cstr);
 
 /// Returns a pointer to the first null byte in a C string slice if one is present.
@@ -329,7 +366,8 @@ NSTDAPI const NSTDChar *nstd_core_cstr_mut_get_null_const(const NSTDCStr *cstr);
 ///
 /// # Returns
 ///
-/// `NSTDChar *chr` - A pointer to the character at `pos`, or null on error.
+/// `NSTDChar *chr` - A pointer to the character at `pos`, or null if `pos` is out of the C
+/// string slice's boundaries.
 NSTDAPI NSTDChar *nstd_core_cstr_mut_get(NSTDCStrMut *cstr, NSTDUInt pos);
 
 /// Return an immutable pointer the character at `pos` in `cstr`.
@@ -342,7 +380,8 @@ NSTDAPI NSTDChar *nstd_core_cstr_mut_get(NSTDCStrMut *cstr, NSTDUInt pos);
 ///
 /// # Returns
 ///
-/// `const NSTDChar *chr` - A pointer to the character at `pos`, or null on error.
+/// `const NSTDChar *chr` - A pointer to the character at `pos`, or null if `pos` is out of the C
+/// string slice's boundaries.
 NSTDAPI const NSTDChar *nstd_core_cstr_mut_get_const(const NSTDCStrMut *cstr, NSTDUInt pos);
 
 #endif
