@@ -1,5 +1,5 @@
 //! Provides functions for examining and operating on character types.
-use crate::{core::def::NSTDChar, NSTDBool, NSTDUInt32, NSTDUnichar, NSTD_FALSE};
+use crate::{NSTDBool, NSTDChar, NSTDUInt32, NSTDUnichar, NSTD_FALSE};
 
 /// Returns the Unicode replacement character (�).
 ///
@@ -248,7 +248,7 @@ pub extern "C" fn nstd_core_cty_is_digit(chr: NSTDUnichar, radix: NSTDUInt32) ->
 /// # Example
 ///
 /// ```
-/// use nstd_sys::core::{cty::nstd_core_cty_is_ascii_punctuation, def::NSTDChar};
+/// use nstd_sys::{core::cty::nstd_core_cty_is_ascii_punctuation, NSTDChar};
 ///
 /// assert!(nstd_core_cty_is_ascii_punctuation(b'.' as NSTDChar) != 0);
 /// assert!(nstd_core_cty_is_ascii_punctuation(b'y' as NSTDChar) == 0);
@@ -280,7 +280,7 @@ pub extern "C" fn nstd_core_cty_is_ascii_punctuation(chr: NSTDChar) -> NSTDBool 
 /// # Example
 ///
 /// ```
-/// use nstd_sys::core::{cty::nstd_core_cty_is_ascii_graphic, def::NSTDChar};
+/// use nstd_sys::{core::cty::nstd_core_cty_is_ascii_graphic, NSTDChar};
 ///
 /// assert!(nstd_core_cty_is_ascii_graphic(b'.' as NSTDChar) != 0);
 /// assert!(nstd_core_cty_is_ascii_graphic(b'\t' as NSTDChar) == 0);
@@ -308,7 +308,7 @@ pub extern "C" fn nstd_core_cty_is_ascii_graphic(chr: NSTDChar) -> NSTDBool {
 /// # Example
 ///
 /// ```
-/// use nstd_sys::core::{cty::nstd_core_cty_to_ascii_lowercase, def::NSTDChar};
+/// use nstd_sys::{core::cty::nstd_core_cty_to_ascii_lowercase, NSTDChar};
 ///
 /// let a = char::from_u32(nstd_core_cty_to_ascii_lowercase('A'.into())).unwrap();
 /// let z = char::from_u32(nstd_core_cty_to_ascii_lowercase('Z'.into())).unwrap();
@@ -340,7 +340,7 @@ pub extern "C" fn nstd_core_cty_to_ascii_lowercase(chr: NSTDUnichar) -> NSTDUnic
 /// # Example
 ///
 /// ```
-/// use nstd_sys::core::{cty::nstd_core_cty_to_ascii_uppercase, def::NSTDChar};
+/// use nstd_sys::{core::cty::nstd_core_cty_to_ascii_uppercase, NSTDChar};
 ///
 /// let a = char::from_u32(nstd_core_cty_to_ascii_uppercase('a'.into())).unwrap();
 /// let z = char::from_u32(nstd_core_cty_to_ascii_uppercase('z'.into())).unwrap();

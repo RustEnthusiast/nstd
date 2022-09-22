@@ -36,7 +36,7 @@ pub(crate) mod test;
 #[cfg(feature = "nstd_vec")]
 #[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_vec")))]
 pub mod vec;
-use ::core::ffi::c_void;
+use ::core::ffi::{c_char, c_void};
 
 /// A null pointer value constant.
 pub const NSTD_NULL: NSTDAnyMut = ::core::ptr::null_mut();
@@ -73,6 +73,8 @@ pub type NSTDFloat32 = f32;
 /// A 64-bit floating point type.
 pub type NSTDFloat64 = f64;
 
+/// Equivalent to C's `char` type.
+pub type NSTDChar = c_char;
 /// An 8-bit character type.
 pub type NSTDChar8 = NSTDUInt8;
 /// A 16-bit character type.

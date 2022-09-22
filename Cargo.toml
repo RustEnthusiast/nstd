@@ -22,7 +22,7 @@ std = []
 clib = []
 asm = []
 nstd_alloc = ["nstd_os_windows_alloc"]
-nstd_core = ["cty"]
+nstd_core = []
 nstd_cstring = ["nstd_alloc", "nstd_core", "nstd_vec"]
 nstd_heap_ptr = ["nstd_alloc", "nstd_core"]
 nstd_io = ["nstd_alloc", "nstd_core", "nstd_string", "nstd_vec", "std"]
@@ -36,7 +36,6 @@ nstd_string = ["nstd_alloc", "nstd_core", "nstd_vec"]
 nstd_vec = ["nstd_alloc", "nstd_core"]
 
 [dependencies]
-cty = { version = "0.2", optional = true }
 libloading = { version = "0.7", optional = true }
 
 [target.'cfg(target_os = "windows")'.dependencies]

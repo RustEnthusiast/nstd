@@ -59,6 +59,8 @@ typedef float NSTDFloat32;
 /// A 64-bit floating point type.
 typedef double NSTDFloat64;
 
+/// Equivalent to C's `char` type.
+typedef char NSTDChar;
 /// An 8-bit character type.
 typedef NSTDUInt8 NSTDChar8;
 /// A 16-bit character type.

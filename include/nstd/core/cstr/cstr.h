@@ -1,7 +1,6 @@
 #ifndef NSTD_CORE_CSTR_CSTR_H
 #define NSTD_CORE_CSTR_CSTR_H
 #include "../../nstd.h"
-#include "../def.h"
 #include "../slice.h"
 
 /// An immutable slice of a C string.

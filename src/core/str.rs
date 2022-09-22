@@ -7,7 +7,7 @@ use crate::{
             raw::{nstd_core_cstr_raw_len, nstd_core_cstr_raw_len_with_null},
             NSTDCStr, NSTDCStrMut,
         },
-        def::{NSTDByte, NSTDChar, NSTDErrorCode},
+        def::{NSTDByte, NSTDErrorCode},
         range::NSTDURange,
         slice::{
             nstd_core_slice_as_ptr, nstd_core_slice_len, nstd_core_slice_mut_as_ptr,
@@ -15,8 +15,8 @@ use crate::{
             nstd_core_slice_new, nstd_core_slice_stride, NSTDSlice, NSTDSliceMut,
         },
     },
-    NSTDFloat32, NSTDFloat64, NSTDInt, NSTDInt16, NSTDInt32, NSTDInt64, NSTDInt8, NSTDUInt,
-    NSTDUInt16, NSTDUInt32, NSTDUInt64, NSTDUInt8, NSTDUnichar,
+    NSTDChar, NSTDFloat32, NSTDFloat64, NSTDInt, NSTDInt16, NSTDInt32, NSTDInt64, NSTDInt8,
+    NSTDUInt, NSTDUInt16, NSTDUInt32, NSTDUInt64, NSTDUInt8, NSTDUnichar,
 };
 
 /// Generates the `nstd_core_str_*_to_[i|u|f]*` functions.

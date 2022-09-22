@@ -1,6 +1,7 @@
 # TBD
 ### `nstd`
 - Added `asm` feature.
+- Made `NSTDChar` a primitive.
 ### `nstd.core`
 - Made `nstd_core_str[_mut]_from_cstr` unsafe.
 - Renamed `cty`'s ASCII functions (`is_punctuation`, `is_graphic`, `to_lowercase`, `to_uppercase`).

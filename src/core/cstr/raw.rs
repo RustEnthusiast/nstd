@@ -1,5 +1,5 @@
 //! Raw C string processing.
-use crate::{core::def::NSTDChar, NSTDBool, NSTDUInt, NSTD_FALSE, NSTD_TRUE};
+use crate::{NSTDBool, NSTDChar, NSTDUInt, NSTD_FALSE, NSTD_TRUE};
 
 /// Gets the length of a null terminated C string, excluding the null byte.
 ///

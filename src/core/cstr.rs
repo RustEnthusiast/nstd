@@ -3,11 +3,10 @@ pub mod raw;
 use self::raw::{nstd_core_cstr_raw_len, nstd_core_cstr_raw_len_with_null};
 use crate::{
     core::{
-        def::NSTDChar,
         mem::nstd_core_mem_search,
         slice::{nstd_core_slice_new, NSTDSlice},
     },
-    NSTDBool, NSTDUInt,
+    NSTDBool, NSTDChar, NSTDUInt,
 };
 
 /// An immutable slice of a C string.

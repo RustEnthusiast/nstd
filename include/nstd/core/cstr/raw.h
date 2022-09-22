@@ -1,7 +1,6 @@
 #ifndef NSTD_CORE_CSTR_RAW_H
 #define NSTD_CORE_CSTR_RAW_H
 #include "../../nstd.h"
-#include "../def.h"
 
 /// Gets the length of a null terminated C string, excluding the null byte.
 ///
