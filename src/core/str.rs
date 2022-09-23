@@ -205,12 +205,25 @@ pub unsafe extern "C" fn nstd_core_str_from_raw_cstr_with_null(cstr: *const NSTD
 ///
 /// # Panics
 ///
-/// This operation will panic if `bytes`'s stride is not 1, or `bytes` is not valid UTF-8.
+/// This operation will panic in the following situations:
+///
+/// - `bytes`'s stride is not 1.
+///
+/// - `bytes`'s length is greater than `NSTDInt`'s max value.
+///
+/// - `bytes` is not valid UTF-8.
+///
+/// # Safety
+///
+/// - `bytes` must remain valid while the returned string slice is in use.
+///
+/// - `bytes`'s data must be valid for reads of at least `bytes.len` consecutive bytes.
+///
+/// - This operation can cause undefined behavior if it panics into non-Rust code.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_str_from_bytes(bytes: &NSTDSlice) -> NSTDStr {
-    // SAFETY: The returned string slice is already unsafe to access.
-    core::str::from_utf8(unsafe { bytes.as_slice() }).expect("Invalid UTF-8 bytes");
+pub unsafe extern "C" fn nstd_core_str_from_bytes(bytes: &NSTDSlice) -> NSTDStr {
+    core::str::from_utf8(bytes.as_slice()).expect("Invalid UTF-8 bytes");
     let ptr = nstd_core_slice_as_ptr(bytes).cast();
     let len = nstd_core_slice_len(bytes);
     NSTDStr { ptr, len }
@@ -232,8 +245,13 @@ pub extern "C" fn nstd_core_str_from_bytes(bytes: &NSTDSlice) -> NSTDStr {
 ///
 /// # Safety
 ///
-/// This function does not check to ensure that `bytes` are valid UTF-8.`bytes` must remain valid
-/// while the returned string slice is in use.
+/// - This function does not check to ensure that `bytes` are valid UTF-8.
+///
+/// - `bytes` must remain valid while the returned string slice is in use.
+///
+/// - `bytes`'s data must be valid for reads of at least `bytes.len` consecutive bytes.
+///
+/// - This operation can cause undefined behavior if it panics into non-Rust code.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_from_bytes_unchecked(bytes: &NSTDSlice) -> NSTDStr {
@@ -343,11 +361,6 @@ pub unsafe extern "C" fn nstd_core_str_get_char(str: &NSTDStr, pos: NSTDUInt) ->
 
 /// Creates a substring of an existing string slice.
 ///
-/// # Note
-///
-/// This function is considered safe because the returned string slice is already unsafe to operate
-/// on.
-///
 /// # Parameters:
 ///
 /// - `const NSTDStr *str` - The string slice to create the new substring from.
@@ -362,18 +375,27 @@ pub unsafe extern "C" fn nstd_core_str_get_char(str: &NSTDStr, pos: NSTDUInt) ->
 ///
 /// This operation can panic under the following circumstances:
 ///
-/// - `range.end` is greater than `str.bytes.len`.
+/// - `range.start` is greater than `NSTDInt`'s max value.
 ///
 /// - `range.start` is greater than `range.end`.
 ///
+/// - `range.end` is greater than `str.len`.
+///
+/// - `range.end` - `range.start` is greater than `NSTDInt`'s max value.
+///
 /// - The substring bytes are not valid UTF-8.
+///
+/// # Safety
+///
+/// - `str`'s data must be valid for reads of at least `str.len` consecutive bytes.
+///
+/// - This operation can cause undefined behavior if it panics into non-Rust code.
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_str_substr(str: &NSTDStr, range: NSTDURange) -> NSTDStr {
+pub unsafe extern "C" fn nstd_core_str_substr(str: &NSTDStr, range: NSTDURange) -> NSTDStr {
     // Make sure the range is valid for the bounds of `str`.
-    assert!(range.start <= range.end && range.end <= str.len);
+    assert!(range.start <= isize::MAX as usize && range.start <= range.end && range.end <= str.len);
     // Create the byte slice with `range` and use it to create the new string slice.
-    // SAFETY: The returned string slice is already unsafe to access.
-    let start = unsafe { str.ptr.add(range.start).cast() };
+    let start = str.ptr.add(range.start).cast();
     let bytes = nstd_core_slice_new(start, 1, range.end - range.start);
     nstd_core_str_from_bytes(&bytes)
 }
@@ -738,12 +760,25 @@ pub unsafe extern "C" fn nstd_core_str_mut_from_raw_cstr_with_null(
 ///
 /// # Panics
 ///
-/// This operation will panic if `bytes`'s stride is not 1, or `bytes` is not valid UTF-8.
+/// This operation will panic in the following situations:
+///
+/// - `bytes`'s stride is not 1.
+///
+/// - `bytes`'s length is greater than `NSTDInt`'s max value.
+///
+/// - `bytes` is not valid UTF-8.
+///
+/// # Safety
+///
+/// - `bytes` must remain valid while the returned string slice is in use.
+///
+/// - `bytes`'s data must be valid for reads of at least `bytes.len` consecutive bytes.
+///
+/// - This operation can cause undefined behavior if it panics into non-Rust code.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_str_mut_from_bytes(bytes: &mut NSTDSliceMut) -> NSTDStrMut {
-    // SAFETY: The returned string slice is already unsafe to access.
-    core::str::from_utf8(unsafe { bytes.as_slice() }).expect("Invalid UTF-8 bytes");
+pub unsafe extern "C" fn nstd_core_str_mut_from_bytes(bytes: &mut NSTDSliceMut) -> NSTDStrMut {
+    core::str::from_utf8(bytes.as_slice()).expect("Invalid UTF-8 bytes");
     let ptr = nstd_core_slice_mut_as_ptr(bytes).cast();
     let len = nstd_core_slice_mut_len(bytes);
     NSTDStrMut { ptr, len }
@@ -765,8 +800,13 @@ pub extern "C" fn nstd_core_str_mut_from_bytes(bytes: &mut NSTDSliceMut) -> NSTD
 ///
 /// # Safety
 ///
-/// This function does not check to ensure that `bytes` are valid UTF-8.`bytes` must remain valid
-/// while the returned string slice is in use.
+/// - This function does not check to ensure that `bytes` are valid UTF-8.
+///
+/// - `bytes` must remain valid while the returned string slice is in use.
+///
+/// - `bytes`'s data must be valid for reads of at least `bytes.len` consecutive bytes.
+///
+/// - This operation can cause undefined behavior if it panics into non-Rust code.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_mut_from_bytes_unchecked(
@@ -898,11 +938,6 @@ pub unsafe extern "C" fn nstd_core_str_mut_get_char(
 
 /// Creates a substring of an existing string slice.
 ///
-/// # Note
-///
-/// This function is considered safe because the returned string slice is already unsafe to operate
-/// on.
-///
 /// # Parameters:
 ///
 /// - `NSTDStrMut *str` - The string slice to create the new substring from.
@@ -917,18 +952,30 @@ pub unsafe extern "C" fn nstd_core_str_mut_get_char(
 ///
 /// This operation can panic under the following circumstances:
 ///
-/// - `range.end` is greater than `str.bytes.len`.
+/// - `range.start` is greater than `NSTDInt`'s max value.
 ///
 /// - `range.start` is greater than `range.end`.
 ///
+/// - `range.end` is greater than `str.len`.
+///
+/// - `range.end` - `range.start` is greater than `NSTDInt`'s max value.
+///
 /// - The substring bytes are not valid UTF-8.
+///
+/// # Safety
+///
+/// - `str`'s data must be valid for reads of at least `str.len` consecutive bytes.
+///
+/// - This operation can cause undefined behavior if it panics into non-Rust code.
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_str_mut_substr(str: &mut NSTDStrMut, range: NSTDURange) -> NSTDStrMut {
+pub unsafe extern "C" fn nstd_core_str_mut_substr(
+    str: &mut NSTDStrMut,
+    range: NSTDURange,
+) -> NSTDStrMut {
     // Make sure the range is valid for the bounds of `str`.
-    assert!(range.start <= range.end && range.end <= str.len);
+    assert!(range.start <= isize::MAX as usize && range.start <= range.end && range.end <= str.len);
     // Create the byte slice with `range` and use it to create the new string slice.
-    // SAFETY: The returned string slice is already unsafe to access.
-    let start = unsafe { str.ptr.add(range.start).cast() };
+    let start = str.ptr.add(range.start).cast();
     let mut bytes = nstd_core_slice_mut_new(start, 1, range.end - range.start);
     nstd_core_str_mut_from_bytes(&mut bytes)
 }

@@ -119,7 +119,21 @@ NSTDAPI NSTDStr nstd_core_str_from_raw_cstr_with_null(const NSTDChar *cstr);
 ///
 /// # Panics
 ///
-/// This operation will panic if `bytes`'s stride is not 1, or `bytes` is not valid UTF-8.
+/// This operation will panic in the following situations:
+///
+/// - `bytes`'s stride is not 1.
+///
+/// - `bytes`'s length is greater than `NSTDInt`'s max value.
+///
+/// - `bytes` is not valid UTF-8.
+///
+/// # Safety
+///
+/// - `bytes` must remain valid while the returned string slice is in use.
+///
+/// - `bytes`'s data must be valid for reads of at least `bytes.len` consecutive bytes.
+///
+/// - This operation can cause undefined behavior if it panics into non-Rust code.
 NSTDAPI NSTDStr nstd_core_str_from_bytes(const NSTDSlice *bytes);
 
 /// Creates a string slice from raw bytes, without checking for UTF-8.
@@ -138,8 +152,13 @@ NSTDAPI NSTDStr nstd_core_str_from_bytes(const NSTDSlice *bytes);
 ///
 /// # Safety
 ///
-/// This function does not check to ensure that `bytes` are valid UTF-8.`bytes` must remain valid
-/// while the returned string slice is in use.
+/// - This function does not check to ensure that `bytes` are valid UTF-8.
+///
+/// - `bytes` must remain valid while the returned string slice is in use.
+///
+/// - `bytes`'s data must be valid for reads of at least `bytes.len` consecutive bytes.
+///
+/// - This operation can cause undefined behavior if it panics into non-Rust code.
 NSTDAPI NSTDStr nstd_core_str_from_bytes_unchecked(const NSTDSlice *bytes);
 
 /// Returns an immutable byte slice over `str`'s data.
@@ -219,11 +238,6 @@ NSTDAPI NSTDUnichar nstd_core_str_get_char(const NSTDStr *str, NSTDUInt pos);
 
 /// Creates a substring of an existing string slice.
 ///
-/// # Note
-///
-/// This function is considered safe because the returned string slice is already unsafe to operate
-/// on.
-///
 /// # Parameters:
 ///
 /// - `const NSTDStr *str` - The string slice to create the new substring from.
@@ -238,11 +252,21 @@ NSTDAPI NSTDUnichar nstd_core_str_get_char(const NSTDStr *str, NSTDUInt pos);
 ///
 /// This operation can panic under the following circumstances:
 ///
-/// - `range.end` is greater than `str.bytes.len`.
+/// - `range.start` is greater than `NSTDInt`'s max value.
 ///
 /// - `range.start` is greater than `range.end`.
 ///
+/// - `range.end` is greater than `str.len`.
+///
+/// - `range.end` - `range.start` is greater than `NSTDInt`'s max value.
+///
 /// - The substring bytes are not valid UTF-8.
+///
+/// # Safety
+///
+/// - `str`'s data must be valid for reads of at least `str.len` consecutive bytes.
+///
+/// - This operation can cause undefined behavior if it panics into non-Rust code.
 NSTDAPI NSTDStr nstd_core_str_substr(const NSTDStr *str, NSTDURange range);
 
 /// Attempts to parse a string slice as an `NSTDFloat32`.
@@ -551,7 +575,21 @@ NSTDAPI NSTDStrMut nstd_core_str_mut_from_raw_cstr_with_null(NSTDChar *cstr);
 ///
 /// # Panics
 ///
-/// This operation will panic if `bytes`'s stride is not 1, or `bytes` is not valid UTF-8.
+/// This operation will panic in the following situations:
+///
+/// - `bytes`'s stride is not 1.
+///
+/// - `bytes`'s length is greater than `NSTDInt`'s max value.
+///
+/// - `bytes` is not valid UTF-8.
+///
+/// # Safety
+///
+/// - `bytes` must remain valid while the returned string slice is in use.
+///
+/// - `bytes`'s data must be valid for reads of at least `bytes.len` consecutive bytes.
+///
+/// - This operation can cause undefined behavior if it panics into non-Rust code.
 NSTDAPI NSTDStrMut nstd_core_str_mut_from_bytes(NSTDSliceMut *bytes);
 
 /// Creates a string slice from raw bytes, without checking for UTF-8.
@@ -570,8 +608,13 @@ NSTDAPI NSTDStrMut nstd_core_str_mut_from_bytes(NSTDSliceMut *bytes);
 ///
 /// # Safety
 ///
-/// This function does not check to ensure that `bytes` are valid UTF-8.`bytes` must remain valid
-/// while the returned string slice is in use.
+/// - This function does not check to ensure that `bytes` are valid UTF-8.
+///
+/// - `bytes` must remain valid while the returned string slice is in use.
+///
+/// - `bytes`'s data must be valid for reads of at least `bytes.len` consecutive bytes.
+///
+/// - This operation can cause undefined behavior if it panics into non-Rust code.
 NSTDAPI NSTDStrMut nstd_core_str_mut_from_bytes_unchecked(NSTDSliceMut *bytes);
 
 /// Creates an immutable version of a mutable string slice.
@@ -662,11 +705,6 @@ NSTDAPI NSTDUnichar nstd_core_str_mut_get_char(const NSTDStrMut *str, NSTDUInt p
 
 /// Creates a substring of an existing string slice.
 ///
-/// # Note
-///
-/// This function is considered safe because the returned string slice is already unsafe to operate
-/// on.
-///
 /// # Parameters:
 ///
 /// - `NSTDStrMut *str` - The string slice to create the new substring from.
@@ -681,11 +719,21 @@ NSTDAPI NSTDUnichar nstd_core_str_mut_get_char(const NSTDStrMut *str, NSTDUInt p
 ///
 /// This operation can panic under the following circumstances:
 ///
-/// - `range.end` is greater than `str.bytes.len`.
+/// - `range.start` is greater than `NSTDInt`'s max value.
 ///
 /// - `range.start` is greater than `range.end`.
 ///
+/// - `range.end` is greater than `str.len`.
+///
+/// - `range.end` - `range.start` is greater than `NSTDInt`'s max value.
+///
 /// - The substring bytes are not valid UTF-8.
+///
+/// # Safety
+///
+/// - `str`'s data must be valid for reads of at least `str.len` consecutive bytes.
+///
+/// - This operation can cause undefined behavior if it panics into non-Rust code.
 NSTDAPI NSTDStrMut nstd_core_str_mut_substr(NSTDStrMut *str, NSTDURange range);
 
 /// Attempts to parse a string slice as an `NSTDFloat32`.
