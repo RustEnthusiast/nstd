@@ -27,9 +27,17 @@ macro_rules! gen_to_primitive {
     ) => {
         $(#[$meta])*
         ///
-        /// # Safety:
+        /// # Panics
         ///
-        /// This operation can cause undefined behavior if `str`'s data is invalid.
+        /// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s
+        /// max value.
+        ///
+        /// # Safety
+        ///
+        /// - This operation can cause undefined behavior in the event that `str`'s data is
+        /// invalid.
+        ///
+        /// - This operation can cause undefined behavior if it panics into non-Rust code.
         #[inline]
         #[cfg_attr(feature = "clib", no_mangle)]
         pub unsafe extern "C" fn $name(str: &$StrT, errc: &mut NSTDErrorCode) -> $RetT {
@@ -303,12 +311,14 @@ pub extern "C" fn nstd_core_str_as_ptr(str: &NSTDStr) -> *const NSTDByte {
 ///
 /// # Panics
 ///
-/// This operation may panic in the event that `str`'s calculated length is greater than the
-/// highest number representable by `NSTDUInt`.
+/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s max
+/// value.
 ///
 /// # Safety
 ///
-/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
+/// - This operation can cause undefined behavior in the event that `str`'s data is invalid.
+///
+/// - This operation can cause undefined behavior if it panics into non-Rust code.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_len(str: &NSTDStr) -> NSTDUInt {
@@ -347,9 +357,16 @@ pub extern "C" fn nstd_core_str_byte_len(str: &NSTDStr) -> NSTDUInt {
 /// `NSTDUnichar chr` - The character at index `pos`, or the Unicode replacement character on
 /// error.
 ///
+/// # Panics
+///
+/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s max
+/// value.
+///
 /// # Safety
 ///
-/// This operation could cause undefined behavior if `str`'s data is invalid.
+/// - This operation can cause undefined behavior in the event that `str`'s data is invalid.
+///
+/// - This operation can cause undefined behavior if it panics into non-Rust code.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_get_char(str: &NSTDStr, pos: NSTDUInt) -> NSTDUnichar {
@@ -877,12 +894,14 @@ pub extern "C" fn nstd_core_str_mut_as_ptr(str: &NSTDStrMut) -> *const NSTDByte 
 ///
 /// # Panics
 ///
-/// This operation may panic in the event that `str`'s calculated length is greater than the
-/// highest number representable by `NSTDUInt`.
+/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s max
+/// value.
 ///
 /// # Safety
 ///
-/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
+/// - This operation can cause undefined behavior in the event that `str`'s data is invalid.
+///
+/// - This operation can cause undefined behavior if it panics into non-Rust code.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_mut_len(str: &NSTDStrMut) -> NSTDUInt {
@@ -921,9 +940,16 @@ pub extern "C" fn nstd_core_str_mut_byte_len(str: &NSTDStrMut) -> NSTDUInt {
 /// `NSTDUnichar chr` - The character at index `pos`, or the Unicode replacement character on
 /// error.
 ///
+/// # Panics
+///
+/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s max
+/// value.
+///
 /// # Safety
 ///
-/// This operation could cause undefined behavior if `str`'s data is invalid.
+/// - This operation can cause undefined behavior in the event that `str`'s data is invalid.
+///
+/// - This operation can cause undefined behavior if it panics into non-Rust code.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_mut_get_char(
