@@ -37,7 +37,7 @@ NSTDAPI NSTDWindowsHeapHandle nstd_os_windows_alloc_heap_new(NSTDUInt size);
 ///
 /// # Parameters:
 ///
-/// - `NSTDWindowsHeapHandle heap` - A handle to the heap to allocate on.
+/// - `const NSTDWindowsHeapHandle *heap` - A handle to the heap to allocate on.
 ///
 /// - `NSTDUInt size` - The number of bytes to allocate.
 ///
@@ -48,13 +48,14 @@ NSTDAPI NSTDWindowsHeapHandle nstd_os_windows_alloc_heap_new(NSTDUInt size);
 /// # Safety
 ///
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapalloc>.
-NSTDAPI NSTDAnyMut nstd_os_windows_alloc_heap_allocate(NSTDWindowsHeapHandle heap, NSTDUInt size);
+NSTDAPI NSTDAnyMut nstd_os_windows_alloc_heap_allocate(const NSTDWindowsHeapHandle *heap,
+NSTDUInt size);
 
 /// Allocates a zero-initialized block of memory on a heap.
 ///
 /// # Parameters:
 ///
-/// - `NSTDWindowsHeapHandle heap` - A handle to the heap to allocate on.
+/// - `const NSTDWindowsHeapHandle *heap` - A handle to the heap to allocate on.
 ///
 /// - `NSTDUInt size` - The number of bytes to allocate.
 ///
@@ -65,14 +66,14 @@ NSTDAPI NSTDAnyMut nstd_os_windows_alloc_heap_allocate(NSTDWindowsHeapHandle hea
 /// # Safety
 ///
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapalloc>.
-NSTDAPI NSTDAnyMut nstd_os_windows_alloc_heap_allocate_zeroed(NSTDWindowsHeapHandle heap,
+NSTDAPI NSTDAnyMut nstd_os_windows_alloc_heap_allocate_zeroed(const NSTDWindowsHeapHandle *heap,
 NSTDUInt size);
 
 /// Reallocates a block of memory on a heap.
 ///
 /// # Parameters:
 ///
-/// - `NSTDWindowsHeapHandle heap` - A handle to the heap to reallocate on.
+/// - `const NSTDWindowsHeapHandle *heap` - A handle to the heap to reallocate on.
 ///
 /// - `NSTDAnyMut *ptr` - A pointer to the memory to reallocate.
 ///
@@ -85,14 +86,14 @@ NSTDUInt size);
 /// # Safety
 ///
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heaprealloc>.
-NSTDAPI NSTDAllocError nstd_os_windows_alloc_heap_reallocate(NSTDWindowsHeapHandle heap,
+NSTDAPI NSTDAllocError nstd_os_windows_alloc_heap_reallocate(const NSTDWindowsHeapHandle *heap,
 NSTDAnyMut *ptr, NSTDUInt size);
 
 /// Deallocates a block of memory on a heap.
 ///
 /// # Parameters:
 ///
-/// - `NSTDWindowsHeapHandle heap` - A handle to the heap to deallocate memory from.
+/// - `const NSTDWindowsHeapHandle *heap` - A handle to the heap to deallocate memory from.
 ///
 /// - `NSTDAnyMut *ptr` - A pointer to the allocated memory.
 ///
@@ -103,7 +104,7 @@ NSTDAnyMut *ptr, NSTDUInt size);
 /// # Safety
 ///
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapfree>.
-NSTDAPI NSTDAllocError nstd_os_windows_alloc_heap_deallocate(NSTDWindowsHeapHandle heap,
+NSTDAPI NSTDAllocError nstd_os_windows_alloc_heap_deallocate(const NSTDWindowsHeapHandle *heap,
 NSTDAnyMut *ptr);
 
 /// Destroys a private heap.

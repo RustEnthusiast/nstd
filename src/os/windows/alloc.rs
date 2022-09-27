@@ -30,7 +30,7 @@ use crate::{alloc::NSTDAllocError, NSTDAnyMut, NSTDUInt};
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_os_windows_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
     let heap = nstd_os_windows_alloc_heap_default();
-    nstd_os_windows_alloc_heap_allocate(heap, size)
+    nstd_os_windows_alloc_heap_allocate(&heap, size)
 }
 
 /// Allocates a new block of zero-initialized memory on the current process' heap.
@@ -56,7 +56,7 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_allocate(size: NSTDUInt) -> NSTDA
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_os_windows_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMut {
     let heap = nstd_os_windows_alloc_heap_default();
-    nstd_os_windows_alloc_heap_allocate_zeroed(heap, size)
+    nstd_os_windows_alloc_heap_allocate_zeroed(&heap, size)
 }
 
 /// Reallocates a block of memory previously allocated by
@@ -92,7 +92,7 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_reallocate(
     new_size: NSTDUInt,
 ) -> NSTDAllocError {
     let heap = nstd_os_windows_alloc_heap_default();
-    nstd_os_windows_alloc_heap_reallocate(heap, ptr, new_size)
+    nstd_os_windows_alloc_heap_reallocate(&heap, ptr, new_size)
 }
 
 /// Deallocates a block of memory previously allocated by
@@ -119,5 +119,5 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_reallocate(
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_os_windows_alloc_deallocate(ptr: &mut NSTDAnyMut) -> NSTDAllocError {
     let heap = nstd_os_windows_alloc_heap_default();
-    nstd_os_windows_alloc_heap_deallocate(heap, ptr)
+    nstd_os_windows_alloc_heap_deallocate(&heap, ptr)
 }
