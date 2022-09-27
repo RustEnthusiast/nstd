@@ -671,6 +671,10 @@ pub unsafe extern "C" fn nstd_core_cstr_mut_get_null_const(cstr: &NSTDCStrMut) -
 
 /// Return a pointer the character at `pos` in `cstr`.
 ///
+/// # Note
+///
+/// This will return a null pointer if `pos` is greater than `NSTDInt`'s max value.
+///
 /// # Parameters:
 ///
 /// - `NSTDCStrMut *cstr` - The C string.

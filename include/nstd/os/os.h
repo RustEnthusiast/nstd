@@ -9,6 +9,11 @@
 #define NSTD_OS_LINUX
 #endif
 
+/// Constant that is only set if the target operating system is macOS.
+#if defined(TARGET_OS_MAC)
+#define NSTD_OS_MACOS
+#endif
+
 /// Constant that is only set if the target operating system is Windows.
 #if defined(__WINDOWS__)\
     || defined(_WIN16)\
