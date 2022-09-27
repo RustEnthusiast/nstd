@@ -18,7 +18,7 @@ Rust syntax).
         - `math` - Low level math operations.
         - `mem` - Contains mostly unsafe functions for interacting with raw memory.
         - `ptr` - A sized pointer to some arbitrary type.
-        - `range` - A half-open (low inclusive, high exclusive) numerical range.
+        - `range` - A numerical range.
         - `slice` - A view into a sequence of values in memory.
         - `str` - An unowned view into a UTF-8 encoded byte string.
     - `cstring` - A dynamically sized, null terminated, C string.
@@ -63,23 +63,35 @@ can easily use the API.
 
 - Any operation that makes a direct call on a C function pointer is considered unsafe.
 
-- References are assumed to be valid arguments (non-null/not dangling), and are safe to access.
+- Any function that may panic must be marked as unsafe, as it is undefined behavior to unwind from
+Rust code into foreign code (though this is
+[subject to change](https://rust-lang.github.io/rfcs/2945-c-unwind-abi.html)).
 
-- Any function that may panic must document each case that it might do so.
+- Reference arguments are assumed to be valid (aligned, non-null, and non-dangling), and are safe
+to access.
 
 # How to build
-`nstd` let you decide what features you want to use. Any module that falls under the top level
-module has a dedicated feature flag, for example `nstd.core` has the feature flag `nstd_core` and
-`nstd.alloc` has the feature flag `nstd_alloc`. Each module can also have additional features, for
-example `nstd.os` has the additional `nstd_os_windows_alloc` feature for memory allocation on
-Windows, this allows other modules to use the low level memory allocation API for Windows without
-enabling memory allocation support for other operating systems. To build `nstd` as a C library, use
-the `clib` feature flag. The `std` feature flag enables Rust standard library support. `std` and
-`nstd_core` are enabled by default.
+`nstd` lets you decide what features you want to use.
 
-For example:
+Any module that falls under the top level module has a dedicated feature flag, for example
+`nstd.core` has the feature flag `nstd_core` and `nstd.alloc` has the feature flag `nstd_alloc`.
+
+Each module may have additional features, for example `nstd.os` has the additional
+`nstd_os_windows_alloc` feature for memory allocation on Windows, this allows other modules to use
+the low level memory allocation API for Windows without enabling memory allocation for other
+operating systems.
+
+The `clib` feature flag is used to build `nstd` as a C library.
+
+The `std` feature flag links the Rust standard library into the binary.
+
+The `asm` feature allows functions to use inline assembly to increase performance.
+
+`std` and `nstd_core` are enabled by default.
+
+Example:
 ```sh
-cargo build --release --features "clib nstd_alloc nstd_vec"
+cargo build --release --features "clib nstd_io nstd_string nstd_vec"
 ```
 
 To build with all features:

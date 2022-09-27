@@ -62,6 +62,371 @@ pub extern "C" fn nstd_core_math_rad_f64(deg: NSTDFloat64) -> NSTDFloat64 {
     deg.to_radians()
 }
 
+/// Generates the `abs` functions.
+macro_rules! gen_abs {
+    (
+        $(#[$meta:meta])*
+        $name: ident, $T: ty
+    ) => {
+        $(#[$meta])*
+        #[inline]
+        #[cfg_attr(feature = "clib", no_mangle)]
+        pub extern "C" fn $name(x: $T) -> $T {
+            x.abs()
+        }
+    };
+}
+gen_abs!(
+    /// Computes the absolute (positive) value of `x`.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDInt x` - The value.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDInt abs` - The absolute value of `x`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_abs_int;
+    /// assert!(nstd_core_math_abs_int(10) == 10);
+    /// assert!(nstd_core_math_abs_int(-10) == 10);
+    /// ```
+    nstd_core_math_abs_int,
+    NSTDInt
+);
+gen_abs!(
+    /// Computes the absolute (positive) value of `x`.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDInt8 x` - The value.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDInt8 abs` - The absolute value of `x`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_abs_i8;
+    /// assert!(nstd_core_math_abs_i8(10) == 10);
+    /// assert!(nstd_core_math_abs_i8(-10) == 10);
+    /// ```
+    nstd_core_math_abs_i8,
+    NSTDInt8
+);
+gen_abs!(
+    /// Computes the absolute (positive) value of `x`.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDInt16 x` - The value.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDInt16 abs` - The absolute value of `x`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_abs_i16;
+    /// assert!(nstd_core_math_abs_i16(10) == 10);
+    /// assert!(nstd_core_math_abs_i16(-10) == 10);
+    /// ```
+    nstd_core_math_abs_i16,
+    NSTDInt16
+);
+gen_abs!(
+    /// Computes the absolute (positive) value of `x`.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDInt32 x` - The value.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDInt32 abs` - The absolute value of `x`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_abs_i32;
+    /// assert!(nstd_core_math_abs_i32(10) == 10);
+    /// assert!(nstd_core_math_abs_i32(-10) == 10);
+    /// ```
+    nstd_core_math_abs_i32,
+    NSTDInt32
+);
+gen_abs!(
+    /// Computes the absolute (positive) value of `x`.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDInt64 x` - The value.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDInt64 abs` - The absolute value of `x`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_abs_i64;
+    /// assert!(nstd_core_math_abs_i64(10) == 10);
+    /// assert!(nstd_core_math_abs_i64(-10) == 10);
+    /// ```
+    nstd_core_math_abs_i64,
+    NSTDInt64
+);
+
+/// Generates the `pow` functions.
+macro_rules! gen_pow {
+    (
+        $(#[$meta:meta])*
+        $name: ident, $T: ty
+    ) => {
+        $(#[$meta])*
+        #[inline]
+        #[cfg_attr(feature = "clib", no_mangle)]
+        pub extern "C" fn $name(x: $T, exp: NSTDUInt32) -> $T {
+            x.pow(exp)
+        }
+    };
+}
+gen_pow!(
+    /// Raises the value `x` to the power of `exp`
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDInt x` - The value.
+    ///
+    /// - `NSTDUInt32 exp` - The exponent.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDInt pow` - `x` raised to the power of `exp`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_pow_int;
+    /// assert!(nstd_core_math_pow_int(2, 3) == 8);
+    /// assert!(nstd_core_math_pow_int(4, 5) == 1024);
+    /// ```
+    nstd_core_math_pow_int,
+    NSTDInt
+);
+gen_pow!(
+    /// Raises the value `x` to the power of `exp`
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDUInt x` - The value.
+    ///
+    /// - `NSTDUInt32 exp` - The exponent.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDUInt pow` - `x` raised to the power of `exp`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_pow_uint;
+    /// assert!(nstd_core_math_pow_uint(2, 3) == 8);
+    /// assert!(nstd_core_math_pow_uint(4, 5) == 1024);
+    /// ```
+    nstd_core_math_pow_uint,
+    NSTDUInt
+);
+gen_pow!(
+    /// Raises the value `x` to the power of `exp`
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDInt8 x` - The value.
+    ///
+    /// - `NSTDUInt32 exp` - The exponent.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDInt8 pow` - `x` raised to the power of `exp`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_pow_i8;
+    /// assert!(nstd_core_math_pow_i8(2, 3) == 8);
+    /// assert!(nstd_core_math_pow_i8(2, 5) == 32);
+    /// ```
+    nstd_core_math_pow_i8,
+    NSTDInt8
+);
+gen_pow!(
+    /// Raises the value `x` to the power of `exp`
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDUInt8 x` - The value.
+    ///
+    /// - `NSTDUInt32 exp` - The exponent.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDUInt8 pow` - `x` raised to the power of `exp`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_pow_u8;
+    /// assert!(nstd_core_math_pow_u8(2, 3) == 8);
+    /// assert!(nstd_core_math_pow_u8(2, 5) == 32);
+    /// ```
+    nstd_core_math_pow_u8,
+    NSTDUInt8
+);
+gen_pow!(
+    /// Raises the value `x` to the power of `exp`
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDInt16 x` - The value.
+    ///
+    /// - `NSTDUInt32 exp` - The exponent.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDInt16 pow` - `x` raised to the power of `exp`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_pow_i16;
+    /// assert!(nstd_core_math_pow_i16(2, 3) == 8);
+    /// assert!(nstd_core_math_pow_i16(4, 5) == 1024);
+    /// ```
+    nstd_core_math_pow_i16,
+    NSTDInt16
+);
+gen_pow!(
+    /// Raises the value `x` to the power of `exp`
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDUInt16 x` - The value.
+    ///
+    /// - `NSTDUInt32 exp` - The exponent.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDUInt16 pow` - `x` raised to the power of `exp`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_pow_u16;
+    /// assert!(nstd_core_math_pow_u16(2, 3) == 8);
+    /// assert!(nstd_core_math_pow_u16(4, 5) == 1024);
+    /// ```
+    nstd_core_math_pow_u16,
+    NSTDUInt16
+);
+gen_pow!(
+    /// Raises the value `x` to the power of `exp`
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDInt32 x` - The value.
+    ///
+    /// - `NSTDUInt32 exp` - The exponent.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDInt32 pow` - `x` raised to the power of `exp`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_pow_i32;
+    /// assert!(nstd_core_math_pow_i32(2, 3) == 8);
+    /// assert!(nstd_core_math_pow_i32(4, 5) == 1024);
+    /// ```
+    nstd_core_math_pow_i32,
+    NSTDInt32
+);
+gen_pow!(
+    /// Raises the value `x` to the power of `exp`
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDUInt32 x` - The value.
+    ///
+    /// - `NSTDUInt32 exp` - The exponent.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDUInt32 pow` - `x` raised to the power of `exp`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_pow_u32;
+    /// assert!(nstd_core_math_pow_u32(2, 3) == 8);
+    /// assert!(nstd_core_math_pow_u32(4, 5) == 1024);
+    /// ```
+    nstd_core_math_pow_u32,
+    NSTDUInt32
+);
+gen_pow!(
+    /// Raises the value `x` to the power of `exp`
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDInt64 x` - The value.
+    ///
+    /// - `NSTDUInt32 exp` - The exponent.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDInt64 pow` - `x` raised to the power of `exp`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_pow_i64;
+    /// assert!(nstd_core_math_pow_i64(2, 3) == 8);
+    /// assert!(nstd_core_math_pow_i64(4, 5) == 1024);
+    /// ```
+    nstd_core_math_pow_i64,
+    NSTDInt64
+);
+gen_pow!(
+    /// Raises the value `x` to the power of `exp`
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDUInt64 x` - The value.
+    ///
+    /// - `NSTDUInt32 exp` - The exponent.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDUInt64 pow` - `x` raised to the power of `exp`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_pow_u64;
+    /// assert!(nstd_core_math_pow_u64(2, 3) == 8);
+    /// assert!(nstd_core_math_pow_u64(4, 5) == 1024);
+    /// ```
+    nstd_core_math_pow_u64,
+    NSTDUInt64
+);
+
 /// Generates the `clamp` functions.
 macro_rules! gen_clamp {
     (
@@ -71,7 +436,7 @@ macro_rules! gen_clamp {
         $(#[$meta])*
         #[inline]
         #[cfg_attr(feature = "clib", no_mangle)]
-        pub extern "C" fn $name(x: $T, min: $T, max: $T) -> $T {
+        pub unsafe extern "C" fn $name(x: $T, min: $T, max: $T) -> $T {
             x.clamp(min, max)
         }
     };
@@ -94,6 +459,22 @@ gen_clamp!(
     /// # Panics
     ///
     /// Panics if `min` > `max`, `min` is NaN, or `max` is NaN.
+    ///
+    /// # Safety
+    ///
+    /// This operation can cause undefined behavior if it panics into non-Rust code.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_clamp_f32;
+    ///
+    /// unsafe {
+    ///     assert!(nstd_core_math_clamp_f32(2.5, 3.0, 5.0) == 3.0);
+    ///     assert!(nstd_core_math_clamp_f32(4.0, 3.0, 5.0) == 4.0);
+    ///     assert!(nstd_core_math_clamp_f32(7.5, 3.0, 5.0) == 5.0);
+    /// }
+    /// ```
     nstd_core_math_clamp_f32,
     NSTDFloat32
 );
@@ -115,6 +496,22 @@ gen_clamp!(
     /// # Panics
     ///
     /// Panics if `min` > `max`, `min` is NaN, or `max` is NaN.
+    ///
+    /// # Safety
+    ///
+    /// This operation can cause undefined behavior if it panics into non-Rust code.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_clamp_f64;
+    ///
+    /// unsafe {
+    ///     assert!(nstd_core_math_clamp_f64(2.5, 3.0, 5.0) == 3.0);
+    ///     assert!(nstd_core_math_clamp_f64(4.0, 3.0, 5.0) == 4.0);
+    ///     assert!(nstd_core_math_clamp_f64(7.5, 3.0, 5.0) == 5.0);
+    /// }
+    /// ```
     nstd_core_math_clamp_f64,
     NSTDFloat64
 );
@@ -136,6 +533,22 @@ gen_clamp!(
     /// # Panics
     ///
     /// Panics if `min` > `max`.
+    ///
+    /// # Safety
+    ///
+    /// This operation can cause undefined behavior if it panics into non-Rust code.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_clamp_int;
+    ///
+    /// unsafe {
+    ///     assert!(nstd_core_math_clamp_int(2, 5, 10) == 5);
+    ///     assert!(nstd_core_math_clamp_int(8, 5, 10) == 8);
+    ///     assert!(nstd_core_math_clamp_int(14, 5, 10) == 10);
+    /// }
+    /// ```
     nstd_core_math_clamp_int,
     NSTDInt
 );
@@ -157,6 +570,22 @@ gen_clamp!(
     /// # Panics
     ///
     /// Panics if `min` > `max`.
+    ///
+    /// # Safety
+    ///
+    /// This operation can cause undefined behavior if it panics into non-Rust code.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_clamp_uint;
+    ///
+    /// unsafe {
+    ///     assert!(nstd_core_math_clamp_uint(2, 5, 10) == 5);
+    ///     assert!(nstd_core_math_clamp_uint(8, 5, 10) == 8);
+    ///     assert!(nstd_core_math_clamp_uint(14, 5, 10) == 10);
+    /// }
+    /// ```
     nstd_core_math_clamp_uint,
     NSTDUInt
 );
@@ -178,6 +607,22 @@ gen_clamp!(
     /// # Panics
     ///
     /// Panics if `min` > `max`.
+    ///
+    /// # Safety
+    ///
+    /// This operation can cause undefined behavior if it panics into non-Rust code.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_clamp_i8;
+    ///
+    /// unsafe {
+    ///     assert!(nstd_core_math_clamp_i8(2, 5, 10) == 5);
+    ///     assert!(nstd_core_math_clamp_i8(8, 5, 10) == 8);
+    ///     assert!(nstd_core_math_clamp_i8(14, 5, 10) == 10);
+    /// }
+    /// ```
     nstd_core_math_clamp_i8,
     NSTDInt8
 );
@@ -199,6 +644,22 @@ gen_clamp!(
     /// # Panics
     ///
     /// Panics if `min` > `max`.
+    ///
+    /// # Safety
+    ///
+    /// This operation can cause undefined behavior if it panics into non-Rust code.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_clamp_u8;
+    ///
+    /// unsafe {
+    ///     assert!(nstd_core_math_clamp_u8(2, 5, 10) == 5);
+    ///     assert!(nstd_core_math_clamp_u8(8, 5, 10) == 8);
+    ///     assert!(nstd_core_math_clamp_u8(14, 5, 10) == 10);
+    /// }
+    /// ```
     nstd_core_math_clamp_u8,
     NSTDUInt8
 );
@@ -220,6 +681,22 @@ gen_clamp!(
     /// # Panics
     ///
     /// Panics if `min` > `max`.
+    ///
+    /// # Safety
+    ///
+    /// This operation can cause undefined behavior if it panics into non-Rust code.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_clamp_i16;
+    ///
+    /// unsafe {
+    ///     assert!(nstd_core_math_clamp_i16(2, 5, 10) == 5);
+    ///     assert!(nstd_core_math_clamp_i16(8, 5, 10) == 8);
+    ///     assert!(nstd_core_math_clamp_i16(14, 5, 10) == 10);
+    /// }
+    /// ```
     nstd_core_math_clamp_i16,
     NSTDInt16
 );
@@ -241,6 +718,22 @@ gen_clamp!(
     /// # Panics
     ///
     /// Panics if `min` > `max`.
+    ///
+    /// # Safety
+    ///
+    /// This operation can cause undefined behavior if it panics into non-Rust code.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_clamp_u16;
+    ///
+    /// unsafe {
+    ///     assert!(nstd_core_math_clamp_u16(2, 5, 10) == 5);
+    ///     assert!(nstd_core_math_clamp_u16(8, 5, 10) == 8);
+    ///     assert!(nstd_core_math_clamp_u16(14, 5, 10) == 10);
+    /// }
+    /// ```
     nstd_core_math_clamp_u16,
     NSTDUInt16
 );
@@ -262,6 +755,22 @@ gen_clamp!(
     /// # Panics
     ///
     /// Panics if `min` > `max`.
+    ///
+    /// # Safety
+    ///
+    /// This operation can cause undefined behavior if it panics into non-Rust code.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_clamp_i32;
+    ///
+    /// unsafe {
+    ///     assert!(nstd_core_math_clamp_i32(2, 5, 10) == 5);
+    ///     assert!(nstd_core_math_clamp_i32(8, 5, 10) == 8);
+    ///     assert!(nstd_core_math_clamp_i32(14, 5, 10) == 10);
+    /// }
+    /// ```
     nstd_core_math_clamp_i32,
     NSTDInt32
 );
@@ -283,6 +792,22 @@ gen_clamp!(
     /// # Panics
     ///
     /// Panics if `min` > `max`.
+    ///
+    /// # Safety
+    ///
+    /// This operation can cause undefined behavior if it panics into non-Rust code.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_clamp_u32;
+    ///
+    /// unsafe {
+    ///     assert!(nstd_core_math_clamp_u32(2, 5, 10) == 5);
+    ///     assert!(nstd_core_math_clamp_u32(8, 5, 10) == 8);
+    ///     assert!(nstd_core_math_clamp_u32(14, 5, 10) == 10);
+    /// }
+    /// ```
     nstd_core_math_clamp_u32,
     NSTDUInt32
 );
@@ -304,6 +829,22 @@ gen_clamp!(
     /// # Panics
     ///
     /// Panics if `min` > `max`.
+    ///
+    /// # Safety
+    ///
+    /// This operation can cause undefined behavior if it panics into non-Rust code.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_clamp_i64;
+    ///
+    /// unsafe {
+    ///     assert!(nstd_core_math_clamp_i64(2, 5, 10) == 5);
+    ///     assert!(nstd_core_math_clamp_i64(8, 5, 10) == 8);
+    ///     assert!(nstd_core_math_clamp_i64(14, 5, 10) == 10);
+    /// }
+    /// ```
     nstd_core_math_clamp_i64,
     NSTDInt64
 );
@@ -325,6 +866,22 @@ gen_clamp!(
     /// # Panics
     ///
     /// Panics if `min` > `max`.
+    ///
+    /// # Safety
+    ///
+    /// This operation can cause undefined behavior if it panics into non-Rust code.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_clamp_u64;
+    ///
+    /// unsafe {
+    ///     assert!(nstd_core_math_clamp_u64(2, 5, 10) == 5);
+    ///     assert!(nstd_core_math_clamp_u64(8, 5, 10) == 8);
+    ///     assert!(nstd_core_math_clamp_u64(14, 5, 10) == 10);
+    /// }
+    /// ```
     nstd_core_math_clamp_u64,
     NSTDUInt64
 );
@@ -339,10 +896,14 @@ macro_rules! gen_div_ceil {
         /// # Panics
         ///
         /// This operation will panic if `y` is 0.
+        ///
+        /// # Safety
+        ///
+        /// This operation can cause undefined behavior if it panics into non-Rust code.
         #[inline]
         #[cfg_attr(feature = "clib", no_mangle)]
         #[allow(unused_comparisons)]
-        pub extern "C" fn $name(x: $T, y: $T) -> $T {
+        pub unsafe extern "C" fn $name(x: $T, y: $T) -> $T {
             let d = x / y;
             let r = x % y;
             if (r > 0 && y > 0) || (r < 0 && y < 0) {
@@ -365,6 +926,18 @@ gen_div_ceil!(
     /// # Returns
     ///
     /// `NSTDInt v` - The divided value, rounded up.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_div_ceil_int;
+    ///
+    /// unsafe {
+    ///     assert!(nstd_core_math_div_ceil_int(8, 5) == 2);
+    ///     assert!(nstd_core_math_div_ceil_int(8, 3) == 3);
+    ///     assert!(nstd_core_math_div_ceil_int(8, 2) == 4);
+    /// }
+    /// ```
     nstd_core_math_div_ceil_int,
     NSTDInt
 );
@@ -380,6 +953,18 @@ gen_div_ceil!(
     /// # Returns
     ///
     /// `NSTDUInt v` - The divided value, rounded up.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_div_ceil_uint;
+    ///
+    /// unsafe {
+    ///     assert!(nstd_core_math_div_ceil_uint(8, 5) == 2);
+    ///     assert!(nstd_core_math_div_ceil_uint(8, 3) == 3);
+    ///     assert!(nstd_core_math_div_ceil_uint(8, 2) == 4);
+    /// }
+    /// ```
     nstd_core_math_div_ceil_uint,
     NSTDUInt
 );
@@ -395,6 +980,18 @@ gen_div_ceil!(
     /// # Returns
     ///
     /// `NSTDInt8 v` - The divided value, rounded up.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_div_ceil_i8;
+    ///
+    /// unsafe {
+    ///     assert!(nstd_core_math_div_ceil_i8(8, 5) == 2);
+    ///     assert!(nstd_core_math_div_ceil_i8(8, 3) == 3);
+    ///     assert!(nstd_core_math_div_ceil_i8(8, 2) == 4);
+    /// }
+    /// ```
     nstd_core_math_div_ceil_i8,
     NSTDInt8
 );
@@ -410,6 +1007,18 @@ gen_div_ceil!(
     /// # Returns
     ///
     /// `NSTDUInt8 v` - The divided value, rounded up.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_div_ceil_u8;
+    ///
+    /// unsafe {
+    ///     assert!(nstd_core_math_div_ceil_u8(8, 5) == 2);
+    ///     assert!(nstd_core_math_div_ceil_u8(8, 3) == 3);
+    ///     assert!(nstd_core_math_div_ceil_u8(8, 2) == 4);
+    /// }
+    /// ```
     nstd_core_math_div_ceil_u8,
     NSTDUInt8
 );
@@ -425,6 +1034,18 @@ gen_div_ceil!(
     /// # Returns
     ///
     /// `NSTDInt16 v` - The divided value, rounded up.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_div_ceil_i16;
+    ///
+    /// unsafe {
+    ///     assert!(nstd_core_math_div_ceil_i16(8, 5) == 2);
+    ///     assert!(nstd_core_math_div_ceil_i16(8, 3) == 3);
+    ///     assert!(nstd_core_math_div_ceil_i16(8, 2) == 4);
+    /// }
+    /// ```
     nstd_core_math_div_ceil_i16,
     NSTDInt16
 );
@@ -440,6 +1061,18 @@ gen_div_ceil!(
     /// # Returns
     ///
     /// `NSTDUInt16 v` - The divided value, rounded up.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_div_ceil_u16;
+    ///
+    /// unsafe {
+    ///     assert!(nstd_core_math_div_ceil_u16(8, 5) == 2);
+    ///     assert!(nstd_core_math_div_ceil_u16(8, 3) == 3);
+    ///     assert!(nstd_core_math_div_ceil_u16(8, 2) == 4);
+    /// }
+    /// ```
     nstd_core_math_div_ceil_u16,
     NSTDUInt16
 );
@@ -455,6 +1088,18 @@ gen_div_ceil!(
     /// # Returns
     ///
     /// `NSTDInt32 v` - The divided value, rounded up.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_div_ceil_i32;
+    ///
+    /// unsafe {
+    ///     assert!(nstd_core_math_div_ceil_i32(8, 5) == 2);
+    ///     assert!(nstd_core_math_div_ceil_i32(8, 3) == 3);
+    ///     assert!(nstd_core_math_div_ceil_i32(8, 2) == 4);
+    /// }
+    /// ```
     nstd_core_math_div_ceil_i32,
     NSTDInt32
 );
@@ -470,6 +1115,18 @@ gen_div_ceil!(
     /// # Returns
     ///
     /// `NSTDUInt32 v` - The divided value, rounded up.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_div_ceil_u32;
+    ///
+    /// unsafe {
+    ///     assert!(nstd_core_math_div_ceil_u32(8, 5) == 2);
+    ///     assert!(nstd_core_math_div_ceil_u32(8, 3) == 3);
+    ///     assert!(nstd_core_math_div_ceil_u32(8, 2) == 4);
+    /// }
+    /// ```
     nstd_core_math_div_ceil_u32,
     NSTDUInt32
 );
@@ -485,6 +1142,18 @@ gen_div_ceil!(
     /// # Returns
     ///
     /// `NSTDInt64 v` - The divided value, rounded up.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_div_ceil_i64;
+    ///
+    /// unsafe {
+    ///     assert!(nstd_core_math_div_ceil_i64(8, 5) == 2);
+    ///     assert!(nstd_core_math_div_ceil_i64(8, 3) == 3);
+    ///     assert!(nstd_core_math_div_ceil_i64(8, 2) == 4);
+    /// }
+    /// ```
     nstd_core_math_div_ceil_i64,
     NSTDInt64
 );
@@ -500,6 +1169,77 @@ gen_div_ceil!(
     /// # Returns
     ///
     /// `NSTDUInt64 v` - The divided value, rounded up.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::core::math::nstd_core_math_div_ceil_u64;
+    ///
+    /// unsafe {
+    ///     assert!(nstd_core_math_div_ceil_u64(8, 5) == 2);
+    ///     assert!(nstd_core_math_div_ceil_u64(8, 3) == 3);
+    ///     assert!(nstd_core_math_div_ceil_u64(8, 2) == 4);
+    /// }
+    /// ```
     nstd_core_math_div_ceil_u64,
     NSTDUInt64
 );
+
+/// Generates the `div_floor` functions.
+macro_rules! gen_div_floor {
+    ($name: ident, $T: ty) => {
+        /// Divides two numbers and rounds the result down to the next integer.
+        ///
+        /// # Parameters:
+        ///
+        #[doc = concat!(" - `", stringify!($T), " x` - The first value.")]
+        ///
+        #[doc = concat!(" - `", stringify!($T), " y` - The second value.")]
+        ///
+        /// # Returns
+        ///
+        #[doc = concat!(" `", stringify!($T), " v` - The divided value, rounded down.")]
+        ///
+        /// # Panics
+        ///
+        /// This operation will panic if `y` is 0.
+        ///
+        /// # Safety
+        ///
+        /// This operation can cause undefined behavior if it panics into non-Rust code.
+        ///
+        /// # Example
+        ///
+        /// ```
+        #[doc = concat!("use nstd_sys::core::math::", stringify!($name), ";")]
+        ///
+        /// unsafe {
+        #[doc = concat!("    assert!(", stringify!($name), "(5, 2) == 2);")]
+        #[doc = concat!("    assert!(", stringify!($name), "(13, 4) == 3);")]
+        #[doc = concat!("    assert!(", stringify!($name), "(23, 5) == 4);")]
+        /// }
+        /// ```
+        #[inline]
+        #[cfg_attr(feature = "clib", no_mangle)]
+        #[allow(unused_comparisons)]
+        pub unsafe extern "C" fn $name(x: $T, y: $T) -> $T {
+            let d = x / y;
+            let r = x % y;
+            if (r > 0 && y < 0) || (r < 0 && y > 0) {
+                d - 1
+            } else {
+                d
+            }
+        }
+    };
+}
+gen_div_floor!(nstd_core_math_div_floor_int, NSTDInt);
+gen_div_floor!(nstd_core_math_div_floor_uint, NSTDUInt);
+gen_div_floor!(nstd_core_math_div_floor_i8, NSTDInt8);
+gen_div_floor!(nstd_core_math_div_floor_u8, NSTDUInt8);
+gen_div_floor!(nstd_core_math_div_floor_i16, NSTDInt16);
+gen_div_floor!(nstd_core_math_div_floor_u16, NSTDUInt16);
+gen_div_floor!(nstd_core_math_div_floor_i32, NSTDInt32);
+gen_div_floor!(nstd_core_math_div_floor_u32, NSTDUInt32);
+gen_div_floor!(nstd_core_math_div_floor_i64, NSTDInt64);
+gen_div_floor!(nstd_core_math_div_floor_u64, NSTDUInt64);

@@ -2,7 +2,6 @@
 #define NSTD_CSTRING_H
 #include "alloc.h"
 #include "core/cstr.h"
-#include "core/def.h"
 #include "core/slice.h"
 #include "nstd.h"
 #include "vec.h"

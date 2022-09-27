@@ -6,7 +6,6 @@ use crate::{
             nstd_core_cstr_as_bytes, nstd_core_cstr_get_null, nstd_core_cstr_mut_new,
             nstd_core_cstr_new, NSTDCStr, NSTDCStrMut,
         },
-        def::NSTDChar,
         slice::NSTDSlice,
     },
     vec::{
@@ -14,7 +13,7 @@ use crate::{
         nstd_vec_extend, nstd_vec_get_mut, nstd_vec_len, nstd_vec_new_with_cap, nstd_vec_pop,
         nstd_vec_push, NSTDVec,
     },
-    NSTDUInt,
+    NSTDChar, NSTDUInt,
 };
 use core::ptr::addr_of;
 

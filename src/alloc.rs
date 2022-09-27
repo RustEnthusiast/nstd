@@ -29,9 +29,17 @@ pub enum NSTDAllocError {
 ///
 /// `NSTDAnyMut ptr` - A pointer to the allocated memory, null on error.
 ///
+/// # Panics
+///
+/// This function may panic if getting a handle to the default heap fails.
+///
 /// # Safety
 ///
-/// This operation is unsafe because the behavior is undefined if `size` is zero.
+/// - Behavior is undefined if `size` is zero.
+///
+/// - The new memory buffer should be considered uninitialized.
+///
+/// - This operation can cause undefined behavior if it panics into non-Rust code.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
@@ -57,9 +65,15 @@ pub unsafe extern "C" fn nstd_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
 ///
 /// `NSTDAnyMut ptr` - A pointer to the allocated memory, null on error.
 ///
+/// # Panics
+///
+/// This function may panic if getting a handle to the default heap fails.
+///
 /// # Safety
 ///
-/// This operation is unsafe because the behavior is undefined if `size` is zero.
+/// - Behavior is undefined if `size` is zero.
+///
+/// - This operation can cause undefined behavior if it panics into non-Rust code.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMut {
@@ -93,10 +107,19 @@ pub unsafe extern "C" fn nstd_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMu
 ///
 /// `NSTDAllocError errc` - The allocation operation error code.
 ///
+/// # Panics
+///
+/// This function may panic if getting a handle to the default heap fails.
+///
 /// # Safety
 ///
-/// This operation is unsafe because the behavior is undefined if `ptr` is not a value returned by
-/// `nstd_alloc_allocate[_zeroed]`.
+/// - Behavior is undefined if `new_size` is zero.
+///
+/// - Behavior is undefined if `ptr` is not a value returned by `nstd_alloc_allocate[_zeroed]`.
+///
+/// - `size` must be the same value that was used to allocate the memory buffer.
+///
+/// - This operation can cause undefined behavior if it panics into non-Rust code.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 #[cfg_attr(target_os = "windows", allow(unused_variables))]
@@ -130,10 +153,17 @@ pub unsafe extern "C" fn nstd_alloc_reallocate(
 ///
 /// - `NSTDUInt size` - The number of bytes to free.
 ///
+/// # Panics
+///
+/// This function may panic if getting a handle to the default heap fails.
+///
 /// # Safety
 ///
-/// This operation is unsafe because the behavior is undefined if `ptr` is not a value returned by
-/// `nstd_alloc_allocate[_zeroed]`.
+/// - Behavior is undefined if `ptr` is not a value returned by `nstd_alloc_allocate[_zeroed]`.
+///
+/// - `size` must be the same value that was used to allocate the memory buffer.
+///
+/// - This operation can cause undefined behavior if it panics into non-Rust code.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 #[cfg_attr(target_os = "windows", allow(unused_variables))]
