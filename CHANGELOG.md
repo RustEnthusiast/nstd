@@ -19,6 +19,7 @@
 - Added `math_abs_*`.
 ### `nstd.os`
 - Added `NSTD_OS_[LINUX|MACOS|WINDOWS]` constants.
+- Made `NSTDWindowsHeapHandle` a structure.
 
 # 0.1.3
 ### `nstd`

@@ -5,7 +5,7 @@ use self::heap::{
     nstd_os_windows_alloc_heap_deallocate, nstd_os_windows_alloc_heap_default,
     nstd_os_windows_alloc_heap_reallocate,
 };
-use crate::{alloc::NSTDAllocError, NSTDAnyMut, NSTDUInt, NSTD_NULL};
+use crate::{alloc::NSTDAllocError, NSTDAnyMut, NSTDUInt};
 
 /// Allocates a new block of memory on the current process' heap.
 ///
@@ -17,16 +17,20 @@ use crate::{alloc::NSTDAllocError, NSTDAnyMut, NSTDUInt, NSTD_NULL};
 ///
 /// `NSTDAnyMut ptr` - A pointer to the block of memory, null on error.
 ///
+/// # Panics
+///
+/// This operation will panic if getting a handle to the default heap fails.
+///
 /// # Safety
 ///
-/// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapalloc>.
+/// - See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapalloc>.
+///
+/// - This operation can cause undefined behavior if it panics into non-Rust code.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_os_windows_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
-    match nstd_os_windows_alloc_heap_default() {
-        0 => NSTD_NULL,
-        heap => nstd_os_windows_alloc_heap_allocate(heap, size),
-    }
+    let heap = nstd_os_windows_alloc_heap_default();
+    nstd_os_windows_alloc_heap_allocate(heap, size)
 }
 
 /// Allocates a new block of zero-initialized memory on the current process' heap.
@@ -39,16 +43,20 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_allocate(size: NSTDUInt) -> NSTDA
 ///
 /// `NSTDAnyMut ptr` - A pointer to the block of memory, null on error.
 ///
+/// # Panics
+///
+/// This operation will panic if getting a handle to the default heap fails.
+///
 /// # Safety
 ///
-/// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapalloc>.
+/// - See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapalloc>.
+///
+/// - This operation can cause undefined behavior if it panics into non-Rust code.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_os_windows_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMut {
-    match nstd_os_windows_alloc_heap_default() {
-        0 => NSTD_NULL,
-        heap => nstd_os_windows_alloc_heap_allocate_zeroed(heap, size),
-    }
+    let heap = nstd_os_windows_alloc_heap_default();
+    nstd_os_windows_alloc_heap_allocate_zeroed(heap, size)
 }
 
 /// Reallocates a block of memory previously allocated by
@@ -68,19 +76,23 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_allocate_zeroed(size: NSTDUInt) -
 ///
 /// `NSTDAllocError errc` - The allocation operation error code.
 ///
+/// # Panics
+///
+/// This operation will panic if getting a handle to the default heap fails.
+///
 /// # Safety
 ///
-/// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heaprealloc>.
+/// - See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heaprealloc>.
+///
+/// - This operation can cause undefined behavior if it panics into non-Rust code.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_os_windows_alloc_reallocate(
     ptr: &mut NSTDAnyMut,
     new_size: NSTDUInt,
 ) -> NSTDAllocError {
-    match nstd_os_windows_alloc_heap_default() {
-        0 => NSTDAllocError::NSTD_ALLOC_ERROR_HEAP_NOT_FOUND,
-        heap => nstd_os_windows_alloc_heap_reallocate(heap, ptr, new_size),
-    }
+    let heap = nstd_os_windows_alloc_heap_default();
+    nstd_os_windows_alloc_heap_reallocate(heap, ptr, new_size)
 }
 
 /// Deallocates a block of memory previously allocated by
@@ -94,14 +106,18 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_reallocate(
 ///
 /// `NSTDAllocError errc` - The allocation operation error code.
 ///
+/// # Panics
+///
+/// This operation will panic if getting a handle to the default heap fails.
+///
 /// # Safety
 ///
-/// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapfree>.
+/// - See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapfree>.
+///
+/// - This operation can cause undefined behavior if it panics into non-Rust code.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_os_windows_alloc_deallocate(ptr: &mut NSTDAnyMut) -> NSTDAllocError {
-    match nstd_os_windows_alloc_heap_default() {
-        0 => NSTDAllocError::NSTD_ALLOC_ERROR_HEAP_NOT_FOUND,
-        heap => nstd_os_windows_alloc_heap_deallocate(heap, ptr),
-    }
+    let heap = nstd_os_windows_alloc_heap_default();
+    nstd_os_windows_alloc_heap_deallocate(heap, ptr)
 }
