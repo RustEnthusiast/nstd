@@ -1,9 +1,5 @@
 //! Common types used throughout `nstd`.
 use crate::{NSTDInt32, NSTDUInt8};
-use cty::c_char;
-
-/// Equivalent to C's `char` type.
-pub type NSTDChar = c_char;
 
 /// The smallest addressable unit of memory.
 pub type NSTDByte = NSTDUInt8;

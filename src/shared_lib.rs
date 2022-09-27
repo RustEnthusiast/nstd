@@ -4,8 +4,8 @@
 //!
 //! This module is only functional on Windows and Unix systems.
 use crate::{
-    core::{cstr::raw::nstd_core_cstr_raw_len_with_null, def::NSTDChar, str::NSTDStr},
-    NSTDAny, NSTDAnyMut, NSTD_NULL,
+    core::{cstr::raw::nstd_core_cstr_raw_len_with_null, str::NSTDStr},
+    NSTDAny, NSTDAnyMut, NSTDChar, NSTD_NULL,
 };
 use libloading::{Error, Library, Symbol};
 

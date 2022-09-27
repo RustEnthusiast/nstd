@@ -2,9 +2,6 @@
 #define NSTD_CORE_DEF_H
 #include "../nstd.h"
 
-/// Equivalent to C's `char` type.
-typedef char NSTDChar;
-
 /// The smallest addressable unit of memory.
 typedef NSTDUInt8 NSTDByte;
 
