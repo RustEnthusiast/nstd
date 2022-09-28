@@ -22,6 +22,9 @@ pub mod heap_ptr;
 #[cfg(feature = "nstd_io")]
 #[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_io")))]
 pub mod io;
+#[cfg(feature = "nstd_math")]
+#[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_math")))]
+pub mod math;
 #[cfg(feature = "nstd_os")]
 #[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_os")))]
 pub mod os;

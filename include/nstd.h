@@ -6,6 +6,7 @@
 #include "nstd/fs.h"
 #include "nstd/heap_ptr.h"
 #include "nstd/io.h"
+#include "nstd/math.h"
 #include "nstd/nstd.h"
 #include "nstd/os.h"
 #include "nstd/shared_lib.h"
