@@ -4,6 +4,7 @@
 - Added `nstd.math`.
 - Added `asm` feature.
 - Made `NSTDChar` a primitive.
+- Updated [windows-sys](https://crates.io/crates/windows-sys) to version 0.42.
 ### `nstd.core`
 - Made `str[_mut]_substr` unsafe.
 - Made `str[_mut]_from_bytes` unsafe.
