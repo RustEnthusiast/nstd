@@ -1,5 +1,7 @@
 # TBD
 ### `nstd`
+- Added `nstd.fs`.
+- Added `nstd.math`.
 - Added `asm` feature.
 - Made `NSTDChar` a primitive.
 ### `nstd.core`
