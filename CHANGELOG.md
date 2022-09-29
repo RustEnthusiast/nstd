@@ -1,3 +1,6 @@
+# TBD
+### `nstd.os`
+- Added `NSTDWindowsAllocError`.
 # 0.2.0
 ### `nstd`
 - Added `nstd.fs`.

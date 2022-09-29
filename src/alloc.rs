@@ -1,6 +1,12 @@
 //! Low level memory allocation.
 #[cfg(not(target_os = "windows"))]
 extern crate alloc;
+#[cfg(target_os = "windows")]
+use crate::os::windows::alloc::{
+    nstd_os_windows_alloc_allocate, nstd_os_windows_alloc_allocate_zeroed,
+    nstd_os_windows_alloc_deallocate, nstd_os_windows_alloc_reallocate,
+    NSTDWindowsAllocError::{self, *},
+};
 use crate::{NSTDAnyMut, NSTDUInt};
 
 /// Describes an error returned from allocation functions.
@@ -16,6 +22,18 @@ pub enum NSTDAllocError {
     NSTD_ALLOC_ERROR_MEMORY_NOT_FOUND,
     /// Getting a handle to a heap failed.
     NSTD_ALLOC_ERROR_HEAP_NOT_FOUND,
+}
+impl NSTDAllocError {
+    /// Converts an [NSTDWindowsAllocError] into an [NSTDAllocError].
+    #[cfg(target_os = "windows")]
+    fn from_windows(err: NSTDWindowsAllocError) -> Self {
+        match err {
+            NSTD_WINDOWS_ALLOC_ERROR_NONE => Self::NSTD_ALLOC_ERROR_NONE,
+            NSTD_WINDOWS_ALLOC_ERROR_OUT_OF_MEMORY => Self::NSTD_ALLOC_ERROR_OUT_OF_MEMORY,
+            NSTD_WINDOWS_ALLOC_ERROR_MEMORY_NOT_FOUND => Self::NSTD_ALLOC_ERROR_MEMORY_NOT_FOUND,
+            NSTD_WINDOWS_ALLOC_ERROR_HEAP_NOT_FOUND => Self::NSTD_ALLOC_ERROR_HEAP_NOT_FOUND,
+        }
+    }
 }
 
 /// Allocates a block of memory on the heap.
@@ -51,7 +69,7 @@ pub unsafe extern "C" fn nstd_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
     }
     #[cfg(target_os = "windows")]
     {
-        crate::os::windows::alloc::nstd_os_windows_alloc_allocate(size)
+        nstd_os_windows_alloc_allocate(size)
     }
 }
 
@@ -85,7 +103,7 @@ pub unsafe extern "C" fn nstd_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMu
     }
     #[cfg(target_os = "windows")]
     {
-        crate::os::windows::alloc::nstd_os_windows_alloc_allocate_zeroed(size)
+        nstd_os_windows_alloc_allocate_zeroed(size)
     }
 }
 
@@ -141,7 +159,7 @@ pub unsafe extern "C" fn nstd_alloc_reallocate(
     }
     #[cfg(target_os = "windows")]
     {
-        crate::os::windows::alloc::nstd_os_windows_alloc_reallocate(ptr, new_size)
+        NSTDAllocError::from_windows(nstd_os_windows_alloc_reallocate(ptr, new_size))
     }
 }
 
@@ -178,6 +196,6 @@ pub unsafe extern "C" fn nstd_alloc_deallocate(ptr: &mut NSTDAnyMut, size: NSTDU
     }
     #[cfg(target_os = "windows")]
     {
-        crate::os::windows::alloc::nstd_os_windows_alloc_deallocate(ptr);
+        nstd_os_windows_alloc_deallocate(ptr);
     }
 }
