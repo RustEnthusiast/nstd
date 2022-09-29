@@ -1,4 +1,4 @@
-# TBD
+# 0.2.0
 ### `nstd`
 - Added `nstd.fs`.
 - Added `nstd.math`.
