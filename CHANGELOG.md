@@ -1,6 +1,7 @@
 # TBD
 ### `nstd.os`
 - Added `NSTDWindowsAllocError`.
+- Renamed `NSTDWindowsHeapHandle` to `NSTDWindowsHeap`.
 # 0.2.0
 ### `nstd`
 - Added `nstd.fs`.

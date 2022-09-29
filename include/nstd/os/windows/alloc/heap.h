@@ -7,13 +7,13 @@
 typedef struct {
     /// The private handle.
     NSTDInt handle;
-} NSTDWindowsHeapHandle;
+} NSTDWindowsHeap;
 
 /// Returns a handle to the default heap of the current process.
 ///
 /// # Returns
 ///
-/// `NSTDWindowsHeapHandle heap` - A handle to the default heap, null on error.
+/// `NSTDWindowsHeap heap` - A handle to the default heap, null on error.
 ///
 /// # Safety
 ///
@@ -40,7 +40,7 @@ typedef struct {
 ///     assert!(errc == NSTD_WINDOWS_ALLOC_ERROR_NONE);
 /// }
 /// ```
-NSTDAPI NSTDWindowsHeapHandle nstd_os_windows_alloc_heap_default();
+NSTDAPI NSTDWindowsHeap nstd_os_windows_alloc_heap_default();
 
 /// Creates a new private heap for the process.
 ///
@@ -51,7 +51,7 @@ NSTDAPI NSTDWindowsHeapHandle nstd_os_windows_alloc_heap_default();
 ///
 /// # Returns
 ///
-/// `NSTDWindowsHeapHandle heap` - A handle to the new private heap.
+/// `NSTDWindowsHeap heap` - A handle to the new private heap.
 ///
 /// # Safety
 ///
@@ -81,13 +81,13 @@ NSTDAPI NSTDWindowsHeapHandle nstd_os_windows_alloc_heap_default();
 ///     assert!(errc == NSTD_WINDOWS_ALLOC_ERROR_NONE);
 /// }
 /// ```
-NSTDAPI NSTDWindowsHeapHandle nstd_os_windows_alloc_heap_new(NSTDUInt size);
+NSTDAPI NSTDWindowsHeap nstd_os_windows_alloc_heap_new(NSTDUInt size);
 
 /// Allocates a block of memory on a heap.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDWindowsHeapHandle *heap` - A handle to the heap to allocate on.
+/// - `const NSTDWindowsHeap *heap` - A handle to the heap to allocate on.
 ///
 /// - `NSTDUInt size` - The number of bytes to allocate.
 ///
@@ -131,14 +131,13 @@ NSTDAPI NSTDWindowsHeapHandle nstd_os_windows_alloc_heap_new(NSTDUInt size);
 ///     assert!(errc == NSTD_WINDOWS_ALLOC_ERROR_NONE);
 /// }
 /// ```
-NSTDAPI NSTDAnyMut nstd_os_windows_alloc_heap_allocate(const NSTDWindowsHeapHandle *heap,
-NSTDUInt size);
+NSTDAPI NSTDAnyMut nstd_os_windows_alloc_heap_allocate(const NSTDWindowsHeap *heap, NSTDUInt size);
 
 /// Allocates a zero-initialized block of memory on a heap.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDWindowsHeapHandle *heap` - A handle to the heap to allocate on.
+/// - `const NSTDWindowsHeap *heap` - A handle to the heap to allocate on.
 ///
 /// - `NSTDUInt size` - The number of bytes to allocate.
 ///
@@ -177,14 +176,14 @@ NSTDUInt size);
 ///     assert!(errc == NSTD_WINDOWS_ALLOC_ERROR_NONE);
 /// }
 /// ```
-NSTDAPI NSTDAnyMut nstd_os_windows_alloc_heap_allocate_zeroed(const NSTDWindowsHeapHandle *heap,
+NSTDAPI NSTDAnyMut nstd_os_windows_alloc_heap_allocate_zeroed(const NSTDWindowsHeap *heap,
 NSTDUInt size);
 
 /// Reallocates a block of memory on a heap.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDWindowsHeapHandle *heap` - A handle to the heap to reallocate on.
+/// - `const NSTDWindowsHeap *heap` - A handle to the heap to reallocate on.
 ///
 /// - `NSTDAnyMut *ptr` - A pointer to the memory to reallocate.
 ///
@@ -226,14 +225,14 @@ NSTDUInt size);
 ///     assert!(errc == NSTD_WINDOWS_ALLOC_ERROR_NONE);
 /// }
 /// ```
-NSTDAPI NSTDWindowsAllocError nstd_os_windows_alloc_heap_reallocate(
-const NSTDWindowsHeapHandle *heap, NSTDAnyMut *ptr, NSTDUInt size);
+NSTDAPI NSTDWindowsAllocError nstd_os_windows_alloc_heap_reallocate(const NSTDWindowsHeap *heap,
+NSTDAnyMut *ptr, NSTDUInt size);
 
 /// Deallocates a block of memory on a heap.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDWindowsHeapHandle *heap` - A handle to the heap to deallocate memory from.
+/// - `const NSTDWindowsHeap *heap` - A handle to the heap to deallocate memory from.
 ///
 /// - `NSTDAnyMut *ptr` - A pointer to the allocated memory.
 ///
@@ -269,14 +268,14 @@ const NSTDWindowsHeapHandle *heap, NSTDAnyMut *ptr, NSTDUInt size);
 ///     assert!(errc == NSTD_WINDOWS_ALLOC_ERROR_NONE);
 /// }
 /// ```
-NSTDAPI NSTDWindowsAllocError nstd_os_windows_alloc_heap_deallocate(
-const NSTDWindowsHeapHandle *heap, NSTDAnyMut *ptr);
+NSTDAPI NSTDWindowsAllocError nstd_os_windows_alloc_heap_deallocate(const NSTDWindowsHeap *heap,
+NSTDAnyMut *ptr);
 
 /// Destroys a private heap.
 ///
 /// # Parameters:
 ///
-/// - `NSTDWindowsHeapHandle *heap` - The heap to destroy.
+/// - `NSTDWindowsHeap heap` - The heap to destroy.
 ///
 /// # Returns
 ///
@@ -310,6 +309,6 @@ const NSTDWindowsHeapHandle *heap, NSTDAnyMut *ptr);
 ///     assert!(errc == NSTD_WINDOWS_ALLOC_ERROR_NONE);
 /// }
 /// ```
-NSTDAPI NSTDWindowsAllocError nstd_os_windows_alloc_heap_free(NSTDWindowsHeapHandle *heap);
+NSTDAPI NSTDWindowsAllocError nstd_os_windows_alloc_heap_free(NSTDWindowsHeap heap);
 
 #endif

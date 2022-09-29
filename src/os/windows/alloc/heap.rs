@@ -6,7 +6,7 @@ use windows_sys::Win32::System::Memory::{
 
 /// A handle to a process heap.
 #[repr(C)]
-pub struct NSTDWindowsHeapHandle {
+pub struct NSTDWindowsHeap {
     /// The private handle.
     handle: NSTDInt,
 }
@@ -15,7 +15,7 @@ pub struct NSTDWindowsHeapHandle {
 ///
 /// # Returns
 ///
-/// `NSTDWindowsHeapHandle heap` - A handle to the default heap.
+/// `NSTDWindowsHeap heap` - A handle to the default heap.
 ///
 /// # Panics
 ///
@@ -50,10 +50,10 @@ pub struct NSTDWindowsHeapHandle {
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_os_windows_alloc_heap_default() -> NSTDWindowsHeapHandle {
+pub unsafe extern "C" fn nstd_os_windows_alloc_heap_default() -> NSTDWindowsHeap {
     let handle = GetProcessHeap();
     assert!(handle != 0);
-    NSTDWindowsHeapHandle { handle }
+    NSTDWindowsHeap { handle }
 }
 
 /// Creates a new private heap for the process.
@@ -65,7 +65,7 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_heap_default() -> NSTDWindowsHeap
 ///
 /// # Returns
 ///
-/// `NSTDWindowsHeapHandle heap` - A handle to the new private heap.
+/// `NSTDWindowsHeap heap` - A handle to the new private heap.
 ///
 /// # Panics
 ///
@@ -103,17 +103,17 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_heap_default() -> NSTDWindowsHeap
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_os_windows_alloc_heap_new(size: NSTDUInt) -> NSTDWindowsHeapHandle {
+pub unsafe extern "C" fn nstd_os_windows_alloc_heap_new(size: NSTDUInt) -> NSTDWindowsHeap {
     let handle = HeapCreate(0, size, 0);
     assert!(handle != 0);
-    NSTDWindowsHeapHandle { handle }
+    NSTDWindowsHeap { handle }
 }
 
 /// Allocates a block of memory on a heap.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDWindowsHeapHandle *heap` - A handle to the heap to allocate on.
+/// - `const NSTDWindowsHeap *heap` - A handle to the heap to allocate on.
 ///
 /// - `NSTDUInt size` - The number of bytes to allocate.
 ///
@@ -160,7 +160,7 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_heap_new(size: NSTDUInt) -> NSTDW
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_os_windows_alloc_heap_allocate(
-    heap: &NSTDWindowsHeapHandle,
+    heap: &NSTDWindowsHeap,
     size: NSTDUInt,
 ) -> NSTDAnyMut {
     HeapAlloc(heap.handle, 0, size)
@@ -170,7 +170,7 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_heap_allocate(
 ///
 /// # Parameters:
 ///
-/// - `const NSTDWindowsHeapHandle *heap` - A handle to the heap to allocate on.
+/// - `const NSTDWindowsHeap *heap` - A handle to the heap to allocate on.
 ///
 /// - `NSTDUInt size` - The number of bytes to allocate.
 ///
@@ -212,7 +212,7 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_heap_allocate(
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_os_windows_alloc_heap_allocate_zeroed(
-    heap: &NSTDWindowsHeapHandle,
+    heap: &NSTDWindowsHeap,
     size: NSTDUInt,
 ) -> NSTDAnyMut {
     HeapAlloc(heap.handle, HEAP_ZERO_MEMORY, size)
@@ -222,7 +222,7 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_heap_allocate_zeroed(
 ///
 /// # Parameters:
 ///
-/// - `const NSTDWindowsHeapHandle *heap` - A handle to the heap to reallocate on.
+/// - `const NSTDWindowsHeap *heap` - A handle to the heap to reallocate on.
 ///
 /// - `NSTDAnyMut *ptr` - A pointer to the memory to reallocate.
 ///
@@ -267,7 +267,7 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_heap_allocate_zeroed(
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_os_windows_alloc_heap_reallocate(
-    heap: &NSTDWindowsHeapHandle,
+    heap: &NSTDWindowsHeap,
     ptr: &mut NSTDAnyMut,
     size: NSTDUInt,
 ) -> NSTDWindowsAllocError {
@@ -283,7 +283,7 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_heap_reallocate(
 ///
 /// # Parameters:
 ///
-/// - `const NSTDWindowsHeapHandle *heap` - A handle to the heap to deallocate memory from.
+/// - `const NSTDWindowsHeap *heap` - A handle to the heap to deallocate memory from.
 ///
 /// - `NSTDAnyMut *ptr` - A pointer to the allocated memory.
 ///
@@ -322,7 +322,7 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_heap_reallocate(
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_os_windows_alloc_heap_deallocate(
-    heap: &NSTDWindowsHeapHandle,
+    heap: &NSTDWindowsHeap,
     ptr: &mut NSTDAnyMut,
 ) -> NSTDWindowsAllocError {
     if HeapFree(heap.handle, 0, *ptr) != 0 {
@@ -336,7 +336,7 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_heap_deallocate(
 ///
 /// # Parameters:
 ///
-/// - `NSTDWindowsHeapHandle heap` - The heap to destroy.
+/// - `NSTDWindowsHeap heap` - The heap to destroy.
 ///
 /// # Returns
 ///
@@ -373,7 +373,7 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_heap_deallocate(
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_os_windows_alloc_heap_free(
-    heap: NSTDWindowsHeapHandle,
+    heap: NSTDWindowsHeap,
 ) -> NSTDWindowsAllocError {
     if HeapDestroy(heap.handle) != 0 {
         return NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_NONE;
