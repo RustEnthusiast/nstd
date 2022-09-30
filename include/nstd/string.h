@@ -317,7 +317,7 @@ NSTDAPI NSTDString nstd_string_from_u64(NSTDUInt64 v);
 ///
 /// # Parameters:
 ///
-/// - `NSTDString string` - A pointer to the string to free.
+/// - `NSTDString string` - The string to free.
 NSTDAPI void nstd_string_free(NSTDString string);
 
 #endif

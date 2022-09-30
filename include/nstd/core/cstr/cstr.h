@@ -524,7 +524,7 @@ NSTDAPI NSTDChar *nstd_core_cstr_mut_get_null(NSTDCStrMut *cstr);
 ///     assert!(nstd_core_cstr_mut_get_null_const(&cstr).is_null());
 /// }
 /// ```
-NSTDAPI const NSTDChar *nstd_core_cstr_mut_get_null_const(const NSTDCStr *cstr);
+NSTDAPI const NSTDChar *nstd_core_cstr_mut_get_null_const(const NSTDCStrMut *cstr);
 
 /// Return a pointer the character at `pos` in `cstr`.
 ///

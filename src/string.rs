@@ -468,7 +468,7 @@ gen_from_primitive!(
 ///
 /// # Parameters:
 ///
-/// - `NSTDString string` - A pointer to the string to free.
+/// - `NSTDString string` - The string to free.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 #[allow(unused_variables)]
