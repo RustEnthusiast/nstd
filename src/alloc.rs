@@ -58,6 +58,18 @@ impl NSTDAllocError {
 /// - The new memory buffer should be considered uninitialized.
 ///
 /// - This operation can cause undefined behavior if it panics into non-Rust code.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::alloc::{nstd_alloc_allocate, nstd_alloc_deallocate};
+///
+/// unsafe {
+///     let mut mem = nstd_alloc_allocate(32);
+///     assert!(!mem.is_null());
+///     nstd_alloc_deallocate(&mut mem, 32);
+/// }
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
@@ -92,6 +104,22 @@ pub unsafe extern "C" fn nstd_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
 /// - Behavior is undefined if `size` is zero.
 ///
 /// - This operation can cause undefined behavior if it panics into non-Rust code.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::alloc::{nstd_alloc_allocate_zeroed, nstd_alloc_deallocate};
+///
+/// const SIZE: usize = core::mem::size_of::<[i16; 16]>();
+///
+/// unsafe {
+///     let mut mem = nstd_alloc_allocate_zeroed(SIZE);
+///     assert!(!mem.is_null());
+///     assert!(*mem.cast::<[i16; 16]>() == [0i16; 16]);
+///
+///     nstd_alloc_deallocate(&mut mem, SIZE);
+/// }
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMut {
@@ -138,6 +166,28 @@ pub unsafe extern "C" fn nstd_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMu
 /// - `size` must be the same value that was used to allocate the memory buffer.
 ///
 /// - This operation can cause undefined behavior if it panics into non-Rust code.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::alloc::{
+///     nstd_alloc_allocate_zeroed, nstd_alloc_deallocate, nstd_alloc_reallocate,
+///     NSTDAllocError::NSTD_ALLOC_ERROR_NONE,
+/// };
+///
+/// const SIZE: usize = core::mem::size_of::<[u64; 64]>();
+///
+/// unsafe {
+///     let mut mem = nstd_alloc_allocate_zeroed(SIZE);
+///     assert!(!mem.is_null());
+///     assert!(*mem.cast::<[u64; 64]>() == [0u64; 64]);
+///
+///     assert!(nstd_alloc_reallocate(&mut mem, SIZE, SIZE / 2) == NSTD_ALLOC_ERROR_NONE);
+///     assert!(*mem.cast::<[u64; 32]>() == [0u64; 32]);
+///
+///     nstd_alloc_deallocate(&mut mem, SIZE);
+/// }
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 #[cfg_attr(target_os = "windows", allow(unused_variables))]
@@ -182,6 +232,18 @@ pub unsafe extern "C" fn nstd_alloc_reallocate(
 /// - `size` must be the same value that was used to allocate the memory buffer.
 ///
 /// - This operation can cause undefined behavior if it panics into non-Rust code.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::alloc::{nstd_alloc_allocate, nstd_alloc_deallocate};
+///
+/// unsafe {
+///     let mut mem = nstd_alloc_allocate(24);
+///     assert!(!mem.is_null());
+///     nstd_alloc_deallocate(&mut mem, 24);
+/// }
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 #[cfg_attr(target_os = "windows", allow(unused_variables))]
