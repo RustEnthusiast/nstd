@@ -168,6 +168,10 @@ NSTDAPI NSTDBool nstd_core_cty_is_control(NSTDUnichar chr);
 ///
 /// `NSTDBool is_digit` - `NSTD_TRUE` if `chr` is a digit.
 ///
+/// # Panics
+///
+/// This function will panic if `radix` is greater than 36.
+///
 /// # Example
 ///
 /// ```
