@@ -1,4 +1,6 @@
 # TBD
+### `nstd.core`
+- Made `math_[clamp|div_ceil|div_floor]_*` safe.
 ### `nstd.os`
 - Added `NSTDWindowsAllocError`.
 - Renamed `NSTDWindowsHeapHandle` to `NSTDWindowsHeap`.
