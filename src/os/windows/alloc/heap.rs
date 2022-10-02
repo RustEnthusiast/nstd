@@ -23,9 +23,7 @@ pub struct NSTDWindowsHeap {
 ///
 /// # Safety
 ///
-/// - See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-getprocessheap>.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-getprocessheap>.
 ///
 /// # Example
 ///
@@ -73,9 +71,7 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_heap_default() -> NSTDWindowsHeap
 ///
 /// # Safety
 ///
-/// - See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapcreate>.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapcreate>.
 ///
 /// # Example
 ///
