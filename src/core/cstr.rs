@@ -202,9 +202,7 @@ pub extern "C" fn nstd_core_cstr_len(cstr: &NSTDCStr) -> NSTDUInt {
 ///
 /// # Safety
 ///
-/// - Undefined behavior may occur if `cstr`'s data is invalid.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// Undefined behavior may occur if `cstr`'s data is invalid.
 ///
 /// # Example
 ///
@@ -548,9 +546,7 @@ pub extern "C" fn nstd_core_cstr_mut_len(cstr: &NSTDCStrMut) -> NSTDUInt {
 ///
 /// # Safety
 ///
-/// - Undefined behavior may occur if `cstr`'s data is invalid.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// Undefined behavior may occur if `cstr`'s data is invalid.
 ///
 /// # Example
 ///
