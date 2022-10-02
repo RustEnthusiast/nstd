@@ -65,8 +65,8 @@ can easily use the API.
 
 - Any operation that makes a direct call on a C function pointer is considered unsafe.
 
-- Any function that may panic must be marked as unsafe, as it is undefined behavior to unwind from
-Rust code into foreign code (though this is
+- The panic behavior is set to abort by default, as it is undefined behavior to unwind from Rust
+code into foreign code (though this is
 [subject to change](https://rust-lang.github.io/rfcs/2945-c-unwind-abi.html)).
 
 - Reference arguments are assumed to be valid (aligned, non-null, and non-dangling), and are safe
