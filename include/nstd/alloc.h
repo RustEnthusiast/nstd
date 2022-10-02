@@ -35,8 +35,6 @@ typedef enum {
 ///
 /// - The new memory buffer should be considered uninitialized.
 ///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
-///
 /// # Example
 ///
 /// ```
@@ -66,9 +64,7 @@ NSTDAPI NSTDAnyMut nstd_alloc_allocate(NSTDUInt size);
 ///
 /// # Safety
 ///
-/// - Behavior is undefined if `size` is zero.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// Behavior is undefined if `size` is zero.
 ///
 /// # Example
 ///
@@ -117,8 +113,6 @@ NSTDAPI NSTDAnyMut nstd_alloc_allocate_zeroed(NSTDUInt size);
 ///
 /// - `size` must be the same value that was used to allocate the memory buffer.
 ///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
-///
 /// # Example
 ///
 /// ```
@@ -159,8 +153,6 @@ NSTDAPI NSTDAllocError nstd_alloc_reallocate(NSTDAnyMut *ptr, NSTDUInt size, NST
 /// - Behavior is undefined if `ptr` is not a value returned by `nstd_alloc_allocate[_zeroed]`.
 ///
 /// - `size` must be the same value that was used to allocate the memory buffer.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
 ///
 /// # Example
 ///

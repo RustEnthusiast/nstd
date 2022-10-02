@@ -57,8 +57,6 @@ impl NSTDAllocError {
 ///
 /// - The new memory buffer should be considered uninitialized.
 ///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
-///
 /// # Example
 ///
 /// ```
@@ -101,9 +99,7 @@ pub unsafe extern "C" fn nstd_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
 ///
 /// # Safety
 ///
-/// - Behavior is undefined if `size` is zero.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// Behavior is undefined if `size` is zero.
 ///
 /// # Example
 ///
@@ -164,8 +160,6 @@ pub unsafe extern "C" fn nstd_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMu
 /// - Behavior is undefined if `ptr` is not a value returned by `nstd_alloc_allocate[_zeroed]`.
 ///
 /// - `size` must be the same value that was used to allocate the memory buffer.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
 ///
 /// # Example
 ///
@@ -230,8 +224,6 @@ pub unsafe extern "C" fn nstd_alloc_reallocate(
 /// - Behavior is undefined if `ptr` is not a value returned by `nstd_alloc_allocate[_zeroed]`.
 ///
 /// - `size` must be the same value that was used to allocate the memory buffer.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
 ///
 /// # Example
 ///
