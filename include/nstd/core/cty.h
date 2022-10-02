@@ -180,7 +180,6 @@ NSTDAPI NSTDBool nstd_core_cty_is_control(NSTDUnichar chr);
 /// assert!(nstd_core_cty_is_digit('5'.into(), 16) != 0);
 /// assert!(nstd_core_cty_is_digit('E'.into(), 16) != 0);
 /// assert!(nstd_core_cty_is_digit('F'.into(), 10) == 0);
-/// assert!(nstd_core_cty_is_digit('9'.into(), 37) == 0);
 /// ```
 NSTDAPI NSTDBool nstd_core_cty_is_digit(NSTDUnichar chr, NSTDUInt32 radix);
 
