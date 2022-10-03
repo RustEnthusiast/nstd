@@ -1,6 +1,6 @@
 2:
     mov {byte}, byte ptr [{src}]
-    cmp {byte}, 0
+    test {byte}, {byte}
     je 3f
     mov byte ptr [{dest}], {byte}
     inc {src}
