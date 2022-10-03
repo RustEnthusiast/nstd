@@ -1,4 +1,7 @@
 # TBD
+### `nstd`
+- The overflow behavior for the "release" profile has been set to panic.
+- The panic behavior for the "release" profile has been set to abort.
 ### `nstd.core`
 - Made `math_[clamp|div_ceil|div_floor]_*` safe.
 ### `nstd.os`
