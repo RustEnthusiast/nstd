@@ -38,9 +38,7 @@ pub enum NSTDWindowsAllocError {
 ///
 /// # Safety
 ///
-/// - See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapalloc>.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapalloc>.
 ///
 /// # Example
 ///
@@ -88,9 +86,7 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_allocate(size: NSTDUInt) -> NSTDA
 ///
 /// # Safety
 ///
-/// - See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapalloc>.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapalloc>.
 ///
 /// # Example
 ///
@@ -139,9 +135,7 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_allocate_zeroed(size: NSTDUInt) -
 ///
 /// # Safety
 ///
-/// - See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heaprealloc>.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heaprealloc>.
 ///
 /// # Example
 ///
@@ -193,9 +187,7 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_reallocate(
 ///
 /// # Safety
 ///
-/// - See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapfree>.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapfree>.
 ///
 /// # Example
 ///

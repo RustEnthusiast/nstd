@@ -13,6 +13,10 @@ exclude = ["include"]
 all-features = true
 rustdoc-args = ["--cfg", "doc_cfg"]
 
+[profile.release]
+overflow-checks = true
+panic = "abort"
+
 [lib]
 crate-type = ["cdylib", "rlib", "staticlib"]
 

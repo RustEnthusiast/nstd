@@ -354,20 +354,14 @@ NSTDAPI NSTDUInt64 nstd_core_math_pow_u64(NSTDUInt64 x, NSTDUInt32 exp);
 ///
 /// Panics if `min` > `max`, `min` is NaN, or `max` is NaN.
 ///
-/// # Safety
-///
-/// This operation can cause undefined behavior if it panics into non-Rust code.
-///
 /// # Example
 ///
 /// ```
 /// use nstd_sys::core::math::nstd_core_math_clamp_f32;
 ///
-/// unsafe {
-///     assert!(nstd_core_math_clamp_f32(2.5, 3.0, 5.0) == 3.0);
-///     assert!(nstd_core_math_clamp_f32(4.0, 3.0, 5.0) == 4.0);
-///     assert!(nstd_core_math_clamp_f32(7.5, 3.0, 5.0) == 5.0);
-/// }
+/// assert!(nstd_core_math_clamp_f32(2.5, 3.0, 5.0) == 3.0);
+/// assert!(nstd_core_math_clamp_f32(4.0, 3.0, 5.0) == 4.0);
+/// assert!(nstd_core_math_clamp_f32(7.5, 3.0, 5.0) == 5.0);
 /// ```
 NSTDAPI NSTDFloat32 nstd_core_math_clamp_f32(NSTDFloat32 x, NSTDFloat32 min, NSTDFloat32 max);
 /// Clamps the value `x` to the bounds `min` and `max`.
@@ -388,20 +382,14 @@ NSTDAPI NSTDFloat32 nstd_core_math_clamp_f32(NSTDFloat32 x, NSTDFloat32 min, NST
 ///
 /// Panics if `min` > `max`, `min` is NaN, or `max` is NaN.
 ///
-/// # Safety
-///
-/// This operation can cause undefined behavior if it panics into non-Rust code.
-///
 /// # Example
 ///
 /// ```
 /// use nstd_sys::core::math::nstd_core_math_clamp_f64;
 ///
-/// unsafe {
-///     assert!(nstd_core_math_clamp_f64(2.5, 3.0, 5.0) == 3.0);
-///     assert!(nstd_core_math_clamp_f64(4.0, 3.0, 5.0) == 4.0);
-///     assert!(nstd_core_math_clamp_f64(7.5, 3.0, 5.0) == 5.0);
-/// }
+/// assert!(nstd_core_math_clamp_f64(2.5, 3.0, 5.0) == 3.0);
+/// assert!(nstd_core_math_clamp_f64(4.0, 3.0, 5.0) == 4.0);
+/// assert!(nstd_core_math_clamp_f64(7.5, 3.0, 5.0) == 5.0);
 /// ```
 NSTDAPI NSTDFloat64 nstd_core_math_clamp_f64(NSTDFloat64 x, NSTDFloat64 min, NSTDFloat64 max);
 /// Clamps the value `x` to the bounds `min` and `max`.
@@ -422,20 +410,14 @@ NSTDAPI NSTDFloat64 nstd_core_math_clamp_f64(NSTDFloat64 x, NSTDFloat64 min, NST
 ///
 /// Panics if `min` > `max`.
 ///
-/// # Safety
-///
-/// This operation can cause undefined behavior if it panics into non-Rust code.
-///
 /// # Example
 ///
 /// ```
 /// use nstd_sys::core::math::nstd_core_math_clamp_int;
 ///
-/// unsafe {
-///     assert!(nstd_core_math_clamp_int(2, 5, 10) == 5);
-///     assert!(nstd_core_math_clamp_int(8, 5, 10) == 8);
-///     assert!(nstd_core_math_clamp_int(14, 5, 10) == 10);
-/// }
+/// assert!(nstd_core_math_clamp_int(2, 5, 10) == 5);
+/// assert!(nstd_core_math_clamp_int(8, 5, 10) == 8);
+/// assert!(nstd_core_math_clamp_int(14, 5, 10) == 10);
 /// ```
 NSTDAPI NSTDInt nstd_core_math_clamp_int(NSTDInt x, NSTDInt min, NSTDInt max);
 /// Clamps the value `x` to the bounds `min` and `max`.
@@ -456,20 +438,14 @@ NSTDAPI NSTDInt nstd_core_math_clamp_int(NSTDInt x, NSTDInt min, NSTDInt max);
 ///
 /// Panics if `min` > `max`.
 ///
-/// # Safety
-///
-/// This operation can cause undefined behavior if it panics into non-Rust code.
-///
 /// # Example
 ///
 /// ```
 /// use nstd_sys::core::math::nstd_core_math_clamp_uint;
 ///
-/// unsafe {
-///     assert!(nstd_core_math_clamp_uint(2, 5, 10) == 5);
-///     assert!(nstd_core_math_clamp_uint(8, 5, 10) == 8);
-///     assert!(nstd_core_math_clamp_uint(14, 5, 10) == 10);
-/// }
+/// assert!(nstd_core_math_clamp_uint(2, 5, 10) == 5);
+/// assert!(nstd_core_math_clamp_uint(8, 5, 10) == 8);
+/// assert!(nstd_core_math_clamp_uint(14, 5, 10) == 10);
 /// ```
 NSTDAPI NSTDUInt nstd_core_math_clamp_uint(NSTDUInt x, NSTDUInt min, NSTDUInt max);
 /// Clamps the value `x` to the bounds `min` and `max`.
@@ -490,20 +466,14 @@ NSTDAPI NSTDUInt nstd_core_math_clamp_uint(NSTDUInt x, NSTDUInt min, NSTDUInt ma
 ///
 /// Panics if `min` > `max`.
 ///
-/// # Safety
-///
-/// This operation can cause undefined behavior if it panics into non-Rust code.
-///
 /// # Example
 ///
 /// ```
 /// use nstd_sys::core::math::nstd_core_math_clamp_i8;
 ///
-/// unsafe {
-///     assert!(nstd_core_math_clamp_i8(2, 5, 10) == 5);
-///     assert!(nstd_core_math_clamp_i8(8, 5, 10) == 8);
-///     assert!(nstd_core_math_clamp_i8(14, 5, 10) == 10);
-/// }
+/// assert!(nstd_core_math_clamp_i8(2, 5, 10) == 5);
+/// assert!(nstd_core_math_clamp_i8(8, 5, 10) == 8);
+/// assert!(nstd_core_math_clamp_i8(14, 5, 10) == 10);
 /// ```
 NSTDAPI NSTDInt8 nstd_core_math_clamp_i8(NSTDInt8 x, NSTDInt8 min, NSTDInt8 max);
 /// Clamps the value `x` to the bounds `min` and `max`.
@@ -524,20 +494,14 @@ NSTDAPI NSTDInt8 nstd_core_math_clamp_i8(NSTDInt8 x, NSTDInt8 min, NSTDInt8 max)
 ///
 /// Panics if `min` > `max`.
 ///
-/// # Safety
-///
-/// This operation can cause undefined behavior if it panics into non-Rust code.
-///
 /// # Example
 ///
 /// ```
 /// use nstd_sys::core::math::nstd_core_math_clamp_u8;
 ///
-/// unsafe {
-///     assert!(nstd_core_math_clamp_u8(2, 5, 10) == 5);
-///     assert!(nstd_core_math_clamp_u8(8, 5, 10) == 8);
-///     assert!(nstd_core_math_clamp_u8(14, 5, 10) == 10);
-/// }
+/// assert!(nstd_core_math_clamp_u8(2, 5, 10) == 5);
+/// assert!(nstd_core_math_clamp_u8(8, 5, 10) == 8);
+/// assert!(nstd_core_math_clamp_u8(14, 5, 10) == 10);
 /// ```
 NSTDAPI NSTDUInt8 nstd_core_math_clamp_u8(NSTDUInt8 x, NSTDUInt8 min, NSTDUInt8 max);
 /// Clamps the value `x` to the bounds `min` and `max`.
@@ -558,20 +522,14 @@ NSTDAPI NSTDUInt8 nstd_core_math_clamp_u8(NSTDUInt8 x, NSTDUInt8 min, NSTDUInt8 
 ///
 /// Panics if `min` > `max`.
 ///
-/// # Safety
-///
-/// This operation can cause undefined behavior if it panics into non-Rust code.
-///
 /// # Example
 ///
 /// ```
 /// use nstd_sys::core::math::nstd_core_math_clamp_i16;
 ///
-/// unsafe {
-///     assert!(nstd_core_math_clamp_i16(2, 5, 10) == 5);
-///     assert!(nstd_core_math_clamp_i16(8, 5, 10) == 8);
-///     assert!(nstd_core_math_clamp_i16(14, 5, 10) == 10);
-/// }
+/// assert!(nstd_core_math_clamp_i16(2, 5, 10) == 5);
+/// assert!(nstd_core_math_clamp_i16(8, 5, 10) == 8);
+/// assert!(nstd_core_math_clamp_i16(14, 5, 10) == 10);
 /// ```
 NSTDAPI NSTDInt16 nstd_core_math_clamp_i16(NSTDInt16 x, NSTDInt16 min, NSTDInt16 max);
 /// Clamps the value `x` to the bounds `min` and `max`.
@@ -592,20 +550,14 @@ NSTDAPI NSTDInt16 nstd_core_math_clamp_i16(NSTDInt16 x, NSTDInt16 min, NSTDInt16
 ///
 /// Panics if `min` > `max`.
 ///
-/// # Safety
-///
-/// This operation can cause undefined behavior if it panics into non-Rust code.
-///
 /// # Example
 ///
 /// ```
 /// use nstd_sys::core::math::nstd_core_math_clamp_u16;
 ///
-/// unsafe {
-///     assert!(nstd_core_math_clamp_u16(2, 5, 10) == 5);
-///     assert!(nstd_core_math_clamp_u16(8, 5, 10) == 8);
-///     assert!(nstd_core_math_clamp_u16(14, 5, 10) == 10);
-/// }
+/// assert!(nstd_core_math_clamp_u16(2, 5, 10) == 5);
+/// assert!(nstd_core_math_clamp_u16(8, 5, 10) == 8);
+/// assert!(nstd_core_math_clamp_u16(14, 5, 10) == 10);
 /// ```
 NSTDAPI NSTDUInt16 nstd_core_math_clamp_u16(NSTDUInt16 x, NSTDUInt16 min, NSTDUInt16 max);
 /// Clamps the value `x` to the bounds `min` and `max`.
@@ -626,20 +578,14 @@ NSTDAPI NSTDUInt16 nstd_core_math_clamp_u16(NSTDUInt16 x, NSTDUInt16 min, NSTDUI
 ///
 /// Panics if `min` > `max`.
 ///
-/// # Safety
-///
-/// This operation can cause undefined behavior if it panics into non-Rust code.
-///
 /// # Example
 ///
 /// ```
 /// use nstd_sys::core::math::nstd_core_math_clamp_i32;
 ///
-/// unsafe {
-///     assert!(nstd_core_math_clamp_i32(2, 5, 10) == 5);
-///     assert!(nstd_core_math_clamp_i32(8, 5, 10) == 8);
-///     assert!(nstd_core_math_clamp_i32(14, 5, 10) == 10);
-/// }
+/// assert!(nstd_core_math_clamp_i32(2, 5, 10) == 5);
+/// assert!(nstd_core_math_clamp_i32(8, 5, 10) == 8);
+/// assert!(nstd_core_math_clamp_i32(14, 5, 10) == 10);
 /// ```
 NSTDAPI NSTDInt32 nstd_core_math_clamp_i32(NSTDInt32 x, NSTDInt32 min, NSTDInt32 max);
 /// Clamps the value `x` to the bounds `min` and `max`.
@@ -660,20 +606,14 @@ NSTDAPI NSTDInt32 nstd_core_math_clamp_i32(NSTDInt32 x, NSTDInt32 min, NSTDInt32
 ///
 /// Panics if `min` > `max`.
 ///
-/// # Safety
-///
-/// This operation can cause undefined behavior if it panics into non-Rust code.
-///
 /// # Example
 ///
 /// ```
 /// use nstd_sys::core::math::nstd_core_math_clamp_u32;
 ///
-/// unsafe {
-///     assert!(nstd_core_math_clamp_u32(2, 5, 10) == 5);
-///     assert!(nstd_core_math_clamp_u32(8, 5, 10) == 8);
-///     assert!(nstd_core_math_clamp_u32(14, 5, 10) == 10);
-/// }
+/// assert!(nstd_core_math_clamp_u32(2, 5, 10) == 5);
+/// assert!(nstd_core_math_clamp_u32(8, 5, 10) == 8);
+/// assert!(nstd_core_math_clamp_u32(14, 5, 10) == 10);
 /// ```
 NSTDAPI NSTDUInt32 nstd_core_math_clamp_u32(NSTDUInt32 x, NSTDUInt32 min, NSTDUInt32 max);
 /// Clamps the value `x` to the bounds `min` and `max`.
@@ -694,20 +634,14 @@ NSTDAPI NSTDUInt32 nstd_core_math_clamp_u32(NSTDUInt32 x, NSTDUInt32 min, NSTDUI
 ///
 /// Panics if `min` > `max`.
 ///
-/// # Safety
-///
-/// This operation can cause undefined behavior if it panics into non-Rust code.
-///
 /// # Example
 ///
 /// ```
 /// use nstd_sys::core::math::nstd_core_math_clamp_i64;
 ///
-/// unsafe {
-///     assert!(nstd_core_math_clamp_i64(2, 5, 10) == 5);
-///     assert!(nstd_core_math_clamp_i64(8, 5, 10) == 8);
-///     assert!(nstd_core_math_clamp_i64(14, 5, 10) == 10);
-/// }
+/// assert!(nstd_core_math_clamp_i64(2, 5, 10) == 5);
+/// assert!(nstd_core_math_clamp_i64(8, 5, 10) == 8);
+/// assert!(nstd_core_math_clamp_i64(14, 5, 10) == 10);
 /// ```
 NSTDAPI NSTDInt64 nstd_core_math_clamp_i64(NSTDInt64 x, NSTDInt64 min, NSTDInt64 max);
 /// Clamps the value `x` to the bounds `min` and `max`.
@@ -728,20 +662,14 @@ NSTDAPI NSTDInt64 nstd_core_math_clamp_i64(NSTDInt64 x, NSTDInt64 min, NSTDInt64
 ///
 /// Panics if `min` > `max`.
 ///
-/// # Safety
-///
-/// This operation can cause undefined behavior if it panics into non-Rust code.
-///
 /// # Example
 ///
 /// ```
 /// use nstd_sys::core::math::nstd_core_math_clamp_u64;
 ///
-/// unsafe {
-///     assert!(nstd_core_math_clamp_u64(2, 5, 10) == 5);
-///     assert!(nstd_core_math_clamp_u64(8, 5, 10) == 8);
-///     assert!(nstd_core_math_clamp_u64(14, 5, 10) == 10);
-/// }
+/// assert!(nstd_core_math_clamp_u64(2, 5, 10) == 5);
+/// assert!(nstd_core_math_clamp_u64(8, 5, 10) == 8);
+/// assert!(nstd_core_math_clamp_u64(14, 5, 10) == 10);
 /// ```
 NSTDAPI NSTDUInt64 nstd_core_math_clamp_u64(NSTDUInt64 x, NSTDUInt64 min, NSTDUInt64 max);
 
@@ -761,20 +689,14 @@ NSTDAPI NSTDUInt64 nstd_core_math_clamp_u64(NSTDUInt64 x, NSTDUInt64 min, NSTDUI
 ///
 /// This operation will panic if `y` is 0.
 ///
-/// # Safety
-///
-/// This operation can cause undefined behavior if it panics into non-Rust code.
-///
 /// # Example
 ///
 /// ```
 /// use nstd_sys::core::math::nstd_core_math_div_ceil_int;
 ///
-/// unsafe {
-///     assert!(nstd_core_math_div_ceil_int(8, 5) == 2);
-///     assert!(nstd_core_math_div_ceil_int(8, 3) == 3);
-///     assert!(nstd_core_math_div_ceil_int(8, 2) == 4);
-/// }
+/// assert!(nstd_core_math_div_ceil_int(8, 5) == 2);
+/// assert!(nstd_core_math_div_ceil_int(8, 3) == 3);
+/// assert!(nstd_core_math_div_ceil_int(8, 2) == 4);
 /// ```
 NSTDAPI NSTDInt nstd_core_math_div_ceil_int(NSTDInt x, NSTDInt y);
 /// Divides two numbers and rounds the result up to the next integer.
@@ -793,20 +715,14 @@ NSTDAPI NSTDInt nstd_core_math_div_ceil_int(NSTDInt x, NSTDInt y);
 ///
 /// This operation will panic if `y` is 0.
 ///
-/// # Safety
-///
-/// This operation can cause undefined behavior if it panics into non-Rust code.
-///
 /// # Example
 ///
 /// ```
 /// use nstd_sys::core::math::nstd_core_math_div_ceil_uint;
 ///
-/// unsafe {
-///     assert!(nstd_core_math_div_ceil_uint(8, 5) == 2);
-///     assert!(nstd_core_math_div_ceil_uint(8, 3) == 3);
-///     assert!(nstd_core_math_div_ceil_uint(8, 2) == 4);
-/// }
+/// assert!(nstd_core_math_div_ceil_uint(8, 5) == 2);
+/// assert!(nstd_core_math_div_ceil_uint(8, 3) == 3);
+/// assert!(nstd_core_math_div_ceil_uint(8, 2) == 4);
 /// ```
 NSTDAPI NSTDUInt nstd_core_math_div_ceil_uint(NSTDUInt x, NSTDUInt y);
 /// Divides two numbers and rounds the result up to the next integer.
@@ -825,20 +741,14 @@ NSTDAPI NSTDUInt nstd_core_math_div_ceil_uint(NSTDUInt x, NSTDUInt y);
 ///
 /// This operation will panic if `y` is 0.
 ///
-/// # Safety
-///
-/// This operation can cause undefined behavior if it panics into non-Rust code.
-///
 /// # Example
 ///
 /// ```
 /// use nstd_sys::core::math::nstd_core_math_div_ceil_i8;
 ///
-/// unsafe {
-///     assert!(nstd_core_math_div_ceil_i8(8, 5) == 2);
-///     assert!(nstd_core_math_div_ceil_i8(8, 3) == 3);
-///     assert!(nstd_core_math_div_ceil_i8(8, 2) == 4);
-/// }
+/// assert!(nstd_core_math_div_ceil_i8(8, 5) == 2);
+/// assert!(nstd_core_math_div_ceil_i8(8, 3) == 3);
+/// assert!(nstd_core_math_div_ceil_i8(8, 2) == 4);
 /// ```
 NSTDAPI NSTDInt8 nstd_core_math_div_ceil_i8(NSTDInt8 x, NSTDInt8 y);
 /// Divides two numbers and rounds the result up to the next integer.
@@ -857,20 +767,14 @@ NSTDAPI NSTDInt8 nstd_core_math_div_ceil_i8(NSTDInt8 x, NSTDInt8 y);
 ///
 /// This operation will panic if `y` is 0.
 ///
-/// # Safety
-///
-/// This operation can cause undefined behavior if it panics into non-Rust code.
-///
 /// # Example
 ///
 /// ```
 /// use nstd_sys::core::math::nstd_core_math_div_ceil_u8;
 ///
-/// unsafe {
-///     assert!(nstd_core_math_div_ceil_u8(8, 5) == 2);
-///     assert!(nstd_core_math_div_ceil_u8(8, 3) == 3);
-///     assert!(nstd_core_math_div_ceil_u8(8, 2) == 4);
-/// }
+/// assert!(nstd_core_math_div_ceil_u8(8, 5) == 2);
+/// assert!(nstd_core_math_div_ceil_u8(8, 3) == 3);
+/// assert!(nstd_core_math_div_ceil_u8(8, 2) == 4);
 /// ```
 NSTDAPI NSTDUInt8 nstd_core_math_div_ceil_u8(NSTDUInt8 x, NSTDUInt8 y);
 /// Divides two numbers and rounds the result up to the next integer.
@@ -889,20 +793,14 @@ NSTDAPI NSTDUInt8 nstd_core_math_div_ceil_u8(NSTDUInt8 x, NSTDUInt8 y);
 ///
 /// This operation will panic if `y` is 0.
 ///
-/// # Safety
-///
-/// This operation can cause undefined behavior if it panics into non-Rust code.
-///
 /// # Example
 ///
 /// ```
 /// use nstd_sys::core::math::nstd_core_math_div_ceil_i16;
 ///
-/// unsafe {
-///     assert!(nstd_core_math_div_ceil_i16(8, 5) == 2);
-///     assert!(nstd_core_math_div_ceil_i16(8, 3) == 3);
-///     assert!(nstd_core_math_div_ceil_i16(8, 2) == 4);
-/// }
+/// assert!(nstd_core_math_div_ceil_i16(8, 5) == 2);
+/// assert!(nstd_core_math_div_ceil_i16(8, 3) == 3);
+/// assert!(nstd_core_math_div_ceil_i16(8, 2) == 4);
 /// ```
 NSTDAPI NSTDInt16 nstd_core_math_div_ceil_i16(NSTDInt16 x, NSTDInt16 y);
 /// Divides two numbers and rounds the result up to the next integer.
@@ -921,20 +819,14 @@ NSTDAPI NSTDInt16 nstd_core_math_div_ceil_i16(NSTDInt16 x, NSTDInt16 y);
 ///
 /// This operation will panic if `y` is 0.
 ///
-/// # Safety
-///
-/// This operation can cause undefined behavior if it panics into non-Rust code.
-///
 /// # Example
 ///
 /// ```
 /// use nstd_sys::core::math::nstd_core_math_div_ceil_u16;
 ///
-/// unsafe {
-///     assert!(nstd_core_math_div_ceil_u16(8, 5) == 2);
-///     assert!(nstd_core_math_div_ceil_u16(8, 3) == 3);
-///     assert!(nstd_core_math_div_ceil_u16(8, 2) == 4);
-/// }
+/// assert!(nstd_core_math_div_ceil_u16(8, 5) == 2);
+/// assert!(nstd_core_math_div_ceil_u16(8, 3) == 3);
+/// assert!(nstd_core_math_div_ceil_u16(8, 2) == 4);
 /// ```
 NSTDAPI NSTDUInt16 nstd_core_math_div_ceil_u16(NSTDUInt16 x, NSTDUInt16 y);
 /// Divides two numbers and rounds the result up to the next integer.
@@ -953,20 +845,14 @@ NSTDAPI NSTDUInt16 nstd_core_math_div_ceil_u16(NSTDUInt16 x, NSTDUInt16 y);
 ///
 /// This operation will panic if `y` is 0.
 ///
-/// # Safety
-///
-/// This operation can cause undefined behavior if it panics into non-Rust code.
-///
 /// # Example
 ///
 /// ```
 /// use nstd_sys::core::math::nstd_core_math_div_ceil_i32;
 ///
-/// unsafe {
-///     assert!(nstd_core_math_div_ceil_i32(8, 5) == 2);
-///     assert!(nstd_core_math_div_ceil_i32(8, 3) == 3);
-///     assert!(nstd_core_math_div_ceil_i32(8, 2) == 4);
-/// }
+/// assert!(nstd_core_math_div_ceil_i32(8, 5) == 2);
+/// assert!(nstd_core_math_div_ceil_i32(8, 3) == 3);
+/// assert!(nstd_core_math_div_ceil_i32(8, 2) == 4);
 /// ```
 NSTDAPI NSTDInt32 nstd_core_math_div_ceil_i32(NSTDInt32 x, NSTDInt32 y);
 /// Divides two numbers and rounds the result up to the next integer.
@@ -985,20 +871,14 @@ NSTDAPI NSTDInt32 nstd_core_math_div_ceil_i32(NSTDInt32 x, NSTDInt32 y);
 ///
 /// This operation will panic if `y` is 0.
 ///
-/// # Safety
-///
-/// This operation can cause undefined behavior if it panics into non-Rust code.
-///
 /// # Example
 ///
 /// ```
 /// use nstd_sys::core::math::nstd_core_math_div_ceil_u32;
 ///
-/// unsafe {
-///     assert!(nstd_core_math_div_ceil_u32(8, 5) == 2);
-///     assert!(nstd_core_math_div_ceil_u32(8, 3) == 3);
-///     assert!(nstd_core_math_div_ceil_u32(8, 2) == 4);
-/// }
+/// assert!(nstd_core_math_div_ceil_u32(8, 5) == 2);
+/// assert!(nstd_core_math_div_ceil_u32(8, 3) == 3);
+/// assert!(nstd_core_math_div_ceil_u32(8, 2) == 4);
 /// ```
 NSTDAPI NSTDUInt32 nstd_core_math_div_ceil_u32(NSTDUInt32 x, NSTDUInt32 y);
 /// Divides two numbers and rounds the result up to the next integer.
@@ -1017,20 +897,14 @@ NSTDAPI NSTDUInt32 nstd_core_math_div_ceil_u32(NSTDUInt32 x, NSTDUInt32 y);
 ///
 /// This operation will panic if `y` is 0.
 ///
-/// # Safety
-///
-/// This operation can cause undefined behavior if it panics into non-Rust code.
-///
 /// # Example
 ///
 /// ```
 /// use nstd_sys::core::math::nstd_core_math_div_ceil_i64;
 ///
-/// unsafe {
-///     assert!(nstd_core_math_div_ceil_i64(8, 5) == 2);
-///     assert!(nstd_core_math_div_ceil_i64(8, 3) == 3);
-///     assert!(nstd_core_math_div_ceil_i64(8, 2) == 4);
-/// }
+/// assert!(nstd_core_math_div_ceil_i64(8, 5) == 2);
+/// assert!(nstd_core_math_div_ceil_i64(8, 3) == 3);
+/// assert!(nstd_core_math_div_ceil_i64(8, 2) == 4);
 /// ```
 NSTDAPI NSTDInt64 nstd_core_math_div_ceil_i64(NSTDInt64 x, NSTDInt64 y);
 /// Divides two numbers and rounds the result up to the next integer.
@@ -1049,20 +923,14 @@ NSTDAPI NSTDInt64 nstd_core_math_div_ceil_i64(NSTDInt64 x, NSTDInt64 y);
 ///
 /// This operation will panic if `y` is 0.
 ///
-/// # Safety
-///
-/// This operation can cause undefined behavior if it panics into non-Rust code.
-///
 /// # Example
 ///
 /// ```
 /// use nstd_sys::core::math::nstd_core_math_div_ceil_u64;
 ///
-/// unsafe {
-///     assert!(nstd_core_math_div_ceil_u64(8, 5) == 2);
-///     assert!(nstd_core_math_div_ceil_u64(8, 3) == 3);
-///     assert!(nstd_core_math_div_ceil_u64(8, 2) == 4);
-/// }
+/// assert!(nstd_core_math_div_ceil_u64(8, 5) == 2);
+/// assert!(nstd_core_math_div_ceil_u64(8, 3) == 3);
+/// assert!(nstd_core_math_div_ceil_u64(8, 2) == 4);
 /// ```
 NSTDAPI NSTDUInt64 nstd_core_math_div_ceil_u64(NSTDUInt64 x, NSTDUInt64 y);
 
@@ -1082,20 +950,14 @@ NSTDAPI NSTDUInt64 nstd_core_math_div_ceil_u64(NSTDUInt64 x, NSTDUInt64 y);
 ///
 /// This operation will panic if `y` is 0.
 ///
-/// # Safety
-///
-/// This operation can cause undefined behavior if it panics into non-Rust code.
-///
 /// # Example
 ///
 /// ```
 /// use nstd_sys::core::math::nstd_core_math_div_floor_int;
 ///
-/// unsafe {
-///     assert!(nstd_core_math_div_floor_int(5, 2) == 2);
-///     assert!(nstd_core_math_div_floor_int(13, 4) == 3);
-///     assert!(nstd_core_math_div_floor_int(23, 5) == 4);
-/// }
+/// assert!(nstd_core_math_div_floor_int(5, 2) == 2);
+/// assert!(nstd_core_math_div_floor_int(13, 4) == 3);
+/// assert!(nstd_core_math_div_floor_int(23, 5) == 4);
 /// ```
 NSTDAPI NSTDInt nstd_core_math_div_floor_int(NSTDInt x, NSTDInt y);
 /// Divides two numbers and rounds the result down to the next integer.
@@ -1114,20 +976,14 @@ NSTDAPI NSTDInt nstd_core_math_div_floor_int(NSTDInt x, NSTDInt y);
 ///
 /// This operation will panic if `y` is 0.
 ///
-/// # Safety
-///
-/// This operation can cause undefined behavior if it panics into non-Rust code.
-///
 /// # Example
 ///
 /// ```
 /// use nstd_sys::core::math::nstd_core_math_div_floor_uint;
 ///
-/// unsafe {
-///     assert!(nstd_core_math_div_floor_uint(5, 2) == 2);
-///     assert!(nstd_core_math_div_floor_uint(13, 4) == 3);
-///     assert!(nstd_core_math_div_floor_uint(23, 5) == 4);
-/// }
+/// assert!(nstd_core_math_div_floor_uint(5, 2) == 2);
+/// assert!(nstd_core_math_div_floor_uint(13, 4) == 3);
+/// assert!(nstd_core_math_div_floor_uint(23, 5) == 4);
 /// ```
 NSTDAPI NSTDUInt nstd_core_math_div_floor_uint(NSTDUInt x, NSTDUInt y);
 /// Divides two numbers and rounds the result down to the next integer.
@@ -1146,20 +1002,14 @@ NSTDAPI NSTDUInt nstd_core_math_div_floor_uint(NSTDUInt x, NSTDUInt y);
 ///
 /// This operation will panic if `y` is 0.
 ///
-/// # Safety
-///
-/// This operation can cause undefined behavior if it panics into non-Rust code.
-///
 /// # Example
 ///
 /// ```
 /// use nstd_sys::core::math::nstd_core_math_div_floor_i8;
 ///
-/// unsafe {
-///     assert!(nstd_core_math_div_floor_i8(5, 2) == 2);
-///     assert!(nstd_core_math_div_floor_i8(13, 4) == 3);
-///     assert!(nstd_core_math_div_floor_i8(23, 5) == 4);
-/// }
+/// assert!(nstd_core_math_div_floor_i8(5, 2) == 2);
+/// assert!(nstd_core_math_div_floor_i8(13, 4) == 3);
+/// assert!(nstd_core_math_div_floor_i8(23, 5) == 4);
 /// ```
 NSTDAPI NSTDInt8 nstd_core_math_div_floor_i8(NSTDInt8 x, NSTDInt8 y);
 /// Divides two numbers and rounds the result down to the next integer.
@@ -1178,20 +1028,14 @@ NSTDAPI NSTDInt8 nstd_core_math_div_floor_i8(NSTDInt8 x, NSTDInt8 y);
 ///
 /// This operation will panic if `y` is 0.
 ///
-/// # Safety
-///
-/// This operation can cause undefined behavior if it panics into non-Rust code.
-///
 /// # Example
 ///
 /// ```
 /// use nstd_sys::core::math::nstd_core_math_div_floor_u8;
 ///
-/// unsafe {
-///     assert!(nstd_core_math_div_floor_u8(5, 2) == 2);
-///     assert!(nstd_core_math_div_floor_u8(13, 4) == 3);
-///     assert!(nstd_core_math_div_floor_u8(23, 5) == 4);
-/// }
+/// assert!(nstd_core_math_div_floor_u8(5, 2) == 2);
+/// assert!(nstd_core_math_div_floor_u8(13, 4) == 3);
+/// assert!(nstd_core_math_div_floor_u8(23, 5) == 4);
 /// ```
 NSTDAPI NSTDUInt8 nstd_core_math_div_floor_u8(NSTDUInt8 x, NSTDUInt8 y);
 /// Divides two numbers and rounds the result down to the next integer.
@@ -1210,20 +1054,14 @@ NSTDAPI NSTDUInt8 nstd_core_math_div_floor_u8(NSTDUInt8 x, NSTDUInt8 y);
 ///
 /// This operation will panic if `y` is 0.
 ///
-/// # Safety
-///
-/// This operation can cause undefined behavior if it panics into non-Rust code.
-///
 /// # Example
 ///
 /// ```
 /// use nstd_sys::core::math::nstd_core_math_div_floor_i16;
 ///
-/// unsafe {
-///     assert!(nstd_core_math_div_floor_i16(5, 2) == 2);
-///     assert!(nstd_core_math_div_floor_i16(13, 4) == 3);
-///     assert!(nstd_core_math_div_floor_i16(23, 5) == 4);
-/// }
+/// assert!(nstd_core_math_div_floor_i16(5, 2) == 2);
+/// assert!(nstd_core_math_div_floor_i16(13, 4) == 3);
+/// assert!(nstd_core_math_div_floor_i16(23, 5) == 4);
 /// ```
 NSTDAPI NSTDInt16 nstd_core_math_div_floor_i16(NSTDInt16 x, NSTDInt16 y);
 /// Divides two numbers and rounds the result down to the next integer.
@@ -1242,20 +1080,14 @@ NSTDAPI NSTDInt16 nstd_core_math_div_floor_i16(NSTDInt16 x, NSTDInt16 y);
 ///
 /// This operation will panic if `y` is 0.
 ///
-/// # Safety
-///
-/// This operation can cause undefined behavior if it panics into non-Rust code.
-///
 /// # Example
 ///
 /// ```
 /// use nstd_sys::core::math::nstd_core_math_div_floor_u16;
 ///
-/// unsafe {
-///     assert!(nstd_core_math_div_floor_u16(5, 2) == 2);
-///     assert!(nstd_core_math_div_floor_u16(13, 4) == 3);
-///     assert!(nstd_core_math_div_floor_u16(23, 5) == 4);
-/// }
+/// assert!(nstd_core_math_div_floor_u16(5, 2) == 2);
+/// assert!(nstd_core_math_div_floor_u16(13, 4) == 3);
+/// assert!(nstd_core_math_div_floor_u16(23, 5) == 4);
 /// ```
 NSTDAPI NSTDUInt16 nstd_core_math_div_floor_u16(NSTDUInt16 x, NSTDUInt16 y);
 /// Divides two numbers and rounds the result down to the next integer.
@@ -1274,20 +1106,14 @@ NSTDAPI NSTDUInt16 nstd_core_math_div_floor_u16(NSTDUInt16 x, NSTDUInt16 y);
 ///
 /// This operation will panic if `y` is 0.
 ///
-/// # Safety
-///
-/// This operation can cause undefined behavior if it panics into non-Rust code.
-///
 /// # Example
 ///
 /// ```
 /// use nstd_sys::core::math::nstd_core_math_div_floor_i32;
 ///
-/// unsafe {
-///     assert!(nstd_core_math_div_floor_i32(5, 2) == 2);
-///     assert!(nstd_core_math_div_floor_i32(13, 4) == 3);
-///     assert!(nstd_core_math_div_floor_i32(23, 5) == 4);
-/// }
+/// assert!(nstd_core_math_div_floor_i32(5, 2) == 2);
+/// assert!(nstd_core_math_div_floor_i32(13, 4) == 3);
+/// assert!(nstd_core_math_div_floor_i32(23, 5) == 4);
 /// ```
 NSTDAPI NSTDInt32 nstd_core_math_div_floor_i32(NSTDInt32 x, NSTDInt32 y);
 /// Divides two numbers and rounds the result down to the next integer.
@@ -1306,20 +1132,14 @@ NSTDAPI NSTDInt32 nstd_core_math_div_floor_i32(NSTDInt32 x, NSTDInt32 y);
 ///
 /// This operation will panic if `y` is 0.
 ///
-/// # Safety
-///
-/// This operation can cause undefined behavior if it panics into non-Rust code.
-///
 /// # Example
 ///
 /// ```
 /// use nstd_sys::core::math::nstd_core_math_div_floor_u32;
 ///
-/// unsafe {
-///     assert!(nstd_core_math_div_floor_u32(5, 2) == 2);
-///     assert!(nstd_core_math_div_floor_u32(13, 4) == 3);
-///     assert!(nstd_core_math_div_floor_u32(23, 5) == 4);
-/// }
+/// assert!(nstd_core_math_div_floor_u32(5, 2) == 2);
+/// assert!(nstd_core_math_div_floor_u32(13, 4) == 3);
+/// assert!(nstd_core_math_div_floor_u32(23, 5) == 4);
 /// ```
 NSTDAPI NSTDUInt32 nstd_core_math_div_floor_u32(NSTDUInt32 x, NSTDUInt32 y);
 /// Divides two numbers and rounds the result down to the next integer.
@@ -1338,20 +1158,14 @@ NSTDAPI NSTDUInt32 nstd_core_math_div_floor_u32(NSTDUInt32 x, NSTDUInt32 y);
 ///
 /// This operation will panic if `y` is 0.
 ///
-/// # Safety
-///
-/// This operation can cause undefined behavior if it panics into non-Rust code.
-///
 /// # Example
 ///
 /// ```
 /// use nstd_sys::core::math::nstd_core_math_div_floor_i64;
 ///
-/// unsafe {
-///     assert!(nstd_core_math_div_floor_i64(5, 2) == 2);
-///     assert!(nstd_core_math_div_floor_i64(13, 4) == 3);
-///     assert!(nstd_core_math_div_floor_i64(23, 5) == 4);
-/// }
+/// assert!(nstd_core_math_div_floor_i64(5, 2) == 2);
+/// assert!(nstd_core_math_div_floor_i64(13, 4) == 3);
+/// assert!(nstd_core_math_div_floor_i64(23, 5) == 4);
 /// ```
 NSTDAPI NSTDInt64 nstd_core_math_div_floor_i64(NSTDInt64 x, NSTDInt64 y);
 /// Divides two numbers and rounds the result down to the next integer.
@@ -1370,20 +1184,14 @@ NSTDAPI NSTDInt64 nstd_core_math_div_floor_i64(NSTDInt64 x, NSTDInt64 y);
 ///
 /// This operation will panic if `y` is 0.
 ///
-/// # Safety
-///
-/// This operation can cause undefined behavior if it panics into non-Rust code.
-///
 /// # Example
 ///
 /// ```
 /// use nstd_sys::core::math::nstd_core_math_div_floor_u64;
 ///
-/// unsafe {
-///     assert!(nstd_core_math_div_floor_u64(5, 2) == 2);
-///     assert!(nstd_core_math_div_floor_u64(13, 4) == 3);
-///     assert!(nstd_core_math_div_floor_u64(23, 5) == 4);
-/// }
+/// assert!(nstd_core_math_div_floor_u64(5, 2) == 2);
+/// assert!(nstd_core_math_div_floor_u64(13, 4) == 3);
+/// assert!(nstd_core_math_div_floor_u64(23, 5) == 4);
 /// ```
 NSTDAPI NSTDUInt64 nstd_core_math_div_floor_u64(NSTDUInt64 x, NSTDUInt64 y);
 

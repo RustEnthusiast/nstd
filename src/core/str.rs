@@ -34,10 +34,7 @@ macro_rules! gen_to_primitive {
         ///
         /// # Safety
         ///
-        /// - This operation can cause undefined behavior in the event that `str`'s data is
-        /// invalid.
-        ///
-        /// - This operation can cause undefined behavior if it panics into non-Rust code.
+        /// This operation can cause undefined behavior in the event that `str`'s data is invalid.
         #[inline]
         #[cfg_attr(feature = "clib", no_mangle)]
         pub unsafe extern "C" fn $name(str: &$StrT, errc: &mut NSTDErrorCode) -> $RetT {
@@ -98,9 +95,7 @@ impl NSTDStr {
 ///
 /// # Safety
 ///
-/// - `cstr`'s data must be valid for reads of at least `cstr.len` consecutive bytes.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// `cstr`'s data must be valid for reads of at least `cstr.len` consecutive bytes.
 ///
 /// # Example
 ///
@@ -185,10 +180,8 @@ pub unsafe extern "C" fn nstd_core_str_from_cstr_unchecked(cstr: &NSTDCStr) -> N
 ///
 /// # Safety
 ///
-/// - This function makes access to raw pointer data, which can cause undefined behavior in the
-/// event that `cstr`'s data is invalid.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// This function makes access to raw pointer data, which can cause undefined behavior in the event
+/// that `cstr`'s data is invalid.
 ///
 /// # Example
 ///
@@ -231,10 +224,8 @@ pub unsafe extern "C" fn nstd_core_str_from_raw_cstr(cstr: *const NSTDChar) -> N
 ///
 /// # Safety
 ///
-/// - This function makes access to raw pointer data, which can cause undefined behavior in the
-/// event that `cstr`'s data is invalid.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// This function makes access to raw pointer data, which can cause undefined behavior in the event
+/// that `cstr`'s data is invalid.
 ///
 /// # Example
 ///
@@ -283,8 +274,6 @@ pub unsafe extern "C" fn nstd_core_str_from_raw_cstr_with_null(cstr: *const NSTD
 ///
 /// - `bytes`'s data must be valid for reads of at least `bytes.len` consecutive bytes.
 ///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
-///
 /// # Example
 ///
 /// ```
@@ -330,8 +319,6 @@ pub unsafe extern "C" fn nstd_core_str_from_bytes(bytes: &NSTDSlice) -> NSTDStr 
 /// - `bytes` must remain valid while the returned string slice is in use.
 ///
 /// - `bytes`'s data must be valid for reads of at least `bytes.len` consecutive bytes.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
 ///
 /// # Example
 ///
@@ -420,9 +407,7 @@ pub extern "C" fn nstd_core_str_as_ptr(str: &NSTDStr) -> *const NSTDByte {
 ///
 /// # Safety
 ///
-/// - This operation can cause undefined behavior in the event that `str`'s data is invalid.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 ///
 /// # Example
 ///
@@ -492,9 +477,7 @@ pub extern "C" fn nstd_core_str_byte_len(str: &NSTDStr) -> NSTDUInt {
 ///
 /// # Safety
 ///
-/// - This operation can cause undefined behavior in the event that `str`'s data is invalid.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 ///
 /// # Example
 ///
@@ -544,9 +527,7 @@ pub unsafe extern "C" fn nstd_core_str_get_char(str: &NSTDStr, pos: NSTDUInt) ->
 ///
 /// # Safety
 ///
-/// - `str`'s data must be valid for reads of at least `str.len` consecutive bytes.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// `str`'s data must be valid for reads of at least `str.len` consecutive bytes.
 ///
 /// # Example
 ///
@@ -986,9 +967,7 @@ impl NSTDStrMut {
 ///
 /// # Safety
 ///
-/// - `cstr`'s data must be valid for reads of at least `cstr.len` consecutive bytes.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// `cstr`'s data must be valid for reads of at least `cstr.len` consecutive bytes.
 ///
 /// # Example
 ///
@@ -1075,10 +1054,8 @@ pub unsafe extern "C" fn nstd_core_str_mut_from_cstr_unchecked(
 ///
 /// # Safety
 ///
-/// - This function makes access to raw pointer data, which can cause undefined behavior in the
-/// event that `cstr`'s data is invalid.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// This function makes access to raw pointer data, which can cause undefined behavior in the event
+/// that `cstr`'s data is invalid.
 ///
 /// # Example
 ///
@@ -1121,10 +1098,8 @@ pub unsafe extern "C" fn nstd_core_str_mut_from_raw_cstr(cstr: *mut NSTDChar) ->
 ///
 /// # Safety
 ///
-/// - This function makes access to raw pointer data, which can cause undefined behavior in the
-/// event that `cstr`'s data is invalid.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// This function makes access to raw pointer data, which can cause undefined behavior in the event
+/// that `cstr`'s data is invalid.
 ///
 /// # Example
 ///
@@ -1177,8 +1152,6 @@ pub unsafe extern "C" fn nstd_core_str_mut_from_raw_cstr_with_null(
 ///
 /// - `bytes`'s data must be valid for reads of at least `bytes.len` consecutive bytes.
 ///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
-///
 /// # Example
 ///
 /// ```
@@ -1224,8 +1197,6 @@ pub unsafe extern "C" fn nstd_core_str_mut_from_bytes(bytes: &mut NSTDSliceMut) 
 /// - `bytes` must remain valid while the returned string slice is in use.
 ///
 /// - `bytes`'s data must be valid for reads of at least `bytes.len` consecutive bytes.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
 ///
 /// # Example
 ///
@@ -1335,9 +1306,7 @@ pub extern "C" fn nstd_core_str_mut_as_ptr(str: &NSTDStrMut) -> *const NSTDByte 
 ///
 /// # Safety
 ///
-/// - This operation can cause undefined behavior in the event that `str`'s data is invalid.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 ///
 /// # Example
 ///
@@ -1409,9 +1378,7 @@ pub extern "C" fn nstd_core_str_mut_byte_len(str: &NSTDStrMut) -> NSTDUInt {
 ///
 /// # Safety
 ///
-/// - This operation can cause undefined behavior in the event that `str`'s data is invalid.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 ///
 /// # Example
 ///
@@ -1464,9 +1431,7 @@ pub unsafe extern "C" fn nstd_core_str_mut_get_char(
 ///
 /// # Safety
 ///
-/// - `str`'s data must be valid for reads of at least `str.len` consecutive bytes.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// `str`'s data must be valid for reads of at least `str.len` consecutive bytes.
 ///
 /// # Example
 ///

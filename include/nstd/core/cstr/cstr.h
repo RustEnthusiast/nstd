@@ -150,9 +150,7 @@ NSTDAPI NSTDUInt nstd_core_cstr_len(const NSTDCStr *cstr);
 ///
 /// # Safety
 ///
-/// - Undefined behavior may occur if `cstr`'s data is invalid.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// Undefined behavior may occur if `cstr`'s data is invalid.
 ///
 /// # Example
 ///
@@ -419,9 +417,7 @@ NSTDAPI NSTDUInt nstd_core_cstr_mut_len(const NSTDCStrMut *cstr);
 ///
 /// # Safety
 ///
-/// - Undefined behavior may occur if `cstr`'s data is invalid.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// Undefined behavior may occur if `cstr`'s data is invalid.
 ///
 /// # Example
 ///

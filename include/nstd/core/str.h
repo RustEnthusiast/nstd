@@ -34,9 +34,7 @@ typedef struct {
 ///
 /// # Safety
 ///
-/// - `cstr`'s data must be valid for reads of at least `cstr.len` consecutive bytes.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// `cstr`'s data must be valid for reads of at least `cstr.len` consecutive bytes.
 ///
 /// # Example
 ///
@@ -107,10 +105,8 @@ NSTDAPI NSTDStr nstd_core_str_from_cstr_unchecked(const NSTDCStr *cstr);
 ///
 /// # Safety
 ///
-/// - This function makes access to raw pointer data, which can cause undefined behavior in the
-/// event that `cstr`'s data is invalid.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// This function makes access to raw pointer data, which can cause undefined behavior in the event
+/// that `cstr`'s data is invalid.
 ///
 /// # Example
 ///
@@ -145,10 +141,8 @@ NSTDAPI NSTDStr nstd_core_str_from_raw_cstr(const NSTDChar *cstr);
 ///
 /// # Safety
 ///
-/// - This function makes access to raw pointer data, which can cause undefined behavior in the
-/// event that `cstr`'s data is invalid.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// This function makes access to raw pointer data, which can cause undefined behavior in the event
+/// that `cstr`'s data is invalid.
 ///
 /// # Example
 ///
@@ -189,8 +183,6 @@ NSTDAPI NSTDStr nstd_core_str_from_raw_cstr_with_null(const NSTDChar *cstr);
 ///
 /// - `bytes`'s data must be valid for reads of at least `bytes.len` consecutive bytes.
 ///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
-///
 /// # Example
 ///
 /// ```
@@ -229,8 +221,6 @@ NSTDAPI NSTDStr nstd_core_str_from_bytes(const NSTDSlice *bytes);
 /// - `bytes` must remain valid while the returned string slice is in use.
 ///
 /// - `bytes`'s data must be valid for reads of at least `bytes.len` consecutive bytes.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
 ///
 /// # Example
 ///
@@ -304,9 +294,7 @@ NSTDAPI const NSTDByte *nstd_core_str_as_ptr(const NSTDStr *str);
 ///
 /// # Safety
 ///
-/// - This operation can cause undefined behavior in the event that `str`'s data is invalid.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 ///
 /// # Example
 ///
@@ -368,9 +356,7 @@ NSTDAPI NSTDUInt nstd_core_str_byte_len(const NSTDStr *str);
 ///
 /// # Safety
 ///
-/// - This operation can cause undefined behavior in the event that `str`'s data is invalid.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 ///
 /// # Example
 ///
@@ -413,9 +399,7 @@ NSTDAPI NSTDUnichar nstd_core_str_get_char(const NSTDStr *str, NSTDUInt pos);
 ///
 /// # Safety
 ///
-/// - `str`'s data must be valid for reads of at least `str.len` consecutive bytes.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// `str`'s data must be valid for reads of at least `str.len` consecutive bytes.
 ///
 /// # Example
 ///
@@ -457,10 +441,7 @@ NSTDAPI NSTDStr nstd_core_str_substr(const NSTDStr *str, NSTDURange range);
 ///
 /// # Safety
 ///
-/// - This operation can cause undefined behavior in the event that `str`'s data is
-/// invalid.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 ///
 /// # Example
 ///
@@ -495,10 +476,7 @@ NSTDAPI NSTDFloat32 nstd_core_str_to_f32(const NSTDStr *str, NSTDErrorCode *errc
 ///
 /// # Safety
 ///
-/// - This operation can cause undefined behavior in the event that `str`'s data is
-/// invalid.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 ///
 /// # Example
 ///
@@ -533,10 +511,7 @@ NSTDAPI NSTDFloat64 nstd_core_str_to_f64(const NSTDStr *str, NSTDErrorCode *errc
 ///
 /// # Safety
 ///
-/// - This operation can cause undefined behavior in the event that `str`'s data is
-/// invalid.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 ///
 /// # Example
 ///
@@ -571,10 +546,7 @@ NSTDAPI NSTDInt nstd_core_str_to_int(const NSTDStr *str, NSTDErrorCode *errc);
 ///
 /// # Safety
 ///
-/// - This operation can cause undefined behavior in the event that `str`'s data is
-/// invalid.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 ///
 /// # Example
 ///
@@ -609,10 +581,7 @@ NSTDAPI NSTDUInt nstd_core_str_to_uint(const NSTDStr *str, NSTDErrorCode *errc);
 ///
 /// # Safety
 ///
-/// - This operation can cause undefined behavior in the event that `str`'s data is
-/// invalid.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 ///
 /// # Example
 ///
@@ -647,10 +616,7 @@ NSTDAPI NSTDInt8 nstd_core_str_to_i8(const NSTDStr *str, NSTDErrorCode *errc);
 ///
 /// # Safety
 ///
-/// - This operation can cause undefined behavior in the event that `str`'s data is
-/// invalid.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 ///
 /// # Example
 ///
@@ -685,10 +651,7 @@ NSTDAPI NSTDUInt8 nstd_core_str_to_u8(const NSTDStr *str, NSTDErrorCode *errc);
 ///
 /// # Safety
 ///
-/// - This operation can cause undefined behavior in the event that `str`'s data is
-/// invalid.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 ///
 /// # Example
 ///
@@ -723,10 +686,7 @@ NSTDAPI NSTDInt16 nstd_core_str_to_i16(const NSTDStr *str, NSTDErrorCode *errc);
 ///
 /// # Safety
 ///
-/// - This operation can cause undefined behavior in the event that `str`'s data is
-/// invalid.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 ///
 /// # Example
 ///
@@ -761,10 +721,7 @@ NSTDAPI NSTDUInt16 nstd_core_str_to_u16(const NSTDStr *str, NSTDErrorCode *errc)
 ///
 /// # Safety
 ///
-/// - This operation can cause undefined behavior in the event that `str`'s data is
-/// invalid.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 ///
 /// # Example
 ///
@@ -799,10 +756,7 @@ NSTDAPI NSTDInt32 nstd_core_str_to_i32(const NSTDStr *str, NSTDErrorCode *errc);
 ///
 /// # Safety
 ///
-/// - This operation can cause undefined behavior in the event that `str`'s data is
-/// invalid.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 ///
 /// # Example
 ///
@@ -837,10 +791,7 @@ NSTDAPI NSTDUInt32 nstd_core_str_to_u32(const NSTDStr *str, NSTDErrorCode *errc)
 ///
 /// # Safety
 ///
-/// - This operation can cause undefined behavior in the event that `str`'s data is
-/// invalid.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 ///
 /// # Example
 ///
@@ -875,10 +826,7 @@ NSTDAPI NSTDInt64 nstd_core_str_to_i64(const NSTDStr *str, NSTDErrorCode *errc);
 ///
 /// # Safety
 ///
-/// - This operation can cause undefined behavior in the event that `str`'s data is
-/// invalid.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 ///
 /// # Example
 ///
@@ -923,9 +871,7 @@ typedef struct {
 ///
 /// # Safety
 ///
-/// - `cstr`'s data must be valid for reads of at least `cstr.len` consecutive bytes.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// `cstr`'s data must be valid for reads of at least `cstr.len` consecutive bytes.
 ///
 /// # Example
 ///
@@ -996,10 +942,8 @@ NSTDAPI NSTDStrMut nstd_core_str_mut_from_cstr_unchecked(NSTDCStrMut *cstr);
 ///
 /// # Safety
 ///
-/// - This function makes access to raw pointer data, which can cause undefined behavior in the
-/// event that `cstr`'s data is invalid.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// This function makes access to raw pointer data, which can cause undefined behavior in the event
+/// that `cstr`'s data is invalid.
 ///
 /// # Example
 ///
@@ -1034,10 +978,8 @@ NSTDAPI NSTDStrMut nstd_core_str_mut_from_raw_cstr(NSTDChar *cstr);
 ///
 /// # Safety
 ///
-/// - This function makes access to raw pointer data, which can cause undefined behavior in the
-/// event that `cstr`'s data is invalid.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// This function makes access to raw pointer data, which can cause undefined behavior in the event
+/// that `cstr`'s data is invalid.
 ///
 /// # Example
 ///
@@ -1080,8 +1022,6 @@ NSTDAPI NSTDStrMut nstd_core_str_mut_from_raw_cstr_with_null(NSTDChar *cstr);
 ///
 /// - `bytes`'s data must be valid for reads of at least `bytes.len` consecutive bytes.
 ///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
-///
 /// # Example
 ///
 /// ```
@@ -1120,8 +1060,6 @@ NSTDAPI NSTDStrMut nstd_core_str_mut_from_bytes(NSTDSliceMut *bytes);
 /// - `bytes` must remain valid while the returned string slice is in use.
 ///
 /// - `bytes`'s data must be valid for reads of at least `bytes.len` consecutive bytes.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
 ///
 /// # Example
 ///
@@ -1208,9 +1146,7 @@ NSTDAPI const NSTDByte *nstd_core_str_mut_as_ptr(const NSTDStrMut *str);
 ///
 /// # Safety
 ///
-/// - This operation can cause undefined behavior in the event that `str`'s data is invalid.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 ///
 /// # Example
 ///
@@ -1274,9 +1210,7 @@ NSTDAPI NSTDUInt nstd_core_str_mut_byte_len(const NSTDStrMut *str);
 ///
 /// # Safety
 ///
-/// - This operation can cause undefined behavior in the event that `str`'s data is invalid.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 ///
 /// # Example
 ///
@@ -1319,9 +1253,7 @@ NSTDAPI NSTDUnichar nstd_core_str_mut_get_char(const NSTDStrMut *str, NSTDUInt p
 ///
 /// # Safety
 ///
-/// - `str`'s data must be valid for reads of at least `str.len` consecutive bytes.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// `str`'s data must be valid for reads of at least `str.len` consecutive bytes.
 ///
 /// # Example
 ///
@@ -1365,10 +1297,7 @@ NSTDAPI NSTDStrMut nstd_core_str_mut_substr(NSTDStrMut *str, NSTDURange range);
 ///
 /// # Safety
 ///
-/// - This operation can cause undefined behavior in the event that `str`'s data is
-/// invalid.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 ///
 /// # Example
 ///
@@ -1403,10 +1332,7 @@ NSTDAPI NSTDFloat32 nstd_core_str_mut_to_f32(const NSTDStrMut *str, NSTDErrorCod
 ///
 /// # Safety
 ///
-/// - This operation can cause undefined behavior in the event that `str`'s data is
-/// invalid.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 ///
 /// # Example
 ///
@@ -1441,10 +1367,7 @@ NSTDAPI NSTDFloat64 nstd_core_str_mut_to_f64(const NSTDStrMut *str, NSTDErrorCod
 ///
 /// # Safety
 ///
-/// - This operation can cause undefined behavior in the event that `str`'s data is
-/// invalid.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 ///
 /// # Example
 ///
@@ -1479,10 +1402,7 @@ NSTDAPI NSTDInt nstd_core_str_mut_to_int(const NSTDStrMut *str, NSTDErrorCode *e
 ///
 /// # Safety
 ///
-/// - This operation can cause undefined behavior in the event that `str`'s data is
-/// invalid.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 ///
 /// # Example
 ///
@@ -1517,10 +1437,7 @@ NSTDAPI NSTDUInt nstd_core_str_mut_to_uint(const NSTDStrMut *str, NSTDErrorCode 
 ///
 /// # Safety
 ///
-/// - This operation can cause undefined behavior in the event that `str`'s data is
-/// invalid.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 ///
 /// # Example
 ///
@@ -1555,10 +1472,7 @@ NSTDAPI NSTDInt8 nstd_core_str_mut_to_i8(const NSTDStrMut *str, NSTDErrorCode *e
 ///
 /// # Safety
 ///
-/// - This operation can cause undefined behavior in the event that `str`'s data is
-/// invalid.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 ///
 /// # Example
 ///
@@ -1593,10 +1507,7 @@ NSTDAPI NSTDUInt8 nstd_core_str_mut_to_u8(const NSTDStrMut *str, NSTDErrorCode *
 ///
 /// # Safety
 ///
-/// - This operation can cause undefined behavior in the event that `str`'s data is
-/// invalid.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 ///
 /// # Example
 ///
@@ -1631,10 +1542,7 @@ NSTDAPI NSTDInt16 nstd_core_str_mut_to_i16(const NSTDStrMut *str, NSTDErrorCode 
 ///
 /// # Safety
 ///
-/// - This operation can cause undefined behavior in the event that `str`'s data is
-/// invalid.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 ///
 /// # Example
 ///
@@ -1669,10 +1577,7 @@ NSTDAPI NSTDUInt16 nstd_core_str_mut_to_u16(const NSTDStrMut *str, NSTDErrorCode
 ///
 /// # Safety
 ///
-/// - This operation can cause undefined behavior in the event that `str`'s data is
-/// invalid.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 ///
 /// # Example
 ///
@@ -1707,10 +1612,7 @@ NSTDAPI NSTDInt32 nstd_core_str_mut_to_i32(const NSTDStrMut *str, NSTDErrorCode 
 ///
 /// # Safety
 ///
-/// - This operation can cause undefined behavior in the event that `str`'s data is
-/// invalid.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 ///
 /// # Example
 ///
@@ -1745,10 +1647,7 @@ NSTDAPI NSTDUInt32 nstd_core_str_mut_to_u32(const NSTDStrMut *str, NSTDErrorCode
 ///
 /// # Safety
 ///
-/// - This operation can cause undefined behavior in the event that `str`'s data is
-/// invalid.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 ///
 /// # Example
 ///
@@ -1783,10 +1682,7 @@ NSTDAPI NSTDInt64 nstd_core_str_mut_to_i64(const NSTDStrMut *str, NSTDErrorCode 
 ///
 /// # Safety
 ///
-/// - This operation can cause undefined behavior in the event that `str`'s data is
-/// invalid.
-///
-/// - This operation can cause undefined behavior if it panics into non-Rust code.
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 ///
 /// # Example
 ///
