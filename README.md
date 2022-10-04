@@ -5,6 +5,21 @@ The library is organized as a series of modules. The top level module `nstd` enc
 crate. Each module can have their own submodules (eg. `nstd.core.def` or `nstd::core::def` with
 Rust syntax).
 
+# Example using C
+```c
+// Build nstd with `cargo build --features "clib nstd_core nstd_io"`.
+#include <nstd/core/str.h>
+#include <nstd/io/io.h>
+
+/// Main entry point of the program.
+int main()
+{
+    const NSTDStr output = nstd_core_str_from_raw_cstr("Hello, 🌎!");
+    nstd_io_print_line(&output);
+    return 0;
+}
+```
+
 # Modules
 - `nstd` - A cross-platform, fast, and safe general purpose C library written in Rust.
     - `alloc` - Low level memory allocation.
