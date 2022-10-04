@@ -16,6 +16,10 @@ pub struct NSTDHeapPtr {
 }
 impl Drop for NSTDHeapPtr {
     /// [NSTDHeapPtr]'s destructor.
+    ///
+    /// # Panics
+    ///
+    /// This operation may panic if getting a handle to the heap fails.
     #[inline]
     fn drop(&mut self) {
         // SAFETY: Heap pointers are always non-null.
@@ -41,8 +45,7 @@ impl Drop for NSTDHeapPtr {
 ///
 /// # Safety
 ///
-/// This operation is unsafe because passing `init` as a null pointer can cause undefined behavior.
-#[inline]
+/// `init` must be a pointer to a value that is valid for reads of `element_size` bytes.
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_heap_ptr_new(element_size: NSTDUInt, init: NSTDAny) -> NSTDHeapPtr {
     assert!(element_size != 0);
@@ -94,7 +97,6 @@ pub extern "C" fn nstd_heap_ptr_new_zeroed(element_size: NSTDUInt) -> NSTDHeapPt
 /// # Panics
 ///
 /// This function will panic if allocation fails.
-#[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_heap_ptr_clone(hptr: &NSTDHeapPtr) -> NSTDHeapPtr {
     let size = nstd_heap_ptr_size(hptr);
@@ -156,6 +158,10 @@ pub extern "C" fn nstd_heap_ptr_get_mut(hptr: &mut NSTDHeapPtr) -> NSTDAnyMut {
 /// # Parameters:
 ///
 /// - `NSTDHeapPtr hptr` - A pointer to the heap object.
+///
+/// # Panics
+///
+/// This operation may panic if getting a handle to the heap fails.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 #[allow(unused_variables)]
