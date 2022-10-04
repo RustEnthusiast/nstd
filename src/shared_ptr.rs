@@ -18,26 +18,29 @@ pub struct NSTDSharedPtr {
     size: NSTDUInt,
 }
 impl NSTDSharedPtr {
-    /// Returns the number of pointers sharing the object.
+    /// Returns a mutable reference to the number of pointers sharing the object.
     #[inline]
-    fn ptrs(&self) -> *mut usize {
-        // SAFETY: Shared pointers are always non-null.
-        unsafe { self.ptr.add(nstd_shared_ptr_size(self)).cast() }
+    fn ptrs(&self) -> &mut usize {
+        // SAFETY:
+        // - Shared pointers are always non-null.
+        // - Shared pointers never allocate more than `isize::MAX` bytes for their value.
+        unsafe { &mut *self.ptr.add(nstd_shared_ptr_size(self)).cast() }
     }
 }
 impl Drop for NSTDSharedPtr {
     /// [NSTDSharedPtr]'s destructor.
-    #[inline]
+    ///
+    /// # Panics
+    ///
+    /// This operation may panic if getting a handle to the heap fails.
     fn drop(&mut self) {
-        // SAFETY: Shared pointers are always non-null.
-        unsafe {
-            // Update the pointer count.
-            let ptrs = self.ptrs();
-            *ptrs -= 1;
-            // If the pointer count is zero, free the data.
-            if *ptrs == 0 {
-                nstd_alloc_deallocate(&mut self.ptr, self.size);
-            }
+        // Update the pointer count.
+        let ptrs = self.ptrs();
+        *ptrs -= 1;
+        // If the pointer count is zero, free the data.
+        if *ptrs == 0 {
+            // SAFETY: Shared pointers are always non-null.
+            unsafe { nstd_alloc_deallocate(&mut self.ptr, self.size) };
         }
     }
 }
@@ -56,16 +59,18 @@ impl Drop for NSTDSharedPtr {
 ///
 /// # Panics
 ///
-/// This operation will panic if allocating fails.
+/// This operation will panic if either `element_size` is greater than `NSTDInt`'s max value or
+/// allocating fails.
 ///
 /// # Safety
 ///
-/// This operation is unsafe because passing `init` as a null pointer can cause undefined behavior.
+/// `init` must be a pointer to a value that is valid for reads of `element_size` bytes.
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_shared_ptr_new(
     element_size: NSTDUInt,
     init: NSTDAny,
 ) -> NSTDSharedPtr {
+    assert!(element_size <= isize::MAX as usize);
     // Allocate a region of memory for the object and the pointer count.
     let buffer_size = element_size + USIZE_SIZE;
     let raw = nstd_alloc_allocate(buffer_size);
@@ -75,8 +80,7 @@ pub unsafe extern "C" fn nstd_shared_ptr_new(
     // Set the pointer count to one.
     let ptrs = raw.add(element_size).cast::<usize>();
     *ptrs = 1;
-    // Construct the pointer with `element_size`, this does not include the size of the pointer
-    // count (a `usize`).
+    // Construct the pointer.
     NSTDSharedPtr {
         ptr: raw,
         size: buffer_size,
@@ -95,11 +99,13 @@ pub unsafe extern "C" fn nstd_shared_ptr_new(
 ///
 /// # Panics
 ///
-/// This operation will panic if allocating fails.
+/// This operation will panic if either `element_size` is greater than `NSTDInt`'s max value or
+/// allocating fails.
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_shared_ptr_new_zeroed(element_size: NSTDUInt) -> NSTDSharedPtr {
     // SAFETY: The allocated memory is validated after allocation.
     unsafe {
+        assert!(element_size <= isize::MAX as usize);
         // Allocate a region of memory for the object and the pointer count.
         let buffer_size = element_size + USIZE_SIZE;
         let raw = nstd_alloc_allocate_zeroed(buffer_size);
@@ -107,8 +113,7 @@ pub extern "C" fn nstd_shared_ptr_new_zeroed(element_size: NSTDUInt) -> NSTDShar
         // Set the pointer count to one.
         let ptrs = raw.add(element_size).cast::<usize>();
         *ptrs = 1;
-        // Construct the pointer with `element_size`, this does not include the size of the pointer
-        // count (a `usize`).
+        // Construct the pointer.
         NSTDSharedPtr {
             ptr: raw,
             size: buffer_size,
@@ -128,16 +133,13 @@ pub extern "C" fn nstd_shared_ptr_new_zeroed(element_size: NSTDUInt) -> NSTDShar
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_shared_ptr_share(shared_ptr: &NSTDSharedPtr) -> NSTDSharedPtr {
-    // SAFETY: Shared pointers are always non-null.
-    unsafe {
-        // Update the pointer count.
-        let ptrs = shared_ptr.ptrs();
-        *ptrs += 1;
-        // Construct the new shared pointer instance.
-        NSTDSharedPtr {
-            ptr: shared_ptr.ptr,
-            size: shared_ptr.size,
-        }
+    // Update the pointer count.
+    let ptrs = shared_ptr.ptrs();
+    *ptrs += 1;
+    // Construct the new shared pointer instance.
+    NSTDSharedPtr {
+        ptr: shared_ptr.ptr,
+        size: shared_ptr.size,
     }
 }
 
@@ -153,8 +155,7 @@ pub extern "C" fn nstd_shared_ptr_share(shared_ptr: &NSTDSharedPtr) -> NSTDShare
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_shared_ptr_owners(shared_ptr: &NSTDSharedPtr) -> NSTDUInt {
-    // SAFETY: Shared pointers are always non-null.
-    unsafe { *shared_ptr.ptrs() }
+    *shared_ptr.ptrs()
 }
 
 /// Returns the size of the shared object.
@@ -192,6 +193,10 @@ pub extern "C" fn nstd_shared_ptr_get(shared_ptr: &NSTDSharedPtr) -> NSTDAny {
 /// # Parameters:
 ///
 /// - `NSTDSharedPtr shared_ptr` - The shared object to free.
+///
+/// # Panics
+///
+/// This operation may panic if getting a handle to the heap fails.
 #[cfg_attr(feature = "clib", no_mangle)]
 #[allow(unused_variables)]
 pub extern "C" fn nstd_shared_ptr_free(shared_ptr: NSTDSharedPtr) {}
