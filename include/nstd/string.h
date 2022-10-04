@@ -103,7 +103,7 @@ NSTDAPI const NSTDByte *nstd_string_as_ptr(const NSTDString *string);
 /// # Returns
 ///
 /// `NSTDVec bytes` - The string's raw data.
-NSTDAPI NSTDVec nstd_string_to_bytes(NSTDString string);
+NSTDAPI NSTDVec nstd_string_into_bytes(NSTDString string);
 
 /// Returns the number of Unicode characters in a string.
 ///

@@ -4,9 +4,13 @@
 - The panic behavior for the "release" profile has been set to abort.
 ### `nstd.core`
 - Made `math_[clamp|div_ceil|div_floor]_*` safe.
+### `nstd.cstring`
+- Renamed `to_bytes` to `into_bytes`.
 ### `nstd.os`
 - Added `NSTDWindowsAllocError`.
 - Renamed `NSTDWindowsHeapHandle` to `NSTDWindowsHeap`.
+### `nstd.string`
+- Renamed `to_bytes` to `into_bytes`.
 # 0.2.0
 ### `nstd`
 - Added `nstd.fs`.

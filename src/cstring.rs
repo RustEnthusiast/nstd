@@ -164,7 +164,7 @@ pub extern "C" fn nstd_cstring_as_ptr(cstring: &NSTDCString) -> *const NSTDChar 
 /// `NSTDVec bytes` - The C string's raw data.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_cstring_to_bytes(cstring: NSTDCString) -> NSTDVec {
+pub extern "C" fn nstd_cstring_into_bytes(cstring: NSTDCString) -> NSTDVec {
     cstring.bytes
 }
 

@@ -182,7 +182,7 @@ pub extern "C" fn nstd_string_as_ptr(string: &NSTDString) -> *const NSTDByte {
 /// `NSTDVec bytes` - The string's raw data.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_string_to_bytes(string: NSTDString) -> NSTDVec {
+pub extern "C" fn nstd_string_into_bytes(string: NSTDString) -> NSTDVec {
     string.bytes
 }
 

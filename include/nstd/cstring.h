@@ -108,7 +108,7 @@ NSTDAPI const NSTDChar *nstd_cstring_as_ptr(const NSTDCString *cstring);
 /// # Returns
 ///
 /// `NSTDVec bytes` - The C string's raw data.
-NSTDAPI NSTDVec nstd_cstring_to_bytes(NSTDCString cstring);
+NSTDAPI NSTDVec nstd_cstring_into_bytes(NSTDCString cstring);
 
 /// Returns the number of `char`s in a C string, excluding the null terminator.
 ///
