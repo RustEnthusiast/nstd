@@ -64,16 +64,22 @@ impl NSTDVec {
     ///
     /// # Panics
     ///
-    /// This operation will panic if `size_of::<T>()` does not match the vector's stride.
+    /// This operation will panic in the following situations:
+    ///
+    /// - `size_of::<T>()` does not match the vector's stride.
+    ///
+    /// - The total length of the vector's buffer exceeds `isize::MAX` bytes.
     ///
     /// # Safety
     ///
-    /// The vector's data must remain valid while the returned slice is in use.
+    /// - The vector's data must remain valid while the returned slice is in use.
+    ///
+    /// - The vector's data must be properly aligned.
     #[inline]
     #[allow(dead_code)]
     pub(crate) unsafe fn as_slice<T>(&self) -> &[T] {
-        assert!(self.stride == core::mem::size_of::<T>());
-        core::slice::from_raw_parts(self.ptr.cast(), self.byte_len())
+        assert!(self.stride == core::mem::size_of::<T>() && self.byte_len() <= isize::MAX as usize);
+        core::slice::from_raw_parts(self.ptr.cast(), self.len)
     }
 
     /// Returns a pointer to one element past the end of the vector.
