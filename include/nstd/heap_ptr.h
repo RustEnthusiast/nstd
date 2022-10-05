@@ -127,7 +127,7 @@ NSTDAPI NSTDUInt nstd_heap_ptr_size(const NSTDHeapPtr *hptr);
 /// const SIZE: usize = core::mem::size_of::<i128>();
 ///
 /// unsafe {
-///     let v = -46923;
+///     let v = -46923i128;
 ///     let hptr = nstd_heap_ptr_new(SIZE, addr_of!(v).cast());
 ///     assert!(*nstd_heap_ptr_get(&hptr).cast::<i128>() == v);
 /// }
@@ -153,7 +153,7 @@ NSTDAPI NSTDAny nstd_heap_ptr_get(const NSTDHeapPtr *hptr);
 /// const SIZE: usize = core::mem::size_of::<i128>();
 ///
 /// unsafe {
-///     let v = 32964;
+///     let v = 32964i128;
 ///     let mut hptr = nstd_heap_ptr_new(SIZE, addr_of!(v).cast());
 ///     let hv = nstd_heap_ptr_get_mut(&mut hptr).cast::<i128>();
 ///     assert!(*hv == v);

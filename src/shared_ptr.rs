@@ -76,6 +76,21 @@ impl Drop for NSTDSharedPtr {
 /// # Safety
 ///
 /// `init` must be a pointer to a value that is valid for reads of `element_size` bytes.
+///
+/// # Example
+///
+/// ```
+/// use core::ptr::addr_of;
+/// use nstd_sys::shared_ptr::{nstd_shared_ptr_get, nstd_shared_ptr_new};
+///
+/// const SIZE: usize = core::mem::size_of::<i16>();
+///
+/// let v = i16::MIN;
+/// unsafe {
+///     let shared_ptr = nstd_shared_ptr_new(SIZE, addr_of!(v).cast());
+///     assert!(*nstd_shared_ptr_get(&shared_ptr).cast::<i16>() == v);
+/// }
+/// ```
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_shared_ptr_new(
     element_size: NSTDUInt,
@@ -112,6 +127,19 @@ pub unsafe extern "C" fn nstd_shared_ptr_new(
 ///
 /// This operation will panic if either `element_size` is greater than `NSTDInt`'s max value or
 /// allocating fails.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::shared_ptr::{nstd_shared_ptr_get, nstd_shared_ptr_new_zeroed};
+///
+/// const SIZE: usize = core::mem::size_of::<u128>();
+///
+/// unsafe {
+///     let shared_ptr = nstd_shared_ptr_new_zeroed(SIZE);
+///     assert!(*nstd_shared_ptr_get(&shared_ptr).cast::<u128>() == 0);
+/// }
+/// ```
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_shared_ptr_new_zeroed(element_size: NSTDUInt) -> NSTDSharedPtr {
     // SAFETY: The allocated memory is validated after allocation.
@@ -141,6 +169,25 @@ pub extern "C" fn nstd_shared_ptr_new_zeroed(element_size: NSTDUInt) -> NSTDShar
 /// # Returns
 ///
 /// `NSTDSharedPtr shared` - A new pointer pointing to the shared data.
+///
+/// # Example
+///
+/// ```
+/// use core::ptr::addr_of;
+/// use nstd_sys::shared_ptr::{nstd_shared_ptr_get, nstd_shared_ptr_new, nstd_shared_ptr_share};
+///
+/// const SIZE: usize = core::mem::size_of::<u64>();
+///
+/// unsafe {
+///     let v = 39u64;
+///     let share;
+///     {
+///         let shared_ptr = nstd_shared_ptr_new(SIZE, addr_of!(v).cast());
+///         share = nstd_shared_ptr_share(&shared_ptr);
+///     }
+///     assert!(*nstd_shared_ptr_get(&share).cast::<u64>() == v);
+/// }
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_shared_ptr_share(shared_ptr: &NSTDSharedPtr) -> NSTDSharedPtr {
@@ -166,6 +213,34 @@ pub extern "C" fn nstd_shared_ptr_share(shared_ptr: &NSTDSharedPtr) -> NSTDShare
 /// # Returns
 ///
 /// `NSTDUInt owners` - The number of pointers that share `shared_ptr`'s data.
+///
+/// # Example
+///
+/// ```
+/// use core::ptr::addr_of;
+/// use nstd_sys::shared_ptr::{
+///     nstd_shared_ptr_get, nstd_shared_ptr_new, nstd_shared_ptr_owners, nstd_shared_ptr_share,
+/// };
+///
+/// const SIZE: usize = core::mem::size_of::<i128>();
+///
+/// unsafe {
+///     let v = i128::MIN;
+///     let share;
+///     {
+///         let shared_ptr = nstd_shared_ptr_new(SIZE, addr_of!(v).cast());
+///         assert!(nstd_shared_ptr_owners(&shared_ptr) == 1);
+///
+///         share = nstd_shared_ptr_share(&shared_ptr);
+///         assert!(nstd_shared_ptr_owners(&shared_ptr) == 2);
+///
+///         let temp = nstd_shared_ptr_share(&shared_ptr);
+///         assert!(nstd_shared_ptr_owners(&temp) == 3);
+///     }
+///     assert!(nstd_shared_ptr_owners(&share) == 1);
+///     assert!(*nstd_shared_ptr_get(&share).cast::<i128>() == v);
+/// }
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_shared_ptr_owners(shared_ptr: &NSTDSharedPtr) -> NSTDUInt {
@@ -181,6 +256,17 @@ pub extern "C" fn nstd_shared_ptr_owners(shared_ptr: &NSTDSharedPtr) -> NSTDUInt
 /// # Returns
 ///
 /// `NSTDUInt size` - The size of the shared object.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::shared_ptr::{nstd_shared_ptr_new_zeroed, nstd_shared_ptr_size};
+///
+/// const SIZE: usize = core::mem::size_of::<f64>();
+///
+/// let shared_ptr = nstd_shared_ptr_new_zeroed(SIZE);
+/// assert!(nstd_shared_ptr_size(&shared_ptr) == SIZE);
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_shared_ptr_size(shared_ptr: &NSTDSharedPtr) -> NSTDUInt {
@@ -196,6 +282,21 @@ pub extern "C" fn nstd_shared_ptr_size(shared_ptr: &NSTDSharedPtr) -> NSTDUInt {
 /// # Returns
 ///
 /// `NSTDAny ptr` - A raw pointer to the shared object.
+///
+/// # Example
+///
+/// ```
+/// use core::ptr::addr_of;
+/// use nstd_sys::shared_ptr::{nstd_shared_ptr_get, nstd_shared_ptr_new};
+///
+/// const SIZE: usize = core::mem::size_of::<u128>();
+///
+/// let v = u128::MAX;
+/// unsafe {
+///     let shared_ptr = nstd_shared_ptr_new(SIZE, addr_of!(v).cast());
+///     assert!(*nstd_shared_ptr_get(&shared_ptr).cast::<u128>() == v);
+/// }
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_shared_ptr_get(shared_ptr: &NSTDSharedPtr) -> NSTDAny {
