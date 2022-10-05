@@ -82,14 +82,20 @@ impl NSTDVec {
         core::slice::from_raw_parts(self.ptr.cast(), self.len)
     }
 
-    /// Returns a pointer to one element past the end of the vector.
+    /// Returns a pointer to one byte past the end of the vector.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the total length of the vector's buffer exceeds `isize::MAX` bytes.
     ///
     /// # Safety
     ///
-    /// This method does ***NOT*** check to make sure the vector is non-null.
+    /// The vector must have already allocated memory.
     #[inline]
     unsafe fn end(&self) -> NSTDAnyMut {
-        self.ptr.add(self.byte_len())
+        let len = self.byte_len();
+        assert!(len <= isize::MAX as usize);
+        self.ptr.add(len)
     }
 
     /// Attempts to reserve some memory for the vector if needed.
