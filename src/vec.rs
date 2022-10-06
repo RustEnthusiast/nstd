@@ -348,12 +348,15 @@ pub extern "C" fn nstd_vec_as_mut_ptr(vec: &mut NSTDVec) -> NSTDAnyMut {
 /// of the vector's boundaries.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_vec_get(vec: &NSTDVec, pos: NSTDUInt) -> NSTDAny {
-    match pos < vec.len {
-        // SAFETY: `pos` is a valid index.
-        true => unsafe { vec.ptr.add(pos * vec.stride) },
-        false => NSTD_NULL,
+pub extern "C" fn nstd_vec_get(vec: &NSTDVec, mut pos: NSTDUInt) -> NSTDAny {
+    if pos < vec.len {
+        pos *= vec.stride;
+        if pos <= isize::MAX as usize {
+            // SAFETY: `pos` is a valid index.
+            return unsafe { vec.ptr.add(pos) };
+        }
     }
+    NSTD_NULL
 }
 
 /// Returns a pointer to the element at index `pos` in `vec`.
