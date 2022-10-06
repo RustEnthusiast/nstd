@@ -313,7 +313,7 @@ NSTDAPI void nstd_vec_truncate(NSTDVec *vec, NSTDUInt len);
 ///
 /// # Panics
 ///
-/// This operation will panic if `size` is zero.
+/// This operation may panic if either `size` is zero or getting a handle to the heap fails.
 NSTDAPI NSTDAllocError nstd_vec_reserve(NSTDVec *vec, NSTDUInt size);
 
 /// Decreases a vector's capacity to match it's length.

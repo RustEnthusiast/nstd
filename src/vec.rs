@@ -99,6 +99,10 @@ impl NSTDVec {
     }
 
     /// Attempts to reserve some memory for the vector if needed.
+    ///
+    /// # Panics
+    ///
+    /// This method may panic if getting a handle to the heap fails.
     #[inline]
     fn try_reserve(&mut self) -> NSTDAllocError {
         if self.len == self.cap {
@@ -594,7 +598,7 @@ pub extern "C" fn nstd_vec_truncate(vec: &mut NSTDVec, len: NSTDUInt) {
 ///
 /// # Panics
 ///
-/// This operation will panic if `size` is zero.
+/// This operation may panic if either `size` is zero or getting a handle to the heap fails.
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_vec_reserve(vec: &mut NSTDVec, size: NSTDUInt) -> NSTDAllocError {
     assert!(size != 0);
