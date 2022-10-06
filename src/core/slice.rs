@@ -188,12 +188,12 @@ pub extern "C" fn nstd_core_slice_stride(slice: &NSTDSlice) -> NSTDUInt {
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_slice_get(slice: &NSTDSlice, pos: NSTDUInt) -> NSTDAny {
-    if pos < slice.len && slice.byte_len() <= isize::MAX as usize {
-        // SAFETY: We've checked `pos`.
-        unsafe {
-            let stride = nstd_core_slice_stride(slice);
-            return nstd_core_slice_as_ptr(slice).add(pos * stride);
+pub extern "C" fn nstd_core_slice_get(slice: &NSTDSlice, mut pos: NSTDUInt) -> NSTDAny {
+    if pos < slice.len {
+        pos *= nstd_core_slice_stride(slice);
+        if pos <= isize::MAX as usize {
+            // SAFETY: We've checked `pos`.
+            return unsafe { nstd_core_slice_as_ptr(slice).add(pos) };
         }
     }
     NSTD_NULL
@@ -561,12 +561,15 @@ pub extern "C" fn nstd_core_slice_mut_get(slice: &mut NSTDSliceMut, pos: NSTDUIn
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_slice_mut_get_const(slice: &NSTDSliceMut, pos: NSTDUInt) -> NSTDAny {
-    if pos < slice.len && slice.byte_len() <= isize::MAX as usize {
-        // SAFETY: We've checked `pos`.
-        unsafe {
-            let stride = nstd_core_slice_mut_stride(slice);
-            return nstd_core_slice_mut_as_ptr_const(slice).add(pos * stride);
+pub extern "C" fn nstd_core_slice_mut_get_const(
+    slice: &NSTDSliceMut,
+    mut pos: NSTDUInt,
+) -> NSTDAny {
+    if pos < slice.len {
+        pos *= nstd_core_slice_mut_stride(slice);
+        if pos <= isize::MAX as usize {
+            // SAFETY: We've checked `pos`.
+            return unsafe { nstd_core_slice_mut_as_ptr_const(slice).add(pos) };
         }
     }
     NSTD_NULL
