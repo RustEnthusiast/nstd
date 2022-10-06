@@ -110,6 +110,10 @@ impl NSTDVec {
 }
 impl Drop for NSTDVec {
     /// [NSTDVec]'s destructor.
+    ///
+    /// # Panics
+    ///
+    /// This operation may panic if getting a handle to the heap fails.
     #[inline]
     fn drop(&mut self) {
         if !self.ptr.is_null() {
@@ -656,6 +660,10 @@ pub extern "C" fn nstd_vec_shrink(vec: &mut NSTDVec) -> NSTDAllocError {
 /// # Parameters:
 ///
 /// - `NSTDVec vec` - The vector to free.
+///
+/// # Panics
+///
+/// This operation may panic if getting a handle to the heap fails.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 #[allow(unused_variables)]

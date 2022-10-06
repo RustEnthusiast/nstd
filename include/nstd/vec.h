@@ -332,6 +332,10 @@ NSTDAPI NSTDAllocError nstd_vec_shrink(NSTDVec *vec);
 /// # Parameters:
 ///
 /// - `NSTDVec vec` - The vector to free.
+///
+/// # Panics
+///
+/// This operation may panic if getting a handle to the heap fails.
 NSTDAPI void nstd_vec_free(NSTDVec vec);
 
 #endif
