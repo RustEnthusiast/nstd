@@ -210,7 +210,7 @@ pub extern "C" fn nstd_vec_new_with_cap(element_size: NSTDUInt, mut cap: NSTDUIn
 /// This operation will panic if allocating for the new vector fails.
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_vec_clone(vec: &NSTDVec) -> NSTDVec {
-    if !vec.ptr.is_null() && vec.len > 0 {
+    if vec.len > 0 {
         let mut cloned = nstd_vec_new_with_cap(vec.stride, vec.len);
         assert!(!cloned.ptr.is_null());
         // SAFETY: Both vectors are non-null.
