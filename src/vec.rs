@@ -431,6 +431,10 @@ pub unsafe extern "C" fn nstd_vec_push(vec: &mut NSTDVec, value: NSTDAny) -> NST
 ///
 /// - `NSTDAny value` - A pointer to the value that was popped off the stack, or null if the
 /// vector is empty.
+///
+/// # Panics
+///
+/// Panics if `vec`'s new length (in bytes) exceeds `NSTDInt`'s max value.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_vec_pop(vec: &mut NSTDVec) -> NSTDAny {

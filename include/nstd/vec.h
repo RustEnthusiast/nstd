@@ -227,6 +227,10 @@ NSTDAPI NSTDAllocError nstd_vec_push(NSTDVec *vec, NSTDAny value);
 ///
 /// - `NSTDAny value` - A pointer to the value that was popped off the stack, or null if the
 /// vector is empty.
+///
+/// # Panics
+///
+/// Panics if `vec`'s new length (in bytes) exceeds `NSTDInt`'s max value.
 NSTDAPI NSTDAny nstd_vec_pop(NSTDVec *vec);
 
 /// Attempts to insert a value into a vector at `index`.
