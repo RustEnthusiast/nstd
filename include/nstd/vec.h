@@ -50,7 +50,11 @@ NSTDAPI NSTDVec nstd_vec_new(NSTDUInt element_size);
 ///
 /// # Panics
 ///
-/// This function will panic if either `element_size` or `cap` are zero.
+/// This function may panic in the following situations:
+///
+/// - Either `element_size` or `cap` are zero.
+///
+/// - Getting a handle to the heap fails.
 NSTDAPI NSTDVec nstd_vec_new_with_cap(NSTDUInt element_size, NSTDUInt cap);
 
 /// Creates a new deep copy of `vec`.

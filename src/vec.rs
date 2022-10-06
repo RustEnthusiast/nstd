@@ -163,13 +163,15 @@ pub extern "C" fn nstd_vec_new(element_size: NSTDUInt) -> NSTDVec {
 ///
 /// # Panics
 ///
-/// This function will panic if either `element_size` or `cap` are zero.
-#[inline]
+/// This function may panic in the following situations:
+///
+/// - Either `element_size` or `cap` are zero.
+///
+/// - Getting a handle to the heap fails.
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_vec_new_with_cap(element_size: NSTDUInt, mut cap: NSTDUInt) -> NSTDVec {
     // Ensure that neither `element_size` or `cap` are zero.
-    assert!(element_size != 0);
-    assert!(cap != 0);
+    assert!(element_size != 0 && cap != 0);
     // Attempt to allocate the memory buffer.
     // SAFETY: Both `element_size` & `cap` are above 0.
     let mem = unsafe { nstd_alloc_allocate(cap * element_size) };
