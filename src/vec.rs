@@ -395,6 +395,10 @@ pub extern "C" fn nstd_vec_get_mut(vec: &mut NSTDVec, pos: NSTDUInt) -> NSTDAnyM
 ///
 /// `NSTDAllocError errc` - The allocation operation error code.
 ///
+/// # Panics
+///
+/// This operation may panic if getting a handle to the heap fails.
+///
 /// # Safety
 ///
 /// This operation is unsafe because undefined behavior can occur if the size of the value being

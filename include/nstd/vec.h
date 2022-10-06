@@ -202,6 +202,10 @@ NSTDAPI NSTDAnyMut nstd_vec_get_mut(NSTDVec *vec, NSTDUInt pos);
 ///
 /// `NSTDAllocError errc` - The allocation operation error code.
 ///
+/// # Panics
+///
+/// This operation may panic if getting a handle to the heap fails.
+///
 /// # Safety
 ///
 /// This operation is unsafe because undefined behavior can occur if the size of the value being
