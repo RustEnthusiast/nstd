@@ -298,7 +298,11 @@ NSTDAPI NSTDErrorCode nstd_vec_remove(NSTDVec *vec, NSTDUInt index);
 ///
 /// # Panics
 ///
-/// This operation will panic if the element sizes for `vec` and `values` do not match.
+/// This operation will panic in the following situations:
+///
+/// - `vec` and `values` strides do not match.
+///
+/// - Getting a handle to the heap fails.
 ///
 /// # Safety
 ///

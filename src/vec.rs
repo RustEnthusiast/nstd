@@ -563,7 +563,11 @@ pub extern "C" fn nstd_vec_remove(vec: &mut NSTDVec, mut index: NSTDUInt) -> NST
 ///
 /// # Panics
 ///
-/// This operation will panic if the element sizes for `vec` and `values` do not match.
+/// This operation will panic in the following situations:
+///
+/// - `vec` and `values` strides do not match.
+///
+/// - Getting a handle to the heap fails.
 ///
 /// # Safety
 ///
