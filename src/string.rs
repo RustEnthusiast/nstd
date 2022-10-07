@@ -199,6 +199,10 @@ pub extern "C" fn nstd_string_into_bytes(string: NSTDString) -> NSTDVec {
 /// # Returns
 ///
 /// `NSTDUInt len` - The length of the string.
+///
+/// # Panics
+///
+/// This operation will panic if the string's length is greater than `NSTDInt`'s max value.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_string_len(string: &NSTDString) -> NSTDUInt {

@@ -114,6 +114,10 @@ NSTDAPI NSTDVec nstd_string_into_bytes(NSTDString string);
 /// # Returns
 ///
 /// `NSTDUInt len` - The length of the string.
+///
+/// # Panics
+///
+/// This operation will panic if the string's length is greater than `NSTDInt`'s max value.
 NSTDAPI NSTDUInt nstd_string_len(const NSTDString *string);
 
 /// Returns the number of bytes a string contains.
