@@ -27,6 +27,10 @@ macro_rules! gen_from_primitive {
         $name: ident, $FromT: ty
     ) => {
         $(#[$meta])*
+        ///
+        /// # Panics
+        ///
+        /// Panics if allocating fails.
         #[inline]
         #[cfg_attr(feature = "clib", no_mangle)]
         pub extern "C" fn $name(v: $FromT) -> NSTDString {
