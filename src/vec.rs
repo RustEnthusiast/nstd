@@ -466,6 +466,14 @@ pub extern "C" fn nstd_vec_pop(vec: &mut NSTDVec) -> NSTDAny {
 ///
 /// - `2` - Reserving space for the vector failed.
 ///
+/// # Panics
+///
+/// This function will panic in the following situations:
+///
+/// - `index` multiplied by `vec`'s stride exceeds `NSTDInt`'s max value.
+///
+/// - Getting a handle to the heap fails.
+///
 /// # Safety
 ///
 /// This operation is unsafe because undefined behavior can occur if the size of the value being
@@ -474,7 +482,7 @@ pub extern "C" fn nstd_vec_pop(vec: &mut NSTDVec) -> NSTDAny {
 pub unsafe extern "C" fn nstd_vec_insert(
     vec: &mut NSTDVec,
     value: NSTDAny,
-    index: NSTDUInt,
+    mut index: NSTDUInt,
 ) -> NSTDErrorCode {
     // Make sure `index` is valid.
     if index > vec.len {
@@ -489,8 +497,9 @@ pub unsafe extern "C" fn nstd_vec_insert(
         // Move elements at/after `index` over by one element.
         let stride = vec.stride;
         let bytes_to_copy = (vec.len - index) * stride;
-        let idxpos = index * stride;
-        let idxptr = vec.ptr.add(idxpos).cast::<NSTDByte>();
+        index *= stride;
+        assert!(index <= isize::MAX as usize);
+        let idxptr = vec.ptr.add(index).cast::<NSTDByte>();
         let dest = idxptr.add(stride);
         nstd_core_mem_copy_overlapping(dest, idxptr, bytes_to_copy);
         // Write `value` over the old value at `index`.

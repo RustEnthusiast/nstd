@@ -253,6 +253,14 @@ NSTDAPI NSTDAny nstd_vec_pop(NSTDVec *vec);
 ///
 /// - `2` - Reserving space for the vector failed.
 ///
+/// # Panics
+///
+/// This function will panic in the following situations:
+///
+/// - `index` multiplied by `vec`'s stride exceeds `NSTDInt`'s max value.
+///
+/// - Getting a handle to the heap fails.
+///
 /// # Safety
 ///
 /// This operation is unsafe because undefined behavior can occur if the size of the value being
