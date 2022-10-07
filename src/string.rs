@@ -44,6 +44,10 @@ pub struct NSTDString {
 }
 impl NSTDString {
     /// Creates a new [NSTDString] from a Rust &[str].
+    ///
+    /// # Panics
+    ///
+    /// Panics if allocating fails.
     #[inline]
     pub(crate) fn from_str(str: &str) -> Self {
         NSTDString {
