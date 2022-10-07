@@ -520,17 +520,22 @@ pub unsafe extern "C" fn nstd_vec_insert(
 /// # Returns
 ///
 /// `NSTDErrorCode errc` - Nonzero if `index` is invalid.
+///
+/// # Panics
+///
+/// This operation will panic if `index` multiplied by `vec`'s stride exceeds `NSTDInt`'s max value.
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_vec_remove(vec: &mut NSTDVec, index: NSTDUInt) -> NSTDErrorCode {
+pub extern "C" fn nstd_vec_remove(vec: &mut NSTDVec, mut index: NSTDUInt) -> NSTDErrorCode {
     // Make sure `index` is valid. This also ensures that `vec.len` is at least 1.
     if index < vec.len {
         // Move bytes after `index` to the left by one element.
         let stride = vec.stride;
         let bytes_to_copy = (vec.len - index - 1) * stride;
-        let idxpos = index * stride;
+        index *= stride;
+        assert!(index <= isize::MAX as usize);
         // SAFETY: The vector's data is valid for the shift.
         unsafe {
-            let idxptr = vec.ptr.add(idxpos).cast::<NSTDByte>();
+            let idxptr = vec.ptr.add(index).cast::<NSTDByte>();
             let src = idxptr.add(stride);
             nstd_core_mem_copy_overlapping(idxptr, src, bytes_to_copy);
         }

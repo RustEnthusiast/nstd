@@ -278,6 +278,10 @@ NSTDAPI NSTDErrorCode nstd_vec_insert(NSTDVec *vec, NSTDAny value, NSTDUInt inde
 /// # Returns
 ///
 /// `NSTDErrorCode errc` - Nonzero if `index` is invalid.
+///
+/// # Panics
+///
+/// This operation will panic if `index` multiplied by `vec`'s stride exceeds `NSTDInt`'s max value.
 NSTDAPI NSTDErrorCode nstd_vec_remove(NSTDVec *vec, NSTDUInt index);
 
 /// Pushes a series of values onto a vector.
