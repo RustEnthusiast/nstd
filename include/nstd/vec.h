@@ -349,6 +349,10 @@ NSTDAPI NSTDAllocError nstd_vec_reserve(NSTDVec *vec, NSTDUInt size);
 /// # Returns
 ///
 /// `NSTDAllocError errc` - The allocation operation error code.
+///
+/// # Panics
+///
+/// Panics if getting a handle to the heap fails.
 NSTDAPI NSTDAllocError nstd_vec_shrink(NSTDVec *vec);
 
 /// Frees an instance of `NSTDVec`.
