@@ -11,5 +11,5 @@
     inc {i}
     cmp {i}, {len}
     jne 4f
-    mov {is_nt}, 1
+    inc {is_nt}
 4:

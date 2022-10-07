@@ -230,7 +230,10 @@ pub extern "C" fn nstd_core_cstr_len(cstr: &NSTDCStr) -> NSTDUInt {
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_cstr_is_null_terminated(cstr: &NSTDCStr) -> NSTDBool {
     assert!(cstr.len <= isize::MAX as usize);
-    #[cfg(not(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64"))))]
+    #[cfg(not(all(
+        feature = "asm",
+        any(target_arch = "arm", target_arch = "x86", target_arch = "x86_64")
+    )))]
     {
         use crate::NSTD_FALSE;
         let mut i = 0;
@@ -248,11 +251,26 @@ pub unsafe extern "C" fn nstd_core_cstr_is_null_terminated(cstr: &NSTDCStr) -> N
         let NSTDCStr { ptr, len } = *cstr;
         let is_nt;
         asm!(
-            include_str!("cstr/is_null_terminated.asm"),
+            include_str!("cstr/x86/is_null_terminated.asm"),
             ptr = in(reg) ptr,
             len = in(reg) len,
             is_nt = out(reg_byte) is_nt,
             i = out(reg) _
+        );
+        is_nt
+    }
+    #[cfg(all(feature = "asm", target_arch = "arm"))]
+    {
+        use core::arch::asm;
+        let NSTDCStr { ptr, len } = *cstr;
+        let is_nt;
+        asm!(
+            include_str!("cstr/arm/is_null_terminated.asm"),
+            ptr = in(reg) ptr,
+            len = in(reg) len,
+            is_nt = out(reg) is_nt,
+            i = out(reg) _,
+            byte = out(reg) _
         );
         is_nt
     }

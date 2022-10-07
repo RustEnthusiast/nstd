@@ -97,7 +97,10 @@ pub unsafe extern "C" fn nstd_core_mem_search(
     size: NSTDUInt,
     delim: NSTDByte,
 ) -> *const NSTDByte {
-    #[cfg(not(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64"))))]
+    #[cfg(not(all(
+        feature = "asm",
+        any(target_arch = "arm", target_arch = "x86", target_arch = "x86_64")
+    )))]
     {
         let mut i = 0;
         while i < size {
@@ -113,11 +116,24 @@ pub unsafe extern "C" fn nstd_core_mem_search(
     {
         use core::arch::asm;
         asm!(
-            include_str!("mem/search.asm"),
+            include_str!("mem/x86/search.asm"),
             buf = inout(reg) buf,
             size = in(reg) size,
             delim = in(reg_byte) delim,
             end = out(reg) _
+        );
+        buf
+    }
+    #[cfg(all(feature = "asm", target_arch = "arm"))]
+    {
+        use core::arch::asm;
+        asm!(
+            include_str!("mem/arm/search.asm"),
+            buf = inout(reg) buf,
+            size = in(reg) size,
+            delim = in(reg) delim,
+            end = out(reg) _,
+            byte = out(reg) _
         );
         buf
     }
@@ -150,11 +166,17 @@ pub unsafe extern "C" fn nstd_core_mem_search(
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 #[cfg_attr(
-    all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64")),
+    all(
+        feature = "asm",
+        any(target_arch = "arm", target_arch = "x86", target_arch = "x86_64")
+    ),
     allow(unused_mut)
 )]
 pub unsafe extern "C" fn nstd_core_mem_zero(mut buf: *mut NSTDByte, size: NSTDUInt) {
-    #[cfg(not(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64"))))]
+    #[cfg(not(all(
+        feature = "asm",
+        any(target_arch = "arm", target_arch = "x86", target_arch = "x86_64")
+    )))]
     {
         let mut i = 0;
         while i < size {
@@ -166,7 +188,23 @@ pub unsafe extern "C" fn nstd_core_mem_zero(mut buf: *mut NSTDByte, size: NSTDUI
     #[cfg(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64")))]
     {
         use core::arch::asm;
-        asm!(include_str!("mem/zero.asm"), buf = in(reg) buf, size = in(reg) size, i = out(reg) _);
+        asm!(
+            include_str!("mem/x86/zero.asm"),
+            buf = in(reg) buf,
+            size = in(reg) size,
+            i = out(reg) _
+        );
+    }
+    #[cfg(all(feature = "asm", target_arch = "arm"))]
+    {
+        use core::arch::asm;
+        asm!(
+            include_str!("mem/arm/zero.asm"),
+            buf = in(reg) buf,
+            size = in(reg) size,
+            i = out(reg) _,
+            byte = out(reg) _
+        );
     }
 }
 
@@ -199,7 +237,10 @@ pub unsafe extern "C" fn nstd_core_mem_zero(mut buf: *mut NSTDByte, size: NSTDUI
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 #[cfg_attr(
-    all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64")),
+    all(
+        feature = "asm",
+        any(target_arch = "arm", target_arch = "x86", target_arch = "x86_64")
+    ),
     allow(unused_mut)
 )]
 pub unsafe extern "C" fn nstd_core_mem_fill(
@@ -207,7 +248,10 @@ pub unsafe extern "C" fn nstd_core_mem_fill(
     size: NSTDUInt,
     fill: NSTDByte,
 ) {
-    #[cfg(not(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64"))))]
+    #[cfg(not(all(
+        feature = "asm",
+        any(target_arch = "arm", target_arch = "x86", target_arch = "x86_64")
+    )))]
     {
         let mut i = 0;
         while i < size {
@@ -220,10 +264,21 @@ pub unsafe extern "C" fn nstd_core_mem_fill(
     {
         use core::arch::asm;
         asm!(
-            include_str!("mem/fill.asm"),
+            include_str!("mem/x86/fill.asm"),
             buf = in(reg) buf,
             size = in(reg) size,
             fill = in(reg_byte) fill,
+            i = out(reg) _
+        );
+    }
+    #[cfg(all(feature = "asm", target_arch = "arm"))]
+    {
+        use core::arch::asm;
+        asm!(
+            include_str!("mem/arm/fill.asm"),
+            buf = in(reg) buf,
+            size = in(reg) size,
+            fill = in(reg) fill,
             i = out(reg) _
         );
     }
