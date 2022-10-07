@@ -11,6 +11,8 @@
 - Renamed `NSTDWindowsHeapHandle` to `NSTDWindowsHeap`.
 ### `nstd.string`
 - Renamed `to_bytes` to `into_bytes`.
+### `nstd.vec`
+- Added `from_slice`.
 # 0.2.0
 ### `nstd`
 - Added `nstd.fs`.

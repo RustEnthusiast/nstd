@@ -195,6 +195,37 @@ pub extern "C" fn nstd_vec_new_with_cap(element_size: NSTDUInt, mut cap: NSTDUIn
     }
 }
 
+/// Creates a new vector from a slice.
+///
+/// # Parameters:
+///
+/// - `const NSTDSlice *slice` - The slice to copy data from.
+///
+/// # Returns
+///
+/// `NSTDVec vec` - The new vector with a copy of `slice`'s contents.
+///
+/// # Panics
+///
+/// This operation will panic if the slice's stride is 0 or allocating fails.
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_vec_from_slice(slice: &NSTDSlice) -> NSTDVec {
+    let stride = nstd_core_slice_stride(slice);
+    let len = nstd_core_slice_len(slice);
+    if len > 0 {
+        // Allocate the new vector.
+        let mut vec = nstd_vec_new_with_cap(stride, len);
+        assert!(!vec.ptr.is_null());
+        let bytes = len * stride;
+        // SAFETY: The vector's buffer is valid for writes of `bytes`.
+        unsafe { nstd_core_mem_copy(vec.ptr.cast(), nstd_core_slice_as_ptr(slice).cast(), bytes) };
+        vec.len = len;
+        vec
+    } else {
+        nstd_vec_new(stride)
+    }
+}
+
 /// Creates a new deep copy of `vec`.
 ///
 /// # Parameters:

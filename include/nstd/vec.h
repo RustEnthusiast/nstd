@@ -57,6 +57,21 @@ NSTDAPI NSTDVec nstd_vec_new(NSTDUInt element_size);
 /// - Getting a handle to the heap fails.
 NSTDAPI NSTDVec nstd_vec_new_with_cap(NSTDUInt element_size, NSTDUInt cap);
 
+/// Creates a new vector from a slice.
+///
+/// # Parameters:
+///
+/// - `const NSTDSlice *slice` - The slice to copy data from.
+///
+/// # Returns
+///
+/// `NSTDVec vec` - The new vector with a copy of `slice`'s contents.
+///
+/// # Panics
+///
+/// This operation will panic if the slice's stride is 0 or allocating fails.
+NSTDAPI NSTDVec nstd_vec_from_slice(const NSTDSlice *slice);
+
 /// Creates a new deep copy of `vec`.
 ///
 /// # Parameters:
