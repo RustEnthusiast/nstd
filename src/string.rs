@@ -254,7 +254,10 @@ pub extern "C" fn nstd_string_cap(string: &NSTDString) -> NSTDUInt {
 /// # Returns
 ///
 /// `NSTDErrorCode errc` - Nonzero on error.
-#[inline]
+///
+/// # Panics
+///
+/// Panics if getting a handle to the heap fails.
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_string_push(string: &mut NSTDString, chr: NSTDUnichar) -> NSTDErrorCode {
     if let Some(chr) = char::from_u32(chr) {
@@ -283,6 +286,10 @@ pub extern "C" fn nstd_string_push(string: &mut NSTDString, chr: NSTDUnichar) ->
 /// # Safety
 ///
 /// This function will cause undefined behavior in the case where `str`'s data is no longer valid.
+///
+/// # Panics
+///
+/// Panics if getting a handle to the heap fails.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_string_push_str(

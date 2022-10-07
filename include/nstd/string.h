@@ -155,6 +155,10 @@ NSTDAPI NSTDUInt nstd_string_cap(const NSTDString *string);
 /// # Returns
 ///
 /// `NSTDErrorCode errc` - Nonzero on error.
+///
+/// # Panics
+///
+/// Panics if getting a handle to the heap fails.
 NSTDAPI NSTDErrorCode nstd_string_push(NSTDString *string, NSTDUnichar chr);
 
 /// Appends a string slice to the end of a string.
@@ -172,6 +176,10 @@ NSTDAPI NSTDErrorCode nstd_string_push(NSTDString *string, NSTDUnichar chr);
 /// # Safety
 ///
 /// This function will cause undefined behavior in the case where `str`'s data is no longer valid.
+///
+/// # Panics
+///
+/// Panics if getting a handle to the heap fails.
 NSTDAPI NSTDAllocError nstd_string_push_str(NSTDString *string, const NSTDStr *str);
 
 /// Removes the last character from a string and returns it.
