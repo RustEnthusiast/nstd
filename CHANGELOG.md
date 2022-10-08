@@ -5,11 +5,13 @@
 ### `nstd.core`
 - Made `math_[clamp|div_ceil|div_floor]_*` safe.
 ### `nstd.cstring`
+- Added `from_cstr`.
 - Renamed `to_bytes` to `into_bytes`.
 ### `nstd.os`
 - Added `NSTDWindowsAllocError`.
 - Renamed `NSTDWindowsHeapHandle` to `NSTDWindowsHeap`.
 ### `nstd.string`
+- Added `from_str`.
 - Renamed `to_bytes` to `into_bytes`.
 ### `nstd.vec`
 - Added `from_slice`.

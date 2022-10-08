@@ -10,8 +10,8 @@ use crate::{
     },
     vec::{
         nstd_vec_as_mut_ptr, nstd_vec_as_ptr, nstd_vec_as_slice, nstd_vec_cap, nstd_vec_clone,
-        nstd_vec_extend, nstd_vec_get_mut, nstd_vec_len, nstd_vec_new_with_cap, nstd_vec_pop,
-        nstd_vec_push, NSTDVec,
+        nstd_vec_extend, nstd_vec_from_slice, nstd_vec_get_mut, nstd_vec_len,
+        nstd_vec_new_with_cap, nstd_vec_pop, nstd_vec_push, NSTDVec,
     },
     NSTDChar, NSTDUInt,
 };
@@ -66,6 +66,32 @@ pub extern "C" fn nstd_cstring_new_with_cap(cap: NSTDUInt) -> NSTDCString {
         assert!(errc == NSTDAllocError::NSTD_ALLOC_ERROR_NONE);
     }
     NSTDCString { bytes }
+}
+
+/// Creates an owned version of an unowned C string slice.
+///
+/// # Parameters:
+///
+/// - `const NSTDCStr *cstr` - The unowned C string slice.
+///
+/// # Returns
+///
+/// `NSTDCString cstring` The new owned version of `cstr`.
+///
+/// # Panics
+///
+/// This operation will panic if allocating fails.
+///
+/// # Safety
+///
+/// The caller of this function must ensure that `cstr`'s data is valid for reads.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_cstring_from_cstr(cstr: &NSTDCStr) -> NSTDCString {
+    let bytes = nstd_core_cstr_as_bytes(cstr);
+    NSTDCString {
+        bytes: nstd_vec_from_slice(&bytes),
+    }
 }
 
 /// Creates a deep copy of an `NSTDCString`.

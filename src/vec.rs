@@ -208,8 +208,12 @@ pub extern "C" fn nstd_vec_new_with_cap(element_size: NSTDUInt, mut cap: NSTDUIn
 /// # Panics
 ///
 /// This operation will panic if the slice's stride is 0 or allocating fails.
+///
+/// # Safety
+///
+/// The caller of this function must ensure that `slice`'s data is valid for reads.
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_vec_from_slice(slice: &NSTDSlice) -> NSTDVec {
+pub unsafe extern "C" fn nstd_vec_from_slice(slice: &NSTDSlice) -> NSTDVec {
     let stride = nstd_core_slice_stride(slice);
     let len = nstd_core_slice_len(slice);
     if len > 0 {
@@ -217,8 +221,7 @@ pub extern "C" fn nstd_vec_from_slice(slice: &NSTDSlice) -> NSTDVec {
         let mut vec = nstd_vec_new_with_cap(stride, len);
         assert!(!vec.ptr.is_null());
         let bytes = len * stride;
-        // SAFETY: The vector's buffer is valid for writes of `bytes`.
-        unsafe { nstd_core_mem_copy(vec.ptr.cast(), nstd_core_slice_as_ptr(slice).cast(), bytes) };
+        nstd_core_mem_copy(vec.ptr.cast(), nstd_core_slice_as_ptr(slice).cast(), bytes);
         vec.len = len;
         vec
     } else {

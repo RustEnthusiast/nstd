@@ -70,6 +70,10 @@ NSTDAPI NSTDVec nstd_vec_new_with_cap(NSTDUInt element_size, NSTDUInt cap);
 /// # Panics
 ///
 /// This operation will panic if the slice's stride is 0 or allocating fails.
+///
+/// # Safety
+///
+/// The caller of this function must ensure that `slice`'s data is valid for reads.
 NSTDAPI NSTDVec nstd_vec_from_slice(const NSTDSlice *slice);
 
 /// Creates a new deep copy of `vec`.

@@ -12,8 +12,8 @@ use crate::{
     },
     vec::{
         nstd_vec_as_ptr, nstd_vec_as_slice, nstd_vec_as_slice_mut, nstd_vec_cap, nstd_vec_clone,
-        nstd_vec_extend, nstd_vec_len, nstd_vec_new, nstd_vec_new_with_cap, nstd_vec_truncate,
-        NSTDVec,
+        nstd_vec_extend, nstd_vec_from_slice, nstd_vec_len, nstd_vec_new, nstd_vec_new_with_cap,
+        nstd_vec_truncate, NSTDVec,
     },
     NSTDFloat32, NSTDFloat64, NSTDInt, NSTDInt16, NSTDInt32, NSTDInt64, NSTDInt8, NSTDUInt,
     NSTDUInt16, NSTDUInt32, NSTDUInt64, NSTDUInt8, NSTDUnichar,
@@ -91,6 +91,32 @@ pub extern "C" fn nstd_string_new() -> NSTDString {
 pub extern "C" fn nstd_string_new_with_cap(cap: NSTDUInt) -> NSTDString {
     NSTDString {
         bytes: nstd_vec_new_with_cap(1, cap),
+    }
+}
+
+/// Creates an owned version of an unowned string slice.
+///
+/// # Parameters:
+///
+/// - `const NSTDStr *str` - The unowned string slice.
+///
+/// # Returns
+///
+/// `NSTDString string` The new owned version of `str`.
+///
+/// # Panics
+///
+/// This operation will panic if allocating fails.
+///
+/// # Safety
+///
+/// The caller of this function must ensure that `str`'s data is valid for reads.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_string_from_str(str: &NSTDStr) -> NSTDString {
+    let bytes = nstd_core_str_as_bytes(str);
+    NSTDString {
+        bytes: nstd_vec_from_slice(&bytes),
     }
 }
 

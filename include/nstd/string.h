@@ -35,6 +35,25 @@ NSTDAPI NSTDString nstd_string_new();
 /// This function will panic if `cap` is zero.
 NSTDAPI NSTDString nstd_string_new_with_cap(NSTDUInt cap);
 
+/// Creates an owned version of an unowned string slice.
+///
+/// # Parameters:
+///
+/// - `const NSTDStr *str` - The unowned string slice.
+///
+/// # Returns
+///
+/// `NSTDString string` The new owned version of `str`.
+///
+/// # Panics
+///
+/// This operation will panic if allocating fails.
+///
+/// # Safety
+///
+/// The caller of this function must ensure that `str`'s data is valid for reads.
+NSTDAPI NSTDString nstd_string_from_str(const NSTDStr *str);
+
 /// Creates a deep copy of a string.
 ///
 /// # Parameters:

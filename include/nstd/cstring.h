@@ -40,6 +40,25 @@ NSTDAPI NSTDCString nstd_cstring_new();
 /// This function will panic if either `cap` is zero or allocating fails.
 NSTDAPI NSTDCString nstd_cstring_new_with_cap(NSTDUInt cap);
 
+/// Creates an owned version of an unowned C string slice.
+///
+/// # Parameters:
+///
+/// - `const NSTDCStr *cstr` - The unowned C string slice.
+///
+/// # Returns
+///
+/// `NSTDCString cstring` The new owned version of `cstr`.
+///
+/// # Panics
+///
+/// This operation will panic if allocating fails.
+///
+/// # Safety
+///
+/// The caller of this function must ensure that `cstr`'s data is valid for reads.
+NSTDAPI NSTDCString nstd_cstring_from_cstr(const NSTDCStr *cstr);
+
 /// Creates a deep copy of an `NSTDCString`.
 ///
 /// # Parameters:
