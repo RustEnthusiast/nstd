@@ -65,6 +65,14 @@ impl NSTDString {
 /// # Returns
 ///
 /// `NSTDString string` - The new string.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::string::nstd_string_new;
+///
+/// let string = nstd_string_new();
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_string_new() -> NSTDString {
@@ -86,6 +94,14 @@ pub extern "C" fn nstd_string_new() -> NSTDString {
 /// # Panics
 ///
 /// This function will panic if `cap` is zero.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::string::nstd_string_new_with_cap;
+///
+/// let string = nstd_string_new_with_cap(20);
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_string_new_with_cap(cap: NSTDUInt) -> NSTDString {
@@ -111,6 +127,17 @@ pub extern "C" fn nstd_string_new_with_cap(cap: NSTDUInt) -> NSTDString {
 /// # Safety
 ///
 /// The caller of this function must ensure that `str`'s data is valid for reads.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::{core::str::nstd_core_str_from_raw_cstr, string::nstd_string_from_str};
+///
+/// unsafe {
+///     let str = nstd_core_str_from_raw_cstr("Hello, world!\0".as_ptr().cast());
+///     let string = nstd_string_from_str(&str);
+/// }
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_string_from_str(str: &NSTDStr) -> NSTDString {
@@ -288,6 +315,18 @@ pub extern "C" fn nstd_string_cap(string: &NSTDString) -> NSTDUInt {
 /// # Panics
 ///
 /// Panics if getting a handle to the heap fails.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::{
+///     string::{nstd_string_new, nstd_string_push},
+///     NSTDUnichar,
+/// };
+///
+/// let mut string = nstd_string_new();
+/// assert!(nstd_string_push(&mut string, '🦀' as NSTDUnichar) == 0);
+/// ```
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_string_push(string: &mut NSTDString, chr: NSTDUnichar) -> NSTDErrorCode {
     if let Some(chr) = char::from_u32(chr) {
@@ -320,6 +359,22 @@ pub extern "C" fn nstd_string_push(string: &mut NSTDString, chr: NSTDUnichar) ->
 /// # Panics
 ///
 /// Panics if getting a handle to the heap fails.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::{
+///     alloc::NSTDAllocError::NSTD_ALLOC_ERROR_NONE,
+///     core::str::nstd_core_str_from_raw_cstr,
+///     string::{nstd_string_new, nstd_string_push_str},
+/// };
+///
+/// unsafe {
+///     let str = nstd_core_str_from_raw_cstr("Hello, 🌎!\0".as_ptr().cast());
+///     let mut string = nstd_string_new();
+///     assert!(nstd_string_push_str(&mut string, &str) == NSTD_ALLOC_ERROR_NONE);
+/// }
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_string_push_str(
@@ -343,7 +398,21 @@ pub unsafe extern "C" fn nstd_string_push_str(
 /// # Panics
 ///
 /// This operation will panic if the string's length in bytes exceeds `NSTDInt`'s max value.
-#[inline]
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::{
+///     core::str::nstd_core_str_from_raw_cstr_with_null,
+///     string::{nstd_string_from_str, nstd_string_pop},
+/// };
+///
+/// unsafe {
+///     let str = nstd_core_str_from_raw_cstr_with_null("Hello, world!\0".as_ptr().cast());
+///     let mut string = nstd_string_from_str(&str);
+///     assert!(nstd_string_pop(&mut string) == 0);
+/// }
+/// ```
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_string_pop(string: &mut NSTDString) -> NSTDUnichar {
     assert!(nstd_vec_len(&string.bytes) <= isize::MAX as usize);
