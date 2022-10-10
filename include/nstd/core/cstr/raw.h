@@ -16,15 +16,6 @@
 ///
 /// This function makes access to raw pointer data, which can cause undefined behavior in the event
 /// that `cstr`'s data is invalid.
-///
-/// # Example
-///
-/// ```
-/// use nstd_sys::core::cstr::raw::nstd_core_cstr_raw_len;
-///
-/// let cstr = b"Hello, world!\0";
-/// assert!(unsafe { nstd_core_cstr_raw_len(cstr.as_ptr().cast()) } == 13);
-/// ```
 NSTDAPI NSTDUInt nstd_core_cstr_raw_len(const NSTDChar *cstr);
 
 /// Gets the length of a null terminated C string, including the null byte.
@@ -41,15 +32,6 @@ NSTDAPI NSTDUInt nstd_core_cstr_raw_len(const NSTDChar *cstr);
 ///
 /// This function makes access to raw pointer data, which can cause undefined behavior in the event
 /// that `cstr`'s data is invalid.
-///
-/// # Example
-///
-/// ```
-/// use nstd_sys::core::cstr::raw::nstd_core_cstr_raw_len_with_null;
-///
-/// let cstr = b"Hello, world!\0";
-/// assert!(unsafe { nstd_core_cstr_raw_len_with_null(cstr.as_ptr().cast()) } == 14);
-/// ```
 NSTDAPI NSTDUInt nstd_core_cstr_raw_len_with_null(const NSTDChar *cstr);
 
 /// Compares two C strings, returning `NSTD_TRUE` if they are lexicographically equal.
@@ -68,17 +50,6 @@ NSTDAPI NSTDUInt nstd_core_cstr_raw_len_with_null(const NSTDChar *cstr);
 ///
 /// This function makes access to raw pointer data, which can cause undefined behavior in the event
 /// that either `cstr1` or `cstr2`'s data is invalid.
-///
-/// # Example
-///
-/// ```
-/// use nstd_sys::{core::cstr::raw::nstd_core_cstr_raw_compare, NSTD_FALSE};
-///
-/// let cstr1 = b"Hello, world!\0".as_ptr().cast();
-/// let cstr2 = b"Hello world!\0".as_ptr().cast();
-///
-/// assert!(unsafe { nstd_core_cstr_raw_compare(cstr1, cstr2) } == NSTD_FALSE);
-/// ```
 NSTDAPI NSTDBool nstd_core_cstr_raw_compare(const NSTDChar *cstr1, const NSTDChar *cstr2);
 
 /// Copies the contents of `src` to `dest`, excluding the null terminator.
@@ -98,18 +69,6 @@ NSTDAPI NSTDBool nstd_core_cstr_raw_compare(const NSTDChar *cstr1, const NSTDCha
 ///
 /// This function reads from/writes to raw pointer data, which can cause undefined behavior in the
 /// event that either `dest` or `src`'s data is invalid.
-///
-/// # Example
-///
-/// ```
-/// use nstd_sys::core::cstr::raw::nstd_core_cstr_raw_copy;
-///
-/// let cstr = b"Hello, world!\0";
-/// let mut buffer = [0u8; 14];
-///
-/// unsafe { nstd_core_cstr_raw_copy(buffer.as_mut_ptr().cast(), cstr.as_ptr().cast()) };
-/// assert!(&buffer == cstr);
-/// ```
 NSTDAPI void nstd_core_cstr_raw_copy(NSTDChar *dest, const NSTDChar *src);
 
 /// Copies the contents of `src` to `dest`, including the null terminator.
@@ -129,19 +88,6 @@ NSTDAPI void nstd_core_cstr_raw_copy(NSTDChar *dest, const NSTDChar *src);
 ///
 /// This function reads from/writes to raw pointer data, which can cause undefined behavior in the
 /// event that either `dest` or `src`'s data is invalid.
-///
-/// # Example
-///
-/// ```
-/// use nstd_sys::core::cstr::raw::nstd_core_cstr_raw_copy_with_null;
-///
-/// let cstr = b"Hello, world!\0";
-/// let mut buffer = [u8::MAX; 14];
-///
-/// let buf_ptr = buffer.as_mut_ptr().cast();
-/// unsafe { nstd_core_cstr_raw_copy_with_null(buf_ptr, cstr.as_ptr().cast()) };
-/// assert!(&buffer == cstr);
-/// ```
 NSTDAPI void nstd_core_cstr_raw_copy_with_null(NSTDChar *dest, const NSTDChar *src);
 
 #endif

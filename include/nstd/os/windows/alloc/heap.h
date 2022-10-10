@@ -18,28 +18,6 @@ typedef struct {
 /// # Safety
 ///
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-getprocessheap>.
-///
-/// # Example
-///
-/// ```
-/// use nstd_sys::os::windows::alloc::{
-///     heap::{
-///         nstd_os_windows_alloc_heap_allocate, nstd_os_windows_alloc_heap_deallocate,
-///         nstd_os_windows_alloc_heap_default,
-///     },
-///     NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_NONE,
-/// };
-///
-/// unsafe {
-///     let heap = nstd_os_windows_alloc_heap_default();
-///
-///     let mut mem = nstd_os_windows_alloc_heap_allocate(&heap, 64);
-///     assert!(!mem.is_null());
-///
-///     let errc = nstd_os_windows_alloc_heap_deallocate(&heap, &mut mem);
-///     assert!(errc == NSTD_WINDOWS_ALLOC_ERROR_NONE);
-/// }
-/// ```
 NSTDAPI NSTDWindowsHeap nstd_os_windows_alloc_heap_default();
 
 /// Creates a new private heap for the process.
@@ -56,31 +34,6 @@ NSTDAPI NSTDWindowsHeap nstd_os_windows_alloc_heap_default();
 /// # Safety
 ///
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapcreate>.
-///
-/// # Example
-///
-/// ```
-/// use nstd_sys::os::windows::alloc::{
-///     heap::{
-///         nstd_os_windows_alloc_heap_allocate, nstd_os_windows_alloc_heap_deallocate,
-///         nstd_os_windows_alloc_heap_free, nstd_os_windows_alloc_heap_new,
-///     },
-///     NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_NONE,
-/// };
-///
-/// unsafe {
-///     let heap = nstd_os_windows_alloc_heap_new(0);
-///
-///     let mut mem = nstd_os_windows_alloc_heap_allocate(&heap, 128);
-///     assert!(!mem.is_null());
-///
-///     let mut errc = nstd_os_windows_alloc_heap_deallocate(&heap, &mut mem);
-///     assert!(errc == NSTD_WINDOWS_ALLOC_ERROR_NONE);
-///
-///     errc = nstd_os_windows_alloc_heap_free(heap);
-///     assert!(errc == NSTD_WINDOWS_ALLOC_ERROR_NONE);
-/// }
-/// ```
 NSTDAPI NSTDWindowsHeap nstd_os_windows_alloc_heap_new(NSTDUInt size);
 
 /// Allocates a block of memory on a heap.
@@ -98,39 +51,6 @@ NSTDAPI NSTDWindowsHeap nstd_os_windows_alloc_heap_new(NSTDUInt size);
 /// # Safety
 ///
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapalloc>.
-///
-/// # Example
-///
-/// ```
-/// use nstd_sys::{
-///     core::mem::nstd_core_mem_zero,
-///     os::windows::alloc::{
-///         heap::{
-///             nstd_os_windows_alloc_heap_allocate, nstd_os_windows_alloc_heap_deallocate,
-///             nstd_os_windows_alloc_heap_free, nstd_os_windows_alloc_heap_new,
-///         },
-///         NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_NONE,
-///     },
-/// };
-///
-/// const SIZE: usize = core::mem::size_of::<isize>();
-///
-/// unsafe {
-///     let heap = nstd_os_windows_alloc_heap_new(0);
-///
-///     let mut mem = nstd_os_windows_alloc_heap_allocate(&heap, SIZE);
-///     assert!(!mem.is_null());
-///
-///     nstd_core_mem_zero(mem.cast(), SIZE);
-///     assert!(*mem.cast::<isize>() == 0);
-///
-///     let mut errc = nstd_os_windows_alloc_heap_deallocate(&heap, &mut mem);
-///     assert!(errc == NSTD_WINDOWS_ALLOC_ERROR_NONE);
-///
-///     errc = nstd_os_windows_alloc_heap_free(heap);
-///     assert!(errc == NSTD_WINDOWS_ALLOC_ERROR_NONE);
-/// }
-/// ```
 NSTDAPI NSTDAnyMut nstd_os_windows_alloc_heap_allocate(const NSTDWindowsHeap *heap, NSTDUInt size);
 
 /// Allocates a zero-initialized block of memory on a heap.
@@ -148,34 +68,6 @@ NSTDAPI NSTDAnyMut nstd_os_windows_alloc_heap_allocate(const NSTDWindowsHeap *he
 /// # Safety
 ///
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapalloc>.
-///
-/// # Example
-///
-/// ```
-/// use nstd_sys::os::windows::alloc::{
-///     heap::{
-///         nstd_os_windows_alloc_heap_allocate_zeroed, nstd_os_windows_alloc_heap_deallocate,
-///         nstd_os_windows_alloc_heap_free, nstd_os_windows_alloc_heap_new,
-///     },
-///     NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_NONE,
-/// };
-///
-/// const SIZE: usize = core::mem::size_of::<u64>();
-///
-/// unsafe {
-///     let heap = nstd_os_windows_alloc_heap_new(0);
-///
-///     let mut mem = nstd_os_windows_alloc_heap_allocate_zeroed(&heap, SIZE);
-///     assert!(!mem.is_null());
-///     assert!(*mem.cast::<u64>() == 0);
-///
-///     let mut errc = nstd_os_windows_alloc_heap_deallocate(&heap, &mut mem);
-///     assert!(errc == NSTD_WINDOWS_ALLOC_ERROR_NONE);
-///
-///     errc = nstd_os_windows_alloc_heap_free(heap);
-///     assert!(errc == NSTD_WINDOWS_ALLOC_ERROR_NONE);
-/// }
-/// ```
 NSTDAPI NSTDAnyMut nstd_os_windows_alloc_heap_allocate_zeroed(const NSTDWindowsHeap *heap,
 NSTDUInt size);
 
@@ -196,35 +88,6 @@ NSTDUInt size);
 /// # Safety
 ///
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heaprealloc>.
-///
-/// # Example
-///
-/// ```
-/// use nstd_sys::os::windows::alloc::{
-///     heap::{
-///         nstd_os_windows_alloc_heap_allocate, nstd_os_windows_alloc_heap_deallocate,
-///         nstd_os_windows_alloc_heap_free, nstd_os_windows_alloc_heap_new,
-///         nstd_os_windows_alloc_heap_reallocate,
-///     },
-///     NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_NONE,
-/// };
-///
-/// unsafe {
-///     let heap = nstd_os_windows_alloc_heap_new(0);
-///
-///     let mut mem = nstd_os_windows_alloc_heap_allocate(&heap, 32);
-///     assert!(!mem.is_null());
-///
-///     let mut errc = nstd_os_windows_alloc_heap_reallocate(&heap, &mut mem, 64);
-///     assert!(errc == NSTD_WINDOWS_ALLOC_ERROR_NONE);
-///
-///     errc = nstd_os_windows_alloc_heap_deallocate(&heap, &mut mem);
-///     assert!(errc == NSTD_WINDOWS_ALLOC_ERROR_NONE);
-///
-///     errc = nstd_os_windows_alloc_heap_free(heap);
-///     assert!(errc == NSTD_WINDOWS_ALLOC_ERROR_NONE);
-/// }
-/// ```
 NSTDAPI NSTDWindowsAllocError nstd_os_windows_alloc_heap_reallocate(const NSTDWindowsHeap *heap,
 NSTDAnyMut *ptr, NSTDUInt size);
 
@@ -243,31 +106,6 @@ NSTDAnyMut *ptr, NSTDUInt size);
 /// # Safety
 ///
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapfree>.
-///
-/// # Example
-///
-/// ```
-/// use nstd_sys::os::windows::alloc::{
-///     heap::{
-///         nstd_os_windows_alloc_heap_allocate, nstd_os_windows_alloc_heap_deallocate,
-///         nstd_os_windows_alloc_heap_free, nstd_os_windows_alloc_heap_new,
-///     },
-///     NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_NONE,
-/// };
-///
-/// unsafe {
-///     let heap = nstd_os_windows_alloc_heap_new(0);
-///
-///     let mut mem = nstd_os_windows_alloc_heap_allocate(&heap, 300);
-///     assert!(!mem.is_null());
-///
-///     let mut errc = nstd_os_windows_alloc_heap_deallocate(&heap, &mut mem);
-///     assert!(errc == NSTD_WINDOWS_ALLOC_ERROR_NONE);
-///
-///     errc = nstd_os_windows_alloc_heap_free(heap);
-///     assert!(errc == NSTD_WINDOWS_ALLOC_ERROR_NONE);
-/// }
-/// ```
 NSTDAPI NSTDWindowsAllocError nstd_os_windows_alloc_heap_deallocate(const NSTDWindowsHeap *heap,
 NSTDAnyMut *ptr);
 
@@ -284,31 +122,6 @@ NSTDAnyMut *ptr);
 /// # Safety
 ///
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapdestroy>.
-///
-/// # Example
-///
-/// ```
-/// use nstd_sys::os::windows::alloc::{
-///     heap::{
-///         nstd_os_windows_alloc_heap_allocate, nstd_os_windows_alloc_heap_deallocate,
-///         nstd_os_windows_alloc_heap_free, nstd_os_windows_alloc_heap_new,
-///     },
-///     NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_NONE,
-/// };
-///
-/// unsafe {
-///     let heap = nstd_os_windows_alloc_heap_new(0);
-///
-///     let mut mem = nstd_os_windows_alloc_heap_allocate(&heap, 16);
-///     assert!(!mem.is_null());
-///
-///     let mut errc = nstd_os_windows_alloc_heap_deallocate(&heap, &mut mem);
-///     assert!(errc == NSTD_WINDOWS_ALLOC_ERROR_NONE);
-///
-///     errc = nstd_os_windows_alloc_heap_free(heap);
-///     assert!(errc == NSTD_WINDOWS_ALLOC_ERROR_NONE);
-/// }
-/// ```
 NSTDAPI NSTDWindowsAllocError nstd_os_windows_alloc_heap_free(NSTDWindowsHeap heap);
 
 #endif
