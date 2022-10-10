@@ -52,7 +52,7 @@ NSTDAPI NSTDCString nstd_cstring_new_with_cap(NSTDUInt cap);
 ///
 /// # Panics
 ///
-/// This operation will panic if allocating fails.
+/// This operation will panic if `cstr` contains a null byte or allocating fails.
 ///
 /// # Safety
 ///

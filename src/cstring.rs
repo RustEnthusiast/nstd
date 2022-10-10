@@ -80,7 +80,7 @@ pub extern "C" fn nstd_cstring_new_with_cap(cap: NSTDUInt) -> NSTDCString {
 ///
 /// # Panics
 ///
-/// This operation will panic if allocating fails.
+/// This operation will panic if `cstr` contains a null byte or allocating fails.
 ///
 /// # Safety
 ///
@@ -88,10 +88,13 @@ pub extern "C" fn nstd_cstring_new_with_cap(cap: NSTDUInt) -> NSTDCString {
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_cstring_from_cstr(cstr: &NSTDCStr) -> NSTDCString {
+    assert!(nstd_core_cstr_get_null(cstr).is_null());
     let bytes = nstd_core_cstr_as_bytes(cstr);
-    NSTDCString {
-        bytes: nstd_vec_from_slice(&bytes),
-    }
+    let mut bytes = nstd_vec_from_slice(&bytes);
+    let null: NSTDChar = 0;
+    let null = addr_of!(null).cast();
+    assert!(nstd_vec_push(&mut bytes, null) == NSTDAllocError::NSTD_ALLOC_ERROR_NONE);
+    NSTDCString { bytes }
 }
 
 /// Creates a deep copy of an `NSTDCString`.
