@@ -36,6 +36,14 @@ pub struct NSTDCString {
 /// # Panics
 ///
 /// This function will panic if allocating for the null byte fails.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::cstring::nstd_cstring_new;
+///
+/// let cstring = nstd_cstring_new();
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_cstring_new() -> NSTDCString {
@@ -55,6 +63,14 @@ pub extern "C" fn nstd_cstring_new() -> NSTDCString {
 /// # Panics
 ///
 /// This function will panic if either `cap` is zero or allocating fails.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::cstring::nstd_cstring_new_with_cap;
+///
+/// let cstring = nstd_cstring_new_with_cap(10);
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_cstring_new_with_cap(cap: NSTDUInt) -> NSTDCString {
@@ -85,7 +101,17 @@ pub extern "C" fn nstd_cstring_new_with_cap(cap: NSTDUInt) -> NSTDCString {
 /// # Safety
 ///
 /// The caller of this function must ensure that `cstr`'s data is valid for reads.
-#[inline]
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::{core::cstr::nstd_core_cstr_from_raw, cstring::nstd_cstring_from_cstr};
+///
+/// unsafe {
+///     let cstr = nstd_core_cstr_from_raw("C string\0".as_ptr().cast());
+///     let cstring = nstd_cstring_from_cstr(&cstr);
+/// }
+/// ```
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_cstring_from_cstr(cstr: &NSTDCStr) -> NSTDCString {
     assert!(nstd_core_cstr_get_null(cstr).is_null());
@@ -257,6 +283,18 @@ pub extern "C" fn nstd_cstring_cap(cstring: &NSTDCString) -> NSTDUInt {
 /// # Panics
 ///
 /// This operation panics if `chr` cannot be appended to the C string.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::{
+///     cstring::{nstd_cstring_new, nstd_cstring_push},
+///     NSTDChar,
+/// };
+///
+/// let mut cstring = nstd_cstring_new();
+/// nstd_cstring_push(&mut cstring, b'!' as NSTDChar);
+/// ```
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_cstring_push(cstring: &mut NSTDCString, chr: NSTDChar) {
     // SAFETY: C strings always contain an exclusive null byte at the end.
@@ -297,6 +335,23 @@ pub extern "C" fn nstd_cstring_push(cstring: &mut NSTDCString, chr: NSTDChar) {
 /// # Safety
 ///
 /// This operation can cause undefined behavior in the case that `cstr`'s data is invalid.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::{
+///     alloc::NSTDAllocError::NSTD_ALLOC_ERROR_NONE,
+///     core::cstr::nstd_core_cstr_from_raw,
+///     cstring::{nstd_cstring_new, nstd_cstring_push_cstr},
+///     NSTDChar,
+/// };
+///
+/// let mut cstring = nstd_cstring_new();
+/// unsafe {
+///     let cstr = nstd_core_cstr_from_raw("baNaNa\0".as_ptr().cast());
+///     assert!(nstd_cstring_push_cstr(&mut cstring, &cstr) == NSTD_ALLOC_ERROR_NONE);
+/// }
+/// ```
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_cstring_push_cstr(
     cstring: &mut NSTDCString,
@@ -324,6 +379,22 @@ pub unsafe extern "C" fn nstd_cstring_push_cstr(
 /// # Returns
 ///
 /// `NSTDChar chr` - The removed character, or null if the C string is empty.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::{
+///     core::cstr::nstd_core_cstr_from_raw,
+///     cstring::{nstd_cstring_from_cstr, nstd_cstring_pop},
+///     NSTDChar,
+/// };
+///
+/// unsafe {
+///     let cstr = nstd_core_cstr_from_raw("123\0".as_ptr().cast());
+///     let mut cstring = nstd_cstring_from_cstr(&cstr);
+///     assert!(nstd_cstring_pop(&mut cstring) == b'3' as NSTDChar);
+/// }
+/// ```
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_cstring_pop(cstring: &mut NSTDCString) -> NSTDChar {
     let mut ret = 0;
