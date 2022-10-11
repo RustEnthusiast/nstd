@@ -193,14 +193,14 @@ NSTDAPI NSTDErrorCode nstd_string_push(NSTDString *string, NSTDUnichar chr);
 ///
 /// `NSTDAllocError errc` - The allocation operation error code.
 ///
-/// # Safety
-///
-/// This function will cause undefined behavior in the case where `str`'s data is no longer valid.
-///
 /// # Panics
 ///
 /// Panics if the current length in bytes exceeds `NSTDInt`'s max value or getting a handle to the
 /// heap fails.
+///
+/// # Safety
+///
+/// This function will cause undefined behavior in the case where `str`'s data is no longer valid.
 NSTDAPI NSTDAllocError nstd_string_push_str(NSTDString *string, const NSTDStr *str);
 
 /// Removes the last character from a string and returns it.

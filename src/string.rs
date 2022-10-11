@@ -353,14 +353,14 @@ pub extern "C" fn nstd_string_push(string: &mut NSTDString, chr: NSTDUnichar) ->
 ///
 /// `NSTDAllocError errc` - The allocation operation error code.
 ///
-/// # Safety
-///
-/// This function will cause undefined behavior in the case where `str`'s data is no longer valid.
-///
 /// # Panics
 ///
 /// Panics if the current length in bytes exceeds `NSTDInt`'s max value or getting a handle to the
 /// heap fails.
+///
+/// # Safety
+///
+/// This function will cause undefined behavior in the case where `str`'s data is no longer valid.
 ///
 /// # Example
 ///
