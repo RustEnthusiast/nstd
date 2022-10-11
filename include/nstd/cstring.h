@@ -52,7 +52,13 @@ NSTDAPI NSTDCString nstd_cstring_new_with_cap(NSTDUInt cap);
 ///
 /// # Panics
 ///
-/// This operation will panic if `cstr` contains a null byte or allocating fails.
+/// This operation will panic in the following situations:
+///
+/// - `cstr` contains a null byte.
+///
+/// - `cstr`'s length is greater than `NSTDInt`'s max value.
+///
+/// - Allocating fails.
 ///
 /// # Safety
 ///
@@ -199,6 +205,8 @@ NSTDAPI void nstd_cstring_push(NSTDCString *cstring, NSTDChar chr);
 ///
 /// - Appending the new null byte to the end of the C string fails.
 ///
+/// - The new length in bytes exceeds `NSTDInt`'s max value.
+///
 /// # Safety
 ///
 /// This operation can cause undefined behavior in the case that `cstr`'s data is invalid.
@@ -213,6 +221,10 @@ NSTDAPI NSTDAllocError nstd_cstring_push_cstr(NSTDCString *cstring, const NSTDCS
 /// # Returns
 ///
 /// `NSTDChar chr` - The removed character, or null if the C string is empty.
+///
+/// # Panics
+///
+/// This function will panic if getting a pointer to the C string's last character fails.
 NSTDAPI NSTDChar nstd_cstring_pop(NSTDCString *cstring);
 
 /// Frees an instance of `NSTDCString`.
@@ -220,6 +232,10 @@ NSTDAPI NSTDChar nstd_cstring_pop(NSTDCString *cstring);
 /// # Parameters:
 ///
 /// - `NSTDCString cstring` - The C string to free.
+///
+/// # Panics
+///
+/// This operation may panic if getting a handle to the heap fails.
 NSTDAPI void nstd_cstring_free(NSTDCString cstring);
 
 #endif

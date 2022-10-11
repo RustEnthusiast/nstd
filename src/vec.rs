@@ -439,6 +439,10 @@ pub extern "C" fn nstd_vec_as_mut_ptr(vec: &mut NSTDVec) -> NSTDAnyMut {
 /// `NSTDAny element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out
 /// of the vector's boundaries.
 ///
+/// # Panics
+///
+/// Panics if the vec's current length in bytes exceeds `NSTDInt`'s max value.
+///
 /// # Example
 ///
 /// ```
@@ -466,10 +470,9 @@ pub extern "C" fn nstd_vec_as_mut_ptr(vec: &mut NSTDVec) -> NSTDAnyMut {
 pub extern "C" fn nstd_vec_get(vec: &NSTDVec, mut pos: NSTDUInt) -> NSTDAny {
     if pos < vec.len {
         pos *= vec.stride;
-        if pos <= isize::MAX as usize {
-            // SAFETY: `pos` is a valid index.
-            return unsafe { vec.ptr.add(pos) };
-        }
+        assert!(pos <= isize::MAX as usize);
+        // SAFETY: `pos` is a valid index.
+        return unsafe { vec.ptr.add(pos) };
     }
     NSTD_NULL
 }
@@ -491,6 +494,10 @@ pub extern "C" fn nstd_vec_get(vec: &NSTDVec, mut pos: NSTDUInt) -> NSTDAny {
 ///
 /// `NSTDAnyMut element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out of
 /// the vector's boundaries.
+///
+/// # Panics
+///
+/// Panics if the vec's current length in bytes exceeds `NSTDInt`'s max value.
 ///
 /// # Example
 ///
@@ -540,7 +547,8 @@ pub extern "C" fn nstd_vec_get_mut(vec: &mut NSTDVec, pos: NSTDUInt) -> NSTDAnyM
 ///
 /// # Panics
 ///
-/// This operation may panic if getting a handle to the heap fails.
+/// Panics if the current length in bytes exceeds `NSTDInt`'s max value or getting a handle to the
+/// heap fails.
 ///
 /// # Safety
 ///
@@ -795,6 +803,8 @@ pub extern "C" fn nstd_vec_remove(vec: &mut NSTDVec, mut index: NSTDUInt) -> NST
 /// This operation will panic in the following situations:
 ///
 /// - `vec` and `values` strides do not match.
+///
+/// - The current length in bytes exceeds `NSTDInt`'s max value.
 ///
 /// - Getting a handle to the heap fails.
 ///

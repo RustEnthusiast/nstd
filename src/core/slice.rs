@@ -169,6 +169,10 @@ pub extern "C" fn nstd_core_slice_stride(slice: &NSTDSlice) -> NSTDUInt {
 /// `NSTDAny element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out
 /// of the slice's boundaries.
 ///
+/// # Panics
+///
+/// Panics if the slice's current length in bytes exceeds `NSTDInt`'s max value.
+///
 /// # Example
 ///
 /// ```
@@ -191,10 +195,9 @@ pub extern "C" fn nstd_core_slice_stride(slice: &NSTDSlice) -> NSTDUInt {
 pub extern "C" fn nstd_core_slice_get(slice: &NSTDSlice, mut pos: NSTDUInt) -> NSTDAny {
     if pos < slice.len {
         pos *= nstd_core_slice_stride(slice);
-        if pos <= isize::MAX as usize {
-            // SAFETY: We've checked `pos`.
-            return unsafe { nstd_core_slice_as_ptr(slice).add(pos) };
-        }
+        assert!(pos <= isize::MAX as usize);
+        // SAFETY: We've checked `pos`.
+        return unsafe { nstd_core_slice_as_ptr(slice).add(pos) };
     }
     NSTD_NULL
 }
@@ -247,6 +250,10 @@ pub extern "C" fn nstd_core_slice_first(slice: &NSTDSlice) -> NSTDAny {
 ///
 /// `NSTDAny element` - A pointer to the last element in `slice` or `NSTD_NULL` if the
 /// slice is empty.
+///
+/// # Panics
+///
+/// Panics if the slice's current length in bytes exceeds `NSTDInt`'s max value.
 ///
 /// # Example
 ///
@@ -506,6 +513,10 @@ pub extern "C" fn nstd_core_slice_mut_stride(slice: &NSTDSliceMut) -> NSTDUInt {
 /// `NSTDAnyMut element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out of
 /// the slice's boundaries.
 ///
+/// # Panics
+///
+/// Panics if the slice's current length in bytes exceeds `NSTDInt`'s max value.
+///
 /// # Example
 ///
 /// ```
@@ -542,6 +553,10 @@ pub extern "C" fn nstd_core_slice_mut_get(slice: &mut NSTDSliceMut, pos: NSTDUIn
 /// `NSTDAny element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out
 /// of the slice's boundaries.
 ///
+/// # Panics
+///
+/// Panics if the slice's current length in bytes exceeds `NSTDInt`'s max value.
+///
 /// # Example
 ///
 /// ```
@@ -567,10 +582,9 @@ pub extern "C" fn nstd_core_slice_mut_get_const(
 ) -> NSTDAny {
     if pos < slice.len {
         pos *= nstd_core_slice_mut_stride(slice);
-        if pos <= isize::MAX as usize {
-            // SAFETY: We've checked `pos`.
-            return unsafe { nstd_core_slice_mut_as_ptr_const(slice).add(pos) };
-        }
+        assert!(pos <= isize::MAX as usize);
+        // SAFETY: We've checked `pos`.
+        return unsafe { nstd_core_slice_mut_as_ptr_const(slice).add(pos) };
     }
     NSTD_NULL
 }
@@ -654,6 +668,10 @@ pub extern "C" fn nstd_core_slice_mut_first_const(slice: &NSTDSliceMut) -> NSTDA
 /// `NSTDAnyMut element` - A pointer to the last element in `slice` or `NSTD_NULL` if the slice
 /// is empty.
 ///
+/// # Panics
+///
+/// Panics if the slice's current length in bytes exceeds `NSTDInt`'s max value.
+///
 /// # Example
 ///
 /// ```
@@ -683,6 +701,10 @@ pub extern "C" fn nstd_core_slice_mut_last(slice: &mut NSTDSliceMut) -> NSTDAnyM
 ///
 /// `NSTDAny element` - A pointer to the last element in `slice` or `NSTD_NULL` if the
 /// slice is empty.
+///
+/// # Panics
+///
+/// Panics if the slice's current length in bytes exceeds `NSTDInt`'s max value.
 ///
 /// # Example
 ///

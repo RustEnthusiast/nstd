@@ -187,6 +187,10 @@ NSTDAPI NSTDAnyMut nstd_vec_as_mut_ptr(NSTDVec *vec);
 ///
 /// `NSTDAny element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out
 /// of the vector's boundaries.
+///
+/// # Panics
+///
+/// Panics if the vec's current length in bytes exceeds `NSTDInt`'s max value.
 NSTDAPI NSTDAny nstd_vec_get(const NSTDVec *vec, NSTDUInt pos);
 
 /// Returns a pointer to the element at index `pos` in `vec`.
@@ -206,6 +210,10 @@ NSTDAPI NSTDAny nstd_vec_get(const NSTDVec *vec, NSTDUInt pos);
 ///
 /// `NSTDAnyMut element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out of
 /// the vector's boundaries.
+///
+/// # Panics
+///
+/// Panics if the vec's current length in bytes exceeds `NSTDInt`'s max value.
 NSTDAPI NSTDAnyMut nstd_vec_get_mut(NSTDVec *vec, NSTDUInt pos);
 
 /// Pushes a value onto a vector by copying bytes to the end of the vector's buffer. The number of
@@ -223,7 +231,8 @@ NSTDAPI NSTDAnyMut nstd_vec_get_mut(NSTDVec *vec, NSTDUInt pos);
 ///
 /// # Panics
 ///
-/// This operation may panic if getting a handle to the heap fails.
+/// Panics if the current length in bytes exceeds `NSTDInt`'s max value or getting a handle to the
+/// heap fails.
 ///
 /// # Safety
 ///
@@ -320,6 +329,8 @@ NSTDAPI NSTDErrorCode nstd_vec_remove(NSTDVec *vec, NSTDUInt index);
 /// This operation will panic in the following situations:
 ///
 /// - `vec` and `values` strides do not match.
+///
+/// - The current length in bytes exceeds `NSTDInt`'s max value.
 ///
 /// - Getting a handle to the heap fails.
 ///

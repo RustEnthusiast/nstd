@@ -314,7 +314,8 @@ pub extern "C" fn nstd_string_cap(string: &NSTDString) -> NSTDUInt {
 ///
 /// # Panics
 ///
-/// Panics if getting a handle to the heap fails.
+/// Panics if the current length in bytes exceeds `NSTDInt`'s max value or getting a handle to the
+/// heap fails.
 ///
 /// # Example
 ///
@@ -358,7 +359,8 @@ pub extern "C" fn nstd_string_push(string: &mut NSTDString, chr: NSTDUnichar) ->
 ///
 /// # Panics
 ///
-/// Panics if getting a handle to the heap fails.
+/// Panics if the current length in bytes exceeds `NSTDInt`'s max value or getting a handle to the
+/// heap fails.
 ///
 /// # Example
 ///
@@ -588,6 +590,10 @@ gen_from_primitive!(
 /// # Parameters:
 ///
 /// - `NSTDString string` - The string to free.
+///
+/// # Panics
+///
+/// This operation may panic if getting a handle to the heap fails.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 #[allow(unused_variables)]
