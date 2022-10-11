@@ -3,17 +3,20 @@ use crate::{
     alloc::NSTDAllocError,
     core::{
         slice::{
-            nstd_core_slice_mut_stride, nstd_core_slice_new, nstd_core_slice_stride, NSTDSlice,
-            NSTDSliceMut,
+            nstd_core_slice_len, nstd_core_slice_mut_len, nstd_core_slice_mut_stride,
+            nstd_core_slice_new, nstd_core_slice_stride, NSTDSlice, NSTDSliceMut,
         },
         str::nstd_core_str_from_bytes_unchecked,
     },
     io::NSTDIOError,
     string::{nstd_string_push_str, NSTDString},
-    vec::{nstd_vec_extend, nstd_vec_stride, NSTDVec},
+    vec::{nstd_vec_extend, nstd_vec_len, nstd_vec_stride, NSTDVec},
     NSTDUInt,
 };
 use std::io::{Read, Write};
+
+/// `isize::MAX` as a [usize].
+const ISIZE_MAX: usize = isize::MAX as usize;
 
 /// Writes some `nstd` bytes to a [Write] stream.
 ///
@@ -28,7 +31,7 @@ pub(crate) unsafe fn write<W: Write>(
     written: &mut NSTDUInt,
 ) -> NSTDIOError {
     // Make sure the slice's element size is 1.
-    if nstd_core_slice_stride(bytes) != 1 {
+    if nstd_core_slice_stride(bytes) != 1 || nstd_core_slice_len(bytes) > ISIZE_MAX {
         *written = 0;
         return NSTDIOError::NSTD_IO_ERROR_INVALID_INPUT;
     }
@@ -52,7 +55,7 @@ pub(crate) unsafe fn write<W: Write>(
 /// This function can cause undefined behavior if `bytes`'s data is invalid.
 pub(crate) unsafe fn write_all<W: Write>(stream: &mut W, bytes: &NSTDSlice) -> NSTDIOError {
     // Make sure the slice's element size is 1.
-    if nstd_core_slice_stride(bytes) != 1 {
+    if nstd_core_slice_stride(bytes) != 1 || nstd_core_slice_len(bytes) > ISIZE_MAX {
         return NSTDIOError::NSTD_IO_ERROR_INVALID_INPUT;
     }
     // Attempt to write the bytes to stdout.
@@ -84,7 +87,7 @@ pub(crate) unsafe fn read<R: Read>(
     read: &mut NSTDUInt,
 ) -> NSTDIOError {
     // Make sure the buffer's element size is 1.
-    if nstd_core_slice_mut_stride(buffer) != 1 {
+    if nstd_core_slice_mut_stride(buffer) != 1 || nstd_core_slice_mut_len(buffer) > ISIZE_MAX {
         *read = 0;
         return NSTDIOError::NSTD_IO_ERROR_INVALID_INPUT;
     }
@@ -109,13 +112,17 @@ pub(crate) unsafe fn read<R: Read>(
 /// This does not mean `read` will return as 0 in this case.
 ///
 /// `read` will return as the number of bytes read from the stream.
+///
+/// # Panics
+///
+/// This function will panic if getting a handle to the heap fails.
 pub(crate) fn read_all<R: Read>(
     stream: &mut R,
     buffer: &mut NSTDVec,
     read: &mut NSTDUInt,
 ) -> NSTDIOError {
     // Make sure the buffer's element size is 1.
-    if nstd_vec_stride(buffer) != 1 {
+    if nstd_vec_stride(buffer) != 1 || nstd_vec_len(buffer) > ISIZE_MAX {
         *read = 0;
         return NSTDIOError::NSTD_IO_ERROR_INVALID_INPUT;
     }
@@ -146,6 +153,14 @@ pub(crate) fn read_all<R: Read>(
 /// This does not mean `read` will return as 0 in this case.
 ///
 /// `read` will return as the number of bytes read from the stream.
+///
+/// # Panics
+///
+/// This function will panic in the following situations:
+///
+/// - `buffer`'s length in bytes exceeds `NSTDInt`'s max value.
+///
+/// - Getting a handle to the heap fails.
 pub(crate) fn read_to_string<R: Read>(
     stream: &mut R,
     buffer: &mut NSTDString,
@@ -180,7 +195,7 @@ pub(crate) fn read_to_string<R: Read>(
 /// `buffer`'s data must be valid for writes.
 pub(crate) unsafe fn read_exact<R: Read>(stream: &mut R, buffer: &mut NSTDSliceMut) -> NSTDIOError {
     // Make sure the buffer's element size is 1.
-    if nstd_core_slice_mut_stride(buffer) != 1 {
+    if nstd_core_slice_mut_stride(buffer) != 1 || nstd_core_slice_mut_len(buffer) > ISIZE_MAX {
         return NSTDIOError::NSTD_IO_ERROR_INVALID_INPUT;
     }
     // Attempt to fill the buffer with data from stdin.
