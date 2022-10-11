@@ -22,6 +22,10 @@ pub type NSTDSharedLib = Box<Library>;
 ///
 /// `NSTDSharedLib lib` - A handle to the dynamically loaded library, or null on error.
 ///
+/// # Panics
+///
+/// Panics if `path`'s length in bytes exceeds `NSTDInt`'s max value.
+///
 /// # Safety
 ///
 /// See <https://docs.rs/libloading/latest/libloading/struct.Library.html#method.new>.
@@ -45,6 +49,10 @@ pub unsafe extern "C" fn nstd_shared_lib_load(path: &NSTDStr) -> Option<NSTDShar
 /// # Returns
 ///
 /// `NSTDAny ptr` - A pointer to the function or variable.
+///
+/// # Panics
+///
+/// Panics if `symbol`'s length exceeds `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -74,6 +82,10 @@ pub unsafe extern "C" fn nstd_shared_lib_get(
 ///
 /// `NSTDAnyMut ptr` - A pointer to the function or variable.
 ///
+/// # Panics
+///
+/// Panics if `symbol`'s length exceeds `NSTDInt`'s max value.
+///
 /// # Safety
 ///
 /// Undefined behavior may occur if `symbol`'s data is invalid.
@@ -101,12 +113,16 @@ pub extern "C" fn nstd_shared_lib_free(lib: NSTDSharedLib) {}
 
 /// Gets a pointer to a function or static variable in a dynamically loaded library by symbol name.
 ///
+/// # Panics
+///
+/// Panics if `symbol`'s length exceeds `NSTDInt`'s max value.
+///
 /// # Safety
 ///
 /// Undefined behavior may occur if `symbol`'s data is invalid.
-#[inline]
 unsafe fn get<T>(lib: &NSTDSharedLib, symbol: *const NSTDChar) -> Result<Symbol<T>, Error> {
     let symbol_len = nstd_core_cstr_raw_len_with_null(symbol);
+    assert!(symbol_len <= isize::MAX as usize);
     let symbol_name = std::slice::from_raw_parts(symbol.cast(), symbol_len);
     lib.get(symbol_name)
 }

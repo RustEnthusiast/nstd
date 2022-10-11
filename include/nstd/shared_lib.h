@@ -16,6 +16,10 @@ typedef NSTDAnyMut NSTDSharedLib;
 ///
 /// `NSTDSharedLib lib` - A handle to the dynamically loaded library, or null on error.
 ///
+/// # Panics
+///
+/// Panics if `path`'s length in bytes exceeds `NSTDInt`'s max value.
+///
 /// # Safety
 ///
 /// See <https://docs.rs/libloading/latest/libloading/struct.Library.html#method.new>.
@@ -32,6 +36,10 @@ NSTDAPI NSTDSharedLib nstd_shared_lib_load(const NSTDStr *path);
 /// # Returns
 ///
 /// `NSTDAny ptr` - A pointer to the function or variable.
+///
+/// # Panics
+///
+/// Panics if `symbol`'s length exceeds `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -50,6 +58,10 @@ NSTDAPI NSTDAny nstd_shared_lib_get(const NSTDSharedLib *lib, const NSTDChar *sy
 /// # Returns
 ///
 /// `NSTDAnyMut ptr` - A pointer to the function or variable.
+///
+/// # Panics
+///
+/// Panics if `symbol`'s length exceeds `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
