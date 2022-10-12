@@ -3,6 +3,7 @@
 - The overflow behavior for the "release" profile has been set to panic.
 - The panic behavior for the "release" profile has been set to abort.
 ### `nstd.core`
+- Added `panic`.
 - Made `math_[clamp|div_ceil|div_floor]_*` safe.
 ### `nstd.cstring`
 - Added `from_cstr`.
