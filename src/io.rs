@@ -11,7 +11,7 @@ use crate::{
     },
     string::{nstd_string_pop, nstd_string_push_str, NSTDString},
 };
-use std::io::{prelude::*, ErrorKind};
+use std::io::{ErrorKind, Write};
 
 /// An error type for I/O operations.
 #[repr(C)]
@@ -99,6 +99,10 @@ impl NSTDIOError {
 ///
 /// `NSTDIOError errc` - The I/O operation error code.
 ///
+/// # Panics
+///
+/// Panics if `output`'s length in bytes exceeds `NSTDInt`'s max value.
+///
 /// # Safety
 ///
 /// The provided string slice's data must be valid, else this function can cause garbage bytes to
@@ -123,6 +127,10 @@ pub unsafe extern "C" fn nstd_io_print(output: &NSTDStr) -> NSTDIOError {
 /// # Returns
 ///
 /// `NSTDIOError errc` - The I/O operation error code.
+///
+/// # Panics
+///
+/// Panics if `output`'s length in bytes exceeds `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -150,6 +158,11 @@ pub unsafe extern "C" fn nstd_io_print_line(output: &NSTDStr) -> NSTDIOError {
 /// # Returns
 ///
 /// `NSTDIOError errc` - The I/O operation error code.
+///
+/// # Panics
+///
+/// Panics if `buffer`'s length in bytes exceeds `NSTDInt`'s max value or getting a handle to the
+/// heap fails.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_io_read(buffer: &mut NSTDString) -> NSTDIOError {
@@ -167,6 +180,11 @@ pub extern "C" fn nstd_io_read(buffer: &mut NSTDString) -> NSTDIOError {
 /// # Returns
 ///
 /// `NSTDIOError errc` - The I/O operation error code.
+///
+/// # Panics
+///
+/// Panics if `buffer`'s length in bytes exceeds `NSTDInt`'s max value or getting a handle to the
+/// heap fails.
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_io_read_line(buffer: &mut NSTDString) -> NSTDIOError {
     // Attempt to read a line from stdin.

@@ -29,7 +29,7 @@ NSTDAPI NSTDBool nstd_core_cty_is_alphabetic(NSTDUnichar chr);
 ///
 /// `NSTDBool is_numeric` - `NSTD_TRUE` if `chr` is numeric.
 NSTDAPI NSTDBool nstd_core_cty_is_numeric(NSTDUnichar chr);
-/// Determines whether or not `chr` is alphanumeric according to the Unicode standard.
+/// Determines whether or not `chr` is alphabetic or numeric according to the Unicode standard.
 ///
 /// # Parameters:
 ///
@@ -37,7 +37,7 @@ NSTDAPI NSTDBool nstd_core_cty_is_numeric(NSTDUnichar chr);
 ///
 /// # Returns
 ///
-/// `NSTDBool is_alphanumeric` - `NSTD_TRUE` if `chr` is alphanumeric.
+/// `NSTDBool is_alphanumeric` - `NSTD_TRUE` if `chr` is alphabetic or numeric.
 NSTDAPI NSTDBool nstd_core_cty_is_alphanumeric(NSTDUnichar chr);
 /// Determines whether or not `chr` is lowercase according to the Unicode standard.
 ///
@@ -80,37 +80,11 @@ NSTDAPI NSTDBool nstd_core_cty_is_whitespace(NSTDUnichar chr);
 /// `NSTDBool is_control` - `NSTD_TRUE` if `chr` is a control character.
 NSTDAPI NSTDBool nstd_core_cty_is_control(NSTDUnichar chr);
 
-/// Determines whether or not `chr` is punctuation.
-///
-/// # Note
-///
-/// This only works with ASCII characters.
-///
-/// # Parameters:
-///
-/// - `NSTDUnichar chr` - The character to check.
-///
-/// # Returns
-///
-/// `NSTDBool is_punctuation` - `NSTD_TRUE` if `chr` is punctuation.
-NSTDAPI NSTDBool nstd_core_cty_is_punctuation(NSTDUnichar chr);
-
-/// Determines whether or not `chr` is a graphic character.
-///
-/// # Note
-///
-/// This only works with ASCII characters.
-///
-/// # Parameters:
-///
-/// - `NSTDUnichar chr` - The character to check.
-///
-/// # Returns
-///
-/// `NSTDBool is_graphic` - `NSTD_TRUE` if `chr` is a graphic character.
-NSTDAPI NSTDBool nstd_core_cty_is_graphic(NSTDUnichar chr);
-
 /// Determines whether or not `chr` is a digit, depending on `radix`.
+///
+/// # Note
+///
+/// This will always return false when given a base greater than 36.
 ///
 /// # Parameters:
 ///
@@ -124,10 +98,40 @@ NSTDAPI NSTDBool nstd_core_cty_is_graphic(NSTDUnichar chr);
 ///
 /// # Panics
 ///
-/// This operation will panic if `radix` is larger than 36.
+/// This function will panic if `radix` is greater than 36.
 NSTDAPI NSTDBool nstd_core_cty_is_digit(NSTDUnichar chr, NSTDUInt32 radix);
 
-/// Returns the lowercase version of `chr` or `chr` if there is no lowercase version.
+/// Determines whether or not `chr` is punctuation.
+///
+/// # Note
+///
+/// This only works with ASCII characters.
+///
+/// # Parameters:
+///
+/// - `NSTDChar chr` - The character to check.
+///
+/// # Returns
+///
+/// `NSTDBool is_punctuation` - `NSTD_TRUE` if `chr` is punctuation.
+NSTDAPI NSTDBool nstd_core_cty_is_ascii_punctuation(NSTDChar chr);
+
+/// Determines whether or not `chr` is a graphic character.
+///
+/// # Note
+///
+/// This only works with ASCII characters.
+///
+/// # Parameters:
+///
+/// - `NSTDChar chr` - The character to check.
+///
+/// # Returns
+///
+/// `NSTDBool is_graphic` - `NSTD_TRUE` if `chr` is a graphic character.
+NSTDAPI NSTDBool nstd_core_cty_is_ascii_graphic(NSTDChar chr);
+
+/// Returns the lowercase version of `chr`, or `chr` if there is no lowercase version.
 ///
 /// # Note
 ///
@@ -140,8 +144,8 @@ NSTDAPI NSTDBool nstd_core_cty_is_digit(NSTDUnichar chr, NSTDUInt32 radix);
 /// # Returns
 ///
 /// `NSTDUnichar lowercase` - The lowercase version of `chr`.
-NSTDAPI NSTDUnichar nstd_core_cty_to_lowercase(NSTDUnichar chr);
-/// Returns the uppercase version of `chr` or `chr` if there is no uppercase version.
+NSTDAPI NSTDUnichar nstd_core_cty_to_ascii_lowercase(NSTDUnichar chr);
+/// Returns the uppercase version of `chr`, or `chr` if there is no uppercase version.
 ///
 /// # Note
 ///
@@ -154,6 +158,6 @@ NSTDAPI NSTDUnichar nstd_core_cty_to_lowercase(NSTDUnichar chr);
 /// # Returns
 ///
 /// `NSTDUnichar uppercase` - The uppercase version of `chr`.
-NSTDAPI NSTDUnichar nstd_core_cty_to_uppercase(NSTDUnichar chr);
+NSTDAPI NSTDUnichar nstd_core_cty_to_ascii_uppercase(NSTDUnichar chr);
 
 #endif

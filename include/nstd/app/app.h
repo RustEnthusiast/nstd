@@ -4,7 +4,6 @@
 #include "../nstd.h"
 #include "data.h"
 #include "events.h"
-#include "handle.h"
 
 /// An application event loop.
 typedef struct {

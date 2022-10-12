@@ -16,6 +16,10 @@ pub struct NSTDHeapPtr {
 }
 impl Drop for NSTDHeapPtr {
     /// [NSTDHeapPtr]'s destructor.
+    ///
+    /// # Panics
+    ///
+    /// This operation may panic if getting a handle to the heap fails.
     #[inline]
     fn drop(&mut self) {
         // SAFETY: Heap pointers are always non-null.
@@ -41,8 +45,19 @@ impl Drop for NSTDHeapPtr {
 ///
 /// # Safety
 ///
-/// This operation is unsafe because passing `init` as a null pointer can cause undefined behavior.
-#[inline]
+/// `init` must be a pointer to a value that is valid for reads of `element_size` bytes.
+///
+/// # Example
+///
+/// ```
+/// use core::ptr::addr_of;
+/// use nstd_sys::heap_ptr::nstd_heap_ptr_new;
+///
+/// const SIZE: usize = core::mem::size_of::<char>();
+///
+/// let v = '🦀';
+/// let hptr = unsafe { nstd_heap_ptr_new(SIZE, addr_of!(v).cast()) };
+/// ```
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_heap_ptr_new(element_size: NSTDUInt, init: NSTDAny) -> NSTDHeapPtr {
     assert!(element_size != 0);
@@ -68,6 +83,19 @@ pub unsafe extern "C" fn nstd_heap_ptr_new(element_size: NSTDUInt, init: NSTDAny
 /// # Panics
 ///
 /// This function will panic if either `element_size` is zero, or allocation fails.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::heap_ptr::{nstd_heap_ptr_get, nstd_heap_ptr_new_zeroed};
+///
+/// const SIZE: usize = core::mem::size_of::<u64>();
+///
+/// unsafe {
+///     let hptr = nstd_heap_ptr_new_zeroed(SIZE);
+///     assert!(*nstd_heap_ptr_get(&hptr).cast::<u64>() == 0);
+/// }
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_heap_ptr_new_zeroed(element_size: NSTDUInt) -> NSTDHeapPtr {
@@ -94,7 +122,6 @@ pub extern "C" fn nstd_heap_ptr_new_zeroed(element_size: NSTDUInt) -> NSTDHeapPt
 /// # Panics
 ///
 /// This function will panic if allocation fails.
-#[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_heap_ptr_clone(hptr: &NSTDHeapPtr) -> NSTDHeapPtr {
     let size = nstd_heap_ptr_size(hptr);
@@ -115,6 +142,17 @@ pub extern "C" fn nstd_heap_ptr_clone(hptr: &NSTDHeapPtr) -> NSTDHeapPtr {
 /// # Returns
 ///
 /// `NSTDUInt size` - The size of the heap allocated object.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::heap_ptr::{nstd_heap_ptr_new_zeroed, nstd_heap_ptr_size};
+///
+/// const SIZE: usize = core::mem::size_of::<i32>();
+///
+/// let hptr = unsafe { nstd_heap_ptr_new_zeroed(SIZE) };
+/// assert!(nstd_heap_ptr_size(&hptr) == SIZE);
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_heap_ptr_size(hptr: &NSTDHeapPtr) -> NSTDUInt {
@@ -130,6 +168,21 @@ pub extern "C" fn nstd_heap_ptr_size(hptr: &NSTDHeapPtr) -> NSTDUInt {
 /// # Returns
 ///
 /// `NSTDAny ptr` - A raw pointer to the object on the heap.
+///
+/// # Example
+///
+/// ```
+/// use core::ptr::addr_of;
+/// use nstd_sys::heap_ptr::{nstd_heap_ptr_get, nstd_heap_ptr_new};
+///
+/// const SIZE: usize = core::mem::size_of::<i128>();
+///
+/// unsafe {
+///     let v = -46923i128;
+///     let hptr = nstd_heap_ptr_new(SIZE, addr_of!(v).cast());
+///     assert!(*nstd_heap_ptr_get(&hptr).cast::<i128>() == v);
+/// }
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_heap_ptr_get(hptr: &NSTDHeapPtr) -> NSTDAny {
@@ -145,6 +198,24 @@ pub extern "C" fn nstd_heap_ptr_get(hptr: &NSTDHeapPtr) -> NSTDAny {
 /// # Returns
 ///
 /// `NSTDAnyMut ptr` - A raw pointer to the object on the heap.
+///
+/// # Example
+///
+/// ```
+/// use core::ptr::addr_of;
+/// use nstd_sys::heap_ptr::{nstd_heap_ptr_get_mut, nstd_heap_ptr_new};
+///
+/// const SIZE: usize = core::mem::size_of::<i128>();
+///
+/// unsafe {
+///     let v = 32964i128;
+///     let mut hptr = nstd_heap_ptr_new(SIZE, addr_of!(v).cast());
+///     let hv = nstd_heap_ptr_get_mut(&mut hptr).cast::<i128>();
+///     assert!(*hv == v);
+///     *hv = -46923;
+///     assert!(*hv != v);
+/// }
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_heap_ptr_get_mut(hptr: &mut NSTDHeapPtr) -> NSTDAnyMut {
@@ -156,6 +227,10 @@ pub extern "C" fn nstd_heap_ptr_get_mut(hptr: &mut NSTDHeapPtr) -> NSTDAnyMut {
 /// # Parameters:
 ///
 /// - `NSTDHeapPtr hptr` - A pointer to the heap object.
+///
+/// # Panics
+///
+/// This operation may panic if getting a handle to the heap fails.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 #[allow(unused_variables)]

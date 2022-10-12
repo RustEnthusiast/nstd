@@ -1,5 +1,5 @@
 #ifndef NSTD_OS_H
 #define NSTD_OS_H
-#include "nstd.h"
+#include "os/os.h"
 #include "os/windows.h"
 #endif

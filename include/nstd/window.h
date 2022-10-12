@@ -1,6 +1,6 @@
 #ifndef NSTD_WINDOW_H
 #define NSTD_WINDOW_H
-#include "app/handle.h"
+#include "app/data.h"
 #include "core/str.h"
 #include "image.h"
 #include "nstd.h"

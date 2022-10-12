@@ -16,6 +16,9 @@ pub mod core;
 #[cfg(feature = "nstd_cstring")]
 #[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_cstring")))]
 pub mod cstring;
+#[cfg(feature = "nstd_fs")]
+#[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_fs")))]
+pub mod fs;
 #[cfg(feature = "nstd_heap_ptr")]
 #[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_heap_ptr")))]
 pub mod heap_ptr;
@@ -25,6 +28,9 @@ pub mod image;
 #[cfg(feature = "nstd_io")]
 #[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_io")))]
 pub mod io;
+#[cfg(feature = "nstd_math")]
+#[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_math")))]
+pub mod math;
 #[cfg(feature = "nstd_os")]
 #[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_os")))]
 pub mod os;
@@ -45,7 +51,7 @@ pub mod vec;
 #[cfg(feature = "nstd_window")]
 #[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_window")))]
 pub mod window;
-use ::core::ffi::c_void;
+use ::core::ffi::{c_char, c_void};
 
 /// A null pointer value constant.
 pub const NSTD_NULL: NSTDAnyMut = ::core::ptr::null_mut();
@@ -82,6 +88,8 @@ pub type NSTDFloat32 = f32;
 /// A 64-bit floating point type.
 pub type NSTDFloat64 = f64;
 
+/// Equivalent to C's `char` type.
+pub type NSTDChar = c_char;
 /// An 8-bit character type.
 pub type NSTDChar8 = NSTDUInt8;
 /// A 16-bit character type.

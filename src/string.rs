@@ -12,8 +12,8 @@ use crate::{
     },
     vec::{
         nstd_vec_as_ptr, nstd_vec_as_slice, nstd_vec_as_slice_mut, nstd_vec_cap, nstd_vec_clone,
-        nstd_vec_extend, nstd_vec_len, nstd_vec_new, nstd_vec_new_with_cap, nstd_vec_truncate,
-        NSTDVec,
+        nstd_vec_extend, nstd_vec_from_slice, nstd_vec_len, nstd_vec_new, nstd_vec_new_with_cap,
+        nstd_vec_truncate, NSTDVec,
     },
     NSTDFloat32, NSTDFloat64, NSTDInt, NSTDInt16, NSTDInt32, NSTDInt64, NSTDInt8, NSTDUInt,
     NSTDUInt16, NSTDUInt32, NSTDUInt64, NSTDUInt8, NSTDUnichar,
@@ -27,6 +27,10 @@ macro_rules! gen_from_primitive {
         $name: ident, $FromT: ty
     ) => {
         $(#[$meta])*
+        ///
+        /// # Panics
+        ///
+        /// Panics if allocating fails.
         #[inline]
         #[cfg_attr(feature = "clib", no_mangle)]
         pub extern "C" fn $name(v: $FromT) -> NSTDString {
@@ -44,6 +48,10 @@ pub struct NSTDString {
 }
 impl NSTDString {
     /// Creates a new [NSTDString] from a Rust &[str].
+    ///
+    /// # Panics
+    ///
+    /// Panics if allocating fails.
     #[inline]
     pub(crate) fn from_str(str: &str) -> Self {
         NSTDString {
@@ -57,6 +65,14 @@ impl NSTDString {
 /// # Returns
 ///
 /// `NSTDString string` - The new string.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::string::nstd_string_new;
+///
+/// let string = nstd_string_new();
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_string_new() -> NSTDString {
@@ -78,11 +94,56 @@ pub extern "C" fn nstd_string_new() -> NSTDString {
 /// # Panics
 ///
 /// This function will panic if `cap` is zero.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::string::nstd_string_new_with_cap;
+///
+/// let string = nstd_string_new_with_cap(20);
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_string_new_with_cap(cap: NSTDUInt) -> NSTDString {
     NSTDString {
         bytes: nstd_vec_new_with_cap(1, cap),
+    }
+}
+
+/// Creates an owned version of an unowned string slice.
+///
+/// # Parameters:
+///
+/// - `const NSTDStr *str` - The unowned string slice.
+///
+/// # Returns
+///
+/// `NSTDString string` The new owned version of `str`.
+///
+/// # Panics
+///
+/// This operation will panic if allocating fails.
+///
+/// # Safety
+///
+/// The caller of this function must ensure that `str`'s data is valid for reads.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::{core::str::nstd_core_str_from_raw_cstr, string::nstd_string_from_str};
+///
+/// unsafe {
+///     let str = nstd_core_str_from_raw_cstr("Hello, world!\0".as_ptr().cast());
+///     let string = nstd_string_from_str(&str);
+/// }
+/// ```
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_string_from_str(str: &NSTDStr) -> NSTDString {
+    let bytes = nstd_core_str_as_bytes(str);
+    NSTDString {
+        bytes: nstd_vec_from_slice(&bytes),
     }
 }
 
@@ -182,7 +243,7 @@ pub extern "C" fn nstd_string_as_ptr(string: &NSTDString) -> *const NSTDByte {
 /// `NSTDVec bytes` - The string's raw data.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_string_to_bytes(string: NSTDString) -> NSTDVec {
+pub extern "C" fn nstd_string_into_bytes(string: NSTDString) -> NSTDVec {
     string.bytes
 }
 
@@ -195,6 +256,10 @@ pub extern "C" fn nstd_string_to_bytes(string: NSTDString) -> NSTDVec {
 /// # Returns
 ///
 /// `NSTDUInt len` - The length of the string.
+///
+/// # Panics
+///
+/// This operation will panic if the string's length is greater than `NSTDInt`'s max value.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_string_len(string: &NSTDString) -> NSTDUInt {
@@ -246,7 +311,23 @@ pub extern "C" fn nstd_string_cap(string: &NSTDString) -> NSTDUInt {
 /// # Returns
 ///
 /// `NSTDErrorCode errc` - Nonzero on error.
-#[inline]
+///
+/// # Panics
+///
+/// Panics if the current length in bytes exceeds `NSTDInt`'s max value or getting a handle to the
+/// heap fails.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::{
+///     string::{nstd_string_new, nstd_string_push},
+///     NSTDUnichar,
+/// };
+///
+/// let mut string = nstd_string_new();
+/// assert!(nstd_string_push(&mut string, '🦀' as NSTDUnichar) == 0);
+/// ```
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_string_push(string: &mut NSTDString, chr: NSTDUnichar) -> NSTDErrorCode {
     if let Some(chr) = char::from_u32(chr) {
@@ -272,9 +353,30 @@ pub extern "C" fn nstd_string_push(string: &mut NSTDString, chr: NSTDUnichar) ->
 ///
 /// `NSTDAllocError errc` - The allocation operation error code.
 ///
+/// # Panics
+///
+/// Panics if the current length in bytes exceeds `NSTDInt`'s max value or getting a handle to the
+/// heap fails.
+///
 /// # Safety
 ///
 /// This function will cause undefined behavior in the case where `str`'s data is no longer valid.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::{
+///     alloc::NSTDAllocError::NSTD_ALLOC_ERROR_NONE,
+///     core::str::nstd_core_str_from_raw_cstr,
+///     string::{nstd_string_new, nstd_string_push_str},
+/// };
+///
+/// unsafe {
+///     let str = nstd_core_str_from_raw_cstr("Hello, 🌎!\0".as_ptr().cast());
+///     let mut string = nstd_string_new();
+///     assert!(nstd_string_push_str(&mut string, &str) == NSTD_ALLOC_ERROR_NONE);
+/// }
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_string_push_str(
@@ -294,9 +396,28 @@ pub unsafe extern "C" fn nstd_string_push_str(
 /// # Returns
 ///
 /// `NSTDUnichar chr` - The removed character, or the Unicode replacement character on error.
-#[inline]
+///
+/// # Panics
+///
+/// This operation will panic if the string's length in bytes exceeds `NSTDInt`'s max value.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::{
+///     core::str::nstd_core_str_from_raw_cstr_with_null,
+///     string::{nstd_string_from_str, nstd_string_pop},
+/// };
+///
+/// unsafe {
+///     let str = nstd_core_str_from_raw_cstr_with_null("Hello, world!\0".as_ptr().cast());
+///     let mut string = nstd_string_from_str(&str);
+///     assert!(nstd_string_pop(&mut string) == 0);
+/// }
+/// ```
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_string_pop(string: &mut NSTDString) -> NSTDUnichar {
+    assert!(nstd_vec_len(&string.bytes) <= isize::MAX as usize);
     // SAFETY: `NSTDString` is always UTF-8 encoded.
     let str = unsafe { core::str::from_utf8_unchecked(string.bytes.as_slice()) };
     if let Some(chr) = str.chars().last() {
@@ -468,7 +589,11 @@ gen_from_primitive!(
 ///
 /// # Parameters:
 ///
-/// - `NSTDString string` - A pointer to the string to free.
+/// - `NSTDString string` - The string to free.
+///
+/// # Panics
+///
+/// This operation may panic if getting a handle to the heap fails.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 #[allow(unused_variables)]

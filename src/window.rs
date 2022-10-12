@@ -1,6 +1,6 @@
 //! An `nstd` application window.
 use crate::{
-    app::handle::NSTDAppHandle,
+    app::data::NSTDAppHandle,
     core::str::NSTDStr,
     image::{nstd_image_as_bytes, nstd_image_height, nstd_image_width, NSTDImage},
     NSTDInt32, NSTDUInt32,

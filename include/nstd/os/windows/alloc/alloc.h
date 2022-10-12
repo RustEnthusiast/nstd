@@ -1,7 +1,18 @@
 #ifndef NSTD_OS_WINDOWS_ALLOC_ALLOC_H
 #define NSTD_OS_WINDOWS_ALLOC_ALLOC_H
-#include "../../../alloc.h"
 #include "../../../nstd.h"
+
+/// Describes an error returned from allocation functions for Windows.
+typedef enum {
+    /// No error occurred.
+    NSTD_WINDOWS_ALLOC_ERROR_NONE,
+    /// Allocating or reallocating failed.
+    NSTD_WINDOWS_ALLOC_ERROR_OUT_OF_MEMORY,
+    /// Deallocating memory failed.
+    NSTD_WINDOWS_ALLOC_ERROR_MEMORY_NOT_FOUND,
+    /// Getting a handle to a heap failed.
+    NSTD_WINDOWS_ALLOC_ERROR_HEAP_NOT_FOUND,
+} NSTDWindowsAllocError;
 
 /// Allocates a new block of memory on the current process' heap.
 ///
@@ -48,12 +59,12 @@ NSTDAPI NSTDAnyMut nstd_os_windows_alloc_allocate_zeroed(NSTDUInt size);
 ///
 /// # Returns
 ///
-/// `NSTDAllocError errc` - The allocation operation error code.
+/// `NSTDWindowsAllocError errc` - The allocation operation error code.
 ///
 /// # Safety
 ///
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heaprealloc>.
-NSTDAPI NSTDAllocError nstd_os_windows_alloc_reallocate(NSTDAnyMut *ptr, NSTDUInt new_size);
+NSTDAPI NSTDWindowsAllocError nstd_os_windows_alloc_reallocate(NSTDAnyMut *ptr, NSTDUInt new_size);
 
 /// Deallocates a block of memory previously allocated by
 /// `nstd_os_windows_alloc_allocate[_zeroed]`.
@@ -64,11 +75,11 @@ NSTDAPI NSTDAllocError nstd_os_windows_alloc_reallocate(NSTDAnyMut *ptr, NSTDUIn
 ///
 /// # Returns
 ///
-/// `NSTDAllocError errc` - The allocation operation error code.
+/// `NSTDWindowsAllocError errc` - The allocation operation error code.
 ///
 /// # Safety
 ///
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapfree>.
-NSTDAPI NSTDAllocError nstd_os_windows_alloc_deallocate(NSTDAnyMut *ptr);
+NSTDAPI NSTDWindowsAllocError nstd_os_windows_alloc_deallocate(NSTDAnyMut *ptr);
 
 #endif
