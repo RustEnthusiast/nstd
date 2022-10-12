@@ -24,11 +24,12 @@ typedef struct {
 ///
 /// # Panics
 ///
-/// This operation will panic if allocating fails.
+/// This operation will panic if either `element_size` is greater than `NSTDInt`'s max value or
+/// allocating fails.
 ///
 /// # Safety
 ///
-/// This operation is unsafe because passing `init` as a null pointer can cause undefined behavior.
+/// `init` must be a pointer to a value that is valid for reads of `element_size` bytes.
 NSTDAPI NSTDSharedPtr nstd_shared_ptr_new(NSTDUInt element_size, NSTDAny init);
 
 /// Creates a new zero-initialized instance of a shared pointer.
@@ -43,7 +44,8 @@ NSTDAPI NSTDSharedPtr nstd_shared_ptr_new(NSTDUInt element_size, NSTDAny init);
 ///
 /// # Panics
 ///
-/// This operation will panic if allocating fails.
+/// This operation will panic if either `element_size` is greater than `NSTDInt`'s max value or
+/// allocating fails.
 NSTDAPI NSTDSharedPtr nstd_shared_ptr_new_zeroed(NSTDUInt element_size);
 
 /// Shares `shared_ptr`.
@@ -95,6 +97,10 @@ NSTDAPI NSTDAny nstd_shared_ptr_get(const NSTDSharedPtr *shared_ptr);
 /// # Parameters:
 ///
 /// - `NSTDSharedPtr shared_ptr` - The shared object to free.
+///
+/// # Panics
+///
+/// This operation may panic if getting a handle to the heap fails.
 NSTDAPI void nstd_shared_ptr_free(NSTDSharedPtr shared_ptr);
 
 #endif

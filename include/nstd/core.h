@@ -11,5 +11,4 @@
 #include "core/range.h"
 #include "core/slice.h"
 #include "core/str.h"
-#include "nstd.h"
 #endif

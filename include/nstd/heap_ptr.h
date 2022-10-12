@@ -28,7 +28,7 @@ typedef struct {
 ///
 /// # Safety
 ///
-/// This operation is unsafe because passing `init` as a null pointer can cause undefined behavior.
+/// `init` must be a pointer to a value that is valid for reads of `element_size` bytes.
 NSTDAPI NSTDHeapPtr nstd_heap_ptr_new(NSTDUInt element_size, NSTDAny init);
 
 /// Creates a new zero-initialized heap allocated object.
@@ -99,6 +99,10 @@ NSTDAPI NSTDAnyMut nstd_heap_ptr_get_mut(NSTDHeapPtr *hptr);
 /// # Parameters:
 ///
 /// - `NSTDHeapPtr hptr` - A pointer to the heap object.
+///
+/// # Panics
+///
+/// This operation may panic if getting a handle to the heap fails.
 NSTDAPI void nstd_heap_ptr_free(NSTDHeapPtr hptr);
 
 #endif

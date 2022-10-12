@@ -35,6 +35,25 @@ NSTDAPI NSTDString nstd_string_new();
 /// This function will panic if `cap` is zero.
 NSTDAPI NSTDString nstd_string_new_with_cap(NSTDUInt cap);
 
+/// Creates an owned version of an unowned string slice.
+///
+/// # Parameters:
+///
+/// - `const NSTDStr *str` - The unowned string slice.
+///
+/// # Returns
+///
+/// `NSTDString string` The new owned version of `str`.
+///
+/// # Panics
+///
+/// This operation will panic if allocating fails.
+///
+/// # Safety
+///
+/// The caller of this function must ensure that `str`'s data is valid for reads.
+NSTDAPI NSTDString nstd_string_from_str(const NSTDStr *str);
+
 /// Creates a deep copy of a string.
 ///
 /// # Parameters:
@@ -103,7 +122,7 @@ NSTDAPI const NSTDByte *nstd_string_as_ptr(const NSTDString *string);
 /// # Returns
 ///
 /// `NSTDVec bytes` - The string's raw data.
-NSTDAPI NSTDVec nstd_string_to_bytes(NSTDString string);
+NSTDAPI NSTDVec nstd_string_into_bytes(NSTDString string);
 
 /// Returns the number of Unicode characters in a string.
 ///
@@ -114,6 +133,10 @@ NSTDAPI NSTDVec nstd_string_to_bytes(NSTDString string);
 /// # Returns
 ///
 /// `NSTDUInt len` - The length of the string.
+///
+/// # Panics
+///
+/// This operation will panic if the string's length is greater than `NSTDInt`'s max value.
 NSTDAPI NSTDUInt nstd_string_len(const NSTDString *string);
 
 /// Returns the number of bytes a string contains.
@@ -151,6 +174,11 @@ NSTDAPI NSTDUInt nstd_string_cap(const NSTDString *string);
 /// # Returns
 ///
 /// `NSTDErrorCode errc` - Nonzero on error.
+///
+/// # Panics
+///
+/// Panics if the current length in bytes exceeds `NSTDInt`'s max value or getting a handle to the
+/// heap fails.
 NSTDAPI NSTDErrorCode nstd_string_push(NSTDString *string, NSTDUnichar chr);
 
 /// Appends a string slice to the end of a string.
@@ -164,6 +192,11 @@ NSTDAPI NSTDErrorCode nstd_string_push(NSTDString *string, NSTDUnichar chr);
 /// # Returns
 ///
 /// `NSTDAllocError errc` - The allocation operation error code.
+///
+/// # Panics
+///
+/// Panics if the current length in bytes exceeds `NSTDInt`'s max value or getting a handle to the
+/// heap fails.
 ///
 /// # Safety
 ///
@@ -179,6 +212,10 @@ NSTDAPI NSTDAllocError nstd_string_push_str(NSTDString *string, const NSTDStr *s
 /// # Returns
 ///
 /// `NSTDUnichar chr` - The removed character, or the Unicode replacement character on error.
+///
+/// # Panics
+///
+/// This operation will panic if the string's length in bytes exceeds `NSTDInt`'s max value.
 NSTDAPI NSTDUnichar nstd_string_pop(NSTDString *string);
 
 /// Creates a new `NSTDString` from an `NSTDFloat32`.
@@ -190,6 +227,10 @@ NSTDAPI NSTDUnichar nstd_string_pop(NSTDString *string);
 /// # Returns
 ///
 /// `NSTDString string` - The 32-bit floating-point value as a string.
+///
+/// # Panics
+///
+/// Panics if allocating fails.
 NSTDAPI NSTDString nstd_string_from_f32(NSTDFloat32 v);
 
 /// Creates a new `NSTDString` from an `NSTDFloat64`.
@@ -201,6 +242,10 @@ NSTDAPI NSTDString nstd_string_from_f32(NSTDFloat32 v);
 /// # Returns
 ///
 /// `NSTDString string` - The 64-bit floating-point value as a string.
+///
+/// # Panics
+///
+/// Panics if allocating fails.
 NSTDAPI NSTDString nstd_string_from_f64(NSTDFloat64 v);
 
 /// Creates a new `NSTDString` from an `NSTDInt`.
@@ -212,6 +257,10 @@ NSTDAPI NSTDString nstd_string_from_f64(NSTDFloat64 v);
 /// # Returns
 ///
 /// `NSTDString string` - The arch-bit signed integer value as a string.
+///
+/// # Panics
+///
+/// Panics if allocating fails.
 NSTDAPI NSTDString nstd_string_from_int(NSTDInt v);
 
 /// Creates a new `NSTDString` from an `NSTDUInt`.
@@ -223,6 +272,10 @@ NSTDAPI NSTDString nstd_string_from_int(NSTDInt v);
 /// # Returns
 ///
 /// `NSTDString string` - The arch-bit unsigned integer value as a string.
+///
+/// # Panics
+///
+/// Panics if allocating fails.
 NSTDAPI NSTDString nstd_string_from_uint(NSTDUInt v);
 
 /// Creates a new `NSTDString` from an `NSTDInt8`.
@@ -234,6 +287,10 @@ NSTDAPI NSTDString nstd_string_from_uint(NSTDUInt v);
 /// # Returns
 ///
 /// `NSTDString string` - The 8-bit signed integer value as a string.
+///
+/// # Panics
+///
+/// Panics if allocating fails.
 NSTDAPI NSTDString nstd_string_from_i8(NSTDInt8 v);
 
 /// Creates a new `NSTDString` from an `NSTDUInt8`.
@@ -245,6 +302,10 @@ NSTDAPI NSTDString nstd_string_from_i8(NSTDInt8 v);
 /// # Returns
 ///
 /// `NSTDString string` - The 8-bit unsigned integer value as a string.
+///
+/// # Panics
+///
+/// Panics if allocating fails.
 NSTDAPI NSTDString nstd_string_from_u8(NSTDUInt8 v);
 
 /// Creates a new `NSTDString` from an `NSTDInt16`.
@@ -256,6 +317,10 @@ NSTDAPI NSTDString nstd_string_from_u8(NSTDUInt8 v);
 /// # Returns
 ///
 /// `NSTDString string` - The 16-bit signed integer value as a string.
+///
+/// # Panics
+///
+/// Panics if allocating fails.
 NSTDAPI NSTDString nstd_string_from_i16(NSTDInt16 v);
 
 /// Creates a new `NSTDString` from an `NSTDUInt16`.
@@ -267,6 +332,10 @@ NSTDAPI NSTDString nstd_string_from_i16(NSTDInt16 v);
 /// # Returns
 ///
 /// `NSTDString string` - The 16-bit unsigned integer value as a string.
+///
+/// # Panics
+///
+/// Panics if allocating fails.
 NSTDAPI NSTDString nstd_string_from_u16(NSTDUInt16 v);
 
 /// Creates a new `NSTDString` from an `NSTDInt32`.
@@ -278,6 +347,10 @@ NSTDAPI NSTDString nstd_string_from_u16(NSTDUInt16 v);
 /// # Returns
 ///
 /// `NSTDString string` - The 32-bit signed integer value as a string.
+///
+/// # Panics
+///
+/// Panics if allocating fails.
 NSTDAPI NSTDString nstd_string_from_i32(NSTDInt32 v);
 
 /// Creates a new `NSTDString` from an `NSTDUInt32`.
@@ -289,6 +362,10 @@ NSTDAPI NSTDString nstd_string_from_i32(NSTDInt32 v);
 /// # Returns
 ///
 /// `NSTDString string` - The 32-bit unsigned integer value as a string.
+///
+/// # Panics
+///
+/// Panics if allocating fails.
 NSTDAPI NSTDString nstd_string_from_u32(NSTDUInt32 v);
 
 /// Creates a new `NSTDString` from an `NSTDInt64`.
@@ -300,6 +377,10 @@ NSTDAPI NSTDString nstd_string_from_u32(NSTDUInt32 v);
 /// # Returns
 ///
 /// `NSTDString string` - The 64-bit signed integer value as a string.
+///
+/// # Panics
+///
+/// Panics if allocating fails.
 NSTDAPI NSTDString nstd_string_from_i64(NSTDInt64 v);
 
 /// Creates a new `NSTDString` from an `NSTDUInt64`.
@@ -311,13 +392,21 @@ NSTDAPI NSTDString nstd_string_from_i64(NSTDInt64 v);
 /// # Returns
 ///
 /// `NSTDString string` - The 64-bit unsigned integer value as a string.
+///
+/// # Panics
+///
+/// Panics if allocating fails.
 NSTDAPI NSTDString nstd_string_from_u64(NSTDUInt64 v);
 
 /// Frees an instance of `NSTDString`.
 ///
 /// # Parameters:
 ///
-/// - `NSTDString string` - A pointer to the string to free.
+/// - `NSTDString string` - The string to free.
+///
+/// # Panics
+///
+/// This operation may panic if getting a handle to the heap fails.
 NSTDAPI void nstd_string_free(NSTDString string);
 
 #endif

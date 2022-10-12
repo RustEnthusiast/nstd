@@ -1,6 +1,12 @@
 //! Low level memory allocation.
 #[cfg(not(target_os = "windows"))]
 extern crate alloc;
+#[cfg(target_os = "windows")]
+use crate::os::windows::alloc::{
+    nstd_os_windows_alloc_allocate, nstd_os_windows_alloc_allocate_zeroed,
+    nstd_os_windows_alloc_deallocate, nstd_os_windows_alloc_reallocate,
+    NSTDWindowsAllocError::{self, *},
+};
 use crate::{NSTDAnyMut, NSTDUInt};
 
 /// Describes an error returned from allocation functions.
@@ -17,6 +23,18 @@ pub enum NSTDAllocError {
     /// Getting a handle to a heap failed.
     NSTD_ALLOC_ERROR_HEAP_NOT_FOUND,
 }
+impl NSTDAllocError {
+    /// Converts an [NSTDWindowsAllocError] into an [NSTDAllocError].
+    #[cfg(target_os = "windows")]
+    fn from_windows(err: NSTDWindowsAllocError) -> Self {
+        match err {
+            NSTD_WINDOWS_ALLOC_ERROR_NONE => Self::NSTD_ALLOC_ERROR_NONE,
+            NSTD_WINDOWS_ALLOC_ERROR_OUT_OF_MEMORY => Self::NSTD_ALLOC_ERROR_OUT_OF_MEMORY,
+            NSTD_WINDOWS_ALLOC_ERROR_MEMORY_NOT_FOUND => Self::NSTD_ALLOC_ERROR_MEMORY_NOT_FOUND,
+            NSTD_WINDOWS_ALLOC_ERROR_HEAP_NOT_FOUND => Self::NSTD_ALLOC_ERROR_HEAP_NOT_FOUND,
+        }
+    }
+}
 
 /// Allocates a block of memory on the heap.
 /// The number of bytes to be allocated is specified by `size`.
@@ -29,9 +47,27 @@ pub enum NSTDAllocError {
 ///
 /// `NSTDAnyMut ptr` - A pointer to the allocated memory, null on error.
 ///
+/// # Panics
+///
+/// This function may panic if getting a handle to the default heap fails.
+///
 /// # Safety
 ///
-/// This operation is unsafe because the behavior is undefined if `size` is zero.
+/// - Behavior is undefined if `size` is zero.
+///
+/// - The new memory buffer should be considered uninitialized.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::alloc::{nstd_alloc_allocate, nstd_alloc_deallocate};
+///
+/// unsafe {
+///     let mut mem = nstd_alloc_allocate(32);
+///     assert!(!mem.is_null());
+///     nstd_alloc_deallocate(&mut mem, 32);
+/// }
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
@@ -43,7 +79,7 @@ pub unsafe extern "C" fn nstd_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
     }
     #[cfg(target_os = "windows")]
     {
-        crate::os::windows::alloc::nstd_os_windows_alloc_allocate(size)
+        nstd_os_windows_alloc_allocate(size)
     }
 }
 
@@ -57,9 +93,29 @@ pub unsafe extern "C" fn nstd_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
 ///
 /// `NSTDAnyMut ptr` - A pointer to the allocated memory, null on error.
 ///
+/// # Panics
+///
+/// This function may panic if getting a handle to the default heap fails.
+///
 /// # Safety
 ///
-/// This operation is unsafe because the behavior is undefined if `size` is zero.
+/// Behavior is undefined if `size` is zero.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::alloc::{nstd_alloc_allocate_zeroed, nstd_alloc_deallocate};
+///
+/// const SIZE: usize = core::mem::size_of::<[i16; 16]>();
+///
+/// unsafe {
+///     let mut mem = nstd_alloc_allocate_zeroed(SIZE);
+///     assert!(!mem.is_null());
+///     assert!(*mem.cast::<[i16; 16]>() == [0i16; 16]);
+///
+///     nstd_alloc_deallocate(&mut mem, SIZE);
+/// }
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMut {
@@ -71,7 +127,7 @@ pub unsafe extern "C" fn nstd_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMu
     }
     #[cfg(target_os = "windows")]
     {
-        crate::os::windows::alloc::nstd_os_windows_alloc_allocate_zeroed(size)
+        nstd_os_windows_alloc_allocate_zeroed(size)
     }
 }
 
@@ -93,10 +149,39 @@ pub unsafe extern "C" fn nstd_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMu
 ///
 /// `NSTDAllocError errc` - The allocation operation error code.
 ///
+/// # Panics
+///
+/// This function may panic if getting a handle to the default heap fails.
+///
 /// # Safety
 ///
-/// This operation is unsafe because the behavior is undefined if `ptr` is not a value returned by
-/// `nstd_alloc_allocate[_zeroed]`.
+/// - Behavior is undefined if `new_size` is zero.
+///
+/// - Behavior is undefined if `ptr` is not a value returned by `nstd_alloc_allocate[_zeroed]`.
+///
+/// - `size` must be the same value that was used to allocate the memory buffer.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::alloc::{
+///     nstd_alloc_allocate_zeroed, nstd_alloc_deallocate, nstd_alloc_reallocate,
+///     NSTDAllocError::NSTD_ALLOC_ERROR_NONE,
+/// };
+///
+/// const SIZE: usize = core::mem::size_of::<[u64; 64]>();
+///
+/// unsafe {
+///     let mut mem = nstd_alloc_allocate_zeroed(SIZE);
+///     assert!(!mem.is_null());
+///     assert!(*mem.cast::<[u64; 64]>() == [0u64; 64]);
+///
+///     assert!(nstd_alloc_reallocate(&mut mem, SIZE, SIZE / 2) == NSTD_ALLOC_ERROR_NONE);
+///     assert!(*mem.cast::<[u64; 32]>() == [0u64; 32]);
+///
+///     nstd_alloc_deallocate(&mut mem, SIZE);
+/// }
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 #[cfg_attr(target_os = "windows", allow(unused_variables))]
@@ -118,7 +203,7 @@ pub unsafe extern "C" fn nstd_alloc_reallocate(
     }
     #[cfg(target_os = "windows")]
     {
-        crate::os::windows::alloc::nstd_os_windows_alloc_reallocate(ptr, new_size)
+        NSTDAllocError::from_windows(nstd_os_windows_alloc_reallocate(ptr, new_size))
     }
 }
 
@@ -130,10 +215,27 @@ pub unsafe extern "C" fn nstd_alloc_reallocate(
 ///
 /// - `NSTDUInt size` - The number of bytes to free.
 ///
+/// # Panics
+///
+/// This function may panic if getting a handle to the default heap fails.
+///
 /// # Safety
 ///
-/// This operation is unsafe because the behavior is undefined if `ptr` is not a value returned by
-/// `nstd_alloc_allocate[_zeroed]`.
+/// - Behavior is undefined if `ptr` is not a value returned by `nstd_alloc_allocate[_zeroed]`.
+///
+/// - `size` must be the same value that was used to allocate the memory buffer.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::alloc::{nstd_alloc_allocate, nstd_alloc_deallocate};
+///
+/// unsafe {
+///     let mut mem = nstd_alloc_allocate(24);
+///     assert!(!mem.is_null());
+///     nstd_alloc_deallocate(&mut mem, 24);
+/// }
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 #[cfg_attr(target_os = "windows", allow(unused_variables))]
@@ -148,6 +250,6 @@ pub unsafe extern "C" fn nstd_alloc_deallocate(ptr: &mut NSTDAnyMut, size: NSTDU
     }
     #[cfg(target_os = "windows")]
     {
-        crate::os::windows::alloc::nstd_os_windows_alloc_deallocate(ptr);
+        nstd_os_windows_alloc_deallocate(ptr);
     }
 }

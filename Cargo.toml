@@ -1,6 +1,6 @@
 [package]
 name = "nstd-sys"
-version = "0.1.2"
+version = "0.2.0"
 edition = "2021"
 license = "MIT"
 homepage = "https://github.com/RustEnthusiast/nstd"
@@ -13,6 +13,10 @@ exclude = ["include"]
 all-features = true
 rustdoc-args = ["--cfg", "doc_cfg"]
 
+[profile.release]
+overflow-checks = true
+panic = "abort"
+
 [lib]
 crate-type = ["cdylib", "rlib", "staticlib"]
 
@@ -20,15 +24,18 @@ crate-type = ["cdylib", "rlib", "staticlib"]
 default = ["std", "nstd_core"]
 std = []
 clib = []
+asm = []
 nstd_alloc = ["nstd_os_windows_alloc"]
 nstd_app = ["nstd_core", "std", "winit"]
-nstd_core = ["cty"]
+nstd_core = []
 nstd_cstring = ["nstd_alloc", "nstd_core", "nstd_vec"]
+nstd_fs = ["nstd_core", "nstd_io", "nstd_string", "nstd_vec", "std"]
 nstd_heap_ptr = ["nstd_alloc", "nstd_core"]
 nstd_io = ["nstd_alloc", "nstd_core", "nstd_string", "nstd_vec", "std"]
+nstd_math = ["std"]
 nstd_os = []
 nstd_os_windows_alloc = [
-    "nstd_alloc", "nstd_os", "windows-sys/Win32_Foundation", "windows-sys/Win32_System_Memory"
+    "nstd_os", "windows-sys/Win32_Foundation", "windows-sys/Win32_System_Memory"
 ]
 nstd_shared_lib = ["libloading", "nstd_core", "std"]
 nstd_shared_ptr = ["nstd_alloc", "nstd_core"]
@@ -36,9 +43,8 @@ nstd_string = ["nstd_alloc", "nstd_core", "nstd_vec"]
 nstd_vec = ["nstd_alloc", "nstd_core"]
 
 [dependencies]
-cty = { version = "0.2", optional = true }
 libloading = { version = "0.7", optional = true }
 winit = { version = "0.27", optional = true }
 
 [target.'cfg(target_os = "windows")'.dependencies]
-windows-sys = { version = "0.36", optional = true }
+windows-sys = { version = "0.42", optional = true }

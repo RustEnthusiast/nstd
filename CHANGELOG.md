@@ -1,5 +1,48 @@
 # TBD
 ### `nstd`
+- The overflow behavior for the "release" profile has been set to panic.
+- The panic behavior for the "release" profile has been set to abort.
+### `nstd.core`
+- Made `math_[clamp|div_ceil|div_floor]_*` safe.
+### `nstd.cstring`
+- Added `from_cstr`.
+- Renamed `to_bytes` to `into_bytes`.
+### `nstd.os`
+- Added `NSTDWindowsAllocError`.
+- Renamed `NSTDWindowsHeapHandle` to `NSTDWindowsHeap`.
+### `nstd.string`
+- Added `from_str`.
+- Renamed `to_bytes` to `into_bytes`.
+### `nstd.vec`
+- Added `from_slice`.
+# 0.2.0
+### `nstd`
+- Added `nstd.fs`.
+- Added `nstd.math`.
+- Added `asm` feature.
+- Made `NSTDChar` a primitive.
+- Updated [windows-sys](https://crates.io/crates/windows-sys) to version 0.42.
+### `nstd.core`
+- Made `str[_mut]_substr` unsafe.
+- Made `str[_mut]_from_bytes` unsafe.
+- Made `str[_mut]_from_cstr` unsafe.
+- Renamed `cty`'s ASCII functions (`is_punctuation`, `is_graphic`, `to_lowercase`, `to_uppercase`).
+- Added `mem_search`.
+- Added `str[_mut]_from_raw_cstr[_with_null]`.
+- Made `cstr[_mut]_get_null[_const]` unsafe.
+- Made `cstr[_mut]_from_raw[_with_null]` unsafe.
+- Renamed range types.
+- `math_[clamp|div_ceil|div_floor]` are now unsafe.
+- `cty_is_[graphic|punctuation]` now take `NSTDChar`.
+- Added `math_div_floor_*`.
+- Added `math_pow_*`.
+- Added `math_abs_*`.
+### `nstd.os`
+- Added `NSTD_OS_[LINUX|MACOS|WINDOWS]` constants.
+- Made `NSTDWindowsHeapHandle` a structure.
+
+# 0.1.3
+### `nstd`
 - Added `extern "C"` to `NSTDAPI` (removes `NSTDCPP[START|END]`).
 ### `nstd.core`
 - Removed `nstd_core_slice[_mut]_compare`.
