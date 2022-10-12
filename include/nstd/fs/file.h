@@ -42,6 +42,10 @@ typedef NSTDAnyMut NSTDFile;
 ///
 /// `NSTDFile file` - A handle to the opened file, or null if an error occurs.
 ///
+/// # Panics
+///
+/// Panics if `name`'s length in bytes exceeds `NSTDInt`'s max value.
+///
 /// # Safety
 ///
 /// This operation can cause undefined behavior if `name`'s data is invalid.
@@ -131,6 +135,10 @@ NSTDAPI NSTDIOError nstd_fs_file_read(NSTDFile *file, NSTDSliceMut *buffer, NSTD
 /// # Returns
 ///
 /// `NSTDIOError errc` - The I/O operation error code.
+///
+/// # Panics
+///
+/// Panics if getting a handle to the heap fails.
 NSTDAPI NSTDIOError nstd_fs_file_read_all(NSTDFile *file, NSTDVec *buffer, NSTDUInt *read);
 
 /// Continuously reads UTF-8 data from `file` into a string buffer until EOF is reached.
@@ -151,6 +159,14 @@ NSTDAPI NSTDIOError nstd_fs_file_read_all(NSTDFile *file, NSTDVec *buffer, NSTDU
 /// # Returns
 ///
 /// `NSTDIOError errc` - The I/O operation error code.
+///
+/// # Panics
+///
+/// This function will panic in the following situations:
+///
+/// - `buffer`'s length in bytes exceeds `NSTDInt`'s max value.
+///
+/// - Getting a handle to the heap fails.
 NSTDAPI NSTDIOError nstd_fs_file_read_to_string(NSTDFile *file, NSTDString *buffer, NSTDUInt *read);
 
 /// Reads enough data from `file` to fill the entirety of `buffer`.
