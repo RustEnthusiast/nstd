@@ -19,9 +19,6 @@ pub mod cstring;
 #[cfg(feature = "nstd_heap_ptr")]
 #[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_heap_ptr")))]
 pub mod heap_ptr;
-#[cfg(feature = "nstd_image")]
-#[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_image")))]
-pub mod image;
 #[cfg(feature = "nstd_io")]
 #[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_io")))]
 pub mod io;
@@ -42,9 +39,6 @@ pub(crate) mod test;
 #[cfg(feature = "nstd_vec")]
 #[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_vec")))]
 pub mod vec;
-#[cfg(feature = "nstd_window")]
-#[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_window")))]
-pub mod window;
 use ::core::ffi::c_void;
 
 /// A null pointer value constant.

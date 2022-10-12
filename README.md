@@ -27,7 +27,6 @@ Rust syntax).
         - `str` - An unowned view into a UTF-8 encoded byte string.
     - `cstring` - A dynamically sized, null terminated, C string.
     - `heap_ptr` - A pointer type for single value heap allocation.
-    - `image` - Multi-format image processing.
     - `io` - Provides functionality for interacting with the standard I/O streams.
         - `stderr` - A handle to the standard error stream.
         - `stdin` - A handle to the standard input stream.
@@ -40,7 +39,6 @@ Rust syntax).
     - `shared_ptr` - A reference counting smart pointer.
     - `string` - Dynamically sized UTF-8 encoded byte string.
     - `vec` - A dynamically sized contiguous sequence of values.
-    - `window` - An `nstd` application window.
 
 # Platform support
 `nstd.core` should support anything that rustc supports.
