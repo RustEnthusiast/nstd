@@ -97,46 +97,15 @@ pub unsafe extern "C" fn nstd_core_mem_search(
     size: NSTDUInt,
     delim: NSTDByte,
 ) -> *const NSTDByte {
-    #[cfg(not(all(
-        feature = "asm",
-        any(target_arch = "arm", target_arch = "x86", target_arch = "x86_64")
-    )))]
-    {
-        let mut i = 0;
-        while i < size {
-            if *buf == delim {
-                return buf;
-            }
-            buf = buf.offset(1);
-            i += 1;
+    let mut i = 0;
+    while i < size {
+        if *buf == delim {
+            return buf;
         }
-        core::ptr::null()
+        buf = buf.offset(1);
+        i += 1;
     }
-    #[cfg(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64")))]
-    {
-        use core::arch::asm;
-        asm!(
-            include_str!("mem/x86/search.asm"),
-            buf = inout(reg) buf,
-            size = in(reg) size,
-            delim = in(reg_byte) delim,
-            end = out(reg) _
-        );
-        buf
-    }
-    #[cfg(all(feature = "asm", target_arch = "arm"))]
-    {
-        use core::arch::asm;
-        asm!(
-            include_str!("mem/arm/search.asm"),
-            buf = inout(reg) buf,
-            size = in(reg) size,
-            delim = in(reg) delim,
-            end = out(reg) _,
-            byte = out(reg) _
-        );
-        buf
-    }
+    core::ptr::null()
 }
 
 /// Zeros out a memory buffer.
@@ -165,46 +134,12 @@ pub unsafe extern "C" fn nstd_core_mem_search(
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-#[cfg_attr(
-    all(
-        feature = "asm",
-        any(target_arch = "arm", target_arch = "x86", target_arch = "x86_64")
-    ),
-    allow(unused_mut)
-)]
 pub unsafe extern "C" fn nstd_core_mem_zero(mut buf: *mut NSTDByte, size: NSTDUInt) {
-    #[cfg(not(all(
-        feature = "asm",
-        any(target_arch = "arm", target_arch = "x86", target_arch = "x86_64")
-    )))]
-    {
-        let mut i = 0;
-        while i < size {
-            *buf = 0;
-            buf = buf.offset(1);
-            i += 1;
-        }
-    }
-    #[cfg(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64")))]
-    {
-        use core::arch::asm;
-        asm!(
-            include_str!("mem/x86/zero.asm"),
-            buf = in(reg) buf,
-            size = in(reg) size,
-            i = out(reg) _
-        );
-    }
-    #[cfg(all(feature = "asm", target_arch = "arm"))]
-    {
-        use core::arch::asm;
-        asm!(
-            include_str!("mem/arm/zero.asm"),
-            buf = in(reg) buf,
-            size = in(reg) size,
-            i = out(reg) _,
-            byte = out(reg) _
-        );
+    let mut i = 0;
+    while i < size {
+        *buf = 0;
+        buf = buf.offset(1);
+        i += 1;
     }
 }
 
@@ -236,51 +171,16 @@ pub unsafe extern "C" fn nstd_core_mem_zero(mut buf: *mut NSTDByte, size: NSTDUI
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-#[cfg_attr(
-    all(
-        feature = "asm",
-        any(target_arch = "arm", target_arch = "x86", target_arch = "x86_64")
-    ),
-    allow(unused_mut)
-)]
 pub unsafe extern "C" fn nstd_core_mem_fill(
     mut buf: *mut NSTDByte,
     size: NSTDUInt,
     fill: NSTDByte,
 ) {
-    #[cfg(not(all(
-        feature = "asm",
-        any(target_arch = "arm", target_arch = "x86", target_arch = "x86_64")
-    )))]
-    {
-        let mut i = 0;
-        while i < size {
-            *buf = fill;
-            buf = buf.offset(1);
-            i += 1;
-        }
-    }
-    #[cfg(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64")))]
-    {
-        use core::arch::asm;
-        asm!(
-            include_str!("mem/x86/fill.asm"),
-            buf = in(reg) buf,
-            size = in(reg) size,
-            fill = in(reg_byte) fill,
-            i = out(reg) _
-        );
-    }
-    #[cfg(all(feature = "asm", target_arch = "arm"))]
-    {
-        use core::arch::asm;
-        asm!(
-            include_str!("mem/arm/fill.asm"),
-            buf = in(reg) buf,
-            size = in(reg) size,
-            fill = in(reg) fill,
-            i = out(reg) _
-        );
+    let mut i = 0;
+    while i < size {
+        *buf = fill;
+        buf = buf.offset(1);
+        i += 1;
     }
 }
 

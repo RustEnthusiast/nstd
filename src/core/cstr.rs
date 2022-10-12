@@ -6,7 +6,7 @@ use crate::{
         mem::nstd_core_mem_search,
         slice::{nstd_core_slice_new, NSTDSlice},
     },
-    NSTDBool, NSTDChar, NSTDUInt,
+    NSTDBool, NSTDChar, NSTDUInt, NSTD_FALSE,
 };
 
 /// An immutable slice of a C string.
@@ -230,50 +230,14 @@ pub extern "C" fn nstd_core_cstr_len(cstr: &NSTDCStr) -> NSTDUInt {
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_cstr_is_null_terminated(cstr: &NSTDCStr) -> NSTDBool {
     assert!(cstr.len <= isize::MAX as usize);
-    #[cfg(not(all(
-        feature = "asm",
-        any(target_arch = "arm", target_arch = "x86", target_arch = "x86_64")
-    )))]
-    {
-        use crate::NSTD_FALSE;
-        let mut i = 0;
-        while i < cstr.len {
-            if *cstr.ptr.add(i) == 0 {
-                return (i == cstr.len - 1) as NSTDBool;
-            }
-            i += 1;
+    let mut i = 0;
+    while i < cstr.len {
+        if *cstr.ptr.add(i) == 0 {
+            return (i == cstr.len - 1) as NSTDBool;
         }
-        NSTD_FALSE
+        i += 1;
     }
-    #[cfg(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64")))]
-    {
-        use core::arch::asm;
-        let NSTDCStr { ptr, len } = *cstr;
-        let is_nt;
-        asm!(
-            include_str!("cstr/x86/is_null_terminated.asm"),
-            ptr = in(reg) ptr,
-            len = in(reg) len,
-            is_nt = out(reg_byte) is_nt,
-            i = out(reg) _
-        );
-        is_nt
-    }
-    #[cfg(all(feature = "asm", target_arch = "arm"))]
-    {
-        use core::arch::asm;
-        let NSTDCStr { ptr, len } = *cstr;
-        let is_nt;
-        asm!(
-            include_str!("cstr/arm/is_null_terminated.asm"),
-            ptr = in(reg) ptr,
-            len = in(reg) len,
-            is_nt = out(reg) is_nt,
-            i = out(reg) _,
-            byte = out(reg) _
-        );
-        is_nt
-    }
+    NSTD_FALSE
 }
 
 /// Returns a pointer to the first null byte in a C string slice if one is present.
