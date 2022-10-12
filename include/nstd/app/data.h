@@ -7,10 +7,10 @@
 typedef struct {
     /// A handle to the `nstd` app.
     NSTDAppHandle handle;
-    /// The application's control flow.
-    NSTDAny control_flow;
     /// Custom user data.
     NSTDAnyMut data;
+    /// The application's control flow.
+    NSTDAny control_flow;
 } NSTDAppData;
 
 #endif

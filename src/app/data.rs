@@ -8,10 +8,10 @@ use winit::event_loop::ControlFlow;
 pub struct NSTDAppData<'a> {
     /// A handle to the `nstd` app.
     pub handle: NSTDAppHandle<'a>,
-    /// The application's control flow.
-    pub control_flow: &'a Cell<ControlFlow>,
     /// Custom user data.
     pub data: NSTDAnyMut,
+    /// The application's control flow.
+    control_flow: &'a Cell<ControlFlow>,
 }
 impl<'a> NSTDAppData<'a> {
     /// Creates a new instance of [NSTDAppData].
@@ -26,5 +26,11 @@ impl<'a> NSTDAppData<'a> {
             control_flow: Cell::from_mut(control_flow),
             data,
         }
+    }
+
+    /// Returns a reference to the control flow cell.
+    #[inline]
+    pub(crate) fn control_flow(&self) -> &Cell<ControlFlow> {
+        self.control_flow
     }
 }
