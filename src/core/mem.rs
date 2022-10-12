@@ -55,7 +55,7 @@ pub unsafe extern "C" fn nstd_core_mem_compare(
     // Otherwise compare them manually.
     let buf1 = core::slice::from_raw_parts(buf1, num);
     let buf2 = core::slice::from_raw_parts(buf2, num);
-    (buf1 == buf2).into()
+    buf1 == buf2
 }
 
 /// Iterates through each byte in a raw memory buffer until `delim` is reached, returning a pointer

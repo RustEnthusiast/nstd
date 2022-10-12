@@ -233,7 +233,7 @@ pub unsafe extern "C" fn nstd_core_cstr_is_null_terminated(cstr: &NSTDCStr) -> N
     let mut i = 0;
     while i < cstr.len {
         if *cstr.ptr.add(i) == 0 {
-            return (i == cstr.len - 1) as NSTDBool;
+            return i == cstr.len - 1;
         }
         i += 1;
     }

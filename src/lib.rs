@@ -48,9 +48,9 @@ use ::core::ffi::{c_char, c_void};
 pub const NSTD_NULL: NSTDAnyMut = ::core::ptr::null_mut();
 
 /// Boolean value false (0).
-pub const NSTD_FALSE: NSTDBool = 0;
+pub const NSTD_FALSE: NSTDBool = false;
 /// Boolean value true (1).
-pub const NSTD_TRUE: NSTDBool = 1;
+pub const NSTD_TRUE: NSTDBool = true;
 
 /// An integral type who's size matches the target architecture's pointer size.
 pub type NSTDInt = isize;
@@ -106,4 +106,4 @@ pub type NSTDAny = *const c_void;
 pub type NSTDAnyMut = *mut c_void;
 
 /// A boolean type, can either be `NSTD_TRUE` (1) or `NSTD_FALSE` (0).
-pub type NSTDBool = NSTDUInt8;
+pub type NSTDBool = bool;
