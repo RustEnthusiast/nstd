@@ -1,7 +1,10 @@
 //! Application data passed to each event.
-use crate::{app::handle::NSTDAppHandle, NSTDAnyMut};
+use crate::NSTDAnyMut;
 use std::cell::Cell;
-use winit::event_loop::ControlFlow;
+use winit::event_loop::{ControlFlow, EventLoopWindowTarget};
+
+/// A handle to the application event loop.
+pub type NSTDAppHandle<'a> = &'a EventLoopWindowTarget<()>;
 
 /// Application data passed to each event.
 #[repr(C)]

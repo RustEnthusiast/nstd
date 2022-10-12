@@ -1,11 +1,9 @@
 //! An application event loop.
 pub mod data;
 pub mod events;
-pub mod handle;
 use self::{
-    data::NSTDAppData,
+    data::{NSTDAppData, NSTDAppHandle},
     events::{NSTDAppEvents, NSTDKey, NSTDMouseInput, NSTDScrollDelta, NSTDTouchState},
-    handle::NSTDAppHandle,
 };
 use crate::{core::def::NSTDErrorCode, NSTDAnyMut};
 use winit::{

@@ -1,7 +1,9 @@
 #ifndef NSTD_APP_DATA_H
 #define NSTD_APP_DATA_H
 #include "../nstd.h"
-#include "handle.h"
+
+/// A handle to the application event loop.
+typedef NSTDAny NSTDAppHandle;
 
 /// Application data passed to each event.
 typedef struct {
