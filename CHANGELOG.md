@@ -10,6 +10,7 @@
 - Added `from_cstr`.
 - Renamed `to_bytes` to `into_bytes`.
 ### `nstd.os`
+- Added `windows_alloc_heap_size`.
 - Added `NSTDWindowsAllocError`.
 - Renamed `NSTDWindowsHeapHandle` to `NSTDWindowsHeap`.
 ### `nstd.string`

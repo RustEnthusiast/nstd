@@ -36,6 +36,23 @@ NSTDAPI NSTDWindowsHeap nstd_os_windows_alloc_heap_default();
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapcreate>.
 NSTDAPI NSTDWindowsHeap nstd_os_windows_alloc_heap_new(NSTDUInt size);
 
+/// Returns the size of a memory block previously allocated by an `NSTDWindowsHeap`.
+///
+/// # Parameters:
+///
+/// - `const NSTDWindowsHeap *heap` - A handle to the heap.
+///
+/// - `NSTDAny ptr` - A pointer to the allocated memory.
+///
+/// # Returns
+///
+/// `NSTDUInt size` - The number of bytes allocated at the memory block pointed to by `ptr`.
+///
+/// # Safety
+///
+/// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapsize>.
+NSTDAPI NSTDUInt nstd_os_windows_alloc_heap_size(const NSTDWindowsHeap *heap, NSTDAny ptr);
+
 /// Allocates a block of memory on a heap.
 ///
 /// # Parameters:
