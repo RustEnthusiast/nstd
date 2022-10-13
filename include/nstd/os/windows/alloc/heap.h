@@ -53,6 +53,27 @@ NSTDAPI NSTDWindowsHeap nstd_os_windows_alloc_heap_new(NSTDUInt size);
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapsize>.
 NSTDAPI NSTDUInt nstd_os_windows_alloc_heap_size(const NSTDWindowsHeap *heap, NSTDAny ptr);
 
+/// Validates a heap or memory block allocated on a heap.
+///
+/// If `ptr` is null, the function will attempt to validate the entire heap.
+///
+/// # Parameters:
+///
+/// - `const NSTDWindowsHeap *heap` - A handle to the heap to validate.
+///
+/// - `NSTDAny ptr` - A pointer to the block of memory to validate. Pass null to validate the
+/// entire heap.
+///
+/// # Returns
+///
+/// `NSTDWindowsAllocError errc` - The allocation operation error code.
+///
+/// # Safety
+///
+/// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapvalidate>.
+NSTDAPI NSTDWindowsAllocError nstd_os_windows_alloc_heap_validate(const NSTDWindowsHeap *heap,
+NSTDAny ptr);
+
 /// Allocates a block of memory on a heap.
 ///
 /// # Parameters:

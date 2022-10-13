@@ -20,6 +20,8 @@ pub enum NSTDWindowsAllocError {
     NSTD_WINDOWS_ALLOC_ERROR_MEMORY_NOT_FOUND,
     /// Getting a handle to a heap failed.
     NSTD_WINDOWS_ALLOC_ERROR_HEAP_NOT_FOUND,
+    /// A heap is invalid.
+    NSTD_WINDOWS_ALLOC_ERROR_INVALID_HEAP,
 }
 
 /// Allocates a new block of memory on the current process' heap.

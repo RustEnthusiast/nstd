@@ -4,7 +4,7 @@ use crate::{
 };
 use windows_sys::Win32::System::Memory::{
     GetProcessHeap, HeapAlloc, HeapCreate, HeapDestroy, HeapFree, HeapReAlloc, HeapSize,
-    HEAP_ZERO_MEMORY,
+    HeapValidate, HEAP_ZERO_MEMORY,
 };
 
 /// A handle to a process heap.
@@ -150,6 +150,60 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_heap_size(
     ptr: NSTDAny,
 ) -> NSTDUInt {
     HeapSize(heap.handle, 0, ptr)
+}
+
+/// Validates a heap or memory block allocated on a heap.
+///
+/// If `ptr` is null, the function will attempt to validate the entire heap.
+///
+/// # Parameters:
+///
+/// - `const NSTDWindowsHeap *heap` - A handle to the heap to validate.
+///
+/// - `NSTDAny ptr` - A pointer to the block of memory to validate. Pass null to validate the
+/// entire heap.
+///
+/// # Returns
+///
+/// `NSTDWindowsAllocError errc` - The allocation operation error code.
+///
+/// # Safety
+///
+/// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapvalidate>.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::{
+///     os::windows::alloc::{
+///         heap::{
+///             nstd_os_windows_alloc_heap_allocate, nstd_os_windows_alloc_heap_deallocate,
+///             nstd_os_windows_alloc_heap_default, nstd_os_windows_alloc_heap_validate,
+///         },
+///         NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_NONE,
+///     },
+///     NSTD_NULL,
+/// };
+///
+/// unsafe {
+///     let heap = nstd_os_windows_alloc_heap_default();
+///     let mut mem = nstd_os_windows_alloc_heap_allocate(&heap, 64);
+///     let mut errc = nstd_os_windows_alloc_heap_validate(&heap, NSTD_NULL);
+///     assert!(errc == NSTD_WINDOWS_ALLOC_ERROR_NONE);
+///     errc = nstd_os_windows_alloc_heap_deallocate(&heap, &mut mem);
+///     assert!(errc == NSTD_WINDOWS_ALLOC_ERROR_NONE);
+/// }
+/// ```
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_os_windows_alloc_heap_validate(
+    heap: &NSTDWindowsHeap,
+    ptr: NSTDAny,
+) -> NSTDWindowsAllocError {
+    match HeapValidate(heap.handle, 0, ptr) {
+        0 => NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_INVALID_HEAP,
+        _ => NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_NONE,
+    }
 }
 
 /// Allocates a block of memory on a heap.
