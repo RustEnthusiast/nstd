@@ -13,3 +13,16 @@ pub mod ptr;
 pub mod range;
 pub mod slice;
 pub mod str;
+
+/// Invokes the runtime's panic handler.
+///
+/// This operation will never return.
+///
+/// # Panics
+///
+/// This function will always panic.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_core_panic() -> ! {
+    panic!();
+}

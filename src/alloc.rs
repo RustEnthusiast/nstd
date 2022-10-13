@@ -22,6 +22,8 @@ pub enum NSTDAllocError {
     NSTD_ALLOC_ERROR_MEMORY_NOT_FOUND,
     /// Getting a handle to a heap failed.
     NSTD_ALLOC_ERROR_HEAP_NOT_FOUND,
+    /// A heap is invalid.
+    NSTD_ALLOC_ERROR_INVALID_HEAP,
 }
 impl NSTDAllocError {
     /// Converts an [NSTDWindowsAllocError] into an [NSTDAllocError].
@@ -32,6 +34,7 @@ impl NSTDAllocError {
             NSTD_WINDOWS_ALLOC_ERROR_OUT_OF_MEMORY => Self::NSTD_ALLOC_ERROR_OUT_OF_MEMORY,
             NSTD_WINDOWS_ALLOC_ERROR_MEMORY_NOT_FOUND => Self::NSTD_ALLOC_ERROR_MEMORY_NOT_FOUND,
             NSTD_WINDOWS_ALLOC_ERROR_HEAP_NOT_FOUND => Self::NSTD_ALLOC_ERROR_HEAP_NOT_FOUND,
+            NSTD_WINDOWS_ALLOC_ERROR_INVALID_HEAP => Self::NSTD_ALLOC_ERROR_INVALID_HEAP,
         }
     }
 }

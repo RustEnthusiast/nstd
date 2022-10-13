@@ -1,7 +1,11 @@
 //! Contains mostly unsafe functions for interacting with raw memory.
-use crate::{core::def::NSTDByte, NSTDBool, NSTDUInt, NSTD_TRUE};
+use crate::{core::def::NSTDByte, NSTDBool, NSTDUInt, NSTD_FALSE, NSTD_TRUE};
 
 /// Compares two memory buffers of `num` bytes.
+///
+/// # Note
+///
+/// This will always return false if `num` is greater than `NSTDInt`'s max value.
 ///
 /// # Parameters:
 ///
@@ -41,7 +45,6 @@ use crate::{core::def::NSTDByte, NSTDBool, NSTDUInt, NSTD_TRUE};
 ///     assert!(nstd_core_mem_compare(ptr1, ptr2, num) == NSTD_TRUE);
 /// }
 /// ```
-#[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_mem_compare(
     buf1: *const NSTDByte,
@@ -52,14 +55,22 @@ pub unsafe extern "C" fn nstd_core_mem_compare(
     if buf1 == buf2 || num == 0 {
         return NSTD_TRUE;
     }
+    // Check if `num` exceeds `isize::MAX`.
+    if num > isize::MAX as usize {
+        return NSTD_FALSE;
+    }
     // Otherwise compare them manually.
     let buf1 = core::slice::from_raw_parts(buf1, num);
     let buf2 = core::slice::from_raw_parts(buf2, num);
-    (buf1 == buf2).into()
+    buf1 == buf2
 }
 
 /// Iterates through each byte in a raw memory buffer until `delim` is reached, returning a pointer
 /// to the delimiter byte if it is found.
+///
+/// # Note
+///
+/// This will always return null if `size` is greater than `NSTDInt`'s max value.
 ///
 /// # Parameters:
 ///
@@ -93,50 +104,23 @@ pub unsafe extern "C" fn nstd_core_mem_compare(
 /// ```
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_mem_search(
-    mut buf: *const NSTDByte,
+    buf: *const NSTDByte,
     size: NSTDUInt,
     delim: NSTDByte,
 ) -> *const NSTDByte {
-    #[cfg(not(all(
-        feature = "asm",
-        any(target_arch = "arm", target_arch = "x86", target_arch = "x86_64")
-    )))]
-    {
-        let mut i = 0;
-        while i < size {
-            if *buf == delim {
-                return buf;
-            }
-            buf = buf.offset(1);
-            i += 1;
+    // Check if `size` is greater than `NSTDInt`'s max size.
+    if size > isize::MAX as usize {
+        return core::ptr::null();
+    }
+    // Search the buffer for `delim`.
+    let mut i = 0;
+    while i < size {
+        if *buf.add(i) == delim {
+            return buf.add(i);
         }
-        core::ptr::null()
+        i += 1;
     }
-    #[cfg(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64")))]
-    {
-        use core::arch::asm;
-        asm!(
-            include_str!("mem/x86/search.asm"),
-            buf = inout(reg) buf,
-            size = in(reg) size,
-            delim = in(reg_byte) delim,
-            end = out(reg) _
-        );
-        buf
-    }
-    #[cfg(all(feature = "asm", target_arch = "arm"))]
-    {
-        use core::arch::asm;
-        asm!(
-            include_str!("mem/arm/search.asm"),
-            buf = inout(reg) buf,
-            size = in(reg) size,
-            delim = in(reg) delim,
-            end = out(reg) _,
-            byte = out(reg) _
-        );
-        buf
-    }
+    core::ptr::null()
 }
 
 /// Zeros out a memory buffer.
@@ -165,46 +149,12 @@ pub unsafe extern "C" fn nstd_core_mem_search(
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-#[cfg_attr(
-    all(
-        feature = "asm",
-        any(target_arch = "arm", target_arch = "x86", target_arch = "x86_64")
-    ),
-    allow(unused_mut)
-)]
 pub unsafe extern "C" fn nstd_core_mem_zero(mut buf: *mut NSTDByte, size: NSTDUInt) {
-    #[cfg(not(all(
-        feature = "asm",
-        any(target_arch = "arm", target_arch = "x86", target_arch = "x86_64")
-    )))]
-    {
-        let mut i = 0;
-        while i < size {
-            *buf = 0;
-            buf = buf.offset(1);
-            i += 1;
-        }
-    }
-    #[cfg(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64")))]
-    {
-        use core::arch::asm;
-        asm!(
-            include_str!("mem/x86/zero.asm"),
-            buf = in(reg) buf,
-            size = in(reg) size,
-            i = out(reg) _
-        );
-    }
-    #[cfg(all(feature = "asm", target_arch = "arm"))]
-    {
-        use core::arch::asm;
-        asm!(
-            include_str!("mem/arm/zero.asm"),
-            buf = in(reg) buf,
-            size = in(reg) size,
-            i = out(reg) _,
-            byte = out(reg) _
-        );
+    let mut i = 0;
+    while i < size {
+        *buf = 0;
+        buf = buf.offset(1);
+        i += 1;
     }
 }
 
@@ -236,51 +186,16 @@ pub unsafe extern "C" fn nstd_core_mem_zero(mut buf: *mut NSTDByte, size: NSTDUI
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-#[cfg_attr(
-    all(
-        feature = "asm",
-        any(target_arch = "arm", target_arch = "x86", target_arch = "x86_64")
-    ),
-    allow(unused_mut)
-)]
 pub unsafe extern "C" fn nstd_core_mem_fill(
     mut buf: *mut NSTDByte,
     size: NSTDUInt,
     fill: NSTDByte,
 ) {
-    #[cfg(not(all(
-        feature = "asm",
-        any(target_arch = "arm", target_arch = "x86", target_arch = "x86_64")
-    )))]
-    {
-        let mut i = 0;
-        while i < size {
-            *buf = fill;
-            buf = buf.offset(1);
-            i += 1;
-        }
-    }
-    #[cfg(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64")))]
-    {
-        use core::arch::asm;
-        asm!(
-            include_str!("mem/x86/fill.asm"),
-            buf = in(reg) buf,
-            size = in(reg) size,
-            fill = in(reg_byte) fill,
-            i = out(reg) _
-        );
-    }
-    #[cfg(all(feature = "asm", target_arch = "arm"))]
-    {
-        use core::arch::asm;
-        asm!(
-            include_str!("mem/arm/fill.asm"),
-            buf = in(reg) buf,
-            size = in(reg) size,
-            fill = in(reg) fill,
-            i = out(reg) _
-        );
+    let mut i = 0;
+    while i < size {
+        *buf = fill;
+        buf = buf.offset(1);
+        i += 1;
     }
 }
 

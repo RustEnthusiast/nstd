@@ -5,6 +5,10 @@
 
 /// Compares two memory buffers of `num` bytes.
 ///
+/// # Note
+///
+/// This will always return false if `num` is greater than `NSTDInt`'s max value.
+///
 /// # Parameters:
 ///
 /// - `const NSTDByte *buf1` - A pointer to the first memory buffer.
@@ -26,6 +30,10 @@ NSTDAPI NSTDBool nstd_core_mem_compare(const NSTDByte *buf1, const NSTDByte *buf
 
 /// Iterates through each byte in a raw memory buffer until `delim` is reached, returning a pointer
 /// to the delimiter byte if it is found.
+///
+/// # Note
+///
+/// This will always return null if `size` is greater than `NSTDInt`'s max value.
 ///
 /// # Parameters:
 ///
