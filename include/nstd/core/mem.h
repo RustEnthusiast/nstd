@@ -5,6 +5,10 @@
 
 /// Compares two memory buffers of `num` bytes.
 ///
+/// # Note
+///
+/// This will always return false if `num` is greater than `NSTDInt`'s max value.
+///
 /// # Parameters:
 ///
 /// - `const NSTDByte *buf1` - A pointer to the first memory buffer.

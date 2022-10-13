@@ -1,7 +1,11 @@
 //! Contains mostly unsafe functions for interacting with raw memory.
-use crate::{core::def::NSTDByte, NSTDBool, NSTDUInt, NSTD_TRUE};
+use crate::{core::def::NSTDByte, NSTDBool, NSTDUInt, NSTD_FALSE, NSTD_TRUE};
 
 /// Compares two memory buffers of `num` bytes.
+///
+/// # Note
+///
+/// This will always return false if `num` is greater than `NSTDInt`'s max value.
 ///
 /// # Parameters:
 ///
@@ -41,7 +45,6 @@ use crate::{core::def::NSTDByte, NSTDBool, NSTDUInt, NSTD_TRUE};
 ///     assert!(nstd_core_mem_compare(ptr1, ptr2, num) == NSTD_TRUE);
 /// }
 /// ```
-#[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_mem_compare(
     buf1: *const NSTDByte,
@@ -51,6 +54,10 @@ pub unsafe extern "C" fn nstd_core_mem_compare(
     // If the two pointers point to the same buffer, or `num` is 0, return true.
     if buf1 == buf2 || num == 0 {
         return NSTD_TRUE;
+    }
+    // Check if `num` exceeds `isize::MAX`.
+    if num > isize::MAX as usize {
+        return NSTD_FALSE;
     }
     // Otherwise compare them manually.
     let buf1 = core::slice::from_raw_parts(buf1, num);
