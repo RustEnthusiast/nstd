@@ -60,6 +60,10 @@ typedef enum {
 ///
 /// `NSTDIOError errc` - The I/O operation error code.
 ///
+/// # Panics
+///
+/// Panics if `output`'s length in bytes exceeds `NSTDInt`'s max value.
+///
 /// # Safety
 ///
 /// The provided string slice's data must be valid, else this function can cause garbage bytes to
@@ -76,6 +80,10 @@ NSTDAPI NSTDIOError nstd_io_print(const NSTDStr *output);
 ///
 /// `NSTDIOError errc` - The I/O operation error code.
 ///
+/// # Panics
+///
+/// Panics if `output`'s length in bytes exceeds `NSTDInt`'s max value.
+///
 /// # Safety
 ///
 /// The provided string slice's data must be valid, else this function can cause garbage bytes to
@@ -91,6 +99,11 @@ NSTDAPI NSTDIOError nstd_io_print_line(const NSTDStr *output);
 /// # Returns
 ///
 /// `NSTDIOError errc` - The I/O operation error code.
+///
+/// # Panics
+///
+/// Panics if `buffer`'s length in bytes exceeds `NSTDInt`'s max value or getting a handle to the
+/// heap fails.
 NSTDAPI NSTDIOError nstd_io_read(NSTDString *buffer);
 
 /// Reads a line of UTF-8 input from stdin and pushes it onto `buffer`.
@@ -102,6 +115,11 @@ NSTDAPI NSTDIOError nstd_io_read(NSTDString *buffer);
 /// # Returns
 ///
 /// `NSTDIOError errc` - The I/O operation error code.
+///
+/// # Panics
+///
+/// Panics if `buffer`'s length in bytes exceeds `NSTDInt`'s max value or getting a handle to the
+/// heap fails.
 NSTDAPI NSTDIOError nstd_io_read_line(NSTDString *buffer);
 
 #endif

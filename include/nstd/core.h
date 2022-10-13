@@ -1,5 +1,6 @@
 #ifndef NSTD_CORE_H
 #define NSTD_CORE_H
+#include "core/core.h"
 #include "core/cstr.h"
 #include "core/cty.h"
 #include "core/def.h"
@@ -11,5 +12,4 @@
 #include "core/range.h"
 #include "core/slice.h"
 #include "core/str.h"
-#include "nstd.h"
 #endif

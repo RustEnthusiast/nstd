@@ -2,7 +2,6 @@
 #define NSTD_CSTRING_H
 #include "alloc.h"
 #include "core/cstr.h"
-#include "core/def.h"
 #include "core/slice.h"
 #include "nstd.h"
 #include "vec.h"
@@ -40,6 +39,31 @@ NSTDAPI NSTDCString nstd_cstring_new();
 ///
 /// This function will panic if either `cap` is zero or allocating fails.
 NSTDAPI NSTDCString nstd_cstring_new_with_cap(NSTDUInt cap);
+
+/// Creates an owned version of an unowned C string slice.
+///
+/// # Parameters:
+///
+/// - `const NSTDCStr *cstr` - The unowned C string slice.
+///
+/// # Returns
+///
+/// `NSTDCString cstring` The new owned version of `cstr`.
+///
+/// # Panics
+///
+/// This operation will panic in the following situations:
+///
+/// - `cstr` contains a null byte.
+///
+/// - `cstr`'s length is greater than `NSTDInt`'s max value.
+///
+/// - Allocating fails.
+///
+/// # Safety
+///
+/// The caller of this function must ensure that `cstr`'s data is valid for reads.
+NSTDAPI NSTDCString nstd_cstring_from_cstr(const NSTDCStr *cstr);
 
 /// Creates a deep copy of an `NSTDCString`.
 ///
@@ -109,7 +133,7 @@ NSTDAPI const NSTDChar *nstd_cstring_as_ptr(const NSTDCString *cstring);
 /// # Returns
 ///
 /// `NSTDVec bytes` - The C string's raw data.
-NSTDAPI NSTDVec nstd_cstring_to_bytes(NSTDCString cstring);
+NSTDAPI NSTDVec nstd_cstring_into_bytes(NSTDCString cstring);
 
 /// Returns the number of `char`s in a C string, excluding the null terminator.
 ///
@@ -121,6 +145,17 @@ NSTDAPI NSTDVec nstd_cstring_to_bytes(NSTDCString cstring);
 ///
 /// `NSTDUInt len` - The length of the C string without it's null byte.
 NSTDAPI NSTDUInt nstd_cstring_len(const NSTDCString *cstring);
+
+/// Returns the number of `char`s in a C string, including the null terminator.
+///
+/// # Parameters:
+///
+/// - `const NSTDCString *cstring` - The C string.
+///
+/// # Returns
+///
+/// `NSTDUInt len` - The length of the C string including it's null byte.
+NSTDAPI NSTDUInt nstd_cstring_len_with_null(const NSTDCString *cstring);
 
 /// Returns a C string's capacity.
 ///
@@ -134,17 +169,6 @@ NSTDAPI NSTDUInt nstd_cstring_len(const NSTDCString *cstring);
 ///
 /// `NSTDUInt cap` - The C string's capacity.
 NSTDAPI NSTDUInt nstd_cstring_cap(const NSTDCString *cstring);
-
-/// Returns the number of `char`s in a C string, including the null terminator.
-///
-/// # Parameters:
-///
-/// - `const NSTDCString *cstring` - The C string.
-///
-/// # Returns
-///
-/// `NSTDUInt len` - The length of the C string including it's null byte.
-NSTDAPI NSTDUInt nstd_cstring_len_with_null(const NSTDCString *cstring);
 
 /// Appends an `NSTDChar` to the end of an `NSTDCString`.
 ///
@@ -179,7 +203,11 @@ NSTDAPI void nstd_cstring_push(NSTDCString *cstring, NSTDChar chr);
 ///
 /// - `cstr` contains a null byte.
 ///
+/// - `cstr`'s length is greater than `NSTDInt`'s max value.
+///
 /// - Appending the new null byte to the end of the C string fails.
+///
+/// - The new length in bytes exceeds `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -195,6 +223,10 @@ NSTDAPI NSTDAllocError nstd_cstring_push_cstr(NSTDCString *cstring, const NSTDCS
 /// # Returns
 ///
 /// `NSTDChar chr` - The removed character, or null if the C string is empty.
+///
+/// # Panics
+///
+/// This function will panic if getting a pointer to the C string's last character fails.
 NSTDAPI NSTDChar nstd_cstring_pop(NSTDCString *cstring);
 
 /// Frees an instance of `NSTDCString`.
@@ -202,6 +234,10 @@ NSTDAPI NSTDChar nstd_cstring_pop(NSTDCString *cstring);
 /// # Parameters:
 ///
 /// - `NSTDCString cstring` - The C string to free.
+///
+/// # Panics
+///
+/// This operation may panic if getting a handle to the heap fails.
 NSTDAPI void nstd_cstring_free(NSTDCString cstring);
 
 #endif
