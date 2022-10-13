@@ -257,10 +257,7 @@ pub extern "C" fn nstd_core_cty_is_digit(chr: NSTDUnichar, radix: NSTDUInt32) ->
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_cty_is_ascii_punctuation(chr: NSTDChar) -> NSTDBool {
-    (0x21..=0x2F).contains(&chr)
-        || (0x3A..=0x40).contains(&chr)
-        || (0x5B..=0x60).contains(&chr)
-        || (0x7B..=0x7E).contains(&chr)
+    matches!(chr, 0x21..=0x2F | 0x3A..=0x40 | 0x5B..=0x60 | 0x7B..=0x7E)
 }
 
 /// Determines whether or not `chr` is a graphic character.
@@ -288,7 +285,7 @@ pub extern "C" fn nstd_core_cty_is_ascii_punctuation(chr: NSTDChar) -> NSTDBool 
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_cty_is_ascii_graphic(chr: NSTDChar) -> NSTDBool {
-    (0x21..=0x7E).contains(&chr)
+    matches!(chr, 0x21..=0x7E)
 }
 
 /// Returns the lowercase version of `chr`, or `chr` if there is no lowercase version.
