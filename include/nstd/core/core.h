@@ -5,6 +5,10 @@
 /// Invokes the runtime's panic handler.
 ///
 /// This operation will never return.
+///
+/// # Panics
+///
+/// This function will always panic.
 NSTDAPI void nstd_core_panic();
 
 #endif
