@@ -8,11 +8,13 @@
 
 /// An immutable unowned view into a UTF-8 encoded byte string.
 typedef struct {
-    /// A view into the UTF-8 encoded buffer.
-    NSTDSlice bytes;
+    /// A raw pointer to the string's data.
+    const NSTDByte *ptr;
+    /// The number of bytes in the string.
+    NSTDUInt len;
 } NSTDStr;
 
-/// Creates a new instance of `NSTDStr` from a C string slice.
+/// Creates a new instance of an `NSTDStr` from a C string slice.
 ///
 /// # Parameters:
 ///
@@ -24,10 +26,18 @@ typedef struct {
 ///
 /// # Panics
 ///
-/// This function will panic if `cstr`'s data is not valid UTF-8.
+/// This function will panic in the following situations:
+///
+/// - `cstr`'s data is not valid UTF-8.
+///
+/// - `cstr`'s length is greater than `NSTDInt`'s max value.
+///
+/// # Safety
+///
+/// `cstr`'s data must be valid for reads of at least `cstr.len` consecutive bytes.
 NSTDAPI NSTDStr nstd_core_str_from_cstr(const NSTDCStr *cstr);
 
-/// Creates a new instance of `NSTDStr` from a C string slice.
+/// Creates a new instance of an `NSTDStr` from a C string slice.
 ///
 /// # Parameters:
 ///
@@ -43,6 +53,54 @@ NSTDAPI NSTDStr nstd_core_str_from_cstr(const NSTDCStr *cstr);
 /// valid while the returned string slice is in use.
 NSTDAPI NSTDStr nstd_core_str_from_cstr_unchecked(const NSTDCStr *cstr);
 
+/// Creates a new `NSTDStr` from a raw C string.
+///
+/// # Parameters:
+///
+/// - `const NSTDChar *cstr` - The raw C string to wrap.
+///
+/// # Returns
+///
+/// `NSTDStr str` - The new string slice.
+///
+/// # Panics
+///
+/// This function will panic in the following situations:
+///
+/// - `cstr`'s data is not valid UTF-8.
+///
+/// - `cstr`'s length is greater than `NSTDInt`'s max value.
+///
+/// # Safety
+///
+/// This function makes access to raw pointer data, which can cause undefined behavior in the event
+/// that `cstr`'s data is invalid.
+NSTDAPI NSTDStr nstd_core_str_from_raw_cstr(const NSTDChar *cstr);
+
+/// Creates a new `NSTDStr` from a raw C string, including the null byte.
+///
+/// # Parameters:
+///
+/// - `const NSTDChar *cstr` - The raw C string to wrap.
+///
+/// # Returns
+///
+/// `NSTDStr str` - The new string slice.
+///
+/// # Panics
+///
+/// This function will panic in the following situations:
+///
+/// - `cstr`'s data is not valid UTF-8.
+///
+/// - `cstr`'s length is greater than `NSTDInt`'s max value.
+///
+/// # Safety
+///
+/// This function makes access to raw pointer data, which can cause undefined behavior in the event
+/// that `cstr`'s data is invalid.
+NSTDAPI NSTDStr nstd_core_str_from_raw_cstr_with_null(const NSTDChar *cstr);
+
 /// Creates a string slice from raw bytes.
 ///
 /// # Parameters:
@@ -55,7 +113,19 @@ NSTDAPI NSTDStr nstd_core_str_from_cstr_unchecked(const NSTDCStr *cstr);
 ///
 /// # Panics
 ///
-/// This operation will panic if `bytes`'s stride is not 1, or `bytes` is not valid UTF-8.
+/// This operation will panic in the following situations:
+///
+/// - `bytes`'s stride is not 1.
+///
+/// - `bytes`'s length is greater than `NSTDInt`'s max value.
+///
+/// - `bytes` is not valid UTF-8.
+///
+/// # Safety
+///
+/// - `bytes` must remain valid while the returned string slice is in use.
+///
+/// - `bytes`'s data must be valid for reads of at least `bytes.len` consecutive bytes.
 NSTDAPI NSTDStr nstd_core_str_from_bytes(const NSTDSlice *bytes);
 
 /// Creates a string slice from raw bytes, without checking for UTF-8.
@@ -74,8 +144,11 @@ NSTDAPI NSTDStr nstd_core_str_from_bytes(const NSTDSlice *bytes);
 ///
 /// # Safety
 ///
-/// This function does not check to ensure that `bytes` are valid UTF-8.`bytes` must remain valid
-/// while the returned string slice is in use.
+/// - This function does not check to ensure that `bytes` are valid UTF-8.
+///
+/// - `bytes` must remain valid while the returned string slice is in use.
+///
+/// - `bytes`'s data must be valid for reads of at least `bytes.len` consecutive bytes.
 NSTDAPI NSTDStr nstd_core_str_from_bytes_unchecked(const NSTDSlice *bytes);
 
 /// Returns an immutable byte slice over `str`'s data.
@@ -112,8 +185,8 @@ NSTDAPI const NSTDByte *nstd_core_str_as_ptr(const NSTDStr *str);
 ///
 /// # Panics
 ///
-/// This operation may panic in the event that `str`'s calculated length is greater than the
-/// highest number representable by `NSTDUInt`.
+/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s max
+/// value.
 ///
 /// # Safety
 ///
@@ -148,17 +221,17 @@ NSTDAPI NSTDUInt nstd_core_str_byte_len(const NSTDStr *str);
 /// `NSTDUnichar chr` - The character at index `pos`, or the Unicode replacement character on
 /// error.
 ///
+/// # Panics
+///
+/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s max
+/// value.
+///
 /// # Safety
 ///
-/// This operation could cause undefined behavior if `str`'s data is invalid.
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 NSTDAPI NSTDUnichar nstd_core_str_get_char(const NSTDStr *str, NSTDUInt pos);
 
 /// Creates a substring of an existing string slice.
-///
-/// # Note
-///
-/// This function is considered safe because the returned string slice is already unsafe to operate
-/// on.
 ///
 /// # Parameters:
 ///
@@ -174,11 +247,19 @@ NSTDAPI NSTDUnichar nstd_core_str_get_char(const NSTDStr *str, NSTDUInt pos);
 ///
 /// This operation can panic under the following circumstances:
 ///
-/// - `range.end` is greater than `str.bytes.len`.
+/// - `range.start` is greater than `NSTDInt`'s max value.
 ///
 /// - `range.start` is greater than `range.end`.
 ///
+/// - `range.end` is greater than `str.len`.
+///
+/// - `range.end` - `range.start` is greater than `NSTDInt`'s max value.
+///
 /// - The substring bytes are not valid UTF-8.
+///
+/// # Safety
+///
+/// `str`'s data must be valid for reads of at least `str.len` consecutive bytes.
 NSTDAPI NSTDStr nstd_core_str_substr(const NSTDStr *str, NSTDURange range);
 
 /// Attempts to parse a string slice as an `NSTDFloat32`.
@@ -193,9 +274,14 @@ NSTDAPI NSTDStr nstd_core_str_substr(const NSTDStr *str, NSTDURange range);
 ///
 /// `NSTDFloat32 v` - The parsed 32-bit floating-point value.
 ///
-/// # Safety:
+/// # Panics
 ///
-/// This operation can cause undefined behavior if `str`'s data is invalid.
+/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s
+/// max value.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 NSTDAPI NSTDFloat32 nstd_core_str_to_f32(const NSTDStr *str, NSTDErrorCode *errc);
 /// Attempts to parse a string slice as an `NSTDFloat64`.
 ///
@@ -209,9 +295,14 @@ NSTDAPI NSTDFloat32 nstd_core_str_to_f32(const NSTDStr *str, NSTDErrorCode *errc
 ///
 /// `NSTDFloat64 v` - The parsed 64-bit floating-point value.
 ///
-/// # Safety:
+/// # Panics
 ///
-/// This operation can cause undefined behavior if `str`'s data is invalid.
+/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s
+/// max value.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 NSTDAPI NSTDFloat64 nstd_core_str_to_f64(const NSTDStr *str, NSTDErrorCode *errc);
 /// Attempts to parse a string slice as an `NSTDInt`.
 ///
@@ -225,9 +316,14 @@ NSTDAPI NSTDFloat64 nstd_core_str_to_f64(const NSTDStr *str, NSTDErrorCode *errc
 ///
 /// `NSTDInt v` - The parsed arch-bit signed integral value.
 ///
-/// # Safety:
+/// # Panics
 ///
-/// This operation can cause undefined behavior if `str`'s data is invalid.
+/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s
+/// max value.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 NSTDAPI NSTDInt nstd_core_str_to_int(const NSTDStr *str, NSTDErrorCode *errc);
 /// Attempts to parse a string slice as an `NSTDUInt`.
 ///
@@ -241,9 +337,14 @@ NSTDAPI NSTDInt nstd_core_str_to_int(const NSTDStr *str, NSTDErrorCode *errc);
 ///
 /// `NSTDUInt v` - The parsed arch-bit unsigned integral value.
 ///
-/// # Safety:
+/// # Panics
 ///
-/// This operation can cause undefined behavior if `str`'s data is invalid.
+/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s
+/// max value.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 NSTDAPI NSTDUInt nstd_core_str_to_uint(const NSTDStr *str, NSTDErrorCode *errc);
 /// Attempts to parse a string slice as an `NSTDInt8`.
 ///
@@ -257,9 +358,14 @@ NSTDAPI NSTDUInt nstd_core_str_to_uint(const NSTDStr *str, NSTDErrorCode *errc);
 ///
 /// `NSTDInt8 v` - The parsed 8-bit signed integral value.
 ///
-/// # Safety:
+/// # Panics
 ///
-/// This operation can cause undefined behavior if `str`'s data is invalid.
+/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s
+/// max value.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 NSTDAPI NSTDInt8 nstd_core_str_to_i8(const NSTDStr *str, NSTDErrorCode *errc);
 /// Attempts to parse a string slice as an `NSTDUInt8`.
 ///
@@ -273,9 +379,14 @@ NSTDAPI NSTDInt8 nstd_core_str_to_i8(const NSTDStr *str, NSTDErrorCode *errc);
 ///
 /// `NSTDUInt8 v` - The parsed 8-bit unsigned integral value.
 ///
-/// # Safety:
+/// # Panics
 ///
-/// This operation can cause undefined behavior if `str`'s data is invalid.
+/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s
+/// max value.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 NSTDAPI NSTDUInt8 nstd_core_str_to_u8(const NSTDStr *str, NSTDErrorCode *errc);
 /// Attempts to parse a string slice as an `NSTDInt16`.
 ///
@@ -289,9 +400,14 @@ NSTDAPI NSTDUInt8 nstd_core_str_to_u8(const NSTDStr *str, NSTDErrorCode *errc);
 ///
 /// `NSTDInt16 v` - The parsed 16-bit signed integral value.
 ///
-/// # Safety:
+/// # Panics
 ///
-/// This operation can cause undefined behavior if `str`'s data is invalid.
+/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s
+/// max value.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 NSTDAPI NSTDInt16 nstd_core_str_to_i16(const NSTDStr *str, NSTDErrorCode *errc);
 /// Attempts to parse a string slice as an `NSTDUInt16`.
 ///
@@ -305,9 +421,14 @@ NSTDAPI NSTDInt16 nstd_core_str_to_i16(const NSTDStr *str, NSTDErrorCode *errc);
 ///
 /// `NSTDUInt16 v` - The parsed 16-bit unsigned integral value.
 ///
-/// # Safety:
+/// # Panics
 ///
-/// This operation can cause undefined behavior if `str`'s data is invalid.
+/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s
+/// max value.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 NSTDAPI NSTDUInt16 nstd_core_str_to_u16(const NSTDStr *str, NSTDErrorCode *errc);
 /// Attempts to parse a string slice as an `NSTDInt32`.
 ///
@@ -321,9 +442,14 @@ NSTDAPI NSTDUInt16 nstd_core_str_to_u16(const NSTDStr *str, NSTDErrorCode *errc)
 ///
 /// `NSTDInt32 v` - The parsed 32-bit signed integral value.
 ///
-/// # Safety:
+/// # Panics
 ///
-/// This operation can cause undefined behavior if `str`'s data is invalid.
+/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s
+/// max value.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 NSTDAPI NSTDInt32 nstd_core_str_to_i32(const NSTDStr *str, NSTDErrorCode *errc);
 /// Attempts to parse a string slice as an `NSTDUInt32`.
 ///
@@ -337,9 +463,14 @@ NSTDAPI NSTDInt32 nstd_core_str_to_i32(const NSTDStr *str, NSTDErrorCode *errc);
 ///
 /// `NSTDUInt32 v` - The parsed 32-bit unsigned integral value.
 ///
-/// # Safety:
+/// # Panics
 ///
-/// This operation can cause undefined behavior if `str`'s data is invalid.
+/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s
+/// max value.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 NSTDAPI NSTDUInt32 nstd_core_str_to_u32(const NSTDStr *str, NSTDErrorCode *errc);
 /// Attempts to parse a string slice as an `NSTDInt64`.
 ///
@@ -353,9 +484,14 @@ NSTDAPI NSTDUInt32 nstd_core_str_to_u32(const NSTDStr *str, NSTDErrorCode *errc)
 ///
 /// `NSTDInt64 v` - The parsed 64-bit signed integral value.
 ///
-/// # Safety:
+/// # Panics
 ///
-/// This operation can cause undefined behavior if `str`'s data is invalid.
+/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s
+/// max value.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 NSTDAPI NSTDInt64 nstd_core_str_to_i64(const NSTDStr *str, NSTDErrorCode *errc);
 /// Attempts to parse a string slice as an `NSTDUInt64`.
 ///
@@ -369,18 +505,25 @@ NSTDAPI NSTDInt64 nstd_core_str_to_i64(const NSTDStr *str, NSTDErrorCode *errc);
 ///
 /// `NSTDUInt64 v` - The parsed 64-bit unsigned integral value.
 ///
-/// # Safety:
+/// # Panics
 ///
-/// This operation can cause undefined behavior if `str`'s data is invalid.
+/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s
+/// max value.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 NSTDAPI NSTDUInt64 nstd_core_str_to_u64(const NSTDStr *str, NSTDErrorCode *errc);
 
 /// An unowned view into a UTF-8 encoded byte string.
 typedef struct {
-    /// A view into the UTF-8 encoded buffer.
-    NSTDSliceMut bytes;
+    /// A raw pointer to the string's data.
+    NSTDByte *ptr;
+    /// The number of bytes in the string.
+    NSTDUInt len;
 } NSTDStrMut;
 
-/// Creates a new instance of `NSTDStrMut` from a C string slice.
+/// Creates a new instance of an `NSTDStrMut` from a C string slice.
 ///
 /// # Parameters:
 ///
@@ -392,10 +535,18 @@ typedef struct {
 ///
 /// # Panics
 ///
-/// This function will panic if `cstr`'s data is not valid UTF-8.
+/// This function will panic in the following situations:
+///
+/// - `cstr`'s data is not valid UTF-8.
+///
+/// - `cstr`'s length is greater than `NSTDInt`'s max value.
+///
+/// # Safety
+///
+/// `cstr`'s data must be valid for reads of at least `cstr.len` consecutive bytes.
 NSTDAPI NSTDStrMut nstd_core_str_mut_from_cstr(NSTDCStrMut *cstr);
 
-/// Creates a new instance of `NSTDStrMut` from a C string slice.
+/// Creates a new instance of an `NSTDStrMut` from a C string slice.
 ///
 /// # Parameters:
 ///
@@ -411,6 +562,54 @@ NSTDAPI NSTDStrMut nstd_core_str_mut_from_cstr(NSTDCStrMut *cstr);
 /// valid while the returned string slice is in use.
 NSTDAPI NSTDStrMut nstd_core_str_mut_from_cstr_unchecked(NSTDCStrMut *cstr);
 
+/// Creates a new `NSTDStrMut` from a raw C string.
+///
+/// # Parameters:
+///
+/// - `NSTDChar *cstr` - The raw C string to wrap.
+///
+/// # Returns
+///
+/// `NSTDStrMut str` - The new string slice.
+///
+/// # Panics
+///
+/// This function will panic in the following situations:
+///
+/// - `cstr`'s data is not valid UTF-8.
+///
+/// - `cstr`'s length is greater than `NSTDInt`'s max value.
+///
+/// # Safety
+///
+/// This function makes access to raw pointer data, which can cause undefined behavior in the event
+/// that `cstr`'s data is invalid.
+NSTDAPI NSTDStrMut nstd_core_str_mut_from_raw_cstr(NSTDChar *cstr);
+
+/// Creates a new `NSTDStrMut` from a raw C string, including the null byte.
+///
+/// # Parameters:
+///
+/// - `NSTDChar *cstr` - The raw C string to wrap.
+///
+/// # Returns
+///
+/// `NSTDStrMut str` - The new string slice.
+///
+/// # Panics
+///
+/// This function will panic in the following situations:
+///
+/// - `cstr`'s data is not valid UTF-8.
+///
+/// - `cstr`'s length is greater than `NSTDInt`'s max value.
+///
+/// # Safety
+///
+/// This function makes access to raw pointer data, which can cause undefined behavior in the event
+/// that `cstr`'s data is invalid.
+NSTDAPI NSTDStrMut nstd_core_str_mut_from_raw_cstr_with_null(NSTDChar *cstr);
+
 /// Creates a string slice from raw bytes.
 ///
 /// # Parameters:
@@ -423,7 +622,19 @@ NSTDAPI NSTDStrMut nstd_core_str_mut_from_cstr_unchecked(NSTDCStrMut *cstr);
 ///
 /// # Panics
 ///
-/// This operation will panic if `bytes`'s stride is not 1, or `bytes` is not valid UTF-8.
+/// This operation will panic in the following situations:
+///
+/// - `bytes`'s stride is not 1.
+///
+/// - `bytes`'s length is greater than `NSTDInt`'s max value.
+///
+/// - `bytes` is not valid UTF-8.
+///
+/// # Safety
+///
+/// - `bytes` must remain valid while the returned string slice is in use.
+///
+/// - `bytes`'s data must be valid for reads of at least `bytes.len` consecutive bytes.
 NSTDAPI NSTDStrMut nstd_core_str_mut_from_bytes(NSTDSliceMut *bytes);
 
 /// Creates a string slice from raw bytes, without checking for UTF-8.
@@ -442,8 +653,11 @@ NSTDAPI NSTDStrMut nstd_core_str_mut_from_bytes(NSTDSliceMut *bytes);
 ///
 /// # Safety
 ///
-/// This function does not check to ensure that `bytes` are valid UTF-8.`bytes` must remain valid
-/// while the returned string slice is in use.
+/// - This function does not check to ensure that `bytes` are valid UTF-8.
+///
+/// - `bytes` must remain valid while the returned string slice is in use.
+///
+/// - `bytes`'s data must be valid for reads of at least `bytes.len` consecutive bytes.
 NSTDAPI NSTDStrMut nstd_core_str_mut_from_bytes_unchecked(NSTDSliceMut *bytes);
 
 /// Creates an immutable version of a mutable string slice.
@@ -491,8 +705,8 @@ NSTDAPI const NSTDByte *nstd_core_str_mut_as_ptr(const NSTDStrMut *str);
 ///
 /// # Panics
 ///
-/// This operation may panic in the event that `str`'s calculated length is greater than the
-/// highest number representable by `NSTDUInt`.
+/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s max
+/// value.
 ///
 /// # Safety
 ///
@@ -527,17 +741,17 @@ NSTDAPI NSTDUInt nstd_core_str_mut_byte_len(const NSTDStrMut *str);
 /// `NSTDUnichar chr` - The character at index `pos`, or the Unicode replacement character on
 /// error.
 ///
+/// # Panics
+///
+/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s max
+/// value.
+///
 /// # Safety
 ///
-/// This operation could cause undefined behavior if `str`'s data is invalid.
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 NSTDAPI NSTDUnichar nstd_core_str_mut_get_char(const NSTDStrMut *str, NSTDUInt pos);
 
 /// Creates a substring of an existing string slice.
-///
-/// # Note
-///
-/// This function is considered safe because the returned string slice is already unsafe to operate
-/// on.
 ///
 /// # Parameters:
 ///
@@ -553,11 +767,19 @@ NSTDAPI NSTDUnichar nstd_core_str_mut_get_char(const NSTDStrMut *str, NSTDUInt p
 ///
 /// This operation can panic under the following circumstances:
 ///
-/// - `range.end` is greater than `str.bytes.len`.
+/// - `range.start` is greater than `NSTDInt`'s max value.
 ///
 /// - `range.start` is greater than `range.end`.
 ///
+/// - `range.end` is greater than `str.len`.
+///
+/// - `range.end` - `range.start` is greater than `NSTDInt`'s max value.
+///
 /// - The substring bytes are not valid UTF-8.
+///
+/// # Safety
+///
+/// `str`'s data must be valid for reads of at least `str.len` consecutive bytes.
 NSTDAPI NSTDStrMut nstd_core_str_mut_substr(NSTDStrMut *str, NSTDURange range);
 
 /// Attempts to parse a string slice as an `NSTDFloat32`.
@@ -572,9 +794,14 @@ NSTDAPI NSTDStrMut nstd_core_str_mut_substr(NSTDStrMut *str, NSTDURange range);
 ///
 /// `NSTDFloat32 v` - The parsed 32-bit floating-point value.
 ///
-/// # Safety:
+/// # Panics
 ///
-/// This operation can cause undefined behavior if `str`'s data is invalid.
+/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s
+/// max value.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 NSTDAPI NSTDFloat32 nstd_core_str_mut_to_f32(const NSTDStrMut *str, NSTDErrorCode *errc);
 /// Attempts to parse a string slice as an `NSTDFloat64`.
 ///
@@ -588,9 +815,14 @@ NSTDAPI NSTDFloat32 nstd_core_str_mut_to_f32(const NSTDStrMut *str, NSTDErrorCod
 ///
 /// `NSTDFloat64 v` - The parsed 64-bit floating-point value.
 ///
-/// # Safety:
+/// # Panics
 ///
-/// This operation can cause undefined behavior if `str`'s data is invalid.
+/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s
+/// max value.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 NSTDAPI NSTDFloat64 nstd_core_str_mut_to_f64(const NSTDStrMut *str, NSTDErrorCode *errc);
 /// Attempts to parse a string slice as an `NSTDInt`.
 ///
@@ -604,9 +836,14 @@ NSTDAPI NSTDFloat64 nstd_core_str_mut_to_f64(const NSTDStrMut *str, NSTDErrorCod
 ///
 /// `NSTDInt v` - The parsed arch-bit signed integral value.
 ///
-/// # Safety:
+/// # Panics
 ///
-/// This operation can cause undefined behavior if `str`'s data is invalid.
+/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s
+/// max value.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 NSTDAPI NSTDInt nstd_core_str_mut_to_int(const NSTDStrMut *str, NSTDErrorCode *errc);
 /// Attempts to parse a string slice as an `NSTDUInt`.
 ///
@@ -620,9 +857,14 @@ NSTDAPI NSTDInt nstd_core_str_mut_to_int(const NSTDStrMut *str, NSTDErrorCode *e
 ///
 /// `NSTDUInt v` - The parsed arch-bit unsigned integral value.
 ///
-/// # Safety:
+/// # Panics
 ///
-/// This operation can cause undefined behavior if `str`'s data is invalid.
+/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s
+/// max value.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 NSTDAPI NSTDUInt nstd_core_str_mut_to_uint(const NSTDStrMut *str, NSTDErrorCode *errc);
 /// Attempts to parse a string slice as an `NSTDInt8`.
 ///
@@ -636,9 +878,14 @@ NSTDAPI NSTDUInt nstd_core_str_mut_to_uint(const NSTDStrMut *str, NSTDErrorCode 
 ///
 /// `NSTDInt8 v` - The parsed 8-bit signed integral value.
 ///
-/// # Safety:
+/// # Panics
 ///
-/// This operation can cause undefined behavior if `str`'s data is invalid.
+/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s
+/// max value.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 NSTDAPI NSTDInt8 nstd_core_str_mut_to_i8(const NSTDStrMut *str, NSTDErrorCode *errc);
 /// Attempts to parse a string slice as an `NSTDUInt8`.
 ///
@@ -652,9 +899,14 @@ NSTDAPI NSTDInt8 nstd_core_str_mut_to_i8(const NSTDStrMut *str, NSTDErrorCode *e
 ///
 /// `NSTDUInt8 v` - The parsed 8-bit unsigned integral value.
 ///
-/// # Safety:
+/// # Panics
 ///
-/// This operation can cause undefined behavior if `str`'s data is invalid.
+/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s
+/// max value.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 NSTDAPI NSTDUInt8 nstd_core_str_mut_to_u8(const NSTDStrMut *str, NSTDErrorCode *errc);
 /// Attempts to parse a string slice as an `NSTDInt16`.
 ///
@@ -668,9 +920,14 @@ NSTDAPI NSTDUInt8 nstd_core_str_mut_to_u8(const NSTDStrMut *str, NSTDErrorCode *
 ///
 /// `NSTDInt16 v` - The parsed 16-bit signed integral value.
 ///
-/// # Safety:
+/// # Panics
 ///
-/// This operation can cause undefined behavior if `str`'s data is invalid.
+/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s
+/// max value.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 NSTDAPI NSTDInt16 nstd_core_str_mut_to_i16(const NSTDStrMut *str, NSTDErrorCode *errc);
 /// Attempts to parse a string slice as an `NSTDUInt16`.
 ///
@@ -684,9 +941,14 @@ NSTDAPI NSTDInt16 nstd_core_str_mut_to_i16(const NSTDStrMut *str, NSTDErrorCode 
 ///
 /// `NSTDUInt16 v` - The parsed 16-bit unsigned integral value.
 ///
-/// # Safety:
+/// # Panics
 ///
-/// This operation can cause undefined behavior if `str`'s data is invalid.
+/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s
+/// max value.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 NSTDAPI NSTDUInt16 nstd_core_str_mut_to_u16(const NSTDStrMut *str, NSTDErrorCode *errc);
 /// Attempts to parse a string slice as an `NSTDInt32`.
 ///
@@ -700,9 +962,14 @@ NSTDAPI NSTDUInt16 nstd_core_str_mut_to_u16(const NSTDStrMut *str, NSTDErrorCode
 ///
 /// `NSTDInt32 v` - The parsed 32-bit signed integral value.
 ///
-/// # Safety:
+/// # Panics
 ///
-/// This operation can cause undefined behavior if `str`'s data is invalid.
+/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s
+/// max value.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 NSTDAPI NSTDInt32 nstd_core_str_mut_to_i32(const NSTDStrMut *str, NSTDErrorCode *errc);
 /// Attempts to parse a string slice as an `NSTDUInt32`.
 ///
@@ -716,9 +983,14 @@ NSTDAPI NSTDInt32 nstd_core_str_mut_to_i32(const NSTDStrMut *str, NSTDErrorCode 
 ///
 /// `NSTDUInt32 v` - The parsed 32-bit unsigned integral value.
 ///
-/// # Safety:
+/// # Panics
 ///
-/// This operation can cause undefined behavior if `str`'s data is invalid.
+/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s
+/// max value.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 NSTDAPI NSTDUInt32 nstd_core_str_mut_to_u32(const NSTDStrMut *str, NSTDErrorCode *errc);
 /// Attempts to parse a string slice as an `NSTDInt64`.
 ///
@@ -732,9 +1004,14 @@ NSTDAPI NSTDUInt32 nstd_core_str_mut_to_u32(const NSTDStrMut *str, NSTDErrorCode
 ///
 /// `NSTDInt64 v` - The parsed 64-bit signed integral value.
 ///
-/// # Safety:
+/// # Panics
 ///
-/// This operation can cause undefined behavior if `str`'s data is invalid.
+/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s
+/// max value.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 NSTDAPI NSTDInt64 nstd_core_str_mut_to_i64(const NSTDStrMut *str, NSTDErrorCode *errc);
 /// Attempts to parse a string slice as an `NSTDUInt64`.
 ///
@@ -748,9 +1025,14 @@ NSTDAPI NSTDInt64 nstd_core_str_mut_to_i64(const NSTDStrMut *str, NSTDErrorCode 
 ///
 /// `NSTDUInt64 v` - The parsed 64-bit unsigned integral value.
 ///
-/// # Safety:
+/// # Panics
 ///
-/// This operation can cause undefined behavior if `str`'s data is invalid.
+/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s
+/// max value.
+///
+/// # Safety
+///
+/// This operation can cause undefined behavior in the event that `str`'s data is invalid.
 NSTDAPI NSTDUInt64 nstd_core_str_mut_to_u64(const NSTDStrMut *str, NSTDErrorCode *errc);
 
 #endif

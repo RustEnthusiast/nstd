@@ -5,8 +5,8 @@ use crate::{
         def::{NSTDByte, NSTDErrorCode},
         mem::{nstd_core_mem_copy, nstd_core_mem_copy_overlapping},
         slice::{
-            nstd_core_slice_mut_new, nstd_core_slice_new, nstd_core_slice_stride, NSTDSlice,
-            NSTDSliceMut,
+            nstd_core_slice_as_ptr, nstd_core_slice_len, nstd_core_slice_mut_new,
+            nstd_core_slice_new, nstd_core_slice_stride, NSTDSlice, NSTDSliceMut,
         },
     },
     NSTDAny, NSTDAnyMut, NSTDUInt, NSTD_NULL,
@@ -30,19 +30,18 @@ impl NSTDVec {
     ///
     /// # Panics
     ///
-    /// This operation will panic if `size_of::<T>()` is 0.
+    /// This operation will panic if either `size_of::<T>()` is 0 or allocating fails.
     #[allow(dead_code)]
-    pub(crate) fn from_slice<T>(slice: &[T]) -> Self {
+    pub(crate) fn from_slice<T: Copy>(slice: &[T]) -> Self {
         let stride = core::mem::size_of::<T>();
         let len = slice.len();
         if len > 0 {
             // Allocate the new vector.
             let mut vec = nstd_vec_new_with_cap(stride, len);
-            if !vec.ptr.is_null() {
-                // SAFETY: `vec`'s memory buffer has just been allocated and validated.
-                unsafe { nstd_core_mem_copy(vec.ptr.cast(), slice.as_ptr().cast(), len * stride) };
-                vec.len = len;
-            }
+            assert!(!vec.ptr.is_null());
+            // SAFETY: `vec`'s memory buffer has just been allocated and validated.
+            unsafe { nstd_core_mem_copy(vec.ptr.cast(), slice.as_ptr().cast(), len * stride) };
+            vec.len = len;
             vec
         } else {
             nstd_vec_new(stride)
@@ -65,29 +64,45 @@ impl NSTDVec {
     ///
     /// # Panics
     ///
-    /// This operation will panic if `size_of::<T>()` does not match the vector's stride.
+    /// This operation will panic in the following situations:
+    ///
+    /// - `size_of::<T>()` does not match the vector's stride.
+    ///
+    /// - The total length of the vector's buffer exceeds `isize::MAX` bytes.
     ///
     /// # Safety
     ///
-    /// The vector's data must remain valid while the returned slice is in use.
+    /// - The vector's data must remain valid while the returned slice is in use.
+    ///
+    /// - The vector's data must be properly aligned.
     #[inline]
     #[allow(dead_code)]
     pub(crate) unsafe fn as_slice<T>(&self) -> &[T] {
-        assert!(self.stride == core::mem::size_of::<T>());
-        core::slice::from_raw_parts(self.ptr.cast(), self.byte_len())
+        assert!(self.stride == core::mem::size_of::<T>() && self.byte_len() <= isize::MAX as usize);
+        core::slice::from_raw_parts(self.ptr.cast(), self.len)
     }
 
-    /// Returns a pointer to one element past the end of the vector.
+    /// Returns a pointer to one byte past the end of the vector.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the total length of the vector's buffer exceeds `isize::MAX` bytes.
     ///
     /// # Safety
     ///
-    /// This method does ***NOT*** check to make sure the vector is non-null.
+    /// The vector must have already allocated memory.
     #[inline]
     unsafe fn end(&self) -> NSTDAnyMut {
-        self.ptr.add(self.byte_len())
+        let len = self.byte_len();
+        assert!(len <= isize::MAX as usize);
+        self.ptr.add(len)
     }
 
     /// Attempts to reserve some memory for the vector if needed.
+    ///
+    /// # Panics
+    ///
+    /// This method may panic if getting a handle to the heap fails.
     #[inline]
     fn try_reserve(&mut self) -> NSTDAllocError {
         if self.len == self.cap {
@@ -99,6 +114,10 @@ impl NSTDVec {
 }
 impl Drop for NSTDVec {
     /// [NSTDVec]'s destructor.
+    ///
+    /// # Panics
+    ///
+    /// This operation may panic if getting a handle to the heap fails.
     #[inline]
     fn drop(&mut self) {
         if !self.ptr.is_null() {
@@ -122,6 +141,16 @@ impl Drop for NSTDVec {
 /// # Panics
 ///
 /// This function will panic if `element_size` is zero.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::vec::nstd_vec_new;
+///
+/// const SIZE: usize = core::mem::size_of::<u32>();
+///
+/// let vec = nstd_vec_new(SIZE);
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_vec_new(element_size: NSTDUInt) -> NSTDVec {
@@ -152,13 +181,40 @@ pub extern "C" fn nstd_vec_new(element_size: NSTDUInt) -> NSTDVec {
 ///
 /// # Panics
 ///
-/// This function will panic if either `element_size` or `cap` are zero.
-#[inline]
+/// This function may panic in the following situations:
+///
+/// - Either `element_size` or `cap` are zero.
+///
+/// - Getting a handle to the heap fails.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::{
+///     core::slice::{nstd_core_slice_get, nstd_core_slice_new},
+///     vec::{nstd_vec_extend, nstd_vec_get, nstd_vec_len, nstd_vec_new_with_cap},
+///     alloc::NSTDAllocError::NSTD_ALLOC_ERROR_NONE,
+/// };
+///
+/// const SIZE: usize = core::mem::size_of::<i16>();
+///
+/// let numbers = [642i16, 324i16, 190i16];
+/// let numbers = nstd_core_slice_new(numbers.as_ptr().cast(), SIZE, 3);
+/// let mut vec = nstd_vec_new_with_cap(SIZE, 3);
+/// unsafe {
+///     assert!(nstd_vec_extend(&mut vec, &numbers) == NSTD_ALLOC_ERROR_NONE);
+///     for i in 0..nstd_vec_len(&vec) {
+///         let sv = nstd_core_slice_get(&numbers, i).cast::<i16>();
+///         let vv = nstd_vec_get(&vec, i).cast::<i16>();
+///         assert!(!sv.is_null() && !vv.is_null());
+///         assert!(*sv == *vv);
+///     }
+/// }
+/// ```
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_vec_new_with_cap(element_size: NSTDUInt, mut cap: NSTDUInt) -> NSTDVec {
     // Ensure that neither `element_size` or `cap` are zero.
-    assert!(element_size != 0);
-    assert!(cap != 0);
+    assert!(element_size != 0 && cap != 0);
     // Attempt to allocate the memory buffer.
     // SAFETY: Both `element_size` & `cap` are above 0.
     let mem = unsafe { nstd_alloc_allocate(cap * element_size) };
@@ -171,6 +227,63 @@ pub extern "C" fn nstd_vec_new_with_cap(element_size: NSTDUInt, mut cap: NSTDUIn
         stride: element_size,
         cap,
         len: 0,
+    }
+}
+
+/// Creates a new vector from a slice.
+///
+/// # Parameters:
+///
+/// - `const NSTDSlice *slice` - The slice to copy data from.
+///
+/// # Returns
+///
+/// `NSTDVec vec` - The new vector with a copy of `slice`'s contents.
+///
+/// # Panics
+///
+/// This operation will panic if the slice's stride is 0 or allocating fails.
+///
+/// # Safety
+///
+/// The caller of this function must ensure that `slice`'s data is valid for reads.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::{
+///     core::slice::{nstd_core_slice_get, nstd_core_slice_new},
+///     vec::{nstd_vec_from_slice, nstd_vec_get, nstd_vec_len},
+/// };
+///
+/// const SIZE: usize = core::mem::size_of::<u128>();
+///
+/// let numbers = [59237u128, 13953u128, 50285u128];
+/// let numbers = nstd_core_slice_new(numbers.as_ptr().cast(), SIZE, 3);
+/// unsafe {
+///     let mut vec = nstd_vec_from_slice(&numbers);
+///     for i in 0..nstd_vec_len(&vec) {
+///         let sv = nstd_core_slice_get(&numbers, i).cast::<u128>();
+///         let vv = nstd_vec_get(&vec, i).cast::<u128>();
+///         assert!(!sv.is_null() && !vv.is_null());
+///         assert!(*sv == *vv);
+///     }
+/// }
+/// ```
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_vec_from_slice(slice: &NSTDSlice) -> NSTDVec {
+    let stride = nstd_core_slice_stride(slice);
+    let len = nstd_core_slice_len(slice);
+    if len > 0 {
+        // Allocate the new vector.
+        let mut vec = nstd_vec_new_with_cap(stride, len);
+        assert!(!vec.ptr.is_null());
+        let bytes = len * stride;
+        nstd_core_mem_copy(vec.ptr.cast(), nstd_core_slice_as_ptr(slice).cast(), bytes);
+        vec.len = len;
+        vec
+    } else {
+        nstd_vec_new(stride)
     }
 }
 
@@ -189,7 +302,7 @@ pub extern "C" fn nstd_vec_new_with_cap(element_size: NSTDUInt, mut cap: NSTDUIn
 /// This operation will panic if allocating for the new vector fails.
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_vec_clone(vec: &NSTDVec) -> NSTDVec {
-    if !vec.ptr.is_null() && vec.len > 0 {
+    if vec.len > 0 {
         let mut cloned = nstd_vec_new_with_cap(vec.stride, vec.len);
         assert!(!cloned.ptr.is_null());
         // SAFETY: Both vectors are non-null.
@@ -325,14 +438,43 @@ pub extern "C" fn nstd_vec_as_mut_ptr(vec: &mut NSTDVec) -> NSTDAnyMut {
 ///
 /// `NSTDAny element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out
 /// of the vector's boundaries.
+///
+/// # Panics
+///
+/// Panics if the vec's current length in bytes exceeds `NSTDInt`'s max value.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::{
+///     core::slice::{nstd_core_slice_get, nstd_core_slice_new},
+///     vec::{nstd_vec_from_slice, nstd_vec_get, nstd_vec_len},
+/// };
+///
+/// const SIZE: usize = core::mem::size_of::<i64>();
+///
+/// let numbers = [-639i64, 429i64, -440i64];
+/// let numbers = nstd_core_slice_new(numbers.as_ptr().cast(), SIZE, 3);
+/// unsafe {
+///     let mut vec = nstd_vec_from_slice(&numbers);
+///     for i in 0..nstd_vec_len(&vec) {
+///         let sv = nstd_core_slice_get(&numbers, i).cast::<i64>();
+///         let vv = nstd_vec_get(&vec, i).cast::<i64>();
+///         assert!(!sv.is_null() && !vv.is_null());
+///         assert!(*sv == *vv);
+///     }
+/// }
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_vec_get(vec: &NSTDVec, pos: NSTDUInt) -> NSTDAny {
-    match pos < vec.len {
+pub extern "C" fn nstd_vec_get(vec: &NSTDVec, mut pos: NSTDUInt) -> NSTDAny {
+    if pos < vec.len {
+        pos *= vec.stride;
+        assert!(pos <= isize::MAX as usize);
         // SAFETY: `pos` is a valid index.
-        true => unsafe { vec.ptr.add(pos * vec.stride) },
-        false => NSTD_NULL,
+        return unsafe { vec.ptr.add(pos) };
     }
+    NSTD_NULL
 }
 
 /// Returns a pointer to the element at index `pos` in `vec`.
@@ -352,6 +494,38 @@ pub extern "C" fn nstd_vec_get(vec: &NSTDVec, pos: NSTDUInt) -> NSTDAny {
 ///
 /// `NSTDAnyMut element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out of
 /// the vector's boundaries.
+///
+/// # Panics
+///
+/// Panics if the vec's current length in bytes exceeds `NSTDInt`'s max value.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::{
+///     core::slice::{nstd_core_slice_get, nstd_core_slice_new},
+///     vec::{nstd_vec_from_slice, nstd_vec_get, nstd_vec_get_mut, nstd_vec_len},
+/// };
+///
+/// const SIZE: usize = core::mem::size_of::<i64>();
+///
+/// let numbers = [639i64, -429i64, 440i64];
+/// let numbers = nstd_core_slice_new(numbers.as_ptr().cast(), SIZE, 3);
+/// unsafe {
+///     let mut vec = nstd_vec_from_slice(&numbers);
+///     for i in 0..nstd_vec_len(&vec) {
+///         let vv = nstd_vec_get_mut(&mut vec, i).cast::<i64>();
+///         assert!(!vv.is_null());
+///         *vv = -*vv;
+///     }
+///     for i in 0..nstd_vec_len(&vec) {
+///         let sv = nstd_core_slice_get(&numbers, i).cast::<i64>();
+///         let vv = nstd_vec_get(&vec, i).cast::<i64>();
+///         assert!(!sv.is_null() && !vv.is_null());
+///         assert!(-*sv == *vv);
+///     }
+/// }
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_vec_get_mut(vec: &mut NSTDVec, pos: NSTDUInt) -> NSTDAnyMut {
@@ -371,10 +545,30 @@ pub extern "C" fn nstd_vec_get_mut(vec: &mut NSTDVec, pos: NSTDUInt) -> NSTDAnyM
 ///
 /// `NSTDAllocError errc` - The allocation operation error code.
 ///
+/// # Panics
+///
+/// Panics if the current length in bytes exceeds `NSTDInt`'s max value or getting a handle to the
+/// heap fails.
+///
 /// # Safety
 ///
 /// This operation is unsafe because undefined behavior can occur if the size of the value being
 /// pushed onto the vector is not equal to `vec`'s stride.
+///
+/// # Example
+///
+/// ```
+/// use core::ptr::addr_of;
+/// use nstd_sys::vec::{nstd_vec_new, nstd_vec_push};
+///
+/// const SIZE: usize = core::mem::size_of::<f64>();
+///
+/// let mut vec = nstd_vec_new(SIZE);
+/// let values: [f64; 3] = [6.0, 3.1, 9.4];
+/// for value in values {
+///     unsafe { nstd_vec_push(&mut vec, addr_of!(value).cast()) };
+/// }
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_vec_push(vec: &mut NSTDVec, value: NSTDAny) -> NSTDAllocError {
@@ -403,6 +597,32 @@ pub unsafe extern "C" fn nstd_vec_push(vec: &mut NSTDVec, value: NSTDAny) -> NST
 ///
 /// - `NSTDAny value` - A pointer to the value that was popped off the stack, or null if the
 /// vector is empty.
+///
+/// # Panics
+///
+/// Panics if `vec`'s new length (in bytes) exceeds `NSTDInt`'s max value.
+///
+/// # Example
+///
+/// ```
+/// use core::ptr::addr_of;
+/// use nstd_sys::{
+///     core::slice::nstd_core_slice_new,
+///     vec::{nstd_vec_extend, nstd_vec_new, nstd_vec_pop},
+/// };
+///
+/// const SIZE: usize = core::mem::size_of::<f64>();
+///
+/// let mut vec = nstd_vec_new(SIZE);
+/// let values: [f64; 3] = [9.4, 3.1, 6.0];
+/// let values_slice = nstd_core_slice_new(values.as_ptr().cast(), SIZE, 3);
+/// unsafe {
+///     nstd_vec_extend(&mut vec, &values_slice);
+///     for value in values.iter().rev() {
+///         assert!(*value == *nstd_vec_pop(&mut vec).cast::<f64>());
+///     }
+/// }
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_vec_pop(vec: &mut NSTDVec) -> NSTDAny {
@@ -434,15 +654,48 @@ pub extern "C" fn nstd_vec_pop(vec: &mut NSTDVec) -> NSTDAny {
 ///
 /// - `2` - Reserving space for the vector failed.
 ///
+/// # Panics
+///
+/// This function will panic in the following situations:
+///
+/// - `index` multiplied by `vec`'s stride exceeds `NSTDInt`'s max value.
+///
+/// - Getting a handle to the heap fails.
+///
 /// # Safety
 ///
 /// This operation is unsafe because undefined behavior can occur if the size of the value being
 /// inserted into the vector is not equal to `vec`'s stride.
+///
+/// # Example
+///
+/// ```
+/// use core::ptr::addr_of;
+/// use nstd_sys::{
+///     core::slice::nstd_core_slice_new,
+///     vec::{nstd_vec_from_slice, nstd_vec_get, nstd_vec_insert},
+/// };
+///
+/// const SIZE: usize = core::mem::size_of::<u32>();
+///
+/// let slice: [u32; 4] = [1, 2, 3, 5];
+/// let slice = nstd_core_slice_new(slice.as_ptr().cast(), SIZE, 4);
+/// unsafe {
+///     let mut vec = nstd_vec_from_slice(&slice);
+///     let four = 4u32;
+///     assert!(nstd_vec_insert(&mut vec, addr_of!(four).cast(), 3) == 0);
+///     for i in 1..=5 {
+///         let v = nstd_vec_get(&vec, i - 1);
+///         assert!(!v.is_null());
+///         assert!(*v.cast::<u32>() == i as u32);
+///     }
+/// }
+/// ```
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_vec_insert(
     vec: &mut NSTDVec,
     value: NSTDAny,
-    index: NSTDUInt,
+    mut index: NSTDUInt,
 ) -> NSTDErrorCode {
     // Make sure `index` is valid.
     if index > vec.len {
@@ -457,8 +710,9 @@ pub unsafe extern "C" fn nstd_vec_insert(
         // Move elements at/after `index` over by one element.
         let stride = vec.stride;
         let bytes_to_copy = (vec.len - index) * stride;
-        let idxpos = index * stride;
-        let idxptr = vec.ptr.add(idxpos).cast::<NSTDByte>();
+        index *= stride;
+        assert!(index <= isize::MAX as usize);
+        let idxptr = vec.ptr.add(index).cast::<NSTDByte>();
         let dest = idxptr.add(stride);
         nstd_core_mem_copy_overlapping(dest, idxptr, bytes_to_copy);
         // Write `value` over the old value at `index`.
@@ -479,17 +733,46 @@ pub unsafe extern "C" fn nstd_vec_insert(
 /// # Returns
 ///
 /// `NSTDErrorCode errc` - Nonzero if `index` is invalid.
+///
+/// # Panics
+///
+/// This operation will panic if `index` multiplied by `vec`'s stride exceeds `NSTDInt`'s max value.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::{
+///     core::slice::nstd_core_slice_new,
+///     vec::{nstd_vec_from_slice, nstd_vec_get, nstd_vec_remove},
+/// };
+///
+/// const SIZE: usize = core::mem::size_of::<u32>();
+///
+/// let slice: [u32; 5] = [1, 2, 3, 4, 5];
+/// let slice = nstd_core_slice_new(slice.as_ptr().cast(), SIZE, 5);
+/// unsafe {
+///     let mut vec = nstd_vec_from_slice(&slice);
+///     assert!(nstd_vec_remove(&mut vec, 0) == 0);
+///     assert!(nstd_vec_remove(&mut vec, 3) == 0);
+///     for i in 0..3 {
+///         let v = nstd_vec_get(&vec, i);
+///         assert!(!v.is_null());
+///         assert!(*v.cast::<u32>() == (i + 2) as u32);
+///     }
+/// }
+/// ```
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_vec_remove(vec: &mut NSTDVec, index: NSTDUInt) -> NSTDErrorCode {
+pub extern "C" fn nstd_vec_remove(vec: &mut NSTDVec, mut index: NSTDUInt) -> NSTDErrorCode {
     // Make sure `index` is valid. This also ensures that `vec.len` is at least 1.
     if index < vec.len {
         // Move bytes after `index` to the left by one element.
         let stride = vec.stride;
         let bytes_to_copy = (vec.len - index - 1) * stride;
-        let idxpos = index * stride;
+        index *= stride;
+        assert!(index <= isize::MAX as usize);
         // SAFETY: The vector's data is valid for the shift.
         unsafe {
-            let idxptr = vec.ptr.add(idxpos).cast::<NSTDByte>();
+            let idxptr = vec.ptr.add(index).cast::<NSTDByte>();
             let src = idxptr.add(stride);
             nstd_core_mem_copy_overlapping(idxptr, src, bytes_to_copy);
         }
@@ -517,26 +800,58 @@ pub extern "C" fn nstd_vec_remove(vec: &mut NSTDVec, index: NSTDUInt) -> NSTDErr
 ///
 /// # Panics
 ///
-/// This operation will panic if the element sizes for `vec` and `values` do not match.
+/// This operation will panic in the following situations:
+///
+/// - `vec` and `values` strides do not match.
+///
+/// - The current length in bytes exceeds `NSTDInt`'s max value.
+///
+/// - Getting a handle to the heap fails.
 ///
 /// # Safety
 ///
 /// This operation can cause undefined behavior if `values`'s data is invalid.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::{
+///     alloc::NSTDAllocError::NSTD_ALLOC_ERROR_NONE,
+///     core::slice::nstd_core_slice_new,
+///     vec::{nstd_vec_extend, nstd_vec_get, nstd_vec_new},
+/// };
+///
+/// const SIZE: usize = core::mem::size_of::<i128>();
+///
+/// let values: [i128; 5] = [1, 2, 3, 4, 5];
+/// let slice = nstd_core_slice_new(values.as_ptr().cast(), SIZE, 5);
+/// unsafe {
+///     let mut vec = nstd_vec_new(SIZE);
+///     assert!(nstd_vec_extend(&mut vec, &slice) == NSTD_ALLOC_ERROR_NONE);
+///     for i in 0..5 {
+///         let v = nstd_vec_get(&vec, i);
+///         assert!(!v.is_null());
+///         assert!(*v.cast::<i128>() == values[i]);
+///     }
+/// }
+/// ```
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_vec_extend(vec: &mut NSTDVec, values: &NSTDSlice) -> NSTDAllocError {
     // Ensure value sizes are the same for both the vector and the slice.
     assert!(vec.stride == nstd_core_slice_stride(values));
+    let len = nstd_core_slice_len(values);
     // Making sure there's enough space for the extension.
     let mut errc = NSTDAllocError::NSTD_ALLOC_ERROR_NONE;
     let reserved = vec.cap - vec.len;
-    if reserved < values.len {
-        let additional = values.len - reserved;
+    if reserved < len {
+        let additional = len - reserved;
         errc = nstd_vec_reserve(vec, additional);
     }
     // On success copy bytes to the end of the vector.
     if errc == NSTDAllocError::NSTD_ALLOC_ERROR_NONE {
-        nstd_core_mem_copy(vec.end().cast(), values.ptr.raw.cast(), values.byte_len());
-        vec.len += values.len;
+        let ptr = nstd_core_slice_as_ptr(values).cast();
+        nstd_core_mem_copy(vec.end().cast(), ptr, values.byte_len());
+        vec.len += len;
     }
     errc
 }
@@ -575,7 +890,7 @@ pub extern "C" fn nstd_vec_truncate(vec: &mut NSTDVec, len: NSTDUInt) {
 ///
 /// # Panics
 ///
-/// This operation will panic if `size` is zero.
+/// This operation may panic if either `size` is zero or getting a handle to the heap fails.
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_vec_reserve(vec: &mut NSTDVec, size: NSTDUInt) -> NSTDAllocError {
     assert!(size != 0);
@@ -618,6 +933,10 @@ pub extern "C" fn nstd_vec_reserve(vec: &mut NSTDVec, size: NSTDUInt) -> NSTDAll
 /// # Returns
 ///
 /// `NSTDAllocError errc` - The allocation operation error code.
+///
+/// # Panics
+///
+/// Panics if getting a handle to the heap fails.
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_vec_shrink(vec: &mut NSTDVec) -> NSTDAllocError {
     // Make sure the vector is non-null and it's capacity is greater than it's length.
@@ -641,6 +960,10 @@ pub extern "C" fn nstd_vec_shrink(vec: &mut NSTDVec) -> NSTDAllocError {
 /// # Parameters:
 ///
 /// - `NSTDVec vec` - The vector to free.
+///
+/// # Panics
+///
+/// This operation may panic if getting a handle to the heap fails.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 #[allow(unused_variables)]

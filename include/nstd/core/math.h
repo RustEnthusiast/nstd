@@ -44,6 +44,178 @@ NSTDAPI NSTDFloat32 nstd_core_math_rad_f32(NSTDFloat32 deg);
 /// `NSTDFloat64 rad` - The degrees value converted to radians.
 NSTDAPI NSTDFloat64 nstd_core_math_rad_f64(NSTDFloat64 deg);
 
+/// Computes the absolute (positive) value of `x`.
+///
+/// # Parameters:
+///
+/// - `NSTDInt x` - The value.
+///
+/// # Returns
+///
+/// `NSTDInt abs` - The absolute value of `x`.
+NSTDAPI NSTDInt nstd_core_math_abs_int(NSTDInt x);
+/// Computes the absolute (positive) value of `x`.
+///
+/// # Parameters:
+///
+/// - `NSTDInt8 x` - The value.
+///
+/// # Returns
+///
+/// `NSTDInt8 abs` - The absolute value of `x`.
+NSTDAPI NSTDInt8 nstd_core_math_abs_i8(NSTDInt8 x);
+/// Computes the absolute (positive) value of `x`.
+///
+/// # Parameters:
+///
+/// - `NSTDInt16 x` - The value.
+///
+/// # Returns
+///
+/// `NSTDInt16 abs` - The absolute value of `x`.
+NSTDAPI NSTDInt16 nstd_core_math_abs_i16(NSTDInt16 x);
+/// Computes the absolute (positive) value of `x`.
+///
+/// # Parameters:
+///
+/// - `NSTDInt32 x` - The value.
+///
+/// # Returns
+///
+/// `NSTDInt32 abs` - The absolute value of `x`.
+NSTDAPI NSTDInt32 nstd_core_math_abs_i32(NSTDInt32 x);
+/// Computes the absolute (positive) value of `x`.
+///
+/// # Parameters:
+///
+/// - `NSTDInt64 x` - The value.
+///
+/// # Returns
+///
+/// `NSTDInt64 abs` - The absolute value of `x`.
+NSTDAPI NSTDInt64 nstd_core_math_abs_i64(NSTDInt64 x);
+
+/// Raises the value `x` to the power of `exp`
+///
+/// # Parameters:
+///
+/// - `NSTDInt x` - The value.
+///
+/// - `NSTDUInt32 exp` - The exponent.
+///
+/// # Returns
+///
+/// `NSTDInt pow` - `x` raised to the power of `exp`.
+NSTDAPI NSTDInt nstd_core_math_pow_int(NSTDInt x, NSTDUInt32 exp);
+/// Raises the value `x` to the power of `exp`
+///
+/// # Parameters:
+///
+/// - `NSTDUInt x` - The value.
+///
+/// - `NSTDUInt32 exp` - The exponent.
+///
+/// # Returns
+///
+/// `NSTDUInt pow` - `x` raised to the power of `exp`.
+NSTDAPI NSTDUInt nstd_core_math_pow_uint(NSTDUInt x, NSTDUInt32 exp);
+/// Raises the value `x` to the power of `exp`
+///
+/// # Parameters:
+///
+/// - `NSTDInt8 x` - The value.
+///
+/// - `NSTDUInt32 exp` - The exponent.
+///
+/// # Returns
+///
+/// `NSTDInt8 pow` - `x` raised to the power of `exp`.
+NSTDAPI NSTDInt8 nstd_core_math_pow_i8(NSTDInt8 x, NSTDUInt32 exp);
+/// Raises the value `x` to the power of `exp`
+///
+/// # Parameters:
+///
+/// - `NSTDUInt8 x` - The value.
+///
+/// - `NSTDUInt32 exp` - The exponent.
+///
+/// # Returns
+///
+/// `NSTDUInt8 pow` - `x` raised to the power of `exp`.
+NSTDAPI NSTDUInt8 nstd_core_math_pow_u8(NSTDUInt8 x, NSTDUInt32 exp);
+/// Raises the value `x` to the power of `exp`
+///
+/// # Parameters:
+///
+/// - `NSTDInt16 x` - The value.
+///
+/// - `NSTDUInt32 exp` - The exponent.
+///
+/// # Returns
+///
+/// `NSTDInt16 pow` - `x` raised to the power of `exp`.
+NSTDAPI NSTDInt16 nstd_core_math_pow_i16(NSTDInt16 x, NSTDUInt32 exp);
+/// Raises the value `x` to the power of `exp`
+///
+/// # Parameters:
+///
+/// - `NSTDUInt16 x` - The value.
+///
+/// - `NSTDUInt32 exp` - The exponent.
+///
+/// # Returns
+///
+/// `NSTDUInt16 pow` - `x` raised to the power of `exp`.
+NSTDAPI NSTDUInt16 nstd_core_math_pow_u16(NSTDUInt16 x, NSTDUInt32 exp);
+/// Raises the value `x` to the power of `exp`
+///
+/// # Parameters:
+///
+/// - `NSTDInt32 x` - The value.
+///
+/// - `NSTDUInt32 exp` - The exponent.
+///
+/// # Returns
+///
+/// `NSTDInt32 pow` - `x` raised to the power of `exp`.
+NSTDAPI NSTDInt32 nstd_core_math_pow_i32(NSTDInt32 x, NSTDUInt32 exp);
+/// Raises the value `x` to the power of `exp`
+///
+/// # Parameters:
+///
+/// - `NSTDUInt32 x` - The value.
+///
+/// - `NSTDUInt32 exp` - The exponent.
+///
+/// # Returns
+///
+/// `NSTDUInt32 pow` - `x` raised to the power of `exp`.
+NSTDAPI NSTDUInt32 nstd_core_math_pow_u32(NSTDUInt32 x, NSTDUInt32 exp);
+/// Raises the value `x` to the power of `exp`
+///
+/// # Parameters:
+///
+/// - `NSTDInt64 x` - The value.
+///
+/// - `NSTDUInt32 exp` - The exponent.
+///
+/// # Returns
+///
+/// `NSTDInt64 pow` - `x` raised to the power of `exp`.
+NSTDAPI NSTDInt64 nstd_core_math_pow_i64(NSTDInt64 x, NSTDUInt32 exp);
+/// Raises the value `x` to the power of `exp`
+///
+/// # Parameters:
+///
+/// - `NSTDUInt64 x` - The value.
+///
+/// - `NSTDUInt32 exp` - The exponent.
+///
+/// # Returns
+///
+/// `NSTDUInt64 pow` - `x` raised to the power of `exp`.
+NSTDAPI NSTDUInt64 nstd_core_math_pow_u64(NSTDUInt64 x, NSTDUInt32 exp);
+
 /// Clamps the value `x` to the bounds `min` and `max`.
 ///
 /// # Parameters:
@@ -421,5 +593,166 @@ NSTDAPI NSTDInt64 nstd_core_math_div_ceil_i64(NSTDInt64 x, NSTDInt64 y);
 ///
 /// This operation will panic if `y` is 0.
 NSTDAPI NSTDUInt64 nstd_core_math_div_ceil_u64(NSTDUInt64 x, NSTDUInt64 y);
+
+/// Divides two numbers and rounds the result down to the next integer.
+///
+/// # Parameters:
+///
+/// - `NSTDInt x` - The first value.
+///
+/// - `NSTDInt y` - The second value.
+///
+/// # Returns
+///
+/// `NSTDInt v` - The divided value, rounded down.
+///
+/// # Panics
+///
+/// This operation will panic if `y` is 0.
+NSTDAPI NSTDInt nstd_core_math_div_floor_int(NSTDInt x, NSTDInt y);
+/// Divides two numbers and rounds the result down to the next integer.
+///
+/// # Parameters:
+///
+/// - `NSTDUInt x` - The first value.
+///
+/// - `NSTDUInt y` - The second value.
+///
+/// # Returns
+///
+/// `NSTDUInt v` - The divided value, rounded down.
+///
+/// # Panics
+///
+/// This operation will panic if `y` is 0.
+NSTDAPI NSTDUInt nstd_core_math_div_floor_uint(NSTDUInt x, NSTDUInt y);
+/// Divides two numbers and rounds the result down to the next integer.
+///
+/// # Parameters:
+///
+/// - `NSTDInt8 x` - The first value.
+///
+/// - `NSTDInt8 y` - The second value.
+///
+/// # Returns
+///
+/// `NSTDInt8 v` - The divided value, rounded down.
+///
+/// # Panics
+///
+/// This operation will panic if `y` is 0.
+NSTDAPI NSTDInt8 nstd_core_math_div_floor_i8(NSTDInt8 x, NSTDInt8 y);
+/// Divides two numbers and rounds the result down to the next integer.
+///
+/// # Parameters:
+///
+/// - `NSTDUInt8 x` - The first value.
+///
+/// - `NSTDUInt8 y` - The second value.
+///
+/// # Returns
+///
+/// `NSTDUInt8 v` - The divided value, rounded down.
+///
+/// # Panics
+///
+/// This operation will panic if `y` is 0.
+NSTDAPI NSTDUInt8 nstd_core_math_div_floor_u8(NSTDUInt8 x, NSTDUInt8 y);
+/// Divides two numbers and rounds the result down to the next integer.
+///
+/// # Parameters:
+///
+/// - `NSTDInt16 x` - The first value.
+///
+/// - `NSTDInt16 y` - The second value.
+///
+/// # Returns
+///
+/// `NSTDInt16 v` - The divided value, rounded down.
+///
+/// # Panics
+///
+/// This operation will panic if `y` is 0.
+NSTDAPI NSTDInt16 nstd_core_math_div_floor_i16(NSTDInt16 x, NSTDInt16 y);
+/// Divides two numbers and rounds the result down to the next integer.
+///
+/// # Parameters:
+///
+/// - `NSTDUInt16 x` - The first value.
+///
+/// - `NSTDUInt16 y` - The second value.
+///
+/// # Returns
+///
+/// `NSTDUInt16 v` - The divided value, rounded down.
+///
+/// # Panics
+///
+/// This operation will panic if `y` is 0.
+NSTDAPI NSTDUInt16 nstd_core_math_div_floor_u16(NSTDUInt16 x, NSTDUInt16 y);
+/// Divides two numbers and rounds the result down to the next integer.
+///
+/// # Parameters:
+///
+/// - `NSTDInt32 x` - The first value.
+///
+/// - `NSTDInt32 y` - The second value.
+///
+/// # Returns
+///
+/// `NSTDInt32 v` - The divided value, rounded down.
+///
+/// # Panics
+///
+/// This operation will panic if `y` is 0.
+NSTDAPI NSTDInt32 nstd_core_math_div_floor_i32(NSTDInt32 x, NSTDInt32 y);
+/// Divides two numbers and rounds the result down to the next integer.
+///
+/// # Parameters:
+///
+/// - `NSTDUInt32 x` - The first value.
+///
+/// - `NSTDUInt32 y` - The second value.
+///
+/// # Returns
+///
+/// `NSTDUInt32 v` - The divided value, rounded down.
+///
+/// # Panics
+///
+/// This operation will panic if `y` is 0.
+NSTDAPI NSTDUInt32 nstd_core_math_div_floor_u32(NSTDUInt32 x, NSTDUInt32 y);
+/// Divides two numbers and rounds the result down to the next integer.
+///
+/// # Parameters:
+///
+/// - `NSTDInt64 x` - The first value.
+///
+/// - `NSTDInt64 y` - The second value.
+///
+/// # Returns
+///
+/// `NSTDInt64 v` - The divided value, rounded down.
+///
+/// # Panics
+///
+/// This operation will panic if `y` is 0.
+NSTDAPI NSTDInt64 nstd_core_math_div_floor_i64(NSTDInt64 x, NSTDInt64 y);
+/// Divides two numbers and rounds the result down to the next integer.
+///
+/// # Parameters:
+///
+/// - `NSTDUInt64 x` - The first value.
+///
+/// - `NSTDUInt64 y` - The second value.
+///
+/// # Returns
+///
+/// `NSTDUInt64 v` - The divided value, rounded down.
+///
+/// # Panics
+///
+/// This operation will panic if `y` is 0.
+NSTDAPI NSTDUInt64 nstd_core_math_div_floor_u64(NSTDUInt64 x, NSTDUInt64 y);
 
 #endif

@@ -3,10 +3,10 @@ use crate::{core::mem::nstd_core_mem_copy, NSTDAny, NSTDAnyMut, NSTDUInt};
 
 /// A sized immutable pointer to some arbitrary type.
 #[repr(C)]
-#[derive(Clone, Copy, Debug, Hash, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Hash)]
 pub struct NSTDPtr {
     /// A raw pointer to the data.
-    pub(crate) raw: NSTDAny,
+    raw: NSTDAny,
     /// The size of the object being pointed to.
     size: NSTDUInt,
 }
@@ -37,6 +37,18 @@ pub extern "C" fn nstd_core_ptr_new(obj: NSTDAny, size: NSTDUInt) -> NSTDPtr {
 /// # Returns
 ///
 /// `NSTDUInt size` - The size of the object pointed to by `ptr`.
+///
+/// # Examples
+///
+/// ```
+/// use core::ptr::addr_of;
+/// use nstd_sys::core::ptr::{nstd_core_ptr_new, nstd_core_ptr_size};
+///
+/// const VALUE_SIZE: usize = core::mem::size_of::<isize>();
+/// let x = 33isize;
+/// let ptr = nstd_core_ptr_new(addr_of!(x).cast(), VALUE_SIZE);
+/// assert!(nstd_core_ptr_size(&ptr) == VALUE_SIZE);
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_ptr_size(ptr: &NSTDPtr) -> NSTDUInt {
@@ -52,6 +64,20 @@ pub extern "C" fn nstd_core_ptr_size(ptr: &NSTDPtr) -> NSTDUInt {
 /// # Returns
 ///
 /// `NSTDAny raw` - A raw pointer to the object.
+///
+/// # Examples
+///
+/// ```
+/// use core::ptr::addr_of;
+/// use nstd_sys::core::ptr::{nstd_core_ptr_get, nstd_core_ptr_new};
+///
+/// const VALUE_SIZE: usize = core::mem::size_of::<u32>();
+/// let x = 45u32;
+/// let ptr = nstd_core_ptr_new(addr_of!(x).cast(), VALUE_SIZE);
+/// unsafe {
+///     assert!(*nstd_core_ptr_get(&ptr).cast::<u32>() == x);
+/// }
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_ptr_get(ptr: &NSTDPtr) -> NSTDAny {
@@ -60,10 +86,10 @@ pub extern "C" fn nstd_core_ptr_get(ptr: &NSTDPtr) -> NSTDAny {
 
 /// A sized pointer to some arbitrary type.
 #[repr(C)]
-#[derive(Clone, Copy, Debug, Hash, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Hash)]
 pub struct NSTDPtrMut {
     /// A raw pointer to the data.
-    pub(crate) raw: NSTDAnyMut,
+    raw: NSTDAnyMut,
     /// The size of the object being pointed to.
     size: NSTDUInt,
 }
@@ -109,6 +135,18 @@ pub extern "C" fn nstd_core_ptr_mut_as_const(ptr: &NSTDPtrMut) -> NSTDPtr {
 /// # Returns
 ///
 /// `NSTDUInt size` - The size of the object pointed to by `ptr`.
+///
+/// # Examples
+///
+/// ```
+/// use core::ptr::addr_of_mut;
+/// use nstd_sys::core::ptr::{nstd_core_ptr_mut_new, nstd_core_ptr_mut_size};
+///
+/// const VALUE_SIZE: usize = core::mem::size_of::<isize>();
+/// let mut x = 33isize;
+/// let ptr = nstd_core_ptr_mut_new(addr_of_mut!(x).cast(), VALUE_SIZE);
+/// assert!(nstd_core_ptr_mut_size(&ptr) == VALUE_SIZE);
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_ptr_mut_size(ptr: &NSTDPtrMut) -> NSTDUInt {
@@ -124,6 +162,22 @@ pub extern "C" fn nstd_core_ptr_mut_size(ptr: &NSTDPtrMut) -> NSTDUInt {
 /// # Returns
 ///
 /// `NSTDAnyMut raw` - A raw pointer to the object.
+///
+/// # Examples
+///
+/// ```
+/// use core::ptr::addr_of_mut;
+/// use nstd_sys::core::ptr::{nstd_core_ptr_mut_get, nstd_core_ptr_mut_new};
+///
+/// const VALUE_SIZE: usize = core::mem::size_of::<u32>();
+/// let mut x = 8u32;
+/// let mut ptr = nstd_core_ptr_mut_new(addr_of_mut!(x).cast(), VALUE_SIZE);
+/// unsafe {
+///     let x_ptr = nstd_core_ptr_mut_get(&mut ptr).cast();
+///     *x_ptr *= 2;
+///     assert!(x == *x_ptr);
+/// }
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_ptr_mut_get(ptr: &mut NSTDPtrMut) -> NSTDAnyMut {
@@ -139,6 +193,20 @@ pub extern "C" fn nstd_core_ptr_mut_get(ptr: &mut NSTDPtrMut) -> NSTDAnyMut {
 /// # Returns
 ///
 /// `NSTDAny raw` - A raw pointer to the object.
+///
+/// # Examples
+///
+/// ```
+/// use core::ptr::addr_of_mut;
+/// use nstd_sys::core::ptr::{nstd_core_ptr_mut_get_const, nstd_core_ptr_mut_new};
+///
+/// const VALUE_SIZE: usize = core::mem::size_of::<u32>();
+/// let mut x = 45u32;
+/// let ptr = nstd_core_ptr_mut_new(addr_of_mut!(x).cast(), VALUE_SIZE);
+/// unsafe {
+///     assert!(*nstd_core_ptr_mut_get_const(&ptr).cast::<u32>() == x);
+/// }
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_ptr_mut_get_const(ptr: &NSTDPtrMut) -> NSTDAny {
@@ -161,6 +229,24 @@ pub extern "C" fn nstd_core_ptr_mut_get_const(ptr: &NSTDPtrMut) -> NSTDAny {
 /// # Safety
 ///
 /// This operation is highly unsafe because there is no way of knowing if `obj`'s data is valid.
+///
+/// # Examples
+///
+/// ```
+/// use core::ptr::{addr_of, addr_of_mut};
+/// use nstd_sys::core::ptr::{
+///     nstd_core_ptr_mut_get_const, nstd_core_ptr_mut_new, nstd_core_ptr_mut_write,
+/// };
+///
+/// const VALUE_SIZE: usize = core::mem::size_of::<i64>();
+/// let mut x = -69i64;
+/// let mut ptr = nstd_core_ptr_mut_new(addr_of_mut!(x).cast(), VALUE_SIZE);
+/// unsafe {
+///     let y = 420i64;
+///     nstd_core_ptr_mut_write(&mut ptr, addr_of!(y).cast());
+///     assert!(x == y);
+/// }
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_ptr_mut_write(ptr: &mut NSTDPtrMut, obj: NSTDAny) {

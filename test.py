@@ -1,8 +1,8 @@
 import os
 
-FEATURES = ("nstd_alloc", "nstd_core", "nstd_cstring", "nstd_heap_ptr", "nstd_io",
-            "nstd_os_windows_alloc", "nstd_shared_lib", "nstd_shared_ptr", "nstd_string",
-            "nstd_thread", "nstd_vec")
+FEATURES = ("nstd_alloc", "nstd_core", "nstd_cstring", "nstd_fs", "nstd_heap_ptr", "nstd_io",
+            "nstd_math", "nstd_os_windows_alloc", "nstd_shared_lib", "nstd_shared_ptr",
+            "nstd_string", "nstd_thread", "nstd_vec")
 
 TARGETS = ("x86_64-pc-windows-msvc", "x86_64-apple-darwin",
            "x86_64-unknown-linux-gnu", "x86_64-apple-ios", "x86_64-linux-android")

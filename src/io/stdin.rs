@@ -76,6 +76,10 @@ pub unsafe extern "C" fn nstd_io_stdin_read(
 /// # Returns
 ///
 /// `NSTDIOError errc` - The I/O operation error code.
+///
+/// # Panics
+///
+/// This function will panic if getting a handle to the heap fails.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_io_stdin_read_all(
@@ -104,6 +108,14 @@ pub extern "C" fn nstd_io_stdin_read_all(
 /// # Returns
 ///
 /// `NSTDIOError errc` - The I/O operation error code.
+///
+/// # Panics
+///
+/// This function will panic in the following situations:
+///
+/// - `buffer`'s length in bytes exceeds `NSTDInt`'s max value.
+///
+/// - Getting a handle to the heap fails.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_io_stdin_read_to_string(
@@ -156,6 +168,14 @@ pub unsafe extern "C" fn nstd_io_stdin_read_exact(
 /// # Returns
 ///
 /// `NSTDIOError errc` - The I/O operation error code.
+///
+/// # Panics
+///
+/// This function will panic in the following situations:
+///
+/// - `buffer`'s length in bytes exceeds `NSTDInt`'s max value.
+///
+/// - Getting a handle to the heap fails.
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_io_stdin_read_line(
     handle: &mut NSTDStdin,
