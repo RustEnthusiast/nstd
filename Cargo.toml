@@ -30,6 +30,10 @@ nstd_cstring = ["nstd_alloc", "nstd_core", "nstd_vec"]
 nstd_fs = ["nstd_core", "nstd_io", "nstd_string", "nstd_vec", "std"]
 nstd_heap_ptr = ["nstd_alloc", "nstd_core"]
 nstd_image = ["image", "nstd_core", "std"]
+nstd_image_gif = ["image/gif", "nstd_image"]
+nstd_image_ico = ["image/ico", "nstd_image"]
+nstd_image_jpeg = ["image/jpeg", "nstd_image"]
+nstd_image_png = ["image/png", "nstd_image"]
 nstd_io = ["nstd_alloc", "nstd_core", "nstd_string", "nstd_vec", "std"]
 nstd_math = ["std"]
 nstd_os = []
@@ -43,7 +47,7 @@ nstd_vec = ["nstd_alloc", "nstd_core"]
 
 [dependencies]
 libloading = { version = "0.7", optional = true }
-image = { version = "0.24", optional = true }
+image = { version = "0.24", optional = true, default-features = false }
 
 [target.'cfg(target_os = "windows")'.dependencies]
 windows-sys = { version = "0.42", optional = true }
