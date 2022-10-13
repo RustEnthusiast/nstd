@@ -1,7 +1,7 @@
 //! Thread spawning, joining, and detaching.
 use crate::{
     core::{def::NSTDErrorCode, str::NSTDStr},
-    NSTDAnyMut, NSTDFloat64, NSTDUInt,
+    NSTDFloat64, NSTDUInt,
 };
 use std::{
     thread::{Builder, JoinHandle},
@@ -19,14 +19,9 @@ pub type NSTDThread = Box<JoinHandle<NSTDErrorCode>>;
 pub struct NSTDThreadDescriptor {
     /// The name of the thread.
     pub name: NSTDStr,
-    /// A pointer to the data to be passed to the thread.
-    ///
-    /// # Note
-    ///
-    /// This will only be passed to the thread function on platforms that support atomic pointers,
-    /// on other platforms `NSTD_NULL` will be passed.
-    pub data: NSTDAnyMut,
     /// The number of bytes that the thread's stack should have.
+    ///
+    /// Set this to 0 to let the host decide how much stack memory should be allocated.
     pub stack_size: NSTDUInt,
 }
 
@@ -34,37 +29,22 @@ pub struct NSTDThreadDescriptor {
 ///
 /// # Parameters:
 ///
-/// - `NSTDErrorCode (*thread_fn)(NSTDAnyMut)` - The thread function.
-///
-/// - `NSTDAnyMut data` - Data to pass to the thread. This will only be passed to `thread_fn` on
-/// platforms that support atomic pointers, on other platforms `NSTD_NULL` will be passed.
+/// - `NSTDErrorCode (*thread_fn)()` - The thread function.
 ///
 /// # Returns
 ///
-/// `NSTDThread thread` - A handle to the new thread.
+/// `NSTDThread thread` - A handle to the new thread, null on error.
 ///
 /// # Safety
 ///
 /// The caller of this function must guarantee that `thread_fn` is a valid function pointer.
 #[cfg_attr(feature = "clib", no_mangle)]
-#[cfg_attr(not(target_has_atomic = "ptr"), allow(unused_variables))]
 pub unsafe extern "C" fn nstd_thread_spawn(
-    thread_fn: Option<unsafe extern "C" fn(NSTDAnyMut) -> NSTDErrorCode>,
-    data: NSTDAnyMut,
+    thread_fn: Option<unsafe extern "C" fn() -> NSTDErrorCode>,
 ) -> Option<NSTDThread> {
     if let Some(thread_fn) = thread_fn {
-        #[cfg(target_has_atomic = "ptr")]
-        {
-            use std::sync::atomic::AtomicPtr;
-            let data = AtomicPtr::new(data);
-            return Some(Box::new(std::thread::spawn(move || {
-                thread_fn(data.into_inner())
-            })));
-        }
-        #[cfg(not(target_has_atomic = "ptr"))]
-        {
-            use crate::NSTD_NULL;
-            return Some(Box::new(std::thread::spawn(move || thread_fn(NSTD_NULL))));
+        if let Ok(thread) = Builder::new().spawn(move || thread_fn()) {
+            return Some(Box::new(thread));
         }
     }
     None
@@ -74,20 +54,30 @@ pub unsafe extern "C" fn nstd_thread_spawn(
 ///
 /// # Parameters:
 ///
-/// - `NSTDErrorCode (*thread_fn)(NSTDAnyMut)` - The thread function.
+/// - `NSTDErrorCode (*thread_fn)()` - The thread function.
 ///
 /// - `const NSTDThreadDescriptor *desc` - The thread descriptor.
 ///
 /// # Returns
 ///
-/// `NSTDThread thread` - A handle to the new thread.
+/// `NSTDThread thread` - A handle to the new thread, null on error.
+///
+/// # Panics
+///
+/// This function will panic in the following situations:
+///
+/// - `desc.name` contains null bytes.
+///
+/// - `desc.name`'s length in bytes exceeds `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
-/// This operation can cause undefined behavior if `desc`'s data is invalid.
+/// - The caller of this function must guarantee that `thread_fn` is a valid function pointer.
+///
+/// - This operation can cause undefined behavior if `desc`'s data is invalid.
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_thread_spawn_with_desc(
-    thread_fn: Option<unsafe extern "C" fn(NSTDAnyMut) -> NSTDErrorCode>,
+    thread_fn: Option<unsafe extern "C" fn() -> NSTDErrorCode>,
     desc: &NSTDThreadDescriptor,
 ) -> Option<NSTDThread> {
     if let Some(thread_fn) = thread_fn {
@@ -98,22 +88,8 @@ pub unsafe extern "C" fn nstd_thread_spawn_with_desc(
             builder = builder.stack_size(desc.stack_size);
         }
         // Spawn the new thread.
-        #[cfg(target_has_atomic = "ptr")]
-        {
-            use std::sync::atomic::AtomicPtr;
-            let data = AtomicPtr::new(desc.data);
-            return match builder.spawn(move || thread_fn(data.into_inner())) {
-                Ok(thread) => Some(Box::new(thread)),
-                _ => None,
-            };
-        }
-        #[cfg(not(target_has_atomic = "ptr"))]
-        {
-            use crate::NSTD_NULL;
-            return match builder.spawn(move || thread_fn(NSTD_NULL)) {
-                Ok(thread) => return Some(Box::new(thread)),
-                _ => None,
-            };
+        if let Ok(thread) = builder.spawn(move || thread_fn()) {
+            return Some(Box::new(thread));
         }
     }
     None
@@ -124,6 +100,10 @@ pub unsafe extern "C" fn nstd_thread_spawn_with_desc(
 /// # Parameters:
 ///
 /// - `NSTDFloat64 secs` - The number of seconds to put the thread to sleep for.
+///
+/// # Panics
+///
+/// Panics if `secs` is negative, overflows Rust's `Duration` structure, or is non-finite.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_thread_sleep(secs: NSTDFloat64) {
@@ -138,15 +118,15 @@ pub extern "C" fn nstd_thread_sleep(secs: NSTDFloat64) {
 ///
 /// # Returns
 ///
-/// `NSTDErrorCode errc` - The thread functions return code. This can also be non-zero if joining
-/// the thread fails.
+/// `NSTDErrorCode errc` - The thread function's return code.
+///
+/// # Panics
+///
+/// Panics if joining the thread fails.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_thread_join(thread: NSTDThread) -> NSTDErrorCode {
-    match thread.join() {
-        Ok(errc) => errc,
-        _ => 1,
-    }
+    thread.join().expect("Failed to join a thread")
 }
 
 /// Detaches a thread from it's handle, allowing it to run in the background.

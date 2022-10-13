@@ -13,14 +13,9 @@ typedef NSTDAnyMut NSTDThread;
 typedef struct {
     /// The name of the thread.
     NSTDStr name;
-    /// A pointer to the data to be passed to the thread.
-    ///
-    /// # Note
-    ///
-    /// This will only be passed to the thread function on platforms that support atomic pointers,
-    /// on other platforms `NSTD_NULL` will be passed.
-    NSTDAnyMut data;
     /// The number of bytes that the thread's stack should have.
+    ///
+    /// Set this to 0 to let the host decide how much stack memory should be allocated.
     NSTDUInt stack_size;
 } NSTDThreadDescriptor;
 
@@ -28,36 +23,43 @@ typedef struct {
 ///
 /// # Parameters:
 ///
-/// - `NSTDErrorCode (*thread_fn)(NSTDAnyMut)` - The thread function.
-///
-/// - `NSTDAnyMut data` - Data to pass to the thread. This will only be passed to `thread_fn` on
-/// platforms that support atomic pointers, on other platforms `NSTD_NULL` will be passed.
+/// - `NSTDErrorCode (*thread_fn)()` - The thread function.
 ///
 /// # Returns
 ///
-/// `NSTDThread thread` - A handle to the new thread.
+/// `NSTDThread thread` - A handle to the new thread, null on error.
 ///
 /// # Safety
 ///
 /// The caller of this function must guarantee that `thread_fn` is a valid function pointer.
-NSTDAPI NSTDThread nstd_thread_spawn(NSTDErrorCode (*thread_fn)(NSTDAnyMut), NSTDAnyMut data);
+NSTDAPI NSTDThread nstd_thread_spawn(NSTDErrorCode (*thread_fn)());
 
 /// Spawns a new thread configured with a descriptor.
 ///
 /// # Parameters:
 ///
-/// - `NSTDErrorCode (*thread_fn)(NSTDAnyMut)` - The thread function.
+/// - `NSTDErrorCode (*thread_fn)()` - The thread function.
 ///
 /// - `const NSTDThreadDescriptor *desc` - The thread descriptor.
 ///
 /// # Returns
 ///
-/// `NSTDThread thread` - A handle to the new thread.
+/// `NSTDThread thread` - A handle to the new thread, null on error.
+///
+/// # Panics
+///
+/// This function will panic in the following situations:
+///
+/// - `desc.name` contains null bytes.
+///
+/// - `desc.name`'s length in bytes exceeds `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
-/// This operation can cause undefined behavior if `desc`'s data is invalid.
-NSTDAPI NSTDThread nstd_thread_spawn_with_desc(NSTDErrorCode (*thread_fn)(NSTDAnyMut),
+/// - The caller of this function must guarantee that `thread_fn` is a valid function pointer.
+///
+/// - This operation can cause undefined behavior if `desc`'s data is invalid.
+NSTDAPI NSTDThread nstd_thread_spawn_with_desc(NSTDErrorCode (*thread_fn)(),
 const NSTDThreadDescriptor *desc);
 
 /// Puts the current thread to sleep for a specified number of seconds.
@@ -65,6 +67,10 @@ const NSTDThreadDescriptor *desc);
 /// # Parameters:
 ///
 /// - `NSTDFloat64 secs` - The number of seconds to put the thread to sleep for.
+///
+/// # Panics
+///
+/// Panics if `secs` is negative, overflows Rust's `Duration` structure, or is non-finite.
 NSTDAPI void nstd_thread_sleep(NSTDFloat64 secs);
 
 /// Joins a thread by it's handle.
@@ -75,8 +81,11 @@ NSTDAPI void nstd_thread_sleep(NSTDFloat64 secs);
 ///
 /// # Returns
 ///
-/// `NSTDErrorCode errc` - The thread functions return code. This can also be non-zero if joining
-/// the thread fails.
+/// `NSTDErrorCode errc` - The thread function's return code.
+///
+/// # Panics
+///
+/// Panics if joining the thread fails.
 NSTDAPI NSTDErrorCode nstd_thread_join(NSTDThread thread);
 
 /// Detaches a thread from it's handle, allowing it to run in the background.
