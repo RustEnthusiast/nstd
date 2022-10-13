@@ -336,6 +336,8 @@ pub extern "C" fn nstd_cstring_push(cstring: &mut NSTDCString, chr: NSTDChar) {
 ///
 /// - `cstr` contains a null byte.
 ///
+/// - `cstr`'s length is greater than `NSTDInt`'s max value.
+///
 /// - Appending the new null byte to the end of the C string fails.
 ///
 /// - The new length in bytes exceeds `NSTDInt`'s max value.

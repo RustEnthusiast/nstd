@@ -68,6 +68,10 @@ pub unsafe extern "C" fn nstd_core_mem_compare(
 /// Iterates through each byte in a raw memory buffer until `delim` is reached, returning a pointer
 /// to the delimiter byte if it is found.
 ///
+/// # Note
+///
+/// This will always return null if `size` is greater than `NSTDInt`'s max value.
+///
 /// # Parameters:
 ///
 /// - `const NSTDByte *buf` - The memory buffer to search.
@@ -100,16 +104,20 @@ pub unsafe extern "C" fn nstd_core_mem_compare(
 /// ```
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_mem_search(
-    mut buf: *const NSTDByte,
+    buf: *const NSTDByte,
     size: NSTDUInt,
     delim: NSTDByte,
 ) -> *const NSTDByte {
+    // Check if `size` is greater than `NSTDInt`'s max size.
+    if size > isize::MAX as usize {
+        return core::ptr::null();
+    }
+    // Search the buffer for `delim`.
     let mut i = 0;
     while i < size {
-        if *buf == delim {
-            return buf;
+        if *buf.add(i) == delim {
+            return buf.add(i);
         }
-        buf = buf.offset(1);
         i += 1;
     }
     core::ptr::null()

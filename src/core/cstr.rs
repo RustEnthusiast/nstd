@@ -242,6 +242,10 @@ pub unsafe extern "C" fn nstd_core_cstr_is_null_terminated(cstr: &NSTDCStr) -> N
 
 /// Returns a pointer to the first null byte in a C string slice if one is present.
 ///
+/// # Note
+///
+/// This will always return null if `cstr`'s length is greater than `NSTDInt`'s max value.
+///
 /// # Parameters:
 ///
 /// - `const NSTDCStr *cstr` - The C string slice.
@@ -562,6 +566,10 @@ pub unsafe extern "C" fn nstd_core_cstr_mut_is_null_terminated(cstr: &NSTDCStrMu
 
 /// Returns a pointer to the first null byte in a C string slice if one is present.
 ///
+/// # Note
+///
+/// This will always return null if `cstr`'s length is greater than `NSTDInt`'s max value.
+///
 /// # Parameters:
 ///
 /// - `NSTDCStrMut *cstr` - The C string slice.
@@ -604,6 +612,10 @@ pub unsafe extern "C" fn nstd_core_cstr_mut_get_null(cstr: &mut NSTDCStrMut) -> 
 }
 
 /// Returns an immutable pointer to the first null byte in a C string slice if one is present.
+///
+/// # Note
+///
+/// This will always return null if `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Parameters:
 ///
