@@ -1,8 +1,10 @@
 //! An application event loop.
 pub mod data;
+pub mod display;
 pub mod events;
 use self::{
     data::{NSTDAppData, NSTDAppHandle},
+    display::NSTDDisplayHandle,
     events::{NSTDAppEvents, NSTDKey, NSTDMouseInput, NSTDScrollDelta, NSTDTouchState},
 };
 use crate::{core::def::NSTDErrorCode, NSTDAnyMut};
@@ -293,6 +295,30 @@ pub unsafe extern "C" fn nstd_app_run(app: NSTDApp, data: NSTDAnyMut) -> ! {
 #[cfg_attr(feature = "clib", no_mangle)]
 #[allow(unused_variables)]
 pub extern "C" fn nstd_app_free(app: NSTDApp) {}
+
+/// Invokes a callback function for each display detected by an `nstd` app.
+///
+/// # Parameters:
+///
+/// - `NSTDAppHandle app` - A handle to the `nstd` application.
+///
+/// - `void (*callback)(NSTDDisplayHandle)` - The callback function.
+///
+/// # Safety
+///
+/// The user of this function must guarantee that `callback` is a valid C function pointer.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_app_displays(
+    app: NSTDAppHandle,
+    callback: Option<unsafe extern "C" fn(NSTDDisplayHandle)>,
+) {
+    if let Some(callback) = callback {
+        for handle in app.available_monitors() {
+            callback(&handle);
+        }
+    }
+}
 
 /// Signals an `NSTDApp`'s event loop to exit.
 ///

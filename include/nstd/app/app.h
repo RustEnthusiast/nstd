@@ -3,6 +3,7 @@
 #include "../core/def.h"
 #include "../nstd.h"
 #include "data.h"
+#include "display.h"
 #include "events.h"
 
 /// An application event loop.
@@ -75,6 +76,19 @@ NSTDAPI void nstd_app_run(NSTDApp app, NSTDAnyMut data);
 ///
 /// - `NSTDApp app` - The `nstd` application.
 NSTDAPI void nstd_app_free(NSTDApp app);
+
+/// Invokes a callback function for each display detected by an `nstd` app.
+///
+/// # Parameters:
+///
+/// - `NSTDAppHandle app` - A handle to the `nstd` application.
+///
+/// - `void (*callback)(NSTDDisplayHandle)` - The callback function.
+///
+/// # Safety
+///
+/// The user of this function must guarantee that `callback` is a valid C function pointer.
+NSTDAPI void nstd_app_displays(NSTDAppHandle app, void (*callback)(NSTDDisplayHandle));
 
 /// Signals an `NSTDApp`'s event loop to exit.
 ///

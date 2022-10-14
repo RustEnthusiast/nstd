@@ -25,8 +25,8 @@ int main()
     - `alloc` - Low level memory allocation.
     - `app` - An application event loop.
         - `data` - Application data passed to each event.
+        - `display` - Provides access to physical displays.
         - `events` - Contains callback based events through function pointers.
-        - `handle` - A handle to the application event loop.
     - `core` - Provides core functionality for `nstd`.
         - `cstr` - Unowned C string slices.
             - `raw` - Raw C string processing.
