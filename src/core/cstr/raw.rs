@@ -26,45 +26,13 @@ use crate::{NSTDBool, NSTDChar, NSTDUInt, NSTD_FALSE, NSTD_TRUE};
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-#[cfg_attr(
-    all(
-        feature = "asm",
-        any(target_arch = "arm", target_arch = "x86", target_arch = "x86_64")
-    ),
-    allow(unused_mut)
-)]
 pub unsafe extern "C" fn nstd_core_cstr_raw_len(mut cstr: *const NSTDChar) -> NSTDUInt {
-    #[cfg(not(all(
-        feature = "asm",
-        any(target_arch = "arm", target_arch = "x86", target_arch = "x86_64")
-    )))]
-    {
-        let mut i = 0;
-        while *cstr != 0 {
-            cstr = cstr.offset(1);
-            i += 1;
-        }
-        i
+    let mut i = 0;
+    while *cstr != 0 {
+        cstr = cstr.offset(1);
+        i += 1;
     }
-    #[cfg(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64")))]
-    {
-        use core::arch::asm;
-        let i;
-        asm!(include_str!("raw/x86/len.asm"), cstr = in(reg) cstr, i = out(reg) i);
-        i
-    }
-    #[cfg(all(feature = "asm", target_arch = "arm"))]
-    {
-        use core::arch::asm;
-        let i;
-        asm!(
-            include_str!("raw/arm/len.asm"),
-            cstr = in(reg) cstr,
-            i = out(reg) i,
-            byte = out(reg) _
-        );
-        i
-    }
+    i
 }
 
 /// Gets the length of a null terminated C string, including the null byte.
@@ -174,47 +142,14 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_compare(
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-#[cfg_attr(
-    all(
-        feature = "asm",
-        any(target_arch = "arm", target_arch = "x86", target_arch = "x86_64")
-    ),
-    allow(unused_mut)
-)]
 pub unsafe extern "C" fn nstd_core_cstr_raw_copy(
     mut dest: *mut NSTDChar,
     mut src: *const NSTDChar,
 ) {
-    #[cfg(not(all(
-        feature = "asm",
-        any(target_arch = "arm", target_arch = "x86", target_arch = "x86_64")
-    )))]
-    {
-        while *src != 0 {
-            *dest = *src;
-            dest = dest.offset(1);
-            src = src.offset(1);
-        }
-    }
-    #[cfg(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64")))]
-    {
-        use core::arch::asm;
-        asm!(
-            include_str!("raw/x86/copy.asm"),
-            src = inout(reg) src => _,
-            dest = inout(reg) dest => _,
-            byte = out(reg_byte) _
-        );
-    }
-    #[cfg(all(feature = "asm", target_arch = "arm"))]
-    {
-        use core::arch::asm;
-        asm!(
-            include_str!("raw/arm/copy.asm"),
-            src = inout(reg) src => _,
-            dest = inout(reg) dest => _,
-            byte = out(reg) _
-        );
+    while *src != 0 {
+        *dest = *src;
+        dest = dest.offset(1);
+        src = src.offset(1);
     }
 }
 
@@ -250,48 +185,15 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_copy(
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-#[cfg_attr(
-    all(
-        feature = "asm",
-        any(target_arch = "arm", target_arch = "x86", target_arch = "x86_64")
-    ),
-    allow(unused_mut)
-)]
 pub unsafe extern "C" fn nstd_core_cstr_raw_copy_with_null(
     mut dest: *mut NSTDChar,
     mut src: *const NSTDChar,
 ) {
-    #[cfg(not(all(
-        feature = "asm",
-        any(target_arch = "arm", target_arch = "x86", target_arch = "x86_64")
-    )))]
-    {
-        while {
-            *dest = *src;
-            *src != 0
-        } {
-            dest = dest.offset(1);
-            src = src.offset(1);
-        }
-    }
-    #[cfg(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64")))]
-    {
-        use core::arch::asm;
-        asm!(
-            include_str!("raw/x86/copy_with_null.asm"),
-            src = inout(reg) src => _,
-            dest = inout(reg) dest => _,
-            byte = out(reg_byte) _
-        );
-    }
-    #[cfg(all(feature = "asm", target_arch = "arm"))]
-    {
-        use core::arch::asm;
-        asm!(
-            include_str!("raw/arm/copy_with_null.asm"),
-            src = inout(reg) src => _,
-            dest = inout(reg) dest => _,
-            byte = out(reg) _
-        );
+    while {
+        *dest = *src;
+        *src != 0
+    } {
+        dest = dest.offset(1);
+        src = src.offset(1);
     }
 }

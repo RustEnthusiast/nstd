@@ -57,6 +57,16 @@ pub struct NSTDStr {
     len: NSTDUInt,
 }
 impl NSTDStr {
+    /// Creates a new [NSTDStr] from a Rust [&str].
+    #[inline]
+    #[allow(dead_code)]
+    pub(crate) fn from_str(str: &str) -> Self {
+        Self {
+            ptr: str.as_ptr(),
+            len: str.len(),
+        }
+    }
+
     /// Creates a Rust string slice from this [NSTDStr].
     ///
     /// # Panics

@@ -203,6 +203,8 @@ NSTDAPI void nstd_cstring_push(NSTDCString *cstring, NSTDChar chr);
 ///
 /// - `cstr` contains a null byte.
 ///
+/// - `cstr`'s length is greater than `NSTDInt`'s max value.
+///
 /// - Appending the new null byte to the end of the C string fails.
 ///
 /// - The new length in bytes exceeds `NSTDInt`'s max value.

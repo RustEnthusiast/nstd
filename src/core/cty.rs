@@ -32,7 +32,7 @@ macro_rules! gen_deterministic {
         #[cfg_attr(feature = "clib", no_mangle)]
         pub extern "C" fn $name(chr: NSTDUnichar) -> NSTDBool {
             match char::from_u32(chr) {
-                Some(chr) => chr.$method().into(),
+                Some(chr) => chr.$method(),
                 _ => NSTD_FALSE,
             }
         }
@@ -52,10 +52,10 @@ gen_deterministic!(
     /// # Example
     ///
     /// ```
-    /// use nstd_sys::core::cty::nstd_core_cty_is_alphabetic;
+    /// use nstd_sys::{core::cty::nstd_core_cty_is_alphabetic, NSTD_FALSE};
     ///
-    /// assert!(nstd_core_cty_is_alphabetic('G'.into()) != 0);
-    /// assert!(nstd_core_cty_is_alphabetic('0'.into()) == 0);
+    /// assert!(nstd_core_cty_is_alphabetic('G'.into()) != NSTD_FALSE);
+    /// assert!(nstd_core_cty_is_alphabetic('0'.into()) == NSTD_FALSE);
     /// ```
     nstd_core_cty_is_alphabetic,
     is_alphabetic
@@ -74,10 +74,10 @@ gen_deterministic!(
     /// # Example
     ///
     /// ```
-    /// use nstd_sys::core::cty::nstd_core_cty_is_numeric;
+    /// use nstd_sys::{core::cty::nstd_core_cty_is_numeric, NSTD_FALSE};
     ///
-    /// assert!(nstd_core_cty_is_numeric('9'.into()) != 0);
-    /// assert!(nstd_core_cty_is_numeric('a'.into()) == 0);
+    /// assert!(nstd_core_cty_is_numeric('9'.into()) != NSTD_FALSE);
+    /// assert!(nstd_core_cty_is_numeric('a'.into()) == NSTD_FALSE);
     /// ```
     nstd_core_cty_is_numeric,
     is_numeric
@@ -96,11 +96,11 @@ gen_deterministic!(
     /// # Example
     ///
     /// ```
-    /// use nstd_sys::core::cty::nstd_core_cty_is_alphanumeric;
+    /// use nstd_sys::{core::cty::nstd_core_cty_is_alphanumeric, NSTD_FALSE};
     ///
-    /// assert!(nstd_core_cty_is_alphanumeric('Z'.into()) != 0);
-    /// assert!(nstd_core_cty_is_alphanumeric('5'.into()) != 0);
-    /// assert!(nstd_core_cty_is_alphanumeric(';'.into()) == 0);
+    /// assert!(nstd_core_cty_is_alphanumeric('Z'.into()) != NSTD_FALSE);
+    /// assert!(nstd_core_cty_is_alphanumeric('5'.into()) != NSTD_FALSE);
+    /// assert!(nstd_core_cty_is_alphanumeric(';'.into()) == NSTD_FALSE);
     /// ```
     nstd_core_cty_is_alphanumeric,
     is_alphanumeric
@@ -119,10 +119,10 @@ gen_deterministic!(
     /// # Example
     ///
     /// ```
-    /// use nstd_sys::core::cty::nstd_core_cty_is_lowercase;
+    /// use nstd_sys::{core::cty::nstd_core_cty_is_lowercase, NSTD_FALSE};
     ///
-    /// assert!(nstd_core_cty_is_lowercase('v'.into()) != 0);
-    /// assert!(nstd_core_cty_is_lowercase('M'.into()) == 0);
+    /// assert!(nstd_core_cty_is_lowercase('v'.into()) != NSTD_FALSE);
+    /// assert!(nstd_core_cty_is_lowercase('M'.into()) == NSTD_FALSE);
     /// ```
     nstd_core_cty_is_lowercase,
     is_lowercase
@@ -141,10 +141,10 @@ gen_deterministic!(
     /// # Example
     ///
     /// ```
-    /// use nstd_sys::core::cty::nstd_core_cty_is_uppercase;
+    /// use nstd_sys::{core::cty::nstd_core_cty_is_uppercase, NSTD_FALSE};
     ///
-    /// assert!(nstd_core_cty_is_uppercase('P'.into()) != 0);
-    /// assert!(nstd_core_cty_is_uppercase('s'.into()) == 0);
+    /// assert!(nstd_core_cty_is_uppercase('P'.into()) != NSTD_FALSE);
+    /// assert!(nstd_core_cty_is_uppercase('s'.into()) == NSTD_FALSE);
     /// ```
     nstd_core_cty_is_uppercase,
     is_uppercase
@@ -163,10 +163,10 @@ gen_deterministic!(
     /// # Example
     ///
     /// ```
-    /// use nstd_sys::core::cty::nstd_core_cty_is_whitespace;
+    /// use nstd_sys::{core::cty::nstd_core_cty_is_whitespace, NSTD_FALSE};
     ///
-    /// assert!(nstd_core_cty_is_whitespace('\n'.into()) != 0);
-    /// assert!(nstd_core_cty_is_whitespace('.'.into()) == 0);
+    /// assert!(nstd_core_cty_is_whitespace('\n'.into()) != NSTD_FALSE);
+    /// assert!(nstd_core_cty_is_whitespace('.'.into()) == NSTD_FALSE);
     /// ```
     nstd_core_cty_is_whitespace,
     is_whitespace
@@ -185,10 +185,10 @@ gen_deterministic!(
     /// # Example
     ///
     /// ```
-    /// use nstd_sys::core::cty::nstd_core_cty_is_control;
+    /// use nstd_sys::{core::cty::nstd_core_cty_is_control, NSTD_FALSE};
     ///
-    /// assert!(nstd_core_cty_is_control('\0'.into()) != 0);
-    /// assert!(nstd_core_cty_is_control('\\'.into()) == 0);
+    /// assert!(nstd_core_cty_is_control('\0'.into()) != NSTD_FALSE);
+    /// assert!(nstd_core_cty_is_control('\\'.into()) == NSTD_FALSE);
     /// ```
     nstd_core_cty_is_control,
     is_control
@@ -217,17 +217,17 @@ gen_deterministic!(
 /// # Example
 ///
 /// ```
-/// use nstd_sys::core::cty::nstd_core_cty_is_digit;
+/// use nstd_sys::{core::cty::nstd_core_cty_is_digit, NSTD_FALSE};
 ///
-/// assert!(nstd_core_cty_is_digit('5'.into(), 16) != 0);
-/// assert!(nstd_core_cty_is_digit('E'.into(), 16) != 0);
-/// assert!(nstd_core_cty_is_digit('F'.into(), 10) == 0);
+/// assert!(nstd_core_cty_is_digit('5'.into(), 16) != NSTD_FALSE);
+/// assert!(nstd_core_cty_is_digit('E'.into(), 16) != NSTD_FALSE);
+/// assert!(nstd_core_cty_is_digit('F'.into(), 10) == NSTD_FALSE);
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_cty_is_digit(chr: NSTDUnichar, radix: NSTDUInt32) -> NSTDBool {
     if let Some(chr) = char::from_u32(chr) {
-        return chr.is_digit(radix).into();
+        return chr.is_digit(radix);
     }
     NSTD_FALSE
 }
@@ -249,19 +249,15 @@ pub extern "C" fn nstd_core_cty_is_digit(chr: NSTDUnichar, radix: NSTDUInt32) ->
 /// # Example
 ///
 /// ```
-/// use nstd_sys::{core::cty::nstd_core_cty_is_ascii_punctuation, NSTDChar};
+/// use nstd_sys::{core::cty::nstd_core_cty_is_ascii_punctuation, NSTDChar, NSTD_FALSE};
 ///
-/// assert!(nstd_core_cty_is_ascii_punctuation(b'.' as NSTDChar) != 0);
-/// assert!(nstd_core_cty_is_ascii_punctuation(b'y' as NSTDChar) == 0);
+/// assert!(nstd_core_cty_is_ascii_punctuation(b'.' as NSTDChar) != NSTD_FALSE);
+/// assert!(nstd_core_cty_is_ascii_punctuation(b'y' as NSTDChar) == NSTD_FALSE);
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_cty_is_ascii_punctuation(chr: NSTDChar) -> NSTDBool {
-    ((0x21..=0x2F).contains(&chr)
-        || (0x3A..=0x40).contains(&chr)
-        || (0x5B..=0x60).contains(&chr)
-        || (0x7B..=0x7E).contains(&chr))
-    .into()
+    matches!(chr, 0x21..=0x2F | 0x3A..=0x40 | 0x5B..=0x60 | 0x7B..=0x7E)
 }
 
 /// Determines whether or not `chr` is a graphic character.
@@ -281,15 +277,15 @@ pub extern "C" fn nstd_core_cty_is_ascii_punctuation(chr: NSTDChar) -> NSTDBool 
 /// # Example
 ///
 /// ```
-/// use nstd_sys::{core::cty::nstd_core_cty_is_ascii_graphic, NSTDChar};
+/// use nstd_sys::{core::cty::nstd_core_cty_is_ascii_graphic, NSTDChar, NSTD_FALSE};
 ///
-/// assert!(nstd_core_cty_is_ascii_graphic(b'.' as NSTDChar) != 0);
-/// assert!(nstd_core_cty_is_ascii_graphic(b'\t' as NSTDChar) == 0);
+/// assert!(nstd_core_cty_is_ascii_graphic(b'.' as NSTDChar) != NSTD_FALSE);
+/// assert!(nstd_core_cty_is_ascii_graphic(b'\t' as NSTDChar) == NSTD_FALSE);
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_cty_is_ascii_graphic(chr: NSTDChar) -> NSTDBool {
-    (0x21..=0x7E).contains(&chr).into()
+    matches!(chr, 0x21..=0x7E)
 }
 
 /// Returns the lowercase version of `chr`, or `chr` if there is no lowercase version.
