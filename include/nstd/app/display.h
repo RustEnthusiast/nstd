@@ -2,6 +2,9 @@
 #define NSTD_APP_DISPLAY_H
 #include "../nstd.h"
 
+/// Represents a monitor/display.
+typedef NSTDAnyMut NSTDDisplay;
+
 /// A handle to a display.
 typedef NSTDAny NSTDDisplayHandle;
 

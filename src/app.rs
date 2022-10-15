@@ -4,7 +4,7 @@ pub mod display;
 pub mod events;
 use self::{
     data::{NSTDAppData, NSTDAppHandle},
-    display::NSTDDisplayHandle,
+    display::{NSTDDisplay, NSTDDisplayHandle},
     events::{NSTDAppEvents, NSTDKey, NSTDMouseInput, NSTDScrollDelta, NSTDTouchState},
 };
 use crate::{core::def::NSTDErrorCode, NSTDAnyMut};
@@ -318,6 +318,21 @@ pub unsafe extern "C" fn nstd_app_displays(
             callback(&handle);
         }
     }
+}
+
+/// Returns a handle to the primary display.
+///
+/// # Parameters:
+///
+/// - `NSTDAppHandle app` - A handle to the `nstd` application.
+///
+/// # Returns
+///
+/// `NSTDDisplay display` - A handle to the primary display, null on error.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_app_primary_display(app: NSTDAppHandle) -> Option<NSTDDisplay> {
+    app.primary_monitor().map(Box::new)
 }
 
 /// Signals an `NSTDApp`'s event loop to exit.

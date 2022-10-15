@@ -2,6 +2,9 @@
 use crate::{NSTDFloat64, NSTDInt32, NSTDUInt16, NSTDUInt32};
 use winit::monitor::{MonitorHandle, VideoMode};
 
+/// Represents a monitor/display.
+pub type NSTDDisplay = Box<MonitorHandle>;
+
 /// A handle to a display.
 pub type NSTDDisplayHandle<'a> = &'a MonitorHandle;
 

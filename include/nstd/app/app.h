@@ -90,6 +90,17 @@ NSTDAPI void nstd_app_free(NSTDApp app);
 /// The user of this function must guarantee that `callback` is a valid C function pointer.
 NSTDAPI void nstd_app_displays(NSTDAppHandle app, void (*callback)(NSTDDisplayHandle));
 
+/// Returns a handle to the primary display.
+///
+/// # Parameters:
+///
+/// - `NSTDAppHandle app` - A handle to the `nstd` application.
+///
+/// # Returns
+///
+/// `NSTDDisplay display` - A handle to the primary display, null on error.
+NSTDAPI NSTDDisplay nstd_app_primary_display(NSTDAppHandle app);
+
 /// Signals an `NSTDApp`'s event loop to exit.
 ///
 /// # Parameters:
