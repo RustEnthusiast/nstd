@@ -1,5 +1,6 @@
 #ifndef NSTD_APP_EVENTS_H
 #define NSTD_APP_EVENTS_H
+#include "../core/str.h"
 #include "../nstd.h"
 #include "data.h"
 
@@ -255,6 +256,12 @@ typedef struct {
     void (*window_cursor_entered)(const NSTDAppData *, NSTDWindowID, NSTDDeviceID);
     /// The cursor left a window.
     void (*window_cursor_left)(const NSTDAppData *, NSTDWindowID, NSTDDeviceID);
+    /// A file was dropped into a window.
+    void (*window_file_received)(const NSTDAppData *, NSTDWindowID, const NSTDStr *);
+    /// A file was hovered over a window.
+    void (*window_file_hovered)(const NSTDAppData *, NSTDWindowID, const NSTDStr *);
+    /// A file was dragged away from a window.
+    void (*window_file_canceled)(const NSTDAppData *, NSTDWindowID);
     /// A window requests closing.
     void (*window_close_requested)(const NSTDAppData *, NSTDWindowID);
     /// Called when a window is closed.

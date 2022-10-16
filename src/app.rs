@@ -1,11 +1,16 @@
 //! An application event loop.
 pub mod data;
+pub mod display;
 pub mod events;
 use self::{
     data::{NSTDAppData, NSTDAppHandle},
+    display::{NSTDDisplay, NSTDDisplayHandle},
     events::{NSTDAppEvents, NSTDKey, NSTDMouseInput, NSTDScrollDelta, NSTDTouchState},
 };
-use crate::{core::def::NSTDErrorCode, NSTDAnyMut};
+use crate::{
+    core::{def::NSTDErrorCode, str::NSTDStr},
+    NSTDAnyMut,
+};
 use winit::{
     event::{DeviceEvent, ElementState, Event, StartCause, WindowEvent},
     event_loop::{ControlFlow, EventLoop},
@@ -258,6 +263,28 @@ pub unsafe extern "C" fn nstd_app_run(app: NSTDApp, data: NSTDAnyMut) -> ! {
                         window_cursor_left(app_data, &window_id, &device_id);
                     }
                 }
+                // A file was dropped into a window.
+                WindowEvent::DroppedFile(path) => {
+                    if let Some(window_file_received) = app.events.window_file_received {
+                        let path = path.to_string_lossy();
+                        let path = NSTDStr::from_str(&path);
+                        window_file_received(app_data, &window_id, &path);
+                    }
+                }
+                // A file was hovered over a window.
+                WindowEvent::HoveredFile(path) => {
+                    if let Some(window_file_hovered) = app.events.window_file_hovered {
+                        let path = path.to_string_lossy();
+                        let path = NSTDStr::from_str(&path);
+                        window_file_hovered(app_data, &window_id, &path);
+                    }
+                }
+                // A file was dragged away from a window.
+                WindowEvent::HoveredFileCancelled => {
+                    if let Some(window_file_canceled) = app.events.window_file_canceled {
+                        window_file_canceled(app_data, &window_id);
+                    }
+                }
                 // A window requests closing.
                 WindowEvent::CloseRequested => {
                     if let Some(window_close_requested) = app.events.window_close_requested {
@@ -293,6 +320,45 @@ pub unsafe extern "C" fn nstd_app_run(app: NSTDApp, data: NSTDAnyMut) -> ! {
 #[cfg_attr(feature = "clib", no_mangle)]
 #[allow(unused_variables)]
 pub extern "C" fn nstd_app_free(app: NSTDApp) {}
+
+/// Invokes a callback function for each display detected by an `nstd` app.
+///
+/// # Parameters:
+///
+/// - `NSTDAppHandle app` - A handle to the `nstd` application.
+///
+/// - `void (*callback)(NSTDDisplayHandle)` - The callback function.
+///
+/// # Safety
+///
+/// The user of this function must guarantee that `callback` is a valid C function pointer.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_app_displays(
+    app: NSTDAppHandle,
+    callback: Option<unsafe extern "C" fn(NSTDDisplayHandle)>,
+) {
+    if let Some(callback) = callback {
+        for handle in app.available_monitors() {
+            callback(&handle);
+        }
+    }
+}
+
+/// Returns a handle to the primary display.
+///
+/// # Parameters:
+///
+/// - `NSTDAppHandle app` - A handle to the `nstd` application.
+///
+/// # Returns
+///
+/// `NSTDDisplay display` - A handle to the primary display, null on error.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_app_primary_display(app: NSTDAppHandle) -> Option<NSTDDisplay> {
+    app.primary_monitor().map(Box::new)
+}
 
 /// Signals an `NSTDApp`'s event loop to exit.
 ///
