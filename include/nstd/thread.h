@@ -63,6 +63,17 @@ NSTDAPI NSTDThread nstd_thread_spawn(NSTDErrorCode (*thread_fn)());
 NSTDAPI NSTDThread nstd_thread_spawn_with_desc(NSTDErrorCode (*thread_fn)(),
 const NSTDThreadDescriptor *desc);
 
+/// Checks if a thread has finished running.
+///
+/// # Parameters:
+///
+/// - `const NSTDThread *thread` - A handle to the thread.
+///
+/// # Returns
+///
+/// `NSTDBool is_finished` - True if the thread associated with the handle has finished executing.
+NSTDAPI NSTDBool nstd_thread_is_finished(const NSTDThread *thread);
+
 /// Joins a thread by it's handle.
 ///
 /// # Parameters:

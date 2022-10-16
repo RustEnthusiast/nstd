@@ -2,7 +2,7 @@
 use crate::{
     core::{def::NSTDErrorCode, str::NSTDStr},
     io::NSTDIOError,
-    NSTDFloat64, NSTDUInt,
+    NSTDBool, NSTDFloat64, NSTDUInt,
 };
 use std::{
     thread::{Builder, JoinHandle},
@@ -94,6 +94,21 @@ pub unsafe extern "C" fn nstd_thread_spawn_with_desc(
         }
     }
     None
+}
+
+/// Checks if a thread has finished running.
+///
+/// # Parameters:
+///
+/// - `const NSTDThread *thread` - A handle to the thread.
+///
+/// # Returns
+///
+/// `NSTDBool is_finished` - True if the thread associated with the handle has finished executing.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_thread_is_finished(thread: &NSTDThread) -> NSTDBool {
+    thread.is_finished()
 }
 
 /// Joins a thread by it's handle.
