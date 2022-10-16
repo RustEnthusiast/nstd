@@ -3,7 +3,7 @@ use crate::{
     app::data::NSTDAppHandle,
     core::str::NSTDStr,
     image::{nstd_image_as_bytes, nstd_image_height, nstd_image_width, NSTDImage},
-    NSTDInt32, NSTDUInt32,
+    NSTDFloat64, NSTDInt32, NSTDUInt32,
 };
 use winit::{
     dpi::{PhysicalPosition, PhysicalSize},
@@ -198,6 +198,21 @@ pub extern "C" fn nstd_window_get_outer_size(window: &NSTDWindow) -> NSTDWindowS
         width: size.width,
         height: size.height,
     }
+}
+
+/// Returns the scale factor of a window.
+///
+/// # Parameter:
+///
+/// - `const NSTDWindow *window` - The window.
+///
+/// # Returns
+///
+/// `NSTDFloat64 scale_factor` - The window's scale factor.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_window_scale_factor(window: &NSTDWindow) -> NSTDFloat64 {
+    window.scale_factor()
 }
 
 /// Permanently closes & frees a window and it's data.

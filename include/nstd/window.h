@@ -135,6 +135,17 @@ NSTDAPI NSTDWindowSize nstd_window_get_size(const NSTDWindow *window);
 /// `NSTDWindowSize size` - The size of the window.
 NSTDAPI NSTDWindowSize nstd_window_get_outer_size(const NSTDWindow *window);
 
+/// Returns the scale factor of a window.
+///
+/// # Parameter:
+///
+/// - `const NSTDWindow *window` - The window.
+///
+/// # Returns
+///
+/// `NSTDFloat64 scale_factor` - The window's scale factor.
+NSTDAPI NSTDFloat64 nstd_window_scale_factor(const NSTDWindow *window);
+
 /// Permanently closes & frees a window and it's data.
 ///
 /// # Parameters:
