@@ -2,6 +2,7 @@
 #define NSTD_THREAD_H
 #include "core/def.h"
 #include "core/str.h"
+#include "io/io.h"
 #include "nstd.h"
 
 /// A handle to a running thread.
@@ -62,17 +63,6 @@ NSTDAPI NSTDThread nstd_thread_spawn(NSTDErrorCode (*thread_fn)());
 NSTDAPI NSTDThread nstd_thread_spawn_with_desc(NSTDErrorCode (*thread_fn)(),
 const NSTDThreadDescriptor *desc);
 
-/// Puts the current thread to sleep for a specified number of seconds.
-///
-/// # Parameters:
-///
-/// - `NSTDFloat64 secs` - The number of seconds to put the thread to sleep for.
-///
-/// # Panics
-///
-/// Panics if `secs` is negative, overflows Rust's `Duration` structure, or is non-finite.
-NSTDAPI void nstd_thread_sleep(NSTDFloat64 secs);
-
 /// Joins a thread by it's handle.
 ///
 /// # Parameters:
@@ -94,5 +84,28 @@ NSTDAPI NSTDErrorCode nstd_thread_join(NSTDThread thread);
 ///
 /// - `NSTDThread thread` - The thread handle.
 NSTDAPI void nstd_thread_detach(NSTDThread thread);
+
+/// Puts the current thread to sleep for a specified number of seconds.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat64 secs` - The number of seconds to put the thread to sleep for.
+///
+/// # Panics
+///
+/// Panics if `secs` is negative, overflows Rust's `Duration` structure, or is non-finite.
+NSTDAPI void nstd_thread_sleep(NSTDFloat64 secs);
+
+/// Returns the number of recommended threads that a program should use.
+///
+/// # Parameters:
+///
+/// - `NSTDIOError *errc` - The operation error code.
+///
+/// # Returns
+///
+/// `NSTDUInt threads` - The estimated default amount of parallelism a program should use, 0 on
+/// error.
+NSTDAPI NSTDUInt nstd_thread_count(NSTDIOError *errc);
 
 #endif

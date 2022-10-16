@@ -1,6 +1,7 @@
 //! Thread spawning, joining, and detaching.
 use crate::{
     core::{def::NSTDErrorCode, str::NSTDStr},
+    io::NSTDIOError,
     NSTDFloat64, NSTDUInt,
 };
 use std::{
@@ -95,21 +96,6 @@ pub unsafe extern "C" fn nstd_thread_spawn_with_desc(
     None
 }
 
-/// Puts the current thread to sleep for a specified number of seconds.
-///
-/// # Parameters:
-///
-/// - `NSTDFloat64 secs` - The number of seconds to put the thread to sleep for.
-///
-/// # Panics
-///
-/// Panics if `secs` is negative, overflows Rust's `Duration` structure, or is non-finite.
-#[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_thread_sleep(secs: NSTDFloat64) {
-    std::thread::sleep(Duration::from_secs_f64(secs));
-}
-
 /// Joins a thread by it's handle.
 ///
 /// # Parameters:
@@ -138,3 +124,42 @@ pub extern "C" fn nstd_thread_join(thread: NSTDThread) -> NSTDErrorCode {
 #[cfg_attr(feature = "clib", no_mangle)]
 #[allow(unused_variables)]
 pub extern "C" fn nstd_thread_detach(thread: NSTDThread) {}
+
+/// Puts the current thread to sleep for a specified number of seconds.
+///
+/// # Parameters:
+///
+/// - `NSTDFloat64 secs` - The number of seconds to put the thread to sleep for.
+///
+/// # Panics
+///
+/// Panics if `secs` is negative, overflows Rust's `Duration` structure, or is non-finite.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_thread_sleep(secs: NSTDFloat64) {
+    std::thread::sleep(Duration::from_secs_f64(secs));
+}
+
+/// Returns the number of recommended threads that a program should use.
+///
+/// # Parameters:
+///
+/// - `NSTDIOError *errc` - The operation error code.
+///
+/// # Returns
+///
+/// `NSTDUInt threads` - The estimated default amount of parallelism a program should use, 0 on
+/// error.
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_thread_count(errc: &mut NSTDIOError) -> NSTDUInt {
+    match std::thread::available_parallelism() {
+        Ok(threads) => {
+            *errc = NSTDIOError::NSTD_IO_ERROR_NONE;
+            threads.get()
+        }
+        Err(err) => {
+            *errc = NSTDIOError::from_err(err.kind());
+            0
+        }
+    }
+}
