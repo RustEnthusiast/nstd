@@ -1,6 +1,7 @@
 //! Contains callback based events through function pointers.
 use crate::{
-    app::data::NSTDAppData, NSTDBool, NSTDFloat64, NSTDInt32, NSTDUInt16, NSTDUInt32, NSTDUnichar,
+    app::data::NSTDAppData, core::str::NSTDStr, NSTDBool, NSTDFloat64, NSTDInt32, NSTDUInt16,
+    NSTDUInt32, NSTDUnichar,
 };
 use winit::{
     event::{
@@ -441,6 +442,12 @@ pub struct NSTDAppEvents {
         Option<unsafe extern "C" fn(&NSTDAppData, NSTDWindowID, NSTDDeviceID)>,
     /// The cursor left a window.
     pub window_cursor_left: Option<unsafe extern "C" fn(&NSTDAppData, NSTDWindowID, NSTDDeviceID)>,
+    /// A file was dropped into a window.
+    pub window_file_received: Option<unsafe extern "C" fn(&NSTDAppData, NSTDWindowID, &NSTDStr)>,
+    /// A file was hovered over a window.
+    pub window_file_hovered: Option<unsafe extern "C" fn(&NSTDAppData, NSTDWindowID, &NSTDStr)>,
+    /// A file was dragged away from a window.
+    pub window_file_canceled: Option<unsafe extern "C" fn(&NSTDAppData, NSTDWindowID)>,
     /// A window requests closing.
     pub window_close_requested: Option<unsafe extern "C" fn(&NSTDAppData, NSTDWindowID)>,
     /// Called when a window is closed.

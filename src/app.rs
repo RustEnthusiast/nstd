@@ -7,7 +7,10 @@ use self::{
     display::{NSTDDisplay, NSTDDisplayHandle},
     events::{NSTDAppEvents, NSTDKey, NSTDMouseInput, NSTDScrollDelta, NSTDTouchState},
 };
-use crate::{core::def::NSTDErrorCode, NSTDAnyMut};
+use crate::{
+    core::{def::NSTDErrorCode, str::NSTDStr},
+    NSTDAnyMut,
+};
 use winit::{
     event::{DeviceEvent, ElementState, Event, StartCause, WindowEvent},
     event_loop::{ControlFlow, EventLoop},
@@ -258,6 +261,28 @@ pub unsafe extern "C" fn nstd_app_run(app: NSTDApp, data: NSTDAnyMut) -> ! {
                 WindowEvent::CursorLeft { device_id } => {
                     if let Some(window_cursor_left) = app.events.window_cursor_left {
                         window_cursor_left(app_data, &window_id, &device_id);
+                    }
+                }
+                // A file was dropped into a window.
+                WindowEvent::DroppedFile(path) => {
+                    if let Some(window_file_received) = app.events.window_file_received {
+                        let path = path.to_string_lossy();
+                        let path = NSTDStr::from_str(&path);
+                        window_file_received(app_data, &window_id, &path);
+                    }
+                }
+                // A file was hovered over a window.
+                WindowEvent::HoveredFile(path) => {
+                    if let Some(window_file_hovered) = app.events.window_file_hovered {
+                        let path = path.to_string_lossy();
+                        let path = NSTDStr::from_str(&path);
+                        window_file_hovered(app_data, &window_id, &path);
+                    }
+                }
+                // A file was dragged away from a window.
+                WindowEvent::HoveredFileCancelled => {
+                    if let Some(window_file_canceled) = app.events.window_file_canceled {
+                        window_file_canceled(app_data, &window_id);
                     }
                 }
                 // A window requests closing.
