@@ -11,16 +11,16 @@ use winit::{
 };
 
 /// A window's unique identifier.
-pub type NSTDWindowID<'a> = &'a WindowId;
+pub type NSTDWindowID = Box<WindowId>;
 
 /// A device's unique identifier.
-pub type NSTDDeviceID<'a> = &'a DeviceId;
+pub type NSTDDeviceID = Box<DeviceId>;
 
 /// Identifier for an analog axis on a device.
-pub type NSTDAnalogAxisID<'a> = &'a AxisId;
+pub type NSTDAnalogAxisID = Box<AxisId>;
 
 /// A button's unique identifier.
-pub type NSTDButtonID<'a> = &'a ButtonId;
+pub type NSTDButtonID = Box<ButtonId>;
 
 /// Describes a mouse wheel's scroll delta.
 #[repr(C)]
@@ -363,34 +363,32 @@ pub struct NSTDAppEvents {
     /// Called when all other events have been processed.
     pub update: Option<unsafe extern "C" fn(&NSTDAppData)>,
     /// Called when a new device is connected to the system.
-    pub device_added: Option<unsafe extern "C" fn(&NSTDAppData, NSTDDeviceID)>,
+    pub device_added: Option<unsafe extern "C" fn(&NSTDAppData, &DeviceId)>,
     /// Called when a device was disconnected from the system.
-    pub device_removed: Option<unsafe extern "C" fn(&NSTDAppData, NSTDDeviceID)>,
+    pub device_removed: Option<unsafe extern "C" fn(&NSTDAppData, &DeviceId)>,
     /// Called when a mouse device is moved.
     pub mouse_moved:
-        Option<unsafe extern "C" fn(&NSTDAppData, NSTDDeviceID, NSTDFloat64, NSTDFloat64)>,
+        Option<unsafe extern "C" fn(&NSTDAppData, &DeviceId, NSTDFloat64, NSTDFloat64)>,
     /// Called when a scroll wheel is scrolled.
     pub mouse_scrolled: Option<
-        unsafe extern "C" fn(&NSTDAppData, NSTDDeviceID, NSTDFloat64, NSTDFloat64, NSTDScrollDelta),
+        unsafe extern "C" fn(&NSTDAppData, &DeviceId, NSTDFloat64, NSTDFloat64, NSTDScrollDelta),
     >,
     /// Called when there is some motion on an analog axis device, such as a touchpad.
     ///
     /// # Note
     ///
     /// Some touchpads can return a negative y value.
-    pub axis_motion:
-        Option<unsafe extern "C" fn(&NSTDAppData, NSTDDeviceID, NSTDAnalogAxisID, NSTDFloat64)>,
+    pub axis_motion: Option<unsafe extern "C" fn(&NSTDAppData, &DeviceId, &AxisId, NSTDFloat64)>,
     /// Called when a button, such as a mouse button's state changes.
-    pub button_input:
-        Option<unsafe extern "C" fn(&NSTDAppData, NSTDDeviceID, NSTDButtonID, NSTDBool)>,
+    pub button_input: Option<unsafe extern "C" fn(&NSTDAppData, &DeviceId, &ButtonId, NSTDBool)>,
     /// Called when a keyboard key is pressed or unpressed.
     pub key_input:
-        Option<unsafe extern "C" fn(&NSTDAppData, NSTDDeviceID, NSTDKey, NSTDUInt32, NSTDBool)>,
+        Option<unsafe extern "C" fn(&NSTDAppData, &DeviceId, NSTDKey, NSTDUInt32, NSTDBool)>,
     /// Called when a window's scale factor changes.
     pub window_dpi_changed: Option<
         unsafe extern "C" fn(
             &NSTDAppData,
-            NSTDWindowID,
+            &WindowId,
             NSTDFloat64,
             &mut NSTDUInt32,
             &mut NSTDUInt32,
@@ -398,35 +396,26 @@ pub struct NSTDAppEvents {
     >,
     /// Called when a window is resized.
     pub window_resized:
-        Option<unsafe extern "C" fn(&NSTDAppData, NSTDWindowID, NSTDUInt32, NSTDUInt32)>,
+        Option<unsafe extern "C" fn(&NSTDAppData, &WindowId, NSTDUInt32, NSTDUInt32)>,
     /// Called when a window is moved.
-    pub window_moved:
-        Option<unsafe extern "C" fn(&NSTDAppData, NSTDWindowID, NSTDInt32, NSTDInt32)>,
+    pub window_moved: Option<unsafe extern "C" fn(&NSTDAppData, &WindowId, NSTDInt32, NSTDInt32)>,
     /// Focus for a window changed.
-    pub window_focus_changed: Option<unsafe extern "C" fn(&NSTDAppData, NSTDWindowID, NSTDBool)>,
+    pub window_focus_changed: Option<unsafe extern "C" fn(&NSTDAppData, &WindowId, NSTDBool)>,
     /// Mouse input was received.
-    pub window_mouse_input: Option<
-        unsafe extern "C" fn(&NSTDAppData, NSTDWindowID, NSTDDeviceID, &NSTDMouseInput, NSTDBool),
-    >,
+    pub window_mouse_input:
+        Option<unsafe extern "C" fn(&NSTDAppData, &WindowId, &DeviceId, &NSTDMouseInput, NSTDBool)>,
     /// Called when a window receives key input.
     pub window_key_input: Option<
-        unsafe extern "C" fn(
-            &NSTDAppData,
-            NSTDWindowID,
-            NSTDDeviceID,
-            NSTDKey,
-            NSTDUInt32,
-            NSTDBool,
-        ),
+        unsafe extern "C" fn(&NSTDAppData, &WindowId, &DeviceId, NSTDKey, NSTDUInt32, NSTDBool),
     >,
     /// Called when a window receives a character.
-    pub window_received_char: Option<unsafe extern "C" fn(&NSTDAppData, NSTDWindowID, NSTDUnichar)>,
+    pub window_received_char: Option<unsafe extern "C" fn(&NSTDAppData, &WindowId, NSTDUnichar)>,
     /// Called when a scroll device is scrolled over a window.
     pub window_scrolled: Option<
         unsafe extern "C" fn(
             &NSTDAppData,
-            NSTDWindowID,
-            NSTDDeviceID,
+            &WindowId,
+            &DeviceId,
             NSTDFloat64,
             NSTDFloat64,
             NSTDScrollDelta,
@@ -434,24 +423,22 @@ pub struct NSTDAppEvents {
         ),
     >,
     /// Called when the cursor is moved over a window.
-    pub window_cursor_moved: Option<
-        unsafe extern "C" fn(&NSTDAppData, NSTDWindowID, NSTDDeviceID, NSTDFloat64, NSTDFloat64),
-    >,
+    pub window_cursor_moved:
+        Option<unsafe extern "C" fn(&NSTDAppData, &WindowId, &DeviceId, NSTDFloat64, NSTDFloat64)>,
     /// The cursor entered a window.
-    pub window_cursor_entered:
-        Option<unsafe extern "C" fn(&NSTDAppData, NSTDWindowID, NSTDDeviceID)>,
+    pub window_cursor_entered: Option<unsafe extern "C" fn(&NSTDAppData, &WindowId, &DeviceId)>,
     /// The cursor left a window.
-    pub window_cursor_left: Option<unsafe extern "C" fn(&NSTDAppData, NSTDWindowID, NSTDDeviceID)>,
+    pub window_cursor_left: Option<unsafe extern "C" fn(&NSTDAppData, &WindowId, &DeviceId)>,
     /// A file was dropped into a window.
-    pub window_file_received: Option<unsafe extern "C" fn(&NSTDAppData, NSTDWindowID, &NSTDStr)>,
+    pub window_file_received: Option<unsafe extern "C" fn(&NSTDAppData, &WindowId, &NSTDStr)>,
     /// A file was hovered over a window.
-    pub window_file_hovered: Option<unsafe extern "C" fn(&NSTDAppData, NSTDWindowID, &NSTDStr)>,
+    pub window_file_hovered: Option<unsafe extern "C" fn(&NSTDAppData, &WindowId, &NSTDStr)>,
     /// A file was dragged away from a window.
-    pub window_file_canceled: Option<unsafe extern "C" fn(&NSTDAppData, NSTDWindowID)>,
+    pub window_file_canceled: Option<unsafe extern "C" fn(&NSTDAppData, &WindowId)>,
     /// A window requests closing.
-    pub window_close_requested: Option<unsafe extern "C" fn(&NSTDAppData, NSTDWindowID)>,
+    pub window_close_requested: Option<unsafe extern "C" fn(&NSTDAppData, &WindowId)>,
     /// Called when a window is closed.
-    pub window_closed: Option<unsafe extern "C" fn(&NSTDAppData, NSTDWindowID)>,
+    pub window_closed: Option<unsafe extern "C" fn(&NSTDAppData, &WindowId)>,
     /// Called once before exiting the application event loop.
     pub exit: Option<unsafe extern "C" fn(&NSTDAppData)>,
 }
