@@ -1,6 +1,7 @@
 #ifndef NSTD_WINDOW_H
 #define NSTD_WINDOW_H
 #include "app/data.h"
+#include "app/events.h"
 #include "core/str.h"
 #include "image.h"
 #include "nstd.h"
@@ -38,6 +39,17 @@ typedef struct {
 ///
 /// This operation will panic if creating the new window fails.
 NSTDAPI NSTDWindow nstd_window_new(NSTDAppHandle app);
+
+/// Returns a window's unique identifier.
+///
+/// # Parameters:
+///
+/// - `const NSTDWindow *window` - The window.
+///
+/// # Returns
+///
+/// `NSTDWindowID window_id` - The window's unique identifier.
+NSTDAPI NSTDWindowID nstd_window_id(const NSTDWindow *window);
 
 /// Sets the title of a window.
 ///

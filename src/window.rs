@@ -1,6 +1,6 @@
 //! An `nstd` application window.
 use crate::{
-    app::data::NSTDAppHandle,
+    app::{data::NSTDAppHandle, events::NSTDWindowID},
     core::str::NSTDStr,
     image::{nstd_image_as_bytes, nstd_image_height, nstd_image_width, NSTDImage},
     NSTDFloat64, NSTDInt32, NSTDUInt32,
@@ -52,6 +52,21 @@ pub extern "C" fn nstd_window_new(app: NSTDAppHandle) -> NSTDWindow {
     let window = Window::new(app).expect("Failed to create an nstd application window.");
     window.set_title("");
     Box::new(window)
+}
+
+/// Returns a window's unique identifier.
+///
+/// # Parameters:
+///
+/// - `const NSTDWindow *window` - The window.
+///
+/// # Returns
+///
+/// `NSTDWindowID window_id` - The window's unique identifier.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_window_id(window: &NSTDWindow) -> NSTDWindowID {
+    Box::new(window.id())
 }
 
 /// Sets the title of a window.
