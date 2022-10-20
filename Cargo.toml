@@ -35,7 +35,9 @@ nstd_os = []
 nstd_os_windows_alloc = [
     "nstd_os", "windows-sys/Win32_Foundation", "windows-sys/Win32_System_Memory"
 ]
-nstd_os_windows_shared_lib = ["nstd_os"]
+nstd_os_windows_shared_lib = [
+    "nstd_os", "windows-sys/Win32_Foundation", "windows-sys/Win32_System_LibraryLoader"
+]
 nstd_shared_lib = ["libloading", "nstd_core", "std"]
 nstd_shared_ptr = ["nstd_alloc", "nstd_core"]
 nstd_string = ["nstd_alloc", "nstd_core", "nstd_vec"]
