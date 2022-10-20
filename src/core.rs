@@ -11,6 +11,7 @@ pub mod math;
 pub mod mem;
 pub mod ptr;
 pub mod range;
+pub mod result;
 pub mod slice;
 pub mod str;
 
