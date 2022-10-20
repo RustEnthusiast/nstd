@@ -49,6 +49,7 @@ int main()
         - `windows` - OS support for Windows.
             - `alloc` - Low level memory allocation for Windows.
                 - `heap` - Process heap management for Windows.
+            - `shared_lib` - Shared library/module access for Windows.
     - `shared_lib` - Access symbols from loaded shared libraries.
     - `shared_ptr` - A reference counting smart pointer.
     - `string` - Dynamically sized UTF-8 encoded byte string.

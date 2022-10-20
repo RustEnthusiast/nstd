@@ -1,0 +1,3 @@
+#ifndef NSTD_OS_WINDOWS_SHARED_LIB_H
+#define NSTD_OS_WINDOWS_SHARED_LIB_H
+#endif
