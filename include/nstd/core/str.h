@@ -7,6 +7,11 @@
 #include "slice.h"
 
 /// An immutable unowned view into a UTF-8 encoded byte string.
+///
+/// # Safety
+///
+/// The user of this structure must ensure that the pointed-to data remains valid UTF-8, and
+/// unmodified while an instance of this structure is in use.
 typedef struct {
     /// A raw pointer to the string's data.
     const NSTDByte *ptr;
@@ -516,6 +521,12 @@ NSTDAPI NSTDInt64 nstd_core_str_to_i64(const NSTDStr *str, NSTDErrorCode *errc);
 NSTDAPI NSTDUInt64 nstd_core_str_to_u64(const NSTDStr *str, NSTDErrorCode *errc);
 
 /// An unowned view into a UTF-8 encoded byte string.
+///
+/// # Safety
+///
+/// The user of this structure must ensure that the pointed-to data remains valid UTF-8, unmodified,
+/// and unreferenced in any other code while an instance of this structure is in use, else data
+/// races may occur.
 typedef struct {
     /// A raw pointer to the string's data.
     NSTDByte *ptr;
