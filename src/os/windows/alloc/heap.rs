@@ -13,6 +13,18 @@ pub struct NSTDWindowsHeap {
     /// The private handle.
     handle: NSTDInt,
 }
+impl Drop for NSTDWindowsHeap {
+    /// [NSTDWindowsHeap] destructor.
+    #[inline]
+    fn drop(&mut self) {
+        // SAFETY: `self.handle` may have been acquired through `GetProcessHeap`.
+        unsafe {
+            if self.handle != GetProcessHeap() {
+                HeapDestroy(self.handle);
+            }
+        }
+    }
+}
 
 /// Returns a handle to the default heap of the current process.
 ///
@@ -82,7 +94,7 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_heap_default() -> NSTDWindowsHeap
 /// use nstd_sys::os::windows::alloc::{
 ///     heap::{
 ///         nstd_os_windows_alloc_heap_allocate, nstd_os_windows_alloc_heap_deallocate,
-///         nstd_os_windows_alloc_heap_free, nstd_os_windows_alloc_heap_new,
+///         nstd_os_windows_alloc_heap_new,
 ///     },
 ///     NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_NONE,
 /// };
@@ -93,10 +105,7 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_heap_default() -> NSTDWindowsHeap
 ///     let mut mem = nstd_os_windows_alloc_heap_allocate(&heap, 128);
 ///     assert!(!mem.is_null());
 ///
-///     let mut errc = nstd_os_windows_alloc_heap_deallocate(&heap, &mut mem);
-///     assert!(errc == NSTD_WINDOWS_ALLOC_ERROR_NONE);
-///
-///     errc = nstd_os_windows_alloc_heap_free(heap);
+///     let errc = nstd_os_windows_alloc_heap_deallocate(&heap, &mut mem);
 ///     assert!(errc == NSTD_WINDOWS_ALLOC_ERROR_NONE);
 /// }
 /// ```
@@ -230,7 +239,7 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_heap_validate(
 ///     os::windows::alloc::{
 ///         heap::{
 ///             nstd_os_windows_alloc_heap_allocate, nstd_os_windows_alloc_heap_deallocate,
-///             nstd_os_windows_alloc_heap_free, nstd_os_windows_alloc_heap_new,
+///             nstd_os_windows_alloc_heap_new,
 ///         },
 ///         NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_NONE,
 ///     },
@@ -247,10 +256,7 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_heap_validate(
 ///     nstd_core_mem_zero(mem.cast(), SIZE);
 ///     assert!(*mem.cast::<isize>() == 0);
 ///
-///     let mut errc = nstd_os_windows_alloc_heap_deallocate(&heap, &mut mem);
-///     assert!(errc == NSTD_WINDOWS_ALLOC_ERROR_NONE);
-///
-///     errc = nstd_os_windows_alloc_heap_free(heap);
+///     let errc = nstd_os_windows_alloc_heap_deallocate(&heap, &mut mem);
 ///     assert!(errc == NSTD_WINDOWS_ALLOC_ERROR_NONE);
 /// }
 /// ```
@@ -285,7 +291,7 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_heap_allocate(
 /// use nstd_sys::os::windows::alloc::{
 ///     heap::{
 ///         nstd_os_windows_alloc_heap_allocate_zeroed, nstd_os_windows_alloc_heap_deallocate,
-///         nstd_os_windows_alloc_heap_free, nstd_os_windows_alloc_heap_new,
+///         nstd_os_windows_alloc_heap_new,
 ///     },
 ///     NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_NONE,
 /// };
@@ -299,10 +305,7 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_heap_allocate(
 ///     assert!(!mem.is_null());
 ///     assert!(*mem.cast::<u64>() == 0);
 ///
-///     let mut errc = nstd_os_windows_alloc_heap_deallocate(&heap, &mut mem);
-///     assert!(errc == NSTD_WINDOWS_ALLOC_ERROR_NONE);
-///
-///     errc = nstd_os_windows_alloc_heap_free(heap);
+///     let errc = nstd_os_windows_alloc_heap_deallocate(&heap, &mut mem);
 ///     assert!(errc == NSTD_WINDOWS_ALLOC_ERROR_NONE);
 /// }
 /// ```
@@ -339,8 +342,7 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_heap_allocate_zeroed(
 /// use nstd_sys::os::windows::alloc::{
 ///     heap::{
 ///         nstd_os_windows_alloc_heap_allocate, nstd_os_windows_alloc_heap_deallocate,
-///         nstd_os_windows_alloc_heap_free, nstd_os_windows_alloc_heap_new,
-///         nstd_os_windows_alloc_heap_reallocate,
+///         nstd_os_windows_alloc_heap_new, nstd_os_windows_alloc_heap_reallocate,
 ///     },
 ///     NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_NONE,
 /// };
@@ -355,9 +357,6 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_heap_allocate_zeroed(
 ///     assert!(errc == NSTD_WINDOWS_ALLOC_ERROR_NONE);
 ///
 ///     errc = nstd_os_windows_alloc_heap_deallocate(&heap, &mut mem);
-///     assert!(errc == NSTD_WINDOWS_ALLOC_ERROR_NONE);
-///
-///     errc = nstd_os_windows_alloc_heap_free(heap);
 ///     assert!(errc == NSTD_WINDOWS_ALLOC_ERROR_NONE);
 /// }
 /// ```
@@ -398,7 +397,7 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_heap_reallocate(
 /// use nstd_sys::os::windows::alloc::{
 ///     heap::{
 ///         nstd_os_windows_alloc_heap_allocate, nstd_os_windows_alloc_heap_deallocate,
-///         nstd_os_windows_alloc_heap_free, nstd_os_windows_alloc_heap_new,
+///         nstd_os_windows_alloc_heap_new,
 ///     },
 ///     NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_NONE,
 /// };
@@ -409,10 +408,7 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_heap_reallocate(
 ///     let mut mem = nstd_os_windows_alloc_heap_allocate(&heap, 300);
 ///     assert!(!mem.is_null());
 ///
-///     let mut errc = nstd_os_windows_alloc_heap_deallocate(&heap, &mut mem);
-///     assert!(errc == NSTD_WINDOWS_ALLOC_ERROR_NONE);
-///
-///     errc = nstd_os_windows_alloc_heap_free(heap);
+///     let errc = nstd_os_windows_alloc_heap_deallocate(&heap, &mut mem);
 ///     assert!(errc == NSTD_WINDOWS_ALLOC_ERROR_NONE);
 /// }
 /// ```
@@ -435,10 +431,6 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_heap_deallocate(
 ///
 /// - `NSTDWindowsHeap heap` - The heap to destroy.
 ///
-/// # Returns
-///
-/// `NSTDWindowsAllocError errc` - The allocation operation error code.
-///
 /// # Safety
 ///
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapdestroy>.
@@ -449,7 +441,7 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_heap_deallocate(
 /// use nstd_sys::os::windows::alloc::{
 ///     heap::{
 ///         nstd_os_windows_alloc_heap_allocate, nstd_os_windows_alloc_heap_deallocate,
-///         nstd_os_windows_alloc_heap_free, nstd_os_windows_alloc_heap_new,
+///         nstd_os_windows_alloc_heap_new,
 ///     },
 ///     NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_NONE,
 /// };
@@ -460,20 +452,11 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_heap_deallocate(
 ///     let mut mem = nstd_os_windows_alloc_heap_allocate(&heap, 16);
 ///     assert!(!mem.is_null());
 ///
-///     let mut errc = nstd_os_windows_alloc_heap_deallocate(&heap, &mut mem);
-///     assert!(errc == NSTD_WINDOWS_ALLOC_ERROR_NONE);
-///
-///     errc = nstd_os_windows_alloc_heap_free(heap);
+///     let errc = nstd_os_windows_alloc_heap_deallocate(&heap, &mut mem);
 ///     assert!(errc == NSTD_WINDOWS_ALLOC_ERROR_NONE);
 /// }
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_os_windows_alloc_heap_free(
-    heap: NSTDWindowsHeap,
-) -> NSTDWindowsAllocError {
-    if HeapDestroy(heap.handle) != 0 {
-        return NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_NONE;
-    }
-    NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_HEAP_NOT_FOUND
-}
+#[allow(unused_variables)]
+pub unsafe extern "C" fn nstd_os_windows_alloc_heap_free(heap: NSTDWindowsHeap) {}

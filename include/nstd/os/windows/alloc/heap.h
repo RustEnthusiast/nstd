@@ -153,13 +153,9 @@ NSTDAnyMut *ptr);
 ///
 /// - `NSTDWindowsHeap heap` - The heap to destroy.
 ///
-/// # Returns
-///
-/// `NSTDWindowsAllocError errc` - The allocation operation error code.
-///
 /// # Safety
 ///
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapdestroy>.
-NSTDAPI NSTDWindowsAllocError nstd_os_windows_alloc_heap_free(NSTDWindowsHeap heap);
+NSTDAPI void nstd_os_windows_alloc_heap_free(NSTDWindowsHeap heap);
 
 #endif
