@@ -102,8 +102,7 @@ NSTDAPI NSTDIOError nstd_io_print_line(const NSTDStr *output);
 ///
 /// # Panics
 ///
-/// Panics if `buffer`'s length in bytes exceeds `NSTDInt`'s max value or getting a handle to the
-/// heap fails.
+/// Panics if `buffer`'s length in bytes exceeds `NSTDInt`'s max value.
 NSTDAPI NSTDIOError nstd_io_read(NSTDString *buffer);
 
 /// Reads a line of UTF-8 input from stdin and pushes it onto `buffer`.
@@ -118,8 +117,7 @@ NSTDAPI NSTDIOError nstd_io_read(NSTDString *buffer);
 ///
 /// # Panics
 ///
-/// Panics if `buffer`'s length in bytes exceeds `NSTDInt`'s max value or getting a handle to the
-/// heap fails.
+/// Panics if `buffer`'s length in bytes exceeds `NSTDInt`'s max value.
 NSTDAPI NSTDIOError nstd_io_read_line(NSTDString *buffer);
 
 #endif

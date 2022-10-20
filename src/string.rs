@@ -314,8 +314,7 @@ pub extern "C" fn nstd_string_cap(string: &NSTDString) -> NSTDUInt {
 ///
 /// # Panics
 ///
-/// Panics if the current length in bytes exceeds `NSTDInt`'s max value or getting a handle to the
-/// heap fails.
+/// Panics if the current length in bytes exceeds `NSTDInt`'s max value.
 ///
 /// # Example
 ///
@@ -355,8 +354,7 @@ pub extern "C" fn nstd_string_push(string: &mut NSTDString, chr: NSTDUnichar) ->
 ///
 /// # Panics
 ///
-/// Panics if the current length in bytes exceeds `NSTDInt`'s max value or getting a handle to the
-/// heap fails.
+/// Panics if the current length in bytes exceeds `NSTDInt`'s max value.
 ///
 /// # Safety
 ///

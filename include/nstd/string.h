@@ -177,8 +177,7 @@ NSTDAPI NSTDUInt nstd_string_cap(const NSTDString *string);
 ///
 /// # Panics
 ///
-/// Panics if the current length in bytes exceeds `NSTDInt`'s max value or getting a handle to the
-/// heap fails.
+/// Panics if the current length in bytes exceeds `NSTDInt`'s max value.
 NSTDAPI NSTDErrorCode nstd_string_push(NSTDString *string, NSTDUnichar chr);
 
 /// Appends a string slice to the end of a string.
@@ -195,8 +194,7 @@ NSTDAPI NSTDErrorCode nstd_string_push(NSTDString *string, NSTDUnichar chr);
 ///
 /// # Panics
 ///
-/// Panics if the current length in bytes exceeds `NSTDInt`'s max value or getting a handle to the
-/// heap fails.
+/// Panics if the current length in bytes exceeds `NSTDInt`'s max value.
 ///
 /// # Safety
 ///

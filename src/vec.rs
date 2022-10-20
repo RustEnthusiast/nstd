@@ -99,10 +99,6 @@ impl NSTDVec {
     }
 
     /// Attempts to reserve some memory for the vector if needed.
-    ///
-    /// # Panics
-    ///
-    /// This method may panic if getting a handle to the heap fails.
     #[inline]
     fn try_reserve(&mut self) -> NSTDAllocError {
         if self.len == self.cap {
@@ -114,10 +110,6 @@ impl NSTDVec {
 }
 impl Drop for NSTDVec {
     /// [NSTDVec]'s destructor.
-    ///
-    /// # Panics
-    ///
-    /// This operation may panic if getting a handle to the heap fails.
     #[inline]
     fn drop(&mut self) {
         if !self.ptr.is_null() {
@@ -181,11 +173,7 @@ pub extern "C" fn nstd_vec_new(element_size: NSTDUInt) -> NSTDVec {
 ///
 /// # Panics
 ///
-/// This function may panic in the following situations:
-///
-/// - Either `element_size` or `cap` are zero.
-///
-/// - Getting a handle to the heap fails.
+/// This function will panic if either `element_size` or `cap` are zero.
 ///
 /// # Example
 ///
@@ -547,8 +535,7 @@ pub extern "C" fn nstd_vec_get_mut(vec: &mut NSTDVec, pos: NSTDUInt) -> NSTDAnyM
 ///
 /// # Panics
 ///
-/// Panics if the current length in bytes exceeds `NSTDInt`'s max value or getting a handle to the
-/// heap fails.
+/// Panics if `vec`'s current length in bytes exceeds `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -656,11 +643,7 @@ pub extern "C" fn nstd_vec_pop(vec: &mut NSTDVec) -> NSTDAny {
 ///
 /// # Panics
 ///
-/// This function will panic in the following situations:
-///
-/// - `index` multiplied by `vec`'s stride exceeds `NSTDInt`'s max value.
-///
-/// - Getting a handle to the heap fails.
+/// This function will panic if `index` multiplied by `vec`'s stride exceeds `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -806,8 +789,6 @@ pub extern "C" fn nstd_vec_remove(vec: &mut NSTDVec, mut index: NSTDUInt) -> NST
 ///
 /// - The current length in bytes exceeds `NSTDInt`'s max value.
 ///
-/// - Getting a handle to the heap fails.
-///
 /// # Safety
 ///
 /// This operation can cause undefined behavior if `values`'s data is invalid.
@@ -890,7 +871,7 @@ pub extern "C" fn nstd_vec_truncate(vec: &mut NSTDVec, len: NSTDUInt) {
 ///
 /// # Panics
 ///
-/// This operation may panic if either `size` is zero or getting a handle to the heap fails.
+/// This operation will panic if `size` is zero.
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_vec_reserve(vec: &mut NSTDVec, size: NSTDUInt) -> NSTDAllocError {
     assert!(size != 0);
@@ -933,10 +914,6 @@ pub extern "C" fn nstd_vec_reserve(vec: &mut NSTDVec, size: NSTDUInt) -> NSTDAll
 /// # Returns
 ///
 /// `NSTDAllocError errc` - The allocation operation error code.
-///
-/// # Panics
-///
-/// Panics if getting a handle to the heap fails.
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_vec_shrink(vec: &mut NSTDVec) -> NSTDAllocError {
     // Make sure the vector is non-null and it's capacity is greater than it's length.
@@ -960,10 +937,6 @@ pub extern "C" fn nstd_vec_shrink(vec: &mut NSTDVec) -> NSTDAllocError {
 /// # Parameters:
 ///
 /// - `NSTDVec vec` - The vector to free.
-///
-/// # Panics
-///
-/// This operation may panic if getting a handle to the heap fails.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 #[allow(unused_variables)]

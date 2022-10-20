@@ -16,10 +16,6 @@ pub struct NSTDHeapPtr {
 }
 impl Drop for NSTDHeapPtr {
     /// [NSTDHeapPtr]'s destructor.
-    ///
-    /// # Panics
-    ///
-    /// This operation may panic if getting a handle to the heap fails.
     #[inline]
     fn drop(&mut self) {
         // SAFETY: Heap pointers are always non-null.
@@ -227,10 +223,6 @@ pub extern "C" fn nstd_heap_ptr_get_mut(hptr: &mut NSTDHeapPtr) -> NSTDAnyMut {
 /// # Parameters:
 ///
 /// - `NSTDHeapPtr hptr` - A pointer to the heap object.
-///
-/// # Panics
-///
-/// This operation may panic if getting a handle to the heap fails.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 #[allow(unused_variables)]
