@@ -1,5 +1,6 @@
 #ifndef NSTD_OS_WINDOWS_ALLOC_HEAP_H
 #define NSTD_OS_WINDOWS_ALLOC_HEAP_H
+#include "../../../core/result.h"
 #include "../../../nstd.h"
 #include "alloc.h"
 
@@ -9,16 +10,19 @@ typedef struct {
     NSTDInt handle;
 } NSTDWindowsHeap;
 
+/// A result type that holds an `NSTDWindowsHeap` as the success variant.
+NSTDResult(NSTDWindowsHeap, NSTDWindowsAllocError) NSTDWindowsHeapResult;
+
 /// Returns a handle to the default heap of the current process.
 ///
 /// # Returns
 ///
-/// `NSTDWindowsHeap heap` - A handle to the default heap, null on error.
+/// `NSTDWindowsHeapResult heap` - A handle to the default heap, null on error.
 ///
 /// # Safety
 ///
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-getprocessheap>.
-NSTDAPI NSTDWindowsHeap nstd_os_windows_alloc_heap_default();
+NSTDAPI NSTDWindowsHeapResult nstd_os_windows_alloc_heap_default();
 
 /// Creates a new private heap for the process.
 ///
@@ -29,12 +33,12 @@ NSTDAPI NSTDWindowsHeap nstd_os_windows_alloc_heap_default();
 ///
 /// # Returns
 ///
-/// `NSTDWindowsHeap heap` - A handle to the new private heap.
+/// `NSTDWindowsHeapResult heap` - A handle to the new private heap.
 ///
 /// # Safety
 ///
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapcreate>.
-NSTDAPI NSTDWindowsHeap nstd_os_windows_alloc_heap_new(NSTDUInt size);
+NSTDAPI NSTDWindowsHeapResult nstd_os_windows_alloc_heap_new(NSTDUInt size);
 
 /// Returns the size of a memory block previously allocated by an `NSTDWindowsHeap`.
 ///

@@ -12,6 +12,7 @@
 - Added `from_cstr`.
 - Renamed `to_bytes` to `into_bytes`.
 ### `nstd.os`
+- Added `NSTDWindowsHeapResult`.
 - Added `windows_alloc_heap_validate`.
 - Added `windows_alloc_heap_size`.
 - Added `NSTDWindowsAllocError`.

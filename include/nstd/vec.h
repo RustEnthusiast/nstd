@@ -50,11 +50,7 @@ NSTDAPI NSTDVec nstd_vec_new(NSTDUInt element_size);
 ///
 /// # Panics
 ///
-/// This function may panic in the following situations:
-///
-/// - Either `element_size` or `cap` are zero.
-///
-/// - Getting a handle to the heap fails.
+/// This function will panic if either `element_size` or `cap` are zero.
 NSTDAPI NSTDVec nstd_vec_new_with_cap(NSTDUInt element_size, NSTDUInt cap);
 
 /// Creates a new vector from a slice.
@@ -231,8 +227,7 @@ NSTDAPI NSTDAnyMut nstd_vec_get_mut(NSTDVec *vec, NSTDUInt pos);
 ///
 /// # Panics
 ///
-/// Panics if the current length in bytes exceeds `NSTDInt`'s max value or getting a handle to the
-/// heap fails.
+/// Panics if `vec`'s current length in bytes exceeds `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -283,11 +278,7 @@ NSTDAPI NSTDAny nstd_vec_pop(NSTDVec *vec);
 ///
 /// # Panics
 ///
-/// This function will panic in the following situations:
-///
-/// - `index` multiplied by `vec`'s stride exceeds `NSTDInt`'s max value.
-///
-/// - Getting a handle to the heap fails.
+/// This function will panic if `index` multiplied by `vec`'s stride exceeds `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -332,8 +323,6 @@ NSTDAPI NSTDErrorCode nstd_vec_remove(NSTDVec *vec, NSTDUInt index);
 ///
 /// - The current length in bytes exceeds `NSTDInt`'s max value.
 ///
-/// - Getting a handle to the heap fails.
-///
 /// # Safety
 ///
 /// This operation can cause undefined behavior if `values`'s data is invalid.
@@ -367,7 +356,7 @@ NSTDAPI void nstd_vec_truncate(NSTDVec *vec, NSTDUInt len);
 ///
 /// # Panics
 ///
-/// This operation may panic if either `size` is zero or getting a handle to the heap fails.
+/// This operation will panic if `size` is zero.
 NSTDAPI NSTDAllocError nstd_vec_reserve(NSTDVec *vec, NSTDUInt size);
 
 /// Decreases a vector's capacity to match it's length.
@@ -379,10 +368,6 @@ NSTDAPI NSTDAllocError nstd_vec_reserve(NSTDVec *vec, NSTDUInt size);
 /// # Returns
 ///
 /// `NSTDAllocError errc` - The allocation operation error code.
-///
-/// # Panics
-///
-/// Panics if getting a handle to the heap fails.
 NSTDAPI NSTDAllocError nstd_vec_shrink(NSTDVec *vec);
 
 /// Frees an instance of `NSTDVec`.
@@ -390,10 +375,6 @@ NSTDAPI NSTDAllocError nstd_vec_shrink(NSTDVec *vec);
 /// # Parameters:
 ///
 /// - `NSTDVec vec` - The vector to free.
-///
-/// # Panics
-///
-/// This operation may panic if getting a handle to the heap fails.
 NSTDAPI void nstd_vec_free(NSTDVec vec);
 
 #endif

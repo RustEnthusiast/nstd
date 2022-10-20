@@ -38,10 +38,6 @@ impl NSTDSharedPtr {
 }
 impl Drop for NSTDSharedPtr {
     /// [NSTDSharedPtr]'s destructor.
-    ///
-    /// # Panics
-    ///
-    /// This operation may panic if getting a handle to the heap fails.
     fn drop(&mut self) {
         // SAFETY: Shared pointers are always non-null.
         unsafe {
@@ -308,10 +304,6 @@ pub extern "C" fn nstd_shared_ptr_get(shared_ptr: &NSTDSharedPtr) -> NSTDAny {
 /// # Parameters:
 ///
 /// - `NSTDSharedPtr shared_ptr` - The shared object to free.
-///
-/// # Panics
-///
-/// This operation may panic if getting a handle to the heap fails.
 #[cfg_attr(feature = "clib", no_mangle)]
 #[allow(unused_variables)]
 pub extern "C" fn nstd_shared_ptr_free(shared_ptr: NSTDSharedPtr) {}
