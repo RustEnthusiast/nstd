@@ -9,6 +9,7 @@ pub mod fty;
 pub mod ity;
 pub mod math;
 pub mod mem;
+pub mod optional;
 pub mod ptr;
 pub mod range;
 pub mod result;

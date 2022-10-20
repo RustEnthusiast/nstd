@@ -32,6 +32,7 @@ int main()
         - `ity` - Provides functions for examining and operating on integral types.
         - `math` - Low level math operations.
         - `mem` - Contains mostly unsafe functions for interacting with raw memory.
+        - `optional` - Represents an optional (possibly uninitialized) value.
         - `ptr` - A sized pointer to some arbitrary type.
         - `range` - A numerical range.
         - `result` - Defines a "result" type with success and error variants.
