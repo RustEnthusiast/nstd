@@ -25,12 +25,12 @@ impl Drop for NSTDWindowsSharedLib {
 /// An optional (possibly null) shared Windows library handle.
 pub type NSTDWindowsOptionalSharedLib = NSTDOptional<NSTDWindowsSharedLib>;
 
-/// Adds a directory to the system's search path used to load shared libraries.
+/// Sets a directory to the system's search path used to load shared libraries.
 ///
 /// # Parameters:
 ///
 /// - `const NSTDChar *path` - A path to a directory to search when looking for DLLs. Pass null to
-/// restore the default search order.
+/// restore the default search path.
 ///
 /// # Returns
 ///
@@ -41,7 +41,7 @@ pub type NSTDWindowsOptionalSharedLib = NSTDOptional<NSTDWindowsSharedLib>;
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setdlldirectorya>.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_os_windows_shared_lib_add_dir(
+pub unsafe extern "C" fn nstd_os_windows_shared_lib_set_dir(
     path: *const NSTDChar,
 ) -> NSTDErrorCode {
     (SetDllDirectoryA(path.cast()) == 0).into()
