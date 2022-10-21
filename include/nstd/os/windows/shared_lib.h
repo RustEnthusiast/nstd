@@ -1,5 +1,6 @@
 #ifndef NSTD_OS_WINDOWS_SHARED_LIB_H
 #define NSTD_OS_WINDOWS_SHARED_LIB_H
+#include "../../core/optional.h"
 #include "../../nstd.h"
 
 /// A handle to a loaded library.
@@ -7,6 +8,9 @@ typedef struct {
     /// A raw handle to the module.
     NSTDInt handle;
 } NSTDWindowsSharedLib;
+
+/// An optional (possibly null) shared Windows library handle.
+NSTDOptional(NSTDWindowsSharedLib) NSTDWindowsOptionalSharedLib;
 
 /// Loads a shared library/module by name.
 ///
@@ -16,17 +20,13 @@ typedef struct {
 ///
 /// # Returns
 ///
-/// `NSTDWindowsSharedLib lib` - A handle to the shared library.
-///
-/// # Panics
-///
-/// Panics if getting a handle to the shared library fails.
+/// `NSTDWindowsOptionalSharedLib lib` - A handle to the shared library.
 ///
 /// # Safety
 ///
 /// See
 /// <https://docs.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-loadlibrarya>.
-NSTDAPI NSTDWindowsSharedLib nstd_os_windows_shared_lib_load(const NSTDChar *name);
+NSTDAPI NSTDWindowsOptionalSharedLib nstd_os_windows_shared_lib_load(const NSTDChar *name);
 
 /// Gets a pointer to a function or static variable in a dynamically loaded library by symbol name.
 ///

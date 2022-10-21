@@ -1,5 +1,5 @@
 //! Shared library/module access for Windows.
-use crate::{NSTDAny, NSTDAnyMut, NSTDChar, NSTDInt};
+use crate::{core::optional::NSTDOptional, NSTDAny, NSTDAnyMut, NSTDChar, NSTDInt};
 use windows_sys::Win32::System::LibraryLoader::{FreeLibrary, GetProcAddress, LoadLibraryA};
 
 /// A handle to a loaded library.
@@ -17,6 +17,9 @@ impl Drop for NSTDWindowsSharedLib {
     }
 }
 
+/// An optional (possibly null) shared Windows library handle.
+pub type NSTDWindowsOptionalSharedLib = NSTDOptional<NSTDWindowsSharedLib>;
+
 /// Loads a shared library/module by name.
 ///
 /// # Parameters:
@@ -25,11 +28,7 @@ impl Drop for NSTDWindowsSharedLib {
 ///
 /// # Returns
 ///
-/// `NSTDWindowsSharedLib lib` - A handle to the shared library.
-///
-/// # Panics
-///
-/// Panics if getting a handle to the shared library fails.
+/// `NSTDWindowsOptionalSharedLib lib` - A handle to the shared library.
 ///
 /// # Safety
 ///
@@ -39,10 +38,11 @@ impl Drop for NSTDWindowsSharedLib {
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_os_windows_shared_lib_load(
     name: *const NSTDChar,
-) -> NSTDWindowsSharedLib {
-    let handle = LoadLibraryA(name.cast());
-    assert!(handle != 0);
-    NSTDWindowsSharedLib { handle }
+) -> NSTDWindowsOptionalSharedLib {
+    match LoadLibraryA(name.cast()) {
+        0 => NSTDOptional::None,
+        handle => NSTDOptional::Some(NSTDWindowsSharedLib { handle }),
+    }
 }
 
 /// Gets a pointer to a function or static variable in a dynamically loaded library by symbol name.
