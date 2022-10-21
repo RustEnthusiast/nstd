@@ -1,7 +1,7 @@
 //! An `nstd` application window.
 use crate::{
     app::{data::NSTDAppHandle, events::NSTDWindowID},
-    core::str::NSTDStr,
+    core::{optional::NSTDOptional, str::NSTDStr},
     image::{nstd_image_as_bytes, nstd_image_height, nstd_image_width, NSTDImage},
     NSTDFloat64, NSTDInt32, NSTDUInt32,
 };
@@ -32,6 +32,9 @@ pub struct NSTDWindowSize {
     /// The height of the window.
     pub height: NSTDUInt32,
 }
+
+/// A type that yields an optional `NSTDWindowSize` value.
+pub type NSTDOptionalWindowSize = NSTDOptional<NSTDWindowSize>;
 
 /// Creates a new window attached to `app`'s event loop.
 ///
@@ -213,6 +216,40 @@ pub extern "C" fn nstd_window_get_outer_size(window: &NSTDWindow) -> NSTDWindowS
         width: size.width,
         height: size.height,
     }
+}
+
+/// Sets a window's minimum size.
+///
+/// # Parameters:
+///
+/// - `const NSTDWindow *window` - The window.
+///
+/// - `NSTDOptionalWindowSize size` - The minimum window size, pass none to disable clamping.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_window_set_min_size(window: &NSTDWindow, size: NSTDOptionalWindowSize) {
+    let size = match size {
+        NSTDOptional::Some(size) => Some(PhysicalSize::new(size.width, size.height)),
+        _ => None,
+    };
+    window.set_min_inner_size(size);
+}
+
+/// Sets a window's maximum size.
+///
+/// # Parameters:
+///
+/// - `const NSTDWindow *window` - The window.
+///
+/// - `NSTDOptionalWindowSize size` - The maximum window size, pass none to disable clamping.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_window_set_max_size(window: &NSTDWindow, size: NSTDOptionalWindowSize) {
+    let size = match size {
+        NSTDOptional::Some(size) => Some(PhysicalSize::new(size.width, size.height)),
+        _ => None,
+    };
+    window.set_max_inner_size(size);
 }
 
 /// Returns the scale factor of a window.

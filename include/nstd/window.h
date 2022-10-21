@@ -2,6 +2,7 @@
 #define NSTD_WINDOW_H
 #include "app/data.h"
 #include "app/events.h"
+#include "core/optional.h"
 #include "core/str.h"
 #include "image.h"
 #include "nstd.h"
@@ -24,6 +25,9 @@ typedef struct {
     /// The height of the window.
     NSTDUInt32 height;
 } NSTDWindowSize;
+
+/// A type that yields an optional `NSTDWindowSize` value.
+NSTDOptional(NSTDWindowSize) NSTDOptionalWindowSize;
 
 /// Creates a new window attached to `app`'s event loop.
 ///
@@ -146,6 +150,24 @@ NSTDAPI NSTDWindowSize nstd_window_get_size(const NSTDWindow *window);
 ///
 /// `NSTDWindowSize size` - The size of the window.
 NSTDAPI NSTDWindowSize nstd_window_get_outer_size(const NSTDWindow *window);
+
+/// Sets a window's minimum size.
+///
+/// # Parameters:
+///
+/// - `const NSTDWindow *window` - The window.
+///
+/// - `NSTDOptionalWindowSize size` - The minimum window size, pass none to disable clamping.
+NSTDAPI void nstd_window_set_min_size(const NSTDWindow *window, NSTDOptionalWindowSize size);
+
+/// Sets a window's maximum size.
+///
+/// # Parameters:
+///
+/// - `const NSTDWindow *window` - The window.
+///
+/// - `NSTDOptionalWindowSize size` - The maximum window size, pass none to disable clamping.
+NSTDAPI void nstd_window_set_max_size(const NSTDWindow *window, NSTDOptionalWindowSize size);
 
 /// Returns the scale factor of a window.
 ///
