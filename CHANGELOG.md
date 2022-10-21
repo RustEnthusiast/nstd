@@ -4,12 +4,15 @@
 - The overflow behavior for the "release" profile has been set to panic.
 - The panic behavior for the "release" profile has been set to abort.
 ### `nstd.core`
+- Added `Optional`.
+- Added `Result`.
 - Added `panic`.
 - Made `math_[clamp|div_ceil|div_floor]_*` safe.
 ### `nstd.cstring`
 - Added `from_cstr`.
 - Renamed `to_bytes` to `into_bytes`.
 ### `nstd.os`
+- Added `NSTDWindowsHeapResult`.
 - Added `windows_alloc_heap_validate`.
 - Added `windows_alloc_heap_size`.
 - Added `NSTDWindowsAllocError`.

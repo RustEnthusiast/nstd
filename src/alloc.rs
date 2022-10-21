@@ -50,10 +50,6 @@ impl NSTDAllocError {
 ///
 /// `NSTDAnyMut ptr` - A pointer to the allocated memory, null on error.
 ///
-/// # Panics
-///
-/// This function may panic if getting a handle to the default heap fails.
-///
 /// # Safety
 ///
 /// - Behavior is undefined if `size` is zero.
@@ -95,10 +91,6 @@ pub unsafe extern "C" fn nstd_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
 /// # Returns
 ///
 /// `NSTDAnyMut ptr` - A pointer to the allocated memory, null on error.
-///
-/// # Panics
-///
-/// This function may panic if getting a handle to the default heap fails.
 ///
 /// # Safety
 ///
@@ -151,10 +143,6 @@ pub unsafe extern "C" fn nstd_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMu
 /// # Returns
 ///
 /// `NSTDAllocError errc` - The allocation operation error code.
-///
-/// # Panics
-///
-/// This function may panic if getting a handle to the default heap fails.
 ///
 /// # Safety
 ///
@@ -217,10 +205,6 @@ pub unsafe extern "C" fn nstd_alloc_reallocate(
 /// - `NSTDAnyMut *ptr` - A pointer to the allocated memory, once freed the pointer is set to null.
 ///
 /// - `NSTDUInt size` - The number of bytes to free.
-///
-/// # Panics
-///
-/// This function may panic if getting a handle to the default heap fails.
 ///
 /// # Safety
 ///

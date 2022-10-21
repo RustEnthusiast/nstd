@@ -112,10 +112,6 @@ pub(crate) unsafe fn read<R: Read>(
 /// This does not mean `read` will return as 0 in this case.
 ///
 /// `read` will return as the number of bytes read from the stream.
-///
-/// # Panics
-///
-/// This function will panic if getting a handle to the heap fails.
 pub(crate) fn read_all<R: Read>(
     stream: &mut R,
     buffer: &mut NSTDVec,
@@ -156,11 +152,7 @@ pub(crate) fn read_all<R: Read>(
 ///
 /// # Panics
 ///
-/// This function will panic in the following situations:
-///
-/// - `buffer`'s length in bytes exceeds `NSTDInt`'s max value.
-///
-/// - Getting a handle to the heap fails.
+/// This function will panic if `buffer`'s length in bytes exceeds `NSTDInt`'s max value.
 pub(crate) fn read_to_string<R: Read>(
     stream: &mut R,
     buffer: &mut NSTDString,

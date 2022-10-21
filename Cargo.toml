@@ -39,7 +39,7 @@ nstd_io = ["nstd_alloc", "nstd_core", "nstd_string", "nstd_vec", "std"]
 nstd_math = ["std"]
 nstd_os = []
 nstd_os_windows_alloc = [
-    "nstd_os", "windows-sys/Win32_Foundation", "windows-sys/Win32_System_Memory"
+    "nstd_core", "nstd_os", "windows-sys/Win32_Foundation", "windows-sys/Win32_System_Memory"
 ]
 nstd_shared_lib = ["libloading", "nstd_core", "std"]
 nstd_shared_ptr = ["nstd_alloc", "nstd_core"]
