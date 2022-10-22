@@ -113,14 +113,29 @@ pub unsafe extern "C" fn nstd_core_mem_search(
         return core::ptr::null();
     }
     // Search the buffer for `delim`.
-    let mut i = 0;
-    while i < size {
-        if *buf.add(i) == delim {
-            return buf.add(i);
+    #[cfg(not(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64"))))]
+    {
+        let mut i = 0;
+        while i < size {
+            if *buf.add(i) == delim {
+                return buf.add(i);
+            }
+            i += 1;
         }
-        i += 1;
+        core::ptr::null()
     }
-    core::ptr::null()
+    #[cfg(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64")))]
+    {
+        use core::arch::asm;
+        let mut end = buf.add(size);
+        asm!(
+            include_str!("mem/x86/search.asm"),
+            buf = inout(reg) buf => end,
+            delim = in(reg_byte) delim,
+            end = in(reg) end
+        );
+        end
+    }
 }
 
 /// Zeros out a memory buffer.

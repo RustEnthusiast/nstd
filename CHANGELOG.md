@@ -1,6 +1,5 @@
 # TBD
 ### `nstd`
-- Removed the `asm` feature.
 - The overflow behavior for the "release" profile has been set to panic.
 - The panic behavior for the "release" profile has been set to abort.
 ### `nstd.core`
