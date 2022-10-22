@@ -180,6 +180,26 @@ NSTDAPI void nstd_window_set_max_size(const NSTDWindow *window, NSTDOptionalWind
 /// `NSTDFloat64 scale_factor` - The window's scale factor.
 NSTDAPI NSTDFloat64 nstd_window_scale_factor(const NSTDWindow *window);
 
+/// Sets whether or not a window is resizable.
+///
+/// # Parameters:
+///
+/// - `const NSTDWindow *window` - The window.
+///
+/// - `NSTDBool resizable` - True if the window should be resizable.
+NSTDAPI void nstd_window_set_resizable(const NSTDWindow *window, NSTDBool resizable);
+
+/// Checks if a window is resizable.
+///
+/// # Parameters:
+///
+/// - `const NSTDWindow *window` - The window.
+///
+/// # Returns
+///
+/// `NSTDBool is_resizable` - Returns true if the window is resizable.
+NSTDAPI NSTDBool nstd_window_is_resizable(const NSTDWindow *window);
+
 /// Permanently closes & frees a window and it's data.
 ///
 /// # Parameters:

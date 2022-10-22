@@ -3,7 +3,7 @@ use crate::{
     app::{data::NSTDAppHandle, events::NSTDWindowID},
     core::{optional::NSTDOptional, str::NSTDStr},
     image::{nstd_image_as_bytes, nstd_image_height, nstd_image_width, NSTDImage},
-    NSTDFloat64, NSTDInt32, NSTDUInt32,
+    NSTDBool, NSTDFloat64, NSTDInt32, NSTDUInt32,
 };
 use winit::{
     dpi::{PhysicalPosition, PhysicalSize},
@@ -265,6 +265,34 @@ pub extern "C" fn nstd_window_set_max_size(window: &NSTDWindow, size: NSTDOption
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_window_scale_factor(window: &NSTDWindow) -> NSTDFloat64 {
     window.scale_factor()
+}
+
+/// Sets whether or not a window is resizable.
+///
+/// # Parameters:
+///
+/// - `const NSTDWindow *window` - The window.
+///
+/// - `NSTDBool resizable` - True if the window should be resizable.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_window_set_resizable(window: &NSTDWindow, resizable: NSTDBool) {
+    window.set_resizable(resizable);
+}
+
+/// Checks if a window is resizable.
+///
+/// # Parameters:
+///
+/// - `const NSTDWindow *window` - The window.
+///
+/// # Returns
+///
+/// `NSTDBool is_resizable` - Returns true if the window is resizable.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_window_is_resizable(window: &NSTDWindow) -> NSTDBool {
+    window.is_resizable()
 }
 
 /// Permanently closes & frees a window and it's data.
