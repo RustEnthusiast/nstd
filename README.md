@@ -104,6 +104,8 @@ The `clib` feature flag is used to build `nstd` as a C library.
 
 The `std` feature flag links the Rust standard library into the binary.
 
+The `asm` feature permits the library to use inline assembly to increase performance.
+
 `std` and `nstd_core` are enabled by default.
 
 Example:
