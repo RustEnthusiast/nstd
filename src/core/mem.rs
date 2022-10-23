@@ -113,7 +113,15 @@ pub unsafe extern "C" fn nstd_core_mem_search(
         return core::ptr::null();
     }
     // Search the buffer for `delim`.
-    #[cfg(not(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64"))))]
+    #[cfg(not(all(
+        feature = "asm",
+        any(
+            target_arch = "arm",
+            target_arch = "aarch64",
+            target_arch = "x86",
+            target_arch = "x86_64"
+        )
+    )))]
     {
         let mut i = 0;
         while i < size {
@@ -133,6 +141,32 @@ pub unsafe extern "C" fn nstd_core_mem_search(
             buf = inout(reg) buf => end,
             delim = in(reg_byte) delim,
             end = in(reg) end
+        );
+        end
+    }
+    #[cfg(all(feature = "asm", target_arch = "arm"))]
+    {
+        use core::arch::asm;
+        let mut end = buf.add(size);
+        asm!(
+            include_str!("mem/arm/search.asm"),
+            buf = inout(reg) buf => end,
+            delim = in(reg) delim as usize,
+            end = in(reg) end,
+            byte = out(reg) _
+        );
+        end
+    }
+    #[cfg(all(feature = "asm", target_arch = "aarch64"))]
+    {
+        use core::arch::asm;
+        let mut end = buf.add(size);
+        asm!(
+            include_str!("mem/arm64/search.asm"),
+            buf = inout(reg) buf => end,
+            delim = in(reg) delim as usize,
+            end = in(reg) end,
+            byte = out(reg) _
         );
         end
     }
