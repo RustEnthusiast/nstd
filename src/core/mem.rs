@@ -204,7 +204,15 @@ pub unsafe extern "C" fn nstd_core_mem_search(
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_mem_zero(buf: *mut NSTDByte, size: NSTDUInt) {
     assert!(size <= isize::MAX as usize);
-    #[cfg(not(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64"))))]
+    #[cfg(not(all(
+        feature = "asm",
+        any(
+            target_arch = "arm",
+            target_arch = "aarch64",
+            target_arch = "x86",
+            target_arch = "x86_64"
+        )
+    )))]
     {
         let mut i = 0;
         while i < size {
@@ -219,6 +227,26 @@ pub unsafe extern "C" fn nstd_core_mem_zero(buf: *mut NSTDByte, size: NSTDUInt) 
             include_str!("mem/x86/zero.asm"),
             buf = inout(reg) buf => _,
             end = in(reg) buf.add(size)
+        );
+    }
+    #[cfg(all(feature = "asm", target_arch = "arm"))]
+    {
+        use core::arch::asm;
+        asm!(
+            include_str!("mem/arm/zero.asm"),
+            buf = inout(reg) buf => _,
+            end = in(reg) buf.add(size),
+            zero = out(reg) _
+        );
+    }
+    #[cfg(all(feature = "asm", target_arch = "aarch64"))]
+    {
+        use core::arch::asm;
+        asm!(
+            include_str!("mem/arm64/zero.asm"),
+            buf = inout(reg) buf => _,
+            end = in(reg) buf.add(size),
+            zero = out(reg) _
         );
     }
 }
@@ -257,7 +285,15 @@ pub unsafe extern "C" fn nstd_core_mem_zero(buf: *mut NSTDByte, size: NSTDUInt) 
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_mem_fill(buf: *mut NSTDByte, size: NSTDUInt, fill: NSTDByte) {
     assert!(size <= isize::MAX as usize);
-    #[cfg(not(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64"))))]
+    #[cfg(not(all(
+        feature = "asm",
+        any(
+            target_arch = "arm",
+            target_arch = "aarch64",
+            target_arch = "x86",
+            target_arch = "x86_64"
+        )
+    )))]
     {
         let mut i = 0;
         while i < size {
@@ -272,6 +308,26 @@ pub unsafe extern "C" fn nstd_core_mem_fill(buf: *mut NSTDByte, size: NSTDUInt, 
             include_str!("mem/x86/fill.asm"),
             buf = inout(reg) buf => _,
             fill = in(reg_byte) fill,
+            end = in(reg) buf.add(size)
+        );
+    }
+    #[cfg(all(feature = "asm", target_arch = "arm"))]
+    {
+        use core::arch::asm;
+        asm!(
+            include_str!("mem/arm/fill.asm"),
+            buf = inout(reg) buf => _,
+            fill = in(reg) fill as usize,
+            end = in(reg) buf.add(size)
+        );
+    }
+    #[cfg(all(feature = "asm", target_arch = "aarch64"))]
+    {
+        use core::arch::asm;
+        asm!(
+            include_str!("mem/arm64/fill.asm"),
+            buf = inout(reg) buf => _,
+            fill = in(reg) fill as usize,
             end = in(reg) buf.add(size)
         );
     }
