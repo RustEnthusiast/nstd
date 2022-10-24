@@ -1,8 +1,7 @@
-    xor {i}, {i}
 2:
-    cmp {i}, {size}
+    cmp {buf}, {end}
     jge 3f
-    mov byte ptr [{buf} + {i}], {fill}
-    inc {i}
+    mov byte ptr [{buf}], {fill}
+    inc {buf}
     jmp 2b
 3:

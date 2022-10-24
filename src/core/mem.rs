@@ -217,9 +217,8 @@ pub unsafe extern "C" fn nstd_core_mem_zero(buf: *mut NSTDByte, size: NSTDUInt) 
         use core::arch::asm;
         asm!(
             include_str!("mem/x86/zero.asm"),
-            buf = in(reg) buf,
-            size = in(reg) size,
-            i = out(reg) _
+            buf = inout(reg) buf => _,
+            end = in(reg) buf.add(size)
         );
     }
 }
@@ -271,10 +270,9 @@ pub unsafe extern "C" fn nstd_core_mem_fill(buf: *mut NSTDByte, size: NSTDUInt, 
         use core::arch::asm;
         asm!(
             include_str!("mem/x86/fill.asm"),
-            buf = in(reg) buf,
-            size = in(reg) size,
+            buf = inout(reg) buf => _,
             fill = in(reg_byte) fill,
-            i = out(reg) _
+            end = in(reg) buf.add(size)
         );
     }
 }
