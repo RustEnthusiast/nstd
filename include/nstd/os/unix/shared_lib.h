@@ -66,6 +66,10 @@ NSTDAPI NSTDAnyMut nstd_os_unix_shared_lib_get_mut(NSTDUnixSharedLib *lib, const
 /// # Parameters:
 ///
 /// - `NSTDUnixSharedLib lib` - A handle to the loaded library to unload.
+///
+/// # Safety
+///
+/// See <https://man7.org/linux/man-pages/man3/dlclose.3p.html>.
 NSTDAPI void nstd_os_unix_shared_lib_free(NSTDUnixSharedLib lib);
 
 #endif
