@@ -234,7 +234,7 @@ NSTDAPI NSTDUInt nstd_core_str_byte_len(const NSTDStr *str);
 /// # Safety
 ///
 /// This operation can cause undefined behavior in the event that `str`'s data is invalid.
-NSTDAPI NSTDUnichar nstd_core_str_get_char(const NSTDStr *str, NSTDUInt pos);
+NSTDAPI NSTDUnichar nstd_core_str_get(const NSTDStr *str, NSTDUInt pos);
 
 /// Creates a substring of an existing string slice.
 ///
@@ -760,7 +760,7 @@ NSTDAPI NSTDUInt nstd_core_str_mut_byte_len(const NSTDStrMut *str);
 /// # Safety
 ///
 /// This operation can cause undefined behavior in the event that `str`'s data is invalid.
-NSTDAPI NSTDUnichar nstd_core_str_mut_get_char(const NSTDStrMut *str, NSTDUInt pos);
+NSTDAPI NSTDUnichar nstd_core_str_mut_get(const NSTDStrMut *str, NSTDUInt pos);
 
 /// Creates a substring of an existing string slice.
 ///

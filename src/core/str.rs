@@ -497,17 +497,17 @@ pub extern "C" fn nstd_core_str_byte_len(str: &NSTDStr) -> NSTDUInt {
 /// # Example
 ///
 /// ```
-/// use nstd_sys::core::str::{nstd_core_str_from_raw_cstr, nstd_core_str_get_char};
+/// use nstd_sys::core::str::{nstd_core_str_from_raw_cstr, nstd_core_str_get};
 ///
 /// let s_str = "🦀🚀🦀!\0";
 /// unsafe {
 ///     let str = nstd_core_str_from_raw_cstr(s_str.as_ptr().cast());
-///     assert!(nstd_core_str_get_char(&str, 1) == '🚀'.into());
+///     assert!(nstd_core_str_get(&str, 1) == '🚀'.into());
 /// }
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_str_get_char(str: &NSTDStr, pos: NSTDUInt) -> NSTDUnichar {
+pub unsafe extern "C" fn nstd_core_str_get(str: &NSTDStr, pos: NSTDUInt) -> NSTDUnichar {
     match str.as_str().chars().nth(pos) {
         Some(chr) => chr as NSTDUnichar,
         _ => char::REPLACEMENT_CHARACTER as NSTDUnichar,
@@ -1404,20 +1404,17 @@ pub extern "C" fn nstd_core_str_mut_byte_len(str: &NSTDStrMut) -> NSTDUInt {
 /// # Example
 ///
 /// ```
-/// use nstd_sys::core::str::{nstd_core_str_mut_from_raw_cstr, nstd_core_str_mut_get_char};
+/// use nstd_sys::core::str::{nstd_core_str_mut_from_raw_cstr, nstd_core_str_mut_get};
 ///
 /// let mut s_str = String::from("🦀🚀🦀!\0");
 /// unsafe {
 ///     let str = nstd_core_str_mut_from_raw_cstr(s_str.as_mut_ptr().cast());
-///     assert!(nstd_core_str_mut_get_char(&str, 1) == '🚀'.into());
+///     assert!(nstd_core_str_mut_get(&str, 1) == '🚀'.into());
 /// }
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_str_mut_get_char(
-    str: &NSTDStrMut,
-    pos: NSTDUInt,
-) -> NSTDUnichar {
+pub unsafe extern "C" fn nstd_core_str_mut_get(str: &NSTDStrMut, pos: NSTDUInt) -> NSTDUnichar {
     match str.as_str().chars().nth(pos) {
         Some(chr) => chr as NSTDUnichar,
         _ => char::REPLACEMENT_CHARACTER as NSTDUnichar,
