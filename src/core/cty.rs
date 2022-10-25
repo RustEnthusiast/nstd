@@ -1,6 +1,21 @@
 //! Provides functions for examining and operating on character types.
 use crate::{NSTDBool, NSTDChar, NSTDUInt32, NSTDUnichar, NSTD_FALSE};
 
+/// Determines whether or not `chr` is a valid Unicode scalar value.
+///
+/// # Parameters:
+///
+/// - `NSTDUnichar chr` - The `NSTDUnichar` to check.
+///
+/// # Returns
+///
+/// `NSTDBool is_unicode` - True if `chr` is a valid Unicode character.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_core_cty_is_unicode(chr: NSTDUnichar) -> NSTDBool {
+    char::from_u32(chr).is_some()
+}
+
 /// Returns the Unicode replacement character (�).
 ///
 /// # Returns
