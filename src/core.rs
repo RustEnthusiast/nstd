@@ -1,7 +1,7 @@
 //! Provides core functionality for `nstd`.
 //!
-//! This library makes no use of Rust's [std] module, and is looking to be dependency free in the
-//! near future, meaning that this will only make use of the [core] standard library module.
+//! The entire `nstd.core` module is dependency free and makes no use of Rust's [std] library,
+//! making it fit for resource constrained/embedded environments.
 pub mod cstr;
 pub mod cty;
 pub mod def;
