@@ -1,4 +1,9 @@
-//! Operator overloading.
+//! Operator overloading for types and operators that may cause overflow.
+//!
+//! The types of overflows that this module attempts to catch can be found
+//! [here](https://doc.rust-lang.org/reference/expressions/operator-expr.html#overflow).
+//!
+//! Also see [this](https://github.com/RustEnthusiast/nstd/issues/22) issue for more information.
 use crate::{
     NSTDFloat32, NSTDFloat64, NSTDInt, NSTDInt16, NSTDInt32, NSTDInt64, NSTDInt8, NSTDUInt,
     NSTDUInt16, NSTDUInt32, NSTDUInt64, NSTDUInt8,
