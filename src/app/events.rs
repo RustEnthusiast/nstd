@@ -1,8 +1,9 @@
 //! Contains callback based events through function pointers.
 use crate::{
-    app::data::NSTDAppData, core::str::NSTDStr, NSTDBool, NSTDFloat64, NSTDInt32, NSTDUInt16,
-    NSTDUInt32, NSTDUnichar,
+    app::data::NSTDAppData, core::str::NSTDStr, NSTDBool, NSTDFloat32, NSTDFloat64, NSTDInt32,
+    NSTDUInt16, NSTDUInt32, NSTDUnichar,
 };
+use gilrs::{Axis, Button, GamepadId};
 use winit::{
     event::{
         AxisId, ButtonId, DeviceId, MouseButton, MouseScrollDelta, TouchPhase, VirtualKeyCode,
@@ -15,6 +16,9 @@ pub type NSTDWindowID = Box<WindowId>;
 
 /// A device's unique identifier.
 pub type NSTDDeviceID = Box<DeviceId>;
+
+/// A gamepad's unique identifier.
+pub type NSTDGamepadID = Box<GamepadId>;
 
 /// Identifier for an analog axis on a device.
 pub type NSTDAnalogAxisID = Box<AxisId>;
@@ -354,6 +358,128 @@ impl NSTDKey {
     }
 }
 
+/// Represents a gamepad button.
+#[repr(C)]
+#[derive(Clone, Copy, Debug)]
+#[allow(non_camel_case_types)]
+pub enum NSTDGamepadButton {
+    /// The upper action pad button.
+    ///
+    /// Corresponds to the `Y` button on Xbox controllers.
+    NSTD_GAMEPAD_BUTTON_NORTH,
+    /// The lower action pad button.
+    ///
+    /// Corresponds to the `A` button on Xbox controllers.
+    NSTD_GAMEPAD_BUTTON_SOUTH,
+    /// The right action pad button.
+    ///
+    /// Corresponds to the `B` button on Xbox controllers.
+    NSTD_GAMEPAD_BUTTON_EAST,
+    /// The left action pad button.
+    ///
+    /// Corresponds to the `X` button on Xbox controllers.
+    NSTD_GAMEPAD_BUTTON_WEST,
+    /// The right bumper.
+    ///
+    /// Corresponds to `RB` on Xbox controllers & `R1` on Playstation controllers.
+    NSTD_GAMEPAD_BUTTON_RIGHT_BUMPER,
+    /// The left bumper.
+    ///
+    /// Corresponds to `LB` on Xbox controllers & `L1` on Playstation controllers.
+    NSTD_GAMEPAD_BUTTON_LEFT_BUMPER,
+    /// The right trigger.
+    ///
+    /// Corresponds to `RT` on Xbox controllers & `R2` on Playstation controllers.
+    NSTD_GAMEPAD_BUTTON_RIGHT_TRIGGER,
+    /// The left trigger.
+    ///
+    /// Corresponds to `LT` on Xbox controllers & `L2` on Playstation controllers.
+    NSTD_GAMEPAD_BUTTON_LEFT_TRIGGER,
+    /// The start/pause button.
+    NSTD_GAMEPAD_BUTTON_START,
+    /// The select/back button.
+    NSTD_GAMEPAD_BUTTON_SELECT,
+    /// The right thumb stick.
+    NSTD_GAMEPAD_BUTTON_RIGHT_THUMB,
+    /// The left thumb stick.
+    NSTD_GAMEPAD_BUTTON_LEFT_THUMB,
+    /// The upper direction pad button.
+    NSTD_GAMEPAD_BUTTON_DPAD_UP,
+    /// The lower direction pad button.
+    NSTD_GAMEPAD_BUTTON_DPAD_DOWN,
+    /// The right direction pad button.
+    NSTD_GAMEPAD_BUTTON_DPAD_RIGHT,
+    /// The left direction pad button.
+    NSTD_GAMEPAD_BUTTON_DPAD_LEFT,
+    /// An unrecognized button.
+    NSTD_GAMEPAD_BUTTON_UNKNOWN,
+}
+impl NSTDGamepadButton {
+    /// Converts a [gilrs] [Button] into an [NSTDGamepadButton].
+    pub(crate) fn from_winit(button: Button) -> Self {
+        match button {
+            Button::North => Self::NSTD_GAMEPAD_BUTTON_NORTH,
+            Button::South => Self::NSTD_GAMEPAD_BUTTON_SOUTH,
+            Button::East => Self::NSTD_GAMEPAD_BUTTON_EAST,
+            Button::West => Self::NSTD_GAMEPAD_BUTTON_WEST,
+            Button::RightTrigger => Self::NSTD_GAMEPAD_BUTTON_RIGHT_BUMPER,
+            Button::LeftTrigger => Self::NSTD_GAMEPAD_BUTTON_LEFT_BUMPER,
+            Button::RightTrigger2 => Self::NSTD_GAMEPAD_BUTTON_RIGHT_TRIGGER,
+            Button::LeftTrigger2 => Self::NSTD_GAMEPAD_BUTTON_LEFT_TRIGGER,
+            Button::Start => Self::NSTD_GAMEPAD_BUTTON_START,
+            Button::Select => Self::NSTD_GAMEPAD_BUTTON_SELECT,
+            Button::RightThumb => Self::NSTD_GAMEPAD_BUTTON_RIGHT_THUMB,
+            Button::LeftThumb => Self::NSTD_GAMEPAD_BUTTON_LEFT_THUMB,
+            Button::DPadUp => Self::NSTD_GAMEPAD_BUTTON_DPAD_UP,
+            Button::DPadDown => Self::NSTD_GAMEPAD_BUTTON_DPAD_DOWN,
+            Button::DPadRight => Self::NSTD_GAMEPAD_BUTTON_DPAD_RIGHT,
+            Button::DPadLeft => Self::NSTD_GAMEPAD_BUTTON_DPAD_LEFT,
+            _ => Self::NSTD_GAMEPAD_BUTTON_UNKNOWN,
+        }
+    }
+}
+
+/// Represents a gamepad axis.
+#[repr(C)]
+#[derive(Clone, Copy, Debug)]
+#[allow(non_camel_case_types)]
+pub enum NSTDGamepadAxis {
+    /// The left stick x-axis.
+    NSTD_GAMEPAD_AXIS_LEFT_X,
+    /// The left stick y-axis.
+    NSTD_GAMEPAD_AXIS_LEFT_Y,
+    /// The left stick z-axis.
+    NSTD_GAMEPAD_AXIS_LEFT_Z,
+    /// The right stick x-axis.
+    NSTD_GAMEPAD_AXIS_RIGHT_X,
+    /// The right stick y-axis.
+    NSTD_GAMEPAD_AXIS_RIGHT_Y,
+    /// The right stick z-axis.
+    NSTD_GAMEPAD_AXIS_RIGHT_Z,
+    /// Left or right on the direction pad.
+    NSTD_GAMEPAD_AXIS_DPAD_X,
+    /// Up or down on the direction pad.
+    NSTD_GAMEPAD_AXIS_DPAD_Y,
+    /// An unknown axis.
+    NSTD_GAMEPAD_AXIS_UNKNOWN,
+}
+impl NSTDGamepadAxis {
+    /// Converts a [gilrs] [Axis] into an [NSTDGamepadAxis].
+    pub(crate) fn from_winit(axis: Axis) -> Self {
+        match axis {
+            Axis::LeftStickX => Self::NSTD_GAMEPAD_AXIS_LEFT_X,
+            Axis::LeftStickY => Self::NSTD_GAMEPAD_AXIS_LEFT_Y,
+            Axis::LeftZ => Self::NSTD_GAMEPAD_AXIS_LEFT_Z,
+            Axis::RightStickX => Self::NSTD_GAMEPAD_AXIS_RIGHT_X,
+            Axis::RightStickY => Self::NSTD_GAMEPAD_AXIS_RIGHT_Y,
+            Axis::RightZ => Self::NSTD_GAMEPAD_AXIS_RIGHT_Z,
+            Axis::DPadX => Self::NSTD_GAMEPAD_AXIS_DPAD_X,
+            Axis::DPadY => Self::NSTD_GAMEPAD_AXIS_DPAD_Y,
+            _ => Self::NSTD_GAMEPAD_AXIS_UNKNOWN,
+        }
+    }
+}
+
 /// Contains callback based events through function pointers.
 #[repr(C)]
 #[derive(Default)]
@@ -439,6 +565,24 @@ pub struct NSTDAppEvents {
     pub window_close_requested: Option<unsafe extern "C" fn(&NSTDAppData, &WindowId)>,
     /// Called when a window is closed.
     pub window_closed: Option<unsafe extern "C" fn(&NSTDAppData, &WindowId)>,
+    /// A gamepad was connected to the system.
+    pub gamepad_connected: Option<unsafe extern "C" fn(&NSTDAppData, &GamepadId)>,
+    /// A gamepad was disconnected to the system.
+    pub gamepad_disconnected: Option<unsafe extern "C" fn(&NSTDAppData, &GamepadId)>,
+    /// A gamepad button was pressed.
+    pub gamepad_button_pressed:
+        Option<unsafe extern "C" fn(&NSTDAppData, &GamepadId, NSTDGamepadButton, NSTDUInt32)>,
+    /// A gamepad button was released.
+    pub gamepad_button_released:
+        Option<unsafe extern "C" fn(&NSTDAppData, &GamepadId, NSTDGamepadButton, NSTDUInt32)>,
+    /// A gamepad button's value changed.
+    pub gamepad_input: Option<
+        unsafe extern "C" fn(&NSTDAppData, &GamepadId, NSTDGamepadButton, NSTDUInt32, NSTDFloat32),
+    >,
+    /// A gamepad axis value has changed.
+    pub gamepad_axis_input: Option<
+        unsafe extern "C" fn(&NSTDAppData, &GamepadId, NSTDGamepadAxis, NSTDUInt32, NSTDFloat32),
+    >,
     /// Called once before exiting the application event loop.
     pub exit: Option<unsafe extern "C" fn(&NSTDAppData)>,
 }

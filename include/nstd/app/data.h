@@ -13,6 +13,8 @@ typedef struct {
     NSTDAnyMut data;
     /// The application's control flow.
     NSTDAny control_flow;
+    /// The gamepad input manager.
+    NSTDAnyMut gil;
 } NSTDAppData;
 
 #endif

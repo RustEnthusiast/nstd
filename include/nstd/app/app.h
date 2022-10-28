@@ -64,6 +64,10 @@ NSTDAPI NSTDAppEvents *nstd_app_events(NSTDApp *app);
 ///
 /// - `NSTDAnyMut data` - Custom user data to pass to each app event.
 ///
+/// # Panics
+///
+/// This may panic if creating the gamepad input handler fails.
+///
 /// # Safety
 ///
 /// This function's caller must guarantee validity of the `app`'s event callbacks.
