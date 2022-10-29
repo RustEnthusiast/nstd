@@ -25,8 +25,16 @@ use winit::{
 pub struct NSTDApp {
     /// The application event callback function pointers.
     events: NSTDAppEvents,
-    /// The underlying event loop.
-    event_loop: Box<EventLoop<()>>,
+    /// Private app data.
+    inner: Box<AppData>,
+}
+
+/// Private application data.
+struct AppData {
+    /// The [winit] event loop.
+    event_loop: EventLoop<()>,
+    /// The gamepad input handler.
+    gil: Gilrs,
 }
 
 /// Creates a new `nstd` application.
@@ -42,13 +50,23 @@ pub struct NSTDApp {
 ///
 /// # Panics
 ///
-/// This function must be called on the "main" thread, otherwise a panic may occur.
-#[inline]
+/// This function may panic in the following situations:
+///
+/// - This function was not called on the "main" thread.
+///
+/// - Creating the gamepad input handler fails.
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_app_new() -> NSTDApp {
     NSTDApp {
         events: NSTDAppEvents::default(),
-        event_loop: Box::default(),
+        inner: Box::new(AppData {
+            event_loop: EventLoop::new(),
+            gil: match Gilrs::new() {
+                Ok(gil) => gil,
+                Err(NotImplemented(gil)) => gil,
+                _ => panic!("Failed to create gamepad event listener"),
+            },
+        }),
     }
 }
 
@@ -64,7 +82,7 @@ pub extern "C" fn nstd_app_new() -> NSTDApp {
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_app_handle(app: &NSTDApp) -> NSTDAppHandle {
-    &app.event_loop
+    &app.inner.event_loop
 }
 
 /// Returns a mutable reference to an `NSTDApp`'s event table.
@@ -94,23 +112,17 @@ pub extern "C" fn nstd_app_events(app: &mut NSTDApp) -> &mut NSTDAppEvents {
 ///
 /// - `NSTDAnyMut data` - Custom user data to pass to each app event.
 ///
-/// # Panics
-///
-/// This may panic if creating the gamepad input handler fails.
-///
 /// # Safety
 ///
 /// This function's caller must guarantee validity of the `app`'s event callbacks.
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_app_run(app: NSTDApp, data: NSTDAnyMut) -> ! {
-    // Create the gamepad input manager.
-    let mut gil = match Gilrs::new() {
-        Ok(gil) => gil,
-        Err(NotImplemented(gil)) => gil,
-        _ => panic!("Failed to create gamepad event listener"),
-    };
+    let AppData {
+        event_loop,
+        mut gil,
+    } = *app.inner;
     // Run the winit event loop.
-    app.event_loop.run(move |event, handle, control_flow| {
+    event_loop.run(move |event, handle, control_flow| {
         // Instantiate a new instance of `NSTDAppData`.
         let app_data = &mut NSTDAppData::new(handle, control_flow, data, &mut gil);
         // Dispatch events.

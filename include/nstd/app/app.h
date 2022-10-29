@@ -10,8 +10,8 @@
 typedef struct {
     /// The application event callback function pointers.
     NSTDAppEvents events;
-    /// The underlying event loop.
-    NSTDAnyMut event_loop;
+    /// Private app data.
+    NSTDAnyMut inner;
 } NSTDApp;
 
 /// Creates a new `nstd` application.
@@ -27,7 +27,11 @@ typedef struct {
 ///
 /// # Panics
 ///
-/// This function must be called on the "main" thread, otherwise a panic may occur.
+/// This function may panic in the following situations:
+///
+/// - This function was not called on the "main" thread.
+///
+/// - Creating the gamepad input handler fails.
 NSTDAPI NSTDApp nstd_app_new();
 
 /// Returns a handle to an `NSTDApp`'s event loop.
@@ -63,10 +67,6 @@ NSTDAPI NSTDAppEvents *nstd_app_events(NSTDApp *app);
 /// - `NSTDApp app` - The `nstd` application to run.
 ///
 /// - `NSTDAnyMut data` - Custom user data to pass to each app event.
-///
-/// # Panics
-///
-/// This may panic if creating the gamepad input handler fails.
 ///
 /// # Safety
 ///
