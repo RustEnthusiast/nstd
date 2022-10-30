@@ -1,8 +1,8 @@
 2:
     cmp {buf}, {reg_end}
     jge 3f
-    mov dword ptr [{buf}], 0
-    add {buf}, 4
+    mov qword ptr [{buf}], 0
+    add {buf}, 8
     jmp 2b
 3:
     cmp {buf}, {end}
