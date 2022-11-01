@@ -251,20 +251,30 @@ pub unsafe extern "C" fn nstd_core_mem_zero(buf: *mut NSTDByte, size: NSTDUInt) 
     #[cfg(all(feature = "asm", target_arch = "arm"))]
     {
         use core::arch::asm;
+        const REG_SIZE: NSTDUInt = 4;
+        let rem_bytes = size % REG_SIZE;
+        let reg_end = buf.add(size - rem_bytes);
+        let end = reg_end.add(rem_bytes);
         asm!(
             include_str!("mem/arm/zero.asm"),
             buf = inout(reg) buf => _,
-            end = in(reg) buf.add(size),
+            reg_end = in(reg) reg_end,
+            end = in(reg) end,
             zero = out(reg) _
         );
     }
     #[cfg(all(feature = "asm", target_arch = "aarch64"))]
     {
         use core::arch::asm;
+        const REG_SIZE: NSTDUInt = 8;
+        let rem_bytes = size % REG_SIZE;
+        let reg_end = buf.add(size - rem_bytes);
+        let end = reg_end.add(rem_bytes);
         asm!(
             include_str!("mem/arm64/zero.asm"),
             buf = inout(reg) buf => _,
-            end = in(reg) buf.add(size),
+            reg_end = in(reg) reg_end,
+            end = in(reg) end,
             zero = out(reg) _
         );
     }
