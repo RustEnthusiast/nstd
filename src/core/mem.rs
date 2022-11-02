@@ -220,63 +220,51 @@ pub unsafe extern "C" fn nstd_core_mem_zero(buf: *mut NSTDByte, size: NSTDUInt) 
             i += 1;
         }
     }
-    #[cfg(all(feature = "asm", target_arch = "x86"))]
+    #[cfg(feature = "asm")]
     {
         use core::arch::asm;
-        const REG_SIZE: NSTDUInt = 4;
+        const REG_SIZE: NSTDUInt = core::mem::size_of::<&()>();
         let rem_bytes = size % REG_SIZE;
         let reg_end = buf.add(size - rem_bytes);
         let end = reg_end.add(rem_bytes);
-        asm!(
-            include_str!("mem/x86/zero.asm"),
-            buf = inout(reg) buf => _,
-            reg_end = in(reg) reg_end,
-            end = in(reg) end
-        );
-    }
-    #[cfg(all(feature = "asm", target_arch = "x86_64"))]
-    {
-        use core::arch::asm;
-        const REG_SIZE: NSTDUInt = 8;
-        let rem_bytes = size % REG_SIZE;
-        let reg_end = buf.add(size - rem_bytes);
-        let end = reg_end.add(rem_bytes);
-        asm!(
-            include_str!("mem/x86_64/zero.asm"),
-            buf = inout(reg) buf => _,
-            reg_end = in(reg) reg_end,
-            end = in(reg) end
-        );
-    }
-    #[cfg(all(feature = "asm", target_arch = "arm"))]
-    {
-        use core::arch::asm;
-        const REG_SIZE: NSTDUInt = 4;
-        let rem_bytes = size % REG_SIZE;
-        let reg_end = buf.add(size - rem_bytes);
-        let end = reg_end.add(rem_bytes);
-        asm!(
-            include_str!("mem/arm/zero.asm"),
-            buf = inout(reg) buf => _,
-            reg_end = in(reg) reg_end,
-            end = in(reg) end,
-            zero = out(reg) _
-        );
-    }
-    #[cfg(all(feature = "asm", target_arch = "aarch64"))]
-    {
-        use core::arch::asm;
-        const REG_SIZE: NSTDUInt = 8;
-        let rem_bytes = size % REG_SIZE;
-        let reg_end = buf.add(size - rem_bytes);
-        let end = reg_end.add(rem_bytes);
-        asm!(
-            include_str!("mem/arm64/zero.asm"),
-            buf = inout(reg) buf => _,
-            reg_end = in(reg) reg_end,
-            end = in(reg) end,
-            zero = out(reg) _
-        );
+        #[cfg(target_arch = "x86")]
+        {
+            asm!(
+                include_str!("mem/x86/zero.asm"),
+                buf = inout(reg) buf => _,
+                reg_end = in(reg) reg_end,
+                end = in(reg) end
+            );
+        }
+        #[cfg(target_arch = "x86_64")]
+        {
+            asm!(
+                include_str!("mem/x86_64/zero.asm"),
+                buf = inout(reg) buf => _,
+                reg_end = in(reg) reg_end,
+                end = in(reg) end
+            );
+        }
+        #[cfg(target_arch = "arm")]
+        {
+            asm!(
+                include_str!("mem/arm/zero.asm"),
+                buf = inout(reg) buf => _,
+                reg_end = in(reg) reg_end,
+                end = in(reg) end,
+                zero = out(reg) _
+            );
+        }
+        #[cfg(target_arch = "aarch64")]
+        {
+            asm!(
+                include_str!("mem/arm64/zero.asm"),
+                buf = inout(reg) buf => _,
+                reg_end = in(reg) reg_end,
+                end = in(reg) end,
+                zero = out(reg) _
+            );
+        }
     }
 }
 
