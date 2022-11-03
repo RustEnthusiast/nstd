@@ -2,7 +2,7 @@
 A cross-platform, fast, and safe general purpose C library written in Rust.
 
 The library is organized as a series of modules. The top level module `nstd` encompasses the entire
-crate. Each module can have their own submodules (eg. `nstd.core.def` or `nstd::core::def` with
+crate. Each module can have their own submodules (eg. `nstd.io.stdout` or `nstd::io::stdout` with
 Rust syntax).
 
 # Example using C
@@ -64,34 +64,36 @@ int main()
 `nstd.core` should support anything that rustc supports.
 
 `nstd.os`'s child modules will only work on the operating system they target. For example,
-`nstd.os.windows` will only work on Windows and `nstd.os.linux` will only work on Linux
-distributions.
+`nstd.os.windows` will only work on Windows and `nstd.os.unix` will only work on Unix-like systems.
 
 Other modules will work on most platforms, primarily targeting Windows, macOS,
 Linux, Android, and iOS.
 
 # Language support
-This library can be accessed from any language that supports calling C code! As of now this will
-need to be done manually as there are no official wrappers for the API, however whenever library
-versioning occurs, the plan is to start adding official wrappers so developers from other languages
+This library can be accessed from any language that supports calling C code. As of now this will
+need to be done manually as there are no official wrappers for the API, however somewhere around
+version 0.11, the plan is to start adding official wrappers so developers from other languages
 can easily use the API.
 
-# Safety notes
+# User safety notes
 
 - Raw pointers are unsafe to access.
 
-- Raw pointer data is unsafe to mutate.
-
-- Any function that may cause undefined behavior must be marked unsafe.
-
-- Any operation that makes a direct call on a C function pointer is considered unsafe.
+- References are assumed to be valid (aligned, non-null, and non-dangling), and are safe to access.
+Users can refer to the [docs](https://docs.rs/nstd-sys/latest/nstd_sys/) to see which APIs expect
+or return valid references.
 
 - The panic behavior is set to abort by default, as it is undefined behavior to unwind from Rust
 code into foreign code (though this is
 [subject to change](https://rust-lang.github.io/rfcs/2945-c-unwind-abi.html)).
 
-- Reference arguments are assumed to be valid (aligned, non-null, and non-dangling), and are safe
-to access.
+# Contributor safety notes
+
+- Any operation that may cause undefined behavior must be marked unsafe.
+
+- Any operation that may cause data races must be marked unsafe.
+
+- Any operation that makes a direct call on a foreign C function pointer must be marked unsafe.
 
 # How to build
 `nstd` lets you decide what features you want to use.
