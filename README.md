@@ -49,6 +49,8 @@ int main()
         - `stdout` - A handle to the standard output stream.
     - `math` - High level math operations.
     - `os` - Operating system specific functionality.
+        - `unix` - Low level Unix like operating system support.
+            - `shared_lib` - Provides shared library access for Unix like systems.
         - `windows` - OS support for Windows.
             - `alloc` - Low level memory allocation for Windows.
                 - `heap` - Process heap management for Windows.

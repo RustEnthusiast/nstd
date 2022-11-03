@@ -33,6 +33,7 @@ nstd_heap_ptr = ["nstd_alloc", "nstd_core"]
 nstd_io = ["nstd_alloc", "nstd_core", "nstd_string", "nstd_vec", "std"]
 nstd_math = ["std"]
 nstd_os = []
+nstd_os_unix_shared_lib = ["libc", "nstd_core", "nstd_os"]
 nstd_os_windows_alloc = [
     "nstd_core", "nstd_os", "windows-sys/Win32_Foundation", "windows-sys/Win32_System_Memory"
 ]
@@ -43,6 +44,9 @@ nstd_vec = ["nstd_alloc", "nstd_core"]
 
 [dependencies]
 libloading = { version = "0.7", optional = true }
+
+[target.'cfg(target_family = "unix")'.dependencies]
+libc = { version = "0.2", optional = true, default-features = false }
 
 [target.'cfg(target_os = "windows")'.dependencies]
 windows-sys = { version = "0.42", optional = true }
