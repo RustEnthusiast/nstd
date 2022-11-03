@@ -38,7 +38,7 @@ pub type NSTDUnixOptionalSharedLib = NSTDOptional<NSTDUnixSharedLib>;
 pub unsafe extern "C" fn nstd_os_unix_shared_lib_load(
     path: *const NSTDChar,
 ) -> NSTDUnixOptionalSharedLib {
-    let handle = dlopen(path.cast(), RTLD_LAZY | RTLD_LOCAL);
+    let handle = dlopen(path, RTLD_LAZY | RTLD_LOCAL);
     if handle.is_null() {
         return NSTDOptional::None;
     }
@@ -66,7 +66,7 @@ pub unsafe extern "C" fn nstd_os_unix_shared_lib_get(
     lib: &NSTDUnixSharedLib,
     symbol: *const NSTDChar,
 ) -> NSTDAny {
-    dlsym(lib.handle, symbol.cast())
+    dlsym(lib.handle, symbol)
 }
 
 /// Returns a mutable opaque pointer to a symbol in a loaded library.
@@ -90,7 +90,7 @@ pub unsafe extern "C" fn nstd_os_unix_shared_lib_get_mut(
     lib: &mut NSTDUnixSharedLib,
     symbol: *const NSTDChar,
 ) -> NSTDAnyMut {
-    dlsym(lib.handle, symbol.cast())
+    dlsym(lib.handle, symbol)
 }
 
 /// Closes and frees a loaded shared library.
