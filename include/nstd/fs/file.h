@@ -11,19 +11,19 @@
 ///
 /// Either of the `NSTD_FILE_WRITE` or `NSTD_FILE_APPEND` options must also be toggled for the file
 /// to be created.
-#define NSTD_FILE_CREATE 0b00000001
+#define NSTD_FILE_CREATE 1
 
 /// Open a file in read mode.
-#define NSTD_FILE_READ 0b00000010
+#define NSTD_FILE_READ (1 << 1)
 
 /// Open a file in write mode.
-#define NSTD_FILE_WRITE 0b00000100
+#define NSTD_FILE_WRITE (1 << 2)
 
 /// Open a file in writing mode without overwriting saved data.
-#define NSTD_FILE_APPEND 0b00001000
+#define NSTD_FILE_APPEND (1 << 3)
 
 /// Open a file in truncate mode, this will set the file's length to 0 upon opening.
-#define NSTD_FILE_TRUNC 0b00010000
+#define NSTD_FILE_TRUNC (1 << 4)
 
 /// A handle to an opened file.
 typedef NSTDAnyMut NSTDFile;

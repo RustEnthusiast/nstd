@@ -15,19 +15,19 @@ use std::fs::File;
 ///
 /// Either of the `NSTD_FILE_WRITE` or `NSTD_FILE_APPEND` options must also be toggled for the file
 /// to be created.
-pub const NSTD_FILE_CREATE: NSTDUInt8 = 0b00000001;
+pub const NSTD_FILE_CREATE: NSTDUInt8 = 1;
 
 /// Open a file in read mode.
-pub const NSTD_FILE_READ: NSTDUInt8 = 0b00000010;
+pub const NSTD_FILE_READ: NSTDUInt8 = 1 << 1;
 
 /// Open a file in write mode.
-pub const NSTD_FILE_WRITE: NSTDUInt8 = 0b00000100;
+pub const NSTD_FILE_WRITE: NSTDUInt8 = 1 << 2;
 
 /// Open a file in writing mode without overwriting saved data.
-pub const NSTD_FILE_APPEND: NSTDUInt8 = 0b00001000;
+pub const NSTD_FILE_APPEND: NSTDUInt8 = 1 << 3;
 
 /// Open a file in truncate mode, this will set the file's length to 0 upon opening.
-pub const NSTD_FILE_TRUNC: NSTDUInt8 = 0b00010000;
+pub const NSTD_FILE_TRUNC: NSTDUInt8 = 1 << 4;
 
 /// A handle to an opened file.
 pub type NSTDFile = Box<File>;
