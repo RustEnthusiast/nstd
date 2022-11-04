@@ -6,7 +6,7 @@ use crate::{
         mem::nstd_core_mem_search,
         slice::{nstd_core_slice_new, NSTDSlice},
     },
-    NSTDBool, NSTDChar, NSTDUInt, NSTD_FALSE,
+    NSTDBool, NSTDChar, NSTDUInt,
 };
 
 /// An immutable slice of a C string.
@@ -232,17 +232,11 @@ pub extern "C" fn nstd_core_cstr_len(cstr: &NSTDCStr) -> NSTDUInt {
 ///     assert!(nstd_core_cstr_is_null_terminated(&mn_cstr) == NSTD_FALSE);
 /// }
 /// ```
+#[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_cstr_is_null_terminated(cstr: &NSTDCStr) -> NSTDBool {
     assert!(cstr.len <= isize::MAX as usize);
-    let mut i = 0;
-    while i < cstr.len {
-        if *cstr.ptr.add(i) == 0 {
-            return i == cstr.len - 1;
-        }
-        i += 1;
-    }
-    NSTD_FALSE
+    nstd_core_mem_search(cstr.ptr.cast(), cstr.len, 0) == nstd_core_cstr_last(cstr).cast()
 }
 
 /// Returns a pointer to the first null byte in a C string slice if one is present.
