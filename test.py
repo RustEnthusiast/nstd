@@ -1,7 +1,7 @@
 import os
 
 FEATURES = ("nstd_alloc", "nstd_core", "nstd_cstring", "nstd_fs", "nstd_heap_ptr", "nstd_io",
-            "nstd_math", "nstd_os_unix_shared_lib", "nstd_os_windows_alloc",
+            "nstd_math", "nstd_os_unix_alloc", "nstd_os_unix_shared_lib", "nstd_os_windows_alloc",
             "nstd_os_windows_shared_lib", "nstd_shared_lib", "nstd_shared_ptr", "nstd_string",
             "nstd_vec")
 
