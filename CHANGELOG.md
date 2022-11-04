@@ -17,6 +17,7 @@
 ### `nstd.fs`
 - Added `NSTDFileResult`.
 ### `nstd.os`
+- Added `unix.alloc`.
 - Added `[unix|windows].shared_lib`.
 - Added `NSTDWindowsHeapResult`.
 - Added `windows_alloc_heap_validate`.
