@@ -332,6 +332,67 @@ pub extern "C" fn nstd_core_cstr_get(cstr: &NSTDCStr, pos: NSTDUInt) -> *const N
     core::ptr::null()
 }
 
+/// Returns a pointer to the first character in a C string slice, or null if it is empty.
+///
+/// # Parameters:
+///
+/// - `const NSTDCStr *cstr` - The C string slice.
+///
+/// # Returns
+///
+/// `const NSTDChar *first` - If present, a pointer to the first character in the C string slice.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::{
+///     core::cstr::{nstd_core_cstr_first, nstd_core_cstr_from_raw},
+///     NSTDChar,
+/// };
+///
+/// unsafe {
+///     let cstr = nstd_core_cstr_from_raw("Tea\0".as_ptr().cast());
+///     assert!(*nstd_core_cstr_first(&cstr) == b'T' as NSTDChar);
+/// }
+/// ```
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_core_cstr_first(cstr: &NSTDCStr) -> *const NSTDChar {
+    match cstr.len > 0 {
+        true => cstr.ptr,
+        false => core::ptr::null(),
+    }
+}
+
+/// Returns a pointer to the last character in a C string slice, or null if it is empty.
+///
+/// # Parameters:
+///
+/// - `const NSTDCStr *cstr` - The C string slice.
+///
+/// # Returns
+///
+/// `const NSTDChar *last` - If present, a pointer to the last character in the C string slice.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::cstr::{nstd_core_cstr_from_raw_with_null, nstd_core_cstr_last};
+///
+/// unsafe {
+///     let cstr = nstd_core_cstr_from_raw_with_null("Tea\0".as_ptr().cast());
+///     assert!(*nstd_core_cstr_last(&cstr) == 0);
+/// }
+/// ```
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_core_cstr_last(cstr: &NSTDCStr) -> *const NSTDChar {
+    match cstr.len > 0 {
+        true => nstd_core_cstr_get(cstr, cstr.len - 1),
+        false => core::ptr::null(),
+    }
+}
+
 /// A mutable slice of a C string.
 ///
 /// # Safety
@@ -753,4 +814,141 @@ pub extern "C" fn nstd_core_cstr_mut_get_const(
         return unsafe { cstr.ptr.add(pos) };
     }
     core::ptr::null_mut()
+}
+
+/// Returns a pointer to the first character in a C string slice, or null if it is empty.
+///
+/// # Parameters:
+///
+/// - `NSTDCStrMut *cstr` - The C string slice.
+///
+/// # Returns
+///
+/// `NSTDChar *first` - If present, a pointer to the first character in the C string slice.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::{
+///     core::cstr::{nstd_core_cstr_mut_first, nstd_core_cstr_mut_from_raw},
+///     NSTDChar,
+/// };
+///
+/// let mut s_str = String::from("Bea\0");
+///
+/// unsafe {
+///     let mut cstr = nstd_core_cstr_mut_from_raw(s_str.as_mut_ptr().cast());
+///     *nstd_core_cstr_mut_first(&mut cstr) = b'T' as NSTDChar;
+///     assert!(s_str == "Tea\0");
+/// }
+/// ```
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_core_cstr_mut_first(cstr: &mut NSTDCStrMut) -> *mut NSTDChar {
+    match cstr.len > 0 {
+        true => cstr.ptr,
+        false => core::ptr::null_mut(),
+    }
+}
+
+/// Returns an immutable pointer to the first character in a C string slice, or null if it is empty.
+///
+/// # Parameters:
+///
+/// - `const NSTDCStrMut *cstr` - The C string slice.
+///
+/// # Returns
+///
+/// `const NSTDChar *first` - If present, a pointer to the first character in the C string slice.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::{
+///     core::cstr::{nstd_core_cstr_mut_first_const, nstd_core_cstr_mut_from_raw},
+///     NSTDChar,
+/// };
+///
+/// let mut s_str = String::from("Tea\0");
+///
+/// unsafe {
+///     let cstr = nstd_core_cstr_mut_from_raw(s_str.as_mut_ptr().cast());
+///     assert!(*nstd_core_cstr_mut_first_const(&cstr) == b'T' as NSTDChar);
+/// }
+/// ```
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_core_cstr_mut_first_const(cstr: &NSTDCStrMut) -> *const NSTDChar {
+    match cstr.len > 0 {
+        true => cstr.ptr,
+        false => core::ptr::null(),
+    }
+}
+
+/// Returns a pointer to the last character in a C string slice, or null if it is empty.
+///
+/// # Parameters:
+///
+/// - `NSTDCStrMut *cstr` - The C string slice.
+///
+/// # Returns
+///
+/// `NSTDChar *last` - If present, a pointer to the last character in the C string slice.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::{
+///     core::cstr::{nstd_core_cstr_mut_from_raw, nstd_core_cstr_mut_last},
+///     NSTDChar,
+/// };
+///
+/// let mut s_str = String::from("Ted\0");
+///
+/// unsafe {
+///     let mut cstr = nstd_core_cstr_mut_from_raw(s_str.as_mut_ptr().cast());
+///     *nstd_core_cstr_mut_last(&mut cstr) = b'a' as NSTDChar;
+///     assert!(s_str == "Tea\0");
+/// }
+/// ```
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_core_cstr_mut_last(cstr: &mut NSTDCStrMut) -> *mut NSTDChar {
+    match cstr.len > 0 {
+        true => nstd_core_cstr_mut_get(cstr, cstr.len - 1),
+        false => core::ptr::null_mut(),
+    }
+}
+
+/// Returns an immutable pointer to the last character in a C string slice, or null if it is empty.
+///
+/// # Parameters:
+///
+/// - `const NSTDCStrMut *cstr` - The C string slice.
+///
+/// # Returns
+///
+/// `const NSTDChar *last` - If present, a pointer to the last character in the C string slice.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::cstr::{
+///     nstd_core_cstr_mut_from_raw_with_null, nstd_core_cstr_mut_last_const,
+/// };
+///
+/// let mut s_str = String::from("Tea\0");
+///
+/// unsafe {
+///     let cstr = nstd_core_cstr_mut_from_raw_with_null(s_str.as_mut_ptr().cast());
+///     assert!(*nstd_core_cstr_mut_last_const(&cstr) == 0);
+/// }
+/// ```
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_core_cstr_mut_last_const(cstr: &NSTDCStrMut) -> *const NSTDChar {
+    match cstr.len > 0 {
+        true => nstd_core_cstr_mut_get_const(cstr, cstr.len - 1),
+        false => core::ptr::null(),
+    }
 }
