@@ -1,6 +1,7 @@
 //! A handle to an opened file.
 use crate::{
     core::{
+        result::NSTDResult,
         slice::{NSTDSlice, NSTDSliceMut},
         str::NSTDStr,
     },
@@ -32,6 +33,9 @@ pub const NSTD_FILE_TRUNC: NSTDUInt8 = 1 << 4;
 /// A handle to an opened file.
 pub type NSTDFile = Box<File>;
 
+/// A result type yielding an `NSTDFile` on success.
+pub type NSTDFileResult = NSTDResult<NSTDFile, NSTDIOError>;
+
 /// Opens file on the filesystem and returns a handle to it.
 ///
 /// # Parameters:
@@ -40,11 +44,9 @@ pub type NSTDFile = Box<File>;
 ///
 /// - `NSTDUInt8 mask` - A bit mask for toggling the file's different open options.
 ///
-/// - `NSTDIOError *errc` - Returns as the I/O operation error code.
-///
 /// # Returns
 ///
-/// `NSTDFile file` - A handle to the opened file, or null if an error occurs.
+/// `NSTDFileResult file` - A handle to the opened file, or the IO error on failure.
 ///
 /// # Panics
 ///
@@ -54,11 +56,7 @@ pub type NSTDFile = Box<File>;
 ///
 /// This operation can cause undefined behavior if `name`'s data is invalid.
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_fs_file_open(
-    name: &NSTDStr,
-    mask: NSTDUInt8,
-    errc: &mut NSTDIOError,
-) -> Option<NSTDFile> {
+pub unsafe extern "C" fn nstd_fs_file_open(name: &NSTDStr, mask: NSTDUInt8) -> NSTDFileResult {
     // Attempt to create/open the file in write mode.
     match File::options()
         .create((mask & NSTD_FILE_CREATE) != 0)
@@ -68,14 +66,8 @@ pub unsafe extern "C" fn nstd_fs_file_open(
         .truncate((mask & NSTD_FILE_TRUNC) != 0)
         .open(name.as_str())
     {
-        Ok(f) => {
-            *errc = NSTDIOError::NSTD_IO_ERROR_NONE;
-            Some(Box::new(f))
-        }
-        Err(err) => {
-            *errc = NSTDIOError::from_err(err.kind());
-            None
-        }
+        Ok(f) => NSTDResult::Ok(Box::new(f)),
+        Err(err) => NSTDResult::Err(NSTDIOError::from_err(err.kind())),
     }
 }
 

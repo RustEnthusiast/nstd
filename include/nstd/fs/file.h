@@ -1,5 +1,6 @@
 #ifndef NSTD_FS_FILE_H
 #define NSTD_FS_FILE_H
+#include "../core/result.h"
 #include "../core/slice.h"
 #include "../core/str.h"
 #include "../io/io.h"
@@ -28,6 +29,9 @@
 /// A handle to an opened file.
 typedef NSTDAnyMut NSTDFile;
 
+/// A result type yielding an `NSTDFile` on success.
+NSTDResult(NSTDFile, NSTDIOError) NSTDFileResult;
+
 /// Opens file on the filesystem and returns a handle to it.
 ///
 /// # Parameters:
@@ -36,11 +40,9 @@ typedef NSTDAnyMut NSTDFile;
 ///
 /// - `NSTDUInt8 mask` - A bit mask for toggling the file's different open options.
 ///
-/// - `NSTDIOError *errc` - Returns as the I/O operation error code.
-///
 /// # Returns
 ///
-/// `NSTDFile file` - A handle to the opened file, or null if an error occurs.
+/// `NSTDFileResult file` - A handle to the opened file, or the IO error on failure.
 ///
 /// # Panics
 ///
@@ -49,7 +51,7 @@ typedef NSTDAnyMut NSTDFile;
 /// # Safety
 ///
 /// This operation can cause undefined behavior if `name`'s data is invalid.
-NSTDAPI NSTDFile nstd_fs_file_open(const NSTDStr *name, NSTDUInt8 mask, NSTDIOError *errc);
+NSTDAPI NSTDFileResult nstd_fs_file_open(const NSTDStr *name, NSTDUInt8 mask);
 
 /// Writes some data to a file & returns how many bytes were written.
 ///

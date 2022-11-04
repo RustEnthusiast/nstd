@@ -14,6 +14,8 @@
 ### `nstd.cstring`
 - Added `from_cstr`.
 - Renamed `to_bytes` to `into_bytes`.
+### `nstd.fs`
+- Added `NSTDFileResult`.
 ### `nstd.os`
 - Added `[unix|windows].shared_lib`.
 - Added `NSTDWindowsHeapResult`.
