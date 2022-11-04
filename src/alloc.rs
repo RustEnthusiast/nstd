@@ -1,6 +1,11 @@
 //! Low level memory allocation.
-#[cfg(not(target_os = "windows"))]
+#[cfg(not(any(target_family = "unix", target_os = "windows")))]
 extern crate alloc;
+#[cfg(target_family = "unix")]
+use crate::os::unix::alloc::{
+    nstd_os_unix_alloc_allocate, nstd_os_unix_alloc_allocate_zeroed, nstd_os_unix_alloc_deallocate,
+    nstd_os_unix_alloc_reallocate,
+};
 #[cfg(target_os = "windows")]
 use crate::os::windows::alloc::{
     nstd_os_windows_alloc_allocate, nstd_os_windows_alloc_allocate_zeroed,
@@ -70,11 +75,15 @@ impl NSTDAllocError {
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
-    #[cfg(not(target_os = "windows"))]
+    #[cfg(not(any(target_family = "unix", target_os = "windows")))]
     {
         use alloc::alloc::Layout;
         let layout = Layout::from_size_align_unchecked(size, 1);
         alloc::alloc::alloc(layout).cast()
+    }
+    #[cfg(target_family = "unix")]
+    {
+        nstd_os_unix_alloc_allocate(size)
     }
     #[cfg(target_os = "windows")]
     {
@@ -114,11 +123,15 @@ pub unsafe extern "C" fn nstd_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMut {
-    #[cfg(not(target_os = "windows"))]
+    #[cfg(not(any(target_family = "unix", target_os = "windows")))]
     {
         use alloc::alloc::Layout;
         let layout = Layout::from_size_align_unchecked(size, 1);
         alloc::alloc::alloc_zeroed(layout).cast()
+    }
+    #[cfg(target_family = "unix")]
+    {
+        nstd_os_unix_alloc_allocate_zeroed(size)
     }
     #[cfg(target_os = "windows")]
     {
@@ -175,13 +188,16 @@ pub unsafe extern "C" fn nstd_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMu
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-#[cfg_attr(target_os = "windows", allow(unused_variables))]
+#[cfg_attr(
+    any(target_family = "unix", target_os = "windows"),
+    allow(unused_variables)
+)]
 pub unsafe extern "C" fn nstd_alloc_reallocate(
     ptr: &mut NSTDAnyMut,
     size: NSTDUInt,
     new_size: NSTDUInt,
 ) -> NSTDAllocError {
-    #[cfg(not(target_os = "windows"))]
+    #[cfg(not(any(target_family = "unix", target_os = "windows")))]
     {
         use alloc::alloc::Layout;
         let layout = Layout::from_size_align_unchecked(size, 1);
@@ -191,6 +207,13 @@ pub unsafe extern "C" fn nstd_alloc_reallocate(
             return NSTDAllocError::NSTD_ALLOC_ERROR_NONE;
         }
         NSTDAllocError::NSTD_ALLOC_ERROR_OUT_OF_MEMORY
+    }
+    #[cfg(target_family = "unix")]
+    {
+        match nstd_os_unix_alloc_reallocate(ptr, new_size) {
+            0 => NSTDAllocError::NSTD_ALLOC_ERROR_NONE,
+            _ => NSTDAllocError::NSTD_ALLOC_ERROR_OUT_OF_MEMORY,
+        }
     }
     #[cfg(target_os = "windows")]
     {
@@ -225,15 +248,22 @@ pub unsafe extern "C" fn nstd_alloc_reallocate(
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-#[cfg_attr(target_os = "windows", allow(unused_variables))]
+#[cfg_attr(
+    any(target_family = "unix", target_os = "windows"),
+    allow(unused_variables)
+)]
 pub unsafe extern "C" fn nstd_alloc_deallocate(ptr: &mut NSTDAnyMut, size: NSTDUInt) {
-    #[cfg(not(target_os = "windows"))]
+    #[cfg(not(any(target_family = "unix", target_os = "windows")))]
     {
         use crate::NSTD_NULL;
         use alloc::alloc::Layout;
         let layout = Layout::from_size_align_unchecked(size, 1);
         alloc::alloc::dealloc((*ptr).cast(), layout);
         *ptr = NSTD_NULL;
+    }
+    #[cfg(target_family = "unix")]
+    {
+        nstd_os_unix_alloc_deallocate(ptr);
     }
     #[cfg(target_os = "windows")]
     {
