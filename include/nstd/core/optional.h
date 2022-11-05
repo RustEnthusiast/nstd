@@ -3,10 +3,10 @@
 
 /// Describes an `NSTDOptional` variant.
 typedef enum {
-    /// "Some" initialized value.
-    NSTD_OPTIONAL_STATUS_SOME,
     /// No value.
-    NSTD_OPTIONAL_STATUS_NONE
+    NSTD_OPTIONAL_STATUS_NONE,
+    /// "Some" initialized value.
+    NSTD_OPTIONAL_STATUS_SOME
 } NSTDOptionalStatus;
 
 /// Represents an optional (possibly uninitialized) value.
