@@ -3,10 +3,13 @@
 #include "../../core/optional.h"
 #include "../../nstd.h"
 
+/// A raw handle to a dynamically loaded library.
+typedef NSTDInt NSTDWindowsSharedLibHandle;
+
 /// A handle to a loaded library.
 typedef struct {
     /// A raw handle to the module.
-    NSTDInt handle;
+    NSTDWindowsSharedLibHandle handle;
 } NSTDWindowsSharedLib;
 
 /// An optional (possibly null) shared Windows library handle.
@@ -27,6 +30,18 @@ NSTDOptional(NSTDWindowsSharedLib) NSTDWindowsOptionalSharedLib;
 /// See
 /// <https://docs.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-loadlibrarya>.
 NSTDAPI NSTDWindowsOptionalSharedLib nstd_os_windows_shared_lib_load(const NSTDChar *name);
+
+/// Returns a raw handle to a dynamically loaded library.
+///
+/// # Parameters:
+///
+/// - `const NSTDWindowsSharedLib *lib` - The loaded library.
+///
+/// # Returns
+///
+/// `NSTDWindowsSharedLibHandle handle` - A native handle to the dynamically loaded library.
+NSTDAPI NSTDWindowsSharedLibHandle nstd_os_windows_shared_lib_handle(
+const NSTDWindowsSharedLib *lib);
 
 /// Gets a pointer to a function or static variable in a dynamically loaded library by symbol name.
 ///
