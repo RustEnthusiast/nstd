@@ -17,8 +17,10 @@ pub enum NSTDOptionalStatus {
 
 /// Represents an optional (possibly uninitialized) value.
 #[repr(C)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
 pub enum NSTDOptional<T> {
     /// The uninitialized variant.
+    #[default]
     None,
     /// The initialized variant.
     Some(T),

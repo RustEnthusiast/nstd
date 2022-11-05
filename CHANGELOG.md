@@ -3,6 +3,7 @@
 - The overflow behavior for the "release" profile has been set to panic.
 - The panic behavior for the "release" profile has been set to abort.
 ### `nstd.core`
+- `str[_mut]_to_*` functions now return `Optional`.
 - Added `cstr[_mut]_[first|last][_const]`.
 - Added `ops`.
 - Added `cty_is_unicode`.
