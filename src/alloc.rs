@@ -81,12 +81,10 @@ pub unsafe extern "C" fn nstd_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
     {
         use crate::NSTD_NULL;
         use alloc::alloc::Layout;
-        // Make sure `size` is valid for `layout`.
-        if size > isize::MAX as usize {
-            return NSTD_NULL;
+        if let Ok(layout) = Layout::from_size_align(size, 1) {
+            return alloc::alloc::alloc(layout).cast();
         }
-        let layout = Layout::from_size_align_unchecked(size, 1);
-        alloc::alloc::alloc(layout).cast()
+        NSTD_NULL
     }
     #[cfg(target_family = "unix")]
     {
@@ -134,12 +132,10 @@ pub unsafe extern "C" fn nstd_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMu
     {
         use crate::NSTD_NULL;
         use alloc::alloc::Layout;
-        // Make sure `size` is valid for `layout`.
-        if size > isize::MAX as usize {
-            return NSTD_NULL;
+        if let Ok(layout) = Layout::from_size_align(size, 1) {
+            return alloc::alloc::alloc_zeroed(layout).cast();
         }
-        let layout = Layout::from_size_align_unchecked(size, 1);
-        alloc::alloc::alloc_zeroed(layout).cast()
+        NSTD_NULL
     }
     #[cfg(target_family = "unix")]
     {
@@ -212,17 +208,15 @@ pub unsafe extern "C" fn nstd_alloc_reallocate(
     #[cfg(not(any(target_family = "unix", target_os = "windows")))]
     {
         use alloc::alloc::Layout;
-        // Make sure `size` is valid for `layout`.
-        if size > isize::MAX as usize {
-            return NSTDAllocError::NSTD_ALLOC_ERROR_INVALID_LAYOUT;
-        }
-        let layout = Layout::from_size_align_unchecked(size, 1);
-        let new_mem = alloc::alloc::realloc((*ptr).cast(), layout, new_size);
-        if !new_mem.is_null() {
+        if let Ok(layout) = Layout::from_size_align(size, 1) {
+            let new_mem = alloc::alloc::realloc((*ptr).cast(), layout, new_size);
+            if new_mem.is_null() {
+                return NSTDAllocError::NSTD_ALLOC_ERROR_OUT_OF_MEMORY;
+            }
             *ptr = new_mem.cast();
             return NSTDAllocError::NSTD_ALLOC_ERROR_NONE;
         }
-        NSTDAllocError::NSTD_ALLOC_ERROR_OUT_OF_MEMORY
+        NSTDAllocError::NSTD_ALLOC_ERROR_INVALID_LAYOUT
     }
     #[cfg(target_family = "unix")]
     {
@@ -280,14 +274,12 @@ pub unsafe extern "C" fn nstd_alloc_deallocate(
     {
         use crate::NSTD_NULL;
         use alloc::alloc::Layout;
-        // Make sure `size` is valid for `layout`.
-        if size > isize::MAX as usize {
-            return NSTDAllocError::NSTD_ALLOC_ERROR_INVALID_LAYOUT;
+        if let Ok(layout) = Layout::from_size_align(size, 1) {
+            alloc::alloc::dealloc((*ptr).cast(), layout);
+            *ptr = NSTD_NULL;
+            return NSTDAllocError::NSTD_ALLOC_ERROR_NONE;
         }
-        let layout = Layout::from_size_align_unchecked(size, 1);
-        alloc::alloc::dealloc((*ptr).cast(), layout);
-        *ptr = NSTD_NULL;
-        NSTDAllocError::NSTD_ALLOC_ERROR_NONE
+        NSTDAllocError::NSTD_ALLOC_ERROR_INVALID_LAYOUT
     }
     #[cfg(target_family = "unix")]
     {
