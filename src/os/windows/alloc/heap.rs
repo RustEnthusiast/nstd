@@ -8,11 +8,14 @@ use windows_sys::Win32::System::Memory::{
     HeapValidate, HEAP_ZERO_MEMORY,
 };
 
+/// A raw handle to a heap.
+pub type NSTDWindowsHeapHandle = NSTDInt;
+
 /// A handle to a process heap.
 #[repr(C)]
 pub struct NSTDWindowsHeap {
     /// The private handle.
-    handle: NSTDInt,
+    handle: NSTDWindowsHeapHandle,
 }
 impl Drop for NSTDWindowsHeap {
     /// [NSTDWindowsHeap] destructor.
@@ -119,6 +122,39 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_heap_new(size: NSTDUInt) -> NSTDW
         0 => NSTDResult::Err(NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_HEAP_NOT_FOUND),
         handle => NSTDResult::Ok(NSTDWindowsHeap { handle }),
     }
+}
+
+/// Returns a raw handle to a heap.
+///
+/// # Parameters:
+///
+/// - `const NSTDWindowsHeap *heap` - The heap.
+///
+/// # Returns
+///
+/// `NSTDWindowsHeapHandle handle` - A native handle to the heap.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::{
+///     core::result::NSTDResult,
+///     os::windows::alloc::heap::{
+///         nstd_os_windows_alloc_heap_default, nstd_os_windows_alloc_heap_handle,
+///     },
+/// };
+///
+/// if let NSTDResult::Ok(heap) = unsafe { nstd_os_windows_alloc_heap_default() } {
+///     let handle = nstd_os_windows_alloc_heap_handle(&heap);
+///     assert!(handle != 0);
+/// }
+/// ```
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_os_windows_alloc_heap_handle(
+    heap: &NSTDWindowsHeap,
+) -> NSTDWindowsHeapHandle {
+    heap.handle
 }
 
 /// Returns the size of a memory block previously allocated by an `NSTDWindowsHeap`.
