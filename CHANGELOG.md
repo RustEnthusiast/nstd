@@ -27,6 +27,8 @@
 - Added `windows_alloc_heap_size`.
 - Added `NSTDWindowsAllocError`.
 - Renamed `NSTDWindowsHeapHandle` to `NSTDWindowsHeap`.
+### `nstd.shared_lib`
+- Added `NSTDOptionalSharedLib`.
 ### `nstd.string`
 - Added `from_str`.
 - Renamed `to_bytes` to `into_bytes`.

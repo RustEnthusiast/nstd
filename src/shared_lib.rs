@@ -4,13 +4,18 @@
 //!
 //! This module is only functional on Windows and Unix systems.
 use crate::{
-    core::{cstr::raw::nstd_core_cstr_raw_len_with_null, str::NSTDStr},
+    core::{cstr::raw::nstd_core_cstr_raw_len_with_null, optional::NSTDOptional, str::NSTDStr},
     NSTDAny, NSTDAnyMut, NSTDChar, NSTD_NULL,
 };
 use libloading::{Error, Library, Symbol};
 
 /// A handle to a dynamically loaded library.
 pub type NSTDSharedLib = Box<Library>;
+
+/// An optional handle to a shared library.
+///
+/// This type is returned from `nstd_shared_lib_load`.
+pub type NSTDOptionalSharedLib = NSTDOptional<NSTDSharedLib>;
 
 /// Dynamically loads a shared library at runtime.
 ///
@@ -20,7 +25,7 @@ pub type NSTDSharedLib = Box<Library>;
 ///
 /// # Returns
 ///
-/// `NSTDSharedLib lib` - A handle to the dynamically loaded library, or null on error.
+/// `NSTDOptionalSharedLib lib` - A handle to the dynamically loaded library, or none on error.
 ///
 /// # Panics
 ///
@@ -31,10 +36,10 @@ pub type NSTDSharedLib = Box<Library>;
 /// See <https://docs.rs/libloading/latest/libloading/struct.Library.html#method.new>.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_shared_lib_load(path: &NSTDStr) -> Option<NSTDSharedLib> {
+pub unsafe extern "C" fn nstd_shared_lib_load(path: &NSTDStr) -> NSTDOptionalSharedLib {
     match Library::new(path.as_str()) {
-        Ok(lib) => Some(Box::new(lib)),
-        _ => None,
+        Ok(lib) => NSTDOptional::Some(Box::new(lib)),
+        _ => NSTDOptional::None,
     }
 }
 
