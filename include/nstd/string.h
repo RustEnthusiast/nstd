@@ -404,7 +404,7 @@ NSTDAPI NSTDString nstd_string_from_u64(NSTDUInt64 v);
 ///
 /// # Panics
 ///
-/// This operation may panic if getting a handle to the heap fails.
+/// Panics if deallocating fails.
 NSTDAPI void nstd_string_free(NSTDString string);
 
 #endif

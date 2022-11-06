@@ -237,7 +237,7 @@ NSTDAPI NSTDChar nstd_cstring_pop(NSTDCString *cstring);
 ///
 /// # Panics
 ///
-/// This operation may panic if getting a handle to the heap fails.
+/// Panics if deallocating fails.
 NSTDAPI void nstd_cstring_free(NSTDCString cstring);
 
 #endif
