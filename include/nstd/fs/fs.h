@@ -121,47 +121,57 @@ NSTDAPI NSTDIOError nstd_fs_remove_dir(const NSTDStr *name);
 /// This operation can cause undefined behavior if `name`'s data is invalid.
 NSTDAPI NSTDIOError nstd_fs_remove_dirs(const NSTDStr *name);
 
-/// Reads the contents of a file into a vector of bytes.
+/// Extends a vector with the contents of a file.
 ///
 /// # Parameters:
 ///
 /// - `const NSTDStr *path` - A path to the file to read.
 ///
-/// - `NSTDIOError *errc` - Returns as the I/O operation's error code.
+/// - `NSTDVec *buffer` - The buffer to extend.
 ///
 /// # Returns
 ///
-/// `NSTDVec contents` - The contents of the file, or empty on error.
+/// `NSTDIOError errc` - The I/O operation error code.
 ///
 /// # Panics
 ///
-/// Panics if `path`'s length in bytes exceeds `NSTDInt`'s max value or allocating fails.
+/// This operation will panic in the following situations:
+///
+/// - `path`'s length in bytes exceeds `NSTDInt`'s max value.
+///
+/// - `buffer`'s length exceeds `NSTDInt`'s max value.
+///
+/// - `buffer`'s stride is not 1.
 ///
 /// # Safety
 ///
 /// This operation can cause undefined behavior if `path`'s data is invalid.
-NSTDAPI NSTDVec nstd_fs_read(const NSTDStr *path, NSTDIOError *errc);
+NSTDAPI NSTDIOError nstd_fs_read(const NSTDStr *path, NSTDVec *buffer);
 
-/// Reads the contents of a file into a string.
+/// Extends a string with the contents of a file.
 ///
 /// # Parameters:
 ///
 /// - `const NSTDStr *path` - A path to the file to read.
 ///
-/// - `NSTDIOError *errc` - Returns as the I/O operation's error code.
+/// - `NSTDString *buffer` - The buffer to extend.
 ///
 /// # Returns
 ///
-/// `NSTDString contents` - The contents of the file, or empty on error.
+/// `NSTDIOError errc` - The I/O operation error code.
 ///
 /// # Panics
 ///
-/// Panics if `path`'s length in bytes exceeds `NSTDInt`'s max value or allocating fails.
+/// This operation will panic in the following situations:
+///
+/// - `path`'s length in bytes exceeds `NSTDInt`'s max value.
+///
+/// - `buffer`'s length exceeds `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
 /// This operation can cause undefined behavior if `path`'s data is invalid.
-NSTDAPI NSTDString nstd_fs_read_to_string(const NSTDStr *path, NSTDIOError *errc);
+NSTDAPI NSTDIOError nstd_fs_read_to_string(const NSTDStr *path, NSTDString *buffer);
 
 /// Overwrites the contents of a file.
 ///
