@@ -250,25 +250,30 @@ NSTDAPI NSTDIOError nstd_fs_rename(const NSTDStr *from, const NSTDStr *to);
 /// This operation can cause undefined behavior if either `to` or `from`'s data is invalid.
 NSTDAPI NSTDIOError nstd_fs_copy(const NSTDStr *from, const NSTDStr *to);
 
-/// Returns the absolute path of a file system item.
+/// Writes the absolute path of a file system item to `out_buf`. This will initially clear
+/// `out_buf`.
 ///
 /// # Parameters:
 ///
 /// - `const NSTDStr *path` - A relative path to the file system item.
 ///
-/// - `NSTDIOError *errc` - Returns as the I/O operation's error code.
+/// - `NSTDString *out_buf` - Returns as the absolute version of `path`.
 ///
 /// # Returns
 ///
-/// `NSTDString abs_path` - The absolute path of `path`.
+/// `NSTDIOError errc` - The I/O operation error code.
 ///
 /// # Panics
 ///
-/// Panics if `path`'s length in bytes exceeds `NSTDInt`'s max value or allocating fails.
+/// This operation will panic in the following situations:
+///
+/// - `path`'s length in bytes exceeds `NSTDInt`'s max value.
+///
+/// - `out_buf`'s length in bytes exceeds `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
 /// This operation can cause undefined behavior if `path`'s data is invalid.
-NSTDAPI NSTDString nstd_fs_absolute(const NSTDStr *path, NSTDIOError *errc);
+NSTDAPI NSTDIOError nstd_fs_absolute(const NSTDStr *path, NSTDString *out_buf);
 
 #endif
