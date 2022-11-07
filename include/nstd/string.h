@@ -216,6 +216,13 @@ NSTDAPI NSTDAllocError nstd_string_push_str(NSTDString *string, const NSTDStr *s
 /// This operation will panic if the string's length in bytes exceeds `NSTDInt`'s max value.
 NSTDAPI NSTDUnichar nstd_string_pop(NSTDString *string);
 
+/// Sets a string's length to zero.
+///
+/// # Parameters:
+///
+/// - `NSTDString *string` - The string to clear.
+NSTDAPI void nstd_string_clear(NSTDString *string);
+
 /// Creates a new `NSTDString` from an `NSTDFloat32`.
 ///
 /// # Parameters:

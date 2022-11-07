@@ -9,8 +9,8 @@ use crate::{
         slice::NSTDSlice,
     },
     vec::{
-        nstd_vec_as_mut_ptr, nstd_vec_as_ptr, nstd_vec_as_slice, nstd_vec_cap, nstd_vec_clone,
-        nstd_vec_extend, nstd_vec_from_slice, nstd_vec_get_mut, nstd_vec_len,
+        nstd_vec_as_mut_ptr, nstd_vec_as_ptr, nstd_vec_as_slice, nstd_vec_cap, nstd_vec_clear,
+        nstd_vec_clone, nstd_vec_extend, nstd_vec_from_slice, nstd_vec_get_mut, nstd_vec_len,
         nstd_vec_new_with_cap, nstd_vec_pop, nstd_vec_push, NSTDVec,
     },
     NSTDChar, NSTDUInt,
@@ -426,6 +426,17 @@ pub extern "C" fn nstd_cstring_pop(cstring: &mut NSTDCString) -> NSTDChar {
         }
     }
     ret
+}
+
+/// Sets a C string's length to zero.
+///
+/// # Parameters:
+///
+/// - `NSTDCString *cstring` - The C string to clear.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_cstring_clear(cstring: &mut NSTDCString) {
+    nstd_vec_clear(&mut cstring.bytes);
 }
 
 /// Frees an instance of `NSTDCString`.

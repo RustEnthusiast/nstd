@@ -941,6 +941,17 @@ pub extern "C" fn nstd_vec_shrink(vec: &mut NSTDVec) -> NSTDAllocError {
     NSTD_ALLOC_ERROR_NONE
 }
 
+/// Sets a vector's length to zero.
+///
+/// # Parameters:
+///
+/// - `NSTDVec *vec` - The vector to clear.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_vec_clear(vec: &mut NSTDVec) {
+    vec.len = 0;
+}
+
 /// Frees an instance of `NSTDVec`.
 ///
 /// # Parameters:

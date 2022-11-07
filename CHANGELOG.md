@@ -13,6 +13,7 @@
 - Added `panic`.
 - Made `math_[clamp|div_ceil|div_floor]_*` safe.
 ### `nstd.cstring`
+- Added `clear`.
 - Added `from_cstr`.
 - Renamed `to_bytes` to `into_bytes`.
 ### `nstd.fs`
@@ -30,9 +31,11 @@
 ### `nstd.shared_lib`
 - Added `NSTDOptionalSharedLib`.
 ### `nstd.string`
+- Added `clear`.
 - Added `from_str`.
 - Renamed `to_bytes` to `into_bytes`.
 ### `nstd.vec`
+- Added `clear`.
 - Added `from_slice`.
 # 0.2.0
 ### `nstd`

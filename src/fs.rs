@@ -322,6 +322,10 @@ pub unsafe extern "C" fn nstd_fs_rename(from: &NSTDStr, to: &NSTDStr) -> NSTDIOE
 ///
 /// - `const NSTDStr *to` - The destination file.
 ///
+/// # Returns
+///
+/// `NSTDIOError errc` - The I/O operation error code.
+///
 /// # Panics
 ///
 /// This operation will panic in the following situations:

@@ -370,6 +370,13 @@ NSTDAPI NSTDAllocError nstd_vec_reserve(NSTDVec *vec, NSTDUInt size);
 /// `NSTDAllocError errc` - The allocation operation error code.
 NSTDAPI NSTDAllocError nstd_vec_shrink(NSTDVec *vec);
 
+/// Sets a vector's length to zero.
+///
+/// # Parameters:
+///
+/// - `NSTDVec *vec` - The vector to clear.
+NSTDAPI void nstd_vec_clear(NSTDVec *vec);
+
 /// Frees an instance of `NSTDVec`.
 ///
 /// # Parameters:
