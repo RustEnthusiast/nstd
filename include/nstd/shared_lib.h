@@ -3,9 +3,15 @@
 #include "core/optional.h"
 #include "core/str.h"
 #include "nstd.h"
+#include "os/os.h"
+#include "os/windows/shared_lib.h"
 
 /// A handle to a dynamically loaded library.
+#ifndef NSTD_OS_WINDOWS
 typedef NSTDAnyMut NSTDSharedLib;
+#else
+typedef NSTDWindowsSharedLib NSTDSharedLib;
+#endif
 
 /// An optional handle to a shared library.
 ///
@@ -24,11 +30,13 @@ NSTDOptional(NSTDSharedLib) NSTDOptionalSharedLib;
 ///
 /// # Panics
 ///
-/// Panics if `path`'s length in bytes exceeds `NSTDInt`'s max value.
+/// Panics if `path`'s length in bytes exceeds `NSTDInt`'s max value or allocating fails.
 ///
 /// # Safety
 ///
-/// See <https://docs.rs/libloading/latest/libloading/struct.Library.html#method.new>.
+/// - `path`'s data must be valid for reads.
+///
+/// - See <https://docs.rs/libloading/latest/libloading/struct.Library.html#method.new>.
 NSTDAPI NSTDOptionalSharedLib nstd_shared_lib_load(const NSTDStr *path);
 
 /// Gets a pointer to a function or static variable in a dynamically loaded library by symbol name.
