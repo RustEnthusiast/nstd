@@ -26,13 +26,20 @@ impl CModule {
 fn main() {
     #[cfg(feature = "nstd_os_unix_alloc")]
     {
-        use build_target::Family;
+        use build_target::{Arch, Family};
         if build_target::target_family() == Ok(Family::Unix) {
             let nstd_os_unix_alloc = CModule {
                 name: "nstd_os_unix_alloc_c",
                 src: &["src/os/unix/alloc.c"],
             };
-            nstd_os_unix_alloc.build();
+            if build_target::target_arch() == Ok(Arch::X86_64) {
+                #[cfg(not(feature = "asm"))]
+                {
+                    nstd_os_unix_alloc.build();
+                }
+            } else {
+                nstd_os_unix_alloc.build();
+            }
         }
     }
 }

@@ -1,7 +1,12 @@
 //! Memory allocation for Unix-like systems.
 use crate::{core::def::NSTDErrorCode, NSTDAnyMut, NSTDUInt};
+#[cfg(all(feature = "asm", target_arch = "x86_64"))]
+core::arch::global_asm!(include_str!("alloc.asm"));
 
-#[link(name = "nstd_os_unix_alloc_c")]
+#[cfg_attr(
+    not(all(feature = "asm", target_arch = "x86_64")),
+    link(name = "nstd_os_unix_alloc_c")
+)]
 extern "C" {
     /// Allocates a block of memory on the heap, returning a pointer to it.
     ///
@@ -97,10 +102,8 @@ extern "C" {
     ///     nstd_os_unix_alloc_deallocate(&mut mem);
     /// }
     /// ```
-    pub fn nstd_os_unix_alloc_reallocate(
-        ptr: &mut NSTDAnyMut,
-        new_size: NSTDUInt,
-    ) -> NSTDErrorCode;
+    pub fn nstd_os_unix_alloc_reallocate(ptr: &mut NSTDAnyMut, new_size: NSTDUInt)
+        -> NSTDErrorCode;
 
     /// Deallocates a block of memory previously allocated by `nstd_os_unix_alloc_allocate[_zeroed]`.
     ///
