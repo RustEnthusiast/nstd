@@ -1,7 +1,9 @@
 //! Memory allocation for Unix-like systems.
 use crate::{core::def::NSTDErrorCode, NSTDAnyMut, NSTDUInt};
-#[cfg(all(feature = "asm", target_arch = "x86_64"))]
+#[cfg(all(feature = "asm", target_arch = "x86_64", not(target_os = "macos")))]
 core::arch::global_asm!(include_str!("alloc.asm"));
+#[cfg(all(feature = "asm", target_arch = "x86_64", target_os = "macos"))]
+core::arch::global_asm!(include_str!("macos/alloc.asm"));
 
 #[cfg_attr(
     not(all(feature = "asm", target_arch = "x86_64")),
