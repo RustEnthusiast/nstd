@@ -1,3 +1,6 @@
+# 0.3.1
+### `nstd`
+- Fixed docs.rs build for non-x86_64 Unix systems.
 # 0.3.0
 ### `nstd`
 - The overflow behavior for the "release" profile has been set to panic.
