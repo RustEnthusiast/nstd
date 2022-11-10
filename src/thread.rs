@@ -1,6 +1,7 @@
 //! Thread spawning, joining, and detaching.
 use crate::{
     core::{def::NSTDErrorCode, str::NSTDStr},
+    heap_ptr::NSTDHeapPtr,
     io::NSTDIOError,
     NSTDBool, NSTDFloat64, NSTDUInt,
 };
@@ -26,11 +27,25 @@ pub struct NSTDThreadDescriptor {
     pub stack_size: NSTDUInt,
 }
 
+/// Data type that wraps [NSTDHeapPtr] and implements the [Send] trait.
+struct ThreadData(NSTDHeapPtr);
+// SAFETY: `nstd_thread_spawn` documents the safety of passing data between threads.
+unsafe impl Send for ThreadData {}
+impl From<ThreadData> for NSTDHeapPtr {
+    /// Consumes `data` returning the inner heap pointer.
+    #[inline]
+    fn from(data: ThreadData) -> Self {
+        data.0
+    }
+}
+
 /// Spawns a new thread and returns a handle to it.
 ///
 /// # Parameters:
 ///
-/// - `NSTDErrorCode (*thread_fn)()` - The thread function.
+/// - `NSTDErrorCode (*thread_fn)(NSTDHeapPtr)` - The thread function.
+///
+/// - `NSTDHeapPtr data` - Data to pass to the thread.
 ///
 /// # Returns
 ///
@@ -38,13 +53,17 @@ pub struct NSTDThreadDescriptor {
 ///
 /// # Safety
 ///
-/// The caller of this function must guarantee that `thread_fn` is a valid function pointer.
+/// - The caller of this function must guarantee that `thread_fn` is a valid function pointer.
+///
+/// - The data type that `data` holds must be able to be safely sent between threads.
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_thread_spawn(
-    thread_fn: Option<unsafe extern "C" fn() -> NSTDErrorCode>,
+    thread_fn: Option<unsafe extern "C" fn(NSTDHeapPtr) -> NSTDErrorCode>,
+    data: NSTDHeapPtr,
 ) -> Option<NSTDThread> {
     if let Some(thread_fn) = thread_fn {
-        if let Ok(thread) = Builder::new().spawn(move || thread_fn()) {
+        let data = ThreadData(data);
+        if let Ok(thread) = Builder::new().spawn(move || thread_fn(data.into())) {
             return Some(Box::new(thread));
         }
     }
@@ -55,7 +74,9 @@ pub unsafe extern "C" fn nstd_thread_spawn(
 ///
 /// # Parameters:
 ///
-/// - `NSTDErrorCode (*thread_fn)()` - The thread function.
+/// - `NSTDErrorCode (*thread_fn)(NSTDHeapPtr)` - The thread function.
+///
+/// - `NSTDHeapPtr data` - Data to pass to the thread.
 ///
 /// - `const NSTDThreadDescriptor *desc` - The thread descriptor.
 ///
@@ -76,9 +97,12 @@ pub unsafe extern "C" fn nstd_thread_spawn(
 /// - The caller of this function must guarantee that `thread_fn` is a valid function pointer.
 ///
 /// - This operation can cause undefined behavior if `desc`'s data is invalid.
+///
+/// - The data type that `data` holds must be able to be safely sent between threads.
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_thread_spawn_with_desc(
-    thread_fn: Option<unsafe extern "C" fn() -> NSTDErrorCode>,
+    thread_fn: Option<unsafe extern "C" fn(NSTDHeapPtr) -> NSTDErrorCode>,
+    data: NSTDHeapPtr,
     desc: &NSTDThreadDescriptor,
 ) -> Option<NSTDThread> {
     if let Some(thread_fn) = thread_fn {
@@ -89,7 +113,8 @@ pub unsafe extern "C" fn nstd_thread_spawn_with_desc(
             builder = builder.stack_size(desc.stack_size);
         }
         // Spawn the new thread.
-        if let Ok(thread) = builder.spawn(move || thread_fn()) {
+        let data = ThreadData(data);
+        if let Ok(thread) = builder.spawn(move || thread_fn(data.into())) {
             return Some(Box::new(thread));
         }
     }

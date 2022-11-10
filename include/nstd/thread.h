@@ -2,6 +2,7 @@
 #define NSTD_THREAD_H
 #include "core/def.h"
 #include "core/str.h"
+#include "heap_ptr.h"
 #include "io/io.h"
 #include "nstd.h"
 
@@ -24,7 +25,9 @@ typedef struct {
 ///
 /// # Parameters:
 ///
-/// - `NSTDErrorCode (*thread_fn)()` - The thread function.
+/// - `NSTDErrorCode (*thread_fn)(NSTDHeapPtr)` - The thread function.
+///
+/// - `NSTDHeapPtr data` - Data to pass to the thread.
 ///
 /// # Returns
 ///
@@ -32,14 +35,18 @@ typedef struct {
 ///
 /// # Safety
 ///
-/// The caller of this function must guarantee that `thread_fn` is a valid function pointer.
-NSTDAPI NSTDThread nstd_thread_spawn(NSTDErrorCode (*thread_fn)());
+/// - The caller of this function must guarantee that `thread_fn` is a valid function pointer.
+///
+/// - The data type that `data` holds must be able to be safely sent between threads.
+NSTDAPI NSTDThread nstd_thread_spawn(NSTDErrorCode (*thread_fn)(NSTDHeapPtr), NSTDHeapPtr data);
 
 /// Spawns a new thread configured with a descriptor.
 ///
 /// # Parameters:
 ///
-/// - `NSTDErrorCode (*thread_fn)()` - The thread function.
+/// - `NSTDErrorCode (*thread_fn)(NSTDHeapPtr)` - The thread function.
+///
+/// - `NSTDHeapPtr data` - Data to pass to the thread.
 ///
 /// - `const NSTDThreadDescriptor *desc` - The thread descriptor.
 ///
@@ -60,8 +67,10 @@ NSTDAPI NSTDThread nstd_thread_spawn(NSTDErrorCode (*thread_fn)());
 /// - The caller of this function must guarantee that `thread_fn` is a valid function pointer.
 ///
 /// - This operation can cause undefined behavior if `desc`'s data is invalid.
-NSTDAPI NSTDThread nstd_thread_spawn_with_desc(NSTDErrorCode (*thread_fn)(),
-const NSTDThreadDescriptor *desc);
+///
+/// - The data type that `data` holds must be able to be safely sent between threads.
+NSTDAPI NSTDThread nstd_thread_spawn_with_desc(NSTDErrorCode (*thread_fn)(NSTDHeapPtr),
+NSTDHeapPtr data, const NSTDThreadDescriptor *desc);
 
 /// Checks if a thread has finished running.
 ///
