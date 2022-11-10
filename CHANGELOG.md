@@ -1,4 +1,4 @@
-# TBD
+# 0.3.0
 ### `nstd`
 - The overflow behavior for the "release" profile has been set to panic.
 - The panic behavior for the "release" profile has been set to abort.
@@ -37,6 +37,7 @@
 ### `nstd.vec`
 - Added `clear`.
 - Added `from_slice`.
+
 # 0.2.0
 ### `nstd`
 - Added `nstd.fs`.
