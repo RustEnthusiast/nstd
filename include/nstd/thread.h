@@ -1,6 +1,7 @@
 #ifndef NSTD_THREAD_H
 #define NSTD_THREAD_H
 #include "core/def.h"
+#include "core/result.h"
 #include "core/str.h"
 #include "heap_ptr.h"
 #include "io/io.h"
@@ -20,6 +21,10 @@ typedef struct {
     /// Set this to 0 to let the host decide how much stack memory should be allocated.
     NSTDUInt stack_size;
 } NSTDThreadDescriptor;
+
+/// Returned from `nstd_thread_count`, contains the number of threads detected on the system on
+/// success.
+NSTDResult(NSTDUInt, NSTDIOError) NSTDThreadCountResult;
 
 /// Spawns a new thread and returns a handle to it.
 ///
@@ -118,14 +123,10 @@ NSTDAPI void nstd_thread_sleep(NSTDFloat64 secs);
 
 /// Returns the number of recommended threads that a program should use.
 ///
-/// # Parameters:
-///
-/// - `NSTDIOError *errc` - The operation error code.
-///
 /// # Returns
 ///
-/// `NSTDUInt threads` - The estimated default amount of parallelism a program should use, 0 on
-/// error.
-NSTDAPI NSTDUInt nstd_thread_count(NSTDIOError *errc);
+/// `NSTDThreadCountResult threads` - The estimated default amount of parallelism a program should
+/// use on success, or the I/O error code on failure.
+NSTDAPI NSTDThreadCountResult nstd_thread_count();
 
 #endif

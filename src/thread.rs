@@ -1,6 +1,6 @@
 //! Thread spawning, joining, and detaching.
 use crate::{
-    core::{def::NSTDErrorCode, str::NSTDStr},
+    core::{def::NSTDErrorCode, result::NSTDResult, str::NSTDStr},
     heap_ptr::NSTDHeapPtr,
     io::NSTDIOError,
     NSTDBool, NSTDFloat64, NSTDUInt,
@@ -26,6 +26,10 @@ pub struct NSTDThreadDescriptor {
     /// Set this to 0 to let the host decide how much stack memory should be allocated.
     pub stack_size: NSTDUInt,
 }
+
+/// Returned from `nstd_thread_count`, contains the number of threads detected on the system on
+/// success.
+pub type NSTDThreadCountResult = NSTDResult<NSTDUInt, NSTDIOError>;
 
 /// Data type that wraps [NSTDHeapPtr] and implements the [Send] trait.
 struct ThreadData(NSTDHeapPtr);
@@ -182,24 +186,15 @@ pub extern "C" fn nstd_thread_sleep(secs: NSTDFloat64) {
 
 /// Returns the number of recommended threads that a program should use.
 ///
-/// # Parameters:
-///
-/// - `NSTDIOError *errc` - The operation error code.
-///
 /// # Returns
 ///
-/// `NSTDUInt threads` - The estimated default amount of parallelism a program should use, 0 on
-/// error.
+/// `NSTDThreadCountResult threads` - The estimated default amount of parallelism a program should
+/// use on success, or the I/O error code on failure.
+#[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_thread_count(errc: &mut NSTDIOError) -> NSTDUInt {
+pub extern "C" fn nstd_thread_count() -> NSTDThreadCountResult {
     match std::thread::available_parallelism() {
-        Ok(threads) => {
-            *errc = NSTDIOError::NSTD_IO_ERROR_NONE;
-            threads.get()
-        }
-        Err(err) => {
-            *errc = NSTDIOError::from_err(err.kind());
-            0
-        }
+        Ok(threads) => NSTDResult::Ok(threads.get()),
+        Err(err) => NSTDResult::Err(NSTDIOError::from_err(err.kind())),
     }
 }
