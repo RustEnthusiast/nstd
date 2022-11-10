@@ -13,7 +13,9 @@ typedef enum {
     /// Getting a handle to a heap failed.
     NSTD_ALLOC_ERROR_HEAP_NOT_FOUND,
     /// A heap is invalid.
-    NSTD_ALLOC_ERROR_INVALID_HEAP
+    NSTD_ALLOC_ERROR_INVALID_HEAP,
+    /// An allocation function received input parameters that resulted in an invalid memory layout.
+    NSTD_ALLOC_ERROR_INVALID_LAYOUT
 } NSTDAllocError;
 
 /// Allocates a block of memory on the heap.
@@ -26,10 +28,6 @@ typedef enum {
 /// # Returns
 ///
 /// `NSTDAnyMut ptr` - A pointer to the allocated memory, null on error.
-///
-/// # Panics
-///
-/// This function may panic if getting a handle to the default heap fails.
 ///
 /// # Safety
 ///
@@ -47,10 +45,6 @@ NSTDAPI NSTDAnyMut nstd_alloc_allocate(NSTDUInt size);
 /// # Returns
 ///
 /// `NSTDAnyMut ptr` - A pointer to the allocated memory, null on error.
-///
-/// # Panics
-///
-/// This function may panic if getting a handle to the default heap fails.
 ///
 /// # Safety
 ///
@@ -75,10 +69,6 @@ NSTDAPI NSTDAnyMut nstd_alloc_allocate_zeroed(NSTDUInt size);
 ///
 /// `NSTDAllocError errc` - The allocation operation error code.
 ///
-/// # Panics
-///
-/// This function may panic if getting a handle to the default heap fails.
-///
 /// # Safety
 ///
 /// - Behavior is undefined if `new_size` is zero.
@@ -96,15 +86,15 @@ NSTDAPI NSTDAllocError nstd_alloc_reallocate(NSTDAnyMut *ptr, NSTDUInt size, NST
 ///
 /// - `NSTDUInt size` - The number of bytes to free.
 ///
-/// # Panics
+/// # Returns
 ///
-/// This function may panic if getting a handle to the default heap fails.
+/// `NSTDAllocError errc` - The allocation operation error code.
 ///
 /// # Safety
 ///
 /// - Behavior is undefined if `ptr` is not a value returned by `nstd_alloc_allocate[_zeroed]`.
 ///
 /// - `size` must be the same value that was used to allocate the memory buffer.
-NSTDAPI void nstd_alloc_deallocate(NSTDAnyMut *ptr, NSTDUInt size);
+NSTDAPI NSTDAllocError nstd_alloc_deallocate(NSTDAnyMut *ptr, NSTDUInt size);
 
 #endif

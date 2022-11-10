@@ -1,24 +1,31 @@
 #ifndef NSTD_OS_WINDOWS_ALLOC_HEAP_H
 #define NSTD_OS_WINDOWS_ALLOC_HEAP_H
+#include "../../../core/result.h"
 #include "../../../nstd.h"
 #include "alloc.h"
+
+/// A raw handle to a heap.
+typedef NSTDInt NSTDWindowsHeapHandle;
 
 /// A handle to a process heap.
 typedef struct {
     /// The private handle.
-    NSTDInt handle;
+    NSTDWindowsHeapHandle handle;
 } NSTDWindowsHeap;
+
+/// A result type that holds an `NSTDWindowsHeap` as the success variant.
+NSTDResult(NSTDWindowsHeap, NSTDWindowsAllocError) NSTDWindowsHeapResult;
 
 /// Returns a handle to the default heap of the current process.
 ///
 /// # Returns
 ///
-/// `NSTDWindowsHeap heap` - A handle to the default heap, null on error.
+/// `NSTDWindowsHeapResult heap` - A handle to the default heap, null on error.
 ///
 /// # Safety
 ///
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-getprocessheap>.
-NSTDAPI NSTDWindowsHeap nstd_os_windows_alloc_heap_default();
+NSTDAPI NSTDWindowsHeapResult nstd_os_windows_alloc_heap_default();
 
 /// Creates a new private heap for the process.
 ///
@@ -29,12 +36,23 @@ NSTDAPI NSTDWindowsHeap nstd_os_windows_alloc_heap_default();
 ///
 /// # Returns
 ///
-/// `NSTDWindowsHeap heap` - A handle to the new private heap.
+/// `NSTDWindowsHeapResult heap` - A handle to the new private heap.
 ///
 /// # Safety
 ///
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapcreate>.
-NSTDAPI NSTDWindowsHeap nstd_os_windows_alloc_heap_new(NSTDUInt size);
+NSTDAPI NSTDWindowsHeapResult nstd_os_windows_alloc_heap_new(NSTDUInt size);
+
+/// Returns a raw handle to a heap.
+///
+/// # Parameters:
+///
+/// - `const NSTDWindowsHeap *heap` - The heap.
+///
+/// # Returns
+///
+/// `NSTDWindowsHeapHandle handle` - A native handle to the heap.
+NSTDAPI NSTDWindowsHeapHandle nstd_os_windows_alloc_heap_handle(const NSTDWindowsHeap *heap);
 
 /// Returns the size of a memory block previously allocated by an `NSTDWindowsHeap`.
 ///
@@ -153,13 +171,9 @@ NSTDAnyMut *ptr);
 ///
 /// - `NSTDWindowsHeap heap` - The heap to destroy.
 ///
-/// # Returns
-///
-/// `NSTDWindowsAllocError errc` - The allocation operation error code.
-///
 /// # Safety
 ///
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapdestroy>.
-NSTDAPI NSTDWindowsAllocError nstd_os_windows_alloc_heap_free(NSTDWindowsHeap heap);
+NSTDAPI void nstd_os_windows_alloc_heap_free(NSTDWindowsHeap heap);
 
 #endif

@@ -1,4 +1,6 @@
 //! Operating system specific functionality.
+#[cfg(target_family = "unix")]
+pub mod unix;
 #[cfg(target_os = "windows")]
 pub mod windows;
 

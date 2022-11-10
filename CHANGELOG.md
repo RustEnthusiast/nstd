@@ -1,23 +1,41 @@
 # TBD
 ### `nstd`
-- Removed the `asm` feature.
 - The overflow behavior for the "release" profile has been set to panic.
 - The panic behavior for the "release" profile has been set to abort.
 ### `nstd.core`
+- `str[_mut]_to_*` functions now return `NSTDOptional`.
+- Added `cstr[_mut]_[first|last][_const]`.
+- Added `ops`.
+- Added `cty_is_unicode`.
+- Renamed `str[_mut]_get_char` to `str[_mut]_get`.
+- Added `NSTDOptional`.
+- Added `NSTDResult`.
 - Added `panic`.
 - Made `math_[clamp|div_ceil|div_floor]_*` safe.
 ### `nstd.cstring`
+- Added `clear`.
 - Added `from_cstr`.
 - Renamed `to_bytes` to `into_bytes`.
+### `nstd.fs`
+- Added `NSTDFileResult`.
 ### `nstd.os`
+- Added `NSTDWindowsHeapHandle`.
+- Added `NSTDWindowsSharedLibHandle`.
+- Added `unix.alloc`.
+- Added `[unix|windows].shared_lib`.
+- Added `NSTDWindowsHeapResult`.
 - Added `windows_alloc_heap_validate`.
 - Added `windows_alloc_heap_size`.
 - Added `NSTDWindowsAllocError`.
 - Renamed `NSTDWindowsHeapHandle` to `NSTDWindowsHeap`.
+### `nstd.shared_lib`
+- Added `NSTDOptionalSharedLib`.
 ### `nstd.string`
+- Added `clear`.
 - Added `from_str`.
 - Renamed `to_bytes` to `into_bytes`.
 ### `nstd.vec`
+- Added `clear`.
 - Added `from_slice`.
 # 0.2.0
 ### `nstd`

@@ -2,3 +2,6 @@
 #[cfg(feature = "nstd_os_windows_alloc")]
 #[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_os_windows_alloc")))]
 pub mod alloc;
+#[cfg(feature = "nstd_os_windows_shared_lib")]
+#[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_os_windows_shared_lib")))]
+pub mod shared_lib;
