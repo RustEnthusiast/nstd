@@ -11,8 +11,7 @@ impl CModule {
     #[cfg(feature = "cc")]
     #[allow(unused)]
     fn build(&self) {
-        #[cfg(not(doc_cfg))]
-        {
+        if std::env::var("DOCS_RS").is_err() {
             use cc::Build;
             let mut cc = Build::new();
             cc.include("include")
