@@ -11,14 +11,17 @@ impl CModule {
     #[cfg(feature = "cc")]
     #[allow(unused)]
     fn build(&self) {
-        use cc::Build;
-        let mut cc = Build::new();
-        cc.include("include")
-            .warnings(true)
-            .extra_warnings(true)
-            .warnings_into_errors(true)
-            .files(self.src)
-            .compile(self.name);
+        #[cfg(not(doc_cfg))]
+        {
+            use cc::Build;
+            let mut cc = Build::new();
+            cc.include("include")
+                .warnings(true)
+                .extra_warnings(true)
+                .warnings_into_errors(true)
+                .files(self.src)
+                .compile(self.name);
+        }
     }
 }
 

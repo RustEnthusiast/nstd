@@ -6,7 +6,7 @@ core::arch::global_asm!(include_str!("alloc.asm"));
 core::arch::global_asm!(include_str!("macos/alloc.asm"));
 
 #[cfg_attr(
-    not(all(feature = "asm", target_arch = "x86_64")),
+    not(any(doc_cfg, all(feature = "asm", target_arch = "x86_64"))),
     link(name = "nstd_os_unix_alloc_c")
 )]
 extern "C" {
