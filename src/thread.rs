@@ -11,7 +11,7 @@ use std::{
 };
 
 /// A handle to a running thread.
-pub type NSTDThread = Box<JoinHandle<NSTDErrorCode>>;
+pub type NSTDThreadHandle = Box<JoinHandle<NSTDErrorCode>>;
 
 /// Describes the creation of a new thread.
 ///
@@ -53,7 +53,7 @@ impl From<ThreadData> for NSTDHeapPtr {
 ///
 /// # Returns
 ///
-/// `NSTDThread thread` - A handle to the new thread, null on error.
+/// `NSTDThreadHandle thread` - A handle to the new thread, null on error.
 ///
 /// # Safety
 ///
@@ -64,7 +64,7 @@ impl From<ThreadData> for NSTDHeapPtr {
 pub unsafe extern "C" fn nstd_thread_spawn(
     thread_fn: Option<unsafe extern "C" fn(NSTDHeapPtr) -> NSTDErrorCode>,
     data: NSTDHeapPtr,
-) -> Option<NSTDThread> {
+) -> Option<NSTDThreadHandle> {
     if let Some(thread_fn) = thread_fn {
         let data = ThreadData(data);
         if let Ok(thread) = Builder::new().spawn(move || thread_fn(data.into())) {
@@ -86,7 +86,7 @@ pub unsafe extern "C" fn nstd_thread_spawn(
 ///
 /// # Returns
 ///
-/// `NSTDThread thread` - A handle to the new thread, null on error.
+/// `NSTDThreadHandle thread` - A handle to the new thread, null on error.
 ///
 /// # Panics
 ///
@@ -108,7 +108,7 @@ pub unsafe extern "C" fn nstd_thread_spawn_with_desc(
     thread_fn: Option<unsafe extern "C" fn(NSTDHeapPtr) -> NSTDErrorCode>,
     data: NSTDHeapPtr,
     desc: &NSTDThreadDescriptor,
-) -> Option<NSTDThread> {
+) -> Option<NSTDThreadHandle> {
     if let Some(thread_fn) = thread_fn {
         // Create the thread builder.
         let mut builder = Builder::new();
@@ -129,14 +129,14 @@ pub unsafe extern "C" fn nstd_thread_spawn_with_desc(
 ///
 /// # Parameters:
 ///
-/// - `const NSTDThread *thread` - A handle to the thread.
+/// - `const NSTDThreadHandle *thread` - A handle to the thread.
 ///
 /// # Returns
 ///
 /// `NSTDBool is_finished` - True if the thread associated with the handle has finished executing.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_thread_is_finished(thread: &NSTDThread) -> NSTDBool {
+pub extern "C" fn nstd_thread_is_finished(thread: &NSTDThreadHandle) -> NSTDBool {
     thread.is_finished()
 }
 
@@ -144,7 +144,7 @@ pub extern "C" fn nstd_thread_is_finished(thread: &NSTDThread) -> NSTDBool {
 ///
 /// # Parameters:
 ///
-/// - `NSTDThread thread` - The thread handle.
+/// - `NSTDThreadHandle thread` - The thread handle.
 ///
 /// # Returns
 ///
@@ -155,7 +155,7 @@ pub extern "C" fn nstd_thread_is_finished(thread: &NSTDThread) -> NSTDBool {
 /// Panics if joining the thread fails.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_thread_join(thread: NSTDThread) -> NSTDErrorCode {
+pub extern "C" fn nstd_thread_join(thread: NSTDThreadHandle) -> NSTDErrorCode {
     thread.join().expect("Failed to join a thread")
 }
 
@@ -163,11 +163,11 @@ pub extern "C" fn nstd_thread_join(thread: NSTDThread) -> NSTDErrorCode {
 ///
 /// # Parameters:
 ///
-/// - `NSTDThread thread` - The thread handle.
+/// - `NSTDThreadHandle thread` - The thread handle.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 #[allow(unused_variables)]
-pub extern "C" fn nstd_thread_detach(thread: NSTDThread) {}
+pub extern "C" fn nstd_thread_detach(thread: NSTDThreadHandle) {}
 
 /// Puts the current thread to sleep for a specified number of seconds.
 ///
