@@ -1,6 +1,6 @@
 //! Thread spawning, joining, and detaching.
 use crate::{
-    core::{def::NSTDErrorCode, result::NSTDResult, str::NSTDStr},
+    core::{def::NSTDErrorCode, optional::NSTDOptional, result::NSTDResult, str::NSTDStr},
     heap_ptr::NSTDHeapPtr,
     io::NSTDIOError,
     NSTDBool, NSTDFloat64, NSTDUInt,
@@ -26,6 +26,9 @@ pub struct NSTDThreadDescriptor {
     /// Set this to 0 to let the host decide how much stack memory should be allocated.
     pub stack_size: NSTDUInt,
 }
+
+/// Returned from `nstd_thread_join`, contains the thread function's return value on success.
+pub type NSTDOptionalThreadResult = NSTDOptional<NSTDErrorCode>;
 
 /// Returned from `nstd_thread_count`, contains the number of threads detected on the system on
 /// success.
@@ -148,15 +151,15 @@ pub extern "C" fn nstd_thread_is_finished(thread: &NSTDThreadHandle) -> NSTDBool
 ///
 /// # Returns
 ///
-/// `NSTDErrorCode errc` - The thread function's return code.
-///
-/// # Panics
-///
-/// Panics if joining the thread fails.
+/// `NSTDOptionalThreadResult errc` - The thread function's return code, or none if joining the
+/// thread fails.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_thread_join(thread: NSTDThreadHandle) -> NSTDErrorCode {
-    thread.join().expect("Failed to join a thread")
+pub extern "C" fn nstd_thread_join(thread: NSTDThreadHandle) -> NSTDOptionalThreadResult {
+    match thread.join() {
+        Ok(errc) => NSTDOptional::Some(errc),
+        _ => NSTDOptional::None,
+    }
 }
 
 /// Detaches a thread from it's handle, allowing it to run in the background.

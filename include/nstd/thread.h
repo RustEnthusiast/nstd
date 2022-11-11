@@ -1,6 +1,7 @@
 #ifndef NSTD_THREAD_H
 #define NSTD_THREAD_H
 #include "core/def.h"
+#include "core/optional.h"
 #include "core/result.h"
 #include "core/str.h"
 #include "heap_ptr.h"
@@ -21,6 +22,9 @@ typedef struct {
     /// Set this to 0 to let the host decide how much stack memory should be allocated.
     NSTDUInt stack_size;
 } NSTDThreadDescriptor;
+
+/// Returned from `nstd_thread_join`, contains the thread function's return value on success.
+NSTDOptional(NSTDErrorCode) NSTDOptionalThreadResult;
 
 /// Returned from `nstd_thread_count`, contains the number of threads detected on the system on
 /// success.
@@ -97,11 +101,8 @@ NSTDAPI NSTDBool nstd_thread_is_finished(const NSTDThreadHandle *thread);
 ///
 /// # Returns
 ///
-/// `NSTDErrorCode errc` - The thread function's return code.
-///
-/// # Panics
-///
-/// Panics if joining the thread fails.
+/// `NSTDOptionalThreadResult errc` - The thread function's return code, or none if joining the
+/// thread fails.
 NSTDAPI NSTDErrorCode nstd_thread_join(NSTDThreadHandle thread);
 
 /// Detaches a thread from it's handle, allowing it to run in the background.
