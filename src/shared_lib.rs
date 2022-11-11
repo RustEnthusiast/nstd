@@ -5,13 +5,15 @@
 //! This module is only functional on Windows and Unix systems.
 #[cfg(target_os = "windows")]
 use crate::{
-    alloc::NSTDAllocError::NSTD_ALLOC_ERROR_NONE,
+    core::{
+        cstr::{nstd_core_cstr_get_null, nstd_core_cstr_new},
+        str::{nstd_core_str_as_ptr, nstd_core_str_byte_len},
+    },
+    cstring::{nstd_cstring_as_ptr, nstd_cstring_from_cstr},
     os::windows::shared_lib::{
         nstd_os_windows_shared_lib_get, nstd_os_windows_shared_lib_get_mut,
         nstd_os_windows_shared_lib_load, NSTDWindowsSharedLib,
     },
-    string::{nstd_string_from_str, nstd_string_into_bytes},
-    vec::{nstd_vec_as_ptr, nstd_vec_push},
 };
 use crate::{
     core::{optional::NSTDOptional, str::NSTDStr},
@@ -62,12 +64,19 @@ pub unsafe extern "C" fn nstd_shared_lib_load(path: &NSTDStr) -> NSTDOptionalSha
     }
     #[cfg(target_os = "windows")]
     {
-        use core::ptr::addr_of;
-        let path = nstd_string_from_str(path);
-        let mut bytes = nstd_string_into_bytes(path);
-        let null = 0u8;
-        assert!(nstd_vec_push(&mut bytes, addr_of!(null).cast()) == NSTD_ALLOC_ERROR_NONE);
-        nstd_os_windows_shared_lib_load(nstd_vec_as_ptr(&bytes).cast())
+        // Check if `path` is already null terminated.
+        let path_ptr = nstd_core_str_as_ptr(path).cast();
+        let path_len = nstd_core_str_byte_len(path);
+        let c_path = nstd_core_cstr_new(path_ptr, path_len);
+        // Allocate a null byte for `path`.
+        if nstd_core_cstr_get_null(&c_path).is_null() {
+            let path = nstd_cstring_from_cstr(&c_path);
+            nstd_os_windows_shared_lib_load(nstd_cstring_as_ptr(&path))
+        }
+        // Use the already null terminated `path`.
+        else {
+            nstd_os_windows_shared_lib_load(path_ptr)
+        }
     }
 }
 
