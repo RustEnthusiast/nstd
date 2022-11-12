@@ -24,7 +24,7 @@ typedef struct {
 ///
 /// # Panics
 ///
-/// This function will panic if either `element_size` is zero, or allocation fails.
+/// This function will panic if allocation fails.
 ///
 /// # Safety
 ///
@@ -43,7 +43,7 @@ NSTDAPI NSTDHeapPtr nstd_heap_ptr_new(NSTDUInt element_size, NSTDAny init);
 ///
 /// # Panics
 ///
-/// This function will panic if either `element_size` is zero, or allocation fails.
+/// This function will panic if allocation fails.
 NSTDAPI NSTDHeapPtr nstd_heap_ptr_new_zeroed(NSTDUInt element_size);
 
 /// Creates a clone of a heap allocated object.
@@ -74,6 +74,10 @@ NSTDAPI NSTDUInt nstd_heap_ptr_size(const NSTDHeapPtr *hptr);
 
 /// Returns an immutable raw pointer to the object on the heap.
 ///
+/// # Note
+///
+/// This will always return null if the size of the object being stored on the heap is 0.
+///
 /// # Parameters:
 ///
 /// - `const NSTDHeapPtr *hptr` - The heap pointer.
@@ -84,6 +88,10 @@ NSTDAPI NSTDUInt nstd_heap_ptr_size(const NSTDHeapPtr *hptr);
 NSTDAPI NSTDAny nstd_heap_ptr_get(const NSTDHeapPtr *hptr);
 
 /// Returns a raw pointer to the object on the heap.
+///
+/// # Note
+///
+/// This will always return null if the size of the object being stored on the heap is 0.
 ///
 /// # Parameters:
 ///
