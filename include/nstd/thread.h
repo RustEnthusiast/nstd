@@ -14,6 +14,9 @@ typedef NSTDAnyMut NSTDThread;
 /// A handle to a running thread.
 typedef NSTDAny NSTDThreadHandle;
 
+/// A thread's unique identifier.
+typedef NSTDAnyMut NSTDThreadID;
+
 /// Describes the creation of a new thread.
 ///
 /// This type is passed to the `nstd_thread_spawn_with_desc` function.
@@ -136,6 +139,17 @@ NSTDAPI void nstd_thread_detach(NSTDThread thread);
 /// `NSTDStr name` - The name of the thread, or an empty string slice if the thread is unnamed.
 NSTDAPI NSTDStr nstd_thread_name(NSTDThreadHandle handle);
 
+/// Returns a thread's unique identifier.
+///
+/// # Parameters:
+///
+/// - `NSTDThreadHandle handle` - A handle to the thread.
+///
+/// # Returns
+///
+/// `NSTDThreadID id` - The thread's unique ID.
+NSTDAPI NSTDThreadID nstd_thread_id(NSTDThreadHandle handle);
+
 /// Puts the current thread to sleep for a specified number of seconds.
 ///
 /// # Parameters:
@@ -154,5 +168,25 @@ NSTDAPI void nstd_thread_sleep(NSTDFloat64 secs);
 /// `NSTDThreadCountResult threads` - The estimated default amount of parallelism a program should
 /// use on success, or the I/O error code on failure.
 NSTDAPI NSTDThreadCountResult nstd_thread_count();
+
+/// Compares two thread identifiers.
+///
+/// # Parameters:
+///
+/// - `const NSTDThreadID *xid` - The first identifier.
+///
+/// - `const NSTDThreadID *yid` - The second identifier.
+///
+/// # Returns
+///
+/// `NSTDBool is_eq` - True if the two identifiers refer to the same thread.
+NSTDAPI NSTDBool nstd_thread_id_compare(const NSTDThreadID *xid, const NSTDThreadID *yid);
+
+/// Frees an instance of `NSTDThreadID`.
+///
+/// # Parameters:
+///
+/// - `NSTDThreadID id` - A thread identifier.
+NSTDAPI void nstd_thread_id_free(NSTDThreadID id);
 
 #endif

@@ -12,7 +12,7 @@ use crate::{
     NSTDBool, NSTDFloat64, NSTDUInt, NSTD_NULL,
 };
 use std::{
-    thread::{Builder, JoinHandle, Thread},
+    thread::{Builder, JoinHandle, Thread, ThreadId},
     time::Duration,
 };
 
@@ -21,6 +21,9 @@ pub type NSTDThread = Box<JoinHandle<NSTDErrorCode>>;
 
 /// A handle to a running thread.
 pub type NSTDThreadHandle<'a> = &'a Thread;
+
+/// A thread's unique identifier.
+pub type NSTDThreadID = Box<ThreadId>;
 
 /// Describes the creation of a new thread.
 ///
@@ -217,6 +220,21 @@ pub extern "C" fn nstd_thread_name(handle: NSTDThreadHandle) -> NSTDStr {
     }
 }
 
+/// Returns a thread's unique identifier.
+///
+/// # Parameters:
+///
+/// - `NSTDThreadHandle handle` - A handle to the thread.
+///
+/// # Returns
+///
+/// `NSTDThreadID id` - The thread's unique ID.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_thread_id(handle: NSTDThreadHandle) -> NSTDThreadID {
+    Box::new(handle.id())
+}
+
 /// Puts the current thread to sleep for a specified number of seconds.
 ///
 /// # Parameters:
@@ -246,3 +264,30 @@ pub extern "C" fn nstd_thread_count() -> NSTDThreadCountResult {
         Err(err) => NSTDResult::Err(NSTDIOError::from_err(err.kind())),
     }
 }
+
+/// Compares two thread identifiers.
+///
+/// # Parameters:
+///
+/// - `const NSTDThreadID *xid` - The first identifier.
+///
+/// - `const NSTDThreadID *yid` - The second identifier.
+///
+/// # Returns
+///
+/// `NSTDBool is_eq` - True if the two identifiers refer to the same thread.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_thread_id_compare(xid: &NSTDThreadID, yid: &NSTDThreadID) -> NSTDBool {
+    xid == yid
+}
+
+/// Frees an instance of `NSTDThreadID`.
+///
+/// # Parameters:
+///
+/// - `NSTDThreadID id` - A thread identifier.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+#[allow(unused_variables)]
+pub extern "C" fn nstd_thread_id_free(id: NSTDThreadID) {}
