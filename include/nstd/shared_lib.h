@@ -4,13 +4,19 @@
 #include "core/str.h"
 #include "nstd.h"
 #include "os/os.h"
-#include "os/windows/shared_lib.h"
+#if defined(NSTD_OS_UNIX)
+#   include "os/unix/shared_lib.h"
+#elif defined(NSTD_OS_WINDOWS)
+#   include "os/windows/shared_lib.h"
+#endif
 
 /// A handle to a dynamically loaded library.
-#ifndef NSTD_OS_WINDOWS
-typedef NSTDAnyMut NSTDSharedLib;
-#else
+#if defined(NSTD_OS_UNIX)
+typedef NSTDUnixSharedLib NSTDSharedLib;
+#elif defined(NSTD_OS_WINDOWS)
 typedef NSTDWindowsSharedLib NSTDSharedLib;
+#else
+typedef NSTDAnyMut NSTDSharedLib;
 #endif
 
 /// An optional handle to a shared library.
@@ -36,7 +42,7 @@ NSTDOptional(NSTDSharedLib) NSTDOptionalSharedLib;
 ///
 /// - `path`'s data must be valid for reads.
 ///
-/// - See <https://docs.rs/libloading/latest/libloading/struct.Library.html#method.new>.
+/// - The loaded library may have platform-specific initialization routines ran when it is loaded.
 NSTDAPI NSTDOptionalSharedLib nstd_shared_lib_load(const NSTDStr *path);
 
 /// Gets a pointer to a function or static variable in a dynamically loaded library by symbol name.
@@ -50,10 +56,6 @@ NSTDAPI NSTDOptionalSharedLib nstd_shared_lib_load(const NSTDStr *path);
 /// # Returns
 ///
 /// `NSTDAny ptr` - A pointer to the function or variable.
-///
-/// # Panics
-///
-/// Panics if `symbol`'s length exceeds `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -72,10 +74,6 @@ NSTDAPI NSTDAny nstd_shared_lib_get(const NSTDSharedLib *lib, const NSTDChar *sy
 /// # Returns
 ///
 /// `NSTDAnyMut ptr` - A pointer to the function or variable.
-///
-/// # Panics
-///
-/// Panics if `symbol`'s length exceeds `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
