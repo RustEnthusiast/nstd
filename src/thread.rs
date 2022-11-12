@@ -1,17 +1,26 @@
 //! Thread spawning, joining, and detaching.
 use crate::{
-    core::{def::NSTDErrorCode, optional::NSTDOptional, result::NSTDResult, str::NSTDStr},
+    core::{
+        def::NSTDErrorCode,
+        optional::NSTDOptional,
+        result::NSTDResult,
+        slice::nstd_core_slice_new,
+        str::{nstd_core_str_from_bytes_unchecked, NSTDStr},
+    },
     heap_ptr::NSTDHeapPtr,
     io::NSTDIOError,
-    NSTDBool, NSTDFloat64, NSTDUInt,
+    NSTDBool, NSTDFloat64, NSTDUInt, NSTD_NULL,
 };
 use std::{
-    thread::{Builder, JoinHandle},
+    thread::{Builder, JoinHandle, Thread},
     time::Duration,
 };
 
+/// Represents a running thread.
+pub type NSTDThread = Box<JoinHandle<NSTDErrorCode>>;
+
 /// A handle to a running thread.
-pub type NSTDThreadHandle = Box<JoinHandle<NSTDErrorCode>>;
+pub type NSTDThreadHandle<'a> = &'a Thread;
 
 /// Describes the creation of a new thread.
 ///
@@ -56,7 +65,7 @@ impl From<ThreadData> for NSTDHeapPtr {
 ///
 /// # Returns
 ///
-/// `NSTDThreadHandle thread` - A handle to the new thread, null on error.
+/// `NSTDThread thread` - A handle to the new thread, null on error.
 ///
 /// # Safety
 ///
@@ -67,7 +76,7 @@ impl From<ThreadData> for NSTDHeapPtr {
 pub unsafe extern "C" fn nstd_thread_spawn(
     thread_fn: Option<unsafe extern "C" fn(NSTDHeapPtr) -> NSTDErrorCode>,
     data: NSTDHeapPtr,
-) -> Option<NSTDThreadHandle> {
+) -> Option<NSTDThread> {
     if let Some(thread_fn) = thread_fn {
         let data = ThreadData(data);
         if let Ok(thread) = Builder::new().spawn(move || thread_fn(data.into())) {
@@ -89,7 +98,7 @@ pub unsafe extern "C" fn nstd_thread_spawn(
 ///
 /// # Returns
 ///
-/// `NSTDThreadHandle thread` - A handle to the new thread, null on error.
+/// `NSTDThread thread` - A handle to the new thread, null on error.
 ///
 /// # Panics
 ///
@@ -111,7 +120,7 @@ pub unsafe extern "C" fn nstd_thread_spawn_with_desc(
     thread_fn: Option<unsafe extern "C" fn(NSTDHeapPtr) -> NSTDErrorCode>,
     data: NSTDHeapPtr,
     desc: &NSTDThreadDescriptor,
-) -> Option<NSTDThreadHandle> {
+) -> Option<NSTDThread> {
     if let Some(thread_fn) = thread_fn {
         // Create the thread builder.
         let mut builder = Builder::new();
@@ -128,18 +137,33 @@ pub unsafe extern "C" fn nstd_thread_spawn_with_desc(
     None
 }
 
+/// Retrieves a raw handle to a thread.
+///
+/// # Parameters:
+///
+/// - `const NSTDThread *thread` - A handle to the thread.
+///
+/// # Returns
+///
+/// `NSTDThreadHandle handle` - A raw handle to the thread.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_thread_handle(thread: &NSTDThread) -> NSTDThreadHandle {
+    thread.thread()
+}
+
 /// Checks if a thread has finished running.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDThreadHandle *thread` - A handle to the thread.
+/// - `const NSTDThread *thread` - A handle to the thread.
 ///
 /// # Returns
 ///
 /// `NSTDBool is_finished` - True if the thread associated with the handle has finished executing.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_thread_is_finished(thread: &NSTDThreadHandle) -> NSTDBool {
+pub extern "C" fn nstd_thread_is_finished(thread: &NSTDThread) -> NSTDBool {
     thread.is_finished()
 }
 
@@ -147,7 +171,7 @@ pub extern "C" fn nstd_thread_is_finished(thread: &NSTDThreadHandle) -> NSTDBool
 ///
 /// # Parameters:
 ///
-/// - `NSTDThreadHandle thread` - The thread handle.
+/// - `NSTDThread thread` - The thread handle.
 ///
 /// # Returns
 ///
@@ -155,7 +179,7 @@ pub extern "C" fn nstd_thread_is_finished(thread: &NSTDThreadHandle) -> NSTDBool
 /// thread fails.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_thread_join(thread: NSTDThreadHandle) -> NSTDOptionalThreadResult {
+pub extern "C" fn nstd_thread_join(thread: NSTDThread) -> NSTDOptionalThreadResult {
     match thread.join() {
         Ok(errc) => NSTDOptional::Some(errc),
         _ => NSTDOptional::None,
@@ -166,11 +190,32 @@ pub extern "C" fn nstd_thread_join(thread: NSTDThreadHandle) -> NSTDOptionalThre
 ///
 /// # Parameters:
 ///
-/// - `NSTDThreadHandle thread` - The thread handle.
+/// - `NSTDThread thread` - The thread handle.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 #[allow(unused_variables)]
-pub extern "C" fn nstd_thread_detach(thread: NSTDThreadHandle) {}
+pub extern "C" fn nstd_thread_detach(thread: NSTDThread) {}
+
+/// Returns the name of a thread.
+///
+/// # Parameters:
+///
+/// - `NSTDThreadHandle handle` - A handle to the thread.
+///
+/// # Returns
+///
+/// `NSTDStr name` - The name of the thread, or an empty string slice if the thread is unnamed.
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_thread_name(handle: NSTDThreadHandle) -> NSTDStr {
+    match handle.name() {
+        Some(name) => NSTDStr::from_str(name),
+        _ => {
+            let empty = nstd_core_slice_new(NSTD_NULL, 1, 0);
+            // SAFETY: `empty` is an empty slice.
+            unsafe { nstd_core_str_from_bytes_unchecked(&empty) }
+        }
+    }
+}
 
 /// Puts the current thread to sleep for a specified number of seconds.
 ///

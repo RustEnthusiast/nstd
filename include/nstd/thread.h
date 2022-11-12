@@ -8,8 +8,11 @@
 #include "io/io.h"
 #include "nstd.h"
 
+/// Represents a running thread.
+typedef NSTDAnyMut NSTDThread;
+
 /// A handle to a running thread.
-typedef NSTDAnyMut NSTDThreadHandle;
+typedef NSTDAny NSTDThreadHandle;
 
 /// Describes the creation of a new thread.
 ///
@@ -40,15 +43,14 @@ NSTDResult(NSTDUInt, NSTDIOError) NSTDThreadCountResult;
 ///
 /// # Returns
 ///
-/// `NSTDThreadHandle thread` - A handle to the new thread, null on error.
+/// `NSTDThread thread` - A handle to the new thread, null on error.
 ///
 /// # Safety
 ///
 /// - The caller of this function must guarantee that `thread_fn` is a valid function pointer.
 ///
 /// - The data type that `data` holds must be able to be safely sent between threads.
-NSTDAPI NSTDThreadHandle nstd_thread_spawn(NSTDErrorCode (*thread_fn)(NSTDHeapPtr),
-NSTDHeapPtr data);
+NSTDAPI NSTDThread nstd_thread_spawn(NSTDErrorCode (*thread_fn)(NSTDHeapPtr), NSTDHeapPtr data);
 
 /// Spawns a new thread configured with a descriptor.
 ///
@@ -62,7 +64,7 @@ NSTDHeapPtr data);
 ///
 /// # Returns
 ///
-/// `NSTDThreadHandle thread` - A handle to the new thread, null on error.
+/// `NSTDThread thread` - A handle to the new thread, null on error.
 ///
 /// # Panics
 ///
@@ -79,38 +81,60 @@ NSTDHeapPtr data);
 /// - This operation can cause undefined behavior if `desc`'s data is invalid.
 ///
 /// - The data type that `data` holds must be able to be safely sent between threads.
-NSTDAPI NSTDThreadHandle nstd_thread_spawn_with_desc(NSTDErrorCode (*thread_fn)(NSTDHeapPtr),
+NSTDAPI NSTDThread nstd_thread_spawn_with_desc(NSTDErrorCode (*thread_fn)(NSTDHeapPtr),
 NSTDHeapPtr data, const NSTDThreadDescriptor *desc);
+
+/// Retrieves a raw handle to a thread.
+///
+/// # Parameters:
+///
+/// - `const NSTDThread *thread` - A handle to the thread.
+///
+/// # Returns
+///
+/// `NSTDThreadHandle handle` - A raw handle to the thread.
+NSTDAPI NSTDThreadHandle nstd_thread_handle(const NSTDThread *thread);
 
 /// Checks if a thread has finished running.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDThreadHandle *thread` - A handle to the thread.
+/// - `const NSTDThread *thread` - A handle to the thread.
 ///
 /// # Returns
 ///
 /// `NSTDBool is_finished` - True if the thread associated with the handle has finished executing.
-NSTDAPI NSTDBool nstd_thread_is_finished(const NSTDThreadHandle *thread);
+NSTDAPI NSTDBool nstd_thread_is_finished(const NSTDThread *thread);
 
 /// Joins a thread by it's handle.
 ///
 /// # Parameters:
 ///
-/// - `NSTDThreadHandle thread` - The thread handle.
+/// - `NSTDThread thread` - The thread handle.
 ///
 /// # Returns
 ///
 /// `NSTDOptionalThreadResult errc` - The thread function's return code, or none if joining the
 /// thread fails.
-NSTDAPI NSTDErrorCode nstd_thread_join(NSTDThreadHandle thread);
+NSTDAPI NSTDOptionalThreadResult nstd_thread_join(NSTDThread thread);
 
 /// Detaches a thread from it's handle, allowing it to run in the background.
 ///
 /// # Parameters:
 ///
-/// - `NSTDThreadHandle thread` - The thread handle.
-NSTDAPI void nstd_thread_detach(NSTDThreadHandle thread);
+/// - `NSTDThread thread` - The thread handle.
+NSTDAPI void nstd_thread_detach(NSTDThread thread);
+
+/// Returns the name of a thread.
+///
+/// # Parameters:
+///
+/// - `NSTDThreadHandle handle` - A handle to the thread.
+///
+/// # Returns
+///
+/// `NSTDStr name` - The name of the thread, or an empty string slice if the thread is unnamed.
+NSTDAPI NSTDStr nstd_thread_name(NSTDThreadHandle handle);
 
 /// Puts the current thread to sleep for a specified number of seconds.
 ///
