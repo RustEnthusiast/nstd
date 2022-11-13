@@ -1,5 +1,19 @@
 # TBD
 ### `nstd`
+- Removed dependency for `libloading`.
+### `nstd.os`
+- Added `NSTD_OS_UNIX`.
+
+# 0.3.2
+### `nstd`
+- Second attempt to fix docs.rs build for non-x86_64 Unix systems.
+
+# 0.3.1
+### `nstd`
+- Attempted to fix docs.rs build for non-x86_64 Unix systems.
+
+# 0.3.0
+### `nstd`
 - The overflow behavior for the "release" profile has been set to panic.
 - The panic behavior for the "release" profile has been set to abort.
 ### `nstd.core`
@@ -37,6 +51,7 @@
 ### `nstd.vec`
 - Added `clear`.
 - Added `from_slice`.
+
 # 0.2.0
 ### `nstd`
 - Added `nstd.fs`.
