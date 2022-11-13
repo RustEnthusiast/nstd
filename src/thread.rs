@@ -75,6 +75,27 @@ impl From<ThreadData> for NSTDHeapPtr {
 /// - The caller of this function must guarantee that `thread_fn` is a valid function pointer.
 ///
 /// - The data type that `data` holds must be able to be safely sent between threads.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::{
+///     core::{def::NSTDErrorCode, optional::NSTDOptional},
+///     heap_ptr::{nstd_heap_ptr_new_zeroed, NSTDHeapPtr},
+///     thread::{nstd_thread_join, nstd_thread_spawn},
+/// };
+///
+/// unsafe extern "C" fn thread_fn(data: NSTDHeapPtr) -> NSTDErrorCode {
+///     0
+/// }
+///
+/// let data = nstd_heap_ptr_new_zeroed(0);
+/// if let Some(thread) = unsafe { nstd_thread_spawn(Some(thread_fn), data) } {
+///     if let NSTDOptional::Some(errc) = nstd_thread_join(thread) {
+///         assert!(errc == 0);
+///     }
+/// }
+/// ```
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_thread_spawn(
     thread_fn: Option<unsafe extern "C" fn(NSTDHeapPtr) -> NSTDErrorCode>,
