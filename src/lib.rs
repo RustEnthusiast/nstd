@@ -39,6 +39,9 @@ pub mod shared_ptr;
 pub mod string;
 #[cfg(test)]
 pub(crate) mod test;
+#[cfg(feature = "nstd_thread")]
+#[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_thread")))]
+pub mod thread;
 #[cfg(feature = "nstd_vec")]
 #[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_vec")))]
 pub mod vec;
