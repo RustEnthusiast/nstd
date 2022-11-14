@@ -415,7 +415,6 @@ pub unsafe extern "C" fn nstd_string_push_str(
 /// ```
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_string_pop(string: &mut NSTDString) -> NSTDUnichar {
-    assert!(nstd_vec_len(&string.bytes) <= isize::MAX as usize);
     // SAFETY: `NSTDString` is always UTF-8 encoded.
     let str = unsafe { core::str::from_utf8_unchecked(string.bytes.as_slice()) };
     if let Some(chr) = str.chars().last() {
