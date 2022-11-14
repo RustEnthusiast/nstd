@@ -1,5 +1,6 @@
 # TBD
 ### `nstd`
+- Added the `thread` module.
 - Removed dependency for `libloading`.
 ### `nstd.os`
 - Added `NSTDUnixSharedLibHandle`.
