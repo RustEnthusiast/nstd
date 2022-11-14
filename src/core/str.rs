@@ -68,7 +68,7 @@ macro_rules! gen_to_primitive {
 /// The user of this structure must ensure that the pointed-to data remains valid UTF-8, and
 /// unmodified while an instance of this structure is in use.
 #[repr(C)]
-#[derive(Clone, Copy, Debug, Hash)]
+#[derive(Clone, Copy, Debug)]
 pub struct NSTDStr {
     /// A raw pointer to the string's data.
     ptr: *const NSTDByte,
@@ -848,7 +848,7 @@ gen_to_primitive!(
 /// and unreferenced in any other code while an instance of this structure is in use, else data
 /// races may occur.
 #[repr(C)]
-#[derive(Clone, Copy, Debug, Hash)]
+#[derive(Debug)]
 pub struct NSTDStrMut {
     /// A raw pointer to the string's data.
     ptr: *mut NSTDByte,

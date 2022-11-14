@@ -16,7 +16,7 @@ use crate::{
 /// The user of this structure must ensure that the pointed-to data remains valid and unmodified
 /// while an instance of this structure is in use.
 #[repr(C)]
-#[derive(Clone, Copy, Debug, Hash)]
+#[derive(Clone, Copy, Debug)]
 pub struct NSTDCStr {
     /// A pointer to the first character in the C string.
     ptr: *const NSTDChar,
@@ -395,7 +395,7 @@ pub extern "C" fn nstd_core_cstr_last(cstr: &NSTDCStr) -> *const NSTDChar {
 /// unreferenced in any other code while an instance of this structure is in use, else data races
 /// may occur.
 #[repr(C)]
-#[derive(Clone, Copy, Debug, Hash)]
+#[derive(Debug)]
 pub struct NSTDCStrMut {
     /// A pointer to the first character in the C string.
     ptr: *mut NSTDChar,

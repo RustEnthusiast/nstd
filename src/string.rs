@@ -41,7 +41,7 @@ macro_rules! gen_from_primitive {
 
 /// Dynamically sized UTF-8 encoded byte string.
 #[repr(C)]
-#[derive(Debug, Hash)]
+#[derive(Debug)]
 pub struct NSTDString {
     /// The underlying UTF-8 encoded byte buffer.
     bytes: NSTDVec,

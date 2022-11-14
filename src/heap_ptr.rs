@@ -10,7 +10,7 @@ use crate::{
 
 /// A pointer type for single value heap allocation.
 #[repr(C)]
-#[derive(Debug, Hash, PartialEq, Eq)]
+#[derive(Debug)]
 pub struct NSTDHeapPtr {
     /// A raw pointer to the value on the heap.
     ptr: NSTDAnyMut,

@@ -8,7 +8,7 @@ use crate::{core::mem::nstd_core_mem_copy, NSTDAny, NSTDAnyMut, NSTDUInt};
 /// The user of this structure must ensure that the pointed-to data remains valid and unmodified
 /// while an instance of this structure is in use.
 #[repr(C)]
-#[derive(Clone, Copy, Debug, Hash)]
+#[derive(Clone, Copy, Debug)]
 pub struct NSTDPtr {
     /// A raw pointer to the data.
     raw: NSTDAny,
@@ -97,7 +97,7 @@ pub extern "C" fn nstd_core_ptr_get(ptr: &NSTDPtr) -> NSTDAny {
 /// unreferenced in any other code while an instance of this structure is in use, else data races
 /// may occur.
 #[repr(C)]
-#[derive(Clone, Copy, Debug, Hash)]
+#[derive(Debug)]
 pub struct NSTDPtrMut {
     /// A raw pointer to the data.
     raw: NSTDAnyMut,

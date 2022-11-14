@@ -17,7 +17,7 @@ use crate::{
 
 /// A dynamically sized contiguous sequence of values.
 #[repr(C)]
-#[derive(Debug, Hash)]
+#[derive(Debug)]
 pub struct NSTDVec {
     /// A raw pointer to the vector's memory buffer.
     ptr: NSTDAnyMut,

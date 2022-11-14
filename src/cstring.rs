@@ -21,7 +21,7 @@ use core::ptr::addr_of;
 ///
 /// Managed C strings (`NSTDCString`) will always contain a null byte until freed.
 #[repr(C)]
-#[derive(Debug, Hash)]
+#[derive(Debug)]
 pub struct NSTDCString {
     /// The underlying vector of `NSTDChar`s.
     bytes: NSTDVec,

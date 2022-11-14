@@ -13,7 +13,7 @@ const USIZE_SIZE: usize = core::mem::size_of::<usize>();
 
 /// A reference counting smart pointer.
 #[repr(C)]
-#[derive(Debug, Hash, PartialEq, Eq)]
+#[derive(Debug)]
 pub struct NSTDSharedPtr {
     /// A raw pointer to private data about the shared object.
     ptr: NSTDAnyMut,
