@@ -2,11 +2,14 @@
 use crate::{core::optional::NSTDOptional, NSTDAny, NSTDAnyMut, NSTDChar};
 use libc::{dlclose, dlopen, dlsym, RTLD_LAZY, RTLD_LOCAL};
 
+/// A raw handle to a dynamically loaded library.
+pub type NSTDUnixSharedLibHandle = NSTDAnyMut;
+
 /// Represents an owned handle to a dynamically loaded library.
 #[repr(C)]
 pub struct NSTDUnixSharedLib {
     /// A raw handle to the shared library.
-    handle: NSTDAnyMut,
+    handle: NSTDUnixSharedLibHandle,
 }
 impl Drop for NSTDUnixSharedLib {
     /// [NSTDUnixSharedLib]'s destructor.

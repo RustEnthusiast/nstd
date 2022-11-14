@@ -2,6 +2,7 @@
 ### `nstd`
 - Removed dependency for `libloading`.
 ### `nstd.os`
+- Added `NSTDUnixSharedLibHandle`.
 - Added `NSTD_OS_UNIX`.
 
 # 0.3.2
