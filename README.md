@@ -40,6 +40,7 @@ int main()
         - `slice` - A view into a sequence of values in memory.
         - `str` - An unowned view into a UTF-8 encoded byte string.
     - `cstring` - A dynamically sized, null terminated, C string.
+    - `env` - Process environment management.
     - `fs` - Provides access to the file system.
         - `file` - A handle to an opened file.
     - `heap_ptr` - A pointer type for single value heap allocation.
