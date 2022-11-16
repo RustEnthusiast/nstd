@@ -14,9 +14,18 @@ use crate::os::windows::alloc::{
 };
 use crate::{NSTDAnyMut, NSTDUInt};
 
+/// The default alignment suitable for any scalar type.
+///
+/// Corresponds to `alignof(max_align_t)`.
+/// The C/C++ standards specify that this value should be at least 8 or 16, I'm going with 16 for
+/// safety but of course this is platform dependent so if you (the reader) know of a platform that
+/// this value is smaller (or larger for that matter) on, please submit an issue/pull request.
+#[cfg(not(any(target_family = "unix", target_os = "windows")))]
+const DEFAULT_ALIGNMENT: usize = 16;
+
 /// Describes an error returned from allocation functions.
 #[repr(C)]
-#[derive(Clone, Copy, Debug, Hash, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[allow(non_camel_case_types)]
 pub enum NSTDAllocError {
     /// No error occurred.
@@ -81,7 +90,7 @@ pub unsafe extern "C" fn nstd_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
     {
         use crate::NSTD_NULL;
         use alloc::alloc::Layout;
-        if let Ok(layout) = Layout::from_size_align(size, 1) {
+        if let Ok(layout) = Layout::from_size_align(size, DEFAULT_ALIGNMENT) {
             return alloc::alloc::alloc(layout).cast();
         }
         NSTD_NULL
@@ -132,7 +141,7 @@ pub unsafe extern "C" fn nstd_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMu
     {
         use crate::NSTD_NULL;
         use alloc::alloc::Layout;
-        if let Ok(layout) = Layout::from_size_align(size, 1) {
+        if let Ok(layout) = Layout::from_size_align(size, DEFAULT_ALIGNMENT) {
             return alloc::alloc::alloc_zeroed(layout).cast();
         }
         NSTD_NULL
@@ -208,7 +217,7 @@ pub unsafe extern "C" fn nstd_alloc_reallocate(
     #[cfg(not(any(target_family = "unix", target_os = "windows")))]
     {
         use alloc::alloc::Layout;
-        if let Ok(layout) = Layout::from_size_align(size, 1) {
+        if let Ok(layout) = Layout::from_size_align(size, DEFAULT_ALIGNMENT) {
             let new_mem = alloc::alloc::realloc((*ptr).cast(), layout, new_size);
             if new_mem.is_null() {
                 return NSTDAllocError::NSTD_ALLOC_ERROR_OUT_OF_MEMORY;
@@ -274,7 +283,7 @@ pub unsafe extern "C" fn nstd_alloc_deallocate(
     {
         use crate::NSTD_NULL;
         use alloc::alloc::Layout;
-        if let Ok(layout) = Layout::from_size_align(size, 1) {
+        if let Ok(layout) = Layout::from_size_align(size, DEFAULT_ALIGNMENT) {
             alloc::alloc::dealloc((*ptr).cast(), layout);
             *ptr = NSTD_NULL;
             return NSTDAllocError::NSTD_ALLOC_ERROR_NONE;
