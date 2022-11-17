@@ -14,6 +14,7 @@ use crate::{
     },
     NSTDAny, NSTDAnyMut, NSTDUInt, NSTD_NULL,
 };
+use core::ptr::NonNull;
 
 /// A dynamically sized contiguous sequence of values.
 #[repr(C)]
@@ -82,7 +83,10 @@ impl NSTDVec {
     #[allow(dead_code)]
     pub(crate) unsafe fn as_slice<T>(&self) -> &[T] {
         assert!(self.stride == core::mem::size_of::<T>() && self.byte_len() <= isize::MAX as usize);
-        core::slice::from_raw_parts(self.ptr.cast(), self.len)
+        match self.ptr.is_null() {
+            false => core::slice::from_raw_parts(self.ptr.cast(), self.len),
+            _ => core::slice::from_raw_parts(NonNull::dangling().as_ptr(), 0),
+        }
     }
 
     /// Returns a pointer to one byte past the end of the vector.
@@ -370,7 +374,10 @@ pub extern "C" fn nstd_vec_stride(vec: &NSTDVec) -> NSTDUInt {
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_vec_as_slice(vec: &NSTDVec) -> NSTDSlice {
-    nstd_core_slice_new(vec.ptr, vec.stride, vec.len)
+    match vec.ptr.is_null() {
+        false => nstd_core_slice_new(vec.ptr, vec.stride, vec.len),
+        _ => nstd_core_slice_new(NonNull::dangling().as_ptr(), vec.stride, 0),
+    }
 }
 
 /// Returns a slice containing all of a vector's active elements.
@@ -385,7 +392,10 @@ pub extern "C" fn nstd_vec_as_slice(vec: &NSTDVec) -> NSTDSlice {
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_vec_as_slice_mut(vec: &mut NSTDVec) -> NSTDSliceMut {
-    nstd_core_slice_mut_new(vec.ptr, vec.stride, vec.len)
+    match vec.ptr.is_null() {
+        false => nstd_core_slice_mut_new(vec.ptr, vec.stride, vec.len),
+        _ => nstd_core_slice_mut_new(NonNull::dangling().as_ptr(), vec.stride, 0),
+    }
 }
 
 /// Returns a pointer to a vector's raw data.

@@ -21,9 +21,11 @@ use crate::{core::def::NSTDByte, NSTDBool, NSTDUInt, NSTD_FALSE, NSTD_TRUE};
 ///
 /// # Safety
 ///
-/// This function is highly unsafe as it does not know how large either of the memory buffers
+/// - This function is highly unsafe as it does not know how large either of the memory buffers
 /// actually are, which can lead to undefined behavior if either of the buffers' length are less
 /// than `num`.
+///
+/// - `buf1` and `buf2` must be non-null.
 ///
 /// # Example
 ///

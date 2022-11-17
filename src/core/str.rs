@@ -143,11 +143,9 @@ impl NSTDStr {
 /// ```
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_from_cstr(cstr: &NSTDCStr) -> NSTDStr {
+    core::str::from_utf8(cstr.as_bytes()).expect("Invalid UTF-8 bytes");
     let ptr = nstd_core_cstr_as_ptr(cstr).cast();
     let len = nstd_core_cstr_len(cstr);
-    assert!(len <= isize::MAX as usize);
-    let bytes = core::slice::from_raw_parts(ptr, len);
-    core::str::from_utf8(bytes).expect("Invalid UTF-8 bytes");
     NSTDStr { ptr, len }
 }
 
@@ -203,6 +201,8 @@ pub unsafe extern "C" fn nstd_core_str_from_cstr_unchecked(cstr: &NSTDCStr) -> N
 ///
 /// This function will panic in the following situations:
 ///
+/// - `cstr` is null.
+///
 /// - `cstr`'s data is not valid UTF-8.
 ///
 /// - `cstr`'s length is greater than `NSTDInt`'s max value.
@@ -225,6 +225,7 @@ pub unsafe extern "C" fn nstd_core_str_from_cstr_unchecked(cstr: &NSTDCStr) -> N
 /// ```
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_from_raw_cstr(cstr: *const NSTDChar) -> NSTDStr {
+    assert!(!cstr.is_null());
     let ptr = cstr.cast();
     let len = nstd_core_cstr_raw_len(cstr);
     assert!(len <= isize::MAX as NSTDUInt);
@@ -246,6 +247,8 @@ pub unsafe extern "C" fn nstd_core_str_from_raw_cstr(cstr: *const NSTDChar) -> N
 /// # Panics
 ///
 /// This function will panic in the following situations:
+///
+/// - `cstr` is null.
 ///
 /// - `cstr`'s data is not valid UTF-8.
 ///
@@ -269,6 +272,7 @@ pub unsafe extern "C" fn nstd_core_str_from_raw_cstr(cstr: *const NSTDChar) -> N
 /// ```
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_from_raw_cstr_with_null(cstr: *const NSTDChar) -> NSTDStr {
+    assert!(!cstr.is_null());
     let ptr = cstr.cast();
     let len = nstd_core_cstr_raw_len_with_null(cstr);
     assert!(len <= isize::MAX as NSTDUInt);
@@ -913,11 +917,9 @@ impl NSTDStrMut {
 /// ```
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_mut_from_cstr(cstr: &mut NSTDCStrMut) -> NSTDStrMut {
+    core::str::from_utf8(cstr.as_bytes()).expect("Invalid UTF-8 bytes");
     let ptr = nstd_core_cstr_mut_as_ptr(cstr).cast();
     let len = nstd_core_cstr_mut_len(cstr);
-    assert!(len <= isize::MAX as usize);
-    let bytes = core::slice::from_raw_parts(ptr, len);
-    core::str::from_utf8(bytes).expect("Invalid UTF-8 bytes");
     NSTDStrMut { ptr, len }
 }
 
@@ -975,6 +977,8 @@ pub unsafe extern "C" fn nstd_core_str_mut_from_cstr_unchecked(
 ///
 /// This function will panic in the following situations:
 ///
+/// - `cstr` is null.
+///
 /// - `cstr`'s data is not valid UTF-8.
 ///
 /// - `cstr`'s length is greater than `NSTDInt`'s max value.
@@ -997,6 +1001,7 @@ pub unsafe extern "C" fn nstd_core_str_mut_from_cstr_unchecked(
 /// ```
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_mut_from_raw_cstr(cstr: *mut NSTDChar) -> NSTDStrMut {
+    assert!(!cstr.is_null());
     let ptr = cstr.cast();
     let len = nstd_core_cstr_raw_len(cstr);
     assert!(len <= isize::MAX as usize);
@@ -1018,6 +1023,8 @@ pub unsafe extern "C" fn nstd_core_str_mut_from_raw_cstr(cstr: *mut NSTDChar) ->
 /// # Panics
 ///
 /// This function will panic in the following situations:
+///
+/// - `cstr` is null.
 ///
 /// - `cstr`'s data is not valid UTF-8.
 ///
@@ -1045,6 +1052,7 @@ pub unsafe extern "C" fn nstd_core_str_mut_from_raw_cstr(cstr: *mut NSTDChar) ->
 pub unsafe extern "C" fn nstd_core_str_mut_from_raw_cstr_with_null(
     cstr: *mut NSTDChar,
 ) -> NSTDStrMut {
+    assert!(!cstr.is_null());
     let ptr = cstr.cast();
     let len = nstd_core_cstr_raw_len_with_null(cstr);
     assert!(len <= isize::MAX as usize);

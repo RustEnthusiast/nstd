@@ -9,9 +9,10 @@ use crate::{
     },
     heap_ptr::NSTDHeapPtr,
     io::NSTDIOError,
-    NSTDBool, NSTDFloat64, NSTDUInt, NSTD_NULL,
+    NSTDBool, NSTDFloat64, NSTDUInt,
 };
 use std::{
+    ptr::NonNull,
     thread::{Builder, JoinHandle, Thread, ThreadId},
     time::Duration,
 };
@@ -234,7 +235,7 @@ pub extern "C" fn nstd_thread_name(handle: NSTDThreadHandle) -> NSTDStr {
     match handle.name() {
         Some(name) => NSTDStr::from_str(name),
         _ => {
-            let empty = nstd_core_slice_new(NSTD_NULL, 1, 0);
+            let empty = nstd_core_slice_new(NonNull::dangling().as_ptr(), 1, 0);
             // SAFETY: `empty` is an empty slice.
             unsafe { nstd_core_str_from_bytes_unchecked(&empty) }
         }

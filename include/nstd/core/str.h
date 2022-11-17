@@ -73,6 +73,8 @@ NSTDAPI NSTDStr nstd_core_str_from_cstr_unchecked(const NSTDCStr *cstr);
 ///
 /// This function will panic in the following situations:
 ///
+/// - `cstr` is null.
+///
 /// - `cstr`'s data is not valid UTF-8.
 ///
 /// - `cstr`'s length is greater than `NSTDInt`'s max value.
@@ -96,6 +98,8 @@ NSTDAPI NSTDStr nstd_core_str_from_raw_cstr(const NSTDChar *cstr);
 /// # Panics
 ///
 /// This function will panic in the following situations:
+///
+/// - `cstr` is null.
 ///
 /// - `cstr`'s data is not valid UTF-8.
 ///
@@ -564,6 +568,8 @@ NSTDAPI NSTDStrMut nstd_core_str_mut_from_cstr_unchecked(NSTDCStrMut *cstr);
 ///
 /// This function will panic in the following situations:
 ///
+/// - `cstr` is null.
+///
 /// - `cstr`'s data is not valid UTF-8.
 ///
 /// - `cstr`'s length is greater than `NSTDInt`'s max value.
@@ -587,6 +593,8 @@ NSTDAPI NSTDStrMut nstd_core_str_mut_from_raw_cstr(NSTDChar *cstr);
 /// # Panics
 ///
 /// This function will panic in the following situations:
+///
+/// - `cstr` is null.
 ///
 /// - `cstr`'s data is not valid UTF-8.
 ///

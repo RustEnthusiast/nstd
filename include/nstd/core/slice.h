@@ -30,6 +30,10 @@ typedef struct {
 /// # Returns
 ///
 /// `NSTDSlice slice` - The new slice.
+///
+/// # Panics
+///
+/// Panics if `ptr` is null.
 NSTDAPI NSTDSlice nstd_core_slice_new(NSTDAny ptr, NSTDUInt element_size,
 NSTDUInt len);
 
@@ -139,6 +143,10 @@ typedef struct {
 /// # Returns
 ///
 /// `NSTDSliceMut slice` - The new slice.
+///
+/// # Panics
+///
+/// Panics if `ptr` is null.
 NSTDAPI NSTDSliceMut nstd_core_slice_mut_new(NSTDAnyMut ptr, NSTDUInt element_size, NSTDUInt len);
 
 /// Creates an immutable version of a mutable slice.

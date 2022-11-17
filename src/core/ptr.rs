@@ -27,9 +27,14 @@ pub struct NSTDPtr {
 /// # Returns
 ///
 /// `NSTDPtr ptr` - A new instance of `NSTDPtr` that points to `obj`.
+///
+/// # Panics
+///
+/// Panics if `obj` is null.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_ptr_new(obj: NSTDAny, size: NSTDUInt) -> NSTDPtr {
+    assert!(!obj.is_null());
     NSTDPtr { raw: obj, size }
 }
 
@@ -116,9 +121,14 @@ pub struct NSTDPtrMut {
 /// # Returns
 ///
 /// `NSTDPtrMut ptr` - A new instance of `NSTDPtrMut` that points to `obj`.
+///
+/// # Panics
+///
+/// Panics if `obj` is null.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_ptr_mut_new(obj: NSTDAnyMut, size: NSTDUInt) -> NSTDPtrMut {
+    assert!(!obj.is_null());
     NSTDPtrMut { raw: obj, size }
 }
 

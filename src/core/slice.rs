@@ -71,6 +71,10 @@ impl NSTDSlice {
 /// # Returns
 ///
 /// `NSTDSlice slice` - The new slice.
+///
+/// # Panics
+///
+/// Panics if `ptr` is null.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_slice_new(
@@ -371,6 +375,10 @@ impl NSTDSliceMut {
 /// # Returns
 ///
 /// `NSTDSliceMut slice` - The new slice.
+///
+/// # Panics
+///
+/// Panics if `ptr` is null.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_slice_mut_new(

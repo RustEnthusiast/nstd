@@ -26,6 +26,10 @@ typedef struct {
 /// # Returns
 ///
 /// `NSTDPtr ptr` - A new instance of `NSTDPtr` that points to `obj`.
+///
+/// # Panics
+///
+/// Panics if `obj` is null.
 NSTDAPI NSTDPtr nstd_core_ptr_new(NSTDAny obj, NSTDUInt size);
 
 /// Returns the size of the object being pointed to.
@@ -75,6 +79,10 @@ typedef struct {
 /// # Returns
 ///
 /// `NSTDPtrMut ptr` - A new instance of `NSTDPtrMut` that points to `obj`.
+///
+/// # Panics
+///
+/// Panics if `obj` is null.
 NSTDAPI NSTDPtrMut nstd_core_ptr_mut_new(NSTDAnyMut obj, NSTDUInt size);
 
 /// Creates an immutable version of a mutable pointer.
