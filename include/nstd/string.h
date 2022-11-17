@@ -177,8 +177,7 @@ NSTDAPI NSTDUInt nstd_string_cap(const NSTDString *string);
 ///
 /// # Panics
 ///
-/// Panics if the current length in bytes exceeds `NSTDInt`'s max value or getting a handle to the
-/// heap fails.
+/// Panics if the current length in bytes exceeds `NSTDInt`'s max value.
 NSTDAPI NSTDErrorCode nstd_string_push(NSTDString *string, NSTDUnichar chr);
 
 /// Appends a string slice to the end of a string.
@@ -195,8 +194,7 @@ NSTDAPI NSTDErrorCode nstd_string_push(NSTDString *string, NSTDUnichar chr);
 ///
 /// # Panics
 ///
-/// Panics if the current length in bytes exceeds `NSTDInt`'s max value or getting a handle to the
-/// heap fails.
+/// Panics if the current length in bytes exceeds `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -217,6 +215,13 @@ NSTDAPI NSTDAllocError nstd_string_push_str(NSTDString *string, const NSTDStr *s
 ///
 /// This operation will panic if the string's length in bytes exceeds `NSTDInt`'s max value.
 NSTDAPI NSTDUnichar nstd_string_pop(NSTDString *string);
+
+/// Sets a string's length to zero.
+///
+/// # Parameters:
+///
+/// - `NSTDString *string` - The string to clear.
+NSTDAPI void nstd_string_clear(NSTDString *string);
 
 /// Creates a new `NSTDString` from an `NSTDFloat32`.
 ///
@@ -406,7 +411,7 @@ NSTDAPI NSTDString nstd_string_from_u64(NSTDUInt64 v);
 ///
 /// # Panics
 ///
-/// This operation may panic if getting a handle to the heap fails.
+/// Panics if deallocating fails.
 NSTDAPI void nstd_string_free(NSTDString string);
 
 #endif

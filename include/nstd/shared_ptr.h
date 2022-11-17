@@ -100,7 +100,8 @@ NSTDAPI NSTDAny nstd_shared_ptr_get(const NSTDSharedPtr *shared_ptr);
 ///
 /// # Panics
 ///
-/// This operation may panic if getting a handle to the heap fails.
+/// Panics if there are no more shared pointers referencing the shared data and freeing the heap
+/// memory fails.
 NSTDAPI void nstd_shared_ptr_free(NSTDSharedPtr shared_ptr);
 
 #endif

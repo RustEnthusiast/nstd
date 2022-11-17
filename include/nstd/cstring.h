@@ -229,6 +229,13 @@ NSTDAPI NSTDAllocError nstd_cstring_push_cstr(NSTDCString *cstring, const NSTDCS
 /// This function will panic if getting a pointer to the C string's last character fails.
 NSTDAPI NSTDChar nstd_cstring_pop(NSTDCString *cstring);
 
+/// Sets a C string's length to zero.
+///
+/// # Parameters:
+///
+/// - `NSTDCString *cstring` - The C string to clear.
+NSTDAPI void nstd_cstring_clear(NSTDCString *cstring);
+
 /// Frees an instance of `NSTDCString`.
 ///
 /// # Parameters:
@@ -237,7 +244,7 @@ NSTDAPI NSTDChar nstd_cstring_pop(NSTDCString *cstring);
 ///
 /// # Panics
 ///
-/// This operation may panic if getting a handle to the heap fails.
+/// Panics if deallocating fails.
 NSTDAPI void nstd_cstring_free(NSTDCString cstring);
 
 #endif

@@ -24,4 +24,15 @@
 #define NSTD_OS_WINDOWS
 #endif
 
+/// Constant that is only set if the target operating system is Unix based.
+#if defined(NSTD_OS_LINUX)\
+    || defined(NSTD_OS_MACOS)\
+    || defined(unix)\
+    || defined(__unix)\
+    || defined(__unix__)\
+    || defined(_XOPEN_SOURCE)\
+    || defined(_POSIX_SOURCE)
+#define NSTD_OS_UNIX
+#endif
+
 #endif

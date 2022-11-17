@@ -1,6 +1,7 @@
 //! A handle to an opened file.
 use crate::{
     core::{
+        result::NSTDResult,
         slice::{NSTDSlice, NSTDSliceMut},
         str::NSTDStr,
     },
@@ -15,22 +16,25 @@ use std::fs::File;
 ///
 /// Either of the `NSTD_FILE_WRITE` or `NSTD_FILE_APPEND` options must also be toggled for the file
 /// to be created.
-pub const NSTD_FILE_CREATE: NSTDUInt8 = 0b00000001;
+pub const NSTD_FILE_CREATE: NSTDUInt8 = 1;
 
 /// Open a file in read mode.
-pub const NSTD_FILE_READ: NSTDUInt8 = 0b00000010;
+pub const NSTD_FILE_READ: NSTDUInt8 = 1 << 1;
 
 /// Open a file in write mode.
-pub const NSTD_FILE_WRITE: NSTDUInt8 = 0b00000100;
+pub const NSTD_FILE_WRITE: NSTDUInt8 = 1 << 2;
 
 /// Open a file in writing mode without overwriting saved data.
-pub const NSTD_FILE_APPEND: NSTDUInt8 = 0b00001000;
+pub const NSTD_FILE_APPEND: NSTDUInt8 = 1 << 3;
 
 /// Open a file in truncate mode, this will set the file's length to 0 upon opening.
-pub const NSTD_FILE_TRUNC: NSTDUInt8 = 0b00010000;
+pub const NSTD_FILE_TRUNC: NSTDUInt8 = 1 << 4;
 
 /// A handle to an opened file.
 pub type NSTDFile = Box<File>;
+
+/// A result type yielding an `NSTDFile` on success.
+pub type NSTDFileResult = NSTDResult<NSTDFile, NSTDIOError>;
 
 /// Opens file on the filesystem and returns a handle to it.
 ///
@@ -40,11 +44,9 @@ pub type NSTDFile = Box<File>;
 ///
 /// - `NSTDUInt8 mask` - A bit mask for toggling the file's different open options.
 ///
-/// - `NSTDIOError *errc` - Returns as the I/O operation error code.
-///
 /// # Returns
 ///
-/// `NSTDFile file` - A handle to the opened file, or null if an error occurs.
+/// `NSTDFileResult file` - A handle to the opened file, or the IO error on failure.
 ///
 /// # Panics
 ///
@@ -54,11 +56,7 @@ pub type NSTDFile = Box<File>;
 ///
 /// This operation can cause undefined behavior if `name`'s data is invalid.
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_fs_file_open(
-    name: &NSTDStr,
-    mask: NSTDUInt8,
-    errc: &mut NSTDIOError,
-) -> Option<NSTDFile> {
+pub unsafe extern "C" fn nstd_fs_file_open(name: &NSTDStr, mask: NSTDUInt8) -> NSTDFileResult {
     // Attempt to create/open the file in write mode.
     match File::options()
         .create((mask & NSTD_FILE_CREATE) != 0)
@@ -68,14 +66,8 @@ pub unsafe extern "C" fn nstd_fs_file_open(
         .truncate((mask & NSTD_FILE_TRUNC) != 0)
         .open(name.as_str())
     {
-        Ok(f) => {
-            *errc = NSTDIOError::NSTD_IO_ERROR_NONE;
-            Some(Box::new(f))
-        }
-        Err(err) => {
-            *errc = NSTDIOError::from_err(err.kind());
-            None
-        }
+        Ok(f) => NSTDResult::Ok(Box::new(f)),
+        Err(err) => NSTDResult::Err(NSTDIOError::from_err(err.kind())),
     }
 }
 
@@ -190,10 +182,6 @@ pub unsafe extern "C" fn nstd_fs_file_read(
 /// # Returns
 ///
 /// `NSTDIOError errc` - The I/O operation error code.
-///
-/// # Panics
-///
-/// Panics if getting a handle to the heap fails.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_fs_file_read_all(
@@ -225,11 +213,7 @@ pub extern "C" fn nstd_fs_file_read_all(
 ///
 /// # Panics
 ///
-/// This function will panic in the following situations:
-///
-/// - `buffer`'s length in bytes exceeds `NSTDInt`'s max value.
-///
-/// - Getting a handle to the heap fails.
+/// This function will panic if `buffer`'s length in bytes exceeds `NSTDInt`'s max value.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_fs_file_read_to_string(

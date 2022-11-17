@@ -1,6 +1,11 @@
 //! Low level memory allocation.
-#[cfg(not(target_os = "windows"))]
+#[cfg(not(any(target_family = "unix", target_os = "windows")))]
 extern crate alloc;
+#[cfg(target_family = "unix")]
+use crate::os::unix::alloc::{
+    nstd_os_unix_alloc_allocate, nstd_os_unix_alloc_allocate_zeroed, nstd_os_unix_alloc_deallocate,
+    nstd_os_unix_alloc_reallocate,
+};
 #[cfg(target_os = "windows")]
 use crate::os::windows::alloc::{
     nstd_os_windows_alloc_allocate, nstd_os_windows_alloc_allocate_zeroed,
@@ -9,9 +14,18 @@ use crate::os::windows::alloc::{
 };
 use crate::{NSTDAnyMut, NSTDUInt};
 
+/// The default alignment suitable for any scalar type.
+///
+/// Corresponds to `alignof(max_align_t)`.
+/// The C/C++ standards specify that this value should be at least 8 or 16, I'm going with 16 for
+/// safety but of course this is platform dependent so if you (the reader) know of a platform that
+/// this value is smaller (or larger for that matter) on, please submit an issue/pull request.
+#[cfg(not(any(target_family = "unix", target_os = "windows")))]
+const DEFAULT_ALIGNMENT: usize = 16;
+
 /// Describes an error returned from allocation functions.
 #[repr(C)]
-#[derive(Clone, Copy, Debug, Hash, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[allow(non_camel_case_types)]
 pub enum NSTDAllocError {
     /// No error occurred.
@@ -24,6 +38,8 @@ pub enum NSTDAllocError {
     NSTD_ALLOC_ERROR_HEAP_NOT_FOUND,
     /// A heap is invalid.
     NSTD_ALLOC_ERROR_INVALID_HEAP,
+    /// An allocation function received input parameters that resulted in an invalid memory layout.
+    NSTD_ALLOC_ERROR_INVALID_LAYOUT,
 }
 impl NSTDAllocError {
     /// Converts an [NSTDWindowsAllocError] into an [NSTDAllocError].
@@ -50,10 +66,6 @@ impl NSTDAllocError {
 ///
 /// `NSTDAnyMut ptr` - A pointer to the allocated memory, null on error.
 ///
-/// # Panics
-///
-/// This function may panic if getting a handle to the default heap fails.
-///
 /// # Safety
 ///
 /// - Behavior is undefined if `size` is zero.
@@ -74,11 +86,18 @@ impl NSTDAllocError {
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
-    #[cfg(not(target_os = "windows"))]
+    #[cfg(not(any(target_family = "unix", target_os = "windows")))]
     {
+        use crate::NSTD_NULL;
         use alloc::alloc::Layout;
-        let layout = Layout::from_size_align_unchecked(size, 1);
-        alloc::alloc::alloc(layout).cast()
+        if let Ok(layout) = Layout::from_size_align(size, DEFAULT_ALIGNMENT) {
+            return alloc::alloc::alloc(layout).cast();
+        }
+        NSTD_NULL
+    }
+    #[cfg(target_family = "unix")]
+    {
+        nstd_os_unix_alloc_allocate(size)
     }
     #[cfg(target_os = "windows")]
     {
@@ -95,10 +114,6 @@ pub unsafe extern "C" fn nstd_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
 /// # Returns
 ///
 /// `NSTDAnyMut ptr` - A pointer to the allocated memory, null on error.
-///
-/// # Panics
-///
-/// This function may panic if getting a handle to the default heap fails.
 ///
 /// # Safety
 ///
@@ -122,11 +137,18 @@ pub unsafe extern "C" fn nstd_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMut {
-    #[cfg(not(target_os = "windows"))]
+    #[cfg(not(any(target_family = "unix", target_os = "windows")))]
     {
+        use crate::NSTD_NULL;
         use alloc::alloc::Layout;
-        let layout = Layout::from_size_align_unchecked(size, 1);
-        alloc::alloc::alloc_zeroed(layout).cast()
+        if let Ok(layout) = Layout::from_size_align(size, DEFAULT_ALIGNMENT) {
+            return alloc::alloc::alloc_zeroed(layout).cast();
+        }
+        NSTD_NULL
+    }
+    #[cfg(target_family = "unix")]
+    {
+        nstd_os_unix_alloc_allocate_zeroed(size)
     }
     #[cfg(target_os = "windows")]
     {
@@ -151,10 +173,6 @@ pub unsafe extern "C" fn nstd_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMu
 /// # Returns
 ///
 /// `NSTDAllocError errc` - The allocation operation error code.
-///
-/// # Panics
-///
-/// This function may panic if getting a handle to the default heap fails.
 ///
 /// # Safety
 ///
@@ -185,24 +203,36 @@ pub unsafe extern "C" fn nstd_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMu
 ///     nstd_alloc_deallocate(&mut mem, SIZE);
 /// }
 /// ```
-#[inline]
+#[cfg_attr(any(target_family = "unix", target_os = "windows"), inline)]
 #[cfg_attr(feature = "clib", no_mangle)]
-#[cfg_attr(target_os = "windows", allow(unused_variables))]
+#[cfg_attr(
+    any(target_family = "unix", target_os = "windows"),
+    allow(unused_variables)
+)]
 pub unsafe extern "C" fn nstd_alloc_reallocate(
     ptr: &mut NSTDAnyMut,
     size: NSTDUInt,
     new_size: NSTDUInt,
 ) -> NSTDAllocError {
-    #[cfg(not(target_os = "windows"))]
+    #[cfg(not(any(target_family = "unix", target_os = "windows")))]
     {
         use alloc::alloc::Layout;
-        let layout = Layout::from_size_align_unchecked(size, 1);
-        let new_mem = alloc::alloc::realloc((*ptr).cast(), layout, new_size);
-        if !new_mem.is_null() {
+        if let Ok(layout) = Layout::from_size_align(size, DEFAULT_ALIGNMENT) {
+            let new_mem = alloc::alloc::realloc((*ptr).cast(), layout, new_size);
+            if new_mem.is_null() {
+                return NSTDAllocError::NSTD_ALLOC_ERROR_OUT_OF_MEMORY;
+            }
             *ptr = new_mem.cast();
             return NSTDAllocError::NSTD_ALLOC_ERROR_NONE;
         }
-        NSTDAllocError::NSTD_ALLOC_ERROR_OUT_OF_MEMORY
+        NSTDAllocError::NSTD_ALLOC_ERROR_INVALID_LAYOUT
+    }
+    #[cfg(target_family = "unix")]
+    {
+        match nstd_os_unix_alloc_reallocate(ptr, new_size) {
+            0 => NSTDAllocError::NSTD_ALLOC_ERROR_NONE,
+            _ => NSTDAllocError::NSTD_ALLOC_ERROR_OUT_OF_MEMORY,
+        }
     }
     #[cfg(target_os = "windows")]
     {
@@ -218,9 +248,9 @@ pub unsafe extern "C" fn nstd_alloc_reallocate(
 ///
 /// - `NSTDUInt size` - The number of bytes to free.
 ///
-/// # Panics
+/// # Returns
 ///
-/// This function may panic if getting a handle to the default heap fails.
+/// `NSTDAllocError errc` - The allocation operation error code.
 ///
 /// # Safety
 ///
@@ -239,20 +269,34 @@ pub unsafe extern "C" fn nstd_alloc_reallocate(
 ///     nstd_alloc_deallocate(&mut mem, 24);
 /// }
 /// ```
-#[inline]
+#[cfg_attr(any(target_family = "unix", target_os = "windows"), inline)]
 #[cfg_attr(feature = "clib", no_mangle)]
-#[cfg_attr(target_os = "windows", allow(unused_variables))]
-pub unsafe extern "C" fn nstd_alloc_deallocate(ptr: &mut NSTDAnyMut, size: NSTDUInt) {
-    #[cfg(not(target_os = "windows"))]
+#[cfg_attr(
+    any(target_family = "unix", target_os = "windows"),
+    allow(unused_variables)
+)]
+pub unsafe extern "C" fn nstd_alloc_deallocate(
+    ptr: &mut NSTDAnyMut,
+    size: NSTDUInt,
+) -> NSTDAllocError {
+    #[cfg(not(any(target_family = "unix", target_os = "windows")))]
     {
         use crate::NSTD_NULL;
         use alloc::alloc::Layout;
-        let layout = Layout::from_size_align_unchecked(size, 1);
-        alloc::alloc::dealloc((*ptr).cast(), layout);
-        *ptr = NSTD_NULL;
+        if let Ok(layout) = Layout::from_size_align(size, DEFAULT_ALIGNMENT) {
+            alloc::alloc::dealloc((*ptr).cast(), layout);
+            *ptr = NSTD_NULL;
+            return NSTDAllocError::NSTD_ALLOC_ERROR_NONE;
+        }
+        NSTDAllocError::NSTD_ALLOC_ERROR_INVALID_LAYOUT
+    }
+    #[cfg(target_family = "unix")]
+    {
+        nstd_os_unix_alloc_deallocate(ptr);
+        NSTDAllocError::NSTD_ALLOC_ERROR_NONE
     }
     #[cfg(target_os = "windows")]
     {
-        nstd_os_windows_alloc_deallocate(ptr);
+        NSTDAllocError::from_windows(nstd_os_windows_alloc_deallocate(ptr))
     }
 }

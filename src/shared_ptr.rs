@@ -1,6 +1,9 @@
 //! A reference counting smart pointer.
 use crate::{
-    alloc::{nstd_alloc_allocate, nstd_alloc_allocate_zeroed, nstd_alloc_deallocate},
+    alloc::{
+        nstd_alloc_allocate, nstd_alloc_allocate_zeroed, nstd_alloc_deallocate,
+        NSTDAllocError::NSTD_ALLOC_ERROR_NONE,
+    },
     core::mem::nstd_core_mem_copy,
     NSTDAny, NSTDAnyMut, NSTDUInt,
 };
@@ -10,7 +13,7 @@ const USIZE_SIZE: usize = core::mem::size_of::<usize>();
 
 /// A reference counting smart pointer.
 #[repr(C)]
-#[derive(Debug, Hash, PartialEq, Eq)]
+#[derive(Debug)]
 pub struct NSTDSharedPtr {
     /// A raw pointer to private data about the shared object.
     ptr: NSTDAnyMut,
@@ -41,7 +44,7 @@ impl Drop for NSTDSharedPtr {
     ///
     /// # Panics
     ///
-    /// This operation may panic if getting a handle to the heap fails.
+    /// Panics if deallocating fails.
     fn drop(&mut self) {
         // SAFETY: Shared pointers are always non-null.
         unsafe {
@@ -50,7 +53,7 @@ impl Drop for NSTDSharedPtr {
             *ptrs -= 1;
             // If the pointer count is zero, free the data.
             if *ptrs == 0 {
-                nstd_alloc_deallocate(&mut self.ptr, self.size);
+                assert!(nstd_alloc_deallocate(&mut self.ptr, self.size) == NSTD_ALLOC_ERROR_NONE);
             }
         }
     }
@@ -311,7 +314,8 @@ pub extern "C" fn nstd_shared_ptr_get(shared_ptr: &NSTDSharedPtr) -> NSTDAny {
 ///
 /// # Panics
 ///
-/// This operation may panic if getting a handle to the heap fails.
+/// Panics if there are no more shared pointers referencing the shared data and freeing the heap
+/// memory fails.
 #[cfg_attr(feature = "clib", no_mangle)]
 #[allow(unused_variables)]
 pub extern "C" fn nstd_shared_ptr_free(shared_ptr: NSTDSharedPtr) {}

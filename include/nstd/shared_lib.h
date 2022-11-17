@@ -1,10 +1,28 @@
 #ifndef NSTD_SHARED_LIB_H
 #define NSTD_SHARED_LIB_H
+#include "core/optional.h"
 #include "core/str.h"
 #include "nstd.h"
+#include "os/os.h"
+#if defined(NSTD_OS_UNIX)
+#   include "os/unix/shared_lib.h"
+#elif defined(NSTD_OS_WINDOWS)
+#   include "os/windows/shared_lib.h"
+#endif
 
 /// A handle to a dynamically loaded library.
+#if defined(NSTD_OS_UNIX)
+typedef NSTDUnixSharedLib NSTDSharedLib;
+#elif defined(NSTD_OS_WINDOWS)
+typedef NSTDWindowsSharedLib NSTDSharedLib;
+#else
 typedef NSTDAnyMut NSTDSharedLib;
+#endif
+
+/// An optional handle to a shared library.
+///
+/// This type is returned from `nstd_shared_lib_load`.
+NSTDOptional(NSTDSharedLib) NSTDOptionalSharedLib;
 
 /// Dynamically loads a shared library at runtime.
 ///
@@ -14,16 +32,18 @@ typedef NSTDAnyMut NSTDSharedLib;
 ///
 /// # Returns
 ///
-/// `NSTDSharedLib lib` - A handle to the dynamically loaded library, or null on error.
+/// `NSTDOptionalSharedLib lib` - A handle to the dynamically loaded library, or none on error.
 ///
 /// # Panics
 ///
-/// Panics if `path`'s length in bytes exceeds `NSTDInt`'s max value.
+/// Panics if `path`'s length in bytes exceeds `NSTDInt`'s max value or allocating fails.
 ///
 /// # Safety
 ///
-/// See <https://docs.rs/libloading/latest/libloading/struct.Library.html#method.new>.
-NSTDAPI NSTDSharedLib nstd_shared_lib_load(const NSTDStr *path);
+/// - `path`'s data must be valid for reads.
+///
+/// - The loaded library may have platform-specific initialization routines ran when it is loaded.
+NSTDAPI NSTDOptionalSharedLib nstd_shared_lib_load(const NSTDStr *path);
 
 /// Gets a pointer to a function or static variable in a dynamically loaded library by symbol name.
 ///
@@ -36,10 +56,6 @@ NSTDAPI NSTDSharedLib nstd_shared_lib_load(const NSTDStr *path);
 /// # Returns
 ///
 /// `NSTDAny ptr` - A pointer to the function or variable.
-///
-/// # Panics
-///
-/// Panics if `symbol`'s length exceeds `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -58,10 +74,6 @@ NSTDAPI NSTDAny nstd_shared_lib_get(const NSTDSharedLib *lib, const NSTDChar *sy
 /// # Returns
 ///
 /// `NSTDAnyMut ptr` - A pointer to the function or variable.
-///
-/// # Panics
-///
-/// Panics if `symbol`'s length exceeds `NSTDInt`'s max value.
 ///
 /// # Safety
 ///

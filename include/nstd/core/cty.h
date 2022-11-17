@@ -2,6 +2,17 @@
 #define NSTD_CORE_CTY_H
 #include "../nstd.h"
 
+/// Determines whether or not `chr` is a valid Unicode scalar value.
+///
+/// # Parameters:
+///
+/// - `NSTDUnichar chr` - The `NSTDUnichar` to check.
+///
+/// # Returns
+///
+/// `NSTDBool is_unicode` - True if `chr` is a valid Unicode character.
+NSTDAPI NSTDBool nstd_core_cty_is_unicode(NSTDUnichar chr);
+
 /// Returns the Unicode replacement character (�).
 ///
 /// # Returns

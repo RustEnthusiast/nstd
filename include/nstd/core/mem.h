@@ -61,6 +61,10 @@ NSTDAPI const NSTDByte *nstd_core_mem_search(const NSTDByte *buf, NSTDUInt size,
 ///
 /// - `NSTDUInt size` - The number of bytes to set to 0.
 ///
+/// # Panics
+///
+/// This operation will panic if `size` is greater than `NSTDInt`'s max value.
+///
 /// # Safety
 ///
 /// This operation can cause undefined behavior if the caller does not ensure that the memory
@@ -76,6 +80,10 @@ NSTDAPI void nstd_core_mem_zero(NSTDByte *buf, NSTDUInt size);
 /// - `NSTDUInt size` - The size of the memory buffer.
 ///
 /// - `NSTDByte fill` - The byte value to fill the memory buffer with.
+///
+/// # Panics
+///
+/// This operation will panic if `size` is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///

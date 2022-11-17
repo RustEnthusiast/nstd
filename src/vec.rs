@@ -1,6 +1,9 @@
 //! A dynamically sized contiguous sequence of values.
 use crate::{
-    alloc::{nstd_alloc_allocate, nstd_alloc_deallocate, nstd_alloc_reallocate, NSTDAllocError},
+    alloc::{
+        nstd_alloc_allocate, nstd_alloc_deallocate, nstd_alloc_reallocate,
+        NSTDAllocError::{self, NSTD_ALLOC_ERROR_NONE},
+    },
     core::{
         def::{NSTDByte, NSTDErrorCode},
         mem::{nstd_core_mem_copy, nstd_core_mem_copy_overlapping},
@@ -14,7 +17,7 @@ use crate::{
 
 /// A dynamically sized contiguous sequence of values.
 #[repr(C)]
-#[derive(Debug, Hash)]
+#[derive(Debug)]
 pub struct NSTDVec {
     /// A raw pointer to the vector's memory buffer.
     ptr: NSTDAnyMut,
@@ -99,17 +102,13 @@ impl NSTDVec {
     }
 
     /// Attempts to reserve some memory for the vector if needed.
-    ///
-    /// # Panics
-    ///
-    /// This method may panic if getting a handle to the heap fails.
     #[inline]
     fn try_reserve(&mut self) -> NSTDAllocError {
         if self.len == self.cap {
             let additional = 1 + self.cap / 2;
             return nstd_vec_reserve(self, additional);
         }
-        NSTDAllocError::NSTD_ALLOC_ERROR_NONE
+        NSTD_ALLOC_ERROR_NONE
     }
 }
 impl Drop for NSTDVec {
@@ -117,13 +116,15 @@ impl Drop for NSTDVec {
     ///
     /// # Panics
     ///
-    /// This operation may panic if getting a handle to the heap fails.
+    /// Panics if deallocating fails.
     #[inline]
     fn drop(&mut self) {
         if !self.ptr.is_null() {
             let buffer_len = self.buffer_byte_len();
             // SAFETY: The vector has allocated.
-            unsafe { nstd_alloc_deallocate(&mut self.ptr, buffer_len) };
+            unsafe {
+                assert!(nstd_alloc_deallocate(&mut self.ptr, buffer_len) == NSTD_ALLOC_ERROR_NONE);
+            }
         }
     }
 }
@@ -181,11 +182,7 @@ pub extern "C" fn nstd_vec_new(element_size: NSTDUInt) -> NSTDVec {
 ///
 /// # Panics
 ///
-/// This function may panic in the following situations:
-///
-/// - Either `element_size` or `cap` are zero.
-///
-/// - Getting a handle to the heap fails.
+/// This function will panic if either `element_size` or `cap` are zero.
 ///
 /// # Example
 ///
@@ -547,8 +544,7 @@ pub extern "C" fn nstd_vec_get_mut(vec: &mut NSTDVec, pos: NSTDUInt) -> NSTDAnyM
 ///
 /// # Panics
 ///
-/// Panics if the current length in bytes exceeds `NSTDInt`'s max value or getting a handle to the
-/// heap fails.
+/// Panics if `vec`'s current length in bytes exceeds `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -575,7 +571,7 @@ pub unsafe extern "C" fn nstd_vec_push(vec: &mut NSTDVec, value: NSTDAny) -> NST
     // Attempt to reserve space for the push.
     let errc = vec.try_reserve();
     // On success: copy bytes to the end of the vector.
-    if errc == NSTDAllocError::NSTD_ALLOC_ERROR_NONE {
+    if errc == NSTD_ALLOC_ERROR_NONE {
         nstd_core_mem_copy(vec.end().cast(), value.cast(), vec.stride);
         vec.len += 1;
     }
@@ -656,11 +652,7 @@ pub extern "C" fn nstd_vec_pop(vec: &mut NSTDVec) -> NSTDAny {
 ///
 /// # Panics
 ///
-/// This function will panic in the following situations:
-///
-/// - `index` multiplied by `vec`'s stride exceeds `NSTDInt`'s max value.
-///
-/// - Getting a handle to the heap fails.
+/// This function will panic if `index` multiplied by `vec`'s stride exceeds `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -702,7 +694,7 @@ pub unsafe extern "C" fn nstd_vec_insert(
         1
     }
     // Attempt to reserve space for the insert.
-    else if vec.try_reserve() != NSTDAllocError::NSTD_ALLOC_ERROR_NONE {
+    else if vec.try_reserve() != NSTD_ALLOC_ERROR_NONE {
         2
     }
     // Insert the value.
@@ -806,8 +798,6 @@ pub extern "C" fn nstd_vec_remove(vec: &mut NSTDVec, mut index: NSTDUInt) -> NST
 ///
 /// - The current length in bytes exceeds `NSTDInt`'s max value.
 ///
-/// - Getting a handle to the heap fails.
-///
 /// # Safety
 ///
 /// This operation can cause undefined behavior if `values`'s data is invalid.
@@ -841,14 +831,14 @@ pub unsafe extern "C" fn nstd_vec_extend(vec: &mut NSTDVec, values: &NSTDSlice) 
     assert!(vec.stride == nstd_core_slice_stride(values));
     let len = nstd_core_slice_len(values);
     // Making sure there's enough space for the extension.
-    let mut errc = NSTDAllocError::NSTD_ALLOC_ERROR_NONE;
+    let mut errc = NSTD_ALLOC_ERROR_NONE;
     let reserved = vec.cap - vec.len;
     if reserved < len {
         let additional = len - reserved;
         errc = nstd_vec_reserve(vec, additional);
     }
     // On success copy bytes to the end of the vector.
-    if errc == NSTDAllocError::NSTD_ALLOC_ERROR_NONE {
+    if errc == NSTD_ALLOC_ERROR_NONE {
         let ptr = nstd_core_slice_as_ptr(values).cast();
         nstd_core_mem_copy(vec.end().cast(), ptr, values.byte_len());
         vec.len += len;
@@ -890,7 +880,7 @@ pub extern "C" fn nstd_vec_truncate(vec: &mut NSTDVec, len: NSTDUInt) {
 ///
 /// # Panics
 ///
-/// This operation may panic if either `size` is zero or getting a handle to the heap fails.
+/// This operation will panic if `size` is zero.
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_vec_reserve(vec: &mut NSTDVec, size: NSTDUInt) -> NSTDAllocError {
     assert!(size != 0);
@@ -903,7 +893,7 @@ pub extern "C" fn nstd_vec_reserve(vec: &mut NSTDVec, size: NSTDUInt) -> NSTDAll
         if !mem.is_null() {
             vec.ptr = mem;
             vec.cap = size;
-            return NSTDAllocError::NSTD_ALLOC_ERROR_NONE;
+            return NSTD_ALLOC_ERROR_NONE;
         }
         NSTDAllocError::NSTD_ALLOC_ERROR_OUT_OF_MEMORY
     }
@@ -917,7 +907,7 @@ pub extern "C" fn nstd_vec_reserve(vec: &mut NSTDVec, size: NSTDUInt) -> NSTDAll
         // SAFETY: The vector is non-null & the lengths are above 0.
         let errc = unsafe { nstd_alloc_reallocate(&mut vec.ptr, current_byte_len, new_byte_len) };
         // On success increase the buffer length.
-        if errc == NSTDAllocError::NSTD_ALLOC_ERROR_NONE {
+        if errc == NSTD_ALLOC_ERROR_NONE {
             vec.cap += size;
         }
         errc
@@ -933,10 +923,6 @@ pub extern "C" fn nstd_vec_reserve(vec: &mut NSTDVec, size: NSTDUInt) -> NSTDAll
 /// # Returns
 ///
 /// `NSTDAllocError errc` - The allocation operation error code.
-///
-/// # Panics
-///
-/// Panics if getting a handle to the heap fails.
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_vec_shrink(vec: &mut NSTDVec) -> NSTDAllocError {
     // Make sure the vector is non-null and it's capacity is greater than it's length.
@@ -946,13 +932,24 @@ pub extern "C" fn nstd_vec_shrink(vec: &mut NSTDVec) -> NSTDAllocError {
         let new_len = vec.byte_len().max(vec.stride);
         // SAFETY: The vector is non-null & the lengths are above 0.
         let errc = unsafe { nstd_alloc_reallocate(&mut vec.ptr, current_len, new_len) };
-        if errc == NSTDAllocError::NSTD_ALLOC_ERROR_NONE {
+        if errc == NSTD_ALLOC_ERROR_NONE {
             // The buffer's new length is at least 1.
             vec.cap = vec.len.max(1);
         }
         return errc;
     }
-    NSTDAllocError::NSTD_ALLOC_ERROR_NONE
+    NSTD_ALLOC_ERROR_NONE
+}
+
+/// Sets a vector's length to zero.
+///
+/// # Parameters:
+///
+/// - `NSTDVec *vec` - The vector to clear.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_vec_clear(vec: &mut NSTDVec) {
+    vec.len = 0;
 }
 
 /// Frees an instance of `NSTDVec`.
@@ -963,7 +960,7 @@ pub extern "C" fn nstd_vec_shrink(vec: &mut NSTDVec) -> NSTDAllocError {
 ///
 /// # Panics
 ///
-/// This operation may panic if getting a handle to the heap fails.
+/// Panics if deallocating fails.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 #[allow(unused_variables)]

@@ -5,11 +5,11 @@ use self::heap::{
     nstd_os_windows_alloc_heap_deallocate, nstd_os_windows_alloc_heap_default,
     nstd_os_windows_alloc_heap_reallocate,
 };
-use crate::{NSTDAnyMut, NSTDUInt};
+use crate::{core::result::NSTDResult, NSTDAnyMut, NSTDUInt, NSTD_NULL};
 
 /// Describes an error returned from allocation functions for Windows.
 #[repr(C)]
-#[derive(Clone, Copy, Debug, Hash, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[allow(non_camel_case_types)]
 pub enum NSTDWindowsAllocError {
     /// No error occurred.
@@ -33,10 +33,6 @@ pub enum NSTDWindowsAllocError {
 /// # Returns
 ///
 /// `NSTDAnyMut ptr` - A pointer to the block of memory, null on error.
-///
-/// # Panics
-///
-/// This operation will panic if getting a handle to the default heap fails.
 ///
 /// # Safety
 ///
@@ -68,8 +64,10 @@ pub enum NSTDWindowsAllocError {
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_os_windows_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
-    let heap = nstd_os_windows_alloc_heap_default();
-    nstd_os_windows_alloc_heap_allocate(&heap, size)
+    match nstd_os_windows_alloc_heap_default() {
+        NSTDResult::Ok(heap) => nstd_os_windows_alloc_heap_allocate(&heap, size),
+        _ => NSTD_NULL,
+    }
 }
 
 /// Allocates a new block of zero-initialized memory on the current process' heap.
@@ -81,10 +79,6 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_allocate(size: NSTDUInt) -> NSTDA
 /// # Returns
 ///
 /// `NSTDAnyMut ptr` - A pointer to the block of memory, null on error.
-///
-/// # Panics
-///
-/// This operation will panic if getting a handle to the default heap fails.
 ///
 /// # Safety
 ///
@@ -110,8 +104,10 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_allocate(size: NSTDUInt) -> NSTDA
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_os_windows_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMut {
-    let heap = nstd_os_windows_alloc_heap_default();
-    nstd_os_windows_alloc_heap_allocate_zeroed(&heap, size)
+    match nstd_os_windows_alloc_heap_default() {
+        NSTDResult::Ok(heap) => nstd_os_windows_alloc_heap_allocate_zeroed(&heap, size),
+        _ => NSTD_NULL,
+    }
 }
 
 /// Reallocates a block of memory previously allocated by
@@ -130,10 +126,6 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_allocate_zeroed(size: NSTDUInt) -
 /// # Returns
 ///
 /// `NSTDWindowsAllocError errc` - The allocation operation error code.
-///
-/// # Panics
-///
-/// This operation will panic if getting a handle to the default heap fails.
 ///
 /// # Safety
 ///
@@ -168,8 +160,10 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_reallocate(
     ptr: &mut NSTDAnyMut,
     new_size: NSTDUInt,
 ) -> NSTDWindowsAllocError {
-    let heap = nstd_os_windows_alloc_heap_default();
-    nstd_os_windows_alloc_heap_reallocate(&heap, ptr, new_size)
+    match nstd_os_windows_alloc_heap_default() {
+        NSTDResult::Ok(heap) => nstd_os_windows_alloc_heap_reallocate(&heap, ptr, new_size),
+        NSTDResult::Err(err) => err,
+    }
 }
 
 /// Deallocates a block of memory previously allocated by
@@ -182,10 +176,6 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_reallocate(
 /// # Returns
 ///
 /// `NSTDWindowsAllocError errc` - The allocation operation error code.
-///
-/// # Panics
-///
-/// This operation will panic if getting a handle to the default heap fails.
 ///
 /// # Safety
 ///
@@ -210,6 +200,8 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_reallocate(
 pub unsafe extern "C" fn nstd_os_windows_alloc_deallocate(
     ptr: &mut NSTDAnyMut,
 ) -> NSTDWindowsAllocError {
-    let heap = nstd_os_windows_alloc_heap_default();
-    nstd_os_windows_alloc_heap_deallocate(&heap, ptr)
+    match nstd_os_windows_alloc_heap_default() {
+        NSTDResult::Ok(heap) => nstd_os_windows_alloc_heap_deallocate(&heap, ptr),
+        NSTDResult::Err(err) => err,
+    }
 }

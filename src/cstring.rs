@@ -9,8 +9,8 @@ use crate::{
         slice::NSTDSlice,
     },
     vec::{
-        nstd_vec_as_mut_ptr, nstd_vec_as_ptr, nstd_vec_as_slice, nstd_vec_cap, nstd_vec_clone,
-        nstd_vec_extend, nstd_vec_from_slice, nstd_vec_get_mut, nstd_vec_len,
+        nstd_vec_as_mut_ptr, nstd_vec_as_ptr, nstd_vec_as_slice, nstd_vec_cap, nstd_vec_clear,
+        nstd_vec_clone, nstd_vec_extend, nstd_vec_from_slice, nstd_vec_get_mut, nstd_vec_len,
         nstd_vec_new_with_cap, nstd_vec_pop, nstd_vec_push, NSTDVec,
     },
     NSTDChar, NSTDUInt,
@@ -21,7 +21,7 @@ use core::ptr::addr_of;
 ///
 /// Managed C strings (`NSTDCString`) will always contain a null byte until freed.
 #[repr(C)]
-#[derive(Debug, Hash)]
+#[derive(Debug)]
 pub struct NSTDCString {
     /// The underlying vector of `NSTDChar`s.
     bytes: NSTDVec,
@@ -428,6 +428,17 @@ pub extern "C" fn nstd_cstring_pop(cstring: &mut NSTDCString) -> NSTDChar {
     ret
 }
 
+/// Sets a C string's length to zero.
+///
+/// # Parameters:
+///
+/// - `NSTDCString *cstring` - The C string to clear.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_cstring_clear(cstring: &mut NSTDCString) {
+    nstd_vec_clear(&mut cstring.bytes);
+}
+
 /// Frees an instance of `NSTDCString`.
 ///
 /// # Parameters:
@@ -436,7 +447,7 @@ pub extern "C" fn nstd_cstring_pop(cstring: &mut NSTDCString) -> NSTDChar {
 ///
 /// # Panics
 ///
-/// This operation may panic if getting a handle to the heap fails.
+/// Panics if deallocating fails.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 #[allow(unused_variables)]

@@ -113,14 +113,63 @@ pub unsafe extern "C" fn nstd_core_mem_search(
         return core::ptr::null();
     }
     // Search the buffer for `delim`.
-    let mut i = 0;
-    while i < size {
-        if *buf.add(i) == delim {
-            return buf.add(i);
+    #[cfg(not(all(
+        feature = "asm",
+        any(
+            target_arch = "arm",
+            target_arch = "aarch64",
+            target_arch = "x86",
+            target_arch = "x86_64"
+        )
+    )))]
+    {
+        let mut i = 0;
+        while i < size {
+            if *buf.add(i) == delim {
+                return buf.add(i);
+            }
+            i += 1;
         }
-        i += 1;
+        core::ptr::null()
     }
-    core::ptr::null()
+    #[cfg(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64")))]
+    {
+        use core::arch::asm;
+        let mut end = buf.add(size);
+        asm!(
+            include_str!("mem/x86/search.asm"),
+            buf = inout(reg) buf => end,
+            delim = in(reg_byte) delim,
+            end = in(reg) end
+        );
+        end
+    }
+    #[cfg(all(feature = "asm", target_arch = "arm"))]
+    {
+        use core::arch::asm;
+        let mut end = buf.add(size);
+        asm!(
+            include_str!("mem/arm/search.asm"),
+            buf = inout(reg) buf => end,
+            delim = in(reg) delim as usize,
+            end = in(reg) end,
+            byte = out(reg) _
+        );
+        end
+    }
+    #[cfg(all(feature = "asm", target_arch = "aarch64"))]
+    {
+        use core::arch::asm;
+        let mut end = buf.add(size);
+        asm!(
+            include_str!("mem/arm64/search.asm"),
+            buf = inout(reg) buf => end,
+            delim = in(reg) delim as usize,
+            end = in(reg) end,
+            byte = out(reg) _
+        );
+        end
+    }
 }
 
 /// Zeros out a memory buffer.
@@ -130,6 +179,10 @@ pub unsafe extern "C" fn nstd_core_mem_search(
 /// - `NSTDByte *buf` - A pointer to the first byte in the memory buffer.
 ///
 /// - `NSTDUInt size` - The number of bytes to set to 0.
+///
+/// # Panics
+///
+/// This operation will panic if `size` is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -142,19 +195,76 @@ pub unsafe extern "C" fn nstd_core_mem_search(
 /// use nstd_sys::core::mem::nstd_core_mem_zero;
 ///
 /// unsafe {
-///     let mut buf = [u8::MAX; 10];
-///     nstd_core_mem_zero(buf.as_mut_ptr(), 10);
-///     assert!(buf == [0u8; 10]);
+///     let mut buf = [i32::MAX; 10];
+///     nstd_core_mem_zero(buf.as_mut_ptr().cast(), core::mem::size_of::<i32>() * 10);
+///     assert!(buf == [0i32; 10]);
 /// }
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_mem_zero(mut buf: *mut NSTDByte, size: NSTDUInt) {
-    let mut i = 0;
-    while i < size {
-        *buf = 0;
-        buf = buf.offset(1);
-        i += 1;
+pub unsafe extern "C" fn nstd_core_mem_zero(buf: *mut NSTDByte, size: NSTDUInt) {
+    assert!(size <= isize::MAX as usize);
+    #[cfg(not(all(
+        feature = "asm",
+        any(
+            target_arch = "arm",
+            target_arch = "aarch64",
+            target_arch = "x86",
+            target_arch = "x86_64"
+        )
+    )))]
+    {
+        let mut i = 0;
+        while i < size {
+            *buf.add(i) = 0;
+            i += 1;
+        }
+    }
+    #[cfg(feature = "asm")]
+    {
+        use core::arch::asm;
+        const REG_SIZE: NSTDUInt = core::mem::size_of::<&()>();
+        let rem_bytes = size % REG_SIZE;
+        let reg_end = buf.add(size - rem_bytes);
+        let end = reg_end.add(rem_bytes);
+        #[cfg(target_arch = "x86")]
+        {
+            asm!(
+                include_str!("mem/x86/zero.asm"),
+                buf = inout(reg) buf => _,
+                reg_end = in(reg) reg_end,
+                end = in(reg) end
+            );
+        }
+        #[cfg(target_arch = "x86_64")]
+        {
+            asm!(
+                include_str!("mem/x86_64/zero.asm"),
+                buf = inout(reg) buf => _,
+                reg_end = in(reg) reg_end,
+                end = in(reg) end
+            );
+        }
+        #[cfg(target_arch = "arm")]
+        {
+            asm!(
+                include_str!("mem/arm/zero.asm"),
+                buf = inout(reg) buf => _,
+                reg_end = in(reg) reg_end,
+                end = in(reg) end,
+                zero = out(reg) _
+            );
+        }
+        #[cfg(target_arch = "aarch64")]
+        {
+            asm!(
+                include_str!("mem/arm64/zero.asm"),
+                buf = inout(reg) buf => _,
+                reg_end = in(reg) reg_end,
+                end = in(reg) end,
+                zero = out(reg) _
+            );
+        }
     }
 }
 
@@ -167,6 +277,10 @@ pub unsafe extern "C" fn nstd_core_mem_zero(mut buf: *mut NSTDByte, size: NSTDUI
 /// - `NSTDUInt size` - The size of the memory buffer.
 ///
 /// - `NSTDByte fill` - The byte value to fill the memory buffer with.
+///
+/// # Panics
+///
+/// This operation will panic if `size` is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -186,16 +300,53 @@ pub unsafe extern "C" fn nstd_core_mem_zero(mut buf: *mut NSTDByte, size: NSTDUI
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_mem_fill(
-    mut buf: *mut NSTDByte,
-    size: NSTDUInt,
-    fill: NSTDByte,
-) {
-    let mut i = 0;
-    while i < size {
-        *buf = fill;
-        buf = buf.offset(1);
-        i += 1;
+pub unsafe extern "C" fn nstd_core_mem_fill(buf: *mut NSTDByte, size: NSTDUInt, fill: NSTDByte) {
+    assert!(size <= isize::MAX as usize);
+    #[cfg(not(all(
+        feature = "asm",
+        any(
+            target_arch = "arm",
+            target_arch = "aarch64",
+            target_arch = "x86",
+            target_arch = "x86_64"
+        )
+    )))]
+    {
+        let mut i = 0;
+        while i < size {
+            *buf.add(i) = fill;
+            i += 1;
+        }
+    }
+    #[cfg(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64")))]
+    {
+        use core::arch::asm;
+        asm!(
+            include_str!("mem/x86/fill.asm"),
+            buf = inout(reg) buf => _,
+            fill = in(reg_byte) fill,
+            end = in(reg) buf.add(size)
+        );
+    }
+    #[cfg(all(feature = "asm", target_arch = "arm"))]
+    {
+        use core::arch::asm;
+        asm!(
+            include_str!("mem/arm/fill.asm"),
+            buf = inout(reg) buf => _,
+            fill = in(reg) fill as usize,
+            end = in(reg) buf.add(size)
+        );
+    }
+    #[cfg(all(feature = "asm", target_arch = "aarch64"))]
+    {
+        use core::arch::asm;
+        asm!(
+            include_str!("mem/arm64/fill.asm"),
+            buf = inout(reg) buf => _,
+            fill = in(reg) fill as usize,
+            end = in(reg) buf.add(size)
+        );
     }
 }
 

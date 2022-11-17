@@ -4,6 +4,11 @@
 #include "../slice.h"
 
 /// An immutable slice of a C string.
+///
+/// # Safety
+///
+/// The user of this structure must ensure that the pointed-to data remains valid and unmodified
+/// while an instance of this structure is in use.
 typedef struct {
     /// A pointer to the first character in the C string.
     const NSTDChar *ptr;
@@ -148,7 +153,35 @@ NSTDAPI const NSTDChar *nstd_core_cstr_get_null(const NSTDCStr *cstr);
 /// string slice's boundaries.
 NSTDAPI const NSTDChar *nstd_core_cstr_get(const NSTDCStr *cstr, NSTDUInt pos);
 
+/// Returns a pointer to the first character in a C string slice, or null if it is empty.
+///
+/// # Parameters:
+///
+/// - `const NSTDCStr *cstr` - The C string slice.
+///
+/// # Returns
+///
+/// `const NSTDChar *first` - If present, a pointer to the first character in the C string slice.
+NSTDAPI const NSTDChar *nstd_core_cstr_first(const NSTDCStr *cstr);
+
+/// Returns a pointer to the last character in a C string slice, or null if it is empty.
+///
+/// # Parameters:
+///
+/// - `const NSTDCStr *cstr` - The C string slice.
+///
+/// # Returns
+///
+/// `const NSTDChar *last` - If present, a pointer to the last character in the C string slice.
+NSTDAPI const NSTDChar *nstd_core_cstr_last(const NSTDCStr *cstr);
+
 /// A mutable slice of a C string.
+///
+/// # Safety
+///
+/// The user of this structure must ensure that the pointed-to data remains valid, unmodified, and
+/// unreferenced in any other code while an instance of this structure is in use, else data races
+/// may occur.
 typedef struct {
     /// A pointer to the first character in the C string.
     NSTDChar *ptr;
@@ -354,5 +387,49 @@ NSTDAPI NSTDChar *nstd_core_cstr_mut_get(NSTDCStrMut *cstr, NSTDUInt pos);
 /// `const NSTDChar *chr` - A pointer to the character at `pos`, or null if `pos` is out of the C
 /// string slice's boundaries.
 NSTDAPI const NSTDChar *nstd_core_cstr_mut_get_const(const NSTDCStrMut *cstr, NSTDUInt pos);
+
+/// Returns a pointer to the first character in a C string slice, or null if it is empty.
+///
+/// # Parameters:
+///
+/// - `NSTDCStrMut *cstr` - The C string slice.
+///
+/// # Returns
+///
+/// `NSTDChar *first` - If present, a pointer to the first character in the C string slice.
+NSTDAPI NSTDChar *nstd_core_cstr_mut_first(NSTDCStrMut *cstr);
+
+/// Returns an immutable pointer to the first character in a C string slice, or null if it is empty.
+///
+/// # Parameters:
+///
+/// - `const NSTDCStrMut *cstr` - The C string slice.
+///
+/// # Returns
+///
+/// `const NSTDChar *first` - If present, a pointer to the first character in the C string slice.
+NSTDAPI const NSTDChar *nstd_core_cstr_mut_first_const(const NSTDCStrMut *cstr);
+
+/// Returns a pointer to the last character in a C string slice, or null if it is empty.
+///
+/// # Parameters:
+///
+/// - `NSTDCStrMut *cstr` - The C string slice.
+///
+/// # Returns
+///
+/// `NSTDChar *last` - If present, a pointer to the last character in the C string slice.
+NSTDAPI NSTDChar *nstd_core_cstr_mut_last(NSTDCStrMut *cstr);
+
+/// Returns an immutable pointer to the last character in a C string slice, or null if it is empty.
+///
+/// # Parameters:
+///
+/// - `const NSTDCStrMut *cstr` - The C string slice.
+///
+/// # Returns
+///
+/// `const NSTDChar *last` - If present, a pointer to the last character in the C string slice.
+NSTDAPI const NSTDChar *nstd_core_cstr_mut_last_const(const NSTDCStrMut *cstr);
 
 #endif
