@@ -1,5 +1,5 @@
 //! Application data passed to each event.
-use crate::NSTDAnyMut;
+use crate::heap_ptr::NSTDHeapPtr;
 use gilrs::{Event as GamepadEvent, Gilrs};
 use std::cell::Cell;
 use winit::event_loop::{ControlFlow, EventLoopWindowTarget};
@@ -13,20 +13,20 @@ pub struct NSTDAppData<'a, 'b> {
     /// A handle to the `nstd` app.
     pub handle: NSTDAppHandle<'a>,
     /// Custom user data.
-    pub data: NSTDAnyMut,
-    /// The application's control flow.
-    control_flow: &'a Cell<ControlFlow>,
+    pub data: &'a mut NSTDHeapPtr,
     /// The gamepad input manager.
-    gil: &'b mut Gilrs,
+    gil: &'a mut Gilrs,
+    /// The application's control flow.
+    control_flow: &'b Cell<ControlFlow>,
 }
 impl<'a, 'b> NSTDAppData<'a, 'b> {
     /// Creates a new instance of [NSTDAppData].
     #[inline]
     pub(crate) fn new(
         handle: NSTDAppHandle<'a>,
-        control_flow: &'a mut ControlFlow,
-        data: NSTDAnyMut,
-        gil: &'b mut Gilrs,
+        control_flow: &'b mut ControlFlow,
+        data: &'a mut NSTDHeapPtr,
+        gil: &'a mut Gilrs,
     ) -> Self {
         Self {
             handle,

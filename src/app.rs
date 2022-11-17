@@ -12,7 +12,7 @@ use self::{
 };
 use crate::{
     core::{def::NSTDErrorCode, str::NSTDStr},
-    NSTDAnyMut,
+    heap_ptr::NSTDHeapPtr,
 };
 use gilrs::{Error::NotImplemented, EventType as GamepadEvent, Gilrs};
 use winit::{
@@ -110,13 +110,13 @@ pub extern "C" fn nstd_app_events(app: &mut NSTDApp) -> &mut NSTDAppEvents {
 ///
 /// - `NSTDApp app` - The `nstd` application to run.
 ///
-/// - `NSTDAnyMut data` - Custom user data to pass to each app event.
+/// - `NSTDHeapPtr data` - Custom user data to pass to each app event.
 ///
 /// # Safety
 ///
 /// This function's caller must guarantee validity of the `app`'s event callbacks.
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_app_run(app: NSTDApp, data: NSTDAnyMut) -> ! {
+pub unsafe extern "C" fn nstd_app_run(app: NSTDApp, mut data: NSTDHeapPtr) -> ! {
     let AppData {
         event_loop,
         mut gil,
@@ -124,7 +124,7 @@ pub unsafe extern "C" fn nstd_app_run(app: NSTDApp, data: NSTDAnyMut) -> ! {
     // Run the winit event loop.
     event_loop.run(move |event, handle, control_flow| {
         // Instantiate a new instance of `NSTDAppData`.
-        let app_data = &mut NSTDAppData::new(handle, control_flow, data, &mut gil);
+        let app_data = &mut NSTDAppData::new(handle, control_flow, &mut data, &mut gil);
         // Dispatch events.
         match event {
             // The event loop was just started.

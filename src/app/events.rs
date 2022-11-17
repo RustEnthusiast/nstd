@@ -79,7 +79,7 @@ impl NSTDTouchState {
 
 /// Represents a mouse button.
 #[repr(C)]
-#[derive(Clone, Copy, Debug, Hash, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[allow(non_camel_case_types)]
 pub enum NSTDMouseButton {
     /// The left mouse button.
@@ -94,7 +94,7 @@ pub enum NSTDMouseButton {
 
 /// Represents some type of mouse button input.
 #[repr(C)]
-#[derive(Clone, Copy, Debug, Hash)]
+#[derive(Clone, Copy, Debug)]
 pub struct NSTDMouseInput {
     /// The mouse button that received input.
     pub button: NSTDMouseButton,
@@ -127,7 +127,7 @@ impl NSTDMouseInput {
 
 /// Represents a key on a keyboard.
 #[repr(C)]
-#[derive(Clone, Copy, Debug, Hash)]
+#[derive(Clone, Copy, Debug)]
 #[allow(non_camel_case_types)]
 pub enum NSTDKey {
     /// An unknown keyboard key.
