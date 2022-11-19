@@ -887,13 +887,12 @@ pub extern "C" fn nstd_vec_truncate(vec: &mut NSTDVec, len: NSTDUInt) {
 /// # Returns
 ///
 /// `NSTDAllocError errc` - The allocation operation error code.
-///
-/// # Panics
-///
-/// This operation will panic if `size` is zero.
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_vec_reserve(vec: &mut NSTDVec, size: NSTDUInt) -> NSTDAllocError {
-    assert!(size != 0);
+    // Check `size`.
+    if size == 0 {
+        return NSTDAllocError::NSTD_ALLOC_ERROR_NONE;
+    }
     // Calculate the number of bytes to allocate.
     let bytes_to_alloc = size * vec.stride;
     // Checking if the vector is null and needs to make it's first allocation.
