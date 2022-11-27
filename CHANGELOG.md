@@ -7,6 +7,10 @@
 - Added `NSTDUnixSharedLibHandle`.
 - Added `NSTD_OS_UNIX`.
 
+# 0.3.3
+### `nstd`
+- Internal safety improvements.
+
 # 0.3.2
 ### `nstd`
 - Second attempt to fix docs.rs build for non-x86_64 Unix systems.
