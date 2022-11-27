@@ -27,10 +27,15 @@ impl NSTDSharedPtr {
         // SAFETY:
         // - Shared pointers are always non-null.
         // - Shared pointers never allocate more than `isize::MAX` bytes for their value.
-        unsafe { *self.ptr.add(nstd_shared_ptr_size(self)).cast() }
+        unsafe { core::ptr::read_unaligned(self.ptr.add(nstd_shared_ptr_size(self)).cast()) }
     }
 
     /// Returns a mutable pointer to the number of pointers sharing the object.
+    ///
+    /// # Note
+    ///
+    /// The returned pointer may be unaligned, so reading/writing must be done with
+    /// [core::ptr::read_unaligned] and [core::ptr::write_unaligned].
     #[inline]
     fn ptrs_mut(&self) -> *mut usize {
         // SAFETY:
@@ -50,9 +55,10 @@ impl Drop for NSTDSharedPtr {
         unsafe {
             // Update the pointer count.
             let ptrs = self.ptrs_mut();
-            *ptrs -= 1;
+            let new_size = self.ptrs() - 1;
+            core::ptr::write_unaligned(ptrs, new_size);
             // If the pointer count is zero, free the data.
-            if *ptrs == 0 {
+            if new_size == 0 {
                 assert!(nstd_alloc_deallocate(&mut self.ptr, self.size) == NSTD_ALLOC_ERROR_NONE);
             }
         }
@@ -108,7 +114,7 @@ pub unsafe extern "C" fn nstd_shared_ptr_new(
     nstd_core_mem_copy(raw.cast(), init.cast(), element_size);
     // Set the pointer count to one.
     let ptrs = raw.add(element_size).cast::<usize>();
-    *ptrs = 1;
+    core::ptr::write_unaligned(ptrs, 1);
     // Construct the pointer.
     NSTDSharedPtr {
         ptr: raw,
@@ -154,7 +160,7 @@ pub extern "C" fn nstd_shared_ptr_new_zeroed(element_size: NSTDUInt) -> NSTDShar
         assert!(!raw.is_null());
         // Set the pointer count to one.
         let ptrs = raw.add(element_size).cast::<usize>();
-        *ptrs = 1;
+        core::ptr::write_unaligned(ptrs, 1);
         // Construct the pointer.
         NSTDSharedPtr {
             ptr: raw,
@@ -198,7 +204,7 @@ pub extern "C" fn nstd_shared_ptr_share(shared_ptr: &NSTDSharedPtr) -> NSTDShare
     unsafe {
         // Update the pointer count.
         let ptrs = shared_ptr.ptrs_mut();
-        *ptrs += 1;
+        core::ptr::write_unaligned(ptrs, shared_ptr.ptrs() + 1);
         // Construct the new shared pointer instance.
         NSTDSharedPtr {
             ptr: shared_ptr.ptr,
