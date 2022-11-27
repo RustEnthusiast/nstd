@@ -1,22 +1,16 @@
-.extern malloc
-.extern calloc
-.extern realloc
-.extern free
+.extern _malloc
+.extern _calloc
+.extern _realloc
+.extern _free
 
 .globl _nstd_os_unix_alloc_allocate
 _nstd_os_unix_alloc_allocate:
-    sub rsp, 8
-    call _malloc
-    add rsp, 8
-    ret
+    jmp _malloc
 
 .globl _nstd_os_unix_alloc_allocate_zeroed
 _nstd_os_unix_alloc_allocate_zeroed:
-    sub rsp, 8
-    mov rsi, 1
-    call _calloc
-    add rsp, 8
-    ret
+    mov esi, 1
+    jmp _calloc
 
 .globl _nstd_os_unix_alloc_reallocate
 _nstd_os_unix_alloc_reallocate:
@@ -27,11 +21,11 @@ _nstd_os_unix_alloc_reallocate:
     test rax, rax
     jz 1f
     mov [rbx], rax
-    xor rax, rax
+    xor eax, eax
     pop rbx
     ret
 1:
-    mov rax, 1
+    mov eax, 1
     pop rbx
     ret
 
