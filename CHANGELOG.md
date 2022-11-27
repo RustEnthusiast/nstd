@@ -10,6 +10,12 @@
 # 0.3.3
 ### `nstd`
 - Internal safety improvements.
+- Added `proc`.
+- Added `thread`.
+- Removed dependency for `libloading`.
+### `nstd.os`
+- Added `NSTDUnixSharedLibHandle`.
+- Added `NSTD_OS_UNIX`.
 
 # 0.3.2
 ### `nstd`
