@@ -1,3 +1,7 @@
+# TBD
+### `nstd.os`
+- [`unix.alloc`] Fixed linker error when using multiple versions of the crate.
+
 # 0.3.3
 ### `nstd`
 - Internal safety improvements.
