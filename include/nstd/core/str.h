@@ -1,7 +1,7 @@
 #ifndef NSTD_CORE_STR_H
 #define NSTD_CORE_STR_H
 #include "../nstd.h"
-#include "cstr.h"
+#include "core/cstr.h"
 #include "def.h"
 #include "optional.h"
 #include "range.h"
@@ -160,6 +160,17 @@ NSTDAPI NSTDStr nstd_core_str_from_bytes(const NSTDSlice *bytes);
 ///
 /// - `bytes`'s data must be valid for reads of at least `bytes.len` consecutive bytes.
 NSTDAPI NSTDStr nstd_core_str_from_bytes_unchecked(const NSTDSlice *bytes);
+
+/// Returns a C string slice variant of this UTF-8 encoded string slice.
+///
+/// # Parameters:
+///
+/// - `const NSTDStr *str` - The UTF-8 encoded string slice.
+///
+/// # Returns
+///
+/// `NSTDCStr cstr` - The new C string slice.
+NSTDAPI NSTDCStr nstd_core_str_as_cstr(const NSTDStr *str);
 
 /// Returns an immutable byte slice over `str`'s data.
 ///
@@ -666,6 +677,17 @@ NSTDAPI NSTDStrMut nstd_core_str_mut_from_bytes_unchecked(NSTDSliceMut *bytes);
 ///
 /// `NSTDStr str_const` - The immutable copy of `str`.
 NSTDAPI NSTDStr nstd_core_str_mut_as_const(const NSTDStrMut *str);
+
+/// Returns a C string slice variant of this UTF-8 encoded string slice.
+///
+/// # Parameters:
+///
+/// - `const NSTDStrMut *str` - The UTF-8 encoded string slice.
+///
+/// # Returns
+///
+/// `NSTDCStr cstr` - The new C string slice.
+NSTDAPI NSTDCStr nstd_core_str_mut_as_cstr(const NSTDStrMut *str);
 
 /// Returns an immutable byte slice over `str`'s data.
 ///

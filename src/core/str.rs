@@ -3,7 +3,7 @@ use crate::{
     core::{
         cstr::{
             nstd_core_cstr_as_ptr, nstd_core_cstr_len, nstd_core_cstr_mut_as_ptr,
-            nstd_core_cstr_mut_len,
+            nstd_core_cstr_mut_len, nstd_core_cstr_new,
             raw::{nstd_core_cstr_raw_len, nstd_core_cstr_raw_len_with_null},
             NSTDCStr, NSTDCStrMut,
         },
@@ -375,6 +375,21 @@ pub unsafe extern "C" fn nstd_core_str_from_bytes_unchecked(bytes: &NSTDSlice) -
     let ptr = nstd_core_slice_as_ptr(bytes).cast();
     let len = nstd_core_slice_len(bytes);
     NSTDStr { ptr, len }
+}
+
+/// Returns a C string slice variant of this UTF-8 encoded string slice.
+///
+/// # Parameters:
+///
+/// - `const NSTDStr *str` - The UTF-8 encoded string slice.
+///
+/// # Returns
+///
+/// `NSTDCStr cstr` - The new C string slice.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_core_str_as_cstr(str: &NSTDStr) -> NSTDCStr {
+    nstd_core_cstr_new(str.ptr.cast(), str.len)
 }
 
 /// Returns an immutable byte slice over `str`'s data.
@@ -1174,6 +1189,21 @@ pub extern "C" fn nstd_core_str_mut_as_const(str: &NSTDStrMut) -> NSTDStr {
     let bytes = nstd_core_str_mut_as_bytes(str);
     // SAFETY: String slices are UTF-8 encoded.
     unsafe { nstd_core_str_from_bytes_unchecked(&bytes) }
+}
+
+/// Returns a C string slice variant of this UTF-8 encoded string slice.
+///
+/// # Parameters:
+///
+/// - `const NSTDStrMut *str` - The UTF-8 encoded string slice.
+///
+/// # Returns
+///
+/// `NSTDCStr cstr` - The new C string slice.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_core_str_mut_as_cstr(str: &NSTDStrMut) -> NSTDCStr {
+    nstd_core_cstr_new(str.ptr.cast(), str.len)
 }
 
 /// Returns an immutable byte slice over `str`'s data.

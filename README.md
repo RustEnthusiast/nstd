@@ -20,7 +20,7 @@ int main()
 }
 ```
 
-# Modules
+# Library modules
 - `nstd` - A cross-platform, fast, and safe general purpose C library written in Rust.
     - `alloc` - Low level memory allocation.
     - `core` - Provides core functionality for `nstd`.

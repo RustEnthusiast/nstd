@@ -1,4 +1,6 @@
 # TBD
+### `nstd.core`
+- Added `nstd_core_str[_mut]_as_cstr`.
 ### `nstd.os`
 - [`unix.alloc`] Fixed linker error when using multiple versions of the crate.
 
