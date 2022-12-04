@@ -1,7 +1,7 @@
 #ifndef NSTD_CORE_STR_H
 #define NSTD_CORE_STR_H
 #include "../nstd.h"
-#include "core/cstr.h"
+#include "cstr/cstr.h"
 #include "def.h"
 #include "optional.h"
 #include "range.h"
