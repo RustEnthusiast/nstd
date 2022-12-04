@@ -21,7 +21,7 @@ use std::{
 pub type NSTDThread = Box<JoinHandle<NSTDErrorCode>>;
 
 /// A handle to a running thread.
-pub type NSTDThreadHandle<'a> = &'a Thread;
+pub type NSTDThreadHandle = Box<Thread>;
 
 /// A thread's unique identifier.
 pub type NSTDThreadID = Box<ThreadId>;
@@ -162,6 +162,17 @@ pub unsafe extern "C" fn nstd_thread_spawn_with_desc(
     None
 }
 
+/// Returns a handle to the calling thread.
+///
+/// # Returns
+///
+/// `NSTDThreadHandle handle` - A handle to the current thread.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_thread_current() -> NSTDThreadHandle {
+    Box::new(std::thread::current())
+}
+
 /// Retrieves a raw handle to a thread.
 ///
 /// # Parameters:
@@ -174,7 +185,7 @@ pub unsafe extern "C" fn nstd_thread_spawn_with_desc(
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_thread_handle(thread: &NSTDThread) -> NSTDThreadHandle {
-    thread.thread()
+    Box::new(thread.thread().clone())
 }
 
 /// Checks if a thread has finished running.
@@ -225,13 +236,13 @@ pub extern "C" fn nstd_thread_detach(thread: NSTDThread) {}
 ///
 /// # Parameters:
 ///
-/// - `NSTDThreadHandle handle` - A handle to the thread.
+/// - `const NSTDThreadHandle *handle` - A handle to the thread.
 ///
 /// # Returns
 ///
 /// `NSTDStr name` - The name of the thread, or an empty string slice if the thread is unnamed.
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_thread_name(handle: NSTDThreadHandle) -> NSTDStr {
+pub extern "C" fn nstd_thread_name(handle: &NSTDThreadHandle) -> NSTDStr {
     match handle.name() {
         Some(name) => NSTDStr::from_str(name),
         _ => {
@@ -246,16 +257,26 @@ pub extern "C" fn nstd_thread_name(handle: NSTDThreadHandle) -> NSTDStr {
 ///
 /// # Parameters:
 ///
-/// - `NSTDThreadHandle handle` - A handle to the thread.
+/// - `const NSTDThreadHandle *handle` - A handle to the thread.
 ///
 /// # Returns
 ///
 /// `NSTDThreadID id` - The thread's unique ID.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_thread_id(handle: NSTDThreadHandle) -> NSTDThreadID {
+pub extern "C" fn nstd_thread_id(handle: &NSTDThreadHandle) -> NSTDThreadID {
     Box::new(handle.id())
 }
+
+/// Frees an instance of `NSTDThreadHandle`.
+///
+/// # Parameters:
+///
+/// - `NSTDThreadHandle handle` - The handle to free.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+#[allow(unused_variables)]
+pub extern "C" fn nstd_thread_handle_free(handle: NSTDThreadHandle) {}
 
 /// Puts the current thread to sleep for a specified number of seconds.
 ///

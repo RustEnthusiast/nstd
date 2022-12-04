@@ -12,7 +12,7 @@
 typedef NSTDAnyMut NSTDThread;
 
 /// A handle to a running thread.
-typedef NSTDAny NSTDThreadHandle;
+typedef NSTDAnyMut NSTDThreadHandle;
 
 /// A thread's unique identifier.
 typedef NSTDAnyMut NSTDThreadID;
@@ -87,6 +87,13 @@ NSTDAPI NSTDThread nstd_thread_spawn(NSTDErrorCode (*thread_fn)(NSTDHeapPtr), NS
 NSTDAPI NSTDThread nstd_thread_spawn_with_desc(NSTDErrorCode (*thread_fn)(NSTDHeapPtr),
 NSTDHeapPtr data, const NSTDThreadDescriptor *desc);
 
+/// Returns a handle to the calling thread.
+///
+/// # Returns
+///
+/// `NSTDThreadHandle handle` - A handle to the current thread.
+NSTDAPI NSTDThreadHandle nstd_thread_current();
+
 /// Retrieves a raw handle to a thread.
 ///
 /// # Parameters:
@@ -132,23 +139,30 @@ NSTDAPI void nstd_thread_detach(NSTDThread thread);
 ///
 /// # Parameters:
 ///
-/// - `NSTDThreadHandle handle` - A handle to the thread.
+/// - `const NSTDThreadHandle *handle` - A handle to the thread.
 ///
 /// # Returns
 ///
 /// `NSTDStr name` - The name of the thread, or an empty string slice if the thread is unnamed.
-NSTDAPI NSTDStr nstd_thread_name(NSTDThreadHandle handle);
+NSTDAPI NSTDStr nstd_thread_name(const NSTDThreadHandle *handle);
 
 /// Returns a thread's unique identifier.
 ///
 /// # Parameters:
 ///
-/// - `NSTDThreadHandle handle` - A handle to the thread.
+/// - `const NSTDThreadHandle *handle` - A handle to the thread.
 ///
 /// # Returns
 ///
 /// `NSTDThreadID id` - The thread's unique ID.
-NSTDAPI NSTDThreadID nstd_thread_id(NSTDThreadHandle handle);
+NSTDAPI NSTDThreadID nstd_thread_id(const NSTDThreadHandle *handle);
+
+/// Frees an instance of `NSTDThreadHandle`.
+///
+/// # Parameters:
+///
+/// - `NSTDThreadHandle handle` - The handle to free.
+NSTDAPI void nstd_thread_handle_free(NSTDThreadHandle handle);
 
 /// Puts the current thread to sleep for a specified number of seconds.
 ///
