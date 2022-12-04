@@ -227,8 +227,8 @@ pub unsafe extern "C" fn nstd_core_mem_zero(buf: *mut NSTDByte, size: NSTDUInt) 
         use core::arch::asm;
         const REG_SIZE: NSTDUInt = core::mem::size_of::<&()>();
         let rem_bytes = size % REG_SIZE;
-        let reg_end = buf.add(size - rem_bytes);
-        let end = reg_end.add(rem_bytes);
+        let reg_end = buf.add(size - rem_bytes).sub(REG_SIZE);
+        let end = buf.add(size);
         #[cfg(target_arch = "x86")]
         {
             asm!(
