@@ -246,7 +246,7 @@ pub extern "C" fn nstd_thread_name(handle: &NSTDThreadHandle) -> NSTDStr {
     match handle.name() {
         Some(name) => NSTDStr::from_str(name),
         _ => {
-            let empty = nstd_core_slice_new(NonNull::dangling().as_ptr(), 1, 0);
+            let empty = nstd_core_slice_new(NonNull::<u8>::dangling().as_ptr().cast(), 1, 0);
             // SAFETY: `empty` is an empty slice.
             unsafe { nstd_core_str_from_bytes_unchecked(&empty) }
         }

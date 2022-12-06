@@ -35,6 +35,7 @@ int main()
         - `ops` - Operator overloading for types and operators that may cause overflow.
         - `optional` - Represents an optional (possibly uninitialized) value.
         - `ptr` - A sized pointer to some arbitrary type.
+            - `raw` - Provides useful utilities for working with raw pointers.
         - `range` - A numerical range.
         - `result` - Defines a "result" type with success and error variants.
         - `slice` - A view into a sequence of values in memory.

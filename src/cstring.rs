@@ -15,7 +15,7 @@ use crate::{
     },
     NSTDChar, NSTDUInt,
 };
-use core::ptr::{addr_of, NonNull};
+use core::ptr::addr_of;
 
 /// A dynamically sized, null terminated, C string.
 ///
@@ -163,10 +163,7 @@ pub extern "C" fn nstd_cstring_clone(cstring: &NSTDCString) -> NSTDCString {
 pub extern "C" fn nstd_cstring_as_cstr(cstring: &NSTDCString) -> NSTDCStr {
     let ptr = nstd_vec_as_ptr(&cstring.bytes);
     let len = nstd_vec_len(&cstring.bytes);
-    match ptr.is_null() {
-        false => nstd_core_cstr_new(ptr.cast(), len),
-        _ => nstd_core_cstr_new(NonNull::dangling().as_ptr(), 0),
-    }
+    nstd_core_cstr_new(ptr.cast(), len)
 }
 
 /// Creates a C string slice containing the contents of `cstring`.
@@ -182,10 +179,7 @@ pub extern "C" fn nstd_cstring_as_cstr(cstring: &NSTDCString) -> NSTDCStr {
 pub extern "C" fn nstd_cstring_as_cstr_mut(cstring: &mut NSTDCString) -> NSTDCStrMut {
     let ptr = nstd_vec_as_mut_ptr(&mut cstring.bytes);
     let len = nstd_vec_len(&cstring.bytes);
-    match ptr.is_null() {
-        false => nstd_core_cstr_mut_new(ptr.cast(), len),
-        _ => nstd_core_cstr_mut_new(NonNull::dangling().as_ptr(), 0),
-    }
+    nstd_core_cstr_mut_new(ptr.cast(), len)
 }
 
 /// Returns an immutable byte slice of the C string's active data, including the null byte.

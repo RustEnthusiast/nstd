@@ -1,4 +1,5 @@
 //! A sized pointer to some arbitrary type.
+pub mod raw;
 use crate::{core::mem::nstd_core_mem_copy, NSTDAny, NSTDAnyMut, NSTDUInt};
 
 /// A sized immutable pointer to some arbitrary type.
