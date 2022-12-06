@@ -3,6 +3,7 @@
 //! # Platform support
 //!
 //! This module is only functional on Windows and Unix systems.
+#![cfg(any(target_family = "unix", target_os = "windows"))]
 #[cfg(target_family = "unix")]
 use crate::os::unix::shared_lib::{
     nstd_os_unix_shared_lib_get, nstd_os_unix_shared_lib_get_mut, nstd_os_unix_shared_lib_load,
