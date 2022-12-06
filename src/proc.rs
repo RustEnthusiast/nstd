@@ -57,8 +57,8 @@ pub unsafe extern "C" fn nstd_proc_spawn(
     let mut len = nstd_core_slice_len(args);
     let mut i = 0;
     while i < len {
-        let arg = *nstd_core_slice_get(args, i).cast::<NSTDStr>();
-        cmd.arg(arg.as_str());
+        let arg = nstd_core_slice_get(args, i).cast::<NSTDStr>();
+        cmd.arg((*arg).as_str());
         i += 1;
     }
     // Add the environment variables.
@@ -66,8 +66,11 @@ pub unsafe extern "C" fn nstd_proc_spawn(
     len = nstd_core_slice_len(vars);
     i = 0;
     while i < len {
-        let env = *nstd_core_slice_get(vars, i).cast::<[NSTDStr; 2]>();
-        cmd.env(env[0].as_str(), env[1].as_str());
+        let env = nstd_core_slice_get(vars, i).cast::<[NSTDStr; 2]>();
+        cmd.env(
+            (*env).get_unchecked(0).as_str(),
+            (*env).get_unchecked(1).as_str(),
+        );
         i += 1;
     }
     // Spawn the process.
