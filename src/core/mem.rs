@@ -222,7 +222,15 @@ pub unsafe extern "C" fn nstd_core_mem_zero(buf: *mut NSTDByte, size: NSTDUInt) 
             i += 1;
         }
     }
-    #[cfg(feature = "asm")]
+    #[cfg(all(
+        feature = "asm",
+        any(
+            target_arch = "x86",
+            target_arch = "x86_64",
+            target_arch = "arm",
+            target_arch = "aarch64"
+        )
+    ))]
     {
         use core::arch::asm;
         const REG_SIZE: NSTDUInt = core::mem::size_of::<&()>();
