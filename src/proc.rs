@@ -1,9 +1,6 @@
 //! Calling/Child process management.
 use crate::{
-    core::{
-        slice::{nstd_core_slice_get, nstd_core_slice_len, nstd_core_slice_stride, NSTDSlice},
-        str::NSTDStr,
-    },
+    core::{slice::NSTDSlice, str::NSTDStr},
     io::NSTDIOError,
     NSTDInt32, NSTDUInt32,
 };
@@ -31,11 +28,15 @@ pub type NSTDChildProcess = Box<Child>;
 ///
 /// This operation will panic in any of the following situations:
 ///
+/// - `program`'s length in bytes exceeds `NSTDInt`'s max value.
+///
 /// - `args`'s stride is not equal to `sizeof(NSTDStr)`.
+///
+/// - `args`'s length is greater than `NSTDInt`'s max value.
 ///
 /// - `vars`'s stride is not equal to `sizeof(NSTDStr[2])`.
 ///
-/// - `program`'s length in bytes exceeds `NSTDInt`'s max value.
+/// - `vars`'s length is greater than `NSTDInt`'s max value.
 ///
 /// - Any of the arguments or environment variable keys/values length in bytes exceeds `NSTDInt`'s
 /// max value.
@@ -53,26 +54,14 @@ pub unsafe extern "C" fn nstd_proc_spawn(
     // Create the process command builder.
     let mut cmd = Command::new(program.as_str());
     // Add the arguments.
-    assert!(nstd_core_slice_stride(args) == core::mem::size_of::<NSTDStr>());
-    let mut len = nstd_core_slice_len(args);
-    let mut i = 0;
-    while i < len {
-        let arg = nstd_core_slice_get(args, i).cast::<NSTDStr>();
-        cmd.arg((*arg).as_str());
-        i += 1;
-    }
+    cmd.args(args.as_slice::<NSTDStr>().iter().map(|arg| arg.as_str()));
     // Add the environment variables.
-    assert!(nstd_core_slice_stride(vars) == core::mem::size_of::<[NSTDStr; 2]>());
-    len = nstd_core_slice_len(vars);
-    i = 0;
-    while i < len {
-        let env = nstd_core_slice_get(vars, i).cast::<[NSTDStr; 2]>();
-        cmd.env(
-            (*env).get_unchecked(0).as_str(),
-            (*env).get_unchecked(1).as_str(),
-        );
-        i += 1;
-    }
+    cmd.envs(vars.as_slice::<[NSTDStr; 2]>().iter().map(|vars| {
+        (
+            vars.get_unchecked(0).as_str(),
+            vars.get_unchecked(1).as_str(),
+        )
+    }));
     // Spawn the process.
     cmd.spawn().ok().map(Box::new)
 }
