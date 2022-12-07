@@ -4,6 +4,7 @@ use self::raw::{nstd_core_cstr_raw_len, nstd_core_cstr_raw_len_with_null};
 use crate::{
     core::{
         mem::nstd_core_mem_search,
+        optional::{gen_optional, NSTDOptional},
         slice::{nstd_core_slice_new, NSTDSlice},
     },
     NSTDBool, NSTDChar, NSTDUInt,
@@ -40,6 +41,7 @@ impl NSTDCStr {
         core::slice::from_raw_parts(self.ptr.cast(), self.len)
     }
 }
+gen_optional!(NSTDOptionalCStr, NSTDCStr);
 
 /// Creates a new C string slice from a raw pointer and a size.
 ///
@@ -431,6 +433,7 @@ impl NSTDCStrMut {
         core::slice::from_raw_parts(self.ptr.cast(), self.len)
     }
 }
+gen_optional!(NSTDOptionalCStrMut, NSTDCStrMut);
 
 /// Creates a new C string slice from a raw pointer and a size.
 ///

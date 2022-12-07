@@ -20,6 +20,9 @@ typedef struct {
     NSTDUInt len;
 } NSTDStr;
 
+/// Represents an optional value of type `NSTDStr`.
+NSTDOptional(NSTDStr) NSTDOptionalStr;
+
 /// Creates a new instance of an `NSTDStr` from a C string slice.
 ///
 /// # Parameters:
@@ -525,6 +528,9 @@ typedef struct {
     /// The number of bytes in the string.
     NSTDUInt len;
 } NSTDStrMut;
+
+/// Represents an optional value of type `NSTDStrMut`.
+NSTDOptional(NSTDStrMut) NSTDOptionalStrMut;
 
 /// Creates a new instance of an `NSTDStrMut` from a C string slice.
 ///

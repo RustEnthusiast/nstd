@@ -1,6 +1,12 @@
 //! A sized pointer to some arbitrary type.
 pub mod raw;
-use crate::{core::mem::nstd_core_mem_copy, NSTDAny, NSTDAnyMut, NSTDUInt};
+use crate::{
+    core::{
+        mem::nstd_core_mem_copy,
+        optional::{gen_optional, NSTDOptional},
+    },
+    NSTDAny, NSTDAnyMut, NSTDUInt,
+};
 
 /// A sized immutable pointer to some arbitrary type.
 ///
@@ -16,6 +22,7 @@ pub struct NSTDPtr {
     /// The size of the object being pointed to.
     size: NSTDUInt,
 }
+gen_optional!(NSTDOptionalPtr, NSTDPtr);
 
 /// Creates a new instance of `NSTDPtr`.
 ///
@@ -110,6 +117,7 @@ pub struct NSTDPtrMut {
     /// The size of the object being pointed to.
     size: NSTDUInt,
 }
+gen_optional!(NSTDOptionalPtrMut, NSTDPtrMut);
 
 /// Creates a new instance of `NSTDPtrMut`.
 ///

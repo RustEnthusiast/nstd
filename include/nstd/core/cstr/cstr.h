@@ -1,6 +1,7 @@
 #ifndef NSTD_CORE_CSTR_CSTR_H
 #define NSTD_CORE_CSTR_CSTR_H
 #include "../../nstd.h"
+#include "../optional.h"
 #include "../slice.h"
 
 /// An immutable slice of a C string.
@@ -15,6 +16,9 @@ typedef struct {
     /// The length of the C string slice.
     NSTDUInt len;
 } NSTDCStr;
+
+/// Represents an optional value of type `NSTDCStr`.
+NSTDOptional(NSTDCStr) NSTDOptionalCStr;
 
 /// Creates a new C string slice from a raw pointer and a size.
 ///
@@ -200,6 +204,9 @@ typedef struct {
     /// The length of the C string slice.
     NSTDUInt len;
 } NSTDCStrMut;
+
+/// Represents an optional value of type `NSTDCStrMut`.
+NSTDOptional(NSTDCStrMut) NSTDOptionalCStrMut;
 
 /// Creates a new C string slice from a raw pointer and a size.
 ///

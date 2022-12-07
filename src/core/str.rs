@@ -9,7 +9,7 @@ use crate::{
         },
         def::NSTDByte,
         optional::{
-            NSTDOptional, NSTDOptionalFloat32, NSTDOptionalFloat64, NSTDOptionalInt,
+            gen_optional, NSTDOptional, NSTDOptionalFloat32, NSTDOptionalFloat64, NSTDOptionalInt,
             NSTDOptionalInt16, NSTDOptionalInt32, NSTDOptionalInt64, NSTDOptionalInt8,
             NSTDOptionalUInt, NSTDOptionalUInt16, NSTDOptionalUInt32, NSTDOptionalUInt64,
             NSTDOptionalUInt8,
@@ -103,6 +103,7 @@ impl NSTDStr {
         core::str::from_utf8_unchecked(bytes)
     }
 }
+gen_optional!(NSTDOptionalStr, NSTDStr);
 
 /// Creates a new instance of an `NSTDStr` from a C string slice.
 ///
@@ -892,6 +893,7 @@ impl NSTDStrMut {
         core::str::from_utf8_unchecked(bytes)
     }
 }
+gen_optional!(NSTDOptionalStrMut, NSTDStrMut);
 
 /// Creates a new instance of an `NSTDStrMut` from a C string slice.
 ///

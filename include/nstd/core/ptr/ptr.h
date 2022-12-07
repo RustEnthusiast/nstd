@@ -1,6 +1,7 @@
 #ifndef NSTD_CORE_PTR_PTR_H
 #define NSTD_CORE_PTR_PTR_H
 #include "../../nstd.h"
+#include "../optional.h"
 
 /// A sized immutable pointer to some arbitrary type.
 ///
@@ -14,6 +15,9 @@ typedef struct {
     /// The size of the object being pointed to.
     NSTDUInt size;
 } NSTDPtr;
+
+/// Represents an optional value of type `NSTDPtr`.
+NSTDOptional(NSTDPtr) NSTDOptionalPtr;
 
 /// Creates a new instance of `NSTDPtr`.
 ///
@@ -67,6 +71,9 @@ typedef struct {
     /// The size of the object being pointed to.
     NSTDUInt size;
 } NSTDPtrMut;
+
+/// Represents an optional value of type `NSTDPtrMut`.
+NSTDOptional(NSTDPtrMut) NSTDOptionalPtrMut;
 
 /// Creates a new instance of `NSTDPtrMut`.
 ///

@@ -2,6 +2,7 @@
 #define NSTD_CORE_SLICE_H
 #include "../nstd.h"
 #include "def.h"
+#include "optional.h"
 #include "ptr.h"
 
 /// An immutable view into a sequence of values in memory.
@@ -16,6 +17,9 @@ typedef struct {
     /// The number of elements in the slice.
     NSTDUInt len;
 } NSTDSlice;
+
+/// Represents an optional value of type `NSTDSlice`.
+NSTDOptional(NSTDSlice) NSTDOptionalSlice;
 
 /// Creates a new slice from raw data.
 ///
@@ -129,6 +133,9 @@ typedef struct {
     /// The number of elements in the slice.
     NSTDUInt len;
 } NSTDSliceMut;
+
+/// Represents an optional value of type `NSTDSliceMut`.
+NSTDOptional(NSTDSliceMut) NSTDOptionalSliceMut;
 
 /// Creates a new slice from raw data.
 ///
