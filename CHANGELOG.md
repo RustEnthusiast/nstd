@@ -2,6 +2,8 @@
 ### `nstd.core`
 - Added `nstd_core_ptr_raw_dangling[_mut]`.
 - Added `nstd_core_str[_mut]_as_cstr`.
+### `nstd.cstring`
+- Removed `nstd_cstring_as_cstr_mut`.
 ### `nstd.os`
 - [`unix.alloc`] Fixed linker error when using multiple versions of the crate.
 ### `nstd.shared_lib`
