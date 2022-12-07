@@ -4,6 +4,8 @@
 - Added `nstd_core_str[_mut]_as_cstr`.
 ### `nstd.os`
 - [`unix.alloc`] Fixed linker error when using multiple versions of the crate.
+### `nstd.shared_lib`
+- `nstd_shared_lib_load` now takes `NSTDCStr`.
 ### `nstd.thread`
 - Added `nstd_thread_current`.
 
