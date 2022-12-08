@@ -1,18 +1,17 @@
 //! Thread spawning, joining, and detaching.
 use crate::{
     core::{
+        cstr::nstd_core_cstr_get_null,
         def::NSTDErrorCode,
         optional::NSTDOptional,
         result::NSTDResult,
-        slice::nstd_core_slice_new,
-        str::{nstd_core_str_from_bytes_unchecked, NSTDStr},
+        str::{nstd_core_str_as_cstr, NSTDOptionalStr, NSTDStr},
     },
     heap_ptr::NSTDHeapPtr,
     io::NSTDIOError,
     NSTDBool, NSTDFloat64, NSTDUInt,
 };
 use std::{
-    ptr::NonNull,
     thread::{Builder, JoinHandle, Thread, ThreadId},
     time::Duration,
 };
@@ -33,7 +32,9 @@ pub type NSTDThreadID = Box<ThreadId>;
 #[derive(Clone, Copy, Debug)]
 pub struct NSTDThreadDescriptor {
     /// The name of the thread.
-    pub name: NSTDStr,
+    ///
+    /// If present, this must not contain any null bytes.
+    pub name: NSTDOptionalStr,
     /// The number of bytes that the thread's stack should have.
     ///
     /// Set this to 0 to let the host decide how much stack memory should be allocated.
@@ -149,7 +150,16 @@ pub unsafe extern "C" fn nstd_thread_spawn_with_desc(
     if let Some(thread_fn) = thread_fn {
         // Create the thread builder.
         let mut builder = Builder::new();
-        builder = builder.name(desc.name.as_str().to_string());
+        // Set the thread name.
+        if let NSTDOptional::Some(name) = &desc.name {
+            // Make sure `name` doesn't contain any null bytes.
+            let c_name = nstd_core_str_as_cstr(name);
+            if !nstd_core_cstr_get_null(&c_name).is_null() {
+                return None;
+            }
+            builder = builder.name(name.as_str().to_string());
+        }
+        // Set the thread stack size.
         if desc.stack_size != 0 {
             builder = builder.stack_size(desc.stack_size);
         }
@@ -240,16 +250,13 @@ pub extern "C" fn nstd_thread_detach(thread: NSTDThread) {}
 ///
 /// # Returns
 ///
-/// `NSTDStr name` - The name of the thread, or an empty string slice if the thread is unnamed.
+/// `NSTDOptionalStr name` - The name of the thread, or none if the thread is unnamed.
+#[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_thread_name(handle: &NSTDThreadHandle) -> NSTDStr {
+pub extern "C" fn nstd_thread_name(handle: &NSTDThreadHandle) -> NSTDOptionalStr {
     match handle.name() {
-        Some(name) => NSTDStr::from_str(name),
-        _ => {
-            let empty = nstd_core_slice_new(NonNull::<u8>::dangling().as_ptr().cast(), 1, 0);
-            // SAFETY: `empty` is an empty slice.
-            unsafe { nstd_core_str_from_bytes_unchecked(&empty) }
-        }
+        Some(name) => NSTDOptional::Some(NSTDStr::from_str(name)),
+        _ => NSTDOptional::None,
     }
 }
 

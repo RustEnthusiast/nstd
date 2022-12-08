@@ -22,7 +22,9 @@ typedef NSTDAnyMut NSTDThreadID;
 /// This type is passed to the `nstd_thread_spawn_with_desc` function.
 typedef struct {
     /// The name of the thread.
-    NSTDStr name;
+    ///
+    /// If present, this must not contain any null bytes.
+    NSTDOptionalStr name;
     /// The number of bytes that the thread's stack should have.
     ///
     /// Set this to 0 to let the host decide how much stack memory should be allocated.
@@ -143,8 +145,8 @@ NSTDAPI void nstd_thread_detach(NSTDThread thread);
 ///
 /// # Returns
 ///
-/// `NSTDStr name` - The name of the thread, or an empty string slice if the thread is unnamed.
-NSTDAPI NSTDStr nstd_thread_name(const NSTDThreadHandle *handle);
+/// `NSTDOptionalStr name` - The name of the thread, or none if the thread is unnamed.
+NSTDAPI NSTDOptionalStr nstd_thread_name(const NSTDThreadHandle *handle);
 
 /// Returns a thread's unique identifier.
 ///
