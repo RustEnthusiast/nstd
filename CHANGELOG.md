@@ -10,6 +10,7 @@
 ### `nstd.shared_lib`
 - `nstd_shared_lib_load` now takes `NSTDCStr`.
 ### `nstd.thread`
+- Added `NSTDThreadResult`.
 - `nstd_thread_name` now returns `NSTDOptionalStr`.
 - `NSTDThreadDescriptor::name` is now `NSTDOptionalStr`.
 - Added `nstd_thread_current`.

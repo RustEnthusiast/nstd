@@ -17,7 +17,7 @@ use std::{
 };
 
 /// Represents a running thread.
-pub type NSTDThread = Box<JoinHandle<NSTDErrorCode>>;
+pub type NSTDThread = Box<JoinHandle<NSTDThreadResult>>;
 
 /// A handle to a running thread.
 pub type NSTDThreadHandle = Box<Thread>;
@@ -41,8 +41,11 @@ pub struct NSTDThreadDescriptor {
     pub stack_size: NSTDUInt,
 }
 
+/// A thread function's return value.
+pub type NSTDThreadResult = NSTDErrorCode;
+
 /// Returned from `nstd_thread_join`, contains the thread function's return value on success.
-pub type NSTDOptionalThreadResult = NSTDOptional<NSTDErrorCode>;
+pub type NSTDOptionalThreadResult = NSTDOptional<NSTDThreadResult>;
 
 /// Returned from `nstd_thread_count`, contains the number of threads detected on the system on
 /// success.
@@ -64,7 +67,7 @@ impl From<ThreadData> for NSTDHeapPtr {
 ///
 /// # Parameters:
 ///
-/// - `NSTDErrorCode (*thread_fn)(NSTDHeapPtr)` - The thread function.
+/// - `NSTDThreadResult (*thread_fn)(NSTDHeapPtr)` - The thread function.
 ///
 /// - `NSTDHeapPtr data` - Data to pass to the thread.
 ///
@@ -82,12 +85,12 @@ impl From<ThreadData> for NSTDHeapPtr {
 ///
 /// ```
 /// use nstd_sys::{
-///     core::{def::NSTDErrorCode, optional::NSTDOptional},
+///     core::optional::NSTDOptional,
 ///     heap_ptr::{nstd_heap_ptr_new_zeroed, NSTDHeapPtr},
-///     thread::{nstd_thread_join, nstd_thread_spawn},
+///     thread::{nstd_thread_join, nstd_thread_spawn, NSTDThreadResult},
 /// };
 ///
-/// unsafe extern "C" fn thread_fn(data: NSTDHeapPtr) -> NSTDErrorCode {
+/// unsafe extern "C" fn thread_fn(data: NSTDHeapPtr) -> NSTDThreadResult {
 ///     0
 /// }
 ///
@@ -100,7 +103,7 @@ impl From<ThreadData> for NSTDHeapPtr {
 /// ```
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_thread_spawn(
-    thread_fn: Option<unsafe extern "C" fn(NSTDHeapPtr) -> NSTDErrorCode>,
+    thread_fn: Option<unsafe extern "C" fn(NSTDHeapPtr) -> NSTDThreadResult>,
     data: NSTDHeapPtr,
 ) -> Option<NSTDThread> {
     if let Some(thread_fn) = thread_fn {
@@ -116,7 +119,7 @@ pub unsafe extern "C" fn nstd_thread_spawn(
 ///
 /// # Parameters:
 ///
-/// - `NSTDErrorCode (*thread_fn)(NSTDHeapPtr)` - The thread function.
+/// - `NSTDThreadResult (*thread_fn)(NSTDHeapPtr)` - The thread function.
 ///
 /// - `NSTDHeapPtr data` - Data to pass to the thread.
 ///
@@ -143,7 +146,7 @@ pub unsafe extern "C" fn nstd_thread_spawn(
 /// - The data type that `data` holds must be able to be safely sent between threads.
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_thread_spawn_with_desc(
-    thread_fn: Option<unsafe extern "C" fn(NSTDHeapPtr) -> NSTDErrorCode>,
+    thread_fn: Option<unsafe extern "C" fn(NSTDHeapPtr) -> NSTDThreadResult>,
     data: NSTDHeapPtr,
     desc: &NSTDThreadDescriptor,
 ) -> Option<NSTDThread> {

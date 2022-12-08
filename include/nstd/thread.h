@@ -31,8 +31,11 @@ typedef struct {
     NSTDUInt stack_size;
 } NSTDThreadDescriptor;
 
+/// A thread function's return value.
+typedef NSTDErrorCode NSTDThreadResult;
+
 /// Returned from `nstd_thread_join`, contains the thread function's return value on success.
-NSTDOptional(NSTDErrorCode) NSTDOptionalThreadResult;
+NSTDOptional(NSTDThreadResult) NSTDOptionalThreadResult;
 
 /// Returned from `nstd_thread_count`, contains the number of threads detected on the system on
 /// success.
@@ -42,7 +45,7 @@ NSTDResult(NSTDUInt, NSTDIOError) NSTDThreadCountResult;
 ///
 /// # Parameters:
 ///
-/// - `NSTDErrorCode (*thread_fn)(NSTDHeapPtr)` - The thread function.
+/// - `NSTDThreadResult (*thread_fn)(NSTDHeapPtr)` - The thread function.
 ///
 /// - `NSTDHeapPtr data` - Data to pass to the thread.
 ///
@@ -55,13 +58,13 @@ NSTDResult(NSTDUInt, NSTDIOError) NSTDThreadCountResult;
 /// - The caller of this function must guarantee that `thread_fn` is a valid function pointer.
 ///
 /// - The data type that `data` holds must be able to be safely sent between threads.
-NSTDAPI NSTDThread nstd_thread_spawn(NSTDErrorCode (*thread_fn)(NSTDHeapPtr), NSTDHeapPtr data);
+NSTDAPI NSTDThread nstd_thread_spawn(NSTDThreadResult (*thread_fn)(NSTDHeapPtr), NSTDHeapPtr data);
 
 /// Spawns a new thread configured with a descriptor.
 ///
 /// # Parameters:
 ///
-/// - `NSTDErrorCode (*thread_fn)(NSTDHeapPtr)` - The thread function.
+/// - `NSTDThreadResult (*thread_fn)(NSTDHeapPtr)` - The thread function.
 ///
 /// - `NSTDHeapPtr data` - Data to pass to the thread.
 ///
@@ -86,7 +89,7 @@ NSTDAPI NSTDThread nstd_thread_spawn(NSTDErrorCode (*thread_fn)(NSTDHeapPtr), NS
 /// - This operation can cause undefined behavior if `desc`'s data is invalid.
 ///
 /// - The data type that `data` holds must be able to be safely sent between threads.
-NSTDAPI NSTDThread nstd_thread_spawn_with_desc(NSTDErrorCode (*thread_fn)(NSTDHeapPtr),
+NSTDAPI NSTDThread nstd_thread_spawn_with_desc(NSTDThreadResult (*thread_fn)(NSTDHeapPtr),
 NSTDHeapPtr data, const NSTDThreadDescriptor *desc);
 
 /// Returns a handle to the calling thread.
