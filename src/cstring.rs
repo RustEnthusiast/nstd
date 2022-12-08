@@ -2,15 +2,12 @@
 use crate::{
     alloc::NSTDAllocError,
     core::{
-        cstr::{
-            nstd_core_cstr_as_bytes, nstd_core_cstr_get_null, nstd_core_cstr_mut_new,
-            nstd_core_cstr_new, NSTDCStr, NSTDCStrMut,
-        },
+        cstr::{nstd_core_cstr_as_bytes, nstd_core_cstr_get_null, nstd_core_cstr_new, NSTDCStr},
         slice::NSTDSlice,
     },
     vec::{
-        nstd_vec_as_mut_ptr, nstd_vec_as_ptr, nstd_vec_as_slice, nstd_vec_cap, nstd_vec_clear,
-        nstd_vec_clone, nstd_vec_extend, nstd_vec_from_slice, nstd_vec_get_mut, nstd_vec_len,
+        nstd_vec_as_ptr, nstd_vec_as_slice, nstd_vec_cap, nstd_vec_clear, nstd_vec_clone,
+        nstd_vec_extend, nstd_vec_from_slice, nstd_vec_get_mut, nstd_vec_len,
         nstd_vec_new_with_cap, nstd_vec_pop, nstd_vec_push, NSTDVec,
     },
     NSTDChar, NSTDUInt,
@@ -159,29 +156,11 @@ pub extern "C" fn nstd_cstring_clone(cstring: &NSTDCString) -> NSTDCString {
 /// # Returns
 ///
 /// `NSTDCStr cstr` - The new C string slice.
-#[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_cstring_as_cstr(cstring: &NSTDCString) -> NSTDCStr {
-    let ptr = nstd_vec_as_ptr(&cstring.bytes).cast();
+    let ptr = nstd_vec_as_ptr(&cstring.bytes);
     let len = nstd_vec_len(&cstring.bytes);
-    nstd_core_cstr_new(ptr, len)
-}
-
-/// Creates a C string slice containing the contents of `cstring`.
-///
-/// # Parameters:
-///
-/// - `NSTDCString *cstring` - The C string.
-///
-/// # Returns
-///
-/// `NSTDCStrMut cstr` - The new C string slice.
-#[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_cstring_as_cstr_mut(cstring: &mut NSTDCString) -> NSTDCStrMut {
-    let ptr = nstd_vec_as_mut_ptr(&mut cstring.bytes).cast();
-    let len = nstd_vec_len(&cstring.bytes);
-    nstd_core_cstr_mut_new(ptr, len)
+    nstd_core_cstr_new(ptr.cast(), len)
 }
 
 /// Returns an immutable byte slice of the C string's active data, including the null byte.

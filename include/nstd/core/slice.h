@@ -2,6 +2,7 @@
 #define NSTD_CORE_SLICE_H
 #include "../nstd.h"
 #include "def.h"
+#include "optional.h"
 #include "ptr.h"
 
 /// An immutable view into a sequence of values in memory.
@@ -17,6 +18,9 @@ typedef struct {
     NSTDUInt len;
 } NSTDSlice;
 
+/// Represents an optional value of type `NSTDSlice`.
+NSTDOptional(NSTDSlice) NSTDOptionalSlice;
+
 /// Creates a new slice from raw data.
 ///
 /// # Parameters:
@@ -30,6 +34,10 @@ typedef struct {
 /// # Returns
 ///
 /// `NSTDSlice slice` - The new slice.
+///
+/// # Panics
+///
+/// Panics if `ptr` is null.
 NSTDAPI NSTDSlice nstd_core_slice_new(NSTDAny ptr, NSTDUInt element_size,
 NSTDUInt len);
 
@@ -126,6 +134,9 @@ typedef struct {
     NSTDUInt len;
 } NSTDSliceMut;
 
+/// Represents an optional value of type `NSTDSliceMut`.
+NSTDOptional(NSTDSliceMut) NSTDOptionalSliceMut;
+
 /// Creates a new slice from raw data.
 ///
 /// # Parameters:
@@ -139,6 +150,10 @@ typedef struct {
 /// # Returns
 ///
 /// `NSTDSliceMut slice` - The new slice.
+///
+/// # Panics
+///
+/// Panics if `ptr` is null.
 NSTDAPI NSTDSliceMut nstd_core_slice_mut_new(NSTDAnyMut ptr, NSTDUInt element_size, NSTDUInt len);
 
 /// Creates an immutable version of a mutable slice.

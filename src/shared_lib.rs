@@ -3,6 +3,7 @@
 //! # Platform support
 //!
 //! This module is only functional on Windows and Unix systems.
+#![cfg(any(target_family = "unix", target_os = "windows"))]
 #[cfg(target_family = "unix")]
 use crate::os::unix::shared_lib::{
     nstd_os_unix_shared_lib_get, nstd_os_unix_shared_lib_get_mut, nstd_os_unix_shared_lib_load,
@@ -15,9 +16,8 @@ use crate::os::windows::shared_lib::{
 };
 use crate::{
     core::{
-        cstr::{nstd_core_cstr_get_null, nstd_core_cstr_new},
+        cstr::{nstd_core_cstr_as_ptr, nstd_core_cstr_get_null, NSTDCStr},
         optional::NSTDOptional,
-        str::{nstd_core_str_as_ptr, nstd_core_str_byte_len, NSTDStr},
     },
     cstring::{nstd_cstring_as_ptr, nstd_cstring_from_cstr},
     NSTDAny, NSTDAnyMut, NSTDChar,
@@ -39,7 +39,7 @@ pub type NSTDOptionalSharedLib = NSTDOptional<NSTDSharedLib>;
 ///
 /// # Parameters:
 ///
-/// - `const NSTDStr *path` - A path to the shared library.
+/// - `const NSTDCStr *path` - A path to the shared library.
 ///
 /// # Returns
 ///
@@ -55,25 +55,21 @@ pub type NSTDOptionalSharedLib = NSTDOptional<NSTDSharedLib>;
 ///
 /// - The loaded library may have platform-specific initialization routines ran when it is loaded.
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_shared_lib_load(path: &NSTDStr) -> NSTDOptionalSharedLib {
+pub unsafe extern "C" fn nstd_shared_lib_load(path: &NSTDCStr) -> NSTDOptionalSharedLib {
     // Check if `path` is already null terminated.
-    let path_ptr = nstd_core_str_as_ptr(path).cast();
-    let path_len = nstd_core_str_byte_len(path);
-    let c_path = nstd_core_cstr_new(path_ptr, path_len);
-    // Allocate a null byte for `path`.
-    if nstd_core_cstr_get_null(&c_path).is_null() {
-        let path = nstd_cstring_from_cstr(&c_path);
+    if nstd_core_cstr_get_null(path).is_null() {
+        // Allocate a null byte for `path`.
+        let path = nstd_cstring_from_cstr(path);
         #[cfg(target_family = "unix")]
         return nstd_os_unix_shared_lib_load(nstd_cstring_as_ptr(&path));
         #[cfg(target_os = "windows")]
         return nstd_os_windows_shared_lib_load(nstd_cstring_as_ptr(&path));
-    }
-    // Use the already null terminated `path`.
-    else {
+    } else {
+        // Use the already null terminated `path`.
         #[cfg(target_family = "unix")]
-        return nstd_os_unix_shared_lib_load(path_ptr);
+        return nstd_os_unix_shared_lib_load(nstd_core_cstr_as_ptr(path));
         #[cfg(target_os = "windows")]
-        return nstd_os_windows_shared_lib_load(path_ptr);
+        return nstd_os_windows_shared_lib_load(nstd_core_cstr_as_ptr(path));
     }
 }
 

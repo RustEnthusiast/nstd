@@ -20,7 +20,7 @@ int main()
 }
 ```
 
-# Modules
+# Library modules
 - `nstd` - A cross-platform, fast, and safe general purpose C library written in Rust.
     - `alloc` - Low level memory allocation.
     - `app` - An application event loop.
@@ -36,9 +36,10 @@ int main()
         - `ity` - Provides functions for examining and operating on integral types.
         - `math` - Low level math operations.
         - `mem` - Contains mostly unsafe functions for interacting with raw memory.
-        - `ops` - Operator overloading.
+        - `ops` - Operator overloading for types and operators that may cause overflow.
         - `optional` - Represents an optional (possibly uninitialized) value.
         - `ptr` - A sized pointer to some arbitrary type.
+            - `raw` - Provides useful utilities for working with raw pointers.
         - `range` - A numerical range.
         - `result` - Defines a "result" type with success and error variants.
         - `slice` - A view into a sequence of values in memory.
@@ -82,7 +83,10 @@ need to be done manually as there are no official wrappers for the API, however 
 version 0.11, the plan is to start adding official wrappers so developers from other languages
 can easily use the API.
 
-# User safety notes
+# Safety
+*Please note that these safety notes (as well as the framework as a whole) are a work in progress.*
+
+## User safety notes
 
 - Raw pointers are unsafe to access.
 
@@ -90,17 +94,23 @@ can easily use the API.
 Users can refer to the [docs](https://docs.rs/nstd-sys/latest/nstd_sys/) to see which APIs expect
 or return valid references.
 
+- Reference data is assumed to remain unaltered by other code/threads.
+
+- When a mutable reference is in use, the underlying data must not be accessed by other code.
+
+- Private (non-`pub`) structure members must not be directly accessed by the user.
+
 - The panic behavior is set to abort by default, as it is undefined behavior to unwind from Rust
 code into foreign code (though this is
 [subject to change](https://rust-lang.github.io/rfcs/2945-c-unwind-abi.html)).
 
-# Contributor safety notes
+## Contributor safety notes
 
 - Any operation that may cause undefined behavior must be marked unsafe.
 
 - Any operation that may cause data races must be marked unsafe.
 
-- Any operation that makes a direct call on a foreign C function pointer must be marked unsafe.
+- All C function pointers taken as input by the API must be marked unsafe.
 
 # How to build
 `nstd` lets you decide what features you want to use.
@@ -117,7 +127,7 @@ The `clib` feature flag is used to build `nstd` as a C library.
 
 The `std` feature flag links the Rust standard library into the binary.
 
-The `asm` feature permits the library to use inline assembly to increase performance.
+The `asm` feature permits the library to use assembly to optimize certain build configurations.
 
 `std` and `nstd_core` are enabled by default.
 

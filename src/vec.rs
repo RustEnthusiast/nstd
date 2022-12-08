@@ -7,6 +7,7 @@ use crate::{
     core::{
         def::{NSTDByte, NSTDErrorCode},
         mem::{nstd_core_mem_copy, nstd_core_mem_copy_overlapping},
+        ptr::raw::{nstd_core_ptr_raw_dangling, nstd_core_ptr_raw_dangling_mut},
         slice::{
             nstd_core_slice_as_ptr, nstd_core_slice_len, nstd_core_slice_mut_new,
             nstd_core_slice_new, nstd_core_slice_stride, NSTDSlice, NSTDSliceMut,
@@ -14,6 +15,7 @@ use crate::{
     },
     NSTDAny, NSTDAnyMut, NSTDUInt, NSTD_NULL,
 };
+use core::ptr::NonNull;
 
 /// A dynamically sized contiguous sequence of values.
 #[repr(C)]
@@ -82,7 +84,10 @@ impl NSTDVec {
     #[allow(dead_code)]
     pub(crate) unsafe fn as_slice<T>(&self) -> &[T] {
         assert!(self.stride == core::mem::size_of::<T>() && self.byte_len() <= isize::MAX as usize);
-        core::slice::from_raw_parts(self.ptr.cast(), self.len)
+        match self.ptr.is_null() {
+            false => core::slice::from_raw_parts(self.ptr.cast(), self.len),
+            _ => core::slice::from_raw_parts(NonNull::dangling().as_ptr(), 0),
+        }
     }
 
     /// Returns a pointer to one byte past the end of the vector.
@@ -370,7 +375,10 @@ pub extern "C" fn nstd_vec_stride(vec: &NSTDVec) -> NSTDUInt {
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_vec_as_slice(vec: &NSTDVec) -> NSTDSlice {
-    nstd_core_slice_new(vec.ptr, vec.stride, vec.len)
+    match vec.ptr.is_null() {
+        false => nstd_core_slice_new(vec.ptr, vec.stride, vec.len),
+        _ => nstd_core_slice_new(nstd_core_ptr_raw_dangling(), vec.stride, 0),
+    }
 }
 
 /// Returns a slice containing all of a vector's active elements.
@@ -385,7 +393,10 @@ pub extern "C" fn nstd_vec_as_slice(vec: &NSTDVec) -> NSTDSlice {
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_vec_as_slice_mut(vec: &mut NSTDVec) -> NSTDSliceMut {
-    nstd_core_slice_mut_new(vec.ptr, vec.stride, vec.len)
+    match vec.ptr.is_null() {
+        false => nstd_core_slice_mut_new(vec.ptr, vec.stride, vec.len),
+        _ => nstd_core_slice_mut_new(nstd_core_ptr_raw_dangling_mut(), vec.stride, 0),
+    }
 }
 
 /// Returns a pointer to a vector's raw data.
@@ -877,13 +888,12 @@ pub extern "C" fn nstd_vec_truncate(vec: &mut NSTDVec, len: NSTDUInt) {
 /// # Returns
 ///
 /// `NSTDAllocError errc` - The allocation operation error code.
-///
-/// # Panics
-///
-/// This operation will panic if `size` is zero.
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_vec_reserve(vec: &mut NSTDVec, size: NSTDUInt) -> NSTDAllocError {
-    assert!(size != 0);
+    // Check `size`.
+    if size == 0 {
+        return NSTDAllocError::NSTD_ALLOC_ERROR_NONE;
+    }
     // Calculate the number of bytes to allocate.
     let bytes_to_alloc = size * vec.stride;
     // Checking if the vector is null and needs to make it's first allocation.
