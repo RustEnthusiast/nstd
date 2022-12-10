@@ -23,9 +23,11 @@
 ///
 /// # Safety
 ///
-/// This function is highly unsafe as it does not know how large either of the memory buffers
+/// - This function is highly unsafe as it does not know how large either of the memory buffers
 /// actually are, which can lead to undefined behavior if either of the buffers' length are less
 /// than `num`.
+///
+/// - `buf1` and `buf2` must be non-null.
 NSTDAPI NSTDBool nstd_core_mem_compare(const NSTDByte *buf1, const NSTDByte *buf2, NSTDUInt num);
 
 /// Iterates through each byte in a raw memory buffer until `delim` is reached, returning a pointer

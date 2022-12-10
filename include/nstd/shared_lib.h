@@ -1,7 +1,7 @@
 #ifndef NSTD_SHARED_LIB_H
 #define NSTD_SHARED_LIB_H
+#include "core/cstr/cstr.h"
 #include "core/optional.h"
-#include "core/str.h"
 #include "nstd.h"
 #include "os/os.h"
 #if defined(NSTD_OS_UNIX)
@@ -28,7 +28,7 @@ NSTDOptional(NSTDSharedLib) NSTDOptionalSharedLib;
 ///
 /// # Parameters:
 ///
-/// - `const NSTDStr *path` - A path to the shared library.
+/// - `const NSTDCStr *path` - A path to the shared library.
 ///
 /// # Returns
 ///
@@ -43,7 +43,7 @@ NSTDOptional(NSTDSharedLib) NSTDOptionalSharedLib;
 /// - `path`'s data must be valid for reads.
 ///
 /// - The loaded library may have platform-specific initialization routines ran when it is loaded.
-NSTDAPI NSTDOptionalSharedLib nstd_shared_lib_load(const NSTDStr *path);
+NSTDAPI NSTDOptionalSharedLib nstd_shared_lib_load(const NSTDCStr *path);
 
 /// Gets a pointer to a function or static variable in a dynamically loaded library by symbol name.
 ///

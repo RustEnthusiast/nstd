@@ -4,12 +4,9 @@ pub mod stdin;
 pub(crate) mod stdio;
 pub mod stdout;
 use crate::{
-    alloc::NSTDAllocError,
-    core::{
-        slice::nstd_core_slice_new,
-        str::{nstd_core_str_from_bytes_unchecked, NSTDStr},
-    },
-    string::{nstd_string_pop, nstd_string_push_str, NSTDString},
+    core::{result::NSTDResult, str::NSTDStr},
+    string::{nstd_string_pop, NSTDString},
+    vec::NSTDVec,
 };
 use std::io::{ErrorKind, Write};
 
@@ -89,6 +86,12 @@ impl NSTDIOError {
     }
 }
 
+/// A result type that yields an [NSTDVec] on success and an I/O operation error code on failure.
+pub type NSTDIOBufferResult = NSTDResult<NSTDVec, NSTDIOError>;
+
+/// A result type that yields a UTF-8 string on success and an I/O operation error code on failure.
+pub type NSTDIOStringResult = NSTDResult<NSTDString, NSTDIOError>;
+
 /// Writes a string slice to stdout.
 ///
 /// # Parameters:
@@ -149,55 +152,42 @@ pub unsafe extern "C" fn nstd_io_print_line(output: &NSTDStr) -> NSTDIOError {
     NSTDIOError::NSTD_IO_ERROR_NONE
 }
 
-/// Reads a line of UTF-8 input from stdin and pushes it onto `buffer` without the newline.
-///
-/// # Parameters:
-///
-/// - `NSTDString *buffer` - The string buffer to be extended with input from stdin.
+/// Reads a line of UTF-8 input from stdin, discarding the newline character.
 ///
 /// # Returns
 ///
-/// `NSTDIOError errc` - The I/O operation error code.
+/// `NSTDIOStringResult input` - The UTF-8 input from stdin on success and the I/O operation error
+/// code on failure.
 ///
 /// # Panics
 ///
-/// Panics if `buffer`'s length in bytes exceeds `NSTDInt`'s max value.
-#[inline]
+/// Panics if allocating the string fails or the input's length in bytes exceeds `NSTDInt`'s max
+/// value.
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_io_read(buffer: &mut NSTDString) -> NSTDIOError {
-    let errc = nstd_io_read_line(buffer);
-    nstd_string_pop(buffer);
-    errc
+pub extern "C" fn nstd_io_read() -> NSTDIOStringResult {
+    let mut res = nstd_io_read_line();
+    if let NSTDResult::Ok(input) = &mut res {
+        nstd_string_pop(input);
+    }
+    res
 }
 
-/// Reads a line of UTF-8 input from stdin and pushes it onto `buffer`.
-///
-/// # Parameters:
-///
-/// - `NSTDString *buffer` - The string buffer to be extended with input from stdin.
+/// Reads a line of UTF-8 input from stdin.
 ///
 /// # Returns
 ///
-/// `NSTDIOError errc` - The I/O operation error code.
+/// `NSTDIOStringResult input` - The UTF-8 input from stdin on success and the I/O operation error
+/// code on failure.
 ///
 /// # Panics
 ///
-/// Panics if `buffer`'s length in bytes exceeds `NSTDInt`'s max value.
+/// Panics if allocating the string fails.
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_io_read_line(buffer: &mut NSTDString) -> NSTDIOError {
+pub extern "C" fn nstd_io_read_line() -> NSTDIOStringResult {
     // Attempt to read a line from stdin.
     let mut input = String::new();
     if let Err(err) = std::io::stdin().read_line(&mut input) {
-        return NSTDIOError::from_err(err.kind());
+        return NSTDResult::Err(NSTDIOError::from_err(err.kind()));
     }
-    // SAFETY: Rust strings are UTF-8 encoded.
-    unsafe {
-        // Extend the string buffer with the input from stdin.
-        let bytes = nstd_core_slice_new(input.as_ptr().cast(), 1, input.len());
-        let str = nstd_core_str_from_bytes_unchecked(&bytes);
-        match nstd_string_push_str(buffer, &str) {
-            NSTDAllocError::NSTD_ALLOC_ERROR_NONE => NSTDIOError::NSTD_IO_ERROR_NONE,
-            _ => NSTDIOError::NSTD_IO_ERROR_OUT_OF_MEMORY,
-        }
-    }
+    NSTDResult::Ok(NSTDString::from_str(&input))
 }

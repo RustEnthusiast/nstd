@@ -16,7 +16,7 @@ use crate::{NSTDAnyMut, NSTDUInt};
 
 /// Describes an error returned from allocation functions.
 #[repr(C)]
-#[derive(Clone, Copy, Debug, Hash, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[allow(non_camel_case_types)]
 pub enum NSTDAllocError {
     /// No error occurred.
@@ -79,9 +79,9 @@ impl NSTDAllocError {
 pub unsafe extern "C" fn nstd_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
     #[cfg(not(any(target_family = "unix", target_os = "windows")))]
     {
-        use crate::NSTD_NULL;
+        use crate::{core::ptr::raw::MAX_ALIGN, NSTD_NULL};
         use alloc::alloc::Layout;
-        if let Ok(layout) = Layout::from_size_align(size, 1) {
+        if let Ok(layout) = Layout::from_size_align(size, MAX_ALIGN) {
             return alloc::alloc::alloc(layout).cast();
         }
         NSTD_NULL
@@ -130,9 +130,9 @@ pub unsafe extern "C" fn nstd_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
 pub unsafe extern "C" fn nstd_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMut {
     #[cfg(not(any(target_family = "unix", target_os = "windows")))]
     {
-        use crate::NSTD_NULL;
+        use crate::{core::ptr::raw::MAX_ALIGN, NSTD_NULL};
         use alloc::alloc::Layout;
-        if let Ok(layout) = Layout::from_size_align(size, 1) {
+        if let Ok(layout) = Layout::from_size_align(size, MAX_ALIGN) {
             return alloc::alloc::alloc_zeroed(layout).cast();
         }
         NSTD_NULL
@@ -207,8 +207,9 @@ pub unsafe extern "C" fn nstd_alloc_reallocate(
 ) -> NSTDAllocError {
     #[cfg(not(any(target_family = "unix", target_os = "windows")))]
     {
+        use crate::core::ptr::raw::MAX_ALIGN;
         use alloc::alloc::Layout;
-        if let Ok(layout) = Layout::from_size_align(size, 1) {
+        if let Ok(layout) = Layout::from_size_align(size, MAX_ALIGN) {
             let new_mem = alloc::alloc::realloc((*ptr).cast(), layout, new_size);
             if new_mem.is_null() {
                 return NSTDAllocError::NSTD_ALLOC_ERROR_OUT_OF_MEMORY;
@@ -272,9 +273,9 @@ pub unsafe extern "C" fn nstd_alloc_deallocate(
 ) -> NSTDAllocError {
     #[cfg(not(any(target_family = "unix", target_os = "windows")))]
     {
-        use crate::NSTD_NULL;
+        use crate::{core::ptr::raw::MAX_ALIGN, NSTD_NULL};
         use alloc::alloc::Layout;
-        if let Ok(layout) = Layout::from_size_align(size, 1) {
+        if let Ok(layout) = Layout::from_size_align(size, MAX_ALIGN) {
             alloc::alloc::dealloc((*ptr).cast(), layout);
             *ptr = NSTD_NULL;
             return NSTDAllocError::NSTD_ALLOC_ERROR_NONE;

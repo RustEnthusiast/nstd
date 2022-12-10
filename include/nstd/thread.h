@@ -12,7 +12,7 @@
 typedef NSTDAnyMut NSTDThread;
 
 /// A handle to a running thread.
-typedef NSTDAny NSTDThreadHandle;
+typedef NSTDAnyMut NSTDThreadHandle;
 
 /// A thread's unique identifier.
 typedef NSTDAnyMut NSTDThreadID;
@@ -22,15 +22,20 @@ typedef NSTDAnyMut NSTDThreadID;
 /// This type is passed to the `nstd_thread_spawn_with_desc` function.
 typedef struct {
     /// The name of the thread.
-    NSTDStr name;
+    ///
+    /// If present, this must not contain any null bytes.
+    NSTDOptionalStr name;
     /// The number of bytes that the thread's stack should have.
     ///
     /// Set this to 0 to let the host decide how much stack memory should be allocated.
     NSTDUInt stack_size;
 } NSTDThreadDescriptor;
 
+/// A thread function's return value.
+typedef NSTDErrorCode NSTDThreadResult;
+
 /// Returned from `nstd_thread_join`, contains the thread function's return value on success.
-NSTDOptional(NSTDErrorCode) NSTDOptionalThreadResult;
+NSTDOptional(NSTDThreadResult) NSTDOptionalThreadResult;
 
 /// Returned from `nstd_thread_count`, contains the number of threads detected on the system on
 /// success.
@@ -40,7 +45,7 @@ NSTDResult(NSTDUInt, NSTDIOError) NSTDThreadCountResult;
 ///
 /// # Parameters:
 ///
-/// - `NSTDErrorCode (*thread_fn)(NSTDHeapPtr)` - The thread function.
+/// - `NSTDThreadResult (*thread_fn)(NSTDHeapPtr)` - The thread function.
 ///
 /// - `NSTDHeapPtr data` - Data to pass to the thread.
 ///
@@ -53,13 +58,13 @@ NSTDResult(NSTDUInt, NSTDIOError) NSTDThreadCountResult;
 /// - The caller of this function must guarantee that `thread_fn` is a valid function pointer.
 ///
 /// - The data type that `data` holds must be able to be safely sent between threads.
-NSTDAPI NSTDThread nstd_thread_spawn(NSTDErrorCode (*thread_fn)(NSTDHeapPtr), NSTDHeapPtr data);
+NSTDAPI NSTDThread nstd_thread_spawn(NSTDThreadResult (*thread_fn)(NSTDHeapPtr), NSTDHeapPtr data);
 
 /// Spawns a new thread configured with a descriptor.
 ///
 /// # Parameters:
 ///
-/// - `NSTDErrorCode (*thread_fn)(NSTDHeapPtr)` - The thread function.
+/// - `NSTDThreadResult (*thread_fn)(NSTDHeapPtr)` - The thread function.
 ///
 /// - `NSTDHeapPtr data` - Data to pass to the thread.
 ///
@@ -84,8 +89,15 @@ NSTDAPI NSTDThread nstd_thread_spawn(NSTDErrorCode (*thread_fn)(NSTDHeapPtr), NS
 /// - This operation can cause undefined behavior if `desc`'s data is invalid.
 ///
 /// - The data type that `data` holds must be able to be safely sent between threads.
-NSTDAPI NSTDThread nstd_thread_spawn_with_desc(NSTDErrorCode (*thread_fn)(NSTDHeapPtr),
+NSTDAPI NSTDThread nstd_thread_spawn_with_desc(NSTDThreadResult (*thread_fn)(NSTDHeapPtr),
 NSTDHeapPtr data, const NSTDThreadDescriptor *desc);
+
+/// Returns a handle to the calling thread.
+///
+/// # Returns
+///
+/// `NSTDThreadHandle handle` - A handle to the current thread.
+NSTDAPI NSTDThreadHandle nstd_thread_current();
 
 /// Retrieves a raw handle to a thread.
 ///
@@ -132,23 +144,30 @@ NSTDAPI void nstd_thread_detach(NSTDThread thread);
 ///
 /// # Parameters:
 ///
-/// - `NSTDThreadHandle handle` - A handle to the thread.
+/// - `const NSTDThreadHandle *handle` - A handle to the thread.
 ///
 /// # Returns
 ///
-/// `NSTDStr name` - The name of the thread, or an empty string slice if the thread is unnamed.
-NSTDAPI NSTDStr nstd_thread_name(NSTDThreadHandle handle);
+/// `NSTDOptionalStr name` - The name of the thread, or none if the thread is unnamed.
+NSTDAPI NSTDOptionalStr nstd_thread_name(const NSTDThreadHandle *handle);
 
 /// Returns a thread's unique identifier.
 ///
 /// # Parameters:
 ///
-/// - `NSTDThreadHandle handle` - A handle to the thread.
+/// - `const NSTDThreadHandle *handle` - A handle to the thread.
 ///
 /// # Returns
 ///
 /// `NSTDThreadID id` - The thread's unique ID.
-NSTDAPI NSTDThreadID nstd_thread_id(NSTDThreadHandle handle);
+NSTDAPI NSTDThreadID nstd_thread_id(const NSTDThreadHandle *handle);
+
+/// Frees an instance of `NSTDThreadHandle`.
+///
+/// # Parameters:
+///
+/// - `NSTDThreadHandle handle` - The handle to free.
+NSTDAPI void nstd_thread_handle_free(NSTDThreadHandle handle);
 
 /// Puts the current thread to sleep for a specified number of seconds.
 ///

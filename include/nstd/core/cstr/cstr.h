@@ -1,6 +1,7 @@
 #ifndef NSTD_CORE_CSTR_CSTR_H
 #define NSTD_CORE_CSTR_CSTR_H
 #include "../../nstd.h"
+#include "../optional.h"
 #include "../slice.h"
 
 /// An immutable slice of a C string.
@@ -16,6 +17,9 @@ typedef struct {
     NSTDUInt len;
 } NSTDCStr;
 
+/// Represents an optional value of type `NSTDCStr`.
+NSTDOptional(NSTDCStr) NSTDOptionalCStr;
+
 /// Creates a new C string slice from a raw pointer and a size.
 ///
 /// # Parameters:
@@ -27,6 +31,10 @@ typedef struct {
 /// # Returns
 ///
 /// `NSTDCStr cstr` - The new C string slice, referencing `raw`'s data.
+///
+/// # Panics
+///
+/// Panics if `raw` is null.
 NSTDAPI NSTDCStr nstd_core_cstr_new(const NSTDChar *raw, NSTDUInt len);
 
 /// Creates a new instance of `NSTDCStr` from a raw C string, excluding the null byte.
@@ -38,6 +46,10 @@ NSTDAPI NSTDCStr nstd_core_cstr_new(const NSTDChar *raw, NSTDUInt len);
 /// # Returns
 ///
 /// `NSTDCStr cstr` - The new C string slice, referencing `raw`'s data.
+///
+/// # Panics
+///
+/// Panics if `raw` is null.
 ///
 /// # Safety
 ///
@@ -54,6 +66,10 @@ NSTDAPI NSTDCStr nstd_core_cstr_from_raw(const NSTDChar *raw);
 /// # Returns
 ///
 /// `NSTDCStr cstr` - The new C string slice, referencing `raw`'s data.
+///
+/// # Panics
+///
+/// Panics if `raw` is null.
 ///
 /// # Safety
 ///
@@ -189,6 +205,9 @@ typedef struct {
     NSTDUInt len;
 } NSTDCStrMut;
 
+/// Represents an optional value of type `NSTDCStrMut`.
+NSTDOptional(NSTDCStrMut) NSTDOptionalCStrMut;
+
 /// Creates a new C string slice from a raw pointer and a size.
 ///
 /// # Parameters:
@@ -200,6 +219,10 @@ typedef struct {
 /// # Returns
 ///
 /// `NSTDCStrMut cstr` - The new C string slice, referencing `raw`'s data.
+///
+/// # Panics
+///
+/// Panics if `raw` is null.
 NSTDAPI NSTDCStrMut nstd_core_cstr_mut_new(NSTDChar *raw, NSTDUInt len);
 
 /// Creates a new instance of `NSTDCStrMut` from a raw C string, excluding the null byte.
@@ -211,6 +234,10 @@ NSTDAPI NSTDCStrMut nstd_core_cstr_mut_new(NSTDChar *raw, NSTDUInt len);
 /// # Returns
 ///
 /// `NSTDCStrMut cstr` - The new C string slice, referencing `raw`'s data.
+///
+/// # Panics
+///
+/// Panics if `raw` is null.
 ///
 /// # Safety
 ///
@@ -227,6 +254,10 @@ NSTDAPI NSTDCStrMut nstd_core_cstr_mut_from_raw(NSTDChar *raw);
 /// # Returns
 ///
 /// `NSTDCStrMut cstr` - The new C string slice, referencing `raw`'s data.
+///
+/// # Panics
+///
+/// Panics if `raw` is null.
 ///
 /// # Safety
 ///

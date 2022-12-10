@@ -21,9 +21,11 @@ use crate::{core::def::NSTDByte, NSTDBool, NSTDUInt, NSTD_FALSE, NSTD_TRUE};
 ///
 /// # Safety
 ///
-/// This function is highly unsafe as it does not know how large either of the memory buffers
+/// - This function is highly unsafe as it does not know how large either of the memory buffers
 /// actually are, which can lead to undefined behavior if either of the buffers' length are less
 /// than `num`.
+///
+/// - `buf1` and `buf2` must be non-null.
 ///
 /// # Example
 ///
@@ -220,13 +222,21 @@ pub unsafe extern "C" fn nstd_core_mem_zero(buf: *mut NSTDByte, size: NSTDUInt) 
             i += 1;
         }
     }
-    #[cfg(feature = "asm")]
+    #[cfg(all(
+        feature = "asm",
+        any(
+            target_arch = "x86",
+            target_arch = "x86_64",
+            target_arch = "arm",
+            target_arch = "aarch64"
+        )
+    ))]
     {
         use core::arch::asm;
         const REG_SIZE: NSTDUInt = core::mem::size_of::<&()>();
         let rem_bytes = size % REG_SIZE;
-        let reg_end = buf.add(size - rem_bytes);
-        let end = reg_end.add(rem_bytes);
+        let reg_end = buf.add(size - rem_bytes).sub(REG_SIZE);
+        let end = buf.add(size);
         #[cfg(target_arch = "x86")]
         {
             asm!(

@@ -3,6 +3,7 @@ use crate::{
     core::{
         def::NSTDErrorCode,
         mem::nstd_core_mem_copy,
+        optional::{gen_optional, NSTDOptional},
         ptr::{
             nstd_core_ptr_get, nstd_core_ptr_mut_get, nstd_core_ptr_mut_get_const,
             nstd_core_ptr_mut_new, nstd_core_ptr_mut_size, nstd_core_ptr_new, nstd_core_ptr_size,
@@ -57,6 +58,7 @@ impl NSTDSlice {
         core::slice::from_raw_parts(ptr, self.len)
     }
 }
+gen_optional!(NSTDOptionalSlice, NSTDSlice);
 
 /// Creates a new slice from raw data.
 ///
@@ -71,6 +73,10 @@ impl NSTDSlice {
 /// # Returns
 ///
 /// `NSTDSlice slice` - The new slice.
+///
+/// # Panics
+///
+/// Panics if `ptr` is null.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_slice_new(
@@ -357,6 +363,7 @@ impl NSTDSliceMut {
         core::slice::from_raw_parts_mut(ptr, self.len)
     }
 }
+gen_optional!(NSTDOptionalSliceMut, NSTDSliceMut);
 
 /// Creates a new slice from raw data.
 ///
@@ -371,6 +378,10 @@ impl NSTDSliceMut {
 /// # Returns
 ///
 /// `NSTDSliceMut slice` - The new slice.
+///
+/// # Panics
+///
+/// Panics if `ptr` is null.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_slice_mut_new(

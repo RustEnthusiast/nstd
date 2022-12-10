@@ -26,13 +26,27 @@ pub enum NSTDOptional<T> {
     Some(T),
 }
 
-/// Generates optional primitive structures.
+/// Generates optional data structures.
+///
+/// `NSTDOptional` must be in scope.
+///
+/// # Example
+///
+/// ```ignore
+/// use nstd_sys::{
+///     core::optional::{gen_optional, NSTDOptional},
+///     string::NSTDString,
+/// };
+///
+/// gen_optional!(NSTDOptionalString, NSTDString);
+/// ```
 macro_rules! gen_optional {
     ($name: ident, $T: ty) => {
         #[doc = concat!("Represents an optional value of type `", stringify!($T), "`.")]
         pub type $name = NSTDOptional<$T>;
     };
 }
+pub(crate) use gen_optional;
 gen_optional!(NSTDOptionalBool, NSTDBool);
 gen_optional!(NSTDOptionalChar, NSTDChar);
 gen_optional!(NSTDOptionalChar8, NSTDChar8);

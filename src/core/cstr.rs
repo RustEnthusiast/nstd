@@ -4,6 +4,7 @@ use self::raw::{nstd_core_cstr_raw_len, nstd_core_cstr_raw_len_with_null};
 use crate::{
     core::{
         mem::nstd_core_mem_search,
+        optional::{gen_optional, NSTDOptional},
         slice::{nstd_core_slice_new, NSTDSlice},
     },
     NSTDBool, NSTDChar, NSTDUInt,
@@ -35,12 +36,12 @@ impl NSTDCStr {
     /// This C string slice's data must remain valid and unmodified while the returned byte slice
     /// is in use.
     #[inline]
-    #[allow(dead_code)]
     pub(crate) unsafe fn as_bytes(&self) -> &[u8] {
         assert!(self.len <= isize::MAX as usize);
         core::slice::from_raw_parts(self.ptr.cast(), self.len)
     }
 }
+gen_optional!(NSTDOptionalCStr, NSTDCStr);
 
 /// Creates a new C string slice from a raw pointer and a size.
 ///
@@ -53,9 +54,14 @@ impl NSTDCStr {
 /// # Returns
 ///
 /// `NSTDCStr cstr` - The new C string slice, referencing `raw`'s data.
+///
+/// # Panics
+///
+/// Panics if `raw` is null.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_cstr_new(raw: *const NSTDChar, len: NSTDUInt) -> NSTDCStr {
+    assert!(!raw.is_null());
     NSTDCStr { ptr: raw, len }
 }
 
@@ -68,6 +74,10 @@ pub extern "C" fn nstd_core_cstr_new(raw: *const NSTDChar, len: NSTDUInt) -> NST
 /// # Returns
 ///
 /// `NSTDCStr cstr` - The new C string slice, referencing `raw`'s data.
+///
+/// # Panics
+///
+/// Panics if `raw` is null.
 ///
 /// # Safety
 ///
@@ -102,6 +112,10 @@ pub unsafe extern "C" fn nstd_core_cstr_from_raw(raw: *const NSTDChar) -> NSTDCS
 /// # Returns
 ///
 /// `NSTDCStr cstr` - The new C string slice, referencing `raw`'s data.
+///
+/// # Panics
+///
+/// Panics if `raw` is null.
 ///
 /// # Safety
 ///
@@ -402,6 +416,24 @@ pub struct NSTDCStrMut {
     /// The length of the C string slice.
     len: NSTDUInt,
 }
+impl NSTDCStrMut {
+    /// Interprets a C string slice as a byte slice.
+    ///
+    /// # Panics
+    ///
+    /// This operation will panic if the C string slice's length is greater than `isize::MAX`.
+    ///
+    /// # Safety
+    ///
+    /// This C string slice's data must remain valid and unmodified while the returned byte slice
+    /// is in use.
+    #[inline]
+    pub(crate) unsafe fn as_bytes(&self) -> &[u8] {
+        assert!(self.len <= isize::MAX as usize);
+        core::slice::from_raw_parts(self.ptr.cast(), self.len)
+    }
+}
+gen_optional!(NSTDOptionalCStrMut, NSTDCStrMut);
 
 /// Creates a new C string slice from a raw pointer and a size.
 ///
@@ -414,9 +446,14 @@ pub struct NSTDCStrMut {
 /// # Returns
 ///
 /// `NSTDCStrMut cstr` - The new C string slice, referencing `raw`'s data.
+///
+/// # Panics
+///
+/// Panics if `raw` is null.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_cstr_mut_new(raw: *mut NSTDChar, len: NSTDUInt) -> NSTDCStrMut {
+    assert!(!raw.is_null());
     NSTDCStrMut { ptr: raw, len }
 }
 
@@ -429,6 +466,10 @@ pub extern "C" fn nstd_core_cstr_mut_new(raw: *mut NSTDChar, len: NSTDUInt) -> N
 /// # Returns
 ///
 /// `NSTDCStrMut cstr` - The new C string slice, referencing `raw`'s data.
+///
+/// # Panics
+///
+/// Panics if `raw` is null.
 ///
 /// # Safety
 ///
@@ -463,6 +504,10 @@ pub unsafe extern "C" fn nstd_core_cstr_mut_from_raw(raw: *mut NSTDChar) -> NSTD
 /// # Returns
 ///
 /// `NSTDCStrMut cstr` - The new C string slice, referencing `raw`'s data.
+///
+/// # Panics
+///
+/// Panics if `raw` is null.
 ///
 /// # Safety
 ///

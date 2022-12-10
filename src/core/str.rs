@@ -3,13 +3,13 @@ use crate::{
     core::{
         cstr::{
             nstd_core_cstr_as_ptr, nstd_core_cstr_len, nstd_core_cstr_mut_as_ptr,
-            nstd_core_cstr_mut_len,
+            nstd_core_cstr_mut_len, nstd_core_cstr_new,
             raw::{nstd_core_cstr_raw_len, nstd_core_cstr_raw_len_with_null},
             NSTDCStr, NSTDCStrMut,
         },
         def::NSTDByte,
         optional::{
-            NSTDOptional, NSTDOptionalFloat32, NSTDOptionalFloat64, NSTDOptionalInt,
+            gen_optional, NSTDOptional, NSTDOptionalFloat32, NSTDOptionalFloat64, NSTDOptionalInt,
             NSTDOptionalInt16, NSTDOptionalInt32, NSTDOptionalInt64, NSTDOptionalInt8,
             NSTDOptionalUInt, NSTDOptionalUInt16, NSTDOptionalUInt32, NSTDOptionalUInt64,
             NSTDOptionalUInt8,
@@ -103,6 +103,7 @@ impl NSTDStr {
         core::str::from_utf8_unchecked(bytes)
     }
 }
+gen_optional!(NSTDOptionalStr, NSTDStr);
 
 /// Creates a new instance of an `NSTDStr` from a C string slice.
 ///
@@ -143,11 +144,9 @@ impl NSTDStr {
 /// ```
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_from_cstr(cstr: &NSTDCStr) -> NSTDStr {
+    core::str::from_utf8(cstr.as_bytes()).expect("Invalid UTF-8 bytes");
     let ptr = nstd_core_cstr_as_ptr(cstr).cast();
     let len = nstd_core_cstr_len(cstr);
-    assert!(len <= isize::MAX as usize);
-    let bytes = core::slice::from_raw_parts(ptr, len);
-    core::str::from_utf8(bytes).expect("Invalid UTF-8 bytes");
     NSTDStr { ptr, len }
 }
 
@@ -203,6 +202,8 @@ pub unsafe extern "C" fn nstd_core_str_from_cstr_unchecked(cstr: &NSTDCStr) -> N
 ///
 /// This function will panic in the following situations:
 ///
+/// - `cstr` is null.
+///
 /// - `cstr`'s data is not valid UTF-8.
 ///
 /// - `cstr`'s length is greater than `NSTDInt`'s max value.
@@ -225,6 +226,7 @@ pub unsafe extern "C" fn nstd_core_str_from_cstr_unchecked(cstr: &NSTDCStr) -> N
 /// ```
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_from_raw_cstr(cstr: *const NSTDChar) -> NSTDStr {
+    assert!(!cstr.is_null());
     let ptr = cstr.cast();
     let len = nstd_core_cstr_raw_len(cstr);
     assert!(len <= isize::MAX as NSTDUInt);
@@ -246,6 +248,8 @@ pub unsafe extern "C" fn nstd_core_str_from_raw_cstr(cstr: *const NSTDChar) -> N
 /// # Panics
 ///
 /// This function will panic in the following situations:
+///
+/// - `cstr` is null.
 ///
 /// - `cstr`'s data is not valid UTF-8.
 ///
@@ -269,6 +273,7 @@ pub unsafe extern "C" fn nstd_core_str_from_raw_cstr(cstr: *const NSTDChar) -> N
 /// ```
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_from_raw_cstr_with_null(cstr: *const NSTDChar) -> NSTDStr {
+    assert!(!cstr.is_null());
     let ptr = cstr.cast();
     let len = nstd_core_cstr_raw_len_with_null(cstr);
     assert!(len <= isize::MAX as NSTDUInt);
@@ -371,6 +376,21 @@ pub unsafe extern "C" fn nstd_core_str_from_bytes_unchecked(bytes: &NSTDSlice) -
     let ptr = nstd_core_slice_as_ptr(bytes).cast();
     let len = nstd_core_slice_len(bytes);
     NSTDStr { ptr, len }
+}
+
+/// Returns a C string slice variant of this UTF-8 encoded string slice.
+///
+/// # Parameters:
+///
+/// - `const NSTDStr *str` - The UTF-8 encoded string slice.
+///
+/// # Returns
+///
+/// `NSTDCStr cstr` - The new C string slice.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_core_str_as_cstr(str: &NSTDStr) -> NSTDCStr {
+    nstd_core_cstr_new(str.ptr.cast(), str.len)
 }
 
 /// Returns an immutable byte slice over `str`'s data.
@@ -873,6 +893,7 @@ impl NSTDStrMut {
         core::str::from_utf8_unchecked(bytes)
     }
 }
+gen_optional!(NSTDOptionalStrMut, NSTDStrMut);
 
 /// Creates a new instance of an `NSTDStrMut` from a C string slice.
 ///
@@ -913,11 +934,9 @@ impl NSTDStrMut {
 /// ```
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_mut_from_cstr(cstr: &mut NSTDCStrMut) -> NSTDStrMut {
+    core::str::from_utf8(cstr.as_bytes()).expect("Invalid UTF-8 bytes");
     let ptr = nstd_core_cstr_mut_as_ptr(cstr).cast();
     let len = nstd_core_cstr_mut_len(cstr);
-    assert!(len <= isize::MAX as usize);
-    let bytes = core::slice::from_raw_parts(ptr, len);
-    core::str::from_utf8(bytes).expect("Invalid UTF-8 bytes");
     NSTDStrMut { ptr, len }
 }
 
@@ -975,6 +994,8 @@ pub unsafe extern "C" fn nstd_core_str_mut_from_cstr_unchecked(
 ///
 /// This function will panic in the following situations:
 ///
+/// - `cstr` is null.
+///
 /// - `cstr`'s data is not valid UTF-8.
 ///
 /// - `cstr`'s length is greater than `NSTDInt`'s max value.
@@ -997,6 +1018,7 @@ pub unsafe extern "C" fn nstd_core_str_mut_from_cstr_unchecked(
 /// ```
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_mut_from_raw_cstr(cstr: *mut NSTDChar) -> NSTDStrMut {
+    assert!(!cstr.is_null());
     let ptr = cstr.cast();
     let len = nstd_core_cstr_raw_len(cstr);
     assert!(len <= isize::MAX as usize);
@@ -1018,6 +1040,8 @@ pub unsafe extern "C" fn nstd_core_str_mut_from_raw_cstr(cstr: *mut NSTDChar) ->
 /// # Panics
 ///
 /// This function will panic in the following situations:
+///
+/// - `cstr` is null.
 ///
 /// - `cstr`'s data is not valid UTF-8.
 ///
@@ -1045,6 +1069,7 @@ pub unsafe extern "C" fn nstd_core_str_mut_from_raw_cstr(cstr: *mut NSTDChar) ->
 pub unsafe extern "C" fn nstd_core_str_mut_from_raw_cstr_with_null(
     cstr: *mut NSTDChar,
 ) -> NSTDStrMut {
+    assert!(!cstr.is_null());
     let ptr = cstr.cast();
     let len = nstd_core_cstr_raw_len_with_null(cstr);
     assert!(len <= isize::MAX as usize);
@@ -1166,6 +1191,21 @@ pub extern "C" fn nstd_core_str_mut_as_const(str: &NSTDStrMut) -> NSTDStr {
     let bytes = nstd_core_str_mut_as_bytes(str);
     // SAFETY: String slices are UTF-8 encoded.
     unsafe { nstd_core_str_from_bytes_unchecked(&bytes) }
+}
+
+/// Returns a C string slice variant of this UTF-8 encoded string slice.
+///
+/// # Parameters:
+///
+/// - `const NSTDStrMut *str` - The UTF-8 encoded string slice.
+///
+/// # Returns
+///
+/// `NSTDCStr cstr` - The new C string slice.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_core_str_mut_as_cstr(str: &NSTDStrMut) -> NSTDCStr {
+    nstd_core_cstr_new(str.ptr.cast(), str.len)
 }
 
 /// Returns an immutable byte slice over `str`'s data.

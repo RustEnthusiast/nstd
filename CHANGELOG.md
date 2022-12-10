@@ -1,5 +1,26 @@
 # TBD
+### `nstd.core`
+- Added `NSTDOptional[Ptr|Slice|CStr|Str][Mut]`.
+- Added `nstd_core_ptr_raw_dangling[_mut]`.
+- Added `nstd_core_str[_mut]_as_cstr`.
+### `nstd.cstring`
+- Removed `nstd_cstring_as_cstr_mut`.
+### `nstd.io`
+- `nstd_io_read[_line]` now returns `NSTDIOStringResult`.
+- Added `NSTDIOBufferResult` & `NSTDIOStringResult`.
+### `nstd.os`
+- [`unix.alloc`] Fixed linker error when using multiple versions of the crate.
+### `nstd.shared_lib`
+- `nstd_shared_lib_load` now takes `NSTDCStr`.
+### `nstd.thread`
+- Added `NSTDThreadResult`.
+- `nstd_thread_name` now returns `NSTDOptionalStr`.
+- `NSTDThreadDescriptor::name` is now `NSTDOptionalStr`.
+- Added `nstd_thread_current`.
+
+# 0.3.3
 ### `nstd`
+- Internal safety improvements.
 - Added `proc`.
 - Added `thread`.
 - Removed dependency for `libloading`.

@@ -9,7 +9,7 @@ use crate::{core::result::NSTDResult, NSTDAnyMut, NSTDUInt, NSTD_NULL};
 
 /// Describes an error returned from allocation functions for Windows.
 #[repr(C)]
-#[derive(Clone, Copy, Debug, Hash, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[allow(non_camel_case_types)]
 pub enum NSTDWindowsAllocError {
     /// No error occurred.
