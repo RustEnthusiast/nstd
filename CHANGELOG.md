@@ -5,6 +5,8 @@
 - Added `nstd_core_str[_mut]_as_cstr`.
 ### `nstd.cstring`
 - Removed `nstd_cstring_as_cstr_mut`.
+### `nstd.io`
+- Added `NSTDIOBufferResult` & `NSTDIOStringResult`.
 ### `nstd.os`
 - [`unix.alloc`] Fixed linker error when using multiple versions of the crate.
 ### `nstd.shared_lib`
