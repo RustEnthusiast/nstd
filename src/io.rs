@@ -165,13 +165,11 @@ pub unsafe extern "C" fn nstd_io_print_line(output: &NSTDStr) -> NSTDIOError {
 /// value.
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_io_read() -> NSTDIOStringResult {
-    match nstd_io_read_line() {
-        NSTDResult::Ok(mut read) => {
-            nstd_string_pop(&mut read);
-            NSTDResult::Ok(read)
-        }
-        err => err,
+    let mut res = nstd_io_read_line();
+    if let NSTDResult::Ok(input) = &mut res {
+        nstd_string_pop(input);
     }
+    res
 }
 
 /// Reads a line of UTF-8 input from stdin.

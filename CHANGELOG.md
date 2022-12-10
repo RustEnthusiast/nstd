@@ -6,6 +6,7 @@
 ### `nstd.cstring`
 - Removed `nstd_cstring_as_cstr_mut`.
 ### `nstd.io`
+- `nstd_io_read[_line]` now returns `NSTDIOStringResult`.
 - Added `NSTDIOBufferResult` & `NSTDIOStringResult`.
 ### `nstd.os`
 - [`unix.alloc`] Fixed linker error when using multiple versions of the crate.
