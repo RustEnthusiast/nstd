@@ -70,4 +70,70 @@ NSTDAPI NSTDString nstd_env_temp_dir();
 /// The user of this function must ensure that `path` is valid for reads.
 NSTDAPI NSTDIOError nstd_env_set_current_dir(const NSTDStr *path);
 
+/// Retrieves a variable from the process environment.
+///
+/// # Parameters:
+///
+/// - `const NSTDStr *key` - The variable's key.
+///
+/// # Returns
+///
+/// `NSTDIOStringResult var` - The value of the environment variable, or the I/O operation error
+/// code on failure. This will return as `NSTD_IO_ERROR_NOT_FOUND` if they variable cannot be found,
+/// and `NSTD_IO_ERROR_INVALID_DATA` if the variable isn't valid Unicode.
+///
+/// # Panics
+///
+/// This operation will panic if `key`'s length in bytes exceeds `NSTDInt`'s max value, or
+/// allocating the string fails.
+///
+/// # Safety
+///
+/// The user of this function must ensure that `key` is valid for reads.
+NSTDAPI NSTDIOStringResult nstd_env_var(const NSTDStr *key);
+
+/// Sets an environment variable for the current process.
+///
+/// # Parameters:
+///
+/// - `const NSTDStr *key` - The environment variable's identification key.
+///
+/// - `const NSTDStr *value` - The environment variable's value.
+///
+/// # Panics
+///
+/// This operation will panic in the following situations:
+///
+/// - `key` is empty or contains either of the following ASCII characters: `'='` or `'\0'`.
+///
+/// - `value` contains the ASCII null character `'\0'`.
+///
+/// - Either `key` or `value`'s length in bytes exceeds `NSTDInt`'s max value.
+///
+/// # Safety
+///
+/// The user of this function must ensure that both `key` and `value` are valid for reads.
+NSTDAPI void nstd_env_set_var(const NSTDStr *key, const NSTDStr *value);
+
+/// Removes an environment variable from the current process.
+///
+/// # Parameters:
+///
+/// - `const NSTDStr *key` - The environment variable's identification key.
+///
+/// # Panics
+///
+/// This operation will panic in the following situations:
+///
+/// - `key` is empty or contains either of the following ASCII characters: `'='` or `'\0'`.
+///
+/// - `key`'s size in bytes exceeds `NSTDInt`'s max value.
+///
+/// - The environment variable's value contains the ASCII null character `'\0'`.
+///
+/// # Safety
+///
+/// The user of this function must ensure that `key` is valid for reads.
+NSTDAPI void nstd_env_remove_var(const NSTDStr *key);
+
 #endif
