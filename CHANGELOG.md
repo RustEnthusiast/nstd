@@ -1,5 +1,6 @@
 # TBD
 ### `nstd.core`
+- Added `nstd_core_ptr_raw_align[_mut]`.
 - Added `NSTDOptional[Ptr|Slice|CStr|Str][Mut]`.
 - Added `nstd_core_ptr_raw_dangling[_mut]`.
 - Added `nstd_core_str[_mut]_as_cstr`.
