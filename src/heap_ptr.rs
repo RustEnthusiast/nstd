@@ -104,6 +104,11 @@ pub unsafe extern "C" fn nstd_heap_ptr_new(element_size: NSTDUInt, init: NSTDAny
 ///
 /// This function will panic if allocation fails.
 ///
+/// # Safety
+///
+/// The data to be stored in the heap pointer must be safely representable by an all-zero byte
+/// pattern.
+///
 /// # Example
 ///
 /// ```
@@ -117,7 +122,7 @@ pub unsafe extern "C" fn nstd_heap_ptr_new(element_size: NSTDUInt, init: NSTDAny
 /// }
 /// ```
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_heap_ptr_new_zeroed(element_size: NSTDUInt) -> NSTDHeapPtr {
+pub unsafe extern "C" fn nstd_heap_ptr_new_zeroed(element_size: NSTDUInt) -> NSTDHeapPtr {
     if element_size == 0 {
         NSTDHeapPtr::zero_sized()
     } else {

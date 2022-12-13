@@ -46,6 +46,11 @@ NSTDAPI NSTDSharedPtr nstd_shared_ptr_new(NSTDUInt element_size, NSTDAny init);
 ///
 /// This operation will panic if either `element_size` is greater than `NSTDInt`'s max value or
 /// allocating fails.
+///
+/// # Safety
+///
+/// The data to be stored in the shared pointer must be safely representable by an all-zero byte
+/// pattern.
 NSTDAPI NSTDSharedPtr nstd_shared_ptr_new_zeroed(NSTDUInt element_size);
 
 /// Shares `shared_ptr`.

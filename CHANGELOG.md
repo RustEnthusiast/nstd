@@ -8,6 +8,8 @@
 ### `nstd.fs`
 - `nstd_fs_[absolute|read_to_string]` now returns `NSTDIOStringResult`.
 - `nstd_fs_read` now returns `NSTDIOBufferResult`.
+### `nstd.heap_ptr`
+- `nstd_heap_ptr_new_zeroed` is now unsafe.
 ### `nstd.io`
 - `nstd_io_read[_line]` now returns `NSTDIOStringResult`.
 - Added `NSTDIOBufferResult` & `NSTDIOStringResult`.
@@ -15,6 +17,8 @@
 - [`unix.alloc`] Fixed linker error when using multiple versions of the crate.
 ### `nstd.shared_lib`
 - `nstd_shared_lib_load` now takes `NSTDCStr`.
+### `nstd.shared_ptr`
+- `nstd_shared_ptr_new_zeroed` is now unsafe.
 ### `nstd.thread`
 - Added `NSTDThreadResult`.
 - `nstd_thread_name` now returns `NSTDOptionalStr`.
