@@ -3,6 +3,7 @@ use crate::{
     core::{result::NSTDResult, str::NSTDStr},
     io::{NSTDIOError, NSTDIOStringResult},
     string::NSTDString,
+    vec::NSTDVec,
 };
 use std::env::VarError;
 
@@ -172,4 +173,47 @@ pub unsafe extern "C" fn nstd_env_set_var(key: &NSTDStr, value: &NSTDStr) {
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_env_remove_var(key: &NSTDStr) {
     std::env::remove_var(key.as_str());
+}
+
+/// Returns an `NSTDVec` of `NSTDString`s that each represent an argument received at program start.
+///
+/// # Returns
+///
+/// `NSTDVec args` - The `NSTDString` arguments that the program was started with.
+///
+/// # Panics
+///
+/// This operation may panic in the following situations:
+///
+/// - Any arguments are invalid Unicode.
+///
+/// - Allocating for any of the arguments fails.
+///
+/// - The total number of bytes required for the vector exceeds `NSTDInt`'s max value.
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_env_args() -> NSTDVec {
+    let args = std::env::args();
+    NSTDVec::from_iter(args.map(|arg| NSTDString::from_str(&arg)))
+}
+
+/// Returns an `NSTDVec` of `NSTDString[2]` which each represent an environment variable from the
+/// current process.
+///
+/// # Returns
+///
+/// `NSTDVec vars` - A list of the process environment variables.
+///
+/// # Panics
+///
+/// This operation may panic in the following situations:
+///
+/// - Any of the environment variable's keys or values are invalid Unicode.
+///
+/// - Allocating for any of the keys/values fails.
+///
+/// - The total number of bytes required for the vector exceeds `NSTDInt`'s max value.
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_env_vars() -> NSTDVec {
+    let vars = std::env::vars();
+    NSTDVec::from_iter(vars.map(|(k, v)| [NSTDString::from_str(&k), NSTDString::from_str(&v)]))
 }

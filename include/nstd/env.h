@@ -4,6 +4,7 @@
 #include "io/io.h"
 #include "nstd.h"
 #include "string.h"
+#include "vec.h"
 
 /// Returns a complete path to the process's current working directory.
 ///
@@ -135,5 +136,40 @@ NSTDAPI void nstd_env_set_var(const NSTDStr *key, const NSTDStr *value);
 ///
 /// The user of this function must ensure that `key` is valid for reads.
 NSTDAPI void nstd_env_remove_var(const NSTDStr *key);
+
+/// Returns an `NSTDVec` of `NSTDString`s that each represent an argument received at program start.
+///
+/// # Returns
+///
+/// `NSTDVec args` - The `NSTDString` arguments that the program was started with.
+///
+/// # Panics
+///
+/// This operation may panic in the following situations:
+///
+/// - Any arguments are invalid Unicode.
+///
+/// - Allocating for any of the arguments fails.
+///
+/// - The total number of bytes required for the vector exceeds `NSTDInt`'s max value.
+NSTDAPI NSTDVec nstd_env_args();
+
+/// Returns an `NSTDVec` of `NSTDString[2]` which each represent an environment variable from the
+/// current process.
+///
+/// # Returns
+///
+/// `NSTDVec vars` - A list of the process environment variables.
+///
+/// # Panics
+///
+/// This operation may panic in the following situations:
+///
+/// - Any of the environment variable's keys or values are invalid Unicode.
+///
+/// - Allocating for any of the keys/values fails.
+///
+/// - The total number of bytes required for the vector exceeds `NSTDInt`'s max value.
+NSTDAPI NSTDVec nstd_env_vars();
 
 #endif
