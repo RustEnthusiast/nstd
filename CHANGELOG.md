@@ -5,6 +5,9 @@
 - Added `nstd_core_str[_mut]_as_cstr`.
 ### `nstd.cstring`
 - Removed `nstd_cstring_as_cstr_mut`.
+### `nstd.fs`
+- `nstd_fs_[absolute|read_to_string]` now returns `NSTDIOStringResult`.
+- `nstd_fs_read` now returns `NSTDIOBufferResult`.
 ### `nstd.io`
 - `nstd_io_read[_line]` now returns `NSTDIOStringResult`.
 - Added `NSTDIOBufferResult` & `NSTDIOStringResult`.
