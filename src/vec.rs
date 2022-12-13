@@ -15,7 +15,7 @@ use crate::{
     },
     NSTDAny, NSTDAnyMut, NSTDUInt, NSTD_NULL,
 };
-use core::ptr::NonNull;
+use core::ptr::{addr_of, NonNull};
 
 /// A dynamically sized contiguous sequence of values.
 #[repr(C)]
@@ -131,6 +131,29 @@ impl Drop for NSTDVec {
                 assert!(nstd_alloc_deallocate(&mut self.ptr, buffer_len) == NSTD_ALLOC_ERROR_NONE);
             }
         }
+    }
+}
+impl<A> FromIterator<A> for NSTDVec {
+    /// Creates a new [NSTDVec] from an iterator.
+    ///
+    /// # Note
+    ///
+    /// Each value will need to be dropped manually, as [NSTDVec] does not automatically drop it's
+    /// contents.
+    ///
+    /// # Panics
+    ///
+    /// This operation will panic if `A`'s size in bytes is 0 or the iterator's length in bytes
+    /// exceeds `NSTDInt`'s max value.
+    fn from_iter<T: IntoIterator<Item = A>>(iter: T) -> Self {
+        let mut s = nstd_vec_new(core::mem::size_of::<A>());
+        for v in iter {
+            // SAFETY: `v` is stored on the stack.
+            unsafe { nstd_vec_push(&mut s, addr_of!(v).cast()) };
+            // Be sure to forget `v` so it doesn't get dropped.
+            core::mem::forget(v);
+        }
+        s
     }
 }
 
