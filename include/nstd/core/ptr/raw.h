@@ -60,4 +60,21 @@ NSTDAPI NSTDAny nstd_core_ptr_raw_align(NSTDAny ptr, NSTDUInt align);
 /// same allocated object.
 NSTDAPI NSTDAnyMut nstd_core_ptr_raw_align_mut(NSTDAnyMut ptr, NSTDUInt align);
 
+/// Checks if `ptr` is aligned to `align`.
+///
+/// # Parameters:
+///
+/// - `NSTDAny ptr` - The pointer to check.
+///
+/// - `NSTDUInt align` - The alignment to check for. This must be a power of two.
+///
+/// # Returns
+///
+/// `NSTDBool is_aligned` - `NSTD_TRUE` if the pointer is aligned to `align`.
+///
+/// # Panics
+///
+/// This operation will panic if `align` is not a power of two.
+NSTDAPI NSTDBool nstd_core_ptr_raw_is_aligned(NSTDAny ptr, NSTDUInt align);
+
 #endif

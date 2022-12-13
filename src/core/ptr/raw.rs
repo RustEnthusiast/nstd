@@ -110,3 +110,41 @@ pub unsafe extern "C" fn nstd_core_ptr_raw_align_mut(
 ) -> NSTDAnyMut {
     nstd_core_ptr_raw_align(ptr, align) as NSTDAnyMut
 }
+
+/// Checks if `ptr` is aligned to `align`.
+///
+/// # Parameters:
+///
+/// - `NSTDAny ptr` - The pointer to check.
+///
+/// - `NSTDUInt align` - The alignment to check for. This must be a power of two.
+///
+/// # Returns
+///
+/// `NSTDBool is_aligned` - `NSTD_TRUE` if the pointer is aligned to `align`.
+///
+/// # Panics
+///
+/// This operation will panic if `align` is not a power of two.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::{
+///     core::ptr::raw::{nstd_core_ptr_raw_align, nstd_core_ptr_raw_is_aligned},
+///     NSTDAny,
+/// };
+///
+/// unsafe {
+///     let mut a = 1usize as NSTDAny;
+///     a = nstd_core_ptr_raw_align(a, 8);
+///     assert!(!nstd_core_ptr_raw_is_aligned(a, 16));
+///     a = nstd_core_ptr_raw_align(a, 16);
+///     assert!(nstd_core_ptr_raw_is_aligned(a, 16));
+/// }
+/// ```
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_core_ptr_raw_is_aligned(ptr: NSTDAny, align: NSTDUInt) -> NSTDBool {
+    ptr as NSTDUInt & (align - 1) == 0
+}
