@@ -19,7 +19,7 @@ use crate::{
         cstr::{nstd_core_cstr_as_ptr, nstd_core_cstr_get_null, NSTDCStr},
         optional::NSTDOptional,
     },
-    cstring::{nstd_cstring_as_ptr, nstd_cstring_from_cstr},
+    cstring::{nstd_cstring_as_ptr, nstd_cstring_from_cstr_unchecked},
     NSTDAny, NSTDAnyMut, NSTDChar,
 };
 
@@ -59,7 +59,7 @@ pub unsafe extern "C" fn nstd_shared_lib_load(path: &NSTDCStr) -> NSTDOptionalSh
     // Check if `path` is already null terminated.
     if nstd_core_cstr_get_null(path).is_null() {
         // Allocate a null byte for `path`.
-        let path = nstd_cstring_from_cstr(path);
+        let path = nstd_cstring_from_cstr_unchecked(path);
         #[cfg(target_family = "unix")]
         return nstd_os_unix_shared_lib_load(nstd_cstring_as_ptr(&path));
         #[cfg(target_os = "windows")]

@@ -118,6 +118,34 @@ pub extern "C" fn nstd_cstring_new_with_cap(cap: NSTDUInt) -> NSTDCString {
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_cstring_from_cstr(cstr: &NSTDCStr) -> NSTDCString {
     assert!(nstd_core_cstr_get_null(cstr).is_null());
+    nstd_cstring_from_cstr_unchecked(cstr)
+}
+
+/// Creates an owned version of an unowned C string slice without checking if the slice contains
+/// any null bytes.
+///
+/// # Parameters:
+///
+/// - `const NSTDCStr *cstr` - The unowned C string slice.
+///
+/// # Returns
+///
+/// `NSTDCString cstring` The new owned version of `cstr`.
+///
+/// # Panics
+///
+/// This operation will panic if `cstr`'s length is greater than `NSTDInt`'s max value or
+/// allocating fails.
+///
+/// # Safety
+///
+/// The caller of this function must ensure the following preconditions:
+///
+/// - `cstr`'s data is valid for reads.
+///
+/// - `cstr` does not contain any null (`'\0'`) bytes.
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_cstring_from_cstr_unchecked(cstr: &NSTDCStr) -> NSTDCString {
     let bytes = nstd_core_cstr_as_bytes(cstr);
     let mut bytes = nstd_vec_from_slice(&bytes);
     let null: NSTDChar = 0;
