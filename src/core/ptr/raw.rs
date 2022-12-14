@@ -146,5 +146,6 @@ pub unsafe extern "C" fn nstd_core_ptr_raw_align_mut(
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_ptr_raw_is_aligned(ptr: NSTDAny, align: NSTDUInt) -> NSTDBool {
+    assert!(is_power_of_two(align));
     ptr as NSTDUInt & (align - 1) == 0
 }
