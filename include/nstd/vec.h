@@ -164,7 +164,7 @@ NSTDAPI NSTDAny nstd_vec_as_ptr(const NSTDVec *vec);
 /// # Returns
 ///
 /// `NSTDAnyMut ptr` - A pointer to the vector's raw data.
-NSTDAPI NSTDAnyMut nstd_vec_as_mut_ptr(NSTDVec *vec);
+NSTDAPI NSTDAnyMut nstd_vec_as_ptr_mut(NSTDVec *vec);
 
 /// Returns an immutable pointer to the element at index `pos` in `vec`.
 ///

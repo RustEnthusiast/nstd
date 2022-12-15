@@ -448,7 +448,7 @@ pub extern "C" fn nstd_vec_as_ptr(vec: &NSTDVec) -> NSTDAny {
 /// `NSTDAnyMut ptr` - A pointer to the vector's raw data.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_vec_as_mut_ptr(vec: &mut NSTDVec) -> NSTDAnyMut {
+pub extern "C" fn nstd_vec_as_ptr_mut(vec: &mut NSTDVec) -> NSTDAnyMut {
     vec.ptr
 }
 
@@ -803,8 +803,6 @@ pub extern "C" fn nstd_vec_remove(vec: &mut NSTDVec, mut index: NSTDUInt) -> NST
             nstd_core_mem_copy_overlapping(idxptr, src, bytes_to_copy);
         }
         // Decrement the vector's length AFTER shifting the bytes.
-        // This is done here because another thread may attempt to shrink the vector. This would
-        // cause undefined behavior if the vectors length is decremented before shifting the bytes.
         vec.len -= 1;
         0
     } else {
