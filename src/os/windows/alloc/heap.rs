@@ -419,12 +419,13 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_heap_reallocate(
     ptr: &mut NSTDAnyMut,
     size: NSTDUInt,
 ) -> NSTDWindowsAllocError {
-    let new_mem = HeapReAlloc(heap.handle, 0, *ptr, size);
-    if !new_mem.is_null() {
-        *ptr = new_mem;
-        return NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_NONE;
+    match HeapReAlloc(heap.handle, 0, *ptr, size) {
+        NSTD_NULL => NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_OUT_OF_MEMORY,
+        new_mem => {
+            *ptr = new_mem;
+            NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_NONE
+        }
     }
-    NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_OUT_OF_MEMORY
 }
 
 /// Deallocates a block of memory on a heap.
