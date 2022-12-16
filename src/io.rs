@@ -12,7 +12,7 @@ use std::io::{ErrorKind, Write};
 
 /// An error type for I/O operations.
 #[repr(C)]
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[allow(non_camel_case_types)]
 pub enum NSTDIOError {
     /// No error occurred.
