@@ -8,8 +8,7 @@ Rust syntax).
 # Example using C
 ```c
 // Build nstd with `cargo build --features "clib nstd_core nstd_io"`.
-#include <nstd/core/str.h>
-#include <nstd/io/io.h>
+#include <nstd.h>
 
 /// Main entry point of the program.
 int main()
