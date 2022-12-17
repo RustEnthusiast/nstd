@@ -46,7 +46,9 @@ pub unsafe extern "C" fn nstd_io_stdout_write(
     bytes: &NSTDSlice,
     written: &mut NSTDUInt,
 ) -> NSTDIOError {
-    crate::io::stdio::write(handle, bytes, written)
+    let (err, w) = crate::io::stdio::write(handle, bytes);
+    *written = w;
+    err
 }
 
 /// Writes an entire buffer to the standard output stream.
