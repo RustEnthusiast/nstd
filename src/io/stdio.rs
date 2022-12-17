@@ -20,8 +20,6 @@ const ISIZE_MAX: usize = isize::MAX as usize;
 
 /// Writes some `nstd` bytes to a [Write] stream.
 ///
-/// `written` will return as the number of bytes written to the stream.
-///
 /// # Safety
 ///
 /// This function can cause undefined behavior if `bytes`'s data is invalid.
@@ -65,8 +63,6 @@ pub(crate) fn flush<W: Write>(stream: &mut W) -> NSTDIOError {
 
 /// Reads some data from a [Read] stream into an `nstd` byte slice.
 ///
-/// `read` will return as the number of bytes read from the stream.
-///
 /// # Safety
 ///
 /// `buffer`'s data must be valid for writes.
@@ -90,9 +86,7 @@ pub(crate) unsafe fn read<R: Read>(
 /// # Note
 ///
 /// If extending the buffer fails, an error code of `NSTD_IO_ERROR_OUT_OF_MEMORY` will be returned.
-/// This does not mean `read` will return as 0 in this case.
-///
-/// `read` will return as the number of bytes read from the stream.
+/// This does not mean the number of bytes read will return as 0 in this case.
 pub(crate) fn read_all<R: Read>(stream: &mut R, buffer: &mut NSTDVec) -> (NSTDIOError, NSTDUInt) {
     // Make sure the buffer's element size is 1.
     if nstd_vec_stride(buffer) != 1 || nstd_vec_len(buffer) > ISIZE_MAX {
@@ -119,8 +113,6 @@ pub(crate) fn read_all<R: Read>(stream: &mut R, buffer: &mut NSTDVec) -> (NSTDIO
 ///
 /// If extending the buffer fails, an error code of `NSTD_IO_ERROR_OUT_OF_MEMORY` will be returned.
 /// This does not mean `read` will return as 0 in this case.
-///
-/// `read` will return as the number of bytes read from the stream.
 ///
 /// # Panics
 ///
