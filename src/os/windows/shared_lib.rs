@@ -1,15 +1,14 @@
 //! Shared library/module access for Windows.
-use crate::{core::optional::NSTDOptional, NSTDAny, NSTDAnyMut, NSTDChar, NSTDInt};
+use crate::{
+    core::optional::NSTDOptional, os::windows::NSTDWindowsHandle, NSTDAny, NSTDAnyMut, NSTDChar,
+};
 use windows_sys::Win32::System::LibraryLoader::{FreeLibrary, GetProcAddress, LoadLibraryA};
-
-/// A raw handle to a dynamically loaded library.
-pub type NSTDWindowsSharedLibHandle = NSTDInt;
 
 /// A handle to a loaded library.
 #[repr(C)]
 pub struct NSTDWindowsSharedLib {
     /// A raw handle to the module.
-    handle: NSTDWindowsSharedLibHandle,
+    handle: NSTDWindowsHandle,
 }
 impl Drop for NSTDWindowsSharedLib {
     /// [NSTDWindowsSharedLib]'s destructor.
@@ -56,12 +55,12 @@ pub unsafe extern "C" fn nstd_os_windows_shared_lib_load(
 ///
 /// # Returns
 ///
-/// `NSTDWindowsSharedLibHandle handle` - A native handle to the dynamically loaded library.
+/// `NSTDWindowsHandle handle` - A native handle to the dynamically loaded library.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_os_windows_shared_lib_handle(
     lib: &NSTDWindowsSharedLib,
-) -> NSTDWindowsSharedLibHandle {
+) -> NSTDWindowsHandle {
     lib.handle
 }
 

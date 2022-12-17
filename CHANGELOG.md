@@ -17,6 +17,10 @@
 - `nstd_io_read[_line]` now returns `NSTDIOStringResult`.
 - Added `NSTDIOBufferResult` & `NSTDIOStringResult`.
 ### `nstd.os`
+- Added `NSTDWindowsHandle`.
+- Removed `NSTDWindowsSharedLibHandle`.
+- Removed `NSTDWindowsHeapHandle`.
+- Removed `NSTDUnixSharedLibHandle`.
 - [`unix.alloc`] Fixed linker error when using multiple versions of the crate.
 ### `nstd.shared_lib`
 - `nstd_shared_lib_load` now takes `NSTDCStr`.

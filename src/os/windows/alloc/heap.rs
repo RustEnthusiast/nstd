@@ -1,21 +1,19 @@
 //! Process heap management for Windows.
 use crate::{
-    core::result::NSTDResult, os::windows::alloc::NSTDWindowsAllocError, NSTDAny, NSTDAnyMut,
-    NSTDInt, NSTDUInt, NSTD_NULL,
+    core::result::NSTDResult,
+    os::windows::{alloc::NSTDWindowsAllocError, NSTDWindowsHandle},
+    NSTDAny, NSTDAnyMut, NSTDUInt, NSTD_NULL,
 };
 use windows_sys::Win32::System::Memory::{
     GetProcessHeap, HeapAlloc, HeapCreate, HeapDestroy, HeapFree, HeapReAlloc, HeapSize,
     HeapValidate, HEAP_ZERO_MEMORY,
 };
 
-/// A raw handle to a heap.
-pub type NSTDWindowsHeapHandle = NSTDInt;
-
 /// A handle to a process heap.
 #[repr(C)]
 pub struct NSTDWindowsHeap {
     /// The private handle.
-    handle: NSTDWindowsHeapHandle,
+    handle: NSTDWindowsHandle,
 }
 impl Drop for NSTDWindowsHeap {
     /// [NSTDWindowsHeap] destructor.
@@ -132,7 +130,7 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_heap_new(size: NSTDUInt) -> NSTDW
 ///
 /// # Returns
 ///
-/// `NSTDWindowsHeapHandle handle` - A native handle to the heap.
+/// `NSTDWindowsHandle handle` - A native handle to the heap.
 ///
 /// # Example
 ///
@@ -151,9 +149,7 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_heap_new(size: NSTDUInt) -> NSTDW
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_os_windows_alloc_heap_handle(
-    heap: &NSTDWindowsHeap,
-) -> NSTDWindowsHeapHandle {
+pub extern "C" fn nstd_os_windows_alloc_heap_handle(heap: &NSTDWindowsHeap) -> NSTDWindowsHandle {
     heap.handle
 }
 

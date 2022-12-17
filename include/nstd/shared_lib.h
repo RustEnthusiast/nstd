@@ -4,11 +4,8 @@
 #include "core/optional.h"
 #include "nstd.h"
 #include "os/os.h"
-#if defined(NSTD_OS_UNIX)
-#   include "os/unix/shared_lib.h"
-#elif defined(NSTD_OS_WINDOWS)
-#   include "os/windows/shared_lib.h"
-#endif
+#include "os/unix/shared_lib.h"
+#include "os/windows/shared_lib.h"
 
 /// A handle to a dynamically loaded library.
 #if defined(NSTD_OS_UNIX)

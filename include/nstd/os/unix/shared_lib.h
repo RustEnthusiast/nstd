@@ -3,13 +3,10 @@
 #include "../../core/optional.h"
 #include "../../nstd.h"
 
-/// A raw handle to a dynamically loaded library.
-typedef NSTDAnyMut NSTDUnixSharedLibHandle;
-
 /// Represents an owned handle to a dynamically loaded library.
 typedef struct {
     /// A raw handle to the shared library.
-    NSTDUnixSharedLibHandle handle;
+    NSTDAnyMut handle;
 } NSTDUnixSharedLib;
 
 /// Represents an optional `NSTDUnixSharedLib`.
