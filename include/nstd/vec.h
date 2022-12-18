@@ -341,6 +341,24 @@ NSTDAPI NSTDAllocError nstd_vec_extend(NSTDVec *vec, const NSTDSlice *values);
 /// - `NSTDUInt len` - The number of elements to keep.
 NSTDAPI void nstd_vec_truncate(NSTDVec *vec, NSTDUInt len);
 
+/// Sets a vectors length.
+///
+/// # Parameters:
+///
+/// - `NSTDVec *vec` - The vector.
+///
+/// - `NSTDUInt len` - The new length for the vector.
+///
+/// # Returns
+///
+/// `NSTDErrorCode errc` - Nonzero if `len` is greater than `cap`.
+///
+/// # Safety
+///
+/// If `len` is greater than the vector's current length, care must be taken to ensure that the new
+/// elements are properly initialized.
+NSTDAPI NSTDErrorCode nstd_vec_set_len(NSTDVec *vec, NSTDUInt len);
+
 /// Reserves some space on the heap for at least `size` more elements to be pushed onto a vector
 /// without making more allocations.
 ///
