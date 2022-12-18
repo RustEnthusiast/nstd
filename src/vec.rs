@@ -452,6 +452,62 @@ pub extern "C" fn nstd_vec_as_ptr_mut(vec: &mut NSTDVec) -> NSTDAnyMut {
     vec.ptr
 }
 
+/// Returns a pointer to the end of a vector.
+///
+/// Note that this does not return a pointer to the last element or the last byte in the vector, but
+/// a pointer to *one byte past* the end of the vector's active buffer.
+///
+/// # Parameters:
+///
+/// - `const NSTDVec *vec` - The vector.
+///
+/// # Returns
+///
+/// `NSTDAny end` - A pointer to the end of the vector or null if the vector has yet to allocate.
+///
+/// # Panics
+///
+/// Panics if the total length of the vector's buffer exceeds `isize::MAX` bytes.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_vec_end(vec: &NSTDVec) -> NSTDAny {
+    if !vec.ptr.is_null() {
+        let len = vec.byte_len();
+        assert!(len <= isize::MAX as usize);
+        // SAFETY: `len` is within the bounds of the vector and does not overflow `isize`.
+        return unsafe { vec.ptr.add(len) };
+    }
+    NSTD_NULL
+}
+
+/// Returns a mutable pointer to the end of a vector.
+///
+/// Note that this does not return a pointer to the last element or the last byte in the vector, but
+/// a pointer to *one byte past* the end of the vector's active buffer.
+///
+/// # Parameters:
+///
+/// - `NSTDVec *vec` - The vector.
+///
+/// # Returns
+///
+/// `NSTDAnyMut end` - A pointer to the end of the vector or null if the vector has yet to allocate.
+///
+/// # Panics
+///
+/// Panics if the total length of the vector's buffer exceeds `isize::MAX` bytes.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_vec_end_mut(vec: &mut NSTDVec) -> NSTDAnyMut {
+    if !vec.ptr.is_null() {
+        let len = vec.byte_len();
+        assert!(len <= isize::MAX as usize);
+        // SAFETY: `len` is within the bounds of the vector and does not overflow `isize`.
+        return unsafe { vec.ptr.add(len) };
+    }
+    NSTD_NULL
+}
+
 /// Returns an immutable pointer to the element at index `pos` in `vec`.
 ///
 /// # Note

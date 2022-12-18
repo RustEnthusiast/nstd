@@ -32,6 +32,7 @@
 - `NSTDThreadDescriptor::name` is now `NSTDOptionalStr`.
 - Added `nstd_thread_current`.
 ### `nstd.vec`
+- Added `nstd_vec_end[_mut]`.
 - Added `nstd_vec_set_len`.
 - Renamed `nstd_vec_as_mut_ptr` to `nstd_vec_as_ptr_mut`.
 

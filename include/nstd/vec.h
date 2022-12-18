@@ -166,6 +166,42 @@ NSTDAPI NSTDAny nstd_vec_as_ptr(const NSTDVec *vec);
 /// `NSTDAnyMut ptr` - A pointer to the vector's raw data.
 NSTDAPI NSTDAnyMut nstd_vec_as_ptr_mut(NSTDVec *vec);
 
+/// Returns a pointer to the end of a vector.
+///
+/// Note that this does not return a pointer to the last element or the last byte in the vector, but
+/// a pointer to *one byte past* the end of the vector's active buffer.
+///
+/// # Parameters:
+///
+/// - `const NSTDVec *vec` - The vector.
+///
+/// # Returns
+///
+/// `NSTDAny end` - A pointer to the end of the vector or null if the vector has yet to allocate.
+///
+/// # Panics
+///
+/// Panics if the total length of the vector's buffer exceeds `isize::MAX` bytes.
+NSTDAPI NSTDAny nstd_vec_end(const NSTDVec *vec);
+
+/// Returns a mutable pointer to the end of a vector.
+///
+/// Note that this does not return a pointer to the last element or the last byte in the vector, but
+/// a pointer to *one byte past* the end of the vector's active buffer.
+///
+/// # Parameters:
+///
+/// - `NSTDVec *vec` - The vector.
+///
+/// # Returns
+///
+/// `NSTDAnyMut end` - A pointer to the end of the vector or null if the vector has yet to allocate.
+///
+/// # Panics
+///
+/// Panics if the total length of the vector's buffer exceeds `isize::MAX` bytes.
+NSTDAPI NSTDAnyMut nstd_vec_end_mut(NSTDVec *vec);
+
 /// Returns an immutable pointer to the element at index `pos` in `vec`.
 ///
 /// # Note
