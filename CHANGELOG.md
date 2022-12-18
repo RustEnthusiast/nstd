@@ -1,4 +1,6 @@
 # TBD
+### `nstd`
+- Added `nstd.env`.
 ### `nstd.core`
 - Added `nstd_core_ptr_raw_is_aligned`.
 - Added `nstd_core_ptr_raw_align[_mut]`.
