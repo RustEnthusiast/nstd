@@ -13,6 +13,9 @@ pub mod core;
 #[cfg(feature = "nstd_cstring")]
 #[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_cstring")))]
 pub mod cstring;
+#[cfg(feature = "nstd_env")]
+#[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_env")))]
+pub mod env;
 #[cfg(feature = "nstd_fs")]
 #[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_fs")))]
 pub mod fs;
