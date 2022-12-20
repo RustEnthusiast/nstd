@@ -147,6 +147,33 @@ pub unsafe extern "C" fn nstd_string_from_str(str: &NSTDStr) -> NSTDString {
     }
 }
 
+/// Creates a new string from owned UTF-8 data.
+///
+/// # Parameters:
+///
+/// - `NSTDVec bytes` - The owned UTF-8 encoded buffer to take ownership of.
+///
+/// # Returns
+///
+/// `NSTDString string` - The new UTF-8 encoded string with ownership of `bytes`.
+///
+/// # Panics
+///
+/// This operation will panic in the following situations:
+///
+/// - `bytes`'s stride is not 1.
+///
+/// - `bytes`'s length is greater than `NSTDInt`'s max value.
+///
+/// - `bytes`'s data is not valid UTF-8.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_string_from_bytes(bytes: NSTDVec) -> NSTDString {
+    // SAFETY: We're ensuring that the vector is properly encoded as UTF-8.
+    assert!(core::str::from_utf8(unsafe { bytes.as_slice() }).is_ok());
+    NSTDString { bytes }
+}
+
 /// Creates a deep copy of a string.
 ///
 /// # Parameters:

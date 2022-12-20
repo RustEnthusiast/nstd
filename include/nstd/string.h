@@ -54,6 +54,27 @@ NSTDAPI NSTDString nstd_string_new_with_cap(NSTDUInt cap);
 /// The caller of this function must ensure that `str`'s data is valid for reads.
 NSTDAPI NSTDString nstd_string_from_str(const NSTDStr *str);
 
+/// Creates a new string from owned UTF-8 data.
+///
+/// # Parameters:
+///
+/// - `NSTDVec bytes` - The owned UTF-8 encoded buffer to take ownership of.
+///
+/// # Returns
+///
+/// `NSTDString string` - The new UTF-8 encoded string with ownership of `bytes`.
+///
+/// # Panics
+///
+/// This operation will panic in the following situations:
+///
+/// - `bytes`'s stride is not 1.
+///
+/// - `bytes`'s length is greater than `NSTDInt`'s max value.
+///
+/// - `bytes`'s data is not valid UTF-8.
+NSTDAPI NSTDString nstd_string_from_bytes(NSTDVec bytes);
+
 /// Creates a deep copy of a string.
 ///
 /// # Parameters:

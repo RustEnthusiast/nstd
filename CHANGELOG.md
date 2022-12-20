@@ -28,6 +28,8 @@
 - `nstd_shared_lib_load` now takes `NSTDCStr`.
 ### `nstd.shared_ptr`
 - `nstd_shared_ptr_new_zeroed` is now unsafe.
+### `nstd.string`
+- Added `nstd_string_from_bytes`.
 ### `nstd.thread`
 - Added `NSTDThreadResult`.
 - `nstd_thread_name` now returns `NSTDOptionalStr`.
