@@ -11,6 +11,8 @@ use crate::{
     NSTDUInt,
 };
 use std::io::Stdin;
+#[cfg(target_family = "unix")]
+use std::os::unix::io::AsRawFd;
 
 /// A handle to the standard input stream.
 pub type NSTDStdin = Box<Stdin>;
@@ -55,9 +57,18 @@ pub unsafe extern "C" fn nstd_io_stdin_read(
     buffer: &mut NSTDSliceMut,
     read: &mut NSTDUInt,
 ) -> NSTDIOError {
-    let (err, r) = crate::io::stdio::read(handle, buffer);
-    *read = r;
-    err
+    #[cfg(not(target_family = "unix"))]
+    {
+        let (err, r) = crate::io::stdio::read(handle, buffer);
+        *read = r;
+        err
+    }
+    #[cfg(target_family = "unix")]
+    {
+        let (err, r) = crate::os::unix::io::stdio::read(handle.as_raw_fd(), buffer);
+        *read = r;
+        err.into()
+    }
 }
 
 /// Continuously reads data from stdin into a buffer until EOF is reached.
@@ -85,9 +96,19 @@ pub extern "C" fn nstd_io_stdin_read_all(
     buffer: &mut NSTDVec,
     read: &mut NSTDUInt,
 ) -> NSTDIOError {
-    let (err, r) = crate::io::stdio::read_all(handle, buffer);
-    *read = r;
-    err
+    #[cfg(not(target_family = "unix"))]
+    {
+        let (err, r) = crate::io::stdio::read_all(handle, buffer);
+        *read = r;
+        err
+    }
+    #[cfg(target_family = "unix")]
+    {
+        // SAFETY: `handle` owns the file descriptor.
+        let (err, r) = unsafe { crate::os::unix::io::stdio::read_all(handle.as_raw_fd(), buffer) };
+        *read = r;
+        err.into()
+    }
 }
 
 /// Continuously reads UTF-8 data from stdin into a string buffer until EOF is reached.
@@ -119,9 +140,21 @@ pub extern "C" fn nstd_io_stdin_read_to_string(
     buffer: &mut NSTDString,
     read: &mut NSTDUInt,
 ) -> NSTDIOError {
-    let (err, r) = crate::io::stdio::read_to_string(handle, buffer);
-    *read = r;
-    err
+    #[cfg(not(target_family = "unix"))]
+    {
+        let (err, r) = crate::io::stdio::read_to_string(handle, buffer);
+        *read = r;
+        err
+    }
+    #[cfg(target_family = "unix")]
+    {
+        // SAFETY: `handle` owns the file descriptor.
+        unsafe {
+            let (err, r) = crate::os::unix::io::stdio::read_to_string(handle.as_raw_fd(), buffer);
+            *read = r;
+            err.into()
+        }
+    }
 }
 
 /// Reads enough data from stdin to fill the entirety of `buffer`.
@@ -150,7 +183,10 @@ pub unsafe extern "C" fn nstd_io_stdin_read_exact(
     handle: &mut NSTDStdin,
     buffer: &mut NSTDSliceMut,
 ) -> NSTDIOError {
-    crate::io::stdio::read_exact(handle, buffer)
+    #[cfg(not(target_family = "unix"))]
+    return crate::io::stdio::read_exact(handle, buffer);
+    #[cfg(target_family = "unix")]
+    return crate::os::unix::io::stdio::read_exact(handle.as_raw_fd(), buffer).into();
 }
 
 /// Reads a line from stdin and appends it to `buffer`.

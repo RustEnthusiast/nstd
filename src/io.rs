@@ -3,6 +3,8 @@ pub mod stderr;
 pub mod stdin;
 pub(crate) mod stdio;
 pub mod stdout;
+#[cfg(target_family = "unix")]
+use crate::os::unix::io::NSTDUnixIOError::{self, *};
 use crate::{
     core::{result::NSTDResult, str::NSTDStr},
     string::{nstd_string_pop, NSTDString},
@@ -82,6 +84,27 @@ impl NSTDIOError {
             ErrorKind::UnexpectedEof => NSTDIOError::NSTD_IO_ERROR_UNEXPECTED_EOF,
             ErrorKind::OutOfMemory => NSTDIOError::NSTD_IO_ERROR_OUT_OF_MEMORY,
             _ => NSTDIOError::NSTD_IO_ERROR_UNKNOWN,
+        }
+    }
+}
+#[cfg(target_family = "unix")]
+impl From<NSTDUnixIOError> for NSTDIOError {
+    /// Converts an [NSTDUnixIOError] into an [NSTDIOError].
+    fn from(err: NSTDUnixIOError) -> Self {
+        match err {
+            NSTD_UNIX_IO_ERROR_NONE => Self::NSTD_IO_ERROR_NONE,
+            NSTD_UNIX_IO_ERROR_NOT_FOUND => Self::NSTD_IO_ERROR_NOT_FOUND,
+            NSTD_UNIX_IO_ERROR_PERMISSION_DENIED => Self::NSTD_IO_ERROR_PERMISSION_DENIED,
+            NSTD_UNIX_IO_ERROR_CONNECTION_RESET => Self::NSTD_IO_ERROR_CONNECTION_RESET,
+            NSTD_UNIX_IO_ERROR_NO_CONNECTION => Self::NSTD_IO_ERROR_NO_CONNECTION,
+            NSTD_UNIX_IO_ERROR_BROKEN_PIPE => Self::NSTD_IO_ERROR_BROKEN_PIPE,
+            NSTD_UNIX_IO_ERROR_BLOCKING => Self::NSTD_IO_ERROR_BLOCKING,
+            NSTD_UNIX_IO_ERROR_INVALID_INPUT => Self::NSTD_IO_ERROR_INVALID_INPUT,
+            NSTD_UNIX_IO_ERROR_TIMED_OUT => Self::NSTD_IO_ERROR_TIMED_OUT,
+            NSTD_UNIX_IO_ERROR_INTERRUPTED => Self::NSTD_IO_ERROR_INTERRUPTED,
+            NSTD_UNIX_IO_ERROR_UNEXPECTED_EOF => Self::NSTD_IO_ERROR_UNEXPECTED_EOF,
+            NSTD_UNIX_IO_ERROR_OUT_OF_MEMORY => Self::NSTD_IO_ERROR_OUT_OF_MEMORY,
+            _ => Self::NSTD_IO_ERROR_UNKNOWN,
         }
     }
 }

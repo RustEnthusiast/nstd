@@ -1,6 +1,8 @@
 //! A handle to the standard error stream.
 use crate::{core::slice::NSTDSlice, io::NSTDIOError, NSTDUInt};
 use std::io::Stderr;
+#[cfg(target_family = "unix")]
+use std::os::unix::io::AsRawFd;
 
 /// A handle to the standard error stream.
 pub type NSTDStderr = Box<Stderr>;
@@ -46,9 +48,18 @@ pub unsafe extern "C" fn nstd_io_stderr_write(
     bytes: &NSTDSlice,
     written: &mut NSTDUInt,
 ) -> NSTDIOError {
-    let (err, w) = crate::io::stdio::write(handle, bytes);
-    *written = w;
-    err
+    #[cfg(not(target_family = "unix"))]
+    {
+        let (err, w) = crate::io::stdio::write(handle, bytes);
+        *written = w;
+        err
+    }
+    #[cfg(target_family = "unix")]
+    {
+        let (err, w) = crate::os::unix::io::stdio::write(handle.as_raw_fd(), bytes);
+        *written = w;
+        err.into()
+    }
 }
 
 /// Writes an entire buffer to the standard error stream.
@@ -77,7 +88,10 @@ pub unsafe extern "C" fn nstd_io_stderr_write_all(
     handle: &mut NSTDStderr,
     bytes: &NSTDSlice,
 ) -> NSTDIOError {
-    crate::io::stdio::write_all(handle, bytes)
+    #[cfg(not(target_family = "unix"))]
+    return crate::io::stdio::write_all(handle, bytes);
+    #[cfg(target_family = "unix")]
+    return crate::os::unix::io::stdio::write_all(handle.as_raw_fd(), bytes).into();
 }
 
 /// Flushes the standard error stream.
