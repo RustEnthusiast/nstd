@@ -90,6 +90,27 @@ NSTDAPI NSTDCString nstd_cstring_from_cstr(const NSTDCStr *cstr);
 /// - `cstr` does not contain any null (`'\0'`) bytes.
 NSTDAPI NSTDCString nstd_cstring_from_cstr_unchecked(const NSTDCStr *cstr);
 
+/// Creates a new C string from owned data.
+///
+/// # Parameters:
+///
+/// - `NSTDVec bytes` - The bytes to take ownership of.
+///
+/// # Returns
+///
+/// `NSTDCString cstring` - The new C string with ownership of `bytes`.
+///
+/// # Panics
+///
+/// This operation will panic in the following situations:
+///
+/// - `bytes`'s stride is not 1.
+///
+/// - `bytes`'s data does not end with a 0 byte.
+///
+/// - `bytes`'s length is greater than `NSTDInt`'s max value.
+NSTDAPI NSTDCString nstd_cstring_from_bytes(NSTDVec bytes);
+
 /// Creates a deep copy of an `NSTDCString`.
 ///
 /// # Parameters:

@@ -8,6 +8,7 @@
 - Added `nstd_core_ptr_raw_dangling[_mut]`.
 - Added `nstd_core_str[_mut]_as_cstr`.
 ### `nstd.cstring`
+- Added `nstd_cstring_from_bytes`.
 - Added `nstd_cstring_from_cstr_unchecked`.
 - Removed `nstd_cstring_as_cstr_mut`.
 ### `nstd.fs`

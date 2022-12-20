@@ -2,13 +2,16 @@
 use crate::{
     alloc::NSTDAllocError,
     core::{
-        cstr::{nstd_core_cstr_as_bytes, nstd_core_cstr_get_null, nstd_core_cstr_new, NSTDCStr},
+        cstr::{
+            nstd_core_cstr_as_bytes, nstd_core_cstr_get_null, nstd_core_cstr_is_null_terminated,
+            nstd_core_cstr_new, NSTDCStr,
+        },
         slice::NSTDSlice,
     },
     vec::{
         nstd_vec_as_ptr, nstd_vec_as_slice, nstd_vec_cap, nstd_vec_clear, nstd_vec_clone,
         nstd_vec_extend, nstd_vec_from_slice, nstd_vec_get_mut, nstd_vec_len,
-        nstd_vec_new_with_cap, nstd_vec_pop, nstd_vec_push, NSTDVec,
+        nstd_vec_new_with_cap, nstd_vec_pop, nstd_vec_push, nstd_vec_stride, NSTDVec,
     },
     NSTDChar, NSTDUInt,
 };
@@ -151,6 +154,34 @@ pub unsafe extern "C" fn nstd_cstring_from_cstr_unchecked(cstr: &NSTDCStr) -> NS
     let null: NSTDChar = 0;
     let null = addr_of!(null).cast();
     assert!(nstd_vec_push(&mut bytes, null) == NSTDAllocError::NSTD_ALLOC_ERROR_NONE);
+    NSTDCString { bytes }
+}
+
+/// Creates a new C string from owned data.
+///
+/// # Parameters:
+///
+/// - `NSTDVec bytes` - The bytes to take ownership of.
+///
+/// # Returns
+///
+/// `NSTDCString cstring` - The new C string with ownership of `bytes`.
+///
+/// # Panics
+///
+/// This operation will panic in the following situations:
+///
+/// - `bytes`'s stride is not 1.
+///
+/// - `bytes`'s data does not end with a 0 byte.
+///
+/// - `bytes`'s length is greater than `NSTDInt`'s max value.
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_cstring_from_bytes(bytes: NSTDVec) -> NSTDCString {
+    assert!(nstd_vec_stride(&bytes) == 1);
+    let cstr = nstd_core_cstr_new(nstd_vec_as_ptr(&bytes) as _, nstd_vec_len(&bytes));
+    // SAFETY: `cstr`'s data is owned by `bytes`.
+    assert!(unsafe { nstd_core_cstr_is_null_terminated(&cstr) });
     NSTDCString { bytes }
 }
 
