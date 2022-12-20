@@ -52,6 +52,7 @@ int main()
     - `os` - Operating system specific functionality.
         - `unix` - Low level Unix-like operating system support.
             - `alloc` - Memory allocation for Unix-like systems.
+            - `io` - Provides functionality for working with input & output on Unix platforms.
             - `shared_lib` - Provides shared library access for Unix-like systems.
         - `windows` - OS support for Windows.
             - `alloc` - Low level memory allocation for Windows.
