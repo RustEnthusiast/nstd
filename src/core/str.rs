@@ -144,7 +144,7 @@ gen_optional!(NSTDOptionalStr, NSTDStr);
 /// ```
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_from_cstr(cstr: &NSTDCStr) -> NSTDStr {
-    core::str::from_utf8(cstr.as_bytes()).expect("Invalid UTF-8 bytes");
+    assert!(core::str::from_utf8(cstr.as_bytes()).is_ok());
     let ptr = nstd_core_cstr_as_ptr(cstr).cast();
     let len = nstd_core_cstr_len(cstr);
     NSTDStr { ptr, len }
@@ -231,7 +231,7 @@ pub unsafe extern "C" fn nstd_core_str_from_raw_cstr(cstr: *const NSTDChar) -> N
     let len = nstd_core_cstr_raw_len(cstr);
     assert!(len <= isize::MAX as NSTDUInt);
     let bytes = core::slice::from_raw_parts(ptr, len);
-    core::str::from_utf8(bytes).expect("Invalid UTF-8 bytes");
+    assert!(core::str::from_utf8(bytes).is_ok());
     NSTDStr { ptr, len }
 }
 
@@ -278,7 +278,7 @@ pub unsafe extern "C" fn nstd_core_str_from_raw_cstr_with_null(cstr: *const NSTD
     let len = nstd_core_cstr_raw_len_with_null(cstr);
     assert!(len <= isize::MAX as NSTDUInt);
     let bytes = core::slice::from_raw_parts(ptr, len);
-    core::str::from_utf8(bytes).expect("Invalid UTF-8 bytes");
+    assert!(core::str::from_utf8(bytes).is_ok());
     NSTDStr { ptr, len }
 }
 
@@ -326,7 +326,7 @@ pub unsafe extern "C" fn nstd_core_str_from_raw_cstr_with_null(cstr: *const NSTD
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_from_bytes(bytes: &NSTDSlice) -> NSTDStr {
-    core::str::from_utf8(bytes.as_slice()).expect("Invalid UTF-8 bytes");
+    assert!(core::str::from_utf8(bytes.as_slice()).is_ok());
     let ptr = nstd_core_slice_as_ptr(bytes).cast();
     let len = nstd_core_slice_len(bytes);
     NSTDStr { ptr, len }
@@ -934,7 +934,7 @@ gen_optional!(NSTDOptionalStrMut, NSTDStrMut);
 /// ```
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_mut_from_cstr(cstr: &mut NSTDCStrMut) -> NSTDStrMut {
-    core::str::from_utf8(cstr.as_bytes()).expect("Invalid UTF-8 bytes");
+    assert!(core::str::from_utf8(cstr.as_bytes()).is_ok());
     let ptr = nstd_core_cstr_mut_as_ptr(cstr).cast();
     let len = nstd_core_cstr_mut_len(cstr);
     NSTDStrMut { ptr, len }
@@ -1023,7 +1023,7 @@ pub unsafe extern "C" fn nstd_core_str_mut_from_raw_cstr(cstr: *mut NSTDChar) ->
     let len = nstd_core_cstr_raw_len(cstr);
     assert!(len <= isize::MAX as usize);
     let bytes = core::slice::from_raw_parts(ptr, len);
-    core::str::from_utf8(bytes).expect("Invalid UTF-8 bytes");
+    assert!(core::str::from_utf8(bytes).is_ok());
     NSTDStrMut { ptr, len }
 }
 
@@ -1074,7 +1074,7 @@ pub unsafe extern "C" fn nstd_core_str_mut_from_raw_cstr_with_null(
     let len = nstd_core_cstr_raw_len_with_null(cstr);
     assert!(len <= isize::MAX as usize);
     let bytes = core::slice::from_raw_parts(ptr, len);
-    core::str::from_utf8(bytes).expect("Invalid UTF-8 bytes");
+    assert!(core::str::from_utf8(bytes).is_ok());
     NSTDStrMut { ptr, len }
 }
 
@@ -1122,7 +1122,7 @@ pub unsafe extern "C" fn nstd_core_str_mut_from_raw_cstr_with_null(
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_mut_from_bytes(bytes: &mut NSTDSliceMut) -> NSTDStrMut {
-    core::str::from_utf8(bytes.as_slice()).expect("Invalid UTF-8 bytes");
+    assert!(core::str::from_utf8(bytes.as_slice()).is_ok());
     let ptr = nstd_core_slice_mut_as_ptr(bytes).cast();
     let len = nstd_core_slice_mut_len(bytes);
     NSTDStrMut { ptr, len }
