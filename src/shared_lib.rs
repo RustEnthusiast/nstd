@@ -3,13 +3,13 @@
 //! # Platform support
 //!
 //! This module is only functional on Windows and Unix systems.
-#![cfg(any(target_family = "unix", target_os = "windows"))]
-#[cfg(target_family = "unix")]
+#![cfg(any(unix, windows))]
+#[cfg(unix)]
 use crate::os::unix::shared_lib::{
     nstd_os_unix_shared_lib_get, nstd_os_unix_shared_lib_get_mut, nstd_os_unix_shared_lib_load,
     NSTDUnixSharedLib,
 };
-#[cfg(target_os = "windows")]
+#[cfg(windows)]
 use crate::os::windows::shared_lib::{
     nstd_os_windows_shared_lib_get, nstd_os_windows_shared_lib_get_mut,
     nstd_os_windows_shared_lib_load, NSTDWindowsSharedLib,
@@ -24,10 +24,10 @@ use crate::{
 };
 
 /// A handle to a dynamically loaded library.
-#[cfg(target_family = "unix")]
+#[cfg(unix)]
 pub type NSTDSharedLib = NSTDUnixSharedLib;
 /// A handle to a dynamically loaded library.
-#[cfg(target_os = "windows")]
+#[cfg(windows)]
 pub type NSTDSharedLib = NSTDWindowsSharedLib;
 
 /// An optional handle to a shared library.
@@ -60,15 +60,15 @@ pub unsafe extern "C" fn nstd_shared_lib_load(path: &NSTDCStr) -> NSTDOptionalSh
     if nstd_core_cstr_get_null(path).is_null() {
         // Allocate a null byte for `path`.
         let path = nstd_cstring_from_cstr_unchecked(path);
-        #[cfg(target_family = "unix")]
+        #[cfg(unix)]
         return nstd_os_unix_shared_lib_load(nstd_cstring_as_ptr(&path));
-        #[cfg(target_os = "windows")]
+        #[cfg(windows)]
         return nstd_os_windows_shared_lib_load(nstd_cstring_as_ptr(&path));
     } else {
         // Use the already null terminated `path`.
-        #[cfg(target_family = "unix")]
+        #[cfg(unix)]
         return nstd_os_unix_shared_lib_load(nstd_core_cstr_as_ptr(path));
-        #[cfg(target_os = "windows")]
+        #[cfg(windows)]
         return nstd_os_windows_shared_lib_load(nstd_core_cstr_as_ptr(path));
     }
 }
@@ -94,9 +94,9 @@ pub unsafe extern "C" fn nstd_shared_lib_get(
     lib: &NSTDSharedLib,
     symbol: *const NSTDChar,
 ) -> NSTDAny {
-    #[cfg(target_family = "unix")]
+    #[cfg(unix)]
     return nstd_os_unix_shared_lib_get(lib, symbol);
-    #[cfg(target_os = "windows")]
+    #[cfg(windows)]
     return nstd_os_windows_shared_lib_get(lib, symbol);
 }
 
@@ -122,9 +122,9 @@ pub unsafe extern "C" fn nstd_shared_lib_get_mut(
     lib: &mut NSTDSharedLib,
     symbol: *const NSTDChar,
 ) -> NSTDAnyMut {
-    #[cfg(target_family = "unix")]
+    #[cfg(unix)]
     return nstd_os_unix_shared_lib_get_mut(lib, symbol);
-    #[cfg(target_os = "windows")]
+    #[cfg(windows)]
     return nstd_os_windows_shared_lib_get_mut(lib, symbol);
 }
 

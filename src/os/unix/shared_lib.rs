@@ -45,6 +45,21 @@ pub unsafe extern "C" fn nstd_os_unix_shared_lib_load(
     NSTDOptional::Some(NSTDUnixSharedLib { handle })
 }
 
+/// Returns a raw handle to a dynamically loaded library.
+///
+/// # Parameters:
+///
+/// - `const NSTDUnixSharedLib *lib` - The shared library.
+///
+/// # Returns
+///
+/// `NSTDAnyMut handle` - A raw handle to the dynamically loaded library.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_os_unix_shared_lib_handle(lib: &NSTDUnixSharedLib) -> NSTDAnyMut {
+    lib.handle
+}
+
 /// Returns an immutable opaque pointer to a symbol in a loaded library.
 ///
 /// # Parameters:

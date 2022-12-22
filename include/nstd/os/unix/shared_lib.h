@@ -27,6 +27,17 @@ NSTDOptional(NSTDUnixSharedLib) NSTDUnixOptionalSharedLib;
 /// See <https://man7.org/linux/man-pages/man3/dlopen.3.html>.
 NSTDAPI NSTDUnixOptionalSharedLib nstd_os_unix_shared_lib_load(const NSTDChar *path);
 
+/// Returns a raw handle to a dynamically loaded library.
+///
+/// # Parameters:
+///
+/// - `const NSTDUnixSharedLib *lib` - The shared library.
+///
+/// # Returns
+///
+/// `NSTDAnyMut handle` - A raw handle to the dynamically loaded library.
+NSTDAPI NSTDAnyMut nstd_os_unix_shared_lib_handle(const NSTDUnixSharedLib *lib);
+
 /// Returns an immutable opaque pointer to a symbol in a loaded library.
 ///
 /// # Parameters:

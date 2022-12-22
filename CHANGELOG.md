@@ -1,4 +1,8 @@
 # TBD
+### `nstd.os`
+- Added `nstd_os_unix_shared_lib_handle`.
+
+# 0.4.0
 ### `nstd`
 - Added `nstd.env`.
 ### `nstd.core`

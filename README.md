@@ -137,3 +137,15 @@ To build with all features:
 ```sh
 cargo build --release --all-features
 ```
+
+# Releases
+`nstd` versions follow the Semantic Versioning rules. Each release is given a major, minor, and
+patch number that makes up that version of the library (major.minor.patch).
+
+There have not yet been any major releases for the framework as it is not yet stable.
+
+A new minor version is released every 6 weeks, exactly 1 week after a new minor Rust release.
+
+Patch releases are released every so often with bug fixes.
+
+See [semver.org](https://semver.org/) to learn more about Semantic Versioning.
