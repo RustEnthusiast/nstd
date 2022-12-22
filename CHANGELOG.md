@@ -1,4 +1,4 @@
-# TBD
+# 0.4.0
 ### `nstd`
 - Added `nstd.env`.
 ### `nstd.core`
