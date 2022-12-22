@@ -1,7 +1,7 @@
 //! Operating system specific functionality.
-#[cfg(target_family = "unix")]
+#[cfg(unix)]
 pub mod unix;
-#[cfg(target_os = "windows")]
+#[cfg(windows)]
 pub mod windows;
 
 /// Constant that is only set if the target operating system is Linux.
@@ -13,9 +13,9 @@ pub const NSTD_OS_LINUX: () = ();
 pub const NSTD_OS_MACOS: () = ();
 
 /// Constant that is only set if the target operating system is Windows.
-#[cfg(target_os = "windows")]
+#[cfg(windows)]
 pub const NSTD_OS_WINDOWS: () = ();
 
 /// Constant that is only set if the target operating system is Unix based.
-#[cfg(target_family = "unix")]
+#[cfg(unix)]
 pub const NSTD_OS_UNIX: () = ();
