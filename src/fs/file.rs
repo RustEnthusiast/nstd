@@ -11,7 +11,7 @@ use crate::{
     NSTDUInt, NSTDUInt8,
 };
 use std::fs::File;
-#[cfg(target_family = "unix")]
+#[cfg(unix)]
 use std::os::unix::io::AsRawFd;
 
 /// Creates the file upon opening if it does not already exist.
@@ -97,13 +97,13 @@ pub unsafe extern "C" fn nstd_fs_file_write(
     bytes: &NSTDSlice,
     written: &mut NSTDUInt,
 ) -> NSTDIOError {
-    #[cfg(not(target_family = "unix"))]
+    #[cfg(not(unix))]
     {
         let (err, w) = crate::io::stdio::write(file, bytes);
         *written = w;
         err
     }
-    #[cfg(target_family = "unix")]
+    #[cfg(unix)]
     {
         let (err, w) = crate::os::unix::io::stdio::write(file.as_raw_fd(), bytes);
         *written = w;
@@ -132,9 +132,9 @@ pub unsafe extern "C" fn nstd_fs_file_write_all(
     file: &mut NSTDFile,
     bytes: &NSTDSlice,
 ) -> NSTDIOError {
-    #[cfg(not(target_family = "unix"))]
+    #[cfg(not(unix))]
     return crate::io::stdio::write_all(file, bytes);
-    #[cfg(target_family = "unix")]
+    #[cfg(unix)]
     return crate::os::unix::io::stdio::write_all(file.as_raw_fd(), bytes).into();
 }
 
@@ -177,13 +177,13 @@ pub unsafe extern "C" fn nstd_fs_file_read(
     buffer: &mut NSTDSliceMut,
     read: &mut NSTDUInt,
 ) -> NSTDIOError {
-    #[cfg(not(target_family = "unix"))]
+    #[cfg(not(unix))]
     {
         let (err, r) = crate::io::stdio::read(file, buffer);
         *read = r;
         err
     }
-    #[cfg(target_family = "unix")]
+    #[cfg(unix)]
     {
         let (err, r) = crate::os::unix::io::stdio::read(file.as_raw_fd(), buffer);
         *read = r;
@@ -216,13 +216,13 @@ pub extern "C" fn nstd_fs_file_read_all(
     buffer: &mut NSTDVec,
     read: &mut NSTDUInt,
 ) -> NSTDIOError {
-    #[cfg(not(target_family = "unix"))]
+    #[cfg(not(unix))]
     {
         let (err, r) = crate::io::stdio::read_all(file, buffer);
         *read = r;
         err
     }
-    #[cfg(target_family = "unix")]
+    #[cfg(unix)]
     {
         // SAFETY: `file` owns the file descriptor.
         let (err, r) = unsafe { crate::os::unix::io::stdio::read_all(file.as_raw_fd(), buffer) };
@@ -260,13 +260,13 @@ pub extern "C" fn nstd_fs_file_read_to_string(
     buffer: &mut NSTDString,
     read: &mut NSTDUInt,
 ) -> NSTDIOError {
-    #[cfg(not(target_family = "unix"))]
+    #[cfg(not(unix))]
     {
         let (err, r) = crate::io::stdio::read_to_string(file, buffer);
         *read = r;
         err
     }
-    #[cfg(target_family = "unix")]
+    #[cfg(unix)]
     {
         // SAFETY: `file` owns the file descriptor.
         unsafe {
@@ -303,9 +303,9 @@ pub unsafe extern "C" fn nstd_fs_file_read_exact(
     file: &mut NSTDFile,
     buffer: &mut NSTDSliceMut,
 ) -> NSTDIOError {
-    #[cfg(not(target_family = "unix"))]
+    #[cfg(not(unix))]
     return crate::io::stdio::read_exact(file, buffer);
-    #[cfg(target_family = "unix")]
+    #[cfg(unix)]
     return crate::os::unix::io::stdio::read_exact(file.as_raw_fd(), buffer).into();
 }
 

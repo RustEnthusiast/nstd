@@ -11,7 +11,7 @@ use crate::{
     NSTDUInt,
 };
 use std::io::Stdin;
-#[cfg(target_family = "unix")]
+#[cfg(unix)]
 use std::os::unix::io::AsRawFd;
 
 /// A handle to the standard input stream.
@@ -57,13 +57,13 @@ pub unsafe extern "C" fn nstd_io_stdin_read(
     buffer: &mut NSTDSliceMut,
     read: &mut NSTDUInt,
 ) -> NSTDIOError {
-    #[cfg(not(target_family = "unix"))]
+    #[cfg(not(unix))]
     {
         let (err, r) = crate::io::stdio::read(handle, buffer);
         *read = r;
         err
     }
-    #[cfg(target_family = "unix")]
+    #[cfg(unix)]
     {
         let (err, r) = crate::os::unix::io::stdio::read(handle.as_raw_fd(), buffer);
         *read = r;
@@ -96,13 +96,13 @@ pub extern "C" fn nstd_io_stdin_read_all(
     buffer: &mut NSTDVec,
     read: &mut NSTDUInt,
 ) -> NSTDIOError {
-    #[cfg(not(target_family = "unix"))]
+    #[cfg(not(unix))]
     {
         let (err, r) = crate::io::stdio::read_all(handle, buffer);
         *read = r;
         err
     }
-    #[cfg(target_family = "unix")]
+    #[cfg(unix)]
     {
         // SAFETY: `handle` owns the file descriptor.
         let (err, r) = unsafe { crate::os::unix::io::stdio::read_all(handle.as_raw_fd(), buffer) };
@@ -140,13 +140,13 @@ pub extern "C" fn nstd_io_stdin_read_to_string(
     buffer: &mut NSTDString,
     read: &mut NSTDUInt,
 ) -> NSTDIOError {
-    #[cfg(not(target_family = "unix"))]
+    #[cfg(not(unix))]
     {
         let (err, r) = crate::io::stdio::read_to_string(handle, buffer);
         *read = r;
         err
     }
-    #[cfg(target_family = "unix")]
+    #[cfg(unix)]
     {
         // SAFETY: `handle` owns the file descriptor.
         unsafe {
@@ -183,9 +183,9 @@ pub unsafe extern "C" fn nstd_io_stdin_read_exact(
     handle: &mut NSTDStdin,
     buffer: &mut NSTDSliceMut,
 ) -> NSTDIOError {
-    #[cfg(not(target_family = "unix"))]
+    #[cfg(not(unix))]
     return crate::io::stdio::read_exact(handle, buffer);
-    #[cfg(target_family = "unix")]
+    #[cfg(unix)]
     return crate::os::unix::io::stdio::read_exact(handle.as_raw_fd(), buffer).into();
 }
 

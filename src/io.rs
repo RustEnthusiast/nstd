@@ -3,7 +3,7 @@ pub mod stderr;
 pub mod stdin;
 pub(crate) mod stdio;
 pub mod stdout;
-#[cfg(target_family = "unix")]
+#[cfg(unix)]
 use crate::os::unix::io::NSTDUnixIOError::{self, *};
 use crate::{
     core::{result::NSTDResult, str::NSTDStr},
@@ -87,7 +87,7 @@ impl NSTDIOError {
         }
     }
 }
-#[cfg(target_family = "unix")]
+#[cfg(unix)]
 impl From<NSTDUnixIOError> for NSTDIOError {
     /// Converts an [NSTDUnixIOError] into an [NSTDIOError].
     fn from(err: NSTDUnixIOError) -> Self {
