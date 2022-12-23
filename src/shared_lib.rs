@@ -133,6 +133,10 @@ pub unsafe extern "C" fn nstd_shared_lib_get_mut(
 /// # Parameters:
 ///
 /// - `NSTDSharedLib lib` - The library handle.
+///
+/// # Panics
+///
+/// Panics if unloading the library fails.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 #[allow(unused_variables)]

@@ -12,10 +12,14 @@ pub struct NSTDWindowsSharedLib {
 }
 impl Drop for NSTDWindowsSharedLib {
     /// [NSTDWindowsSharedLib]'s destructor.
+    ///
+    /// # Panics
+    ///
+    /// Panics if unloading the library fails.
     #[inline]
     fn drop(&mut self) {
         // SAFETY: `handle` is non-null.
-        unsafe { FreeLibrary(self.handle) };
+        unsafe { assert!(FreeLibrary(self.handle) != 0) };
     }
 }
 
@@ -118,6 +122,10 @@ pub unsafe extern "C" fn nstd_os_windows_shared_lib_get_mut(
 /// # Parameters:
 ///
 /// - `NSTDWindowsSharedLib lib` - The library handle.
+///
+/// # Panics
+///
+/// Panics if unloading the library fails.
 ///
 /// # Safety
 ///
