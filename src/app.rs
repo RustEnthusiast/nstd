@@ -5,12 +5,16 @@ pub mod events;
 use self::{
     data::{NSTDAppData, NSTDAppHandle},
     display::{NSTDDisplay, NSTDDisplayHandle},
-    events::{NSTDAppEvents, NSTDKey, NSTDMouseInput, NSTDScrollDelta, NSTDTouchState},
+    events::{
+        NSTDAppEvents, NSTDGamepadAxis, NSTDGamepadButton, NSTDKey, NSTDMouseInput,
+        NSTDScrollDelta, NSTDTouchState,
+    },
 };
 use crate::{
     core::{def::NSTDErrorCode, str::NSTDStr},
-    NSTDAnyMut,
+    heap_ptr::NSTDHeapPtr,
 };
+use gilrs::{Error::NotImplemented, EventType as GamepadEvent, Gilrs};
 use winit::{
     event::{DeviceEvent, ElementState, Event, StartCause, WindowEvent},
     event_loop::{ControlFlow, EventLoop},
@@ -21,8 +25,16 @@ use winit::{
 pub struct NSTDApp {
     /// The application event callback function pointers.
     events: NSTDAppEvents,
-    /// The underlying event loop.
-    event_loop: Box<EventLoop<()>>,
+    /// Private app data.
+    inner: Box<AppData>,
+}
+
+/// Private application data.
+struct AppData {
+    /// The [winit] event loop.
+    event_loop: EventLoop<()>,
+    /// The gamepad input handler.
+    gil: Gilrs,
 }
 
 /// Creates a new `nstd` application.
@@ -38,13 +50,23 @@ pub struct NSTDApp {
 ///
 /// # Panics
 ///
-/// This function must be called on the "main" thread, otherwise a panic may occur.
-#[inline]
+/// This function may panic in the following situations:
+///
+/// - This function was not called on the "main" thread.
+///
+/// - Creating the gamepad input handler fails.
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_app_new() -> NSTDApp {
     NSTDApp {
         events: NSTDAppEvents::default(),
-        event_loop: Box::default(),
+        inner: Box::new(AppData {
+            event_loop: EventLoop::new(),
+            gil: match Gilrs::new() {
+                Ok(gil) => gil,
+                Err(NotImplemented(gil)) => gil,
+                _ => panic!("Failed to create gamepad event listener"),
+            },
+        }),
     }
 }
 
@@ -60,7 +82,7 @@ pub extern "C" fn nstd_app_new() -> NSTDApp {
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_app_handle(app: &NSTDApp) -> NSTDAppHandle {
-    &app.event_loop
+    &app.inner.event_loop
 }
 
 /// Returns a mutable reference to an `NSTDApp`'s event table.
@@ -88,17 +110,21 @@ pub extern "C" fn nstd_app_events(app: &mut NSTDApp) -> &mut NSTDAppEvents {
 ///
 /// - `NSTDApp app` - The `nstd` application to run.
 ///
-/// - `NSTDAnyMut data` - Custom user data to pass to each app event.
+/// - `NSTDHeapPtr data` - Custom user data to pass to each app event.
 ///
 /// # Safety
 ///
 /// This function's caller must guarantee validity of the `app`'s event callbacks.
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_app_run(app: NSTDApp, data: NSTDAnyMut) -> ! {
+pub unsafe extern "C" fn nstd_app_run(app: NSTDApp, mut data: NSTDHeapPtr) -> ! {
+    let AppData {
+        event_loop,
+        mut gil,
+    } = *app.inner;
     // Run the winit event loop.
-    app.event_loop.run(move |event, handle, control_flow| {
+    event_loop.run(move |event, handle, control_flow| {
         // Instantiate a new instance of `NSTDAppData`.
-        let app_data = &NSTDAppData::new(handle, control_flow, data);
+        let app_data = &mut NSTDAppData::new(handle, control_flow, &mut data, &mut gil);
         // Dispatch events.
         match event {
             // The event loop was just started.
@@ -109,6 +135,60 @@ pub unsafe extern "C" fn nstd_app_run(app: NSTDApp, data: NSTDAnyMut) -> ! {
             }
             // All other events have been processed.
             Event::MainEventsCleared => {
+                // Dispatch gamepad events.
+                while let Some(event) = app_data.next_gamepad_event() {
+                    match event.event {
+                        // A gamepad was connected to the system.
+                        GamepadEvent::Connected => {
+                            if let Some(gamepad_connected) = app.events.gamepad_connected {
+                                gamepad_connected(app_data, &event.id);
+                            }
+                        }
+                        // A gamepad was disconnected from the system.
+                        GamepadEvent::Disconnected => {
+                            if let Some(gamepad_disconnected) = app.events.gamepad_disconnected {
+                                gamepad_disconnected(app_data, &event.id);
+                            }
+                        }
+                        // A gamepad button was pressed.
+                        GamepadEvent::ButtonPressed(button, code) => {
+                            if let Some(gamepad_button_pressed) = app.events.gamepad_button_pressed
+                            {
+                                let button = NSTDGamepadButton::from_winit(button);
+                                let code = code.into_u32();
+                                gamepad_button_pressed(app_data, &event.id, button, code);
+                            }
+                        }
+                        // A gamepad button was released.
+                        GamepadEvent::ButtonReleased(button, code) => {
+                            if let Some(gamepad_button_released) =
+                                app.events.gamepad_button_released
+                            {
+                                let button = NSTDGamepadButton::from_winit(button);
+                                let code = code.into_u32();
+                                gamepad_button_released(app_data, &event.id, button, code);
+                            }
+                        }
+                        // A gamepad button's value changed.
+                        GamepadEvent::ButtonChanged(button, value, code) => {
+                            if let Some(gamepad_input) = app.events.gamepad_input {
+                                let button = NSTDGamepadButton::from_winit(button);
+                                let code = code.into_u32();
+                                gamepad_input(app_data, &event.id, button, code, value);
+                            }
+                        }
+                        // A gamepad axis value has changed.
+                        GamepadEvent::AxisChanged(axis, value, code) => {
+                            if let Some(gamepad_axis_input) = app.events.gamepad_axis_input {
+                                let axis = NSTDGamepadAxis::from_winit(axis);
+                                let code = code.into_u32();
+                                gamepad_axis_input(app_data, &event.id, axis, code, value);
+                            }
+                        }
+                        _ => (),
+                    }
+                }
+                // Dispatch update event.
                 if let Some(update) = app.events.update {
                     update(app_data);
                 }
@@ -150,7 +230,7 @@ pub unsafe extern "C" fn nstd_app_run(app: NSTDApp, data: NSTDAnyMut) -> ! {
                 DeviceEvent::Button { button, state } => {
                     if let Some(button_input) = app.events.button_input {
                         let is_down = state == ElementState::Pressed;
-                        button_input(app_data, &device_id, &button, is_down.into());
+                        button_input(app_data, &device_id, &button, is_down);
                     }
                 }
                 // There was some keyboard input.
@@ -158,7 +238,7 @@ pub unsafe extern "C" fn nstd_app_run(app: NSTDApp, data: NSTDAnyMut) -> ! {
                     if let Some(key_input) = app.events.key_input {
                         let key = NSTDKey::from_winit(input.virtual_keycode);
                         let is_down = input.state == ElementState::Pressed;
-                        key_input(app_data, &device_id, key, input.scancode, is_down.into());
+                        key_input(app_data, &device_id, key, input.scancode, is_down);
                     }
                 }
                 _ => (),
@@ -195,7 +275,7 @@ pub unsafe extern "C" fn nstd_app_run(app: NSTDApp, data: NSTDAnyMut) -> ! {
                 // A window's focus has changed.
                 WindowEvent::Focused(is_focused) => {
                     if let Some(window_focus_changed) = app.events.window_focus_changed {
-                        window_focus_changed(app_data, &window_id, is_focused.into());
+                        window_focus_changed(app_data, &window_id, is_focused);
                     }
                 }
                 // A window received mouse button input.
@@ -207,7 +287,7 @@ pub unsafe extern "C" fn nstd_app_run(app: NSTDApp, data: NSTDAnyMut) -> ! {
                 } => {
                     if let Some(window_mouse_input) = app.events.window_mouse_input {
                         let input = NSTDMouseInput::from_winit(button);
-                        let is_down = (state == ElementState::Pressed).into();
+                        let is_down = state == ElementState::Pressed;
                         window_mouse_input(app_data, &window_id, &device_id, &input, is_down);
                     }
                 }
@@ -217,7 +297,7 @@ pub unsafe extern "C" fn nstd_app_run(app: NSTDApp, data: NSTDAnyMut) -> ! {
                 } => {
                     if let Some(window_key_input) = app.events.window_key_input {
                         let key = NSTDKey::from_winit(input.virtual_keycode);
-                        let is_down = (input.state == ElementState::Pressed).into();
+                        let is_down = input.state == ElementState::Pressed;
                         let scancode = input.scancode;
                         window_key_input(app_data, &window_id, &device_id, key, scancode, is_down);
                     }

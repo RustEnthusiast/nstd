@@ -1,6 +1,7 @@
 #ifndef NSTD_CORE_CSTR_CSTR_H
 #define NSTD_CORE_CSTR_CSTR_H
 #include "../../nstd.h"
+#include "../optional.h"
 #include "../slice.h"
 
 /// An immutable slice of a C string.
@@ -16,6 +17,9 @@ typedef struct {
     NSTDUInt len;
 } NSTDCStr;
 
+/// Represents an optional value of type `NSTDCStr`.
+NSTDOptional(NSTDCStr) NSTDOptionalCStr;
+
 /// Creates a new C string slice from a raw pointer and a size.
 ///
 /// # Parameters:
@@ -27,6 +31,10 @@ typedef struct {
 /// # Returns
 ///
 /// `NSTDCStr cstr` - The new C string slice, referencing `raw`'s data.
+///
+/// # Panics
+///
+/// Panics if `raw` is null.
 NSTDAPI NSTDCStr nstd_core_cstr_new(const NSTDChar *raw, NSTDUInt len);
 
 /// Creates a new instance of `NSTDCStr` from a raw C string, excluding the null byte.
@@ -38,6 +46,10 @@ NSTDAPI NSTDCStr nstd_core_cstr_new(const NSTDChar *raw, NSTDUInt len);
 /// # Returns
 ///
 /// `NSTDCStr cstr` - The new C string slice, referencing `raw`'s data.
+///
+/// # Panics
+///
+/// Panics if `raw` is null.
 ///
 /// # Safety
 ///
@@ -54,6 +66,10 @@ NSTDAPI NSTDCStr nstd_core_cstr_from_raw(const NSTDChar *raw);
 /// # Returns
 ///
 /// `NSTDCStr cstr` - The new C string slice, referencing `raw`'s data.
+///
+/// # Panics
+///
+/// Panics if `raw` is null.
 ///
 /// # Safety
 ///
@@ -153,6 +169,28 @@ NSTDAPI const NSTDChar *nstd_core_cstr_get_null(const NSTDCStr *cstr);
 /// string slice's boundaries.
 NSTDAPI const NSTDChar *nstd_core_cstr_get(const NSTDCStr *cstr, NSTDUInt pos);
 
+/// Returns a pointer to the first character in a C string slice, or null if it is empty.
+///
+/// # Parameters:
+///
+/// - `const NSTDCStr *cstr` - The C string slice.
+///
+/// # Returns
+///
+/// `const NSTDChar *first` - If present, a pointer to the first character in the C string slice.
+NSTDAPI const NSTDChar *nstd_core_cstr_first(const NSTDCStr *cstr);
+
+/// Returns a pointer to the last character in a C string slice, or null if it is empty.
+///
+/// # Parameters:
+///
+/// - `const NSTDCStr *cstr` - The C string slice.
+///
+/// # Returns
+///
+/// `const NSTDChar *last` - If present, a pointer to the last character in the C string slice.
+NSTDAPI const NSTDChar *nstd_core_cstr_last(const NSTDCStr *cstr);
+
 /// A mutable slice of a C string.
 ///
 /// # Safety
@@ -167,6 +205,9 @@ typedef struct {
     NSTDUInt len;
 } NSTDCStrMut;
 
+/// Represents an optional value of type `NSTDCStrMut`.
+NSTDOptional(NSTDCStrMut) NSTDOptionalCStrMut;
+
 /// Creates a new C string slice from a raw pointer and a size.
 ///
 /// # Parameters:
@@ -178,6 +219,10 @@ typedef struct {
 /// # Returns
 ///
 /// `NSTDCStrMut cstr` - The new C string slice, referencing `raw`'s data.
+///
+/// # Panics
+///
+/// Panics if `raw` is null.
 NSTDAPI NSTDCStrMut nstd_core_cstr_mut_new(NSTDChar *raw, NSTDUInt len);
 
 /// Creates a new instance of `NSTDCStrMut` from a raw C string, excluding the null byte.
@@ -189,6 +234,10 @@ NSTDAPI NSTDCStrMut nstd_core_cstr_mut_new(NSTDChar *raw, NSTDUInt len);
 /// # Returns
 ///
 /// `NSTDCStrMut cstr` - The new C string slice, referencing `raw`'s data.
+///
+/// # Panics
+///
+/// Panics if `raw` is null.
 ///
 /// # Safety
 ///
@@ -205,6 +254,10 @@ NSTDAPI NSTDCStrMut nstd_core_cstr_mut_from_raw(NSTDChar *raw);
 /// # Returns
 ///
 /// `NSTDCStrMut cstr` - The new C string slice, referencing `raw`'s data.
+///
+/// # Panics
+///
+/// Panics if `raw` is null.
 ///
 /// # Safety
 ///
@@ -365,5 +418,49 @@ NSTDAPI NSTDChar *nstd_core_cstr_mut_get(NSTDCStrMut *cstr, NSTDUInt pos);
 /// `const NSTDChar *chr` - A pointer to the character at `pos`, or null if `pos` is out of the C
 /// string slice's boundaries.
 NSTDAPI const NSTDChar *nstd_core_cstr_mut_get_const(const NSTDCStrMut *cstr, NSTDUInt pos);
+
+/// Returns a pointer to the first character in a C string slice, or null if it is empty.
+///
+/// # Parameters:
+///
+/// - `NSTDCStrMut *cstr` - The C string slice.
+///
+/// # Returns
+///
+/// `NSTDChar *first` - If present, a pointer to the first character in the C string slice.
+NSTDAPI NSTDChar *nstd_core_cstr_mut_first(NSTDCStrMut *cstr);
+
+/// Returns an immutable pointer to the first character in a C string slice, or null if it is empty.
+///
+/// # Parameters:
+///
+/// - `const NSTDCStrMut *cstr` - The C string slice.
+///
+/// # Returns
+///
+/// `const NSTDChar *first` - If present, a pointer to the first character in the C string slice.
+NSTDAPI const NSTDChar *nstd_core_cstr_mut_first_const(const NSTDCStrMut *cstr);
+
+/// Returns a pointer to the last character in a C string slice, or null if it is empty.
+///
+/// # Parameters:
+///
+/// - `NSTDCStrMut *cstr` - The C string slice.
+///
+/// # Returns
+///
+/// `NSTDChar *last` - If present, a pointer to the last character in the C string slice.
+NSTDAPI NSTDChar *nstd_core_cstr_mut_last(NSTDCStrMut *cstr);
+
+/// Returns an immutable pointer to the last character in a C string slice, or null if it is empty.
+///
+/// # Parameters:
+///
+/// - `const NSTDCStrMut *cstr` - The C string slice.
+///
+/// # Returns
+///
+/// `const NSTDChar *last` - If present, a pointer to the last character in the C string slice.
+NSTDAPI const NSTDChar *nstd_core_cstr_mut_last_const(const NSTDCStrMut *cstr);
 
 #endif

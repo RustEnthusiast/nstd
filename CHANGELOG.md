@@ -1,27 +1,78 @@
 # TBD
+### `nstd.core`
+- Added `NSTDOptional[Ptr|Slice|CStr|Str][Mut]`.
+- Added `nstd_core_ptr_raw_dangling[_mut]`.
+- Added `nstd_core_str[_mut]_as_cstr`.
+### `nstd.cstring`
+- Removed `nstd_cstring_as_cstr_mut`.
+### `nstd.os`
+- [`unix.alloc`] Fixed linker error when using multiple versions of the crate.
+### `nstd.shared_lib`
+- `nstd_shared_lib_load` now takes `NSTDCStr`.
+### `nstd.thread`
+- Added `NSTDThreadResult`.
+- `nstd_thread_name` now returns `NSTDOptionalStr`.
+- `NSTDThreadDescriptor::name` is now `NSTDOptionalStr`.
+- Added `nstd_thread_current`.
+
+# 0.3.3
 ### `nstd`
-- Removed the `asm` feature.
+- Internal safety improvements.
+- Added `proc`.
+- Added `thread`.
+- Removed dependency for `libloading`.
+### `nstd.os`
+- Added `NSTDUnixSharedLibHandle`.
+- Added `NSTD_OS_UNIX`.
+
+# 0.3.2
+### `nstd`
+- Second attempt to fix docs.rs build for non-x86_64 Unix systems.
+
+# 0.3.1
+### `nstd`
+- Attempted to fix docs.rs build for non-x86_64 Unix systems.
+
+# 0.3.0
+### `nstd`
 - The overflow behavior for the "release" profile has been set to panic.
 - The panic behavior for the "release" profile has been set to abort.
 ### `nstd.core`
-- Added `Optional`.
-- Added `Result`.
+- `str[_mut]_to_*` functions now return `NSTDOptional`.
+- Added `cstr[_mut]_[first|last][_const]`.
+- Added `ops`.
+- Added `cty_is_unicode`.
+- Renamed `str[_mut]_get_char` to `str[_mut]_get`.
+- Added `NSTDOptional`.
+- Added `NSTDResult`.
 - Added `panic`.
 - Made `math_[clamp|div_ceil|div_floor]_*` safe.
 ### `nstd.cstring`
+- Added `clear`.
 - Added `from_cstr`.
 - Renamed `to_bytes` to `into_bytes`.
+### `nstd.fs`
+- Added `NSTDFileResult`.
 ### `nstd.os`
+- Added `NSTDWindowsHeapHandle`.
+- Added `NSTDWindowsSharedLibHandle`.
+- Added `unix.alloc`.
+- Added `[unix|windows].shared_lib`.
 - Added `NSTDWindowsHeapResult`.
 - Added `windows_alloc_heap_validate`.
 - Added `windows_alloc_heap_size`.
 - Added `NSTDWindowsAllocError`.
 - Renamed `NSTDWindowsHeapHandle` to `NSTDWindowsHeap`.
+### `nstd.shared_lib`
+- Added `NSTDOptionalSharedLib`.
 ### `nstd.string`
+- Added `clear`.
 - Added `from_str`.
 - Renamed `to_bytes` to `into_bytes`.
 ### `nstd.vec`
+- Added `clear`.
 - Added `from_slice`.
+
 # 0.2.0
 ### `nstd`
 - Added `nstd.fs`.

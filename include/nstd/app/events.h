@@ -10,6 +10,9 @@ typedef NSTDAnyMut NSTDWindowID;
 /// A device's unique identifier.
 typedef NSTDAnyMut NSTDDeviceID;
 
+/// A gamepad's unique identifier.
+typedef NSTDAnyMut NSTDGamepadID;
+
 /// Identifier for an analog axis on a device.
 typedef NSTDAnyMut NSTDAnalogAxisID;
 
@@ -204,6 +207,82 @@ typedef enum {
     NSTD_KEY_RIGHT_ALT
 } NSTDKey;
 
+/// Represents a gamepad button.
+typedef enum {
+    /// The upper action pad button.
+    ///
+    /// Corresponds to the `Y` button on Xbox controllers.
+    NSTD_GAMEPAD_BUTTON_NORTH,
+    /// The lower action pad button.
+    ///
+    /// Corresponds to the `A` button on Xbox controllers.
+    NSTD_GAMEPAD_BUTTON_SOUTH,
+    /// The right action pad button.
+    ///
+    /// Corresponds to the `B` button on Xbox controllers.
+    NSTD_GAMEPAD_BUTTON_EAST,
+    /// The left action pad button.
+    ///
+    /// Corresponds to the `X` button on Xbox controllers.
+    NSTD_GAMEPAD_BUTTON_WEST,
+    /// The right bumper.
+    ///
+    /// Corresponds to `RB` on Xbox controllers & `R1` on Playstation controllers.
+    NSTD_GAMEPAD_BUTTON_RIGHT_BUMPER,
+    /// The left bumper.
+    ///
+    /// Corresponds to `LB` on Xbox controllers & `L1` on Playstation controllers.
+    NSTD_GAMEPAD_BUTTON_LEFT_BUMPER,
+    /// The right trigger.
+    ///
+    /// Corresponds to `RT` on Xbox controllers & `R2` on Playstation controllers.
+    NSTD_GAMEPAD_BUTTON_RIGHT_TRIGGER,
+    /// The left trigger.
+    ///
+    /// Corresponds to `LT` on Xbox controllers & `L2` on Playstation controllers.
+    NSTD_GAMEPAD_BUTTON_LEFT_TRIGGER,
+    /// The start/pause button.
+    NSTD_GAMEPAD_BUTTON_START,
+    /// The select/back button.
+    NSTD_GAMEPAD_BUTTON_SELECT,
+    /// The right thumb stick.
+    NSTD_GAMEPAD_BUTTON_RIGHT_THUMB,
+    /// The left thumb stick.
+    NSTD_GAMEPAD_BUTTON_LEFT_THUMB,
+    /// The upper direction pad button.
+    NSTD_GAMEPAD_BUTTON_DPAD_UP,
+    /// The lower direction pad button.
+    NSTD_GAMEPAD_BUTTON_DPAD_DOWN,
+    /// The right direction pad button.
+    NSTD_GAMEPAD_BUTTON_DPAD_RIGHT,
+    /// The left direction pad button.
+    NSTD_GAMEPAD_BUTTON_DPAD_LEFT,
+    /// An unrecognized button.
+    NSTD_GAMEPAD_BUTTON_UNKNOWN
+} NSTDGamepadButton;
+
+/// Represents a gamepad axis.
+typedef enum {
+    /// The left stick x-axis.
+    NSTD_GAMEPAD_AXIS_LEFT_X,
+    /// The left stick y-axis.
+    NSTD_GAMEPAD_AXIS_LEFT_Y,
+    /// The left stick z-axis.
+    NSTD_GAMEPAD_AXIS_LEFT_Z,
+    /// The right stick x-axis.
+    NSTD_GAMEPAD_AXIS_RIGHT_X,
+    /// The right stick y-axis.
+    NSTD_GAMEPAD_AXIS_RIGHT_Y,
+    /// The right stick z-axis.
+    NSTD_GAMEPAD_AXIS_RIGHT_Z,
+    /// Left or right on the direction pad.
+    NSTD_GAMEPAD_AXIS_DPAD_X,
+    /// Up or down on the direction pad.
+    NSTD_GAMEPAD_AXIS_DPAD_Y,
+    /// An unknown axis.
+    NSTD_GAMEPAD_AXIS_UNKNOWN
+} NSTDGamepadAxis;
+
 /// Contains callback based events through function pointers.
 typedef struct {
     /// Called once before starting the application event loop.
@@ -266,6 +345,22 @@ typedef struct {
     void (*window_close_requested)(const NSTDAppData *, NSTDWindowID);
     /// Called when a window is closed.
     void (*window_closed)(const NSTDAppData *, NSTDWindowID);
+    /// A gamepad was connected to the system.
+    void (*gamepad_connected)(const NSTDAppData *, NSTDGamepadID);
+    /// A gamepad was disconnected to the system.
+    void (*gamepad_disconnected)(const NSTDAppData *, NSTDGamepadID);
+    /// A gamepad button was pressed.
+    void (*gamepad_button_pressed)(const NSTDAppData *, NSTDGamepadID, NSTDGamepadButton,
+    NSTDUInt32);
+    /// A gamepad button was released.
+    void (*gamepad_button_released)(const NSTDAppData *, NSTDGamepadID, NSTDGamepadButton,
+    NSTDUInt32);
+    /// A gamepad button's value changed.
+    void (*gamepad_input)(const NSTDAppData *, NSTDGamepadID, NSTDGamepadButton, NSTDUInt32,
+    NSTDFloat32);
+    /// A gamepad axis value has changed.
+    void (*gamepad_axis_input)(const NSTDAppData *, NSTDGamepadID, NSTDGamepadAxis, NSTDUInt32,
+    NSTDFloat32);
     /// Called once before exiting the application event loop.
     void (*exit)(const NSTDAppData *);
 } NSTDAppEvents;

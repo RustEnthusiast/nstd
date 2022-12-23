@@ -13,7 +13,9 @@ typedef enum {
     /// Getting a handle to a heap failed.
     NSTD_ALLOC_ERROR_HEAP_NOT_FOUND,
     /// A heap is invalid.
-    NSTD_ALLOC_ERROR_INVALID_HEAP
+    NSTD_ALLOC_ERROR_INVALID_HEAP,
+    /// An allocation function received input parameters that resulted in an invalid memory layout.
+    NSTD_ALLOC_ERROR_INVALID_LAYOUT
 } NSTDAllocError;
 
 /// Allocates a block of memory on the heap.
@@ -84,11 +86,15 @@ NSTDAPI NSTDAllocError nstd_alloc_reallocate(NSTDAnyMut *ptr, NSTDUInt size, NST
 ///
 /// - `NSTDUInt size` - The number of bytes to free.
 ///
+/// # Returns
+///
+/// `NSTDAllocError errc` - The allocation operation error code.
+///
 /// # Safety
 ///
 /// - Behavior is undefined if `ptr` is not a value returned by `nstd_alloc_allocate[_zeroed]`.
 ///
 /// - `size` must be the same value that was used to allocate the memory buffer.
-NSTDAPI void nstd_alloc_deallocate(NSTDAnyMut *ptr, NSTDUInt size);
+NSTDAPI NSTDAllocError nstd_alloc_deallocate(NSTDAnyMut *ptr, NSTDUInt size);
 
 #endif

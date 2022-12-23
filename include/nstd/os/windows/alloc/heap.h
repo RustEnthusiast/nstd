@@ -4,10 +4,13 @@
 #include "../../../nstd.h"
 #include "alloc.h"
 
+/// A raw handle to a heap.
+typedef NSTDInt NSTDWindowsHeapHandle;
+
 /// A handle to a process heap.
 typedef struct {
     /// The private handle.
-    NSTDInt handle;
+    NSTDWindowsHeapHandle handle;
 } NSTDWindowsHeap;
 
 /// A result type that holds an `NSTDWindowsHeap` as the success variant.
@@ -39,6 +42,17 @@ NSTDAPI NSTDWindowsHeapResult nstd_os_windows_alloc_heap_default();
 ///
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapcreate>.
 NSTDAPI NSTDWindowsHeapResult nstd_os_windows_alloc_heap_new(NSTDUInt size);
+
+/// Returns a raw handle to a heap.
+///
+/// # Parameters:
+///
+/// - `const NSTDWindowsHeap *heap` - The heap.
+///
+/// # Returns
+///
+/// `NSTDWindowsHeapHandle handle` - A native handle to the heap.
+NSTDAPI NSTDWindowsHeapHandle nstd_os_windows_alloc_heap_handle(const NSTDWindowsHeap *heap);
 
 /// Returns the size of a memory block previously allocated by an `NSTDWindowsHeap`.
 ///

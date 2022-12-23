@@ -23,9 +23,11 @@
 ///
 /// # Safety
 ///
-/// This function is highly unsafe as it does not know how large either of the memory buffers
+/// - This function is highly unsafe as it does not know how large either of the memory buffers
 /// actually are, which can lead to undefined behavior if either of the buffers' length are less
 /// than `num`.
+///
+/// - `buf1` and `buf2` must be non-null.
 NSTDAPI NSTDBool nstd_core_mem_compare(const NSTDByte *buf1, const NSTDByte *buf2, NSTDUInt num);
 
 /// Iterates through each byte in a raw memory buffer until `delim` is reached, returning a pointer
@@ -61,6 +63,10 @@ NSTDAPI const NSTDByte *nstd_core_mem_search(const NSTDByte *buf, NSTDUInt size,
 ///
 /// - `NSTDUInt size` - The number of bytes to set to 0.
 ///
+/// # Panics
+///
+/// This operation will panic if `size` is greater than `NSTDInt`'s max value.
+///
 /// # Safety
 ///
 /// This operation can cause undefined behavior if the caller does not ensure that the memory
@@ -76,6 +82,10 @@ NSTDAPI void nstd_core_mem_zero(NSTDByte *buf, NSTDUInt size);
 /// - `NSTDUInt size` - The size of the memory buffer.
 ///
 /// - `NSTDByte fill` - The byte value to fill the memory buffer with.
+///
+/// # Panics
+///
+/// This operation will panic if `size` is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///

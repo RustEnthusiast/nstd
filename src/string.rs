@@ -11,9 +11,9 @@ use crate::{
         },
     },
     vec::{
-        nstd_vec_as_ptr, nstd_vec_as_slice, nstd_vec_as_slice_mut, nstd_vec_cap, nstd_vec_clone,
-        nstd_vec_extend, nstd_vec_from_slice, nstd_vec_len, nstd_vec_new, nstd_vec_new_with_cap,
-        nstd_vec_truncate, NSTDVec,
+        nstd_vec_as_ptr, nstd_vec_as_slice, nstd_vec_as_slice_mut, nstd_vec_cap, nstd_vec_clear,
+        nstd_vec_clone, nstd_vec_extend, nstd_vec_from_slice, nstd_vec_len, nstd_vec_new,
+        nstd_vec_new_with_cap, nstd_vec_truncate, NSTDVec,
     },
     NSTDFloat32, NSTDFloat64, NSTDInt, NSTDInt16, NSTDInt32, NSTDInt64, NSTDInt8, NSTDUInt,
     NSTDUInt16, NSTDUInt32, NSTDUInt64, NSTDUInt8, NSTDUnichar,
@@ -41,7 +41,7 @@ macro_rules! gen_from_primitive {
 
 /// Dynamically sized UTF-8 encoded byte string.
 #[repr(C)]
-#[derive(Debug, Hash)]
+#[derive(Debug)]
 pub struct NSTDString {
     /// The underlying UTF-8 encoded byte buffer.
     bytes: NSTDVec,
@@ -415,7 +415,6 @@ pub unsafe extern "C" fn nstd_string_push_str(
 /// ```
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_string_pop(string: &mut NSTDString) -> NSTDUnichar {
-    assert!(nstd_vec_len(&string.bytes) <= isize::MAX as usize);
     // SAFETY: `NSTDString` is always UTF-8 encoded.
     let str = unsafe { core::str::from_utf8_unchecked(string.bytes.as_slice()) };
     if let Some(chr) = str.chars().last() {
@@ -424,6 +423,17 @@ pub extern "C" fn nstd_string_pop(string: &mut NSTDString) -> NSTDUnichar {
         return chr as NSTDUnichar;
     }
     char::REPLACEMENT_CHARACTER as NSTDUnichar
+}
+
+/// Sets a string's length to zero.
+///
+/// # Parameters:
+///
+/// - `NSTDString *string` - The string to clear.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_string_clear(string: &mut NSTDString) {
+    nstd_vec_clear(&mut string.bytes);
 }
 
 gen_from_primitive!(
@@ -591,7 +601,7 @@ gen_from_primitive!(
 ///
 /// # Panics
 ///
-/// This operation may panic if getting a handle to the heap fails.
+/// Panics if deallocating fails.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 #[allow(unused_variables)]

@@ -34,6 +34,9 @@ pub mod math;
 #[cfg(feature = "nstd_os")]
 #[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_os")))]
 pub mod os;
+#[cfg(feature = "nstd_proc")]
+#[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_proc")))]
+pub mod proc;
 #[cfg(feature = "nstd_shared_lib")]
 #[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_shared_lib")))]
 pub mod shared_lib;
@@ -45,6 +48,9 @@ pub mod shared_ptr;
 pub mod string;
 #[cfg(test)]
 pub(crate) mod test;
+#[cfg(feature = "nstd_thread")]
+#[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_thread")))]
+pub mod thread;
 #[cfg(feature = "nstd_vec")]
 #[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_vec")))]
 pub mod vec;

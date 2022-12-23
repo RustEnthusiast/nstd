@@ -1,7 +1,7 @@
 #ifndef NSTD_CSTRING_H
 #define NSTD_CSTRING_H
 #include "alloc.h"
-#include "core/cstr.h"
+#include "core/cstr/cstr.h"
 #include "core/slice.h"
 #include "nstd.h"
 #include "vec.h"
@@ -90,17 +90,6 @@ NSTDAPI NSTDCString nstd_cstring_clone(const NSTDCString *cstring);
 ///
 /// `NSTDCStr cstr` - The new C string slice.
 NSTDAPI NSTDCStr nstd_cstring_as_cstr(const NSTDCString *cstring);
-
-/// Creates a C string slice containing the contents of `cstring`.
-///
-/// # Parameters:
-///
-/// - `NSTDCString *cstring` - The C string.
-///
-/// # Returns
-///
-/// `NSTDCStrMut cstr` - The new C string slice.
-NSTDAPI NSTDCStrMut nstd_cstring_as_cstr_mut(NSTDCString *cstring);
 
 /// Returns an immutable byte slice of the C string's active data, including the null byte.
 ///
@@ -229,6 +218,13 @@ NSTDAPI NSTDAllocError nstd_cstring_push_cstr(NSTDCString *cstring, const NSTDCS
 /// This function will panic if getting a pointer to the C string's last character fails.
 NSTDAPI NSTDChar nstd_cstring_pop(NSTDCString *cstring);
 
+/// Sets a C string's length to zero.
+///
+/// # Parameters:
+///
+/// - `NSTDCString *cstring` - The C string to clear.
+NSTDAPI void nstd_cstring_clear(NSTDCString *cstring);
+
 /// Frees an instance of `NSTDCString`.
 ///
 /// # Parameters:
@@ -237,7 +233,7 @@ NSTDAPI NSTDChar nstd_cstring_pop(NSTDCString *cstring);
 ///
 /// # Panics
 ///
-/// This operation may panic if getting a handle to the heap fails.
+/// Panics if deallocating fails.
 NSTDAPI void nstd_cstring_free(NSTDCString cstring);
 
 #endif

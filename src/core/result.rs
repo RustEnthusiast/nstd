@@ -12,6 +12,7 @@ pub enum NSTDResultStatus {
 
 /// Defines a "result" type with success and error variants.
 #[repr(C)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum NSTDResult<T, E> {
     /// The success variant.
     Ok(T),
