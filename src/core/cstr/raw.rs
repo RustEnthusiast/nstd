@@ -26,13 +26,21 @@ use crate::{NSTDBool, NSTDChar, NSTDUInt, NSTD_FALSE, NSTD_TRUE};
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
+#[allow(unused_mut)]
 pub unsafe extern "C" fn nstd_core_cstr_raw_len(mut cstr: *const NSTDChar) -> NSTDUInt {
-    let mut i = 0;
-    while *cstr != 0 {
-        cstr = cstr.offset(1);
-        i += 1;
+    #[cfg(not(any(all(unix, feature = "libc"), all(windows, feature = "windows-sys"))))]
+    {
+        let mut i = 0;
+        while *cstr != 0 {
+            cstr = cstr.offset(1);
+            i += 1;
+        }
+        i
     }
-    i
+    #[cfg(all(unix, feature = "libc"))]
+    return libc::strlen(cstr);
+    #[cfg(all(windows, feature = "windows-sys"))]
+    return windows_sys::Win32::Globalization::lstrlenA(cstr as _) as _;
 }
 
 /// Gets the length of a null terminated C string, including the null byte.
@@ -185,15 +193,23 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_copy(
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
+#[allow(unused_mut)]
 pub unsafe extern "C" fn nstd_core_cstr_raw_copy_with_null(
     mut dest: *mut NSTDChar,
     mut src: *const NSTDChar,
 ) {
-    while {
-        *dest = *src;
-        *src != 0
-    } {
-        dest = dest.offset(1);
-        src = src.offset(1);
+    #[cfg(not(any(all(unix, feature = "libc"), all(windows, feature = "windows-sys"))))]
+    {
+        while {
+            *dest = *src;
+            *src != 0
+        } {
+            dest = dest.offset(1);
+            src = src.offset(1);
+        }
     }
+    #[cfg(all(unix, feature = "libc"))]
+    libc::strcpy(dest, src);
+    #[cfg(all(windows, feature = "windows-sys"))]
+    windows_sys::Win32::Globalization::lstrcpyA(dest as _, src as _);
 }
