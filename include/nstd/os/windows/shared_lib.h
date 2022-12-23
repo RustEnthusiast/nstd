@@ -83,6 +83,10 @@ const NSTDChar *symbol);
 ///
 /// - `NSTDWindowsSharedLib lib` - The library handle.
 ///
+/// # Panics
+///
+/// Panics if unloading the library fails.
+///
 /// # Safety
 ///
 /// See
