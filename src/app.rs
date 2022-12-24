@@ -6,8 +6,8 @@ use self::{
     data::{NSTDAppData, NSTDAppHandle},
     display::{NSTDDisplay, NSTDDisplayHandle},
     events::{
-        NSTDAppEvents, NSTDGamepadAxis, NSTDGamepadButton, NSTDKey, NSTDMouseInput,
-        NSTDScrollDelta, NSTDTouchState,
+        NSTDAppEvents, NSTDDeviceEventFilter, NSTDGamepadAxis, NSTDGamepadButton, NSTDKey,
+        NSTDMouseInput, NSTDScrollDelta, NSTDTouchState,
     },
 };
 use crate::{
@@ -17,7 +17,7 @@ use crate::{
 use gilrs::{Error::NotImplemented, EventType as GamepadEvent, Gilrs};
 use winit::{
     event::{DeviceEvent, ElementState, Event, StartCause, WindowEvent},
-    event_loop::{ControlFlow, EventLoop},
+    event_loop::{ControlFlow, DeviceEventFilter, EventLoop},
 };
 
 /// An application event loop.
@@ -57,14 +57,16 @@ struct AppData {
 /// - Creating the gamepad input handler fails.
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_app_new() -> NSTDApp {
+    let event_loop = EventLoop::new();
+    event_loop.set_device_event_filter(DeviceEventFilter::Never);
     NSTDApp {
         events: NSTDAppEvents::default(),
         inner: Box::new(AppData {
-            event_loop: EventLoop::new(),
+            event_loop,
             gil: match Gilrs::new() {
                 Ok(gil) => gil,
                 Err(NotImplemented(gil)) => gil,
-                _ => panic!("Failed to create gamepad event listener"),
+                _ => panic!("failed to create gamepad event listener"),
             },
         }),
     }
@@ -438,6 +440,22 @@ pub unsafe extern "C" fn nstd_app_displays(
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_app_primary_display(app: NSTDAppHandle) -> Option<NSTDDisplay> {
     app.primary_monitor().map(Box::new)
+}
+
+/// Sets the `nstd` application's device filtering mode.
+///
+/// # Parameters:
+///
+/// - `NSTDAppHandle app` - A handle to the `nstd` application.
+///
+/// - `NSTDDeviceEventFilter filter` - The device event filtering mode to use.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_app_set_device_event_filter(
+    app: NSTDAppHandle,
+    filter: NSTDDeviceEventFilter,
+) {
+    app.set_device_event_filter(filter.into());
 }
 
 /// Signals an `NSTDApp`'s event loop to exit.

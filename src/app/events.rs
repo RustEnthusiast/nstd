@@ -8,6 +8,7 @@ use winit::{
     event::{
         AxisId, ButtonId, DeviceId, MouseButton, MouseScrollDelta, TouchPhase, VirtualKeyCode,
     },
+    event_loop::DeviceEventFilter,
     window::WindowId,
 };
 
@@ -25,6 +26,29 @@ pub type NSTDAnalogAxisID = Box<AxisId>;
 
 /// A button's unique identifier.
 pub type NSTDButtonID = Box<ButtonId>;
+
+/// An enumeration of device event filtering modes.
+#[repr(C)]
+#[derive(Clone, Copy, Debug)]
+#[allow(non_camel_case_types)]
+pub enum NSTDDeviceEventFilter {
+    /// Always dispatch device events.
+    NSTD_DEVICE_EVENT_FILTER_NONE,
+    /// Only dispatch device events when an application window is focused.
+    NSTD_DEVICE_EVENT_FILTER_UNFOCUSED,
+    /// Never dispatch device events.
+    NSTD_DEVICE_EVENT_FILTER_ALL,
+}
+impl From<NSTDDeviceEventFilter> for DeviceEventFilter {
+    /// Converts an [NSTDDeviceEventFilter] into a [DeviceEventFilter].
+    fn from(value: NSTDDeviceEventFilter) -> Self {
+        match value {
+            NSTDDeviceEventFilter::NSTD_DEVICE_EVENT_FILTER_NONE => Self::Never,
+            NSTDDeviceEventFilter::NSTD_DEVICE_EVENT_FILTER_UNFOCUSED => Self::Unfocused,
+            NSTDDeviceEventFilter::NSTD_DEVICE_EVENT_FILTER_ALL => Self::Always,
+        }
+    }
+}
 
 /// Describes a mouse wheel's scroll delta.
 #[repr(C)]

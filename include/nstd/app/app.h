@@ -106,6 +106,15 @@ NSTDAPI void nstd_app_displays(NSTDAppHandle app, void (*callback)(NSTDDisplayHa
 /// `NSTDDisplay display` - A handle to the primary display, null on error.
 NSTDAPI NSTDDisplay nstd_app_primary_display(NSTDAppHandle app);
 
+/// Sets the `nstd` application's device filtering mode.
+///
+/// # Parameters:
+///
+/// - `NSTDAppHandle app` - A handle to the `nstd` application.
+///
+/// - `NSTDDeviceEventFilter filter` - The device event filtering mode to use.
+NSTDAPI void nstd_app_set_device_event_filter(NSTDAppHandle app, NSTDDeviceEventFilter filter);
+
 /// Signals an `NSTDApp`'s event loop to exit.
 ///
 /// # Parameters:

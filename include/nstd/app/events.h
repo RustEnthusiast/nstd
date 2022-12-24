@@ -19,6 +19,16 @@ typedef NSTDAnyMut NSTDAnalogAxisID;
 /// A button's unique identifier.
 typedef NSTDAnyMut NSTDButtonID;
 
+/// An enumeration of device event filtering modes.
+typedef enum {
+    /// Always dispatch device events.
+    NSTD_DEVICE_EVENT_FILTER_NONE,
+    /// Only dispatch device events when an application window is focused.
+    NSTD_DEVICE_EVENT_FILTER_UNFOCUSED,
+    /// Never dispatch device events.
+    NSTD_DEVICE_EVENT_FILTER_ALL
+} NSTDDeviceEventFilter;
+
 /// Describes a mouse wheel's scroll delta.
 typedef enum {
     /// The scroll was measured in lines.
