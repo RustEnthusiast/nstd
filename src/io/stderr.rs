@@ -56,7 +56,7 @@ pub unsafe extern "C" fn nstd_io_stderr_write(
     }
     #[cfg(unix)]
     {
-        let (err, w) = crate::os::unix::io::stdio::write(handle.as_raw_fd(), bytes);
+        let (err, w) = crate::os::unix::io::stdio::write(handle.lock().as_raw_fd(), bytes);
         *written = w;
         err.into()
     }
@@ -91,7 +91,7 @@ pub unsafe extern "C" fn nstd_io_stderr_write_all(
     #[cfg(not(unix))]
     return crate::io::stdio::write_all(handle, bytes);
     #[cfg(unix)]
-    return crate::os::unix::io::stdio::write_all(handle.as_raw_fd(), bytes).into();
+    return crate::os::unix::io::stdio::write_all(handle.lock().as_raw_fd(), bytes).into();
 }
 
 /// Flushes the standard error stream.

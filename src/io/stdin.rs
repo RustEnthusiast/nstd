@@ -65,7 +65,7 @@ pub unsafe extern "C" fn nstd_io_stdin_read(
     }
     #[cfg(unix)]
     {
-        let (err, r) = crate::os::unix::io::stdio::read(handle.as_raw_fd(), buffer);
+        let (err, r) = crate::os::unix::io::stdio::read(handle.lock().as_raw_fd(), buffer);
         *read = r;
         err.into()
     }
@@ -105,9 +105,11 @@ pub extern "C" fn nstd_io_stdin_read_all(
     #[cfg(unix)]
     {
         // SAFETY: `handle` owns the file descriptor.
-        let (err, r) = unsafe { crate::os::unix::io::stdio::read_all(handle.as_raw_fd(), buffer) };
-        *read = r;
-        err.into()
+        unsafe {
+            let (err, r) = crate::os::unix::io::stdio::read_all(handle.lock().as_raw_fd(), buffer);
+            *read = r;
+            err.into()
+        }
     }
 }
 
@@ -150,6 +152,7 @@ pub extern "C" fn nstd_io_stdin_read_to_string(
     {
         // SAFETY: `handle` owns the file descriptor.
         unsafe {
+            let handle = handle.lock();
             let (err, r) = crate::os::unix::io::stdio::read_to_string(handle.as_raw_fd(), buffer);
             *read = r;
             err.into()
@@ -186,7 +189,7 @@ pub unsafe extern "C" fn nstd_io_stdin_read_exact(
     #[cfg(not(unix))]
     return crate::io::stdio::read_exact(handle, buffer);
     #[cfg(unix)]
-    return crate::os::unix::io::stdio::read_exact(handle.as_raw_fd(), buffer).into();
+    return crate::os::unix::io::stdio::read_exact(handle.lock().as_raw_fd(), buffer).into();
 }
 
 /// Reads a line from stdin and appends it to `buffer`.
