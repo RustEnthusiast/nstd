@@ -1,4 +1,6 @@
 # TBD
+### `nstd.core`
+- Added `nstd_core_panic_with_msg`.
 ### `nstd.os`
 - Added `nstd_os_unix_shared_lib_handle`.
 
