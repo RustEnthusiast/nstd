@@ -14,10 +14,10 @@ typedef NSTDAnyMut NSTDDeviceID;
 typedef NSTDAnyMut NSTDGamepadID;
 
 /// Identifier for an analog axis on a device.
-typedef NSTDAnyMut NSTDAnalogAxisID;
+typedef NSTDUInt32 NSTDAnalogAxisID;
 
 /// A button's unique identifier.
-typedef NSTDAnyMut NSTDButtonID;
+typedef NSTDUInt32 NSTDButtonID;
 
 /// An enumeration of device event filtering modes.
 typedef enum {

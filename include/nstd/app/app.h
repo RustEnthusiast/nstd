@@ -131,4 +131,64 @@ NSTDAPI void nstd_app_exit(const NSTDAppData *app);
 /// - `NSTDErrorCode errc` - The error code to exit the application event loop with.
 NSTDAPI void nstd_app_exit_with_code(const NSTDAppData *app, NSTDErrorCode errc);
 
+/// Checks if two `NSTDWindowID`s refer to the same window.
+///
+/// # Parameters:
+///
+/// - `const NSTDWindowID *id1` - The first ID.
+///
+/// - `const NSTDWindowID *id2` - The second ID.
+///
+/// # Returns
+///
+/// `NSTDBool is_eq` - `NSTD_TRUE` if the two window IDs compare equal.
+NSTDAPI NSTDBool nstd_app_window_id_compare(const NSTDWindowID *id1, const NSTDWindowID *id2);
+
+/// Frees an instance of `NSTDWindowID`.
+///
+/// # Parameters:
+///
+/// - `NSTDWindowID id` - The window ID to free.
+NSTDAPI void nstd_app_window_id_free(NSTDWindowID id);
+
+/// Checks if two `NSTDDeviceID`s refer to the same device.
+///
+/// # Parameters:
+///
+/// - `const NSTDDeviceID *id1` - The first ID.
+///
+/// - `const NSTDDeviceID *id2` - The second ID.
+///
+/// # Returns
+///
+/// `NSTDBool is_eq` - `NSTD_TRUE` if the two device IDs compare equal.
+NSTDAPI NSTDBool nstd_app_device_id_compare(const NSTDDeviceID *id1, const NSTDDeviceID *id2);
+
+/// Frees an instance of `NSTDDeviceID`.
+///
+/// # Parameters:
+///
+/// - `NSTDDeviceID id` - The device ID to free.
+NSTDAPI void nstd_app_device_id_free(NSTDDeviceID id);
+
+/// Checks if two `NSTDGamepadID`s refer to the same gamepad.
+///
+/// # Parameters:
+///
+/// - `const NSTDGamepadID *id1` - The first ID.
+///
+/// - `const NSTDGamepadID *id2` - The second ID.
+///
+/// # Returns
+///
+/// `NSTDBool is_eq` - `NSTD_TRUE` if the two gamepad IDs compare equal.
+NSTDAPI NSTDBool nstd_app_gamepad_id_compare(const NSTDGamepadID *id1, const NSTDGamepadID *id2);
+
+/// Frees an instance of `NSTDGamepadID`.
+///
+/// # Parameters:
+///
+/// - `NSTDGamepadID id` - The gamepad ID to free.
+NSTDAPI void nstd_app_gamepad_id_free(NSTDGamepadID id);
+
 #endif
