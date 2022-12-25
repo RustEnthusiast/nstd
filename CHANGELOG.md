@@ -1,5 +1,6 @@
 # TBD
 ### `nstd.core`
+- `nstd_core_cty_is_unicode` now takes `NSTDChar32`.
 - Added `nstd_core_panic_with_msg`.
 ### `nstd.os`
 - Added `nstd_os_unix_shared_lib_handle`.

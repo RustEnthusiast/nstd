@@ -1,18 +1,27 @@
 //! Provides functions for examining and operating on character types.
-use crate::{NSTDBool, NSTDChar, NSTDUInt32, NSTDUnichar, NSTD_FALSE};
+use crate::{NSTDBool, NSTDChar, NSTDChar32, NSTDUInt32, NSTDUnichar, NSTD_FALSE};
 
-/// Determines whether or not `chr` is a valid Unicode scalar value.
+/// Determines whether or not a 32-bit character value is a valid Unicode scalar value.
 ///
 /// # Parameters:
 ///
-/// - `NSTDUnichar chr` - The `NSTDUnichar` to check.
+/// - `NSTDChar32 chr` - The 32-bit character value to check.
 ///
 /// # Returns
 ///
 /// `NSTDBool is_unicode` - True if `chr` is a valid Unicode character.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::{core::cty::nstd_core_cty_is_unicode, NSTDChar32};
+///
+/// assert!(nstd_core_cty_is_unicode('🦀' as NSTDChar32));
+/// assert!(!nstd_core_cty_is_unicode(NSTDChar32::MAX));
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_cty_is_unicode(chr: NSTDUnichar) -> NSTDBool {
+pub extern "C" fn nstd_core_cty_is_unicode(chr: NSTDChar32) -> NSTDBool {
     char::from_u32(chr).is_some()
 }
 
