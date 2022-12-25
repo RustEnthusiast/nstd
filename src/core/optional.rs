@@ -25,6 +25,23 @@ pub enum NSTDOptional<T> {
     /// The initialized variant.
     Some(T),
 }
+impl<T> NSTDOptional<T> {
+    /// Attempts to return the contained `Some` value in an `NSTDOptional`.
+    ///
+    /// This operation is only useful for testing code, it's use in production should be
+    /// discouraged.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `self` is a `None` value.
+    #[inline]
+    pub fn unwrap(self) -> T {
+        match self {
+            Self::Some(value) => value,
+            _ => panic!("called `NSTDOptional::unwrap()` on a `None` value"),
+        }
+    }
+}
 
 /// Generates optional data structures.
 ///
