@@ -323,10 +323,12 @@ pub extern "C" fn nstd_core_cty_is_ascii_graphic(chr: NSTDChar) -> NSTDBool {
 /// # Example
 ///
 /// ```
-/// use nstd_sys::{core::cty::nstd_core_cty_to_ascii_lowercase, NSTDChar};
+/// use nstd_sys::core::{cty::nstd_core_cty_to_ascii_lowercase, unichar::nstd_core_unichar_new};
 ///
-/// let a = char::from_u32(nstd_core_cty_to_ascii_lowercase('A'.into())).unwrap();
-/// let z = char::from_u32(nstd_core_cty_to_ascii_lowercase('Z'.into())).unwrap();
+/// let a = nstd_core_unichar_new('A'.into()).unwrap();
+/// let z = nstd_core_unichar_new('Z'.into()).unwrap();
+/// let a = char::from(nstd_core_cty_to_ascii_lowercase(a));
+/// let z = char::from(nstd_core_cty_to_ascii_lowercase(z));
 /// assert!(a == 'a');
 /// assert!(z == 'z');
 /// ```
@@ -352,10 +354,12 @@ pub extern "C" fn nstd_core_cty_to_ascii_lowercase(chr: NSTDUnichar) -> NSTDUnic
 /// # Example
 ///
 /// ```
-/// use nstd_sys::{core::cty::nstd_core_cty_to_ascii_uppercase, NSTDChar};
+/// use nstd_sys::core::{cty::nstd_core_cty_to_ascii_uppercase, unichar::nstd_core_unichar_new};
 ///
-/// let a = char::from_u32(nstd_core_cty_to_ascii_uppercase('a'.into())).unwrap();
-/// let z = char::from_u32(nstd_core_cty_to_ascii_uppercase('z'.into())).unwrap();
+/// let a = nstd_core_unichar_new('a'.into()).unwrap();
+/// let z = nstd_core_unichar_new('z'.into()).unwrap();
+/// let a = char::from(nstd_core_cty_to_ascii_uppercase(a));
+/// let z = char::from(nstd_core_cty_to_ascii_uppercase(z));
 /// assert!(a == 'A');
 /// assert!(z == 'Z');
 /// ```

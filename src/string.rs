@@ -349,12 +349,12 @@ pub extern "C" fn nstd_string_cap(string: &NSTDString) -> NSTDUInt {
 ///
 /// ```
 /// use nstd_sys::{
+///     alloc::NSTDAllocError::NSTD_ALLOC_ERROR_NONE,
 ///     string::{nstd_string_new, nstd_string_push},
-///     NSTDUnichar,
 /// };
 ///
 /// let mut string = nstd_string_new();
-/// assert!(nstd_string_push(&mut string, '🦀' as NSTDUnichar) == 0);
+/// assert!(nstd_string_push(&mut string, '🦀'.into()) == NSTD_ALLOC_ERROR_NONE);
 /// ```
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_string_push(string: &mut NSTDString, chr: NSTDUnichar) -> NSTDAllocError {
@@ -429,14 +429,14 @@ pub unsafe extern "C" fn nstd_string_push_str(
 ///
 /// ```
 /// use nstd_sys::{
-///     core::str::nstd_core_str_from_raw_cstr_with_null,
+///     core::{optional::NSTDOptional, str::nstd_core_str_from_raw_cstr_with_null},
 ///     string::{nstd_string_from_str, nstd_string_pop},
 /// };
 ///
 /// unsafe {
 ///     let str = nstd_core_str_from_raw_cstr_with_null("Hello, world!\0".as_ptr().cast());
 ///     let mut string = nstd_string_from_str(&str);
-///     assert!(nstd_string_pop(&mut string) == 0);
+///     assert!(nstd_string_pop(&mut string) == NSTDOptional::Some('\0'.into()));
 /// }
 /// ```
 #[cfg_attr(feature = "clib", no_mangle)]

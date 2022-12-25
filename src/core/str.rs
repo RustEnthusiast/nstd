@@ -536,7 +536,7 @@ pub extern "C" fn nstd_core_str_byte_len(str: &NSTDStr) -> NSTDUInt {
 /// let s_str = "🦀🚀🦀!\0";
 /// unsafe {
 ///     let str = nstd_core_str_from_raw_cstr(s_str.as_ptr().cast());
-///     assert!(nstd_core_str_get(&str, 1) == '🚀'.into());
+///     assert!(nstd_core_str_get(&str, 1).unwrap() == '🚀'.into());
 /// }
 /// ```
 #[inline]
@@ -1354,7 +1354,7 @@ pub extern "C" fn nstd_core_str_mut_byte_len(str: &NSTDStrMut) -> NSTDUInt {
 /// let mut s_str = String::from("🦀🚀🦀!\0");
 /// unsafe {
 ///     let str = nstd_core_str_mut_from_raw_cstr(s_str.as_mut_ptr().cast());
-///     assert!(nstd_core_str_mut_get(&str, 1) == '🚀'.into());
+///     assert!(nstd_core_str_mut_get(&str, 1).unwrap() == '🚀'.into());
 /// }
 /// ```
 #[inline]
