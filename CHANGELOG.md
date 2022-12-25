@@ -8,6 +8,7 @@
 ### `nstd.os`
 - Added `nstd_os_unix_shared_lib_handle`.
 ### `nstd.string`
+- `nstd_string_push` now returns `NSTDAllocError`.
 - `nstd_string_pop` now returns `NSTDOptionalUnichar`.
 
 # 0.4.0

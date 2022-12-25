@@ -3,7 +3,7 @@ extern crate alloc;
 use crate::{
     alloc::NSTDAllocError,
     core::{
-        def::{NSTDByte, NSTDErrorCode},
+        def::NSTDByte,
         optional::NSTDOptional,
         slice::{nstd_core_slice_new, NSTDSlice},
         str::{
@@ -339,7 +339,7 @@ pub extern "C" fn nstd_string_cap(string: &NSTDString) -> NSTDUInt {
 ///
 /// # Returns
 ///
-/// `NSTDErrorCode errc` - Nonzero on error.
+/// `NSTDAllocError errc` - The allocation operation error code.
 ///
 /// # Panics
 ///
@@ -357,14 +357,13 @@ pub extern "C" fn nstd_string_cap(string: &NSTDString) -> NSTDUInt {
 /// assert!(nstd_string_push(&mut string, '🦀' as NSTDUnichar) == 0);
 /// ```
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_string_push(string: &mut NSTDString, chr: NSTDUnichar) -> NSTDErrorCode {
+pub extern "C" fn nstd_string_push(string: &mut NSTDString, chr: NSTDUnichar) -> NSTDAllocError {
     let chr = char::from(chr);
     let mut buf = [0; 4];
     chr.encode_utf8(&mut buf);
     let buf = nstd_core_slice_new(buf.as_ptr().cast(), 1, chr.len_utf8());
     // SAFETY: `buf`'s data is stored on the stack.
-    let errc = unsafe { nstd_vec_extend(&mut string.bytes, &buf) };
-    (errc != NSTDAllocError::NSTD_ALLOC_ERROR_NONE).into()
+    unsafe { nstd_vec_extend(&mut string.bytes, &buf) }
 }
 
 /// Appends a string slice to the end of a string.
