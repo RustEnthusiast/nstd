@@ -2,6 +2,7 @@
 #define NSTD_STRING_H
 #include "alloc.h"
 #include "core/def.h"
+#include "core/optional.h"
 #include "core/slice.h"
 #include "core/str.h"
 #include "nstd.h"
@@ -230,12 +231,12 @@ NSTDAPI NSTDAllocError nstd_string_push_str(NSTDString *string, const NSTDStr *s
 ///
 /// # Returns
 ///
-/// `NSTDUnichar chr` - The removed character, or the Unicode replacement character on error.
+/// `NSTDOptionalUnichar chr` - The removed character on success.
 ///
 /// # Panics
 ///
 /// This operation will panic if the string's length in bytes exceeds `NSTDInt`'s max value.
-NSTDAPI NSTDUnichar nstd_string_pop(NSTDString *string);
+NSTDAPI NSTDOptionalUnichar nstd_string_pop(NSTDString *string);
 
 /// Sets a string's length to zero.
 ///

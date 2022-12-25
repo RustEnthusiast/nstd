@@ -4,6 +4,7 @@ use crate::{
     alloc::NSTDAllocError,
     core::{
         def::{NSTDByte, NSTDErrorCode},
+        optional::{NSTDOptional, NSTDOptionalUnichar},
         slice::{nstd_core_slice_new, NSTDSlice},
         str::{
             nstd_core_str_as_bytes, nstd_core_str_from_bytes_unchecked, nstd_core_str_len,
@@ -420,7 +421,7 @@ pub unsafe extern "C" fn nstd_string_push_str(
 ///
 /// # Returns
 ///
-/// `NSTDUnichar chr` - The removed character, or the Unicode replacement character on error.
+/// `NSTDOptionalUnichar chr` - The removed character on success.
 ///
 /// # Panics
 ///
@@ -441,15 +442,15 @@ pub unsafe extern "C" fn nstd_string_push_str(
 /// }
 /// ```
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_string_pop(string: &mut NSTDString) -> NSTDUnichar {
+pub extern "C" fn nstd_string_pop(string: &mut NSTDString) -> NSTDOptionalUnichar {
     // SAFETY: `NSTDString` is always UTF-8 encoded.
     let str = unsafe { core::str::from_utf8_unchecked(string.bytes.as_slice()) };
     if let Some(chr) = str.chars().last() {
         let len = nstd_vec_len(&string.bytes) - chr.len_utf8();
         nstd_vec_truncate(&mut string.bytes, len);
-        return chr as NSTDUnichar;
+        return NSTDOptional::Some(chr as NSTDUnichar);
     }
-    char::REPLACEMENT_CHARACTER as NSTDUnichar
+    NSTDOptional::None
 }
 
 /// Sets a string's length to zero.
