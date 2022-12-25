@@ -16,6 +16,7 @@ pub mod range;
 pub mod result;
 pub mod slice;
 pub mod str;
+pub mod unichar;
 use self::str::NSTDStr;
 
 /// Invokes the runtime's panic handler.

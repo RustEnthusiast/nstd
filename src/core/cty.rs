@@ -1,5 +1,5 @@
 //! Provides functions for examining and operating on character types.
-use crate::{NSTDBool, NSTDChar, NSTDChar32, NSTDUInt32, NSTDUnichar, NSTD_FALSE};
+use crate::{core::unichar::NSTDUnichar, NSTDBool, NSTDChar, NSTDChar32, NSTDUInt32};
 
 /// Determines whether or not a 32-bit character value is a valid Unicode scalar value.
 ///
@@ -55,10 +55,7 @@ macro_rules! gen_deterministic {
         #[inline]
         #[cfg_attr(feature = "clib", no_mangle)]
         pub extern "C" fn $name(chr: NSTDUnichar) -> NSTDBool {
-            match char::from_u32(chr) {
-                Some(chr) => chr.$method(),
-                _ => NSTD_FALSE,
-            }
+            char::from(chr).$method()
         }
     };
 }
@@ -250,10 +247,7 @@ gen_deterministic!(
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_cty_is_digit(chr: NSTDUnichar, radix: NSTDUInt32) -> NSTDBool {
-    if let Some(chr) = char::from_u32(chr) {
-        return chr.is_digit(radix);
-    }
-    NSTD_FALSE
+    char::from(chr).is_digit(radix)
 }
 
 /// Determines whether or not `chr` is punctuation.
@@ -339,10 +333,7 @@ pub extern "C" fn nstd_core_cty_is_ascii_graphic(chr: NSTDChar) -> NSTDBool {
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_cty_to_ascii_lowercase(chr: NSTDUnichar) -> NSTDUnichar {
-    match char::from_u32(chr) {
-        Some(chr) => chr.to_ascii_lowercase().into(),
-        _ => chr,
-    }
+    char::from(chr).to_ascii_lowercase().into()
 }
 /// Returns the uppercase version of `chr`, or `chr` if there is no uppercase version.
 ///
@@ -371,8 +362,5 @@ pub extern "C" fn nstd_core_cty_to_ascii_lowercase(chr: NSTDUnichar) -> NSTDUnic
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_cty_to_ascii_uppercase(chr: NSTDUnichar) -> NSTDUnichar {
-    match char::from_u32(chr) {
-        Some(chr) => chr.to_ascii_uppercase().into(),
-        _ => chr,
-    }
+    char::from(chr).to_ascii_uppercase().into()
 }

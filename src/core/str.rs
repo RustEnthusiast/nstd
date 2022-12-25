@@ -20,8 +20,9 @@ use crate::{
             nstd_core_slice_mut_len, nstd_core_slice_mut_new, nstd_core_slice_mut_stride,
             nstd_core_slice_new, nstd_core_slice_stride, NSTDSlice, NSTDSliceMut,
         },
+        unichar::NSTDUnichar,
     },
-    NSTDChar, NSTDUInt, NSTDUnichar,
+    NSTDChar, NSTDUInt,
 };
 
 /// Generates the `nstd_core_str_*_to_[i|u|f]*` functions.
@@ -543,8 +544,8 @@ pub extern "C" fn nstd_core_str_byte_len(str: &NSTDStr) -> NSTDUInt {
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_get(str: &NSTDStr, pos: NSTDUInt) -> NSTDUnichar {
     match str.as_str().chars().nth(pos) {
-        Some(chr) => chr as NSTDUnichar,
-        _ => char::REPLACEMENT_CHARACTER as NSTDUnichar,
+        Some(chr) => chr.into(),
+        _ => char::REPLACEMENT_CHARACTER.into(),
     }
 }
 
@@ -1362,8 +1363,8 @@ pub extern "C" fn nstd_core_str_mut_byte_len(str: &NSTDStrMut) -> NSTDUInt {
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_mut_get(str: &NSTDStrMut, pos: NSTDUInt) -> NSTDUnichar {
     match str.as_str().chars().nth(pos) {
-        Some(chr) => chr as NSTDUnichar,
-        _ => char::REPLACEMENT_CHARACTER as NSTDUnichar,
+        Some(chr) => chr.into(),
+        _ => char::REPLACEMENT_CHARACTER.into(),
     }
 }
 

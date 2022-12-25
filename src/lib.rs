@@ -96,8 +96,6 @@ pub type NSTDChar8 = NSTDUInt8;
 pub type NSTDChar16 = NSTDUInt16;
 /// A 32-bit character type.
 pub type NSTDChar32 = NSTDUInt32;
-/// Represents a Unicode scalar value.
-pub type NSTDUnichar = NSTDChar32;
 
 /// A void pointer to some immutable data.
 ///

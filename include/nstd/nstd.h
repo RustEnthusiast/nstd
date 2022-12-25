@@ -67,8 +67,6 @@ typedef NSTDUInt8 NSTDChar8;
 typedef NSTDUInt16 NSTDChar16;
 /// A 32-bit character type.
 typedef NSTDUInt32 NSTDChar32;
-/// Represents a Unicode scalar value.
-typedef NSTDChar32 NSTDUnichar;
 
 /// A void pointer to some immutable data.
 ///

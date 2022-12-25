@@ -1,4 +1,6 @@
 # TBD
+### `nstd`
+- Moved `NSTDUnichar` into `core`.
 ### `nstd.core`
 - `nstd_core_cty_is_unicode` now takes `NSTDChar32`.
 - Added `nstd_core_panic_with_msg`.

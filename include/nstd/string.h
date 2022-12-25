@@ -5,6 +5,7 @@
 #include "core/optional.h"
 #include "core/slice.h"
 #include "core/str.h"
+#include "core/unichar.h"
 #include "nstd.h"
 #include "vec.h"
 

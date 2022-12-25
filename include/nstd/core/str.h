@@ -6,6 +6,7 @@
 #include "optional.h"
 #include "range.h"
 #include "slice.h"
+#include "unichar.h"
 
 /// An immutable unowned view into a UTF-8 encoded byte string.
 ///

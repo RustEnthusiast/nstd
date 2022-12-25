@@ -1,6 +1,7 @@
 #ifndef NSTD_CORE_CTY_H
 #define NSTD_CORE_CTY_H
 #include "../nstd.h"
+#include "unichar.h"
 
 /// Determines whether or not a 32-bit character value is a valid Unicode scalar value.
 ///
