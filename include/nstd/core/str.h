@@ -243,8 +243,7 @@ NSTDAPI NSTDUInt nstd_core_str_byte_len(const NSTDStr *str);
 ///
 /// # Returns
 ///
-/// `NSTDUnichar chr` - The character at index `pos`, or the Unicode replacement character on
-/// error.
+/// `NSTDOptionalUnichar chr` - The character at index `pos`, or none on error.
 ///
 /// # Panics
 ///
@@ -254,7 +253,7 @@ NSTDAPI NSTDUInt nstd_core_str_byte_len(const NSTDStr *str);
 /// # Safety
 ///
 /// This operation can cause undefined behavior in the event that `str`'s data is invalid.
-NSTDAPI NSTDUnichar nstd_core_str_get(const NSTDStr *str, NSTDUInt pos);
+NSTDAPI NSTDOptionalUnichar nstd_core_str_get(const NSTDStr *str, NSTDUInt pos);
 
 /// Creates a substring of an existing string slice.
 ///
@@ -763,8 +762,7 @@ NSTDAPI NSTDUInt nstd_core_str_mut_byte_len(const NSTDStrMut *str);
 ///
 /// # Returns
 ///
-/// `NSTDUnichar chr` - The character at index `pos`, or the Unicode replacement character on
-/// error.
+/// `NSTDOptionalUnichar chr` - The character at index `pos`, or none on error.
 ///
 /// # Panics
 ///
@@ -774,7 +772,7 @@ NSTDAPI NSTDUInt nstd_core_str_mut_byte_len(const NSTDStrMut *str);
 /// # Safety
 ///
 /// This operation can cause undefined behavior in the event that `str`'s data is invalid.
-NSTDAPI NSTDUnichar nstd_core_str_mut_get(const NSTDStrMut *str, NSTDUInt pos);
+NSTDAPI NSTDOptionalUnichar nstd_core_str_mut_get(const NSTDStrMut *str, NSTDUInt pos);
 
 /// Creates a substring of an existing string slice.
 ///

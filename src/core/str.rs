@@ -20,7 +20,7 @@ use crate::{
             nstd_core_slice_mut_len, nstd_core_slice_mut_new, nstd_core_slice_mut_stride,
             nstd_core_slice_new, nstd_core_slice_stride, NSTDSlice, NSTDSliceMut,
         },
-        unichar::NSTDUnichar,
+        unichar::NSTDOptionalUnichar,
     },
     NSTDChar, NSTDUInt,
 };
@@ -517,8 +517,7 @@ pub extern "C" fn nstd_core_str_byte_len(str: &NSTDStr) -> NSTDUInt {
 ///
 /// # Returns
 ///
-/// `NSTDUnichar chr` - The character at index `pos`, or the Unicode replacement character on
-/// error.
+/// `NSTDOptionalUnichar chr` - The character at index `pos`, or none on error.
 ///
 /// # Panics
 ///
@@ -542,10 +541,10 @@ pub extern "C" fn nstd_core_str_byte_len(str: &NSTDStr) -> NSTDUInt {
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_str_get(str: &NSTDStr, pos: NSTDUInt) -> NSTDUnichar {
+pub unsafe extern "C" fn nstd_core_str_get(str: &NSTDStr, pos: NSTDUInt) -> NSTDOptionalUnichar {
     match str.as_str().chars().nth(pos) {
-        Some(chr) => chr.into(),
-        _ => char::REPLACEMENT_CHARACTER.into(),
+        Some(chr) => NSTDOptional::Some(chr.into()),
+        _ => NSTDOptional::None,
     }
 }
 
@@ -1336,8 +1335,7 @@ pub extern "C" fn nstd_core_str_mut_byte_len(str: &NSTDStrMut) -> NSTDUInt {
 ///
 /// # Returns
 ///
-/// `NSTDUnichar chr` - The character at index `pos`, or the Unicode replacement character on
-/// error.
+/// `NSTDOptionalUnichar chr` - The character at index `pos`, or none on error.
 ///
 /// # Panics
 ///
@@ -1361,10 +1359,13 @@ pub extern "C" fn nstd_core_str_mut_byte_len(str: &NSTDStrMut) -> NSTDUInt {
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_str_mut_get(str: &NSTDStrMut, pos: NSTDUInt) -> NSTDUnichar {
+pub unsafe extern "C" fn nstd_core_str_mut_get(
+    str: &NSTDStrMut,
+    pos: NSTDUInt,
+) -> NSTDOptionalUnichar {
     match str.as_str().chars().nth(pos) {
-        Some(chr) => chr.into(),
-        _ => char::REPLACEMENT_CHARACTER.into(),
+        Some(chr) => NSTDOptional::Some(chr.into()),
+        _ => NSTDOptional::None,
     }
 }
 
