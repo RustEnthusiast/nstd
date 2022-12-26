@@ -7,6 +7,8 @@
 - Added `nstd_core_panic_with_msg`.
 ### `nstd.os`
 - Added `nstd_os_unix_shared_lib_handle`.
+### `nstd.shared_lib`
+- `nstd_shared_lib_load` now takes `NSTDStr`.
 ### `nstd.string`
 - `nstd_string_push` now returns `NSTDAllocError`.
 - `nstd_string_pop` now returns `NSTDOptionalUnichar`.
