@@ -92,9 +92,9 @@ or return valid references.
 
 - Reference data is assumed to remain unaltered by other code/threads.
 
-- When a mutable reference is in use, the underlying data must not be accessed by other code.
-
 - Private (non-`pub`) structure members must not be directly accessed by the user.
+
+- Data is *moved* when using the value-copy semantic on a type that does not implement `Copy`.
 
 - The panic behavior is set to abort by default, as it is undefined behavior to unwind from Rust
 code into foreign code (though this is
@@ -145,6 +145,6 @@ There have not yet been any major releases for the framework as it is not yet st
 
 A new minor version is released every 6 weeks, exactly 1 week after a new minor Rust release.
 
-Patch releases are released every so often with bug fixes.
+Patch releases are released every so often with minor fixes and additions.
 
 See [semver.org](https://semver.org/) to learn more about Semantic Versioning.
