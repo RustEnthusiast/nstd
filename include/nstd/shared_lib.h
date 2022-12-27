@@ -33,7 +33,13 @@ NSTDOptional(NSTDSharedLib) NSTDOptionalSharedLib;
 ///
 /// # Panics
 ///
-/// Panics if `path`'s length in bytes exceeds `NSTDInt`'s max value or allocating fails.
+/// This operation may panic in the following situations:
+///
+/// - `path`'s length in bytes exceeds `NSTDInt`'s max value.
+///
+/// - Allocating fails.
+///
+/// - Conversion from UTF-8 to UTF-16 fails on Windows.
 ///
 /// # Safety
 ///

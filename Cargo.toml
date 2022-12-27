@@ -45,7 +45,8 @@ nstd_os_windows_shared_lib = [
 nstd_os_windows_str = ["nstd_core", "nstd_os", "nstd_vec", "windows-sys/Win32_Globalization"]
 nstd_proc = ["nstd_core", "nstd_io", "std"]
 nstd_shared_lib = [
-    "nstd_core", "nstd_cstring", "nstd_os_unix_shared_lib", "nstd_os_windows_shared_lib"
+    "nstd_core", "nstd_cstring", "nstd_os_unix_shared_lib", "nstd_os_windows_shared_lib",
+    "nstd_os_windows_str", "nstd_vec"
 ]
 nstd_shared_ptr = ["nstd_alloc", "nstd_core"]
 nstd_string = ["nstd_alloc", "nstd_core", "nstd_vec"]

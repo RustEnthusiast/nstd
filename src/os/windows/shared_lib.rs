@@ -1,8 +1,9 @@
 //! Shared library/module access for Windows.
 use crate::{
     core::optional::NSTDOptional, os::windows::NSTDWindowsHandle, NSTDAny, NSTDAnyMut, NSTDChar,
+    NSTDChar16,
 };
-use windows_sys::Win32::System::LibraryLoader::{FreeLibrary, GetProcAddress, LoadLibraryA};
+use windows_sys::Win32::System::LibraryLoader::{FreeLibrary, GetProcAddress, LoadLibraryW};
 
 /// A handle to a loaded library.
 #[repr(C)]
@@ -30,7 +31,7 @@ pub type NSTDWindowsOptionalSharedLib = NSTDOptional<NSTDWindowsSharedLib>;
 ///
 /// # Parameters:
 ///
-/// - `const NSTDChar *name` - The name of the module to load.
+/// - `const NSTDChar16 *name` - The name of the module to load.
 ///
 /// # Returns
 ///
@@ -39,13 +40,13 @@ pub type NSTDWindowsOptionalSharedLib = NSTDOptional<NSTDWindowsSharedLib>;
 /// # Safety
 ///
 /// See
-/// <https://docs.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-loadlibrarya>.
+/// <https://docs.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-loadlibraryw>.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_os_windows_shared_lib_load(
-    name: *const NSTDChar,
+    name: *const NSTDChar16,
 ) -> NSTDWindowsOptionalSharedLib {
-    match LoadLibraryA(name.cast()) {
+    match LoadLibraryW(name) {
         0 => NSTDOptional::None,
         handle => NSTDOptional::Some(NSTDWindowsSharedLib { handle }),
     }
