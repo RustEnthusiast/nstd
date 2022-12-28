@@ -2,6 +2,7 @@
 ### `nstd`
 - Moved `NSTDUnichar` into `core`.
 ### `nstd.core`
+- `nstd_core_ops_sh[l|r]_*` now take `NSTDUInt32` as their right operand.
 - Removed floating-point operations from `nstd.core.ops`.
 - `nstd_core_str[_mut]_get` now returns `NSTDOptionalUnichar`.
 - `nstd_core_cty_is_unicode` now takes `NSTDChar32`.

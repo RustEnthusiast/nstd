@@ -367,7 +367,7 @@ macro_rules! gen_shl {
         ///
         #[doc = concat!(" - `", stringify!($T), " x` - The value to shift.")]
         ///
-        #[doc = concat!(" - `", stringify!($T), " y` - The number of bits to shift.")]
+        /// - `NSTDUInt32 y` - The number of bits to shift.
         ///
         /// # Returns
         ///
@@ -386,8 +386,8 @@ macro_rules! gen_shl {
         /// ```
         #[inline]
         #[cfg_attr(feature = "clib", no_mangle)]
-        pub extern "C" fn $name(x: $T, y: $T) -> $T {
-            x.checked_shl(y as _)
+        pub extern "C" fn $name(x: $T, y: NSTDUInt32) -> $T {
+            x.checked_shl(y)
                 .expect("attempt to shift left with overflow")
         }
     };
@@ -412,7 +412,7 @@ macro_rules! gen_shr {
         ///
         #[doc = concat!(" - `", stringify!($T), " x` - The value to shift.")]
         ///
-        #[doc = concat!(" - `", stringify!($T), " y` - The number of bits to shift.")]
+        /// - `NSTDUInt32 y` - The number of bits to shift.
         ///
         /// # Returns
         ///
@@ -431,8 +431,8 @@ macro_rules! gen_shr {
         /// ```
         #[inline]
         #[cfg_attr(feature = "clib", no_mangle)]
-        pub extern "C" fn $name(x: $T, y: $T) -> $T {
-            x.checked_shr(y as _)
+        pub extern "C" fn $name(x: $T, y: NSTDUInt32) -> $T {
+            x.checked_shr(y)
                 .expect("attempt to shift right with overflow")
         }
     };

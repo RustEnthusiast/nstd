@@ -1086,7 +1086,7 @@ NSTDAPI NSTDUInt64 nstd_core_ops_rem_u64(NSTDUInt64 x, NSTDUInt64 y);
 ///
 /// - `NSTDInt x` - The value to shift.
 ///
-/// - `NSTDInt y` - The number of bits to shift.
+/// - `NSTDUInt32 y` - The number of bits to shift.
 ///
 /// # Returns
 ///
@@ -1095,14 +1095,14 @@ NSTDAPI NSTDUInt64 nstd_core_ops_rem_u64(NSTDUInt64 x, NSTDUInt64 y);
 /// # Panics
 ///
 /// This will panic if the left shift operation results in an overflow.
-NSTDAPI NSTDInt nstd_core_ops_shl_int(NSTDInt x, NSTDInt y);
+NSTDAPI NSTDInt nstd_core_ops_shl_int(NSTDInt x, NSTDUInt32 y);
 /// Shifts value `x` `y` bits to the left.
 ///
 /// # Parameters:
 ///
 /// - `NSTDUInt x` - The value to shift.
 ///
-/// - `NSTDUInt y` - The number of bits to shift.
+/// - `NSTDUInt32 y` - The number of bits to shift.
 ///
 /// # Returns
 ///
@@ -1111,14 +1111,14 @@ NSTDAPI NSTDInt nstd_core_ops_shl_int(NSTDInt x, NSTDInt y);
 /// # Panics
 ///
 /// This will panic if the left shift operation results in an overflow.
-NSTDAPI NSTDUInt nstd_core_ops_shl_uint(NSTDUInt x, NSTDUInt y);
+NSTDAPI NSTDUInt nstd_core_ops_shl_uint(NSTDUInt x, NSTDUInt32 y);
 /// Shifts value `x` `y` bits to the left.
 ///
 /// # Parameters:
 ///
 /// - `NSTDInt8 x` - The value to shift.
 ///
-/// - `NSTDInt8 y` - The number of bits to shift.
+/// - `NSTDUInt32 y` - The number of bits to shift.
 ///
 /// # Returns
 ///
@@ -1127,14 +1127,14 @@ NSTDAPI NSTDUInt nstd_core_ops_shl_uint(NSTDUInt x, NSTDUInt y);
 /// # Panics
 ///
 /// This will panic if the left shift operation results in an overflow.
-NSTDAPI NSTDInt8 nstd_core_ops_shl_i8(NSTDInt8 x, NSTDInt8 y);
+NSTDAPI NSTDInt8 nstd_core_ops_shl_i8(NSTDInt8 x, NSTDUInt32 y);
 /// Shifts value `x` `y` bits to the left.
 ///
 /// # Parameters:
 ///
 /// - `NSTDUInt8 x` - The value to shift.
 ///
-/// - `NSTDUInt8 y` - The number of bits to shift.
+/// - `NSTDUInt32 y` - The number of bits to shift.
 ///
 /// # Returns
 ///
@@ -1143,14 +1143,14 @@ NSTDAPI NSTDInt8 nstd_core_ops_shl_i8(NSTDInt8 x, NSTDInt8 y);
 /// # Panics
 ///
 /// This will panic if the left shift operation results in an overflow.
-NSTDAPI NSTDUInt8 nstd_core_ops_shl_u8(NSTDUInt8 x, NSTDUInt8 y);
+NSTDAPI NSTDUInt8 nstd_core_ops_shl_u8(NSTDUInt8 x, NSTDUInt32 y);
 /// Shifts value `x` `y` bits to the left.
 ///
 /// # Parameters:
 ///
 /// - `NSTDInt16 x` - The value to shift.
 ///
-/// - `NSTDInt16 y` - The number of bits to shift.
+/// - `NSTDUInt32 y` - The number of bits to shift.
 ///
 /// # Returns
 ///
@@ -1159,14 +1159,14 @@ NSTDAPI NSTDUInt8 nstd_core_ops_shl_u8(NSTDUInt8 x, NSTDUInt8 y);
 /// # Panics
 ///
 /// This will panic if the left shift operation results in an overflow.
-NSTDAPI NSTDInt16 nstd_core_ops_shl_i16(NSTDInt16 x, NSTDInt16 y);
+NSTDAPI NSTDInt16 nstd_core_ops_shl_i16(NSTDInt16 x, NSTDUInt32 y);
 /// Shifts value `x` `y` bits to the left.
 ///
 /// # Parameters:
 ///
 /// - `NSTDUInt16 x` - The value to shift.
 ///
-/// - `NSTDUInt16 y` - The number of bits to shift.
+/// - `NSTDUInt32 y` - The number of bits to shift.
 ///
 /// # Returns
 ///
@@ -1175,14 +1175,14 @@ NSTDAPI NSTDInt16 nstd_core_ops_shl_i16(NSTDInt16 x, NSTDInt16 y);
 /// # Panics
 ///
 /// This will panic if the left shift operation results in an overflow.
-NSTDAPI NSTDUInt16 nstd_core_ops_shl_u16(NSTDUInt16 x, NSTDUInt16 y);
+NSTDAPI NSTDUInt16 nstd_core_ops_shl_u16(NSTDUInt16 x, NSTDUInt32 y);
 /// Shifts value `x` `y` bits to the left.
 ///
 /// # Parameters:
 ///
 /// - `NSTDInt32 x` - The value to shift.
 ///
-/// - `NSTDInt32 y` - The number of bits to shift.
+/// - `NSTDUInt32 y` - The number of bits to shift.
 ///
 /// # Returns
 ///
@@ -1191,7 +1191,7 @@ NSTDAPI NSTDUInt16 nstd_core_ops_shl_u16(NSTDUInt16 x, NSTDUInt16 y);
 /// # Panics
 ///
 /// This will panic if the left shift operation results in an overflow.
-NSTDAPI NSTDInt32 nstd_core_ops_shl_i32(NSTDInt32 x, NSTDInt32 y);
+NSTDAPI NSTDInt32 nstd_core_ops_shl_i32(NSTDInt32 x, NSTDUInt32 y);
 /// Shifts value `x` `y` bits to the left.
 ///
 /// # Parameters:
@@ -1214,7 +1214,7 @@ NSTDAPI NSTDUInt32 nstd_core_ops_shl_u32(NSTDUInt32 x, NSTDUInt32 y);
 ///
 /// - `NSTDInt64 x` - The value to shift.
 ///
-/// - `NSTDInt64 y` - The number of bits to shift.
+/// - `NSTDUInt32 y` - The number of bits to shift.
 ///
 /// # Returns
 ///
@@ -1223,14 +1223,14 @@ NSTDAPI NSTDUInt32 nstd_core_ops_shl_u32(NSTDUInt32 x, NSTDUInt32 y);
 /// # Panics
 ///
 /// This will panic if the left shift operation results in an overflow.
-NSTDAPI NSTDInt64 nstd_core_ops_shl_i64(NSTDInt64 x, NSTDInt64 y);
+NSTDAPI NSTDInt64 nstd_core_ops_shl_i64(NSTDInt64 x, NSTDUInt32 y);
 /// Shifts value `x` `y` bits to the left.
 ///
 /// # Parameters:
 ///
 /// - `NSTDUInt64 x` - The value to shift.
 ///
-/// - `NSTDUInt64 y` - The number of bits to shift.
+/// - `NSTDUInt32 y` - The number of bits to shift.
 ///
 /// # Returns
 ///
@@ -1239,7 +1239,7 @@ NSTDAPI NSTDInt64 nstd_core_ops_shl_i64(NSTDInt64 x, NSTDInt64 y);
 /// # Panics
 ///
 /// This will panic if the left shift operation results in an overflow.
-NSTDAPI NSTDUInt64 nstd_core_ops_shl_u64(NSTDUInt64 x, NSTDUInt64 y);
+NSTDAPI NSTDUInt64 nstd_core_ops_shl_u64(NSTDUInt64 x, NSTDUInt32 y);
 
 /// Shifts value `x` `y` bits to the right.
 ///
@@ -1247,7 +1247,7 @@ NSTDAPI NSTDUInt64 nstd_core_ops_shl_u64(NSTDUInt64 x, NSTDUInt64 y);
 ///
 /// - `NSTDInt x` - The value to shift.
 ///
-/// - `NSTDInt y` - The number of bits to shift.
+/// - `NSTDUInt32 y` - The number of bits to shift.
 ///
 /// # Returns
 ///
@@ -1256,14 +1256,14 @@ NSTDAPI NSTDUInt64 nstd_core_ops_shl_u64(NSTDUInt64 x, NSTDUInt64 y);
 /// # Panics
 ///
 /// This will panic if the right shift operation results in an overflow.
-NSTDAPI NSTDInt nstd_core_ops_shr_int(NSTDInt x, NSTDInt y);
+NSTDAPI NSTDInt nstd_core_ops_shr_int(NSTDInt x, NSTDUInt32 y);
 /// Shifts value `x` `y` bits to the right.
 ///
 /// # Parameters:
 ///
 /// - `NSTDUInt x` - The value to shift.
 ///
-/// - `NSTDUInt y` - The number of bits to shift.
+/// - `NSTDUInt32 y` - The number of bits to shift.
 ///
 /// # Returns
 ///
@@ -1272,14 +1272,14 @@ NSTDAPI NSTDInt nstd_core_ops_shr_int(NSTDInt x, NSTDInt y);
 /// # Panics
 ///
 /// This will panic if the right shift operation results in an overflow.
-NSTDAPI NSTDUInt nstd_core_ops_shr_uint(NSTDUInt x, NSTDUInt y);
+NSTDAPI NSTDUInt nstd_core_ops_shr_uint(NSTDUInt x, NSTDUInt32 y);
 /// Shifts value `x` `y` bits to the right.
 ///
 /// # Parameters:
 ///
 /// - `NSTDInt8 x` - The value to shift.
 ///
-/// - `NSTDInt8 y` - The number of bits to shift.
+/// - `NSTDUInt32 y` - The number of bits to shift.
 ///
 /// # Returns
 ///
@@ -1288,14 +1288,14 @@ NSTDAPI NSTDUInt nstd_core_ops_shr_uint(NSTDUInt x, NSTDUInt y);
 /// # Panics
 ///
 /// This will panic if the right shift operation results in an overflow.
-NSTDAPI NSTDInt8 nstd_core_ops_shr_i8(NSTDInt8 x, NSTDInt8 y);
+NSTDAPI NSTDInt8 nstd_core_ops_shr_i8(NSTDInt8 x, NSTDUInt32 y);
 /// Shifts value `x` `y` bits to the right.
 ///
 /// # Parameters:
 ///
 /// - `NSTDUInt8 x` - The value to shift.
 ///
-/// - `NSTDUInt8 y` - The number of bits to shift.
+/// - `NSTDUInt32 y` - The number of bits to shift.
 ///
 /// # Returns
 ///
@@ -1304,14 +1304,14 @@ NSTDAPI NSTDInt8 nstd_core_ops_shr_i8(NSTDInt8 x, NSTDInt8 y);
 /// # Panics
 ///
 /// This will panic if the right shift operation results in an overflow.
-NSTDAPI NSTDUInt8 nstd_core_ops_shr_u8(NSTDUInt8 x, NSTDUInt8 y);
+NSTDAPI NSTDUInt8 nstd_core_ops_shr_u8(NSTDUInt8 x, NSTDUInt32 y);
 /// Shifts value `x` `y` bits to the right.
 ///
 /// # Parameters:
 ///
 /// - `NSTDInt16 x` - The value to shift.
 ///
-/// - `NSTDInt16 y` - The number of bits to shift.
+/// - `NSTDUInt32 y` - The number of bits to shift.
 ///
 /// # Returns
 ///
@@ -1320,14 +1320,14 @@ NSTDAPI NSTDUInt8 nstd_core_ops_shr_u8(NSTDUInt8 x, NSTDUInt8 y);
 /// # Panics
 ///
 /// This will panic if the right shift operation results in an overflow.
-NSTDAPI NSTDInt16 nstd_core_ops_shr_i16(NSTDInt16 x, NSTDInt16 y);
+NSTDAPI NSTDInt16 nstd_core_ops_shr_i16(NSTDInt16 x, NSTDUInt32 y);
 /// Shifts value `x` `y` bits to the right.
 ///
 /// # Parameters:
 ///
 /// - `NSTDUInt16 x` - The value to shift.
 ///
-/// - `NSTDUInt16 y` - The number of bits to shift.
+/// - `NSTDUInt32 y` - The number of bits to shift.
 ///
 /// # Returns
 ///
@@ -1336,14 +1336,14 @@ NSTDAPI NSTDInt16 nstd_core_ops_shr_i16(NSTDInt16 x, NSTDInt16 y);
 /// # Panics
 ///
 /// This will panic if the right shift operation results in an overflow.
-NSTDAPI NSTDUInt16 nstd_core_ops_shr_u16(NSTDUInt16 x, NSTDUInt16 y);
+NSTDAPI NSTDUInt16 nstd_core_ops_shr_u16(NSTDUInt16 x, NSTDUInt32 y);
 /// Shifts value `x` `y` bits to the right.
 ///
 /// # Parameters:
 ///
 /// - `NSTDInt32 x` - The value to shift.
 ///
-/// - `NSTDInt32 y` - The number of bits to shift.
+/// - `NSTDUInt32 y` - The number of bits to shift.
 ///
 /// # Returns
 ///
@@ -1352,7 +1352,7 @@ NSTDAPI NSTDUInt16 nstd_core_ops_shr_u16(NSTDUInt16 x, NSTDUInt16 y);
 /// # Panics
 ///
 /// This will panic if the right shift operation results in an overflow.
-NSTDAPI NSTDInt32 nstd_core_ops_shr_i32(NSTDInt32 x, NSTDInt32 y);
+NSTDAPI NSTDInt32 nstd_core_ops_shr_i32(NSTDInt32 x, NSTDUInt32 y);
 /// Shifts value `x` `y` bits to the right.
 ///
 /// # Parameters:
@@ -1375,7 +1375,7 @@ NSTDAPI NSTDUInt32 nstd_core_ops_shr_u32(NSTDUInt32 x, NSTDUInt32 y);
 ///
 /// - `NSTDInt64 x` - The value to shift.
 ///
-/// - `NSTDInt64 y` - The number of bits to shift.
+/// - `NSTDUInt32 y` - The number of bits to shift.
 ///
 /// # Returns
 ///
@@ -1384,14 +1384,14 @@ NSTDAPI NSTDUInt32 nstd_core_ops_shr_u32(NSTDUInt32 x, NSTDUInt32 y);
 /// # Panics
 ///
 /// This will panic if the right shift operation results in an overflow.
-NSTDAPI NSTDInt64 nstd_core_ops_shr_i64(NSTDInt64 x, NSTDInt64 y);
+NSTDAPI NSTDInt64 nstd_core_ops_shr_i64(NSTDInt64 x, NSTDUInt32 y);
 /// Shifts value `x` `y` bits to the right.
 ///
 /// # Parameters:
 ///
 /// - `NSTDUInt64 x` - The value to shift.
 ///
-/// - `NSTDUInt64 y` - The number of bits to shift.
+/// - `NSTDUInt32 y` - The number of bits to shift.
 ///
 /// # Returns
 ///
@@ -1400,6 +1400,6 @@ NSTDAPI NSTDInt64 nstd_core_ops_shr_i64(NSTDInt64 x, NSTDInt64 y);
 /// # Panics
 ///
 /// This will panic if the right shift operation results in an overflow.
-NSTDAPI NSTDUInt64 nstd_core_ops_shr_u64(NSTDUInt64 x, NSTDUInt64 y);
+NSTDAPI NSTDUInt64 nstd_core_ops_shr_u64(NSTDUInt64 x, NSTDUInt32 y);
 
 #endif
