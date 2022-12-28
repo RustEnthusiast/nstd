@@ -30,12 +30,22 @@ use crate::{NSTDBool, NSTDChar, NSTDUInt, NSTD_FALSE, NSTD_TRUE};
 pub unsafe extern "C" fn nstd_core_cstr_raw_len(mut cstr: *const NSTDChar) -> NSTDUInt {
     #[cfg(not(any(all(unix, feature = "libc"), all(windows, feature = "windows-sys"))))]
     {
-        let mut i = 0;
-        while *cstr != 0 {
-            cstr = cstr.offset(1);
-            i += 1;
+        #[cfg(not(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64"))))]
+        {
+            let mut i = 0;
+            while *cstr != 0 {
+                cstr = cstr.offset(1);
+                i += 1;
+            }
+            i
         }
-        i
+        #[cfg(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64")))]
+        {
+            use core::arch::asm;
+            let len;
+            asm!(include_str!("raw/x86/len.asm"), len = out(reg) len, cstr = inout(reg) cstr => _);
+            len
+        }
     }
     #[cfg(all(unix, feature = "libc"))]
     return libc::strlen(cstr);
