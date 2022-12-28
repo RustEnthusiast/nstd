@@ -17,10 +17,26 @@ macro_rules! gen_inc {
         /// # Parameters:
         ///
         #[doc = concat!(" - `", stringify!($T), " x` - The value to increment.")]
+        ///
+        /// # Panics
+        ///
+        /// This will panic if the increment operation results in an overflow.
+        ///
+        /// # Example
+        ///
+        /// ```
+        #[doc = concat!("use nstd_sys::core::ops::", stringify!($name), ";")]
+        ///
+        /// let mut x = 5;
+        #[doc = concat!(stringify!($name), "(&mut x);")]
+        /// assert!(x == 6);
+        /// ```
         #[inline]
         #[cfg_attr(feature = "clib", no_mangle)]
         pub extern "C" fn $name(x: $T) {
-            *x += 1;
+            *x = x
+                .checked_add(1)
+                .expect("attempt to increment with overflow");
         }
     };
 }
@@ -43,10 +59,26 @@ macro_rules! gen_dec {
         /// # Parameters:
         ///
         #[doc = concat!(" - `", stringify!($T), " x` - The value to decrement.")]
+        ///
+        /// # Panics
+        ///
+        /// This will panic if the decrement operation results in an overflow.
+        ///
+        /// # Example
+        ///
+        /// ```
+        #[doc = concat!("use nstd_sys::core::ops::", stringify!($name), ";")]
+        ///
+        /// let mut x = 5;
+        #[doc = concat!(stringify!($name), "(&mut x);")]
+        /// assert!(x == 4);
+        /// ```
         #[inline]
         #[cfg_attr(feature = "clib", no_mangle)]
         pub extern "C" fn $name(x: $T) {
-            *x -= 1;
+            *x = x
+                .checked_sub(1)
+                .expect("attempt to decrement with overflow");
         }
     };
 }
@@ -74,10 +106,22 @@ macro_rules! gen_neg {
         /// # Returns
         ///
         #[doc = concat!(" `", stringify!($T), " v` - The negative value of `x`.")]
+        ///
+        /// # Panics
+        ///
+        /// This will panic if the negate operation results in an overflow.
+        ///
+        /// # Example
+        ///
+        /// ```
+        #[doc = concat!("use nstd_sys::core::ops::", stringify!($name), ";")]
+        ///
+        #[doc = concat!("assert!(", stringify!($name), "(69) == -69);")]
+        /// ```
         #[inline]
         #[cfg_attr(feature = "clib", no_mangle)]
         pub extern "C" fn $name(x: $T) -> $T {
-            -x
+            x.checked_neg().expect("attempt to negate with overflow")
         }
     };
 }
@@ -101,10 +145,22 @@ macro_rules! gen_add {
         /// # Returns
         ///
         #[doc = concat!(" `", stringify!($T), " z` - The result of the operation.")]
+        ///
+        /// # Panics
+        ///
+        /// This will panic if the addition operation results in an overflow.
+        ///
+        /// # Example
+        ///
+        /// ```
+        #[doc = concat!("use nstd_sys::core::ops::", stringify!($name), ";")]
+        ///
+        #[doc = concat!("assert!(", stringify!($name), "(4, 5) == 9);")]
+        /// ```
         #[inline]
         #[cfg_attr(feature = "clib", no_mangle)]
         pub extern "C" fn $name(x: $T, y: $T) -> $T {
-            x + y
+            x.checked_add(y).expect("attempt to add with overflow")
         }
     };
 }
@@ -133,10 +189,22 @@ macro_rules! gen_sub {
         /// # Returns
         ///
         #[doc = concat!(" `", stringify!($T), " z` - The result of the operation.")]
+        ///
+        /// # Panics
+        ///
+        /// This will panic if the subtraction operation results in an overflow.
+        ///
+        /// # Example
+        ///
+        /// ```
+        #[doc = concat!("use nstd_sys::core::ops::", stringify!($name), ";")]
+        ///
+        #[doc = concat!("assert!(", stringify!($name), "(9, 5) == 4);")]
+        /// ```
         #[inline]
         #[cfg_attr(feature = "clib", no_mangle)]
         pub extern "C" fn $name(x: $T, y: $T) -> $T {
-            x - y
+            x.checked_sub(y).expect("attempt to subtract with overflow")
         }
     };
 }
@@ -165,10 +233,22 @@ macro_rules! gen_mul {
         /// # Returns
         ///
         #[doc = concat!(" `", stringify!($T), " z` - The result of the operation.")]
+        ///
+        /// # Panics
+        ///
+        /// This will panic if the multiplication operation results in an overflow.
+        ///
+        /// # Example
+        ///
+        /// ```
+        #[doc = concat!("use nstd_sys::core::ops::", stringify!($name), ";")]
+        ///
+        #[doc = concat!("assert!(", stringify!($name), "(3, 4) == 12);")]
+        /// ```
         #[inline]
         #[cfg_attr(feature = "clib", no_mangle)]
         pub extern "C" fn $name(x: $T, y: $T) -> $T {
-            x * y
+            x.checked_mul(y).expect("attempt to multiply with overflow")
         }
     };
 }
@@ -197,10 +277,25 @@ macro_rules! gen_div {
         /// # Returns
         ///
         #[doc = concat!(" `", stringify!($T), " z` - The result of the operation.")]
+        ///
+        /// # Panics
+        ///
+        /// This will panic if `y` is 0 or the division operation results in an overflow.
+        ///
+        /// # Example
+        ///
+        /// ```
+        #[doc = concat!("use nstd_sys::core::ops::", stringify!($name), ";")]
+        ///
+        #[doc = concat!("assert!(", stringify!($name), "(15, 3) == 5);")]
+        /// ```
         #[inline]
         #[cfg_attr(feature = "clib", no_mangle)]
         pub extern "C" fn $name(x: $T, y: $T) -> $T {
-            x / y
+            if y == 0 {
+                panic!("attempt to divide by zero");
+            }
+            x.checked_div(y).expect("attempt to divide with overflow")
         }
     };
 }
@@ -229,10 +324,26 @@ macro_rules! gen_rem {
         /// # Returns
         ///
         #[doc = concat!(" `", stringify!($T), " z` - The result of the operation.")]
+        ///
+        /// # Panics
+        ///
+        /// This will panic if `y` is 0 or the remainder operation results in an overflow.
+        ///
+        /// # Example
+        ///
+        /// ```
+        #[doc = concat!("use nstd_sys::core::ops::", stringify!($name), ";")]
+        ///
+        #[doc = concat!("assert!(", stringify!($name), "(23, 5) == 3);")]
+        /// ```
         #[inline]
         #[cfg_attr(feature = "clib", no_mangle)]
         pub extern "C" fn $name(x: $T, y: $T) -> $T {
-            x % y
+            if y == 0 {
+                panic!("attempt to calculate the remainder with a divisor of zero");
+            }
+            x.checked_rem(y)
+                .expect("attempt to calculate the remainder with overflow")
         }
     };
 }
@@ -261,10 +372,23 @@ macro_rules! gen_shl {
         /// # Returns
         ///
         #[doc = concat!(" `", stringify!($T), " z` - The result of the operation.")]
+        ///
+        /// # Panics
+        ///
+        /// This will panic if the left shift operation results in an overflow.
+        ///
+        /// # Example
+        ///
+        /// ```
+        #[doc = concat!("use nstd_sys::core::ops::", stringify!($name), ";")]
+        ///
+        #[doc = concat!("assert!(", stringify!($name), "(1, 4) == 16);")]
+        /// ```
         #[inline]
         #[cfg_attr(feature = "clib", no_mangle)]
         pub extern "C" fn $name(x: $T, y: $T) -> $T {
-            x << y
+            x.checked_shl(y as _)
+                .expect("attempt to shift left with overflow")
         }
     };
 }
@@ -293,10 +417,23 @@ macro_rules! gen_shr {
         /// # Returns
         ///
         #[doc = concat!(" `", stringify!($T), " z` - The result of the operation.")]
+        ///
+        /// # Panics
+        ///
+        /// This will panic if the right shift operation results in an overflow.
+        ///
+        /// # Example
+        ///
+        /// ```
+        #[doc = concat!("use nstd_sys::core::ops::", stringify!($name), ";")]
+        ///
+        #[doc = concat!("assert!(", stringify!($name), "(16, 4) == 1);")]
+        /// ```
         #[inline]
         #[cfg_attr(feature = "clib", no_mangle)]
         pub extern "C" fn $name(x: $T, y: $T) -> $T {
-            x >> y
+            x.checked_shr(y as _)
+                .expect("attempt to shift right with overflow")
         }
     };
 }
