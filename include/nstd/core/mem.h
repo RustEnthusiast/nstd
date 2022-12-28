@@ -69,8 +69,7 @@ NSTDAPI const NSTDByte *nstd_core_mem_search(const NSTDByte *buf, NSTDUInt size,
 ///
 /// # Safety
 ///
-/// This operation can cause undefined behavior if the caller does not ensure that the memory
-/// buffer is at least `size` bytes in size.
+/// The caller must ensure that `buf` is valid for reads of `size` contiguous bytes.
 NSTDAPI void nstd_core_mem_zero(NSTDByte *buf, NSTDUInt size);
 
 /// Fills the memory buffer `buf` with byte `fill`.

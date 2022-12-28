@@ -188,8 +188,7 @@ pub unsafe extern "C" fn nstd_core_mem_search(
 ///
 /// # Safety
 ///
-/// This operation can cause undefined behavior if the caller does not ensure that the memory
-/// buffer is at least `size` bytes in size.
+/// The caller must ensure that `buf` is valid for reads of `size` contiguous bytes.
 ///
 /// # Example
 ///
@@ -235,7 +234,7 @@ pub unsafe extern "C" fn nstd_core_mem_zero(buf: *mut NSTDByte, size: NSTDUInt) 
         use core::arch::asm;
         const REG_SIZE: NSTDUInt = core::mem::size_of::<&()>();
         let rem_bytes = size % REG_SIZE;
-        let reg_end = buf.add(size - rem_bytes).sub(REG_SIZE);
+        let reg_end = buf.add(size - rem_bytes);
         let end = buf.add(size);
         #[cfg(target_arch = "x86")]
         {
