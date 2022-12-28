@@ -6,18 +6,6 @@
 ///
 /// # Parameters:
 ///
-/// - `NSTDFloat32 *x` - The value to increment.
-NSTDAPI void nstd_core_ops_inc_f32(NSTDFloat32 *x);
-/// Increments `x` by 1.
-///
-/// # Parameters:
-///
-/// - `NSTDFloat64 *x` - The value to increment.
-NSTDAPI void nstd_core_ops_inc_f64(NSTDFloat64 *x);
-/// Increments `x` by 1.
-///
-/// # Parameters:
-///
 /// - `NSTDInt *x` - The value to increment.
 NSTDAPI void nstd_core_ops_inc_int(NSTDInt *x);
 /// Increments `x` by 1.
@@ -75,18 +63,6 @@ NSTDAPI void nstd_core_ops_inc_i64(NSTDInt64 *x);
 /// - `NSTDUInt64 *x` - The value to increment.
 NSTDAPI void nstd_core_ops_inc_u64(NSTDUInt64 *x);
 
-/// Decrements `x` by 1.
-///
-/// # Parameters:
-///
-/// - `NSTDFloat32 *x` - The value to decrement.
-NSTDAPI void nstd_core_ops_dec_f32(NSTDFloat32 *x);
-/// Decrements `x` by 1.
-///
-/// # Parameters:
-///
-/// - `NSTDFloat64 *x` - The value to decrement.
-NSTDAPI void nstd_core_ops_dec_f64(NSTDFloat64 *x);
 /// Decrements `x` by 1.
 ///
 /// # Parameters:
@@ -152,26 +128,6 @@ NSTDAPI void nstd_core_ops_dec_u64(NSTDUInt64 *x);
 ///
 /// # Parameters:
 ///
-/// - `NSTDFloat32 x` - The value to negate.
-///
-/// # Returns
-///
-/// `NSTDFloat32 v` - The negative value of `x`.
-NSTDAPI NSTDFloat32 nstd_core_ops_neg_f32(NSTDFloat32 x);
-/// Returns the negative value of `x`.
-///
-/// # Parameters:
-///
-/// - `NSTDFloat64 x` - The value to negate.
-///
-/// # Returns
-///
-/// `NSTDFloat64 v` - The negative value of `x`.
-NSTDAPI NSTDFloat64 nstd_core_ops_neg_f64(NSTDFloat64 x);
-/// Returns the negative value of `x`.
-///
-/// # Parameters:
-///
 /// - `NSTDInt x` - The value to negate.
 ///
 /// # Returns
@@ -219,30 +175,6 @@ NSTDAPI NSTDInt32 nstd_core_ops_neg_i32(NSTDInt32 x);
 /// `NSTDInt64 v` - The negative value of `x`.
 NSTDAPI NSTDInt64 nstd_core_ops_neg_i64(NSTDInt64 x);
 
-/// Computes the addition operation of `x` + `y`.
-///
-/// # Parameters:
-///
-/// - `NSTDFloat32 x` - The left operand.
-///
-/// - `NSTDFloat32 y` - The right operand.
-///
-/// # Returns
-///
-/// `NSTDFloat32 z` - The result of the operation.
-NSTDAPI NSTDFloat32 nstd_core_ops_add_f32(NSTDFloat32 x, NSTDFloat32 y);
-/// Computes the addition operation of `x` + `y`.
-///
-/// # Parameters:
-///
-/// - `NSTDFloat64 x` - The left operand.
-///
-/// - `NSTDFloat64 y` - The right operand.
-///
-/// # Returns
-///
-/// `NSTDFloat64 z` - The result of the operation.
-NSTDAPI NSTDFloat64 nstd_core_ops_add_f64(NSTDFloat64 x, NSTDFloat64 y);
 /// Computes the addition operation of `x` + `y`.
 ///
 /// # Parameters:
@@ -368,30 +300,6 @@ NSTDAPI NSTDUInt64 nstd_core_ops_add_u64(NSTDUInt64 x, NSTDUInt64 y);
 ///
 /// # Parameters:
 ///
-/// - `NSTDFloat32 x` - The left operand.
-///
-/// - `NSTDFloat32 y` - The right operand.
-///
-/// # Returns
-///
-/// `NSTDFloat32 z` - The result of the operation.
-NSTDAPI NSTDFloat32 nstd_core_ops_sub_f32(NSTDFloat32 x, NSTDFloat32 y);
-/// Computes the subtraction operation of `x` - `y`.
-///
-/// # Parameters:
-///
-/// - `NSTDFloat64 x` - The left operand.
-///
-/// - `NSTDFloat64 y` - The right operand.
-///
-/// # Returns
-///
-/// `NSTDFloat64 z` - The result of the operation.
-NSTDAPI NSTDFloat64 nstd_core_ops_sub_f64(NSTDFloat64 x, NSTDFloat64 y);
-/// Computes the subtraction operation of `x` - `y`.
-///
-/// # Parameters:
-///
 /// - `NSTDInt x` - The left operand.
 ///
 /// - `NSTDInt y` - The right operand.
@@ -509,30 +417,6 @@ NSTDAPI NSTDInt64 nstd_core_ops_sub_i64(NSTDInt64 x, NSTDInt64 y);
 /// `NSTDUInt64 z` - The result of the operation.
 NSTDAPI NSTDUInt64 nstd_core_ops_sub_u64(NSTDUInt64 x, NSTDUInt64 y);
 
-/// Computes the multiplication operation of `x` * `y`.
-///
-/// # Parameters:
-///
-/// - `NSTDFloat32 x` - The left operand.
-///
-/// - `NSTDFloat32 y` - The right operand.
-///
-/// # Returns
-///
-/// `NSTDFloat32 z` - The result of the operation.
-NSTDAPI NSTDFloat32 nstd_core_ops_mul_f32(NSTDFloat32 x, NSTDFloat32 y);
-/// Computes the multiplication operation of `x` * `y`.
-///
-/// # Parameters:
-///
-/// - `NSTDFloat64 x` - The left operand.
-///
-/// - `NSTDFloat64 y` - The right operand.
-///
-/// # Returns
-///
-/// `NSTDFloat64 z` - The result of the operation.
-NSTDAPI NSTDFloat64 nstd_core_ops_mul_f64(NSTDFloat64 x, NSTDFloat64 y);
 /// Computes the multiplication operation of `x` * `y`.
 ///
 /// # Parameters:
@@ -658,30 +542,6 @@ NSTDAPI NSTDUInt64 nstd_core_ops_mul_u64(NSTDUInt64 x, NSTDUInt64 y);
 ///
 /// # Parameters:
 ///
-/// - `NSTDFloat32 x` - The left operand.
-///
-/// - `NSTDFloat32 y` - The right operand.
-///
-/// # Returns
-///
-/// `NSTDFloat32 z` - The result of the operation.
-NSTDAPI NSTDFloat32 nstd_core_ops_div_f32(NSTDFloat32 x, NSTDFloat32 y);
-/// Computes the division operation of `x` / `y`.
-///
-/// # Parameters:
-///
-/// - `NSTDFloat64 x` - The left operand.
-///
-/// - `NSTDFloat64 y` - The right operand.
-///
-/// # Returns
-///
-/// `NSTDFloat64 z` - The result of the operation.
-NSTDAPI NSTDFloat64 nstd_core_ops_div_f64(NSTDFloat64 x, NSTDFloat64 y);
-/// Computes the division operation of `x` / `y`.
-///
-/// # Parameters:
-///
 /// - `NSTDInt x` - The left operand.
 ///
 /// - `NSTDInt y` - The right operand.
@@ -799,30 +659,6 @@ NSTDAPI NSTDInt64 nstd_core_ops_div_i64(NSTDInt64 x, NSTDInt64 y);
 /// `NSTDUInt64 z` - The result of the operation.
 NSTDAPI NSTDUInt64 nstd_core_ops_div_u64(NSTDUInt64 x, NSTDUInt64 y);
 
-/// Computes the remainder of `x` / `y`.
-///
-/// # Parameters:
-///
-/// - `NSTDFloat32 x` - The left operand.
-///
-/// - `NSTDFloat32 y` - The right operand.
-///
-/// # Returns
-///
-/// `NSTDFloat32 z` - The result of the operation.
-NSTDAPI NSTDFloat32 nstd_core_ops_rem_f32(NSTDFloat32 x, NSTDFloat32 y);
-/// Computes the remainder of `x` / `y`.
-///
-/// # Parameters:
-///
-/// - `NSTDFloat64 x` - The left operand.
-///
-/// - `NSTDFloat64 y` - The right operand.
-///
-/// # Returns
-///
-/// `NSTDFloat64 z` - The result of the operation.
-NSTDAPI NSTDFloat64 nstd_core_ops_rem_f64(NSTDFloat64 x, NSTDFloat64 y);
 /// Computes the remainder of `x` / `y`.
 ///
 /// # Parameters:

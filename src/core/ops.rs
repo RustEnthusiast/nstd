@@ -5,8 +5,8 @@
 //!
 //! Also see [this](https://github.com/RustEnthusiast/nstd/issues/22) issue for more information.
 use crate::{
-    NSTDFloat32, NSTDFloat64, NSTDInt, NSTDInt16, NSTDInt32, NSTDInt64, NSTDInt8, NSTDUInt,
-    NSTDUInt16, NSTDUInt32, NSTDUInt64, NSTDUInt8,
+    NSTDInt, NSTDInt16, NSTDInt32, NSTDInt64, NSTDInt8, NSTDUInt, NSTDUInt16, NSTDUInt32,
+    NSTDUInt64, NSTDUInt8,
 };
 
 /// Generates the increment (++) operator implementations.
@@ -24,23 +24,6 @@ macro_rules! gen_inc {
         }
     };
 }
-/// Generates the increment (++) operator implementations for floating point numbers.
-macro_rules! gen_inc_f {
-    ($name: ident, $T: ty) => {
-        /// Increments `x` by 1.
-        ///
-        /// # Parameters:
-        ///
-        #[doc = concat!(" - `", stringify!($T), " x` - The value to increment.")]
-        #[inline]
-        #[cfg_attr(feature = "clib", no_mangle)]
-        pub extern "C" fn $name(x: $T) {
-            *x += 1.0;
-        }
-    };
-}
-gen_inc_f!(nstd_core_ops_inc_f32, &mut NSTDFloat32);
-gen_inc_f!(nstd_core_ops_inc_f64, &mut NSTDFloat64);
 gen_inc!(nstd_core_ops_inc_int, &mut NSTDInt);
 gen_inc!(nstd_core_ops_inc_uint, &mut NSTDUInt);
 gen_inc!(nstd_core_ops_inc_i8, &mut NSTDInt8);
@@ -67,23 +50,6 @@ macro_rules! gen_dec {
         }
     };
 }
-/// Generates the decrement (--) operator implementations for floating point numbers.
-macro_rules! gen_dec_f {
-    ($name: ident, $T: ty) => {
-        /// Decrements `x` by 1.
-        ///
-        /// # Parameters:
-        ///
-        #[doc = concat!(" - `", stringify!($T), " x` - The value to decrement.")]
-        #[inline]
-        #[cfg_attr(feature = "clib", no_mangle)]
-        pub extern "C" fn $name(x: $T) {
-            *x -= 1.0;
-        }
-    };
-}
-gen_dec_f!(nstd_core_ops_dec_f32, &mut NSTDFloat32);
-gen_dec_f!(nstd_core_ops_dec_f64, &mut NSTDFloat64);
 gen_dec!(nstd_core_ops_dec_int, &mut NSTDInt);
 gen_dec!(nstd_core_ops_dec_uint, &mut NSTDUInt);
 gen_dec!(nstd_core_ops_dec_i8, &mut NSTDInt8);
@@ -115,8 +81,6 @@ macro_rules! gen_neg {
         }
     };
 }
-gen_neg!(nstd_core_ops_neg_f32, NSTDFloat32);
-gen_neg!(nstd_core_ops_neg_f64, NSTDFloat64);
 gen_neg!(nstd_core_ops_neg_int, NSTDInt);
 gen_neg!(nstd_core_ops_neg_i8, NSTDInt8);
 gen_neg!(nstd_core_ops_neg_i16, NSTDInt16);
@@ -144,8 +108,6 @@ macro_rules! gen_add {
         }
     };
 }
-gen_add!(nstd_core_ops_add_f32, NSTDFloat32);
-gen_add!(nstd_core_ops_add_f64, NSTDFloat64);
 gen_add!(nstd_core_ops_add_int, NSTDInt);
 gen_add!(nstd_core_ops_add_uint, NSTDUInt);
 gen_add!(nstd_core_ops_add_i8, NSTDInt8);
@@ -178,8 +140,6 @@ macro_rules! gen_sub {
         }
     };
 }
-gen_sub!(nstd_core_ops_sub_f32, NSTDFloat32);
-gen_sub!(nstd_core_ops_sub_f64, NSTDFloat64);
 gen_sub!(nstd_core_ops_sub_int, NSTDInt);
 gen_sub!(nstd_core_ops_sub_uint, NSTDUInt);
 gen_sub!(nstd_core_ops_sub_i8, NSTDInt8);
@@ -212,8 +172,6 @@ macro_rules! gen_mul {
         }
     };
 }
-gen_mul!(nstd_core_ops_mul_f32, NSTDFloat32);
-gen_mul!(nstd_core_ops_mul_f64, NSTDFloat64);
 gen_mul!(nstd_core_ops_mul_int, NSTDInt);
 gen_mul!(nstd_core_ops_mul_uint, NSTDUInt);
 gen_mul!(nstd_core_ops_mul_i8, NSTDInt8);
@@ -246,8 +204,6 @@ macro_rules! gen_div {
         }
     };
 }
-gen_div!(nstd_core_ops_div_f32, NSTDFloat32);
-gen_div!(nstd_core_ops_div_f64, NSTDFloat64);
 gen_div!(nstd_core_ops_div_int, NSTDInt);
 gen_div!(nstd_core_ops_div_uint, NSTDUInt);
 gen_div!(nstd_core_ops_div_i8, NSTDInt8);
@@ -280,8 +236,6 @@ macro_rules! gen_rem {
         }
     };
 }
-gen_rem!(nstd_core_ops_rem_f32, NSTDFloat32);
-gen_rem!(nstd_core_ops_rem_f64, NSTDFloat64);
 gen_rem!(nstd_core_ops_rem_int, NSTDInt);
 gen_rem!(nstd_core_ops_rem_uint, NSTDUInt);
 gen_rem!(nstd_core_ops_rem_i8, NSTDInt8);
