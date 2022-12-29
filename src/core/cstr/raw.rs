@@ -179,14 +179,28 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_compare(
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
+#[allow(unused_mut)]
 pub unsafe extern "C" fn nstd_core_cstr_raw_copy(
     mut dest: *mut NSTDChar,
     mut src: *const NSTDChar,
 ) {
-    while *src != 0 {
-        *dest = *src;
-        dest = dest.offset(1);
-        src = src.offset(1);
+    #[cfg(not(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64"))))]
+    {
+        while *src != 0 {
+            *dest = *src;
+            dest = dest.offset(1);
+            src = src.offset(1);
+        }
+    }
+    #[cfg(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64")))]
+    {
+        use core::arch::asm;
+        asm!(
+            include_str!("raw/x86/copy.asm"),
+            dest = inout(reg) dest => _,
+            src = inout(reg) src => _,
+            byte = out(reg_byte) _
+        );
     }
 }
 
@@ -229,12 +243,25 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_copy_with_null(
 ) {
     #[cfg(not(any(all(unix, feature = "libc"), all(windows, feature = "windows-sys"))))]
     {
-        while {
-            *dest = *src;
-            *src != 0
-        } {
-            dest = dest.offset(1);
-            src = src.offset(1);
+        #[cfg(not(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64"))))]
+        {
+            while {
+                *dest = *src;
+                *src != 0
+            } {
+                dest = dest.offset(1);
+                src = src.offset(1);
+            }
+        }
+        #[cfg(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64")))]
+        {
+            use core::arch::asm;
+            asm!(
+                include_str!("raw/x86/copy_with_null.asm"),
+                dest = inout(reg) dest => _,
+                src = inout(reg) src => _,
+                byte = out(reg_byte) _
+            );
         }
     }
     #[cfg(all(unix, feature = "libc"))]
