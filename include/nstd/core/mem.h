@@ -35,7 +35,7 @@ NSTDAPI NSTDBool nstd_core_mem_compare(const NSTDByte *buf1, const NSTDByte *buf
 ///
 /// # Note
 ///
-/// This will always return null if `size` is greater than `NSTDInt`'s max value.
+/// This may return null if `size` is greater than `NSTDInt`'s max value.
 ///
 /// # Parameters:
 ///
