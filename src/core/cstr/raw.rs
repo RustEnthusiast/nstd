@@ -32,7 +32,12 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_len(mut cstr: *const NSTDChar) -> NS
     {
         #[cfg(not(all(
             feature = "asm",
-            any(target_arch = "x86", target_arch = "x86_64", target_arch = "arm")
+            any(
+                target_arch = "x86",
+                target_arch = "x86_64",
+                target_arch = "arm",
+                target_arch = "aarch64"
+            )
         )))]
         {
             let mut i = 0;
@@ -55,6 +60,18 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_len(mut cstr: *const NSTDChar) -> NS
             let len;
             asm!(
                 include_str!("raw/arm/len.asm"),
+                len = out(reg) len,
+                cstr = inout(reg) cstr => _,
+                byte = out(reg) _
+            );
+            len
+        }
+        #[cfg(all(feature = "asm", target_arch = "aarch64"))]
+        {
+            use core::arch::asm;
+            let len;
+            asm!(
+                include_str!("raw/arm64/len.asm"),
                 len = out(reg) len,
                 cstr = inout(reg) cstr => _,
                 byte = out(reg) _
@@ -132,7 +149,12 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_compare(
 ) -> NSTDBool {
     #[cfg(not(all(
         feature = "asm",
-        any(target_arch = "x86", target_arch = "x86_64", target_arch = "arm")
+        any(
+            target_arch = "x86",
+            target_arch = "x86_64",
+            target_arch = "arm",
+            target_arch = "aarch64"
+        )
     )))]
     {
         use crate::{NSTD_FALSE, NSTD_TRUE};
@@ -170,6 +192,20 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_compare(
         let is_eq: NSTDUInt;
         asm!(
             include_str!("raw/arm/compare.asm"),
+            cstr1 = inout(reg) cstr1 => _,
+            cstr2 = inout(reg) cstr2 => _,
+            is_eq = out(reg) is_eq,
+            ch1 = out(reg) _,
+            ch2 = out(reg) _
+        );
+        is_eq != 0
+    }
+    #[cfg(all(feature = "asm", target_arch = "aarch64"))]
+    {
+        use core::arch::asm;
+        let is_eq: NSTDUInt;
+        asm!(
+            include_str!("raw/arm64/compare.asm"),
             cstr1 = inout(reg) cstr1 => _,
             cstr2 = inout(reg) cstr2 => _,
             is_eq = out(reg) is_eq,
@@ -218,7 +254,12 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_copy(
 ) {
     #[cfg(not(all(
         feature = "asm",
-        any(target_arch = "x86", target_arch = "x86_64", target_arch = "arm")
+        any(
+            target_arch = "x86",
+            target_arch = "x86_64",
+            target_arch = "arm",
+            target_arch = "aarch64"
+        )
     )))]
     {
         while *src != 0 {
@@ -242,6 +283,16 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_copy(
         use core::arch::asm;
         asm!(
             include_str!("raw/arm/copy.asm"),
+            dest = inout(reg) dest => _,
+            src = inout(reg) src => _,
+            byte = out(reg) _
+        );
+    }
+    #[cfg(all(feature = "asm", target_arch = "aarch64"))]
+    {
+        use core::arch::asm;
+        asm!(
+            include_str!("raw/arm64/copy.asm"),
             dest = inout(reg) dest => _,
             src = inout(reg) src => _,
             byte = out(reg) _
@@ -290,7 +341,12 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_copy_with_null(
     {
         #[cfg(not(all(
             feature = "asm",
-            any(target_arch = "x86", target_arch = "x86_64", target_arch = "arm")
+            any(
+                target_arch = "x86",
+                target_arch = "x86_64",
+                target_arch = "arm",
+                target_arch = "aarch64"
+            )
         )))]
         {
             while {
@@ -316,6 +372,16 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_copy_with_null(
             use core::arch::asm;
             asm!(
                 include_str!("raw/arm/copy_with_null.asm"),
+                dest = inout(reg) dest => _,
+                src = inout(reg) src => _,
+                byte = out(reg) _
+            );
+        }
+        #[cfg(all(feature = "asm", target_arch = "aarch64"))]
+        {
+            use core::arch::asm;
+            asm!(
+                include_str!("raw/arm64/copy_with_null.asm"),
                 dest = inout(reg) dest => _,
                 src = inout(reg) src => _,
                 byte = out(reg) _
