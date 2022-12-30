@@ -68,19 +68,19 @@ typedef NSTDUInt16 NSTDChar16;
 /// A 32-bit character type.
 typedef NSTDUInt32 NSTDChar32;
 
-/// A void pointer to some immutable data.
+/// An opaque pointer to some immutable data.
 ///
 /// # Safety
 ///
 /// Accessing any data through this pointer type is unsafe. Raw pointers have no way of knowing if
 /// the data being pointed to is or isn't valid.
 typedef const void *NSTDAny;
-/// A void pointer (a pointer to some arbitrary type).
+/// An opaque pointer to some mutable data.
 ///
 /// # Safety
 ///
-/// Accessing any data through this pointer type is unsafe. Raw pointers have no way of knowing if
-/// the data being pointed to is or isn't valid.
+/// Accessing or mutating any data through this pointer type is unsafe. Raw pointers have no way of
+/// knowing if the data being pointed to is or isn't valid.
 typedef void *NSTDAnyMut;
 
 /// A boolean type, can either be `NSTD_TRUE` (1) or `NSTD_FALSE` (0).
