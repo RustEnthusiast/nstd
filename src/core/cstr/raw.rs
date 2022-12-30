@@ -147,73 +147,78 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_compare(
     mut cstr1: *const NSTDChar,
     mut cstr2: *const NSTDChar,
 ) -> NSTDBool {
-    #[cfg(not(all(
-        feature = "asm",
-        any(
-            target_arch = "x86",
-            target_arch = "x86_64",
-            target_arch = "arm",
-            target_arch = "aarch64"
-        )
-    )))]
+    #[cfg(not(all(unix, feature = "libc")))]
     {
-        use crate::{NSTD_FALSE, NSTD_TRUE};
-        // If the C strings point to the same data return true.
-        if cstr1 == cstr2 {
-            return NSTD_TRUE;
-        }
-        // Otherwise compare them lexicographically.
-        while *cstr1 == *cstr2 {
-            if *cstr1 == 0 {
+        #[cfg(not(all(
+            feature = "asm",
+            any(
+                target_arch = "x86",
+                target_arch = "x86_64",
+                target_arch = "arm",
+                target_arch = "aarch64"
+            )
+        )))]
+        {
+            use crate::{NSTD_FALSE, NSTD_TRUE};
+            // If the C strings point to the same data return true.
+            if cstr1 == cstr2 {
                 return NSTD_TRUE;
             }
-            cstr1 = cstr1.offset(1);
-            cstr2 = cstr2.offset(1);
+            // Otherwise compare them lexicographically.
+            while *cstr1 == *cstr2 {
+                if *cstr1 == 0 {
+                    return NSTD_TRUE;
+                }
+                cstr1 = cstr1.offset(1);
+                cstr2 = cstr2.offset(1);
+            }
+            NSTD_FALSE
         }
-        NSTD_FALSE
+        #[cfg(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64")))]
+        {
+            use crate::core::def::NSTDByte;
+            use core::arch::asm;
+            let is_eq: NSTDByte;
+            asm!(
+                include_str!("raw/x86/compare.asm"),
+                cstr1 = inout(reg) cstr1 => _,
+                cstr2 = inout(reg) cstr2 => _,
+                is_eq = out(reg_byte) is_eq,
+                byte = out(reg_byte) _
+            );
+            is_eq != 0
+        }
+        #[cfg(all(feature = "asm", target_arch = "arm"))]
+        {
+            use core::arch::asm;
+            let is_eq: NSTDUInt;
+            asm!(
+                include_str!("raw/arm/compare.asm"),
+                cstr1 = inout(reg) cstr1 => _,
+                cstr2 = inout(reg) cstr2 => _,
+                is_eq = out(reg) is_eq,
+                ch1 = out(reg) _,
+                ch2 = out(reg) _
+            );
+            is_eq != 0
+        }
+        #[cfg(all(feature = "asm", target_arch = "aarch64"))]
+        {
+            use core::arch::asm;
+            let is_eq: NSTDUInt;
+            asm!(
+                include_str!("raw/arm64/compare.asm"),
+                cstr1 = inout(reg) cstr1 => _,
+                cstr2 = inout(reg) cstr2 => _,
+                is_eq = out(reg) is_eq,
+                ch1 = out(reg) _,
+                ch2 = out(reg) _
+            );
+            is_eq != 0
+        }
     }
-    #[cfg(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64")))]
-    {
-        use crate::core::def::NSTDByte;
-        use core::arch::asm;
-        let is_eq: NSTDByte;
-        asm!(
-            include_str!("raw/x86/compare.asm"),
-            cstr1 = inout(reg) cstr1 => _,
-            cstr2 = inout(reg) cstr2 => _,
-            is_eq = out(reg_byte) is_eq,
-            byte = out(reg_byte) _
-        );
-        is_eq != 0
-    }
-    #[cfg(all(feature = "asm", target_arch = "arm"))]
-    {
-        use core::arch::asm;
-        let is_eq: NSTDUInt;
-        asm!(
-            include_str!("raw/arm/compare.asm"),
-            cstr1 = inout(reg) cstr1 => _,
-            cstr2 = inout(reg) cstr2 => _,
-            is_eq = out(reg) is_eq,
-            ch1 = out(reg) _,
-            ch2 = out(reg) _
-        );
-        is_eq != 0
-    }
-    #[cfg(all(feature = "asm", target_arch = "aarch64"))]
-    {
-        use core::arch::asm;
-        let is_eq: NSTDUInt;
-        asm!(
-            include_str!("raw/arm64/compare.asm"),
-            cstr1 = inout(reg) cstr1 => _,
-            cstr2 = inout(reg) cstr2 => _,
-            is_eq = out(reg) is_eq,
-            ch1 = out(reg) _,
-            ch2 = out(reg) _
-        );
-        is_eq != 0
-    }
+    #[cfg(all(unix, feature = "libc"))]
+    return libc::strcmp(cstr1, cstr2) == 0;
 }
 
 /// Copies the contents of `src` to `dest`, excluding the null terminator.
