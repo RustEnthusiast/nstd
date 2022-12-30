@@ -342,7 +342,7 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_copy_with_null(
     mut dest: *mut NSTDChar,
     mut src: *const NSTDChar,
 ) {
-    #[cfg(not(any(all(unix, feature = "libc"), all(windows, feature = "windows-sys"))))]
+    #[cfg(not(all(unix, feature = "libc")))]
     {
         #[cfg(not(all(
             feature = "asm",
@@ -395,6 +395,4 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_copy_with_null(
     }
     #[cfg(all(unix, feature = "libc"))]
     libc::strcpy(dest, src);
-    #[cfg(all(windows, feature = "windows-sys"))]
-    windows_sys::Win32::Globalization::lstrcpyA(dest as _, src as _);
 }
