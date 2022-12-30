@@ -39,6 +39,7 @@ int main()
         - `result` - Defines a "result" type with success and error variants.
         - `slice` - A view into a sequence of values in memory.
         - `str` - An unowned view into a UTF-8 encoded byte string.
+        - `unichar` - A Unicode scalar value.
     - `cstring` - A dynamically sized, null terminated, C string.
     - `env` - Process environment management.
     - `fs` - Provides access to the file system.
