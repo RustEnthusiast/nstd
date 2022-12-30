@@ -1,7 +1,7 @@
 //! Raw C string processing.
 use crate::{NSTDBool, NSTDChar, NSTDUInt};
 
-/// Gets the length of a null terminated C string, excluding the null byte.
+/// Gets the length of a raw null terminated C string, excluding the null-terminator.
 ///
 /// # Parameters:
 ///
@@ -9,12 +9,12 @@ use crate::{NSTDBool, NSTDChar, NSTDUInt};
 ///
 /// # Returns
 ///
-/// `NSTDUInt len` - The length of the C string, excluding the null byte.
+/// `NSTDUInt len` - The length of the C string, excluding the null-terminator.
 ///
 /// # Safety
 ///
-/// This function makes access to raw pointer data, which can cause undefined behavior in the event
-/// that `cstr`'s data is invalid.
+/// `cstr` must point to a character array that is valid for reads up until and including it's
+/// null-terminating byte.
 ///
 /// # Example
 ///
@@ -85,7 +85,7 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_len(mut cstr: *const NSTDChar) -> NS
     return windows_sys::Win32::Globalization::lstrlenA(cstr as _) as _;
 }
 
-/// Gets the length of a null terminated C string, including the null byte.
+/// Gets the length of a raw null terminated C string, including the null-terminator.
 ///
 /// # Parameters:
 ///
@@ -93,12 +93,12 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_len(mut cstr: *const NSTDChar) -> NS
 ///
 /// # Returns
 ///
-/// `NSTDUInt len` - The length of the C string, including the null byte.
+/// `NSTDUInt len` - The length of the C string, including the null-terminator.
 ///
 /// # Safety
 ///
-/// This function makes access to raw pointer data, which can cause undefined behavior in the event
-/// that `cstr`'s data is invalid.
+/// `cstr` must point to a character array that is valid for reads up until and including it's
+/// null-terminating byte.
 ///
 /// # Example
 ///
@@ -114,7 +114,8 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_len_with_null(cstr: *const NSTDChar)
     nstd_core_cstr_raw_len(cstr) + 1
 }
 
-/// Compares two C strings, returning `NSTD_TRUE` if they are lexicographically equal.
+/// Compares two raw null-terminated C strings, returning `NSTD_TRUE` if they are lexicographically
+/// equal.
 ///
 /// # Parameters:
 ///
@@ -124,12 +125,12 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_len_with_null(cstr: *const NSTDChar)
 ///
 /// # Returns
 ///
-/// `NSTDBool is_eq` - `NSTD_TRUE` if the C strings are lexicographically equal.
+/// `NSTDBool is_eq` - `NSTD_TRUE` if the two C strings are lexicographically equal.
 ///
 /// # Safety
 ///
-/// This function makes access to raw pointer data, which can cause undefined behavior in the event
-/// that either `cstr1` or `cstr2`'s data is invalid.
+/// Both `cstr1` and `cstr2` must point to character arrays that are valid for reads up until and
+/// including their null-terminating bytes.
 ///
 /// # Example
 ///
@@ -221,7 +222,7 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_compare(
     return libc::strcmp(cstr1, cstr2) == 0;
 }
 
-/// Copies the contents of `src` to `dest`, excluding the null terminator.
+/// Copies the contents of one raw C string to another, excluding the source's null-terminator.
 ///
 /// # Note
 ///
@@ -236,8 +237,12 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_compare(
 ///
 /// # Safety
 ///
-/// This function reads from/writes to raw pointer data, which can cause undefined behavior in the
-/// event that either `dest` or `src`'s data is invalid.
+/// - `src` must point to a character array that is valid for reads up until and including it's
+/// null-terminating byte.
+///
+/// - `dest` must point to a character array that is valid for writes.
+///
+/// - `dest`'s buffer must be large enough to contain the contents of `src`.
 ///
 /// # Example
 ///
@@ -305,7 +310,7 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_copy(
     }
 }
 
-/// Copies the contents of `src` to `dest`, including the null terminator.
+/// Copies the contents of one raw C string to another, including the source's null-terminator.
 ///
 /// # Note
 ///
@@ -320,8 +325,13 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_copy(
 ///
 /// # Safety
 ///
-/// This function reads from/writes to raw pointer data, which can cause undefined behavior in the
-/// event that either `dest` or `src`'s data is invalid.
+/// - `src` must point to a character array that is valid for reads up until and including it's
+/// null-terminating byte.
+///
+/// - `dest` must point to a character array that is valid for writes.
+///
+/// - `dest`'s buffer must be large enough to contain the contents of `src`, including it's
+/// null-terminating byte.
 ///
 /// # Example
 ///
