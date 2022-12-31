@@ -60,6 +60,17 @@ impl NSTDString {
             bytes: NSTDVec::from_slice(str.as_bytes()),
         }
     }
+
+    /// Returns a mutable reference to the string's buffer.
+    ///
+    /// # Safety
+    ///
+    /// When mutating the returned buffer, the buffer's data must remain valid UTF-8.
+    #[inline]
+    #[allow(dead_code)]
+    pub(crate) unsafe fn as_mut_vec(&mut self) -> &mut NSTDVec {
+        &mut self.bytes
+    }
 }
 
 /// Creates a new instance of `NSTDString`.
