@@ -386,6 +386,30 @@ pub extern "C" fn nstd_vec_stride(vec: &NSTDVec) -> NSTDUInt {
     vec.stride
 }
 
+/// Returns the number of reserved elements within a vector's inactive buffer.
+///
+/// # Parameters:
+///
+/// - `const NSTDVec *vec` - The vector.
+///
+/// # Returns
+///
+/// `NSTDUInt reserved` - The number of uninitialized elements within `vec`'s inactive buffer.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::vec::{nstd_vec_new_with_cap, nstd_vec_reserved};
+///
+/// let vec = nstd_vec_new_with_cap(2, 16);
+/// assert!(nstd_vec_reserved(&vec) == 16);
+/// ```
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_vec_reserved(vec: &NSTDVec) -> NSTDUInt {
+    vec.cap - vec.len
+}
+
 /// Returns an immutable slice containing all of a vector's active elements.
 ///
 /// # Parameters:

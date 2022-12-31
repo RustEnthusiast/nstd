@@ -122,6 +122,17 @@ NSTDAPI NSTDUInt nstd_vec_cap(const NSTDVec *vec);
 /// `NSTDUInt stride` - The size of each value in the vector.
 NSTDAPI NSTDUInt nstd_vec_stride(const NSTDVec *vec);
 
+/// Returns the number of reserved elements within a vector's inactive buffer.
+///
+/// # Parameters:
+///
+/// - `const NSTDVec *vec` - The vector.
+///
+/// # Returns
+///
+/// `NSTDUInt reserved` - The number of uninitialized elements within `vec`'s inactive buffer.
+NSTDAPI NSTDUInt nstd_vec_reserved(const NSTDVec *vec);
+
 /// Returns an immutable slice containing all of a vector's active elements.
 ///
 /// # Parameters:

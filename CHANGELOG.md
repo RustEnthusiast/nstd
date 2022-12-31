@@ -16,6 +16,8 @@
 ### `nstd.string`
 - `nstd_string_push` now returns `NSTDAllocError`.
 - `nstd_string_pop` now returns `NSTDOptionalUnichar`.
+### `nstd.vec`
+- Added `nstd_vec_reserved`.
 
 # 0.4.0
 ### `nstd`
