@@ -1,7 +1,7 @@
 #ifndef NSTD_SHARED_LIB_H
 #define NSTD_SHARED_LIB_H
-#include "core/cstr/cstr.h"
 #include "core/optional.h"
+#include "core/str.h"
 #include "nstd.h"
 #include "os/os.h"
 #include "os/unix/shared_lib.h"
@@ -25,7 +25,7 @@ NSTDOptional(NSTDSharedLib) NSTDOptionalSharedLib;
 ///
 /// # Parameters:
 ///
-/// - `const NSTDCStr *path` - A path to the shared library.
+/// - `const NSTDStr *path` - A path to the shared library.
 ///
 /// # Returns
 ///
@@ -33,14 +33,20 @@ NSTDOptional(NSTDSharedLib) NSTDOptionalSharedLib;
 ///
 /// # Panics
 ///
-/// Panics if `path`'s length in bytes exceeds `NSTDInt`'s max value or allocating fails.
+/// This operation may panic in the following situations:
+///
+/// - `path`'s length in bytes exceeds `NSTDInt`'s max value.
+///
+/// - Allocating fails.
+///
+/// - Conversion from UTF-8 to UTF-16 fails on Windows.
 ///
 /// # Safety
 ///
 /// - `path`'s data must be valid for reads.
 ///
 /// - The loaded library may have platform-specific initialization routines ran when it is loaded.
-NSTDAPI NSTDOptionalSharedLib nstd_shared_lib_load(const NSTDCStr *path);
+NSTDAPI NSTDOptionalSharedLib nstd_shared_lib_load(const NSTDStr *path);
 
 /// Gets a pointer to a function or static variable in a dynamically loaded library by symbol name.
 ///
@@ -82,6 +88,10 @@ NSTDAPI NSTDAnyMut nstd_shared_lib_get_mut(NSTDSharedLib *lib, const NSTDChar *s
 /// # Parameters:
 ///
 /// - `NSTDSharedLib lib` - The library handle.
+///
+/// # Panics
+///
+/// Panics if unloading the library fails.
 NSTDAPI void nstd_shared_lib_free(NSTDSharedLib lib);
 
 #endif

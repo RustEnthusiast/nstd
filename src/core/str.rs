@@ -20,8 +20,9 @@ use crate::{
             nstd_core_slice_mut_len, nstd_core_slice_mut_new, nstd_core_slice_mut_stride,
             nstd_core_slice_new, nstd_core_slice_stride, NSTDSlice, NSTDSliceMut,
         },
+        unichar::NSTDOptionalUnichar,
     },
-    NSTDChar, NSTDUInt, NSTDUnichar,
+    NSTDChar, NSTDUInt,
 };
 
 /// Generates the `nstd_core_str_*_to_[i|u|f]*` functions.
@@ -516,8 +517,7 @@ pub extern "C" fn nstd_core_str_byte_len(str: &NSTDStr) -> NSTDUInt {
 ///
 /// # Returns
 ///
-/// `NSTDUnichar chr` - The character at index `pos`, or the Unicode replacement character on
-/// error.
+/// `NSTDOptionalUnichar chr` - The character at index `pos`, or none on error.
 ///
 /// # Panics
 ///
@@ -536,15 +536,15 @@ pub extern "C" fn nstd_core_str_byte_len(str: &NSTDStr) -> NSTDUInt {
 /// let s_str = "🦀🚀🦀!\0";
 /// unsafe {
 ///     let str = nstd_core_str_from_raw_cstr(s_str.as_ptr().cast());
-///     assert!(nstd_core_str_get(&str, 1) == '🚀'.into());
+///     assert!(nstd_core_str_get(&str, 1).unwrap() == '🚀'.into());
 /// }
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_str_get(str: &NSTDStr, pos: NSTDUInt) -> NSTDUnichar {
+pub unsafe extern "C" fn nstd_core_str_get(str: &NSTDStr, pos: NSTDUInt) -> NSTDOptionalUnichar {
     match str.as_str().chars().nth(pos) {
-        Some(chr) => chr as NSTDUnichar,
-        _ => char::REPLACEMENT_CHARACTER as NSTDUnichar,
+        Some(chr) => NSTDOptional::Some(chr.into()),
+        _ => NSTDOptional::None,
     }
 }
 
@@ -1335,8 +1335,7 @@ pub extern "C" fn nstd_core_str_mut_byte_len(str: &NSTDStrMut) -> NSTDUInt {
 ///
 /// # Returns
 ///
-/// `NSTDUnichar chr` - The character at index `pos`, or the Unicode replacement character on
-/// error.
+/// `NSTDOptionalUnichar chr` - The character at index `pos`, or none on error.
 ///
 /// # Panics
 ///
@@ -1355,15 +1354,18 @@ pub extern "C" fn nstd_core_str_mut_byte_len(str: &NSTDStrMut) -> NSTDUInt {
 /// let mut s_str = String::from("🦀🚀🦀!\0");
 /// unsafe {
 ///     let str = nstd_core_str_mut_from_raw_cstr(s_str.as_mut_ptr().cast());
-///     assert!(nstd_core_str_mut_get(&str, 1) == '🚀'.into());
+///     assert!(nstd_core_str_mut_get(&str, 1).unwrap() == '🚀'.into());
 /// }
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_str_mut_get(str: &NSTDStrMut, pos: NSTDUInt) -> NSTDUnichar {
+pub unsafe extern "C" fn nstd_core_str_mut_get(
+    str: &NSTDStrMut,
+    pos: NSTDUInt,
+) -> NSTDOptionalUnichar {
     match str.as_str().chars().nth(pos) {
-        Some(chr) => chr as NSTDUnichar,
-        _ => char::REPLACEMENT_CHARACTER as NSTDUnichar,
+        Some(chr) => NSTDOptional::Some(chr.into()),
+        _ => NSTDOptional::None,
     }
 }
 

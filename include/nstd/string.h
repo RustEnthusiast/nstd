@@ -2,8 +2,10 @@
 #define NSTD_STRING_H
 #include "alloc.h"
 #include "core/def.h"
+#include "core/optional.h"
 #include "core/slice.h"
 #include "core/str.h"
+#include "core/unichar.h"
 #include "nstd.h"
 #include "vec.h"
 
@@ -194,12 +196,12 @@ NSTDAPI NSTDUInt nstd_string_cap(const NSTDString *string);
 ///
 /// # Returns
 ///
-/// `NSTDErrorCode errc` - Nonzero on error.
+/// `NSTDAllocError errc` - The allocation operation error code.
 ///
 /// # Panics
 ///
 /// Panics if the current length in bytes exceeds `NSTDInt`'s max value.
-NSTDAPI NSTDErrorCode nstd_string_push(NSTDString *string, NSTDUnichar chr);
+NSTDAPI NSTDAllocError nstd_string_push(NSTDString *string, NSTDUnichar chr);
 
 /// Appends a string slice to the end of a string.
 ///
@@ -230,12 +232,12 @@ NSTDAPI NSTDAllocError nstd_string_push_str(NSTDString *string, const NSTDStr *s
 ///
 /// # Returns
 ///
-/// `NSTDUnichar chr` - The removed character, or the Unicode replacement character on error.
+/// `NSTDOptionalUnichar chr` - The removed character on success.
 ///
 /// # Panics
 ///
 /// This operation will panic if the string's length in bytes exceeds `NSTDInt`'s max value.
-NSTDAPI NSTDUnichar nstd_string_pop(NSTDString *string);
+NSTDAPI NSTDOptionalUnichar nstd_string_pop(NSTDString *string);
 
 /// Sets a string's length to zero.
 ///

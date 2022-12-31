@@ -26,8 +26,6 @@ NSTDOptional(NSTDChar8) NSTDOptionalChar8;
 NSTDOptional(NSTDChar16) NSTDOptionalChar16;
 /// Represents an optional value of type `NSTDChar32`.
 NSTDOptional(NSTDChar32) NSTDOptionalChar32;
-/// Represents an optional value of type `NSTDUnichar`.
-NSTDOptional(NSTDUnichar) NSTDOptionalUnichar;
 /// Represents an optional value of type `NSTDFloat32`.
 NSTDOptional(NSTDFloat32) NSTDOptionalFloat32;
 /// Represents an optional value of type `NSTDFloat64`.

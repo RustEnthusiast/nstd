@@ -3,12 +3,14 @@ extern crate alloc;
 use crate::{
     alloc::NSTDAllocError,
     core::{
-        def::{NSTDByte, NSTDErrorCode},
+        def::NSTDByte,
+        optional::NSTDOptional,
         slice::{nstd_core_slice_new, NSTDSlice},
         str::{
             nstd_core_str_as_bytes, nstd_core_str_from_bytes_unchecked, nstd_core_str_len,
             nstd_core_str_mut_from_bytes_unchecked, NSTDStr, NSTDStrMut,
         },
+        unichar::{NSTDOptionalUnichar, NSTDUnichar},
     },
     vec::{
         nstd_vec_as_ptr, nstd_vec_as_slice, nstd_vec_as_slice_mut, nstd_vec_cap, nstd_vec_clear,
@@ -16,7 +18,7 @@ use crate::{
         nstd_vec_new_with_cap, nstd_vec_truncate, NSTDVec,
     },
     NSTDFloat32, NSTDFloat64, NSTDInt, NSTDInt16, NSTDInt32, NSTDInt64, NSTDInt8, NSTDUInt,
-    NSTDUInt16, NSTDUInt32, NSTDUInt64, NSTDUInt8, NSTDUnichar,
+    NSTDUInt16, NSTDUInt32, NSTDUInt64, NSTDUInt8,
 };
 use alloc::string::ToString;
 
@@ -337,7 +339,7 @@ pub extern "C" fn nstd_string_cap(string: &NSTDString) -> NSTDUInt {
 ///
 /// # Returns
 ///
-/// `NSTDErrorCode errc` - Nonzero on error.
+/// `NSTDAllocError errc` - The allocation operation error code.
 ///
 /// # Panics
 ///
@@ -347,24 +349,21 @@ pub extern "C" fn nstd_string_cap(string: &NSTDString) -> NSTDUInt {
 ///
 /// ```
 /// use nstd_sys::{
+///     alloc::NSTDAllocError::NSTD_ALLOC_ERROR_NONE,
 ///     string::{nstd_string_new, nstd_string_push},
-///     NSTDUnichar,
 /// };
 ///
 /// let mut string = nstd_string_new();
-/// assert!(nstd_string_push(&mut string, '🦀' as NSTDUnichar) == 0);
+/// assert!(nstd_string_push(&mut string, '🦀'.into()) == NSTD_ALLOC_ERROR_NONE);
 /// ```
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_string_push(string: &mut NSTDString, chr: NSTDUnichar) -> NSTDErrorCode {
-    if let Some(chr) = char::from_u32(chr) {
-        let mut buf = [0; 4];
-        chr.encode_utf8(&mut buf);
-        let buf = nstd_core_slice_new(buf.as_ptr().cast(), 1, chr.len_utf8());
-        // SAFETY: `buf`'s data is stored on the stack.
-        let errc = unsafe { nstd_vec_extend(&mut string.bytes, &buf) };
-        return (errc != NSTDAllocError::NSTD_ALLOC_ERROR_NONE).into();
-    }
-    1
+pub extern "C" fn nstd_string_push(string: &mut NSTDString, chr: NSTDUnichar) -> NSTDAllocError {
+    let chr = char::from(chr);
+    let mut buf = [0; 4];
+    chr.encode_utf8(&mut buf);
+    let buf = nstd_core_slice_new(buf.as_ptr().cast(), 1, chr.len_utf8());
+    // SAFETY: `buf`'s data is stored on the stack.
+    unsafe { nstd_vec_extend(&mut string.bytes, &buf) }
 }
 
 /// Appends a string slice to the end of a string.
@@ -420,7 +419,7 @@ pub unsafe extern "C" fn nstd_string_push_str(
 ///
 /// # Returns
 ///
-/// `NSTDUnichar chr` - The removed character, or the Unicode replacement character on error.
+/// `NSTDOptionalUnichar chr` - The removed character on success.
 ///
 /// # Panics
 ///
@@ -430,26 +429,26 @@ pub unsafe extern "C" fn nstd_string_push_str(
 ///
 /// ```
 /// use nstd_sys::{
-///     core::str::nstd_core_str_from_raw_cstr_with_null,
+///     core::{optional::NSTDOptional, str::nstd_core_str_from_raw_cstr_with_null},
 ///     string::{nstd_string_from_str, nstd_string_pop},
 /// };
 ///
 /// unsafe {
 ///     let str = nstd_core_str_from_raw_cstr_with_null("Hello, world!\0".as_ptr().cast());
 ///     let mut string = nstd_string_from_str(&str);
-///     assert!(nstd_string_pop(&mut string) == 0);
+///     assert!(nstd_string_pop(&mut string) == NSTDOptional::Some('\0'.into()));
 /// }
 /// ```
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_string_pop(string: &mut NSTDString) -> NSTDUnichar {
+pub extern "C" fn nstd_string_pop(string: &mut NSTDString) -> NSTDOptionalUnichar {
     // SAFETY: `NSTDString` is always UTF-8 encoded.
     let str = unsafe { core::str::from_utf8_unchecked(string.bytes.as_slice()) };
     if let Some(chr) = str.chars().last() {
         let len = nstd_vec_len(&string.bytes) - chr.len_utf8();
         nstd_vec_truncate(&mut string.bytes, len);
-        return chr as NSTDUnichar;
+        return NSTDOptional::Some(chr.into());
     }
-    char::REPLACEMENT_CHARACTER as NSTDUnichar
+    NSTDOptional::None
 }
 
 /// Sets a string's length to zero.

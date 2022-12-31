@@ -5,22 +5,31 @@
 //! This module is only functional on Windows and Unix systems.
 #![cfg(any(unix, windows))]
 #[cfg(unix)]
-use crate::os::unix::shared_lib::{
-    nstd_os_unix_shared_lib_get, nstd_os_unix_shared_lib_get_mut, nstd_os_unix_shared_lib_load,
-    NSTDUnixSharedLib,
-};
-#[cfg(windows)]
-use crate::os::windows::shared_lib::{
-    nstd_os_windows_shared_lib_get, nstd_os_windows_shared_lib_get_mut,
-    nstd_os_windows_shared_lib_load, NSTDWindowsSharedLib,
-};
 use crate::{
     core::{
-        cstr::{nstd_core_cstr_as_ptr, nstd_core_cstr_get_null, NSTDCStr},
-        optional::NSTDOptional,
+        cstr::{nstd_core_cstr_as_ptr, nstd_core_cstr_get_null},
+        str::nstd_core_str_as_cstr,
     },
     cstring::{nstd_cstring_as_ptr, nstd_cstring_from_cstr_unchecked},
+    os::unix::shared_lib::{
+        nstd_os_unix_shared_lib_get, nstd_os_unix_shared_lib_get_mut, nstd_os_unix_shared_lib_load,
+        NSTDUnixSharedLib,
+    },
+};
+use crate::{
+    core::{optional::NSTDOptional, str::NSTDStr},
     NSTDAny, NSTDAnyMut, NSTDChar,
+};
+#[cfg(windows)]
+use crate::{
+    os::windows::{
+        shared_lib::{
+            nstd_os_windows_shared_lib_get, nstd_os_windows_shared_lib_get_mut,
+            nstd_os_windows_shared_lib_load, NSTDWindowsSharedLib,
+        },
+        str::nstd_os_windows_str_to_utf16,
+    },
+    vec::nstd_vec_as_ptr,
 };
 
 /// A handle to a dynamically loaded library.
@@ -39,7 +48,7 @@ pub type NSTDOptionalSharedLib = NSTDOptional<NSTDSharedLib>;
 ///
 /// # Parameters:
 ///
-/// - `const NSTDCStr *path` - A path to the shared library.
+/// - `const NSTDStr *path` - A path to the shared library.
 ///
 /// # Returns
 ///
@@ -47,7 +56,13 @@ pub type NSTDOptionalSharedLib = NSTDOptional<NSTDSharedLib>;
 ///
 /// # Panics
 ///
-/// Panics if `path`'s length in bytes exceeds `NSTDInt`'s max value or allocating fails.
+/// This operation may panic in the following situations:
+///
+/// - `path`'s length in bytes exceeds `NSTDInt`'s max value.
+///
+/// - Allocating fails.
+///
+/// - Conversion from UTF-8 to UTF-16 fails on Windows.
 ///
 /// # Safety
 ///
@@ -55,21 +70,24 @@ pub type NSTDOptionalSharedLib = NSTDOptional<NSTDSharedLib>;
 ///
 /// - The loaded library may have platform-specific initialization routines ran when it is loaded.
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_shared_lib_load(path: &NSTDCStr) -> NSTDOptionalSharedLib {
-    // Check if `path` is already null terminated.
-    if nstd_core_cstr_get_null(path).is_null() {
-        // Allocate a null byte for `path`.
-        let path = nstd_cstring_from_cstr_unchecked(path);
-        #[cfg(unix)]
-        return nstd_os_unix_shared_lib_load(nstd_cstring_as_ptr(&path));
-        #[cfg(windows)]
-        return nstd_os_windows_shared_lib_load(nstd_cstring_as_ptr(&path));
-    } else {
-        // Use the already null terminated `path`.
-        #[cfg(unix)]
-        return nstd_os_unix_shared_lib_load(nstd_core_cstr_as_ptr(path));
-        #[cfg(windows)]
-        return nstd_os_windows_shared_lib_load(nstd_core_cstr_as_ptr(path));
+pub unsafe extern "C" fn nstd_shared_lib_load(path: &NSTDStr) -> NSTDOptionalSharedLib {
+    #[cfg(unix)]
+    {
+        // Check if `path` is already null terminated.
+        let path = nstd_core_str_as_cstr(path);
+        if nstd_core_cstr_get_null(&path).is_null() {
+            // Allocate a null byte for `path`.
+            let path = nstd_cstring_from_cstr_unchecked(&path);
+            nstd_os_unix_shared_lib_load(nstd_cstring_as_ptr(&path))
+        } else {
+            // Use the already null terminated `path`.
+            nstd_os_unix_shared_lib_load(nstd_core_cstr_as_ptr(&path))
+        }
+    }
+    #[cfg(windows)]
+    {
+        let utf16 = nstd_os_windows_str_to_utf16(path);
+        nstd_os_windows_shared_lib_load(nstd_vec_as_ptr(&utf16) as _)
     }
 }
 
@@ -133,6 +151,10 @@ pub unsafe extern "C" fn nstd_shared_lib_get_mut(
 /// # Parameters:
 ///
 /// - `NSTDSharedLib lib` - The library handle.
+///
+/// # Panics
+///
+/// Panics if unloading the library fails.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 #[allow(unused_variables)]

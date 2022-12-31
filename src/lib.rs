@@ -96,22 +96,20 @@ pub type NSTDChar8 = NSTDUInt8;
 pub type NSTDChar16 = NSTDUInt16;
 /// A 32-bit character type.
 pub type NSTDChar32 = NSTDUInt32;
-/// Represents a Unicode scalar value.
-pub type NSTDUnichar = NSTDChar32;
 
-/// A void pointer to some immutable data.
+/// An opaque pointer to some immutable data.
 ///
 /// # Safety
 ///
 /// Accessing any data through this pointer type is unsafe. Raw pointers have no way of knowing if
 /// the data being pointed to is or isn't valid.
 pub type NSTDAny = *const c_void;
-/// A void pointer (a pointer to some arbitrary type).
+/// An opaque pointer to some mutable data.
 ///
 /// # Safety
 ///
-/// Accessing any data through this pointer type is unsafe. Raw pointers have no way of knowing if
-/// the data being pointed to is or isn't valid.
+/// Accessing or mutating any data through this pointer type is unsafe. Raw pointers have no way of
+/// knowing if the data being pointed to is or isn't valid.
 pub type NSTDAnyMut = *mut c_void;
 
 /// A boolean type, can either be `NSTD_TRUE` (1) or `NSTD_FALSE` (0).

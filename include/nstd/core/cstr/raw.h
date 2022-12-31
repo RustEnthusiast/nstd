@@ -2,7 +2,7 @@
 #define NSTD_CORE_CSTR_RAW_H
 #include "../../nstd.h"
 
-/// Gets the length of a null terminated C string, excluding the null byte.
+/// Gets the length of a raw null terminated C string, excluding the null-terminator.
 ///
 /// # Parameters:
 ///
@@ -10,15 +10,15 @@
 ///
 /// # Returns
 ///
-/// `NSTDUInt len` - The length of the C string, excluding the null byte.
+/// `NSTDUInt len` - The length of the C string, excluding the null-terminator.
 ///
 /// # Safety
 ///
-/// This function makes access to raw pointer data, which can cause undefined behavior in the event
-/// that `cstr`'s data is invalid.
+/// `cstr` must point to a character array that is valid for reads up until and including it's
+/// null-terminating byte.
 NSTDAPI NSTDUInt nstd_core_cstr_raw_len(const NSTDChar *cstr);
 
-/// Gets the length of a null terminated C string, including the null byte.
+/// Gets the length of a raw null terminated C string, including the null-terminator.
 ///
 /// # Parameters:
 ///
@@ -26,15 +26,16 @@ NSTDAPI NSTDUInt nstd_core_cstr_raw_len(const NSTDChar *cstr);
 ///
 /// # Returns
 ///
-/// `NSTDUInt len` - The length of the C string, including the null byte.
+/// `NSTDUInt len` - The length of the C string, including the null-terminator.
 ///
 /// # Safety
 ///
-/// This function makes access to raw pointer data, which can cause undefined behavior in the event
-/// that `cstr`'s data is invalid.
+/// `cstr` must point to a character array that is valid for reads up until and including it's
+/// null-terminating byte.
 NSTDAPI NSTDUInt nstd_core_cstr_raw_len_with_null(const NSTDChar *cstr);
 
-/// Compares two C strings, returning `NSTD_TRUE` if they are lexicographically equal.
+/// Compares two raw null-terminated C strings, returning `NSTD_TRUE` if they are lexicographically
+/// equal.
 ///
 /// # Parameters:
 ///
@@ -44,15 +45,15 @@ NSTDAPI NSTDUInt nstd_core_cstr_raw_len_with_null(const NSTDChar *cstr);
 ///
 /// # Returns
 ///
-/// `NSTDBool is_eq` - `NSTD_TRUE` if the C strings are lexicographically equal.
+/// `NSTDBool is_eq` - `NSTD_TRUE` if the two C strings are lexicographically equal.
 ///
 /// # Safety
 ///
-/// This function makes access to raw pointer data, which can cause undefined behavior in the event
-/// that either `cstr1` or `cstr2`'s data is invalid.
+/// Both `cstr1` and `cstr2` must point to character arrays that are valid for reads up until and
+/// including their null-terminating bytes.
 NSTDAPI NSTDBool nstd_core_cstr_raw_compare(const NSTDChar *cstr1, const NSTDChar *cstr2);
 
-/// Copies the contents of `src` to `dest`, excluding the null terminator.
+/// Copies the contents of one raw C string to another, excluding the source's null-terminator.
 ///
 /// # Note
 ///
@@ -67,11 +68,15 @@ NSTDAPI NSTDBool nstd_core_cstr_raw_compare(const NSTDChar *cstr1, const NSTDCha
 ///
 /// # Safety
 ///
-/// This function reads from/writes to raw pointer data, which can cause undefined behavior in the
-/// event that either `dest` or `src`'s data is invalid.
+/// - `src` must point to a character array that is valid for reads up until and including it's
+/// null-terminating byte.
+///
+/// - `dest` must point to a character array that is valid for writes.
+///
+/// - `dest`'s buffer must be large enough to contain the contents of `src`.
 NSTDAPI void nstd_core_cstr_raw_copy(NSTDChar *dest, const NSTDChar *src);
 
-/// Copies the contents of `src` to `dest`, including the null terminator.
+/// Copies the contents of one raw C string to another, including the source's null-terminator.
 ///
 /// # Note
 ///
@@ -86,8 +91,13 @@ NSTDAPI void nstd_core_cstr_raw_copy(NSTDChar *dest, const NSTDChar *src);
 ///
 /// # Safety
 ///
-/// This function reads from/writes to raw pointer data, which can cause undefined behavior in the
-/// event that either `dest` or `src`'s data is invalid.
+/// - `src` must point to a character array that is valid for reads up until and including it's
+/// null-terminating byte.
+///
+/// - `dest` must point to a character array that is valid for writes.
+///
+/// - `dest`'s buffer must be large enough to contain the contents of `src`, including it's
+/// null-terminating byte.
 NSTDAPI void nstd_core_cstr_raw_copy_with_null(NSTDChar *dest, const NSTDChar *src);
 
 #endif

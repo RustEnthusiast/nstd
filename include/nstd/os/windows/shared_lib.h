@@ -17,7 +17,7 @@ NSTDOptional(NSTDWindowsSharedLib) NSTDWindowsOptionalSharedLib;
 ///
 /// # Parameters:
 ///
-/// - `const NSTDChar *name` - The name of the module to load.
+/// - `const NSTDChar16 *name` - The name of the module to load.
 ///
 /// # Returns
 ///
@@ -26,8 +26,8 @@ NSTDOptional(NSTDWindowsSharedLib) NSTDWindowsOptionalSharedLib;
 /// # Safety
 ///
 /// See
-/// <https://docs.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-loadlibrarya>.
-NSTDAPI NSTDWindowsOptionalSharedLib nstd_os_windows_shared_lib_load(const NSTDChar *name);
+/// <https://docs.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-loadlibraryw>.
+NSTDAPI NSTDWindowsOptionalSharedLib nstd_os_windows_shared_lib_load(const NSTDChar16 *name);
 
 /// Returns a raw handle to a dynamically loaded library.
 ///
@@ -82,6 +82,10 @@ const NSTDChar *symbol);
 /// # Parameters:
 ///
 /// - `NSTDWindowsSharedLib lib` - The library handle.
+///
+/// # Panics
+///
+/// Panics if unloading the library fails.
 ///
 /// # Safety
 ///

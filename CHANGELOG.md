@@ -1,6 +1,23 @@
 # TBD
+### `nstd`
+- Moved `NSTDUnichar` into `core`.
+### `nstd.core`
+- `nstd_core_ops_sh[l|r]_*` now take `NSTDUInt32` as their right operand.
+- Removed floating-point operations from `nstd.core.ops`.
+- `nstd_core_str[_mut]_get` now returns `NSTDOptionalUnichar`.
+- `nstd_core_cty_is_unicode` now takes `NSTDChar32`.
+- Added `nstd_core_panic_with_msg`.
 ### `nstd.os`
+- `nstd_os_windows_shared_lib_load` now accepts Unicode.
+- Added `nstd_os_windows_str_to_utf16`.
 - Added `nstd_os_unix_shared_lib_handle`.
+### `nstd.shared_lib`
+- `nstd_shared_lib_load` now takes `NSTDStr`.
+### `nstd.string`
+- `nstd_string_push` now returns `NSTDAllocError`.
+- `nstd_string_pop` now returns `NSTDOptionalUnichar`.
+### `nstd.vec`
+- Added `nstd_vec_reserved`.
 
 # 0.4.0
 ### `nstd`
