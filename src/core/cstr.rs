@@ -58,6 +58,16 @@ gen_optional!(NSTDOptionalCStr, NSTDCStr);
 /// # Panics
 ///
 /// Panics if `raw` is null.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::cstr::{nstd_core_cstr_is_null_terminated, nstd_core_cstr_new};
+///
+/// let str = "This is a null-terminated C string slice.\0";
+/// let cstr = nstd_core_cstr_new(str.as_ptr().cast(), str.len());
+/// assert!(unsafe { nstd_core_cstr_is_null_terminated(&cstr) });
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_cstr_new(raw: *const NSTDChar, len: NSTDUInt) -> NSTDCStr {
@@ -81,8 +91,8 @@ pub extern "C" fn nstd_core_cstr_new(raw: *const NSTDChar, len: NSTDUInt) -> NST
 ///
 /// # Safety
 ///
-/// This operation may attempt to access data that is unowned by the raw C string, which can lead
-/// to undefined behavior.
+/// `raw` must point to a character array that is valid for reads up until and including it's
+/// null-terminating byte.
 ///
 /// # Example
 ///
@@ -119,8 +129,8 @@ pub unsafe extern "C" fn nstd_core_cstr_from_raw(raw: *const NSTDChar) -> NSTDCS
 ///
 /// # Safety
 ///
-/// This operation may attempt to access data that is unowned by the raw C string, which can lead
-/// to undefined behavior.
+/// `raw` must point to a character array that is valid for reads up until and including it's
+/// null-terminating byte.
 ///
 /// # Example
 ///
@@ -182,6 +192,17 @@ pub extern "C" fn nstd_core_cstr_as_bytes(cstr: &NSTDCStr) -> NSTDSlice {
 /// # Returns
 ///
 /// `const NSTDChar *ptr` - A pointer to the first character in the C string.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::cstr::{nstd_core_cstr_as_ptr, nstd_core_cstr_new};
+///
+/// let str = "assert!(Rust + C >= God)";
+/// let str_ptr = str.as_ptr().cast();
+/// let cstr = nstd_core_cstr_new(str_ptr, str.len());
+/// assert!(str_ptr == nstd_core_cstr_as_ptr(&cstr));
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_cstr_as_ptr(cstr: &NSTDCStr) -> *const NSTDChar {
@@ -197,6 +218,16 @@ pub extern "C" fn nstd_core_cstr_as_ptr(cstr: &NSTDCStr) -> *const NSTDChar {
 /// # Returns
 ///
 /// `NSTDUInt len` - The length of the C string slice.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::cstr::{nstd_core_cstr_from_raw, nstd_core_cstr_len};
+///
+/// let str = "Sunflower seeds yum\0";
+/// let cstr = unsafe { nstd_core_cstr_from_raw(str.as_ptr().cast()) };
+/// assert!(nstd_core_cstr_len(&cstr) == 19);
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_cstr_len(cstr: &NSTDCStr) -> NSTDUInt {
@@ -221,7 +252,7 @@ pub extern "C" fn nstd_core_cstr_len(cstr: &NSTDCStr) -> NSTDUInt {
 ///
 /// # Safety
 ///
-/// Undefined behavior may occur if `cstr`'s data is invalid.
+/// The caller must ensure that `cstr` is valid for reads.
 ///
 /// # Example
 ///
@@ -270,7 +301,7 @@ pub unsafe extern "C" fn nstd_core_cstr_is_null_terminated(cstr: &NSTDCStr) -> N
 ///
 /// # Safety
 ///
-/// Undefined behavior may occur if `cstr`'s data is invalid.
+/// The caller must ensure that `cstr` is valid for reads.
 ///
 /// # Example
 ///
@@ -299,7 +330,7 @@ pub unsafe extern "C" fn nstd_core_cstr_get_null(cstr: &NSTDCStr) -> *const NSTD
     nstd_core_mem_search(cstr.ptr.cast(), cstr.len, 0).cast()
 }
 
-/// Return a pointer the character at `pos` in `cstr`.
+/// Return a pointer to the character at index `pos` in `cstr`.
 ///
 /// # Note
 ///
@@ -450,6 +481,16 @@ gen_optional!(NSTDOptionalCStrMut, NSTDCStrMut);
 /// # Panics
 ///
 /// Panics if `raw` is null.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::cstr::{nstd_core_cstr_mut_is_null_terminated, nstd_core_cstr_mut_new};
+///
+/// let mut str = String::from("This is a null-terminated C string slice.\0");
+/// let cstr = nstd_core_cstr_mut_new(str.as_mut_ptr().cast(), str.len());
+/// assert!(unsafe { nstd_core_cstr_mut_is_null_terminated(&cstr) });
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_cstr_mut_new(raw: *mut NSTDChar, len: NSTDUInt) -> NSTDCStrMut {
@@ -473,8 +514,8 @@ pub extern "C" fn nstd_core_cstr_mut_new(raw: *mut NSTDChar, len: NSTDUInt) -> N
 ///
 /// # Safety
 ///
-/// This operation may attempt to access data that is unowned by the raw C string, which can lead
-/// to undefined behavior.
+/// `raw` must point to a character array that is valid for reads up until and including it's
+/// null-terminating byte.
 ///
 /// # Example
 ///
@@ -511,8 +552,8 @@ pub unsafe extern "C" fn nstd_core_cstr_mut_from_raw(raw: *mut NSTDChar) -> NSTD
 ///
 /// # Safety
 ///
-/// This operation may attempt to access data that is unowned by the raw C string, which can lead
-/// to undefined behavior.
+/// `raw` must point to a character array that is valid for reads up until and including it's
+/// null-terminating byte.
 ///
 /// # Example
 ///
@@ -542,6 +583,21 @@ pub unsafe extern "C" fn nstd_core_cstr_mut_from_raw_with_null(raw: *mut NSTDCha
 /// # Returns
 ///
 /// `NSTDCStr cstr_const` - The immutable copy of `cstr`.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::{
+///     core::cstr::{nstd_core_cstr_len, nstd_core_cstr_mut_as_const, nstd_core_cstr_mut_new},
+///     cstring::{nstd_cstring_from_cstr, nstd_cstring_len},
+/// };
+///
+/// let mut str = String::from("Faded than a ho");
+/// let cstr = nstd_core_cstr_mut_new(str.as_mut_ptr().cast(), str.len());
+/// let cstr = nstd_core_cstr_mut_as_const(&cstr);
+/// let cstring = unsafe { nstd_cstring_from_cstr(&cstr) };
+/// assert!(nstd_cstring_len(&cstring) == nstd_core_cstr_len(&cstr));
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_cstr_mut_as_const(cstr: &NSTDCStrMut) -> NSTDCStr {
@@ -589,6 +645,17 @@ pub extern "C" fn nstd_core_cstr_mut_as_bytes(cstr: &NSTDCStrMut) -> NSTDSlice {
 /// # Returns
 ///
 /// `NSTDChar *ptr` - A pointer to the first character in the C string.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::cstr::{nstd_core_cstr_mut_as_ptr, nstd_core_cstr_mut_new};
+///
+/// let mut str = String::from("assert!(Rust + C >= God)");
+/// let str_ptr = str.as_mut_ptr().cast();
+/// let mut cstr = nstd_core_cstr_mut_new(str_ptr, str.len());
+/// assert!(str_ptr == nstd_core_cstr_mut_as_ptr(&mut cstr));
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_cstr_mut_as_ptr(cstr: &mut NSTDCStrMut) -> *mut NSTDChar {
@@ -604,6 +671,16 @@ pub extern "C" fn nstd_core_cstr_mut_as_ptr(cstr: &mut NSTDCStrMut) -> *mut NSTD
 /// # Returns
 ///
 /// `const NSTDChar *ptr` - A pointer to the first character in the C string.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::cstr::{nstd_core_cstr_mut_as_ptr_const, nstd_core_cstr_mut_new};
+///
+/// let mut str = String::from("assert!(Rust + C >= God)");
+/// let cstr = nstd_core_cstr_mut_new(str.as_mut_ptr().cast(), str.len());
+/// assert!(str.as_ptr().cast() == nstd_core_cstr_mut_as_ptr_const(&cstr));
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_cstr_mut_as_ptr_const(cstr: &NSTDCStrMut) -> *const NSTDChar {
@@ -619,6 +696,16 @@ pub extern "C" fn nstd_core_cstr_mut_as_ptr_const(cstr: &NSTDCStrMut) -> *const 
 /// # Returns
 ///
 /// `NSTDUInt len` - The length of the C string slice.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::cstr::{nstd_core_cstr_mut_from_raw, nstd_core_cstr_mut_len};
+///
+/// let mut str = String::from("Sunflower seeds yum\0");
+/// let cstr = unsafe { nstd_core_cstr_mut_from_raw(str.as_mut_ptr().cast()) };
+/// assert!(nstd_core_cstr_mut_len(&cstr) == 19);
+/// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_cstr_mut_len(cstr: &NSTDCStrMut) -> NSTDUInt {
@@ -643,7 +730,7 @@ pub extern "C" fn nstd_core_cstr_mut_len(cstr: &NSTDCStrMut) -> NSTDUInt {
 ///
 /// # Safety
 ///
-/// Undefined behavior may occur if `cstr`'s data is invalid.
+/// The caller must ensure that `cstr` is valid for reads.
 ///
 /// # Example
 ///
@@ -692,8 +779,7 @@ pub unsafe extern "C" fn nstd_core_cstr_mut_is_null_terminated(cstr: &NSTDCStrMu
 ///
 /// # Safety
 ///
-/// This operation may attempt to access data that is unowned by the raw C string, which can lead
-/// to undefined behavior.
+/// The caller must ensure that `cstr` is valid for reads.
 ///
 /// # Example
 ///
@@ -739,8 +825,7 @@ pub unsafe extern "C" fn nstd_core_cstr_mut_get_null(cstr: &mut NSTDCStrMut) -> 
 ///
 /// # Safety
 ///
-/// This operation may attempt to access data that is unowned by the raw C string, which can lead
-/// to undefined behavior.
+/// The caller must ensure that `cstr` is valid for reads.
 ///
 /// # Example
 ///
@@ -770,7 +855,7 @@ pub unsafe extern "C" fn nstd_core_cstr_mut_get_null_const(cstr: &NSTDCStrMut) -
     nstd_core_cstr_get_null(&cstr_const)
 }
 
-/// Return a pointer the character at `pos` in `cstr`.
+/// Return a pointer to the character at index `pos` in `cstr`.
 ///
 /// # Note
 ///
@@ -811,7 +896,7 @@ pub extern "C" fn nstd_core_cstr_mut_get(cstr: &mut NSTDCStrMut, pos: NSTDUInt) 
     nstd_core_cstr_mut_get_const(cstr, pos) as *mut NSTDChar
 }
 
-/// Return an immutable pointer the character at `pos` in `cstr`.
+/// Return an immutable pointer to the character at index `pos` in `cstr`.
 ///
 /// # Note
 ///
