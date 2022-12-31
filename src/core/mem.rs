@@ -76,10 +76,6 @@ pub unsafe extern "C" fn nstd_core_mem_compare(
 /// Iterates through each byte in a raw memory buffer until `delim` is reached, returning a pointer
 /// to the delimiter byte if it is found.
 ///
-/// # Note
-///
-/// This may return null if `size` is greater than `NSTDInt`'s max value.
-///
 /// # Parameters:
 ///
 /// - `const NSTDByte *buf` - The memory buffer to search.
@@ -91,6 +87,10 @@ pub unsafe extern "C" fn nstd_core_mem_compare(
 /// # Returns
 ///
 /// `const NSTDByte *delim_ptr` - A pointer to the delimiter byte, or null if it was not found.
+///
+/// # Panics
+///
+/// This operation may panic if `size` is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -119,9 +119,7 @@ pub unsafe extern "C" fn nstd_core_mem_search(
     #[cfg(not(all(unix, feature = "libc")))]
     {
         // Check if `size` is greater than `NSTDInt`'s max size.
-        if size > isize::MAX as usize {
-            return core::ptr::null();
-        }
+        assert!(size <= isize::MAX as usize);
         // Search the buffer for `delim`.
         #[cfg(not(all(
             feature = "asm",

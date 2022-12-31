@@ -124,7 +124,7 @@ NSTDAPI NSTDUInt nstd_core_cstr_len(const NSTDCStr *cstr);
 ///
 /// # Panics
 ///
-/// This function will panic if `cstr`'s length is greater than `NSTDInt`'s maximum value.
+/// This function may panic if `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -132,10 +132,6 @@ NSTDAPI NSTDUInt nstd_core_cstr_len(const NSTDCStr *cstr);
 NSTDAPI NSTDBool nstd_core_cstr_is_null_terminated(const NSTDCStr *cstr);
 
 /// Returns a pointer to the first null byte in a C string slice if one is present.
-///
-/// # Note
-///
-/// This will always return null if `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Parameters:
 ///
@@ -145,6 +141,10 @@ NSTDAPI NSTDBool nstd_core_cstr_is_null_terminated(const NSTDCStr *cstr);
 ///
 /// `const NSTDChar *nul` - A pointer to the first null byte in `cstr`, or null if the C string
 /// slice doesn't contain a null byte.
+///
+/// # Panics
+///
+/// This operation may panic if `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -343,10 +343,6 @@ NSTDAPI NSTDBool nstd_core_cstr_mut_is_null_terminated(const NSTDCStrMut *cstr);
 
 /// Returns a pointer to the first null byte in a C string slice if one is present.
 ///
-/// # Note
-///
-/// This will always return null if `cstr`'s length is greater than `NSTDInt`'s max value.
-///
 /// # Parameters:
 ///
 /// - `NSTDCStrMut *cstr` - The C string slice.
@@ -356,16 +352,16 @@ NSTDAPI NSTDBool nstd_core_cstr_mut_is_null_terminated(const NSTDCStrMut *cstr);
 /// `NSTDChar *nul` - A pointer to the first null byte in `cstr`, or null if the C string
 /// slice doesn't contain a null byte.
 ///
+/// # Panics
+///
+/// This operation may panic if `cstr`'s length is greater than `NSTDInt`'s max value.
+///
 /// # Safety
 ///
 /// The caller must ensure that `cstr` is valid for reads.
 NSTDAPI NSTDChar *nstd_core_cstr_mut_get_null(NSTDCStrMut *cstr);
 
 /// Returns an immutable pointer to the first null byte in a C string slice if one is present.
-///
-/// # Note
-///
-/// This will always return null if `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Parameters:
 ///
@@ -375,6 +371,10 @@ NSTDAPI NSTDChar *nstd_core_cstr_mut_get_null(NSTDCStrMut *cstr);
 ///
 /// `const NSTDChar *nul` - A pointer to the first null byte in `cstr`, or null if the C string
 /// slice doesn't contain a null byte.
+///
+/// # Panics
+///
+/// This operation may panic if `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///

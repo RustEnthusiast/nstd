@@ -248,7 +248,7 @@ pub extern "C" fn nstd_core_cstr_len(cstr: &NSTDCStr) -> NSTDUInt {
 ///
 /// # Panics
 ///
-/// This function will panic if `cstr`'s length is greater than `NSTDInt`'s maximum value.
+/// This function may panic if `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -280,15 +280,10 @@ pub extern "C" fn nstd_core_cstr_len(cstr: &NSTDCStr) -> NSTDUInt {
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_cstr_is_null_terminated(cstr: &NSTDCStr) -> NSTDBool {
-    assert!(cstr.len <= isize::MAX as usize);
     nstd_core_mem_search(cstr.ptr.cast(), cstr.len, 0) == nstd_core_cstr_last(cstr).cast()
 }
 
 /// Returns a pointer to the first null byte in a C string slice if one is present.
-///
-/// # Note
-///
-/// This will always return null if `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Parameters:
 ///
@@ -298,6 +293,10 @@ pub unsafe extern "C" fn nstd_core_cstr_is_null_terminated(cstr: &NSTDCStr) -> N
 ///
 /// `const NSTDChar *nul` - A pointer to the first null byte in `cstr`, or null if the C string
 /// slice doesn't contain a null byte.
+///
+/// # Panics
+///
+/// This operation may panic if `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -764,10 +763,6 @@ pub unsafe extern "C" fn nstd_core_cstr_mut_is_null_terminated(cstr: &NSTDCStrMu
 
 /// Returns a pointer to the first null byte in a C string slice if one is present.
 ///
-/// # Note
-///
-/// This will always return null if `cstr`'s length is greater than `NSTDInt`'s max value.
-///
 /// # Parameters:
 ///
 /// - `NSTDCStrMut *cstr` - The C string slice.
@@ -776,6 +771,10 @@ pub unsafe extern "C" fn nstd_core_cstr_mut_is_null_terminated(cstr: &NSTDCStrMu
 ///
 /// `NSTDChar *nul` - A pointer to the first null byte in `cstr`, or null if the C string
 /// slice doesn't contain a null byte.
+///
+/// # Panics
+///
+/// This operation may panic if `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -810,10 +809,6 @@ pub unsafe extern "C" fn nstd_core_cstr_mut_get_null(cstr: &mut NSTDCStrMut) -> 
 
 /// Returns an immutable pointer to the first null byte in a C string slice if one is present.
 ///
-/// # Note
-///
-/// This will always return null if `cstr`'s length is greater than `NSTDInt`'s max value.
-///
 /// # Parameters:
 ///
 /// - `const NSTDCStrMut *cstr` - The C string slice.
@@ -822,6 +817,10 @@ pub unsafe extern "C" fn nstd_core_cstr_mut_get_null(cstr: &mut NSTDCStrMut) -> 
 ///
 /// `const NSTDChar *nul` - A pointer to the first null byte in `cstr`, or null if the C string
 /// slice doesn't contain a null byte.
+///
+/// # Panics
+///
+/// This operation may panic if `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
