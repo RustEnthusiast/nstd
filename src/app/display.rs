@@ -31,6 +31,36 @@ pub struct NSTDDisplayPosition {
     pub y: NSTDInt32,
 }
 
+/// Creates a new `NSTDDisplay` from it's handle.
+///
+/// # Parameters:
+///
+/// - `NSTDDisplayHandle handle` - A borrowed handle to a display.
+///
+/// # Returns
+///
+/// `NSTDDisplay display` - An owned handle to the display.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_app_display_new(handle: NSTDDisplayHandle) -> NSTDDisplay {
+    Box::new(handle.clone())
+}
+
+/// Immutably borrows an `NSTDDisplay`.
+///
+/// # Parameters:
+///
+/// - `const NSTDDisplay *display` - The display handle to borrow.
+///
+/// # Returns
+///
+/// `NSTDDisplayHandle handle` - A borrowed handle to the display.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_app_display_handle(display: &NSTDDisplay) -> NSTDDisplayHandle {
+    display
+}
+
 /// Returns the size of a display.
 ///
 /// # Parameters:

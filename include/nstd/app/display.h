@@ -27,6 +27,28 @@ typedef struct {
     NSTDInt32 y;
 } NSTDDisplayPosition;
 
+/// Creates a new `NSTDDisplay` from it's handle.
+///
+/// # Parameters:
+///
+/// - `NSTDDisplayHandle handle` - A borrowed handle to a display.
+///
+/// # Returns
+///
+/// `NSTDDisplay display` - An owned handle to the display.
+NSTDAPI NSTDDisplay nstd_app_display_new(NSTDDisplayHandle handle);
+
+/// Immutably borrows an `NSTDDisplay`.
+///
+/// # Parameters:
+///
+/// - `const NSTDDisplay *display` - The display handle to borrow.
+///
+/// # Returns
+///
+/// `NSTDDisplayHandle handle` - A borrowed handle to the display.
+NSTDAPI NSTDDisplayHandle nstd_app_display_handle(const NSTDDisplay *display);
+
 /// Returns the size of a display.
 ///
 /// # Parameters:
