@@ -7,12 +7,16 @@
 - `nstd_core_str[_mut]_get` now returns `NSTDOptionalUnichar`.
 - `nstd_core_cty_is_unicode` now takes `NSTDChar32`.
 - Added `nstd_core_panic_with_msg`.
+### `nstd.heap_ptr`
+- Added `NSTDOptionalHeapPtr`.
 ### `nstd.os`
 - `nstd_os_windows_shared_lib_load` now accepts Unicode.
 - Added `nstd_os_windows_str_to_utf16`.
 - Added `nstd_os_unix_shared_lib_handle`.
 ### `nstd.shared_lib`
 - `nstd_shared_lib_load` now takes `NSTDStr`.
+### `nstd.shared_ptr`
+- Added `NSTDOptionalSharedPtr`.
 ### `nstd.string`
 - `nstd_string_push` now returns `NSTDAllocError`.
 - `nstd_string_pop` now returns `NSTDOptionalUnichar`.

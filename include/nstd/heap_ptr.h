@@ -1,5 +1,6 @@
 #ifndef NSTD_HEAP_PTR_H
 #define NSTD_HEAP_PTR_H
+#include "core/optional.h"
 #include "nstd.h"
 
 /// A pointer type for single value heap allocation.
@@ -9,6 +10,9 @@ typedef struct {
     /// The size of the object in bytes.
     NSTDUInt size;
 } NSTDHeapPtr;
+
+/// Represents an optional value of type `NSTDHeapPtr`.
+NSTDOptional(NSTDHeapPtr) NSTDOptionalHeapPtr;
 
 /// Creates a new initialized heap allocated object.
 ///

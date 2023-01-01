@@ -1,5 +1,6 @@
 #ifndef NSTD_SHARED_PTR_H
 #define NSTD_SHARED_PTR_H
+#include "core/optional.h"
 #include "nstd.h"
 
 /// A reference counting smart pointer.
@@ -9,6 +10,9 @@ typedef struct {
     /// The size of the shared pointer's memory buffer.
     NSTDUInt size;
 } NSTDSharedPtr;
+
+/// Represents an optional value of type `NSTDSharedPtr`.
+NSTDOptional(NSTDSharedPtr) NSTDOptionalSharedPtr;
 
 /// Creates a new initialized instance of a shared pointer.
 ///

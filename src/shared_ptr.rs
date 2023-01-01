@@ -4,7 +4,10 @@ use crate::{
         nstd_alloc_allocate, nstd_alloc_allocate_zeroed, nstd_alloc_deallocate,
         NSTDAllocError::NSTD_ALLOC_ERROR_NONE,
     },
-    core::mem::nstd_core_mem_copy,
+    core::{
+        mem::nstd_core_mem_copy,
+        optional::{gen_optional, NSTDOptional},
+    },
     NSTDAny, NSTDAnyMut, NSTDUInt,
 };
 
@@ -64,6 +67,7 @@ impl Drop for NSTDSharedPtr {
         }
     }
 }
+gen_optional!(NSTDOptionalSharedPtr, NSTDSharedPtr);
 
 /// Creates a new initialized instance of a shared pointer.
 ///
