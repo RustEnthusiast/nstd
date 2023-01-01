@@ -16,6 +16,8 @@ pub mod range;
 pub mod result;
 pub mod slice;
 pub mod str;
+pub mod unichar;
+use self::str::NSTDStr;
 
 /// Invokes the runtime's panic handler.
 ///
@@ -28,4 +30,25 @@ pub mod str;
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_panic() -> ! {
     panic!();
+}
+
+/// Invokes the runtime's panic handler with a UTF-8 encoded payload.
+///
+/// This operation will never return.
+///
+/// # Parameters:
+///
+/// - `const NSTDStr *msg` - The message to panic with.
+///
+/// # Panics
+///
+/// This function will always panic.
+///
+/// # Safety
+///
+/// `msg`'s data must be valid for reads.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_core_panic_with_msg(msg: &NSTDStr) -> ! {
+    panic!("{}", msg.as_str());
 }

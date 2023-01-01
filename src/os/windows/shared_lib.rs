@@ -1,22 +1,26 @@
 //! Shared library/module access for Windows.
-use crate::{core::optional::NSTDOptional, NSTDAny, NSTDAnyMut, NSTDChar, NSTDInt};
-use windows_sys::Win32::System::LibraryLoader::{FreeLibrary, GetProcAddress, LoadLibraryA};
-
-/// A raw handle to a dynamically loaded library.
-pub type NSTDWindowsSharedLibHandle = NSTDInt;
+use crate::{
+    core::optional::NSTDOptional, os::windows::NSTDWindowsHandle, NSTDAny, NSTDAnyMut, NSTDChar,
+    NSTDChar16,
+};
+use windows_sys::Win32::System::LibraryLoader::{FreeLibrary, GetProcAddress, LoadLibraryW};
 
 /// A handle to a loaded library.
 #[repr(C)]
 pub struct NSTDWindowsSharedLib {
     /// A raw handle to the module.
-    handle: NSTDWindowsSharedLibHandle,
+    handle: NSTDWindowsHandle,
 }
 impl Drop for NSTDWindowsSharedLib {
     /// [NSTDWindowsSharedLib]'s destructor.
+    ///
+    /// # Panics
+    ///
+    /// Panics if unloading the library fails.
     #[inline]
     fn drop(&mut self) {
         // SAFETY: `handle` is non-null.
-        unsafe { FreeLibrary(self.handle) };
+        unsafe { assert!(FreeLibrary(self.handle) != 0) };
     }
 }
 
@@ -27,7 +31,7 @@ pub type NSTDWindowsOptionalSharedLib = NSTDOptional<NSTDWindowsSharedLib>;
 ///
 /// # Parameters:
 ///
-/// - `const NSTDChar *name` - The name of the module to load.
+/// - `const NSTDChar16 *name` - The name of the module to load.
 ///
 /// # Returns
 ///
@@ -36,13 +40,13 @@ pub type NSTDWindowsOptionalSharedLib = NSTDOptional<NSTDWindowsSharedLib>;
 /// # Safety
 ///
 /// See
-/// <https://docs.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-loadlibrarya>.
+/// <https://docs.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-loadlibraryw>.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_os_windows_shared_lib_load(
-    name: *const NSTDChar,
+    name: *const NSTDChar16,
 ) -> NSTDWindowsOptionalSharedLib {
-    match LoadLibraryA(name.cast()) {
+    match LoadLibraryW(name) {
         0 => NSTDOptional::None,
         handle => NSTDOptional::Some(NSTDWindowsSharedLib { handle }),
     }
@@ -56,12 +60,12 @@ pub unsafe extern "C" fn nstd_os_windows_shared_lib_load(
 ///
 /// # Returns
 ///
-/// `NSTDWindowsSharedLibHandle handle` - A native handle to the dynamically loaded library.
+/// `NSTDWindowsHandle handle` - A native handle to the dynamically loaded library.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_os_windows_shared_lib_handle(
     lib: &NSTDWindowsSharedLib,
-) -> NSTDWindowsSharedLibHandle {
+) -> NSTDWindowsHandle {
     lib.handle
 }
 
@@ -119,6 +123,10 @@ pub unsafe extern "C" fn nstd_os_windows_shared_lib_get_mut(
 /// # Parameters:
 ///
 /// - `NSTDWindowsSharedLib lib` - The library handle.
+///
+/// # Panics
+///
+/// Panics if unloading the library fails.
 ///
 /// # Safety
 ///

@@ -2,21 +2,22 @@
 use crate::{core::optional::NSTDOptional, NSTDAny, NSTDAnyMut, NSTDChar};
 use libc::{dlclose, dlopen, dlsym, RTLD_LAZY, RTLD_LOCAL};
 
-/// A raw handle to a dynamically loaded library.
-pub type NSTDUnixSharedLibHandle = NSTDAnyMut;
-
 /// Represents an owned handle to a dynamically loaded library.
 #[repr(C)]
 pub struct NSTDUnixSharedLib {
     /// A raw handle to the shared library.
-    handle: NSTDUnixSharedLibHandle,
+    handle: NSTDAnyMut,
 }
 impl Drop for NSTDUnixSharedLib {
     /// [NSTDUnixSharedLib]'s destructor.
+    ///
+    /// # Panics
+    ///
+    /// Panics if unloading the library fails.
     #[inline]
     fn drop(&mut self) {
         // SAFETY: `self.handle` is never null.
-        unsafe { dlclose(self.handle) };
+        unsafe { assert!(dlclose(self.handle) == 0) };
     }
 }
 
@@ -46,6 +47,21 @@ pub unsafe extern "C" fn nstd_os_unix_shared_lib_load(
         return NSTDOptional::None;
     }
     NSTDOptional::Some(NSTDUnixSharedLib { handle })
+}
+
+/// Returns a raw handle to a dynamically loaded library.
+///
+/// # Parameters:
+///
+/// - `const NSTDUnixSharedLib *lib` - The shared library.
+///
+/// # Returns
+///
+/// `NSTDAnyMut handle` - A raw handle to the dynamically loaded library.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_os_unix_shared_lib_handle(lib: &NSTDUnixSharedLib) -> NSTDAnyMut {
+    lib.handle
 }
 
 /// Returns an immutable opaque pointer to a symbol in a loaded library.
@@ -101,6 +117,10 @@ pub unsafe extern "C" fn nstd_os_unix_shared_lib_get_mut(
 /// # Parameters:
 ///
 /// - `NSTDUnixSharedLib lib` - A handle to the loaded library to unload.
+///
+/// # Panics
+///
+/// Panics if unloading the library fails.
 ///
 /// # Safety
 ///

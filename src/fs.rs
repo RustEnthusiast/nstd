@@ -1,14 +1,10 @@
 //! Provides access to the file system.
 pub mod file;
 use crate::{
-    alloc::NSTDAllocError,
-    core::{
-        slice::{nstd_core_slice_new, NSTDSlice},
-        str::{nstd_core_str_from_bytes_unchecked, NSTDStr},
-    },
-    io::NSTDIOError,
-    string::{nstd_string_clear, nstd_string_push_str, NSTDString},
-    vec::{nstd_vec_extend, NSTDVec},
+    core::{result::NSTDResult, slice::NSTDSlice, str::NSTDStr},
+    io::{NSTDIOBufferResult, NSTDIOError, NSTDIOStringResult},
+    string::NSTDString,
+    vec::NSTDVec,
 };
 use std::fs::File;
 
@@ -168,83 +164,55 @@ pub unsafe extern "C" fn nstd_fs_remove_dirs(name: &NSTDStr) -> NSTDIOError {
     NSTDIOError::NSTD_IO_ERROR_NONE
 }
 
-/// Extends a vector with the contents of a file.
+/// Reads the contents of a file.
 ///
 /// # Parameters:
 ///
 /// - `const NSTDStr *path` - A path to the file to read.
 ///
-/// - `NSTDVec *buffer` - The buffer to extend.
-///
 /// # Returns
 ///
-/// `NSTDIOError errc` - The I/O operation error code.
+/// `NSTDIOBufferResult contents` - The file's contents, or the I/O operation error code on failure.
 ///
 /// # Panics
 ///
-/// This operation will panic in the following situations:
-///
-/// - `path`'s length in bytes exceeds `NSTDInt`'s max value.
-///
-/// - `buffer`'s length exceeds `NSTDInt`'s max value.
-///
-/// - `buffer`'s stride is not 1.
+/// This operation will panic if `path`'s length in bytes exceeds `NSTDInt`'s max value or
+/// allocating fails.
 ///
 /// # Safety
 ///
 /// This operation can cause undefined behavior if `path`'s data is invalid.
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_fs_read(path: &NSTDStr, buffer: &mut NSTDVec) -> NSTDIOError {
+pub unsafe extern "C" fn nstd_fs_read(path: &NSTDStr) -> NSTDIOBufferResult {
     match std::fs::read(path.as_str()) {
-        Ok(contents) => {
-            let contents = nstd_core_slice_new(contents.as_ptr().cast(), 1, contents.len());
-            match nstd_vec_extend(buffer, &contents) {
-                NSTDAllocError::NSTD_ALLOC_ERROR_NONE => NSTDIOError::NSTD_IO_ERROR_NONE,
-                _ => NSTDIOError::NSTD_IO_ERROR_OUT_OF_MEMORY,
-            }
-        }
-        Err(err) => NSTDIOError::from_err(err.kind()),
+        Ok(contents) => NSTDResult::Ok(NSTDVec::from_slice(&contents)),
+        Err(err) => NSTDResult::Err(NSTDIOError::from_err(err.kind())),
     }
 }
 
-/// Extends a string with the contents of a file.
+/// Reads the contents of a file into a UTF-8 string.
 ///
 /// # Parameters:
 ///
 /// - `const NSTDStr *path` - A path to the file to read.
 ///
-/// - `NSTDString *buffer` - The buffer to extend.
-///
 /// # Returns
 ///
-/// `NSTDIOError errc` - The I/O operation error code.
+/// `NSTDIOStringResult contents` - The file's contents, or the I/O operation error code on failure.
 ///
 /// # Panics
 ///
-/// This operation will panic in the following situations:
-///
-/// - `path`'s length in bytes exceeds `NSTDInt`'s max value.
-///
-/// - `buffer`'s length exceeds `NSTDInt`'s max value.
+/// This operation will panic if `path`'s length in bytes exceeds `NSTDInt`'s max value or
+/// allocating fails.
 ///
 /// # Safety
 ///
 /// This operation can cause undefined behavior if `path`'s data is invalid.
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_fs_read_to_string(
-    path: &NSTDStr,
-    buffer: &mut NSTDString,
-) -> NSTDIOError {
+pub unsafe extern "C" fn nstd_fs_read_to_string(path: &NSTDStr) -> NSTDIOStringResult {
     match std::fs::read_to_string(path.as_str()) {
-        Ok(contents) => {
-            let bytes = nstd_core_slice_new(contents.as_ptr().cast(), 1, contents.len());
-            let contents = nstd_core_str_from_bytes_unchecked(&bytes);
-            match nstd_string_push_str(buffer, &contents) {
-                NSTDAllocError::NSTD_ALLOC_ERROR_NONE => NSTDIOError::NSTD_IO_ERROR_NONE,
-                _ => NSTDIOError::NSTD_IO_ERROR_OUT_OF_MEMORY,
-            }
-        }
-        Err(err) => NSTDIOError::from_err(err.kind()),
+        Ok(contents) => NSTDResult::Ok(NSTDString::from_str(&contents)),
+        Err(err) => NSTDResult::Err(NSTDIOError::from_err(err.kind())),
     }
 }
 
@@ -346,45 +314,32 @@ pub unsafe extern "C" fn nstd_fs_copy(from: &NSTDStr, to: &NSTDStr) -> NSTDIOErr
     NSTDIOError::NSTD_IO_ERROR_NONE
 }
 
-/// Writes the absolute path of a file system item to `out_buf`. This will initially clear
-/// `out_buf`.
+/// Returns the absolute path of a file system item.
 ///
 /// # Parameters:
 ///
 /// - `const NSTDStr *path` - A relative path to the file system item.
 ///
-/// - `NSTDString *out_buf` - Returns as the absolute version of `path`.
-///
 /// # Returns
 ///
-/// `NSTDIOError errc` - The I/O operation error code.
+/// `NSTDIOStringResult contents` - The absolute version of `path`, or the I/O operation error code
+/// on failure.
 ///
 /// # Panics
 ///
-/// This operation will panic in the following situations:
-///
-/// - `path`'s length in bytes exceeds `NSTDInt`'s max value.
-///
-/// - `out_buf`'s length in bytes exceeds `NSTDInt`'s max value.
+/// This operation will panic if `path`'s length in bytes exceeds `NSTDInt`'s max value or
+/// allocating fails.
 ///
 /// # Safety
 ///
 /// This operation can cause undefined behavior if `path`'s data is invalid.
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_fs_absolute(path: &NSTDStr, out_buf: &mut NSTDString) -> NSTDIOError {
+pub unsafe extern "C" fn nstd_fs_absolute(path: &NSTDStr) -> NSTDIOStringResult {
     match std::fs::canonicalize(path.as_str()) {
         Ok(path) => match path.into_os_string().into_string() {
-            Ok(path) => {
-                nstd_string_clear(out_buf);
-                let bytes = nstd_core_slice_new(path.as_ptr().cast(), 1, path.len());
-                let path = nstd_core_str_from_bytes_unchecked(&bytes);
-                match nstd_string_push_str(out_buf, &path) {
-                    NSTDAllocError::NSTD_ALLOC_ERROR_NONE => NSTDIOError::NSTD_IO_ERROR_NONE,
-                    _ => NSTDIOError::NSTD_IO_ERROR_OUT_OF_MEMORY,
-                }
-            }
-            _ => NSTDIOError::NSTD_IO_ERROR_INVALID_DATA,
+            Ok(path) => NSTDResult::Ok(NSTDString::from_str(&path)),
+            _ => NSTDResult::Err(NSTDIOError::NSTD_IO_ERROR_INVALID_DATA),
         },
-        Err(err) => NSTDIOError::from_err(err.kind()),
+        Err(err) => NSTDResult::Err(NSTDIOError::from_err(err.kind())),
     }
 }

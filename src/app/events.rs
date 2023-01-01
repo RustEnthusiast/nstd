@@ -1,7 +1,8 @@
 //! Contains callback based events through function pointers.
 use crate::{
-    app::data::NSTDAppData, core::str::NSTDStr, NSTDBool, NSTDFloat32, NSTDFloat64, NSTDInt32,
-    NSTDUInt16, NSTDUInt32, NSTDUnichar,
+    app::data::NSTDAppData,
+    core::{str::NSTDStr, unichar::NSTDUnichar},
+    NSTDBool, NSTDFloat32, NSTDFloat64, NSTDInt32, NSTDUInt16, NSTDUInt32,
 };
 use gilrs::{Axis, Button, GamepadId};
 use winit::{

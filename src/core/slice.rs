@@ -28,6 +28,16 @@ pub struct NSTDSlice {
     len: NSTDUInt,
 }
 impl NSTDSlice {
+    /// Creates a new [NSTDSlice] from a Rust slice.
+    #[inline]
+    #[allow(dead_code)]
+    pub(crate) fn from_slice<T>(s: &[T]) -> Self {
+        Self {
+            ptr: nstd_core_ptr_new(s.as_ptr() as _, core::mem::size_of::<T>()),
+            len: s.len(),
+        }
+    }
+
     /// Returns the number of bytes that this slice covers.
     #[inline]
     pub(crate) fn byte_len(&self) -> usize {

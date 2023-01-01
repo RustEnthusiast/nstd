@@ -3,13 +3,10 @@
 #include "../../core/optional.h"
 #include "../../nstd.h"
 
-/// A raw handle to a dynamically loaded library.
-typedef NSTDAnyMut NSTDUnixSharedLibHandle;
-
 /// Represents an owned handle to a dynamically loaded library.
 typedef struct {
     /// A raw handle to the shared library.
-    NSTDUnixSharedLibHandle handle;
+    NSTDAnyMut handle;
 } NSTDUnixSharedLib;
 
 /// Represents an optional `NSTDUnixSharedLib`.
@@ -29,6 +26,17 @@ NSTDOptional(NSTDUnixSharedLib) NSTDUnixOptionalSharedLib;
 ///
 /// See <https://man7.org/linux/man-pages/man3/dlopen.3.html>.
 NSTDAPI NSTDUnixOptionalSharedLib nstd_os_unix_shared_lib_load(const NSTDChar *path);
+
+/// Returns a raw handle to a dynamically loaded library.
+///
+/// # Parameters:
+///
+/// - `const NSTDUnixSharedLib *lib` - The shared library.
+///
+/// # Returns
+///
+/// `NSTDAnyMut handle` - A raw handle to the dynamically loaded library.
+NSTDAPI NSTDAnyMut nstd_os_unix_shared_lib_handle(const NSTDUnixSharedLib *lib);
 
 /// Returns an immutable opaque pointer to a symbol in a loaded library.
 ///
@@ -69,6 +77,10 @@ NSTDAPI NSTDAnyMut nstd_os_unix_shared_lib_get_mut(NSTDUnixSharedLib *lib, const
 /// # Parameters:
 ///
 /// - `NSTDUnixSharedLib lib` - A handle to the loaded library to unload.
+///
+/// # Panics
+///
+/// Panics if unloading the library fails.
 ///
 /// # Safety
 ///

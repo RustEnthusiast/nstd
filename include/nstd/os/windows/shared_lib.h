@@ -2,14 +2,12 @@
 #define NSTD_OS_WINDOWS_SHARED_LIB_H
 #include "../../core/optional.h"
 #include "../../nstd.h"
-
-/// A raw handle to a dynamically loaded library.
-typedef NSTDInt NSTDWindowsSharedLibHandle;
+#include "windows.h"
 
 /// A handle to a loaded library.
 typedef struct {
     /// A raw handle to the module.
-    NSTDWindowsSharedLibHandle handle;
+    NSTDWindowsHandle handle;
 } NSTDWindowsSharedLib;
 
 /// An optional (possibly null) shared Windows library handle.
@@ -19,7 +17,7 @@ NSTDOptional(NSTDWindowsSharedLib) NSTDWindowsOptionalSharedLib;
 ///
 /// # Parameters:
 ///
-/// - `const NSTDChar *name` - The name of the module to load.
+/// - `const NSTDChar16 *name` - The name of the module to load.
 ///
 /// # Returns
 ///
@@ -28,8 +26,8 @@ NSTDOptional(NSTDWindowsSharedLib) NSTDWindowsOptionalSharedLib;
 /// # Safety
 ///
 /// See
-/// <https://docs.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-loadlibrarya>.
-NSTDAPI NSTDWindowsOptionalSharedLib nstd_os_windows_shared_lib_load(const NSTDChar *name);
+/// <https://docs.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-loadlibraryw>.
+NSTDAPI NSTDWindowsOptionalSharedLib nstd_os_windows_shared_lib_load(const NSTDChar16 *name);
 
 /// Returns a raw handle to a dynamically loaded library.
 ///
@@ -39,9 +37,8 @@ NSTDAPI NSTDWindowsOptionalSharedLib nstd_os_windows_shared_lib_load(const NSTDC
 ///
 /// # Returns
 ///
-/// `NSTDWindowsSharedLibHandle handle` - A native handle to the dynamically loaded library.
-NSTDAPI NSTDWindowsSharedLibHandle nstd_os_windows_shared_lib_handle(
-const NSTDWindowsSharedLib *lib);
+/// `NSTDWindowsHandle handle` - A native handle to the dynamically loaded library.
+NSTDAPI NSTDWindowsHandle nstd_os_windows_shared_lib_handle(const NSTDWindowsSharedLib *lib);
 
 /// Gets a pointer to a function or static variable in a dynamically loaded library by symbol name.
 ///
@@ -85,6 +82,10 @@ const NSTDChar *symbol);
 /// # Parameters:
 ///
 /// - `NSTDWindowsSharedLib lib` - The library handle.
+///
+/// # Panics
+///
+/// Panics if unloading the library fails.
 ///
 /// # Safety
 ///

@@ -2,6 +2,7 @@
 #define NSTD_VEC_H
 #include "alloc.h"
 #include "core/def.h"
+#include "core/optional.h"
 #include "core/slice.h"
 #include "nstd.h"
 
@@ -16,6 +17,9 @@ typedef struct {
     /// The number of values allocated in the memory buffer.
     NSTDUInt cap;
 } NSTDVec;
+
+/// Represents an optional value of type `NSTDVec`.
+NSTDOptional(NSTDVec) NSTDOptionalVec;
 
 /// Creates a new vector without allocating any resources.
 ///
@@ -122,6 +126,17 @@ NSTDAPI NSTDUInt nstd_vec_cap(const NSTDVec *vec);
 /// `NSTDUInt stride` - The size of each value in the vector.
 NSTDAPI NSTDUInt nstd_vec_stride(const NSTDVec *vec);
 
+/// Returns the number of reserved elements within a vector's inactive buffer.
+///
+/// # Parameters:
+///
+/// - `const NSTDVec *vec` - The vector.
+///
+/// # Returns
+///
+/// `NSTDUInt reserved` - The number of uninitialized elements within `vec`'s inactive buffer.
+NSTDAPI NSTDUInt nstd_vec_reserved(const NSTDVec *vec);
+
 /// Returns an immutable slice containing all of a vector's active elements.
 ///
 /// # Parameters:
@@ -164,7 +179,43 @@ NSTDAPI NSTDAny nstd_vec_as_ptr(const NSTDVec *vec);
 /// # Returns
 ///
 /// `NSTDAnyMut ptr` - A pointer to the vector's raw data.
-NSTDAPI NSTDAnyMut nstd_vec_as_mut_ptr(NSTDVec *vec);
+NSTDAPI NSTDAnyMut nstd_vec_as_ptr_mut(NSTDVec *vec);
+
+/// Returns a pointer to the end of a vector.
+///
+/// Note that this does not return a pointer to the last element or the last byte in the vector, but
+/// a pointer to *one byte past* the end of the vector's active buffer.
+///
+/// # Parameters:
+///
+/// - `const NSTDVec *vec` - The vector.
+///
+/// # Returns
+///
+/// `NSTDAny end` - A pointer to the end of the vector or null if the vector has yet to allocate.
+///
+/// # Panics
+///
+/// Panics if the total length of the vector's buffer exceeds `isize::MAX` bytes.
+NSTDAPI NSTDAny nstd_vec_end(const NSTDVec *vec);
+
+/// Returns a mutable pointer to the end of a vector.
+///
+/// Note that this does not return a pointer to the last element or the last byte in the vector, but
+/// a pointer to *one byte past* the end of the vector's active buffer.
+///
+/// # Parameters:
+///
+/// - `NSTDVec *vec` - The vector.
+///
+/// # Returns
+///
+/// `NSTDAnyMut end` - A pointer to the end of the vector or null if the vector has yet to allocate.
+///
+/// # Panics
+///
+/// Panics if the total length of the vector's buffer exceeds `isize::MAX` bytes.
+NSTDAPI NSTDAnyMut nstd_vec_end_mut(NSTDVec *vec);
 
 /// Returns an immutable pointer to the element at index `pos` in `vec`.
 ///
@@ -340,6 +391,24 @@ NSTDAPI NSTDAllocError nstd_vec_extend(NSTDVec *vec, const NSTDSlice *values);
 ///
 /// - `NSTDUInt len` - The number of elements to keep.
 NSTDAPI void nstd_vec_truncate(NSTDVec *vec, NSTDUInt len);
+
+/// Sets a vectors length.
+///
+/// # Parameters:
+///
+/// - `NSTDVec *vec` - The vector.
+///
+/// - `NSTDUInt len` - The new length for the vector.
+///
+/// # Returns
+///
+/// `NSTDErrorCode errc` - Nonzero if `len` is greater than `cap`.
+///
+/// # Safety
+///
+/// If `len` is greater than the vector's current length, care must be taken to ensure that the new
+/// elements are properly initialized.
+NSTDAPI NSTDErrorCode nstd_vec_set_len(NSTDVec *vec, NSTDUInt len);
 
 /// Reserves some space on the heap for at least `size` more elements to be pushed onto a vector
 /// without making more allocations.

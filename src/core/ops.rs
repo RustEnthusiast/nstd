@@ -5,8 +5,8 @@
 //!
 //! Also see [this](https://github.com/RustEnthusiast/nstd/issues/22) issue for more information.
 use crate::{
-    NSTDFloat32, NSTDFloat64, NSTDInt, NSTDInt16, NSTDInt32, NSTDInt64, NSTDInt8, NSTDUInt,
-    NSTDUInt16, NSTDUInt32, NSTDUInt64, NSTDUInt8,
+    NSTDInt, NSTDInt16, NSTDInt32, NSTDInt64, NSTDInt8, NSTDUInt, NSTDUInt16, NSTDUInt32,
+    NSTDUInt64, NSTDUInt8,
 };
 
 /// Generates the increment (++) operator implementations.
@@ -17,30 +17,29 @@ macro_rules! gen_inc {
         /// # Parameters:
         ///
         #[doc = concat!(" - `", stringify!($T), " x` - The value to increment.")]
+        ///
+        /// # Panics
+        ///
+        /// This will panic if the increment operation results in an overflow.
+        ///
+        /// # Example
+        ///
+        /// ```
+        #[doc = concat!("use nstd_sys::core::ops::", stringify!($name), ";")]
+        ///
+        /// let mut x = 5;
+        #[doc = concat!(stringify!($name), "(&mut x);")]
+        /// assert!(x == 6);
+        /// ```
         #[inline]
         #[cfg_attr(feature = "clib", no_mangle)]
         pub extern "C" fn $name(x: $T) {
-            *x += 1;
+            *x = x
+                .checked_add(1)
+                .expect("attempt to increment with overflow");
         }
     };
 }
-/// Generates the increment (++) operator implementations for floating point numbers.
-macro_rules! gen_inc_f {
-    ($name: ident, $T: ty) => {
-        /// Increments `x` by 1.
-        ///
-        /// # Parameters:
-        ///
-        #[doc = concat!(" - `", stringify!($T), " x` - The value to increment.")]
-        #[inline]
-        #[cfg_attr(feature = "clib", no_mangle)]
-        pub extern "C" fn $name(x: $T) {
-            *x += 1.0;
-        }
-    };
-}
-gen_inc_f!(nstd_core_ops_inc_f32, &mut NSTDFloat32);
-gen_inc_f!(nstd_core_ops_inc_f64, &mut NSTDFloat64);
 gen_inc!(nstd_core_ops_inc_int, &mut NSTDInt);
 gen_inc!(nstd_core_ops_inc_uint, &mut NSTDUInt);
 gen_inc!(nstd_core_ops_inc_i8, &mut NSTDInt8);
@@ -60,30 +59,29 @@ macro_rules! gen_dec {
         /// # Parameters:
         ///
         #[doc = concat!(" - `", stringify!($T), " x` - The value to decrement.")]
+        ///
+        /// # Panics
+        ///
+        /// This will panic if the decrement operation results in an overflow.
+        ///
+        /// # Example
+        ///
+        /// ```
+        #[doc = concat!("use nstd_sys::core::ops::", stringify!($name), ";")]
+        ///
+        /// let mut x = 5;
+        #[doc = concat!(stringify!($name), "(&mut x);")]
+        /// assert!(x == 4);
+        /// ```
         #[inline]
         #[cfg_attr(feature = "clib", no_mangle)]
         pub extern "C" fn $name(x: $T) {
-            *x -= 1;
+            *x = x
+                .checked_sub(1)
+                .expect("attempt to decrement with overflow");
         }
     };
 }
-/// Generates the decrement (--) operator implementations for floating point numbers.
-macro_rules! gen_dec_f {
-    ($name: ident, $T: ty) => {
-        /// Decrements `x` by 1.
-        ///
-        /// # Parameters:
-        ///
-        #[doc = concat!(" - `", stringify!($T), " x` - The value to decrement.")]
-        #[inline]
-        #[cfg_attr(feature = "clib", no_mangle)]
-        pub extern "C" fn $name(x: $T) {
-            *x -= 1.0;
-        }
-    };
-}
-gen_dec_f!(nstd_core_ops_dec_f32, &mut NSTDFloat32);
-gen_dec_f!(nstd_core_ops_dec_f64, &mut NSTDFloat64);
 gen_dec!(nstd_core_ops_dec_int, &mut NSTDInt);
 gen_dec!(nstd_core_ops_dec_uint, &mut NSTDUInt);
 gen_dec!(nstd_core_ops_dec_i8, &mut NSTDInt8);
@@ -108,15 +106,25 @@ macro_rules! gen_neg {
         /// # Returns
         ///
         #[doc = concat!(" `", stringify!($T), " v` - The negative value of `x`.")]
+        ///
+        /// # Panics
+        ///
+        /// This will panic if the negate operation results in an overflow.
+        ///
+        /// # Example
+        ///
+        /// ```
+        #[doc = concat!("use nstd_sys::core::ops::", stringify!($name), ";")]
+        ///
+        #[doc = concat!("assert!(", stringify!($name), "(69) == -69);")]
+        /// ```
         #[inline]
         #[cfg_attr(feature = "clib", no_mangle)]
         pub extern "C" fn $name(x: $T) -> $T {
-            -x
+            x.checked_neg().expect("attempt to negate with overflow")
         }
     };
 }
-gen_neg!(nstd_core_ops_neg_f32, NSTDFloat32);
-gen_neg!(nstd_core_ops_neg_f64, NSTDFloat64);
 gen_neg!(nstd_core_ops_neg_int, NSTDInt);
 gen_neg!(nstd_core_ops_neg_i8, NSTDInt8);
 gen_neg!(nstd_core_ops_neg_i16, NSTDInt16);
@@ -137,15 +145,25 @@ macro_rules! gen_add {
         /// # Returns
         ///
         #[doc = concat!(" `", stringify!($T), " z` - The result of the operation.")]
+        ///
+        /// # Panics
+        ///
+        /// This will panic if the addition operation results in an overflow.
+        ///
+        /// # Example
+        ///
+        /// ```
+        #[doc = concat!("use nstd_sys::core::ops::", stringify!($name), ";")]
+        ///
+        #[doc = concat!("assert!(", stringify!($name), "(4, 5) == 9);")]
+        /// ```
         #[inline]
         #[cfg_attr(feature = "clib", no_mangle)]
         pub extern "C" fn $name(x: $T, y: $T) -> $T {
-            x + y
+            x.checked_add(y).expect("attempt to add with overflow")
         }
     };
 }
-gen_add!(nstd_core_ops_add_f32, NSTDFloat32);
-gen_add!(nstd_core_ops_add_f64, NSTDFloat64);
 gen_add!(nstd_core_ops_add_int, NSTDInt);
 gen_add!(nstd_core_ops_add_uint, NSTDUInt);
 gen_add!(nstd_core_ops_add_i8, NSTDInt8);
@@ -171,15 +189,25 @@ macro_rules! gen_sub {
         /// # Returns
         ///
         #[doc = concat!(" `", stringify!($T), " z` - The result of the operation.")]
+        ///
+        /// # Panics
+        ///
+        /// This will panic if the subtraction operation results in an overflow.
+        ///
+        /// # Example
+        ///
+        /// ```
+        #[doc = concat!("use nstd_sys::core::ops::", stringify!($name), ";")]
+        ///
+        #[doc = concat!("assert!(", stringify!($name), "(9, 5) == 4);")]
+        /// ```
         #[inline]
         #[cfg_attr(feature = "clib", no_mangle)]
         pub extern "C" fn $name(x: $T, y: $T) -> $T {
-            x - y
+            x.checked_sub(y).expect("attempt to subtract with overflow")
         }
     };
 }
-gen_sub!(nstd_core_ops_sub_f32, NSTDFloat32);
-gen_sub!(nstd_core_ops_sub_f64, NSTDFloat64);
 gen_sub!(nstd_core_ops_sub_int, NSTDInt);
 gen_sub!(nstd_core_ops_sub_uint, NSTDUInt);
 gen_sub!(nstd_core_ops_sub_i8, NSTDInt8);
@@ -205,15 +233,25 @@ macro_rules! gen_mul {
         /// # Returns
         ///
         #[doc = concat!(" `", stringify!($T), " z` - The result of the operation.")]
+        ///
+        /// # Panics
+        ///
+        /// This will panic if the multiplication operation results in an overflow.
+        ///
+        /// # Example
+        ///
+        /// ```
+        #[doc = concat!("use nstd_sys::core::ops::", stringify!($name), ";")]
+        ///
+        #[doc = concat!("assert!(", stringify!($name), "(3, 4) == 12);")]
+        /// ```
         #[inline]
         #[cfg_attr(feature = "clib", no_mangle)]
         pub extern "C" fn $name(x: $T, y: $T) -> $T {
-            x * y
+            x.checked_mul(y).expect("attempt to multiply with overflow")
         }
     };
 }
-gen_mul!(nstd_core_ops_mul_f32, NSTDFloat32);
-gen_mul!(nstd_core_ops_mul_f64, NSTDFloat64);
 gen_mul!(nstd_core_ops_mul_int, NSTDInt);
 gen_mul!(nstd_core_ops_mul_uint, NSTDUInt);
 gen_mul!(nstd_core_ops_mul_i8, NSTDInt8);
@@ -239,15 +277,28 @@ macro_rules! gen_div {
         /// # Returns
         ///
         #[doc = concat!(" `", stringify!($T), " z` - The result of the operation.")]
+        ///
+        /// # Panics
+        ///
+        /// This will panic if `y` is 0 or the division operation results in an overflow.
+        ///
+        /// # Example
+        ///
+        /// ```
+        #[doc = concat!("use nstd_sys::core::ops::", stringify!($name), ";")]
+        ///
+        #[doc = concat!("assert!(", stringify!($name), "(15, 3) == 5);")]
+        /// ```
         #[inline]
         #[cfg_attr(feature = "clib", no_mangle)]
         pub extern "C" fn $name(x: $T, y: $T) -> $T {
-            x / y
+            if y == 0 {
+                panic!("attempt to divide by zero");
+            }
+            x.checked_div(y).expect("attempt to divide with overflow")
         }
     };
 }
-gen_div!(nstd_core_ops_div_f32, NSTDFloat32);
-gen_div!(nstd_core_ops_div_f64, NSTDFloat64);
 gen_div!(nstd_core_ops_div_int, NSTDInt);
 gen_div!(nstd_core_ops_div_uint, NSTDUInt);
 gen_div!(nstd_core_ops_div_i8, NSTDInt8);
@@ -273,15 +324,29 @@ macro_rules! gen_rem {
         /// # Returns
         ///
         #[doc = concat!(" `", stringify!($T), " z` - The result of the operation.")]
+        ///
+        /// # Panics
+        ///
+        /// This will panic if `y` is 0 or the remainder operation results in an overflow.
+        ///
+        /// # Example
+        ///
+        /// ```
+        #[doc = concat!("use nstd_sys::core::ops::", stringify!($name), ";")]
+        ///
+        #[doc = concat!("assert!(", stringify!($name), "(23, 5) == 3);")]
+        /// ```
         #[inline]
         #[cfg_attr(feature = "clib", no_mangle)]
         pub extern "C" fn $name(x: $T, y: $T) -> $T {
-            x % y
+            if y == 0 {
+                panic!("attempt to calculate the remainder with a divisor of zero");
+            }
+            x.checked_rem(y)
+                .expect("attempt to calculate the remainder with overflow")
         }
     };
 }
-gen_rem!(nstd_core_ops_rem_f32, NSTDFloat32);
-gen_rem!(nstd_core_ops_rem_f64, NSTDFloat64);
 gen_rem!(nstd_core_ops_rem_int, NSTDInt);
 gen_rem!(nstd_core_ops_rem_uint, NSTDUInt);
 gen_rem!(nstd_core_ops_rem_i8, NSTDInt8);
@@ -302,15 +367,28 @@ macro_rules! gen_shl {
         ///
         #[doc = concat!(" - `", stringify!($T), " x` - The value to shift.")]
         ///
-        #[doc = concat!(" - `", stringify!($T), " y` - The number of bits to shift.")]
+        /// - `NSTDUInt32 y` - The number of bits to shift.
         ///
         /// # Returns
         ///
         #[doc = concat!(" `", stringify!($T), " z` - The result of the operation.")]
+        ///
+        /// # Panics
+        ///
+        /// This will panic if the left shift operation results in an overflow.
+        ///
+        /// # Example
+        ///
+        /// ```
+        #[doc = concat!("use nstd_sys::core::ops::", stringify!($name), ";")]
+        ///
+        #[doc = concat!("assert!(", stringify!($name), "(1, 4) == 16);")]
+        /// ```
         #[inline]
         #[cfg_attr(feature = "clib", no_mangle)]
-        pub extern "C" fn $name(x: $T, y: $T) -> $T {
-            x << y
+        pub extern "C" fn $name(x: $T, y: NSTDUInt32) -> $T {
+            x.checked_shl(y)
+                .expect("attempt to shift left with overflow")
         }
     };
 }
@@ -334,15 +412,28 @@ macro_rules! gen_shr {
         ///
         #[doc = concat!(" - `", stringify!($T), " x` - The value to shift.")]
         ///
-        #[doc = concat!(" - `", stringify!($T), " y` - The number of bits to shift.")]
+        /// - `NSTDUInt32 y` - The number of bits to shift.
         ///
         /// # Returns
         ///
         #[doc = concat!(" `", stringify!($T), " z` - The result of the operation.")]
+        ///
+        /// # Panics
+        ///
+        /// This will panic if the right shift operation results in an overflow.
+        ///
+        /// # Example
+        ///
+        /// ```
+        #[doc = concat!("use nstd_sys::core::ops::", stringify!($name), ";")]
+        ///
+        #[doc = concat!("assert!(", stringify!($name), "(16, 4) == 1);")]
+        /// ```
         #[inline]
         #[cfg_attr(feature = "clib", no_mangle)]
-        pub extern "C" fn $name(x: $T, y: $T) -> $T {
-            x >> y
+        pub extern "C" fn $name(x: $T, y: NSTDUInt32) -> $T {
+            x.checked_shr(y)
+                .expect("attempt to shift right with overflow")
         }
     };
 }

@@ -55,7 +55,9 @@ pub unsafe extern "C" fn nstd_io_stdin_read(
     buffer: &mut NSTDSliceMut,
     read: &mut NSTDUInt,
 ) -> NSTDIOError {
-    crate::io::stdio::read(handle, buffer, read)
+    let (err, r) = crate::io::stdio::read(handle, buffer);
+    *read = r;
+    err
 }
 
 /// Continuously reads data from stdin into a buffer until EOF is reached.
@@ -83,7 +85,9 @@ pub extern "C" fn nstd_io_stdin_read_all(
     buffer: &mut NSTDVec,
     read: &mut NSTDUInt,
 ) -> NSTDIOError {
-    crate::io::stdio::read_all(handle, buffer, read)
+    let (err, r) = crate::io::stdio::read_all(handle, buffer);
+    *read = r;
+    err
 }
 
 /// Continuously reads UTF-8 data from stdin into a string buffer until EOF is reached.
@@ -115,7 +119,9 @@ pub extern "C" fn nstd_io_stdin_read_to_string(
     buffer: &mut NSTDString,
     read: &mut NSTDUInt,
 ) -> NSTDIOError {
-    crate::io::stdio::read_to_string(handle, buffer, read)
+    let (err, r) = crate::io::stdio::read_to_string(handle, buffer);
+    *read = r;
+    err
 }
 
 /// Reads enough data from stdin to fill the entirety of `buffer`.

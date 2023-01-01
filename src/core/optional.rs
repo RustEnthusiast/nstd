@@ -2,7 +2,7 @@
 use crate::{
     NSTDBool, NSTDChar, NSTDChar16, NSTDChar32, NSTDChar8, NSTDFloat32, NSTDFloat64, NSTDInt,
     NSTDInt16, NSTDInt32, NSTDInt64, NSTDInt8, NSTDUInt, NSTDUInt16, NSTDUInt32, NSTDUInt64,
-    NSTDUInt8, NSTDUnichar,
+    NSTDUInt8,
 };
 
 /// Describes an `NSTDOptional` variant.
@@ -24,6 +24,23 @@ pub enum NSTDOptional<T> {
     None,
     /// The initialized variant.
     Some(T),
+}
+impl<T> NSTDOptional<T> {
+    /// Attempts to return the contained `Some` value in an `NSTDOptional`.
+    ///
+    /// This operation is only useful for testing code, it's use in production should be
+    /// discouraged.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `self` is a `None` value.
+    #[inline]
+    pub fn unwrap(self) -> T {
+        match self {
+            Self::Some(value) => value,
+            _ => panic!("called `NSTDOptional::unwrap()` on a `None` value"),
+        }
+    }
 }
 
 /// Generates optional data structures.
@@ -52,7 +69,6 @@ gen_optional!(NSTDOptionalChar, NSTDChar);
 gen_optional!(NSTDOptionalChar8, NSTDChar8);
 gen_optional!(NSTDOptionalChar16, NSTDChar16);
 gen_optional!(NSTDOptionalChar32, NSTDChar32);
-gen_optional!(NSTDOptionalUnichar, NSTDUnichar);
 gen_optional!(NSTDOptionalFloat32, NSTDFloat32);
 gen_optional!(NSTDOptionalFloat64, NSTDFloat64);
 gen_optional!(NSTDOptionalInt, NSTDInt);

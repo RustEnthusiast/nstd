@@ -95,7 +95,9 @@ pub unsafe extern "C" fn nstd_fs_file_write(
     bytes: &NSTDSlice,
     written: &mut NSTDUInt,
 ) -> NSTDIOError {
-    crate::io::stdio::write(file, bytes, written)
+    let (err, w) = crate::io::stdio::write(file, bytes);
+    *written = w;
+    err
 }
 
 /// Writes a whole buffer to a file.
@@ -161,7 +163,9 @@ pub unsafe extern "C" fn nstd_fs_file_read(
     buffer: &mut NSTDSliceMut,
     read: &mut NSTDUInt,
 ) -> NSTDIOError {
-    crate::io::stdio::read(file, buffer, read)
+    let (err, r) = crate::io::stdio::read(file, buffer);
+    *read = r;
+    err
 }
 
 /// Continuously reads data from `file` into a buffer until EOF is reached.
@@ -189,7 +193,9 @@ pub extern "C" fn nstd_fs_file_read_all(
     buffer: &mut NSTDVec,
     read: &mut NSTDUInt,
 ) -> NSTDIOError {
-    crate::io::stdio::read_all(file, buffer, read)
+    let (err, r) = crate::io::stdio::read_all(file, buffer);
+    *read = r;
+    err
 }
 
 /// Continuously reads UTF-8 data from `file` into a string buffer until EOF is reached.
@@ -221,7 +227,9 @@ pub extern "C" fn nstd_fs_file_read_to_string(
     buffer: &mut NSTDString,
     read: &mut NSTDUInt,
 ) -> NSTDIOError {
-    crate::io::stdio::read_to_string(file, buffer, read)
+    let (err, r) = crate::io::stdio::read_to_string(file, buffer);
+    *read = r;
+    err
 }
 
 /// Reads enough data from `file` to fill the entirety of `buffer`.

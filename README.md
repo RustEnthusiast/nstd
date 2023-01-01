@@ -8,8 +8,7 @@ Rust syntax).
 # Example using C
 ```c
 // Build nstd with `cargo build --features "clib nstd_core nstd_io"`.
-#include <nstd/core/str.h>
-#include <nstd/io/io.h>
+#include <nstd.h>
 
 /// Main entry point of the program.
 int main()
@@ -44,7 +43,9 @@ int main()
         - `result` - Defines a "result" type with success and error variants.
         - `slice` - A view into a sequence of values in memory.
         - `str` - An unowned view into a UTF-8 encoded byte string.
+        - `unichar` - A Unicode scalar value.
     - `cstring` - A dynamically sized, null terminated, C string.
+    - `env` - Process environment management.
     - `fs` - Provides access to the file system.
         - `file` - A handle to an opened file.
     - `heap_ptr` - A pointer type for single value heap allocation.
@@ -61,6 +62,7 @@ int main()
             - `alloc` - Low level memory allocation for Windows.
                 - `heap` - Process heap management for Windows.
             - `shared_lib` - Shared library/module access for Windows.
+            - `str` - String slice extensions for Windows.
     - `proc` - Calling/Child process management.
     - `shared_lib` - Access symbols from loaded shared libraries.
     - `shared_ptr` - A reference counting smart pointer.
@@ -96,9 +98,9 @@ or return valid references.
 
 - Reference data is assumed to remain unaltered by other code/threads.
 
-- When a mutable reference is in use, the underlying data must not be accessed by other code.
-
 - Private (non-`pub`) structure members must not be directly accessed by the user.
+
+- Data is *moved* when using the value-copy semantic on a type that does not implement `Copy`.
 
 - The panic behavior is set to abort by default, as it is undefined behavior to unwind from Rust
 code into foreign code (though this is
@@ -140,3 +142,15 @@ To build with all features:
 ```sh
 cargo build --release --all-features
 ```
+
+# Releases
+`nstd` versions follow the Semantic Versioning rules. Each release is given a major, minor, and
+patch number that makes up that version of the library (major.minor.patch).
+
+There have not yet been any major releases for the framework as it is not yet stable.
+
+A new minor version is released every 6 weeks, exactly 1 week after a new minor Rust release.
+
+Patch releases are released every so often with minor fixes and additions.
+
+See [semver.org](https://semver.org/) to learn more about Semantic Versioning.

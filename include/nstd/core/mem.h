@@ -33,10 +33,6 @@ NSTDAPI NSTDBool nstd_core_mem_compare(const NSTDByte *buf1, const NSTDByte *buf
 /// Iterates through each byte in a raw memory buffer until `delim` is reached, returning a pointer
 /// to the delimiter byte if it is found.
 ///
-/// # Note
-///
-/// This will always return null if `size` is greater than `NSTDInt`'s max value.
-///
 /// # Parameters:
 ///
 /// - `const NSTDByte *buf` - The memory buffer to search.
@@ -48,6 +44,10 @@ NSTDAPI NSTDBool nstd_core_mem_compare(const NSTDByte *buf1, const NSTDByte *buf
 /// # Returns
 ///
 /// `const NSTDByte *delim_ptr` - A pointer to the delimiter byte, or null if it was not found.
+///
+/// # Panics
+///
+/// This operation may panic if `size` is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -69,8 +69,7 @@ NSTDAPI const NSTDByte *nstd_core_mem_search(const NSTDByte *buf, NSTDUInt size,
 ///
 /// # Safety
 ///
-/// This operation can cause undefined behavior if the caller does not ensure that the memory
-/// buffer is at least `size` bytes in size.
+/// The caller must ensure that `buf` is valid for reads of `size` contiguous bytes.
 NSTDAPI void nstd_core_mem_zero(NSTDByte *buf, NSTDUInt size);
 
 /// Fills the memory buffer `buf` with byte `fill`.
