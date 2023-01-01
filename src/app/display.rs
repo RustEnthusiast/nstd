@@ -1,5 +1,9 @@
 //! Provides access to physical displays.
-use crate::{NSTDFloat64, NSTDInt32, NSTDUInt16, NSTDUInt32};
+use crate::{
+    core::optional::NSTDOptional,
+    string::{NSTDOptionalString, NSTDString},
+    NSTDFloat64, NSTDInt32, NSTDUInt16, NSTDUInt32,
+};
 use winit::monitor::{MonitorHandle, VideoMode};
 
 /// Represents a monitor/display.
@@ -62,6 +66,24 @@ pub extern "C" fn nstd_app_display_new(handle: NSTDDisplayHandle) -> NSTDDisplay
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_app_display_handle(display: &NSTDDisplay) -> NSTDDisplayHandle {
     display
+}
+
+/// Attempts to retrieve the name of a display.
+///
+/// # Parameters:
+///
+/// - `NSTDDisplayHandle display` - A handle to the display.
+///
+/// # Returns
+///
+/// `NSTDOptionalString name` - The name of the display if it could be obtained.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_app_display_name(display: NSTDDisplayHandle) -> NSTDOptionalString {
+    match display.name() {
+        Some(name) => NSTDOptional::Some(NSTDString::from_str(&name)),
+        _ => NSTDOptional::None,
+    }
 }
 
 /// Returns the size of a display.

@@ -1,6 +1,7 @@
 #ifndef NSTD_APP_DISPLAY_H
 #define NSTD_APP_DISPLAY_H
 #include "../nstd.h"
+#include "../string.h"
 
 /// Represents a monitor/display.
 typedef NSTDAnyMut NSTDDisplay;
@@ -51,6 +52,17 @@ NSTDAPI NSTDDisplay nstd_app_display_new(NSTDDisplayHandle handle);
 ///
 /// `NSTDDisplayHandle handle` - A borrowed handle to the display.
 NSTDAPI NSTDDisplayHandle nstd_app_display_handle(const NSTDDisplay *display);
+
+/// Attempts to retrieve the name of a display.
+///
+/// # Parameters:
+///
+/// - `NSTDDisplayHandle display` - A handle to the display.
+///
+/// # Returns
+///
+/// `NSTDOptionalString name` - The name of the display if it could be obtained.
+NSTDAPI NSTDOptionalString nstd_app_display_name(NSTDDisplayHandle display);
 
 /// Returns the size of a display.
 ///
