@@ -1,6 +1,7 @@
 #ifndef NSTD_APP_DISPLAY_H
 #define NSTD_APP_DISPLAY_H
 #include "../nstd.h"
+#include "../string.h"
 
 /// Represents a monitor/display.
 typedef NSTDAnyMut NSTDDisplay;
@@ -8,8 +9,11 @@ typedef NSTDAnyMut NSTDDisplay;
 /// A handle to a display.
 typedef NSTDAny NSTDDisplayHandle;
 
+/// An owned display mode handle.
+typedef NSTDAnyMut NSTDDisplayMode;
+
 /// Represents a display's video mode.
-typedef NSTDAny NSTDDisplayMode;
+typedef NSTDAny NSTDDisplayModeHandle;
 
 /// Represents the size of a display.
 typedef struct {
@@ -26,6 +30,39 @@ typedef struct {
     /// The position of the display on the y-axis.
     NSTDInt32 y;
 } NSTDDisplayPosition;
+
+/// Creates a new `NSTDDisplay` from it's handle.
+///
+/// # Parameters:
+///
+/// - `NSTDDisplayHandle handle` - A borrowed handle to a display.
+///
+/// # Returns
+///
+/// `NSTDDisplay display` - An owned handle to the display.
+NSTDAPI NSTDDisplay nstd_app_display_new(NSTDDisplayHandle handle);
+
+/// Immutably borrows an `NSTDDisplay`.
+///
+/// # Parameters:
+///
+/// - `const NSTDDisplay *display` - The display handle to borrow.
+///
+/// # Returns
+///
+/// `NSTDDisplayHandle handle` - A borrowed handle to the display.
+NSTDAPI NSTDDisplayHandle nstd_app_display_handle(const NSTDDisplay *display);
+
+/// Attempts to retrieve the name of a display.
+///
+/// # Parameters:
+///
+/// - `NSTDDisplayHandle display` - A handle to the display.
+///
+/// # Returns
+///
+/// `NSTDOptionalString name` - The name of the display if it could be obtained.
+NSTDAPI NSTDOptionalString nstd_app_display_name(NSTDDisplayHandle display);
 
 /// Returns the size of a display.
 ///
@@ -77,44 +114,67 @@ NSTDAPI NSTDFloat64 nstd_app_display_scale_factor(NSTDDisplayHandle display);
 ///
 /// - `NSTDDisplayHandle display` - A handle to the display.
 ///
-/// - `void (*callback)(NSTDDisplayMode)` - The callback function.
+/// - `void (*callback)(NSTDDisplayModeHandle)` - The callback function.
 ///
 /// # Safety
 ///
 /// The user of this function must guarantee that `callback` is a valid C function pointer.
-NSTDAPI void nstd_app_display_modes(NSTDDisplayHandle display, void (*callback)(NSTDDisplayMode));
+NSTDAPI void nstd_app_display_modes(NSTDDisplayHandle display,
+void (*callback)(NSTDDisplayModeHandle));
+
+/// Creates a new `NSTDDisplayMode` from it's handle.
+///
+/// # Parameters:
+///
+/// - `NSTDDisplayModeHandle handle` - A borrowed handle to a display mode.
+///
+/// # Returns
+///
+/// `NSTDDisplayMode mode` - An owned representation of the display mode.
+NSTDAPI NSTDDisplayMode nstd_app_display_mode_new(NSTDDisplayModeHandle handle);
+
+/// Immutably borrows an `NSTDDisplayMode`.
+///
+/// # Parameters:
+///
+/// - `const NSTDDisplayMode *mode` - The display mode to borrow.
+///
+/// # Returns
+///
+/// `NSTDDisplayModeHandle handle` - A borrowed handle to the display mode.
+NSTDAPI NSTDDisplayModeHandle nstd_app_display_mode_handle(const NSTDDisplayMode *mode);
 
 /// Returns the size of a display mode.
 ///
 /// # Parameters:
 ///
-/// - `NSTDDisplayMode mode` - The display mode.
+/// - `NSTDDisplayModeHandle mode` - The display mode.
 ///
 /// # Returns
 ///
 /// `NSTDDisplaySize size` - The display mode's size.
-NSTDAPI NSTDDisplaySize nstd_app_display_mode_size(NSTDDisplayMode mode);
+NSTDAPI NSTDDisplaySize nstd_app_display_mode_size(NSTDDisplayModeHandle mode);
 
 /// Returns the bit depth of a display mode.
 ///
 /// # Parameters:
 ///
-/// - `NSTDDisplayMode mode` - The display mode.
+/// - `NSTDDisplayModeHandle mode` - The display mode.
 ///
 /// # Returns
 ///
 /// `NSTDUInt16 bit_depth` - The display mode's bit depth.
-NSTDAPI NSTDUInt16 nstd_app_display_mode_bit_depth(NSTDDisplayMode mode);
+NSTDAPI NSTDUInt16 nstd_app_display_mode_bit_depth(NSTDDisplayModeHandle mode);
 
 /// Returns the refresh rate of a display mode in millihertz.
 ///
 /// # Parameters:
 ///
-/// - `NSTDDisplayMode mode` - The display mode.
+/// - `NSTDDisplayModeHandle mode` - The display mode.
 ///
 /// # Returns
 ///
 /// `NSTDUInt32 refresh_rate` - The display's refresh rate.
-NSTDAPI NSTDUInt32 nstd_app_display_mode_refresh_rate(NSTDDisplayMode mode);
+NSTDAPI NSTDUInt32 nstd_app_display_mode_refresh_rate(NSTDDisplayModeHandle mode);
 
 #endif

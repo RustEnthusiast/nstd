@@ -4,8 +4,6 @@
 #include "../core/str.h"
 #include "../io/io.h"
 #include "../nstd.h"
-#include "../string.h"
-#include "../vec.h"
 
 /// Creates a new file on the file system.
 ///
@@ -121,57 +119,45 @@ NSTDAPI NSTDIOError nstd_fs_remove_dir(const NSTDStr *name);
 /// This operation can cause undefined behavior if `name`'s data is invalid.
 NSTDAPI NSTDIOError nstd_fs_remove_dirs(const NSTDStr *name);
 
-/// Extends a vector with the contents of a file.
+/// Reads the contents of a file.
 ///
 /// # Parameters:
 ///
 /// - `const NSTDStr *path` - A path to the file to read.
 ///
-/// - `NSTDVec *buffer` - The buffer to extend.
-///
 /// # Returns
 ///
-/// `NSTDIOError errc` - The I/O operation error code.
+/// `NSTDIOBufferResult contents` - The file's contents, or the I/O operation error code on failure.
 ///
 /// # Panics
 ///
-/// This operation will panic in the following situations:
-///
-/// - `path`'s length in bytes exceeds `NSTDInt`'s max value.
-///
-/// - `buffer`'s length exceeds `NSTDInt`'s max value.
-///
-/// - `buffer`'s stride is not 1.
+/// This operation will panic if `path`'s length in bytes exceeds `NSTDInt`'s max value or
+/// allocating fails.
 ///
 /// # Safety
 ///
 /// This operation can cause undefined behavior if `path`'s data is invalid.
-NSTDAPI NSTDIOError nstd_fs_read(const NSTDStr *path, NSTDVec *buffer);
+NSTDAPI NSTDIOBufferResult nstd_fs_read(const NSTDStr *path);
 
-/// Extends a string with the contents of a file.
+/// Reads the contents of a file into a UTF-8 string.
 ///
 /// # Parameters:
 ///
 /// - `const NSTDStr *path` - A path to the file to read.
 ///
-/// - `NSTDString *buffer` - The buffer to extend.
-///
 /// # Returns
 ///
-/// `NSTDIOError errc` - The I/O operation error code.
+/// `NSTDIOStringResult contents` - The file's contents, or the I/O operation error code on failure.
 ///
 /// # Panics
 ///
-/// This operation will panic in the following situations:
-///
-/// - `path`'s length in bytes exceeds `NSTDInt`'s max value.
-///
-/// - `buffer`'s length exceeds `NSTDInt`'s max value.
+/// This operation will panic if `path`'s length in bytes exceeds `NSTDInt`'s max value or
+/// allocating fails.
 ///
 /// # Safety
 ///
 /// This operation can cause undefined behavior if `path`'s data is invalid.
-NSTDAPI NSTDIOError nstd_fs_read_to_string(const NSTDStr *path, NSTDString *buffer);
+NSTDAPI NSTDIOStringResult nstd_fs_read_to_string(const NSTDStr *path);
 
 /// Overwrites the contents of a file.
 ///
@@ -250,30 +236,25 @@ NSTDAPI NSTDIOError nstd_fs_rename(const NSTDStr *from, const NSTDStr *to);
 /// This operation can cause undefined behavior if either `to` or `from`'s data is invalid.
 NSTDAPI NSTDIOError nstd_fs_copy(const NSTDStr *from, const NSTDStr *to);
 
-/// Writes the absolute path of a file system item to `out_buf`. This will initially clear
-/// `out_buf`.
+/// Returns the absolute path of a file system item.
 ///
 /// # Parameters:
 ///
 /// - `const NSTDStr *path` - A relative path to the file system item.
 ///
-/// - `NSTDString *out_buf` - Returns as the absolute version of `path`.
-///
 /// # Returns
 ///
-/// `NSTDIOError errc` - The I/O operation error code.
+/// `NSTDIOStringResult contents` - The absolute version of `path`, or the I/O operation error code
+/// on failure.
 ///
 /// # Panics
 ///
-/// This operation will panic in the following situations:
-///
-/// - `path`'s length in bytes exceeds `NSTDInt`'s max value.
-///
-/// - `out_buf`'s length in bytes exceeds `NSTDInt`'s max value.
+/// This operation will panic if `path`'s length in bytes exceeds `NSTDInt`'s max value or
+/// allocating fails.
 ///
 /// # Safety
 ///
 /// This operation can cause undefined behavior if `path`'s data is invalid.
-NSTDAPI NSTDIOError nstd_fs_absolute(const NSTDStr *path, NSTDString *out_buf);
+NSTDAPI NSTDIOStringResult nstd_fs_absolute(const NSTDStr *path);
 
 #endif

@@ -4,6 +4,7 @@
 #include "nstd/app.h"
 #include "nstd/core.h"
 #include "nstd/cstring.h"
+#include "nstd/env.h"
 #include "nstd/fs.h"
 #include "nstd/heap_ptr.h"
 #include "nstd/image.h"

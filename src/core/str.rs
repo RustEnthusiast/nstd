@@ -20,8 +20,9 @@ use crate::{
             nstd_core_slice_mut_len, nstd_core_slice_mut_new, nstd_core_slice_mut_stride,
             nstd_core_slice_new, nstd_core_slice_stride, NSTDSlice, NSTDSliceMut,
         },
+        unichar::NSTDOptionalUnichar,
     },
-    NSTDChar, NSTDUInt, NSTDUnichar,
+    NSTDChar, NSTDUInt,
 };
 
 /// Generates the `nstd_core_str_*_to_[i|u|f]*` functions.
@@ -144,7 +145,7 @@ gen_optional!(NSTDOptionalStr, NSTDStr);
 /// ```
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_from_cstr(cstr: &NSTDCStr) -> NSTDStr {
-    core::str::from_utf8(cstr.as_bytes()).expect("Invalid UTF-8 bytes");
+    assert!(core::str::from_utf8(cstr.as_bytes()).is_ok());
     let ptr = nstd_core_cstr_as_ptr(cstr).cast();
     let len = nstd_core_cstr_len(cstr);
     NSTDStr { ptr, len }
@@ -231,7 +232,7 @@ pub unsafe extern "C" fn nstd_core_str_from_raw_cstr(cstr: *const NSTDChar) -> N
     let len = nstd_core_cstr_raw_len(cstr);
     assert!(len <= isize::MAX as NSTDUInt);
     let bytes = core::slice::from_raw_parts(ptr, len);
-    core::str::from_utf8(bytes).expect("Invalid UTF-8 bytes");
+    assert!(core::str::from_utf8(bytes).is_ok());
     NSTDStr { ptr, len }
 }
 
@@ -278,7 +279,7 @@ pub unsafe extern "C" fn nstd_core_str_from_raw_cstr_with_null(cstr: *const NSTD
     let len = nstd_core_cstr_raw_len_with_null(cstr);
     assert!(len <= isize::MAX as NSTDUInt);
     let bytes = core::slice::from_raw_parts(ptr, len);
-    core::str::from_utf8(bytes).expect("Invalid UTF-8 bytes");
+    assert!(core::str::from_utf8(bytes).is_ok());
     NSTDStr { ptr, len }
 }
 
@@ -326,7 +327,7 @@ pub unsafe extern "C" fn nstd_core_str_from_raw_cstr_with_null(cstr: *const NSTD
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_from_bytes(bytes: &NSTDSlice) -> NSTDStr {
-    core::str::from_utf8(bytes.as_slice()).expect("Invalid UTF-8 bytes");
+    assert!(core::str::from_utf8(bytes.as_slice()).is_ok());
     let ptr = nstd_core_slice_as_ptr(bytes).cast();
     let len = nstd_core_slice_len(bytes);
     NSTDStr { ptr, len }
@@ -516,8 +517,7 @@ pub extern "C" fn nstd_core_str_byte_len(str: &NSTDStr) -> NSTDUInt {
 ///
 /// # Returns
 ///
-/// `NSTDUnichar chr` - The character at index `pos`, or the Unicode replacement character on
-/// error.
+/// `NSTDOptionalUnichar chr` - The character at index `pos`, or none on error.
 ///
 /// # Panics
 ///
@@ -536,15 +536,15 @@ pub extern "C" fn nstd_core_str_byte_len(str: &NSTDStr) -> NSTDUInt {
 /// let s_str = "🦀🚀🦀!\0";
 /// unsafe {
 ///     let str = nstd_core_str_from_raw_cstr(s_str.as_ptr().cast());
-///     assert!(nstd_core_str_get(&str, 1) == '🚀'.into());
+///     assert!(nstd_core_str_get(&str, 1).unwrap() == '🚀'.into());
 /// }
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_str_get(str: &NSTDStr, pos: NSTDUInt) -> NSTDUnichar {
+pub unsafe extern "C" fn nstd_core_str_get(str: &NSTDStr, pos: NSTDUInt) -> NSTDOptionalUnichar {
     match str.as_str().chars().nth(pos) {
-        Some(chr) => chr as NSTDUnichar,
-        _ => char::REPLACEMENT_CHARACTER as NSTDUnichar,
+        Some(chr) => NSTDOptional::Some(chr.into()),
+        _ => NSTDOptional::None,
     }
 }
 
@@ -934,7 +934,7 @@ gen_optional!(NSTDOptionalStrMut, NSTDStrMut);
 /// ```
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_mut_from_cstr(cstr: &mut NSTDCStrMut) -> NSTDStrMut {
-    core::str::from_utf8(cstr.as_bytes()).expect("Invalid UTF-8 bytes");
+    assert!(core::str::from_utf8(cstr.as_bytes()).is_ok());
     let ptr = nstd_core_cstr_mut_as_ptr(cstr).cast();
     let len = nstd_core_cstr_mut_len(cstr);
     NSTDStrMut { ptr, len }
@@ -1023,7 +1023,7 @@ pub unsafe extern "C" fn nstd_core_str_mut_from_raw_cstr(cstr: *mut NSTDChar) ->
     let len = nstd_core_cstr_raw_len(cstr);
     assert!(len <= isize::MAX as usize);
     let bytes = core::slice::from_raw_parts(ptr, len);
-    core::str::from_utf8(bytes).expect("Invalid UTF-8 bytes");
+    assert!(core::str::from_utf8(bytes).is_ok());
     NSTDStrMut { ptr, len }
 }
 
@@ -1074,7 +1074,7 @@ pub unsafe extern "C" fn nstd_core_str_mut_from_raw_cstr_with_null(
     let len = nstd_core_cstr_raw_len_with_null(cstr);
     assert!(len <= isize::MAX as usize);
     let bytes = core::slice::from_raw_parts(ptr, len);
-    core::str::from_utf8(bytes).expect("Invalid UTF-8 bytes");
+    assert!(core::str::from_utf8(bytes).is_ok());
     NSTDStrMut { ptr, len }
 }
 
@@ -1122,7 +1122,7 @@ pub unsafe extern "C" fn nstd_core_str_mut_from_raw_cstr_with_null(
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_mut_from_bytes(bytes: &mut NSTDSliceMut) -> NSTDStrMut {
-    core::str::from_utf8(bytes.as_slice()).expect("Invalid UTF-8 bytes");
+    assert!(core::str::from_utf8(bytes.as_slice()).is_ok());
     let ptr = nstd_core_slice_mut_as_ptr(bytes).cast();
     let len = nstd_core_slice_mut_len(bytes);
     NSTDStrMut { ptr, len }
@@ -1335,8 +1335,7 @@ pub extern "C" fn nstd_core_str_mut_byte_len(str: &NSTDStrMut) -> NSTDUInt {
 ///
 /// # Returns
 ///
-/// `NSTDUnichar chr` - The character at index `pos`, or the Unicode replacement character on
-/// error.
+/// `NSTDOptionalUnichar chr` - The character at index `pos`, or none on error.
 ///
 /// # Panics
 ///
@@ -1355,15 +1354,18 @@ pub extern "C" fn nstd_core_str_mut_byte_len(str: &NSTDStrMut) -> NSTDUInt {
 /// let mut s_str = String::from("🦀🚀🦀!\0");
 /// unsafe {
 ///     let str = nstd_core_str_mut_from_raw_cstr(s_str.as_mut_ptr().cast());
-///     assert!(nstd_core_str_mut_get(&str, 1) == '🚀'.into());
+///     assert!(nstd_core_str_mut_get(&str, 1).unwrap() == '🚀'.into());
 /// }
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_str_mut_get(str: &NSTDStrMut, pos: NSTDUInt) -> NSTDUnichar {
+pub unsafe extern "C" fn nstd_core_str_mut_get(
+    str: &NSTDStrMut,
+    pos: NSTDUInt,
+) -> NSTDOptionalUnichar {
     match str.as_str().chars().nth(pos) {
-        Some(chr) => chr as NSTDUnichar,
-        _ => char::REPLACEMENT_CHARACTER as NSTDUnichar,
+        Some(chr) => NSTDOptional::Some(chr.into()),
+        _ => NSTDOptional::None,
     }
 }
 

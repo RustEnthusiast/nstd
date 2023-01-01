@@ -4,7 +4,10 @@ use crate::{
         nstd_alloc_allocate, nstd_alloc_allocate_zeroed, nstd_alloc_deallocate,
         NSTDAllocError::NSTD_ALLOC_ERROR_NONE,
     },
-    core::mem::nstd_core_mem_copy,
+    core::{
+        mem::nstd_core_mem_copy,
+        optional::{gen_optional, NSTDOptional},
+    },
     NSTDAny, NSTDAnyMut, NSTDUInt,
 };
 
@@ -64,6 +67,7 @@ impl Drop for NSTDSharedPtr {
         }
     }
 }
+gen_optional!(NSTDOptionalSharedPtr, NSTDSharedPtr);
 
 /// Creates a new initialized instance of a shared pointer.
 ///
@@ -137,6 +141,11 @@ pub unsafe extern "C" fn nstd_shared_ptr_new(
 /// This operation will panic if either `element_size` is greater than `NSTDInt`'s max value or
 /// allocating fails.
 ///
+/// # Safety
+///
+/// The data to be stored in the shared pointer must be safely representable by an all-zero byte
+/// pattern.
+///
 /// # Example
 ///
 /// ```
@@ -150,7 +159,7 @@ pub unsafe extern "C" fn nstd_shared_ptr_new(
 /// }
 /// ```
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_shared_ptr_new_zeroed(element_size: NSTDUInt) -> NSTDSharedPtr {
+pub unsafe extern "C" fn nstd_shared_ptr_new_zeroed(element_size: NSTDUInt) -> NSTDSharedPtr {
     // SAFETY: The allocated memory is validated after allocation.
     unsafe {
         assert!(element_size <= isize::MAX as usize);
@@ -273,7 +282,7 @@ pub extern "C" fn nstd_shared_ptr_owners(shared_ptr: &NSTDSharedPtr) -> NSTDUInt
 ///
 /// const SIZE: usize = core::mem::size_of::<f64>();
 ///
-/// let shared_ptr = nstd_shared_ptr_new_zeroed(SIZE);
+/// let shared_ptr = unsafe { nstd_shared_ptr_new_zeroed(SIZE) };
 /// assert!(nstd_shared_ptr_size(&shared_ptr) == SIZE);
 /// ```
 #[inline]

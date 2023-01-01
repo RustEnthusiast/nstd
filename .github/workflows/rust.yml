@@ -12,5 +12,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - name: Install dependencies
+      if: matrix.os == 'ubuntu-latest'
+      run: sudo apt-get install -y libudev-dev
     - name: Test
       run: cargo test --all-features --verbose

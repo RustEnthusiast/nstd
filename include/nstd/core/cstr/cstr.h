@@ -53,8 +53,8 @@ NSTDAPI NSTDCStr nstd_core_cstr_new(const NSTDChar *raw, NSTDUInt len);
 ///
 /// # Safety
 ///
-/// This operation may attempt to access data that is unowned by the raw C string, which can lead
-/// to undefined behavior.
+/// `raw` must point to a character array that is valid for reads up until and including it's
+/// null-terminating byte.
 NSTDAPI NSTDCStr nstd_core_cstr_from_raw(const NSTDChar *raw);
 
 /// Creates a new instance of `NSTDCStr` from a raw C string, including the null byte.
@@ -73,8 +73,8 @@ NSTDAPI NSTDCStr nstd_core_cstr_from_raw(const NSTDChar *raw);
 ///
 /// # Safety
 ///
-/// This operation may attempt to access data that is unowned by the raw C string, which can lead
-/// to undefined behavior.
+/// `raw` must point to a character array that is valid for reads up until and including it's
+/// null-terminating byte.
 NSTDAPI NSTDCStr nstd_core_cstr_from_raw_with_null(const NSTDChar *raw);
 
 /// Returns a byte slice of a C string slice's data.
@@ -124,18 +124,14 @@ NSTDAPI NSTDUInt nstd_core_cstr_len(const NSTDCStr *cstr);
 ///
 /// # Panics
 ///
-/// This function will panic if `cstr`'s length is greater than `NSTDInt`'s maximum value.
+/// This function may panic if `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
-/// Undefined behavior may occur if `cstr`'s data is invalid.
+/// The caller must ensure that `cstr` is valid for reads.
 NSTDAPI NSTDBool nstd_core_cstr_is_null_terminated(const NSTDCStr *cstr);
 
 /// Returns a pointer to the first null byte in a C string slice if one is present.
-///
-/// # Note
-///
-/// This will always return null if `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Parameters:
 ///
@@ -146,12 +142,16 @@ NSTDAPI NSTDBool nstd_core_cstr_is_null_terminated(const NSTDCStr *cstr);
 /// `const NSTDChar *nul` - A pointer to the first null byte in `cstr`, or null if the C string
 /// slice doesn't contain a null byte.
 ///
+/// # Panics
+///
+/// This operation may panic if `cstr`'s length is greater than `NSTDInt`'s max value.
+///
 /// # Safety
 ///
-/// Undefined behavior may occur if `cstr`'s data is invalid.
+/// The caller must ensure that `cstr` is valid for reads.
 NSTDAPI const NSTDChar *nstd_core_cstr_get_null(const NSTDCStr *cstr);
 
-/// Return a pointer the character at `pos` in `cstr`.
+/// Return a pointer to the character at index `pos` in `cstr`.
 ///
 /// # Note
 ///
@@ -241,8 +241,8 @@ NSTDAPI NSTDCStrMut nstd_core_cstr_mut_new(NSTDChar *raw, NSTDUInt len);
 ///
 /// # Safety
 ///
-/// This operation may attempt to access data that is unowned by the raw C string, which can lead
-/// to undefined behavior.
+/// `raw` must point to a character array that is valid for reads up until and including it's
+/// null-terminating byte.
 NSTDAPI NSTDCStrMut nstd_core_cstr_mut_from_raw(NSTDChar *raw);
 
 /// Creates a new instance of `NSTDCStrMut` from a raw C string, including the null byte.
@@ -261,8 +261,8 @@ NSTDAPI NSTDCStrMut nstd_core_cstr_mut_from_raw(NSTDChar *raw);
 ///
 /// # Safety
 ///
-/// This operation may attempt to access data that is unowned by the raw C string, which can lead
-/// to undefined behavior.
+/// `raw` must point to a character array that is valid for reads up until and including it's
+/// null-terminating byte.
 NSTDAPI NSTDCStrMut nstd_core_cstr_mut_from_raw_with_null(NSTDChar *raw);
 
 /// Creates an immutable version of a mutable C string slice.
@@ -338,14 +338,10 @@ NSTDAPI NSTDUInt nstd_core_cstr_mut_len(const NSTDCStrMut *cstr);
 ///
 /// # Safety
 ///
-/// Undefined behavior may occur if `cstr`'s data is invalid.
+/// The caller must ensure that `cstr` is valid for reads.
 NSTDAPI NSTDBool nstd_core_cstr_mut_is_null_terminated(const NSTDCStrMut *cstr);
 
 /// Returns a pointer to the first null byte in a C string slice if one is present.
-///
-/// # Note
-///
-/// This will always return null if `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Parameters:
 ///
@@ -356,17 +352,16 @@ NSTDAPI NSTDBool nstd_core_cstr_mut_is_null_terminated(const NSTDCStrMut *cstr);
 /// `NSTDChar *nul` - A pointer to the first null byte in `cstr`, or null if the C string
 /// slice doesn't contain a null byte.
 ///
+/// # Panics
+///
+/// This operation may panic if `cstr`'s length is greater than `NSTDInt`'s max value.
+///
 /// # Safety
 ///
-/// This operation may attempt to access data that is unowned by the raw C string, which can lead
-/// to undefined behavior.
+/// The caller must ensure that `cstr` is valid for reads.
 NSTDAPI NSTDChar *nstd_core_cstr_mut_get_null(NSTDCStrMut *cstr);
 
 /// Returns an immutable pointer to the first null byte in a C string slice if one is present.
-///
-/// # Note
-///
-/// This will always return null if `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Parameters:
 ///
@@ -377,13 +372,16 @@ NSTDAPI NSTDChar *nstd_core_cstr_mut_get_null(NSTDCStrMut *cstr);
 /// `const NSTDChar *nul` - A pointer to the first null byte in `cstr`, or null if the C string
 /// slice doesn't contain a null byte.
 ///
+/// # Panics
+///
+/// This operation may panic if `cstr`'s length is greater than `NSTDInt`'s max value.
+///
 /// # Safety
 ///
-/// This operation may attempt to access data that is unowned by the raw C string, which can lead
-/// to undefined behavior.
+/// The caller must ensure that `cstr` is valid for reads.
 NSTDAPI const NSTDChar *nstd_core_cstr_mut_get_null_const(const NSTDCStrMut *cstr);
 
-/// Return a pointer the character at `pos` in `cstr`.
+/// Return a pointer to the character at index `pos` in `cstr`.
 ///
 /// # Note
 ///
@@ -401,7 +399,7 @@ NSTDAPI const NSTDChar *nstd_core_cstr_mut_get_null_const(const NSTDCStrMut *cst
 /// string slice's boundaries.
 NSTDAPI NSTDChar *nstd_core_cstr_mut_get(NSTDCStrMut *cstr, NSTDUInt pos);
 
-/// Return an immutable pointer the character at `pos` in `cstr`.
+/// Return an immutable pointer to the character at index `pos` in `cstr`.
 ///
 /// # Note
 ///

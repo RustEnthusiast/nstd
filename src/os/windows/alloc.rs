@@ -1,11 +1,9 @@
 //! Low level memory allocation for Windows.
 pub mod heap;
-use self::heap::{
-    nstd_os_windows_alloc_heap_allocate, nstd_os_windows_alloc_heap_allocate_zeroed,
-    nstd_os_windows_alloc_heap_deallocate, nstd_os_windows_alloc_heap_default,
-    nstd_os_windows_alloc_heap_reallocate,
+use crate::{NSTDAnyMut, NSTDUInt, NSTD_NULL};
+use windows_sys::Win32::System::Memory::{
+    GetProcessHeap, HeapAlloc, HeapFree, HeapReAlloc, HEAP_ZERO_MEMORY,
 };
-use crate::{core::result::NSTDResult, NSTDAnyMut, NSTDUInt, NSTD_NULL};
 
 /// Describes an error returned from allocation functions for Windows.
 #[repr(C)]
@@ -64,9 +62,9 @@ pub enum NSTDWindowsAllocError {
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_os_windows_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
-    match nstd_os_windows_alloc_heap_default() {
-        NSTDResult::Ok(heap) => nstd_os_windows_alloc_heap_allocate(&heap, size),
-        _ => NSTD_NULL,
+    match GetProcessHeap() {
+        0 => NSTD_NULL,
+        heap => HeapAlloc(heap, 0, size),
     }
 }
 
@@ -104,9 +102,9 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_allocate(size: NSTDUInt) -> NSTDA
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_os_windows_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMut {
-    match nstd_os_windows_alloc_heap_default() {
-        NSTDResult::Ok(heap) => nstd_os_windows_alloc_heap_allocate_zeroed(&heap, size),
-        _ => NSTD_NULL,
+    match GetProcessHeap() {
+        0 => NSTD_NULL,
+        heap => HeapAlloc(heap, HEAP_ZERO_MEMORY, size),
     }
 }
 
@@ -154,15 +152,20 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_allocate_zeroed(size: NSTDUInt) -
 ///     assert!(errc == NSTD_WINDOWS_ALLOC_ERROR_NONE);
 /// }
 /// ```
-#[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_os_windows_alloc_reallocate(
     ptr: &mut NSTDAnyMut,
     new_size: NSTDUInt,
 ) -> NSTDWindowsAllocError {
-    match nstd_os_windows_alloc_heap_default() {
-        NSTDResult::Ok(heap) => nstd_os_windows_alloc_heap_reallocate(&heap, ptr, new_size),
-        NSTDResult::Err(err) => err,
+    match GetProcessHeap() {
+        0 => NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_HEAP_NOT_FOUND,
+        heap => match HeapReAlloc(heap, 0, *ptr, new_size) {
+            NSTD_NULL => NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_OUT_OF_MEMORY,
+            new_mem => {
+                *ptr = new_mem;
+                NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_NONE
+            }
+        },
     }
 }
 
@@ -195,13 +198,18 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_reallocate(
 ///     assert!(nstd_os_windows_alloc_deallocate(&mut buf) == NSTD_WINDOWS_ALLOC_ERROR_NONE);
 /// }
 /// ```
-#[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_os_windows_alloc_deallocate(
     ptr: &mut NSTDAnyMut,
 ) -> NSTDWindowsAllocError {
-    match nstd_os_windows_alloc_heap_default() {
-        NSTDResult::Ok(heap) => nstd_os_windows_alloc_heap_deallocate(&heap, ptr),
-        NSTDResult::Err(err) => err,
+    match GetProcessHeap() {
+        0 => NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_HEAP_NOT_FOUND,
+        heap => match HeapFree(heap, 0, *ptr) {
+            0 => NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_MEMORY_NOT_FOUND,
+            _ => {
+                *ptr = NSTD_NULL;
+                NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_NONE
+            }
+        },
     }
 }
