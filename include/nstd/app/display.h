@@ -8,6 +8,9 @@ typedef NSTDAnyMut NSTDDisplay;
 /// A handle to a display.
 typedef NSTDAny NSTDDisplayHandle;
 
+/// An owned display mode handle.
+typedef NSTDAnyMut NSTDDisplayMode;
+
 /// Represents a display's video mode.
 typedef NSTDAny NSTDDisplayModeHandle;
 
@@ -106,6 +109,28 @@ NSTDAPI NSTDFloat64 nstd_app_display_scale_factor(NSTDDisplayHandle display);
 /// The user of this function must guarantee that `callback` is a valid C function pointer.
 NSTDAPI void nstd_app_display_modes(NSTDDisplayHandle display,
 void (*callback)(NSTDDisplayModeHandle));
+
+/// Creates a new `NSTDDisplayMode` from it's handle.
+///
+/// # Parameters:
+///
+/// - `NSTDDisplayModeHandle handle` - A borrowed handle to a display mode.
+///
+/// # Returns
+///
+/// `NSTDDisplayMode mode` - An owned representation of the display mode.
+NSTDAPI NSTDDisplayMode nstd_app_display_mode_new(NSTDDisplayModeHandle handle);
+
+/// Immutably borrows an `NSTDDisplayMode`.
+///
+/// # Parameters:
+///
+/// - `const NSTDDisplayMode *mode` - The display mode to borrow.
+///
+/// # Returns
+///
+/// `NSTDDisplayModeHandle handle` - A borrowed handle to the display mode.
+NSTDAPI NSTDDisplayModeHandle nstd_app_display_mode_handle(const NSTDDisplayMode *mode);
 
 /// Returns the size of a display mode.
 ///

@@ -8,6 +8,9 @@ pub type NSTDDisplay = Box<MonitorHandle>;
 /// A handle to a display.
 pub type NSTDDisplayHandle<'a> = &'a MonitorHandle;
 
+/// An owned display mode handle.
+pub type NSTDDisplayMode = Box<VideoMode>;
+
 /// Represents a display's video mode.
 pub type NSTDDisplayModeHandle<'a> = &'a VideoMode;
 
@@ -151,6 +154,36 @@ pub unsafe extern "C" fn nstd_app_display_modes(
             callback(&mode);
         }
     }
+}
+
+/// Creates a new `NSTDDisplayMode` from it's handle.
+///
+/// # Parameters:
+///
+/// - `NSTDDisplayModeHandle handle` - A borrowed handle to a display mode.
+///
+/// # Returns
+///
+/// `NSTDDisplayMode mode` - An owned representation of the display mode.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_app_display_mode_new(handle: NSTDDisplayModeHandle) -> NSTDDisplayMode {
+    Box::new(handle.clone())
+}
+
+/// Immutably borrows an `NSTDDisplayMode`.
+///
+/// # Parameters:
+///
+/// - `const NSTDDisplayMode *mode` - The display mode to borrow.
+///
+/// # Returns
+///
+/// `NSTDDisplayModeHandle handle` - A borrowed handle to the display mode.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_app_display_mode_handle(mode: &NSTDDisplayMode) -> NSTDDisplayModeHandle {
+    mode
 }
 
 /// Returns the size of a display mode.
