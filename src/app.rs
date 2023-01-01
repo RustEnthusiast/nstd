@@ -462,24 +462,24 @@ pub extern "C" fn nstd_app_set_device_event_filter(
 ///
 /// # Parameters:
 ///
-/// - `const NSTDAppData *app` - The application data received from an event.
+/// - `NSTDAppData *app` - The application data received from an event.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_app_exit(app: &NSTDAppData) {
-    app.control_flow().set(ControlFlow::Exit);
+pub extern "C" fn nstd_app_exit(app: &mut NSTDAppData) {
+    *app.control_flow() = ControlFlow::Exit;
 }
 
 /// Signals an `NSTDApp`'s event loop to exit with a specific error code.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDAppData *app` - The application data received from an event.
+/// - `NSTDAppData *app` - The application data received from an event.
 ///
 /// - `NSTDErrorCode errc` - The error code to exit the application event loop with.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_app_exit_with_code(app: &NSTDAppData, errc: NSTDErrorCode) {
-    app.control_flow().set(ControlFlow::ExitWithCode(errc));
+pub extern "C" fn nstd_app_exit_with_code(app: &mut NSTDAppData, errc: NSTDErrorCode) {
+    *app.control_flow() = ControlFlow::ExitWithCode(errc);
 }
 
 /// Checks if two `NSTDWindowID`s refer to the same window.

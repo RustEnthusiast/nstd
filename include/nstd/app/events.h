@@ -296,83 +296,79 @@ typedef enum {
 /// Contains callback based events through function pointers.
 typedef struct {
     /// Called once before starting the application event loop.
-    void (*start)(const NSTDAppData *);
+    void (*start)(NSTDAppData *);
     /// Called when all other events have been processed.
-    void (*update)(const NSTDAppData *);
+    void (*update)(NSTDAppData *);
     /// Called when a new device is connected to the system.
-    void (*device_added)(const NSTDAppData *, NSTDDeviceID);
+    void (*device_added)(NSTDAppData *, NSTDDeviceID);
     /// Called when a device was disconnected from the system.
-    void (*device_removed)(const NSTDAppData *, NSTDDeviceID);
+    void (*device_removed)(NSTDAppData *, NSTDDeviceID);
     /// Called when a mouse device is moved.
-    void (*mouse_moved)(const NSTDAppData *, NSTDDeviceID, NSTDFloat64, NSTDFloat64);
+    void (*mouse_moved)(NSTDAppData *, NSTDDeviceID, NSTDFloat64, NSTDFloat64);
     /// Called when a scroll wheel is scrolled.
-    void (*mouse_scrolled)(const NSTDAppData *, NSTDDeviceID, NSTDFloat64, NSTDFloat64,
-    NSTDScrollDelta);
+    void (*mouse_scrolled)(NSTDAppData *, NSTDDeviceID, NSTDFloat64, NSTDFloat64, NSTDScrollDelta);
     /// Called when there is some motion on an analog axis device, such as a touchpad.
     ///
     /// # Note
     ///
     /// Some touchpads can return a negative y value.
-    void (*axis_motion)(const NSTDAppData *, NSTDDeviceID, NSTDAnalogAxisID, NSTDFloat64);
+    void (*axis_motion)(NSTDAppData *, NSTDDeviceID, NSTDAnalogAxisID, NSTDFloat64);
     /// Called when a button, such as a mouse button's state changes.
-    void (*button_input)(const NSTDAppData *, NSTDDeviceID, NSTDButtonID, NSTDBool);
+    void (*button_input)(NSTDAppData *, NSTDDeviceID, NSTDButtonID, NSTDBool);
     /// Called when a keyboard key is pressed or unpressed.
-    void (*key_input)(const NSTDAppData *, NSTDDeviceID, NSTDKey, NSTDUInt32, NSTDBool);
+    void (*key_input)(NSTDAppData *, NSTDDeviceID, NSTDKey, NSTDUInt32, NSTDBool);
     /// Called when a window's scale factor changes.
-    void (*window_dpi_changed)(const NSTDAppData *, NSTDWindowID, NSTDFloat64,
-    NSTDUInt32 *, NSTDUInt32 *);
+    void (*window_dpi_changed)(NSTDAppData *, NSTDWindowID, NSTDFloat64, NSTDUInt32 *,
+    NSTDUInt32 *);
     /// Called when a window is resized.
-    void (*window_resized)(const NSTDAppData *, NSTDWindowID, NSTDUInt32, NSTDUInt32);
+    void (*window_resized)(NSTDAppData *, NSTDWindowID, NSTDUInt32, NSTDUInt32);
     /// Called when a window is moved.
-    void (*window_moved)(const NSTDAppData *, NSTDWindowID, NSTDInt32, NSTDInt32);
+    void (*window_moved)(NSTDAppData *, NSTDWindowID, NSTDInt32, NSTDInt32);
     /// Focus for a window changed.
-    void (*window_focus_changed)(const NSTDAppData *, NSTDWindowID, NSTDBool);
+    void (*window_focus_changed)(NSTDAppData *, NSTDWindowID, NSTDBool);
     /// Mouse input was received.
-    void (*window_mouse_input)(const NSTDAppData *, NSTDWindowID, NSTDDeviceID,
-    const NSTDMouseInput *, NSTDBool);
+    void (*window_mouse_input)(NSTDAppData *, NSTDWindowID, NSTDDeviceID, const NSTDMouseInput *,
+    NSTDBool);
     /// Called when a window receives key input.
-    void (*window_key_input)(const NSTDAppData *, NSTDWindowID, NSTDDeviceID, NSTDKey, NSTDUInt32,
+    void (*window_key_input)(NSTDAppData *, NSTDWindowID, NSTDDeviceID, NSTDKey, NSTDUInt32,
     NSTDBool);
     /// Called when a window receives a character.
-    void (*window_received_char)(const NSTDAppData *, NSTDWindowID, NSTDUnichar);
+    void (*window_received_char)(NSTDAppData *, NSTDWindowID, NSTDUnichar);
     /// Called when a scroll device is scrolled over a window.
-    void (*window_scrolled)(const NSTDAppData *, NSTDWindowID, NSTDDeviceID,
-    NSTDFloat64, NSTDFloat64, NSTDScrollDelta, NSTDTouchState);
+    void (*window_scrolled)(NSTDAppData *, NSTDWindowID, NSTDDeviceID, NSTDFloat64, NSTDFloat64,
+    NSTDScrollDelta, NSTDTouchState);
     /// Called when the cursor is moved over a window.
-    void (*window_cursor_moved)(const NSTDAppData *, NSTDWindowID, NSTDDeviceID, NSTDFloat64,
+    void (*window_cursor_moved)(NSTDAppData *, NSTDWindowID, NSTDDeviceID, NSTDFloat64,
     NSTDFloat64);
     /// The cursor entered a window.
-    void (*window_cursor_entered)(const NSTDAppData *, NSTDWindowID, NSTDDeviceID);
+    void (*window_cursor_entered)(NSTDAppData *, NSTDWindowID, NSTDDeviceID);
     /// The cursor left a window.
-    void (*window_cursor_left)(const NSTDAppData *, NSTDWindowID, NSTDDeviceID);
+    void (*window_cursor_left)(NSTDAppData *, NSTDWindowID, NSTDDeviceID);
     /// A file was dropped into a window.
-    void (*window_file_received)(const NSTDAppData *, NSTDWindowID, const NSTDStr *);
+    void (*window_file_received)(NSTDAppData *, NSTDWindowID, const NSTDStr *);
     /// A file was hovered over a window.
-    void (*window_file_hovered)(const NSTDAppData *, NSTDWindowID, const NSTDStr *);
+    void (*window_file_hovered)(NSTDAppData *, NSTDWindowID, const NSTDStr *);
     /// A file was dragged away from a window.
-    void (*window_file_canceled)(const NSTDAppData *, NSTDWindowID);
+    void (*window_file_canceled)(NSTDAppData *, NSTDWindowID);
     /// A window requests closing.
-    void (*window_close_requested)(const NSTDAppData *, NSTDWindowID);
+    void (*window_close_requested)(NSTDAppData *, NSTDWindowID);
     /// Called when a window is closed.
-    void (*window_closed)(const NSTDAppData *, NSTDWindowID);
+    void (*window_closed)(NSTDAppData *, NSTDWindowID);
     /// A gamepad was connected to the system.
-    void (*gamepad_connected)(const NSTDAppData *, NSTDGamepadID);
+    void (*gamepad_connected)(NSTDAppData *, NSTDGamepadID);
     /// A gamepad was disconnected to the system.
-    void (*gamepad_disconnected)(const NSTDAppData *, NSTDGamepadID);
+    void (*gamepad_disconnected)(NSTDAppData *, NSTDGamepadID);
     /// A gamepad button was pressed.
-    void (*gamepad_button_pressed)(const NSTDAppData *, NSTDGamepadID, NSTDGamepadButton,
-    NSTDUInt32);
+    void (*gamepad_button_pressed)(NSTDAppData *, NSTDGamepadID, NSTDGamepadButton, NSTDUInt32);
     /// A gamepad button was released.
-    void (*gamepad_button_released)(const NSTDAppData *, NSTDGamepadID, NSTDGamepadButton,
-    NSTDUInt32);
+    void (*gamepad_button_released)(NSTDAppData *, NSTDGamepadID, NSTDGamepadButton, NSTDUInt32);
     /// A gamepad button's value changed.
-    void (*gamepad_input)(const NSTDAppData *, NSTDGamepadID, NSTDGamepadButton, NSTDUInt32,
-    NSTDFloat32);
+    void (*gamepad_input)(NSTDAppData *, NSTDGamepadID, NSTDGamepadButton, NSTDUInt32, NSTDFloat32);
     /// A gamepad axis value has changed.
-    void (*gamepad_axis_input)(const NSTDAppData *, NSTDGamepadID, NSTDGamepadAxis, NSTDUInt32,
+    void (*gamepad_axis_input)(NSTDAppData *, NSTDGamepadID, NSTDGamepadAxis, NSTDUInt32,
     NSTDFloat32);
     /// Called once before exiting the application event loop.
-    void (*exit)(const NSTDAppData *);
+    void (*exit)(NSTDAppData *);
 } NSTDAppEvents;
 
 #endif

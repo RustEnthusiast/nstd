@@ -119,17 +119,17 @@ NSTDAPI void nstd_app_set_device_event_filter(NSTDAppHandle app, NSTDDeviceEvent
 ///
 /// # Parameters:
 ///
-/// - `const NSTDAppData *app` - The application data received from an event.
-NSTDAPI void nstd_app_exit(const NSTDAppData *app);
+/// - `NSTDAppData *app` - The application data received from an event.
+NSTDAPI void nstd_app_exit(NSTDAppData *app);
 
 /// Signals an `NSTDApp`'s event loop to exit with a specific error code.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDAppData *app` - The application data received from an event.
+/// - `NSTDAppData *app` - The application data received from an event.
 ///
 /// - `NSTDErrorCode errc` - The error code to exit the application event loop with.
-NSTDAPI void nstd_app_exit_with_code(const NSTDAppData *app, NSTDErrorCode errc);
+NSTDAPI void nstd_app_exit_with_code(NSTDAppData *app, NSTDErrorCode errc);
 
 /// Checks if two `NSTDWindowID`s refer to the same window.
 ///
