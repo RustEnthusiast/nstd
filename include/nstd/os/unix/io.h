@@ -24,6 +24,8 @@ typedef enum {
     NSTD_UNIX_IO_ERROR_BLOCKING,
     /// Some input parameter was incorrect.
     NSTD_UNIX_IO_ERROR_INVALID_INPUT,
+    /// Some input/output data had an incorrect format.
+    NSTD_UNIX_IO_ERROR_INVALID_DATA,
     /// The I/O operation's timeout expired, causing it to be canceled.
     NSTD_UNIX_IO_ERROR_TIMED_OUT,
     /// The operation was interrupted.

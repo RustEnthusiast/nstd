@@ -5,18 +5,15 @@ use super::{
 };
 use crate::{
     alloc::NSTDAllocError::NSTD_ALLOC_ERROR_NONE,
-    core::{
-        slice::{
-            nstd_core_slice_as_ptr, nstd_core_slice_len, nstd_core_slice_mut_as_ptr,
-            nstd_core_slice_mut_len, nstd_core_slice_mut_stride, nstd_core_slice_stride, NSTDSlice,
-            NSTDSliceMut,
-        },
-        str::nstd_core_str_from_bytes,
+    core::slice::{
+        nstd_core_slice_as_ptr, nstd_core_slice_len, nstd_core_slice_mut_as_ptr,
+        nstd_core_slice_mut_len, nstd_core_slice_mut_stride, nstd_core_slice_stride, NSTDSlice,
+        NSTDSliceMut,
     },
-    string::{nstd_string_push_str, NSTDString},
+    string::NSTDString,
     vec::{
-        nstd_vec_as_slice, nstd_vec_cap, nstd_vec_end_mut, nstd_vec_len, nstd_vec_new,
-        nstd_vec_reserve, nstd_vec_set_len, nstd_vec_stride, NSTDVec,
+        nstd_vec_cap, nstd_vec_end, nstd_vec_end_mut, nstd_vec_len, nstd_vec_reserve,
+        nstd_vec_set_len, nstd_vec_stride, NSTDVec,
     },
     NSTDUInt,
 };
@@ -200,11 +197,9 @@ pub(crate) unsafe fn read_all(
 ///
 /// This operation will panic in the following situations:
 ///
-/// - `buffer`'s current length in bytes is greater than `NSTDInt::MAX`.
+/// - `buffer`'s length in bytes ends up exceeding `NSTDInt::MAX`.
 ///
 /// - An attempt was made to read more than `NSTDInt::MAX` bytes.
-///
-/// - The data read from the file is not UTF-8 encoded.
 ///
 /// # Safety
 ///
@@ -217,15 +212,15 @@ pub(crate) unsafe fn read_to_string(
     buffer: &mut NSTDString,
 ) -> (NSTDUnixIOError, NSTDUInt) {
     // Read data from the file.
-    let mut buf = nstd_vec_new(1);
-    let (mut err, read) = read_all(fd, &mut buf);
-    if err == NSTD_UNIX_IO_ERROR_NONE {
-        // Push the data onto `buffer`.
-        let bytes = nstd_vec_as_slice(&buf);
-        let str = nstd_core_str_from_bytes(&bytes);
-        if nstd_string_push_str(buffer, &str) != NSTD_ALLOC_ERROR_NONE {
-            err = NSTD_UNIX_IO_ERROR_OUT_OF_MEMORY;
-        }
+    let buf = buffer.as_mut_vec();
+    let (mut err, read) = read_all(fd, buf);
+    // Make sure the successfully read data is valid UTF-8.
+    let read_start = nstd_vec_end(buf).sub(read) as _;
+    let bytes = core::slice::from_raw_parts(read_start, read);
+    if let Err(_) = core::str::from_utf8(&bytes) {
+        let len = nstd_vec_len(buf);
+        nstd_vec_set_len(buf, len - read);
+        err = NSTD_UNIX_IO_ERROR_INVALID_DATA;
     }
     (err, read)
 }
