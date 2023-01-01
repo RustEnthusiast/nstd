@@ -2,6 +2,7 @@
 #define NSTD_VEC_H
 #include "alloc.h"
 #include "core/def.h"
+#include "core/optional.h"
 #include "core/slice.h"
 #include "nstd.h"
 
@@ -16,6 +17,9 @@ typedef struct {
     /// The number of values allocated in the memory buffer.
     NSTDUInt cap;
 } NSTDVec;
+
+/// Represents an optional value of type `NSTDVec`.
+NSTDOptional(NSTDVec) NSTDOptionalVec;
 
 /// Creates a new vector without allocating any resources.
 ///

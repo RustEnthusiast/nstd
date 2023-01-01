@@ -7,6 +7,8 @@
 - `nstd_core_str[_mut]_get` now returns `NSTDOptionalUnichar`.
 - `nstd_core_cty_is_unicode` now takes `NSTDChar32`.
 - Added `nstd_core_panic_with_msg`.
+### `nstd.cstring`
+- Added `NSTDOptionalCString`.
 ### `nstd.heap_ptr`
 - Added `NSTDOptionalHeapPtr`.
 ### `nstd.os`
@@ -18,9 +20,11 @@
 ### `nstd.shared_ptr`
 - Added `NSTDOptionalSharedPtr`.
 ### `nstd.string`
+- Added `NSTDOptionalString`.
 - `nstd_string_push` now returns `NSTDAllocError`.
 - `nstd_string_pop` now returns `NSTDOptionalUnichar`.
 ### `nstd.vec`
+- Added `NSTDOptionalVec`.
 - Added `nstd_vec_reserved`.
 
 # 0.4.0

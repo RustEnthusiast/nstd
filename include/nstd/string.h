@@ -15,6 +15,9 @@ typedef struct {
     NSTDVec bytes;
 } NSTDString;
 
+/// Represents an optional value of type `NSTDString`.
+NSTDOptional(NSTDString) NSTDOptionalString;
+
 /// Creates a new instance of `NSTDString`.
 ///
 /// # Returns

@@ -6,6 +6,7 @@ use crate::{
             nstd_core_cstr_as_bytes, nstd_core_cstr_get_null, nstd_core_cstr_is_null_terminated,
             nstd_core_cstr_new, NSTDCStr,
         },
+        optional::{gen_optional, NSTDOptional},
         slice::NSTDSlice,
     },
     vec::{
@@ -26,6 +27,7 @@ pub struct NSTDCString {
     /// The underlying vector of `NSTDChar`s.
     bytes: NSTDVec,
 }
+gen_optional!(NSTDOptionalCString, NSTDCString);
 
 /// Creates a new empty `NSTDCString`.
 ///

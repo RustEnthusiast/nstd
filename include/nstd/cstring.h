@@ -2,6 +2,7 @@
 #define NSTD_CSTRING_H
 #include "alloc.h"
 #include "core/cstr/cstr.h"
+#include "core/optional.h"
 #include "core/slice.h"
 #include "nstd.h"
 #include "vec.h"
@@ -13,6 +14,9 @@ typedef struct {
     /// The underlying vector of `NSTDChar`s.
     NSTDVec bytes;
 } NSTDCString;
+
+/// Represents an optional value of type `NSTDCString`.
+NSTDOptional(NSTDCString) NSTDOptionalCString;
 
 /// Creates a new empty `NSTDCString`.
 ///

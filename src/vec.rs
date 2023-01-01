@@ -7,6 +7,7 @@ use crate::{
     core::{
         def::{NSTDByte, NSTDErrorCode},
         mem::{nstd_core_mem_copy, nstd_core_mem_copy_overlapping},
+        optional::{gen_optional, NSTDOptional},
         ptr::raw::{nstd_core_ptr_raw_dangling, nstd_core_ptr_raw_dangling_mut},
         slice::{
             nstd_core_slice_as_ptr, nstd_core_slice_len, nstd_core_slice_mut_new,
@@ -156,6 +157,7 @@ impl<A> FromIterator<A> for NSTDVec {
         s
     }
 }
+gen_optional!(NSTDOptionalVec, NSTDVec);
 
 /// Creates a new vector without allocating any resources.
 ///

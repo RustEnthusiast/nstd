@@ -4,7 +4,7 @@ use crate::{
     alloc::NSTDAllocError,
     core::{
         def::NSTDByte,
-        optional::NSTDOptional,
+        optional::{gen_optional, NSTDOptional},
         slice::{nstd_core_slice_new, NSTDSlice},
         str::{
             nstd_core_str_as_bytes, nstd_core_str_from_bytes_unchecked, nstd_core_str_len,
@@ -72,6 +72,7 @@ impl NSTDString {
         &mut self.bytes
     }
 }
+gen_optional!(NSTDOptionalString, NSTDString);
 
 /// Creates a new instance of `NSTDString`.
 ///
