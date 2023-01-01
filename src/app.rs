@@ -3,7 +3,7 @@ pub mod data;
 pub mod display;
 pub mod events;
 use self::{
-    data::{NSTDAppData, NSTDAppHandle},
+    data::{AppData, NSTDAppData, NSTDAppHandle},
     display::{NSTDDisplay, NSTDDisplayHandle},
     events::{
         NSTDAppEvents, NSTDDeviceEventFilter, NSTDDeviceID, NSTDGamepadAxis, NSTDGamepadButton,
@@ -28,14 +28,6 @@ pub struct NSTDApp {
     events: NSTDAppEvents,
     /// Private app data.
     inner: Box<AppData>,
-}
-
-/// Private application data.
-struct AppData {
-    /// The [winit] event loop.
-    event_loop: EventLoop<()>,
-    /// The gamepad input handler.
-    gil: Gilrs,
 }
 
 /// Creates a new `nstd` application.
