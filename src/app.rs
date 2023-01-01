@@ -12,7 +12,7 @@ use self::{
 };
 use crate::{
     core::{def::NSTDErrorCode, str::NSTDStr},
-    heap_ptr::NSTDHeapPtr,
+    heap_ptr::NSTDOptionalHeapPtr,
     NSTDBool,
 };
 use gilrs::{Error::NotImplemented, EventType as GamepadEvent, Gilrs};
@@ -105,13 +105,13 @@ pub extern "C" fn nstd_app_events(app: &mut NSTDApp) -> &mut NSTDAppEvents {
 ///
 /// - `NSTDApp app` - The `nstd` application to run.
 ///
-/// - `NSTDHeapPtr data` - Custom user data to pass to each app event.
+/// - `NSTDOptionalHeapPtr data` - Custom user data to pass to each app event.
 ///
 /// # Safety
 ///
 /// This function's caller must guarantee validity of the `app`'s event callbacks.
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_app_run(app: NSTDApp, mut data: NSTDHeapPtr) -> ! {
+pub unsafe extern "C" fn nstd_app_run(app: NSTDApp, mut data: NSTDOptionalHeapPtr) -> ! {
     let AppData {
         event_loop,
         mut gil,

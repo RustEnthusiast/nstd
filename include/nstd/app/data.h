@@ -11,7 +11,7 @@ typedef struct {
     /// A handle to the `nstd` app.
     NSTDAppHandle handle;
     /// Custom user data.
-    NSTDHeapPtr *data;
+    NSTDOptionalHeapPtr *data;
     /// The gamepad input manager.
     NSTDAnyMut gil;
     /// The application's control flow.

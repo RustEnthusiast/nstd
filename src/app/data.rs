@@ -1,5 +1,5 @@
 //! Application data passed to each event.
-use crate::heap_ptr::NSTDHeapPtr;
+use crate::heap_ptr::NSTDOptionalHeapPtr;
 use gilrs::{Event as GamepadEvent, Gilrs};
 use winit::event_loop::{ControlFlow, EventLoop, EventLoopWindowTarget};
 
@@ -12,7 +12,7 @@ pub struct NSTDAppData<'a> {
     /// A handle to the `nstd` app.
     pub handle: NSTDAppHandle<'a>,
     /// Custom user data.
-    pub data: &'a mut NSTDHeapPtr,
+    pub data: &'a mut NSTDOptionalHeapPtr,
     /// The gamepad input manager.
     gil: &'a mut Gilrs,
     /// The application's control flow.
@@ -24,7 +24,7 @@ impl<'a> NSTDAppData<'a> {
     pub(crate) fn new(
         handle: NSTDAppHandle<'a>,
         control_flow: &'a mut ControlFlow,
-        data: &'a mut NSTDHeapPtr,
+        data: &'a mut NSTDOptionalHeapPtr,
         gil: &'a mut Gilrs,
     ) -> Self {
         Self {
