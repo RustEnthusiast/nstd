@@ -9,7 +9,7 @@ pub type NSTDDisplay = Box<MonitorHandle>;
 pub type NSTDDisplayHandle<'a> = &'a MonitorHandle;
 
 /// Represents a display's video mode.
-pub type NSTDDisplayMode<'a> = &'a VideoMode;
+pub type NSTDDisplayModeHandle<'a> = &'a VideoMode;
 
 /// Represents the size of a display.
 #[repr(C)]
@@ -135,7 +135,7 @@ pub extern "C" fn nstd_app_display_scale_factor(display: NSTDDisplayHandle) -> N
 ///
 /// - `NSTDDisplayHandle display` - A handle to the display.
 ///
-/// - `void (*callback)(NSTDDisplayMode)` - The callback function.
+/// - `void (*callback)(NSTDDisplayModeHandle)` - The callback function.
 ///
 /// # Safety
 ///
@@ -144,7 +144,7 @@ pub extern "C" fn nstd_app_display_scale_factor(display: NSTDDisplayHandle) -> N
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_app_display_modes(
     display: NSTDDisplayHandle,
-    callback: Option<unsafe extern "C" fn(NSTDDisplayMode)>,
+    callback: Option<unsafe extern "C" fn(NSTDDisplayModeHandle)>,
 ) {
     if let Some(callback) = callback {
         for mode in display.video_modes() {
@@ -157,14 +157,14 @@ pub unsafe extern "C" fn nstd_app_display_modes(
 ///
 /// # Parameters:
 ///
-/// - `NSTDDisplayMode mode` - The display mode.
+/// - `NSTDDisplayModeHandle mode` - The display mode.
 ///
 /// # Returns
 ///
 /// `NSTDDisplaySize size` - The display mode's size.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_app_display_mode_size(mode: NSTDDisplayMode) -> NSTDDisplaySize {
+pub extern "C" fn nstd_app_display_mode_size(mode: NSTDDisplayModeHandle) -> NSTDDisplaySize {
     let size = mode.size();
     NSTDDisplaySize {
         width: size.width,
@@ -176,14 +176,14 @@ pub extern "C" fn nstd_app_display_mode_size(mode: NSTDDisplayMode) -> NSTDDispl
 ///
 /// # Parameters:
 ///
-/// - `NSTDDisplayMode mode` - The display mode.
+/// - `NSTDDisplayModeHandle mode` - The display mode.
 ///
 /// # Returns
 ///
 /// `NSTDUInt16 bit_depth` - The display mode's bit depth.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_app_display_mode_bit_depth(mode: NSTDDisplayMode) -> NSTDUInt16 {
+pub extern "C" fn nstd_app_display_mode_bit_depth(mode: NSTDDisplayModeHandle) -> NSTDUInt16 {
     mode.bit_depth()
 }
 
@@ -191,13 +191,13 @@ pub extern "C" fn nstd_app_display_mode_bit_depth(mode: NSTDDisplayMode) -> NSTD
 ///
 /// # Parameters:
 ///
-/// - `NSTDDisplayMode mode` - The display mode.
+/// - `NSTDDisplayModeHandle mode` - The display mode.
 ///
 /// # Returns
 ///
 /// `NSTDUInt32 refresh_rate` - The display's refresh rate.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_app_display_mode_refresh_rate(mode: NSTDDisplayMode) -> NSTDUInt32 {
+pub extern "C" fn nstd_app_display_mode_refresh_rate(mode: NSTDDisplayModeHandle) -> NSTDUInt32 {
     mode.refresh_rate_millihertz()
 }

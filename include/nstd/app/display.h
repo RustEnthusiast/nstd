@@ -9,7 +9,7 @@ typedef NSTDAnyMut NSTDDisplay;
 typedef NSTDAny NSTDDisplayHandle;
 
 /// Represents a display's video mode.
-typedef NSTDAny NSTDDisplayMode;
+typedef NSTDAny NSTDDisplayModeHandle;
 
 /// Represents the size of a display.
 typedef struct {
@@ -99,44 +99,45 @@ NSTDAPI NSTDFloat64 nstd_app_display_scale_factor(NSTDDisplayHandle display);
 ///
 /// - `NSTDDisplayHandle display` - A handle to the display.
 ///
-/// - `void (*callback)(NSTDDisplayMode)` - The callback function.
+/// - `void (*callback)(NSTDDisplayModeHandle)` - The callback function.
 ///
 /// # Safety
 ///
 /// The user of this function must guarantee that `callback` is a valid C function pointer.
-NSTDAPI void nstd_app_display_modes(NSTDDisplayHandle display, void (*callback)(NSTDDisplayMode));
+NSTDAPI void nstd_app_display_modes(NSTDDisplayHandle display,
+void (*callback)(NSTDDisplayModeHandle));
 
 /// Returns the size of a display mode.
 ///
 /// # Parameters:
 ///
-/// - `NSTDDisplayMode mode` - The display mode.
+/// - `NSTDDisplayModeHandle mode` - The display mode.
 ///
 /// # Returns
 ///
 /// `NSTDDisplaySize size` - The display mode's size.
-NSTDAPI NSTDDisplaySize nstd_app_display_mode_size(NSTDDisplayMode mode);
+NSTDAPI NSTDDisplaySize nstd_app_display_mode_size(NSTDDisplayModeHandle mode);
 
 /// Returns the bit depth of a display mode.
 ///
 /// # Parameters:
 ///
-/// - `NSTDDisplayMode mode` - The display mode.
+/// - `NSTDDisplayModeHandle mode` - The display mode.
 ///
 /// # Returns
 ///
 /// `NSTDUInt16 bit_depth` - The display mode's bit depth.
-NSTDAPI NSTDUInt16 nstd_app_display_mode_bit_depth(NSTDDisplayMode mode);
+NSTDAPI NSTDUInt16 nstd_app_display_mode_bit_depth(NSTDDisplayModeHandle mode);
 
 /// Returns the refresh rate of a display mode in millihertz.
 ///
 /// # Parameters:
 ///
-/// - `NSTDDisplayMode mode` - The display mode.
+/// - `NSTDDisplayModeHandle mode` - The display mode.
 ///
 /// # Returns
 ///
 /// `NSTDUInt32 refresh_rate` - The display's refresh rate.
-NSTDAPI NSTDUInt32 nstd_app_display_mode_refresh_rate(NSTDDisplayMode mode);
+NSTDAPI NSTDUInt32 nstd_app_display_mode_refresh_rate(NSTDDisplayModeHandle mode);
 
 #endif
