@@ -216,7 +216,7 @@ pub(crate) unsafe fn read_to_string(
     // Make sure the successfully read data is valid UTF-8.
     let read_start = nstd_vec_end(buf).sub(read) as _;
     let bytes = core::slice::from_raw_parts(read_start, read);
-    if let Err(_) = core::str::from_utf8(&bytes) {
+    if core::str::from_utf8(bytes).is_err() {
         let len = nstd_vec_len(buf);
         nstd_vec_set_len(buf, len - read);
         err = NSTD_UNIX_IO_ERROR_INVALID_DATA;
