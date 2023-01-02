@@ -17,7 +17,7 @@ use crate::{
     },
     NSTDUInt,
 };
-use libc::{lseek, SEEK_CUR, SEEK_END};
+use libc::{lseek, SEEK_CUR, SEEK_END, SEEK_SET};
 
 /// `isize::MAX` as a [usize].
 const ISIZE_MAX: usize = isize::MAX as usize;
@@ -138,16 +138,19 @@ pub(crate) unsafe fn read_all(
     if nstd_vec_stride(buffer) != 1 {
         return (NSTD_UNIX_IO_ERROR_INVALID_INPUT, 0);
     }
-    // Get the file size.
-    let (mut buf_size, is_piped) = match lseek(fd, 0, SEEK_END) {
+    // Get the number of bytes remaining in the file.
+    let (mut buf_size, is_piped) = match lseek(fd, 0, SEEK_CUR) {
         -1 => match NSTDUnixIOError::last() {
             // The file is piped and cannot be used with `lseek`. Give it a default buffer size.
             NSTD_UNIX_IO_ERROR_INVALID_SEEK => (PIPE_BUF_SIZE, true),
             err => return (err, 0),
         },
-        size => match lseek(fd, -size, SEEK_CUR) {
+        offset => match lseek(fd, 0, SEEK_END) {
             -1 => return (NSTDUnixIOError::last(), 0),
-            _ => (size as _, false),
+            size => match lseek(fd, offset, SEEK_SET) {
+                -1 => return (NSTDUnixIOError::last(), 0),
+                _ => ((size - offset) as _, false),
+            },
         },
     };
     assert!(buf_size <= ISIZE_MAX);
