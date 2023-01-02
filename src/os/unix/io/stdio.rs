@@ -36,14 +36,14 @@ pub(crate) unsafe fn write(
     fd: NSTDUnixFileDescriptor,
     bytes: &NSTDSlice,
 ) -> (NSTDUnixIOError, NSTDUInt) {
-    // Check if `len` is 0.
     let len = nstd_core_slice_len(bytes);
-    if len == 0 {
-        return (NSTD_UNIX_IO_ERROR_NONE, 0);
-    }
     // Make sure the slice's element size is 1.
     if nstd_core_slice_stride(bytes) != 1 || len > ISIZE_MAX {
         return (NSTD_UNIX_IO_ERROR_INVALID_INPUT, 0);
+    }
+    // Check if `len` is 0.
+    if len == 0 {
+        return (NSTD_UNIX_IO_ERROR_NONE, 0);
     }
     // Write the data.
     match libc::write(fd, nstd_core_slice_as_ptr(bytes), len) {
@@ -63,11 +63,7 @@ pub(crate) unsafe fn write(
 ///
 /// - `bytes` must be valid for reads.
 pub(crate) unsafe fn write_all(fd: NSTDUnixFileDescriptor, bytes: &NSTDSlice) -> NSTDUnixIOError {
-    // Check if `len` is 0.
     let len = nstd_core_slice_len(bytes);
-    if len == 0 {
-        return NSTD_UNIX_IO_ERROR_NONE;
-    }
     // Make sure the slice's element size is 1.
     if nstd_core_slice_stride(bytes) != 1 || len > ISIZE_MAX {
         return NSTD_UNIX_IO_ERROR_INVALID_INPUT;
