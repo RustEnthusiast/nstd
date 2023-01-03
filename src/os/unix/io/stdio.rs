@@ -114,13 +114,12 @@ pub(crate) unsafe fn read(
 
 /// Extends a vector with data from a Unix file until the end of the file is reached.
 ///
+/// This will return an error variant of `NSTD_UNIX_IO_ERROR_INVALID_INPUT` in an attempt to read
+/// more than `NSTDInt::MAX` bytes.
+///
 /// # Panics
 ///
-/// This operation will panic in the following situations:
-///
-/// - `buffer`'s length in bytes ends up exceeding `NSTDInt::MAX`.
-///
-/// - An attempt was made to read more than `NSTDInt::MAX` bytes.
+/// This operation will panic if `buffer`'s length in bytes ends up exceeding `NSTDInt::MAX`.
 ///
 /// # Safety
 ///
@@ -153,7 +152,10 @@ pub(crate) unsafe fn read_all(
             },
         },
     };
-    assert!(buf_size <= ISIZE_MAX);
+    // Check `buf_size`.
+    if buf_size > ISIZE_MAX {
+        return (NSTD_UNIX_IO_ERROR_INVALID_INPUT, 0);
+    }
     // Read data into the vector.
     let start_len = nstd_vec_len(buffer);
     loop {
@@ -192,13 +194,12 @@ pub(crate) unsafe fn read_all(
 ///
 /// If an error occurs, `buffer` is left unchanged.
 ///
+/// This will return an error variant of `NSTD_UNIX_IO_ERROR_INVALID_INPUT` in an attempt to read
+/// more than `NSTDInt::MAX` bytes.
+///
 /// # Panics
 ///
-/// This operation will panic in the following situations:
-///
-/// - `buffer`'s length in bytes ends up exceeding `NSTDInt::MAX`.
-///
-/// - An attempt was made to read more than `NSTDInt::MAX` bytes.
+/// This operation will panic if `buffer`'s length in bytes ends up exceeding `NSTDInt::MAX`.
 ///
 /// # Safety
 ///

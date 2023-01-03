@@ -58,6 +58,10 @@ NSTDAPI NSTDIOError nstd_io_stdin_read(NSTDStdin *handle, NSTDSliceMut *buffer, 
 /// # Returns
 ///
 /// `NSTDIOError errc` - The I/O operation error code.
+///
+/// # Panics
+///
+/// This function will panic if `buffer`'s length in bytes ends up exceeding `NSTDInt`'s max value.
 NSTDAPI NSTDIOError nstd_io_stdin_read_all(NSTDStdin *handle, NSTDVec *buffer, NSTDUInt *read);
 
 /// Continuously reads UTF-8 data from stdin into a string buffer until EOF is reached.
@@ -81,7 +85,7 @@ NSTDAPI NSTDIOError nstd_io_stdin_read_all(NSTDStdin *handle, NSTDVec *buffer, N
 ///
 /// # Panics
 ///
-/// This function will panic if `buffer`'s length in bytes exceeds `NSTDInt`'s max value.
+/// This function will panic if `buffer`'s length in bytes ends up exceeding `NSTDInt`'s max value.
 NSTDAPI NSTDIOError nstd_io_stdin_read_to_string(NSTDStdin *handle, NSTDString *buffer,
 NSTDUInt *read);
 
