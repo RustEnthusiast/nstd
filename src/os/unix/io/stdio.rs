@@ -167,7 +167,7 @@ pub(crate) unsafe fn read_all(
             if reserved < buf_size
                 && nstd_vec_reserve(buffer, buf_size - reserved) != NSTD_ALLOC_ERROR_NONE
             {
-                return (NSTD_UNIX_IO_ERROR_OUT_OF_MEMORY, 0);
+                return (NSTD_UNIX_IO_ERROR_OUT_OF_MEMORY, len - start_len);
             }
         }
         // Attempt to fill the rest of the vector's reserved buffer.
