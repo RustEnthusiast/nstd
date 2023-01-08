@@ -45,17 +45,15 @@ gen_optional!(NSTDOptionalWindowSize, NSTDWindowSize);
 ///
 /// # Returns
 ///
-/// `NSTDWindow window` - A handle to the newly created window.
-///
-/// # Panics
-///
-/// This operation will panic if creating the new window fails.
-#[inline]
+/// `NSTDWindow window` - A handle to the newly created window, or null on error.
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_window_new(app: NSTDAppHandle) -> NSTDWindow {
-    let window = Window::new(app).expect("Failed to create an nstd application window.");
+pub extern "C" fn nstd_window_new(app: NSTDAppHandle) -> Option<NSTDWindow> {
+    let window = match Window::new(app) {
+        Ok(window) => window,
+        _ => return None,
+    };
     window.set_title("");
-    Box::new(window)
+    Some(Box::new(window))
 }
 
 /// Returns a window's unique identifier.

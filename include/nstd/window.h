@@ -37,11 +37,7 @@ NSTDOptional(NSTDWindowSize) NSTDOptionalWindowSize;
 ///
 /// # Returns
 ///
-/// `NSTDWindow window` - A handle to the newly created window.
-///
-/// # Panics
-///
-/// This operation will panic if creating the new window fails.
+/// `NSTDWindow window` - A handle to the newly created window, or null on error.
 NSTDAPI NSTDWindow nstd_window_new(NSTDAppHandle app);
 
 /// Returns a window's unique identifier.
