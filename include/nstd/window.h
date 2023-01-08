@@ -26,7 +26,7 @@ typedef struct {
     NSTDUInt32 height;
 } NSTDWindowSize;
 
-/// A type that yields an optional `NSTDWindowSize` value.
+/// Represents an optional value of type `NSTDWindowSize`.
 NSTDOptional(NSTDWindowSize) NSTDOptionalWindowSize;
 
 /// Creates a new window attached to `app`'s event loop.

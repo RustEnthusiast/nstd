@@ -1,7 +1,10 @@
 //! An `nstd` application window.
 use crate::{
     app::{data::NSTDAppHandle, events::NSTDWindowID},
-    core::{optional::NSTDOptional, str::NSTDStr},
+    core::{
+        optional::{gen_optional, NSTDOptional},
+        str::NSTDStr,
+    },
     image::{nstd_image_as_bytes, nstd_image_height, nstd_image_width, NSTDImage},
     NSTDBool, NSTDFloat64, NSTDInt32, NSTDUInt32,
 };
@@ -15,7 +18,7 @@ pub type NSTDWindow = Box<Window>;
 
 /// Describes the position of a window.
 #[repr(C)]
-#[derive(Clone, Copy, Debug, Default, Hash)]
+#[derive(Clone, Copy)]
 pub struct NSTDWindowPosition {
     /// The position of the window from the left of the screen.
     pub x: NSTDInt32,
@@ -25,16 +28,14 @@ pub struct NSTDWindowPosition {
 
 /// Describes the size of a window.
 #[repr(C)]
-#[derive(Clone, Copy, Debug, Default, Hash)]
+#[derive(Clone, Copy)]
 pub struct NSTDWindowSize {
     /// The width of the window.
     pub width: NSTDUInt32,
     /// The height of the window.
     pub height: NSTDUInt32,
 }
-
-/// A type that yields an optional `NSTDWindowSize` value.
-pub type NSTDOptionalWindowSize = NSTDOptional<NSTDWindowSize>;
+gen_optional!(NSTDOptionalWindowSize, NSTDWindowSize);
 
 /// Creates a new window attached to `app`'s event loop.
 ///
