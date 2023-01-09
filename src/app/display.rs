@@ -2,7 +2,7 @@
 use crate::{
     core::optional::NSTDOptional,
     string::{NSTDOptionalString, NSTDString},
-    NSTDFloat64, NSTDInt32, NSTDUInt16, NSTDUInt32,
+    NSTDAnyMut, NSTDFloat64, NSTDInt32, NSTDUInt16, NSTDUInt32,
 };
 use winit::monitor::{MonitorHandle, VideoMode};
 
@@ -160,7 +160,9 @@ pub extern "C" fn nstd_app_display_scale_factor(display: NSTDDisplayHandle) -> N
 ///
 /// - `NSTDDisplayHandle display` - A handle to the display.
 ///
-/// - `void (*callback)(NSTDDisplayModeHandle)` - The callback function.
+/// - `void (*callback)(NSTDDisplayModeHandle, NSTDAnyMut)` - The callback function.
+///
+/// - `NSTDAnyMut data` - Data to pass to `callback`.
 ///
 /// # Safety
 ///
@@ -169,11 +171,12 @@ pub extern "C" fn nstd_app_display_scale_factor(display: NSTDDisplayHandle) -> N
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_app_display_modes(
     display: NSTDDisplayHandle,
-    callback: Option<unsafe extern "C" fn(NSTDDisplayModeHandle)>,
+    callback: Option<unsafe extern "C" fn(NSTDDisplayModeHandle, NSTDAnyMut)>,
+    data: NSTDAnyMut,
 ) {
     if let Some(callback) = callback {
         for mode in display.video_modes() {
-            callback(&mode);
+            callback(&mode, data);
         }
     }
 }

@@ -13,7 +13,7 @@ use self::{
 use crate::{
     core::{def::NSTDErrorCode, str::NSTDStr},
     heap_ptr::NSTDOptionalHeapPtr,
-    NSTDBool,
+    NSTDAnyMut, NSTDBool,
 };
 use gilrs::{Error::NotImplemented, EventType as GamepadEvent, Gilrs};
 use winit::{
@@ -409,7 +409,9 @@ pub extern "C" fn nstd_app_free(app: NSTDApp) {}
 ///
 /// - `NSTDAppHandle app` - A handle to the `nstd` application.
 ///
-/// - `void (*callback)(NSTDDisplayHandle)` - The callback function.
+/// - `void (*callback)(NSTDDisplayHandle, NSTDAnyMut)` - The callback function.
+///
+/// - `NSTDAnyMut data` - Data to pass to `callback`.
 ///
 /// # Safety
 ///
@@ -418,11 +420,12 @@ pub extern "C" fn nstd_app_free(app: NSTDApp) {}
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_app_displays(
     app: NSTDAppHandle,
-    callback: Option<unsafe extern "C" fn(NSTDDisplayHandle)>,
+    callback: Option<unsafe extern "C" fn(NSTDDisplayHandle, NSTDAnyMut)>,
+    data: NSTDAnyMut,
 ) {
     if let Some(callback) = callback {
         for handle in app.available_monitors() {
-            callback(&handle);
+            callback(&handle, data);
         }
     }
 }
