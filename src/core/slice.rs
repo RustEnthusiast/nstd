@@ -776,7 +776,7 @@ pub extern "C" fn nstd_core_slice_mut_last_const(slice: &NSTDSliceMut) -> NSTDAn
 ///
 /// `NSTDErrorCode errc` - Nonzero on error.
 ///
-/// # Possible errors
+/// # Errors
 ///
 /// - `1` - The two buffer's lengths do not match.
 ///

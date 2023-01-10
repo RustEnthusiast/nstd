@@ -760,7 +760,7 @@ pub extern "C" fn nstd_vec_pop(vec: &mut NSTDVec) -> NSTDAny {
 ///
 /// `NSTDErrorCode errc` - Nonzero on error.
 ///
-/// # Possible errors
+/// # Errors
 ///
 /// - `1` - `index` is greater than the vector's length.
 ///

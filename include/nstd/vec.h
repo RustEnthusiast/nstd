@@ -321,7 +321,7 @@ NSTDAPI NSTDAny nstd_vec_pop(NSTDVec *vec);
 ///
 /// `NSTDErrorCode errc` - Nonzero on error.
 ///
-/// # Possible errors
+/// # Errors
 ///
 /// - `1` - `index` is greater than the vector's length.
 ///
