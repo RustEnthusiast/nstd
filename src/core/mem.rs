@@ -53,7 +53,7 @@ pub unsafe extern "C" fn nstd_core_mem_compare(
     buf2: *const NSTDByte,
     num: NSTDUInt,
 ) -> NSTDBool {
-    #[cfg(not(all(unix, feature = "libc")))]
+    #[cfg(not(all(any(unix, windows), feature = "libc")))]
     {
         use crate::{NSTD_FALSE, NSTD_TRUE};
         // If the two pointers point to the same buffer, or `num` is 0, return true.
@@ -69,7 +69,7 @@ pub unsafe extern "C" fn nstd_core_mem_compare(
         let buf2 = core::slice::from_raw_parts(buf2, num);
         buf1 == buf2
     }
-    #[cfg(all(unix, feature = "libc"))]
+    #[cfg(all(any(unix, windows), feature = "libc"))]
     return libc::memcmp(buf1 as _, buf2 as _, num) == 0;
 }
 
@@ -116,7 +116,7 @@ pub unsafe extern "C" fn nstd_core_mem_search(
     size: NSTDUInt,
     delim: NSTDByte,
 ) -> *const NSTDByte {
-    #[cfg(not(all(unix, feature = "libc")))]
+    #[cfg(not(all(any(unix, windows), feature = "libc")))]
     {
         // Check if `size` is greater than `NSTDInt`'s max size.
         assert!(size <= isize::MAX as usize);
@@ -179,7 +179,7 @@ pub unsafe extern "C" fn nstd_core_mem_search(
             end
         }
     }
-    #[cfg(all(unix, feature = "libc"))]
+    #[cfg(all(any(unix, windows), feature = "libc"))]
     return libc::memchr(buf as _, delim as _, size) as _;
 }
 
@@ -213,7 +213,7 @@ pub unsafe extern "C" fn nstd_core_mem_search(
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_mem_zero(buf: *mut NSTDByte, size: NSTDUInt) {
-    #[cfg(not(all(unix, feature = "libc")))]
+    #[cfg(not(all(any(unix, windows), feature = "libc")))]
     {
         assert!(size <= isize::MAX as usize);
         #[cfg(not(all(
@@ -287,7 +287,7 @@ pub unsafe extern "C" fn nstd_core_mem_zero(buf: *mut NSTDByte, size: NSTDUInt) 
             }
         }
     }
-    #[cfg(all(unix, feature = "libc"))]
+    #[cfg(all(any(unix, windows), feature = "libc"))]
     libc::memset(buf as _, 0, size);
 }
 
@@ -324,7 +324,7 @@ pub unsafe extern "C" fn nstd_core_mem_zero(buf: *mut NSTDByte, size: NSTDUInt) 
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub unsafe extern "C" fn nstd_core_mem_fill(buf: *mut NSTDByte, size: NSTDUInt, fill: NSTDByte) {
-    #[cfg(not(all(unix, feature = "libc")))]
+    #[cfg(not(all(any(unix, windows), feature = "libc")))]
     {
         assert!(size <= isize::MAX as usize);
         #[cfg(not(all(
@@ -374,7 +374,7 @@ pub unsafe extern "C" fn nstd_core_mem_fill(buf: *mut NSTDByte, size: NSTDUInt, 
             );
         }
     }
-    #[cfg(all(unix, feature = "libc"))]
+    #[cfg(all(any(unix, windows), feature = "libc"))]
     libc::memset(buf as _, fill as _, size);
 }
 

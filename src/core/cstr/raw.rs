@@ -28,7 +28,7 @@ use crate::{NSTDBool, NSTDChar, NSTDUInt};
 #[cfg_attr(feature = "clib", no_mangle)]
 #[allow(unused_mut)]
 pub unsafe extern "C" fn nstd_core_cstr_raw_len(mut cstr: *const NSTDChar) -> NSTDUInt {
-    #[cfg(not(any(all(unix, feature = "libc"), all(windows, feature = "windows-sys"))))]
+    #[cfg(not(all(any(unix, windows), feature = "libc")))]
     {
         #[cfg(not(all(
             feature = "asm",
@@ -79,10 +79,8 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_len(mut cstr: *const NSTDChar) -> NS
             len
         }
     }
-    #[cfg(all(unix, feature = "libc"))]
+    #[cfg(all(any(unix, windows), feature = "libc"))]
     return libc::strlen(cstr);
-    #[cfg(all(windows, feature = "windows-sys"))]
-    return windows_sys::Win32::Globalization::lstrlenA(cstr as _) as _;
 }
 
 /// Gets the length of a raw null terminated C string, including the null-terminator.
@@ -148,7 +146,7 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_compare(
     mut cstr1: *const NSTDChar,
     mut cstr2: *const NSTDChar,
 ) -> NSTDBool {
-    #[cfg(not(all(unix, feature = "libc")))]
+    #[cfg(not(all(any(unix, windows), feature = "libc")))]
     {
         #[cfg(not(all(
             feature = "asm",
@@ -218,7 +216,7 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_compare(
             is_eq != 0
         }
     }
-    #[cfg(all(unix, feature = "libc"))]
+    #[cfg(all(any(unix, windows), feature = "libc"))]
     return libc::strcmp(cstr1, cstr2) == 0;
 }
 
@@ -352,7 +350,7 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_copy_with_null(
     mut dest: *mut NSTDChar,
     mut src: *const NSTDChar,
 ) {
-    #[cfg(not(all(unix, feature = "libc")))]
+    #[cfg(not(all(any(unix, windows), feature = "libc")))]
     {
         #[cfg(not(all(
             feature = "asm",
@@ -403,6 +401,6 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_copy_with_null(
             );
         }
     }
-    #[cfg(all(unix, feature = "libc"))]
+    #[cfg(all(any(unix, windows), feature = "libc"))]
     libc::strcpy(dest, src);
 }
