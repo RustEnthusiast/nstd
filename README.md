@@ -97,6 +97,9 @@ or return valid references.
 
 - Private (non-`pub`) structure members must not be directly accessed by the user.
 
+- Structured enum variants must be checked before they're accessed (eg. `NSTDOptional` or
+`NSTDResult` types).
+
 - Data is *moved* when using the value-copy semantic on a type that does not implement `Copy`.
 
 - The panic behavior is set to abort by default, as it is undefined behavior to unwind from Rust
