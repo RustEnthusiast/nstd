@@ -141,9 +141,9 @@ pub unsafe extern "C" fn nstd_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMu
 
 /// Reallocates a block of memory previously allocated by `nstd_alloc_allocate[_zeroed]`.
 ///
-/// If everything goes right, the pointer will point to the new memory location and 0 will be
-/// returned. If this is not the case and allocation fails, the pointer will remain untouched and a
-/// value of nonzero is returned.
+/// If everything goes right, the pointer will point to the new memory location and
+/// `NSTD_ALLOC_ERROR_NONE` will be returned. If this is not the case and allocation fails, the
+/// pointer will remain untouched and the appropriate error is returned.
 ///
 /// # Parameters:
 ///
