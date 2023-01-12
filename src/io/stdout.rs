@@ -1,6 +1,8 @@
 //! A handle to the standard output stream.
 use crate::{core::slice::NSTDSlice, io::NSTDIOError, NSTDUInt};
 use std::io::Stdout;
+#[cfg(unix)]
+use std::os::unix::io::AsRawFd;
 
 /// A handle to the standard output stream.
 pub type NSTDStdout = Box<Stdout>;
@@ -46,9 +48,18 @@ pub unsafe extern "C" fn nstd_io_stdout_write(
     bytes: &NSTDSlice,
     written: &mut NSTDUInt,
 ) -> NSTDIOError {
-    let (err, w) = crate::io::stdio::write(handle, bytes);
-    *written = w;
-    err
+    #[cfg(not(unix))]
+    {
+        let (err, w) = crate::io::stdio::write(handle, bytes);
+        *written = w;
+        err
+    }
+    #[cfg(unix)]
+    {
+        let (err, w) = crate::os::unix::io::stdio::write(handle.lock().as_raw_fd(), bytes);
+        *written = w;
+        err.into()
+    }
 }
 
 /// Writes an entire buffer to the standard output stream.
@@ -77,7 +88,10 @@ pub unsafe extern "C" fn nstd_io_stdout_write_all(
     handle: &mut NSTDStdout,
     bytes: &NSTDSlice,
 ) -> NSTDIOError {
-    crate::io::stdio::write_all(handle, bytes)
+    #[cfg(not(unix))]
+    return crate::io::stdio::write_all(handle, bytes);
+    #[cfg(unix)]
+    return crate::os::unix::io::stdio::write_all(handle.lock().as_raw_fd(), bytes).into();
 }
 
 /// Flushes the standard output stream.

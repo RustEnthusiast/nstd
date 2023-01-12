@@ -57,6 +57,7 @@ int main()
     - `os` - Operating system specific functionality.
         - `unix` - Low level Unix-like operating system support.
             - `alloc` - Memory allocation for Unix-like systems.
+            - `io` - Provides functionality for working with input & output on Unix platforms.
             - `shared_lib` - Provides shared library access for Unix-like systems.
         - `windows` - OS support for Windows.
             - `alloc` - Low level memory allocation for Windows.
@@ -99,6 +100,9 @@ or return valid references.
 - Reference data is assumed to remain unaltered by other code/threads.
 
 - Private (non-`pub`) structure members must not be directly accessed by the user.
+
+- Structured enum variants must be checked before they're accessed (eg. `NSTDOptional` or
+`NSTDResult` types).
 
 - Data is *moved* when using the value-copy semantic on a type that does not implement `Copy`.
 
