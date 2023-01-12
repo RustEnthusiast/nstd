@@ -137,6 +137,10 @@ NSTDAPI NSTDIOError nstd_fs_file_read(NSTDFile *file, NSTDSliceMut *buffer, NSTD
 /// # Returns
 ///
 /// `NSTDIOError errc` - The I/O operation error code.
+///
+/// # Panics
+///
+/// This function will panic if `buffer`'s length in bytes ends up exceeding `NSTDInt`'s max value.
 NSTDAPI NSTDIOError nstd_fs_file_read_all(NSTDFile *file, NSTDVec *buffer, NSTDUInt *read);
 
 /// Continuously reads UTF-8 data from `file` into a string buffer until EOF is reached.
@@ -160,7 +164,7 @@ NSTDAPI NSTDIOError nstd_fs_file_read_all(NSTDFile *file, NSTDVec *buffer, NSTDU
 ///
 /// # Panics
 ///
-/// This function will panic if `buffer`'s length in bytes exceeds `NSTDInt`'s max value.
+/// This function will panic if `buffer`'s length in bytes ends up exceeding `NSTDInt`'s max value.
 NSTDAPI NSTDIOError nstd_fs_file_read_to_string(NSTDFile *file, NSTDString *buffer, NSTDUInt *read);
 
 /// Reads enough data from `file` to fill the entirety of `buffer`.

@@ -114,13 +114,15 @@ NSTDAPI NSTDFloat64 nstd_app_display_scale_factor(NSTDDisplayHandle display);
 ///
 /// - `NSTDDisplayHandle display` - A handle to the display.
 ///
-/// - `void (*callback)(NSTDDisplayModeHandle)` - The callback function.
+/// - `void (*callback)(NSTDDisplayModeHandle, NSTDAnyMut)` - The callback function.
+///
+/// - `NSTDAnyMut data` - Data to pass to `callback`.
 ///
 /// # Safety
 ///
 /// The user of this function must guarantee that `callback` is a valid C function pointer.
 NSTDAPI void nstd_app_display_modes(NSTDDisplayHandle display,
-void (*callback)(NSTDDisplayModeHandle));
+void (*callback)(NSTDDisplayModeHandle), NSTDAnyMut data);
 
 /// Creates a new `NSTDDisplayMode` from it's handle.
 ///

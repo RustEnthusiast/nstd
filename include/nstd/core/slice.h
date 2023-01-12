@@ -315,7 +315,7 @@ NSTDAPI NSTDAny nstd_core_slice_mut_last_const(const NSTDSliceMut *slice);
 ///
 /// `NSTDErrorCode errc` - Nonzero on error.
 ///
-/// # Possible errors
+/// # Errors
 ///
 /// - `1` - The two buffer's lengths do not match.
 ///

@@ -12,6 +12,7 @@
 ### `nstd.heap_ptr`
 - Added `NSTDOptionalHeapPtr`.
 ### `nstd.os`
+- Added `nstd.os.unix.io`.
 - `nstd_os_windows_shared_lib_load` now accepts Unicode.
 - Added `nstd_os_windows_str_to_utf16`.
 - Added `nstd_os_unix_shared_lib_handle`.

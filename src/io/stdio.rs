@@ -1,4 +1,5 @@
 //! Contains common I/O operations for [Read] & [Write] with `nstd` types.
+#![allow(dead_code)]
 use crate::{
     alloc::NSTDAllocError,
     core::{

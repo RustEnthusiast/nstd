@@ -88,12 +88,15 @@ NSTDAPI void nstd_app_free(NSTDApp app);
 ///
 /// - `NSTDAppHandle app` - A handle to the `nstd` application.
 ///
-/// - `void (*callback)(NSTDDisplayHandle)` - The callback function.
+/// - `void (*callback)(NSTDDisplayHandle, NSTDAnyMut)` - The callback function.
+///
+/// - `NSTDAnyMut data` - Data to pass to `callback`.
 ///
 /// # Safety
 ///
 /// The user of this function must guarantee that `callback` is a valid C function pointer.
-NSTDAPI void nstd_app_displays(NSTDAppHandle app, void (*callback)(NSTDDisplayHandle));
+NSTDAPI void nstd_app_displays(NSTDAppHandle app, void (*callback)(NSTDDisplayHandle, NSTDAnyMut),
+NSTDAnyMut data);
 
 /// Returns a handle to the primary display.
 ///
