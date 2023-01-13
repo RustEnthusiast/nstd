@@ -20,6 +20,10 @@ impl Drop for NSTDUnixSharedLib {
         unsafe { assert!(dlclose(self.handle) == 0) };
     }
 }
+// SAFETY: `NSTDUnixSharedLib` owns a handle to the dynamically loaded library.
+unsafe impl Send for NSTDUnixSharedLib {}
+// SAFETY: `NSTDUnixSharedLib` does not undergo interior mutability.
+unsafe impl Sync for NSTDUnixSharedLib {}
 
 /// Represents an optional `NSTDUnixSharedLib`.
 pub type NSTDUnixOptionalSharedLib = NSTDOptional<NSTDUnixSharedLib>;
