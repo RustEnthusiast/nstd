@@ -25,7 +25,7 @@ use winit::{
 #[repr(C)]
 pub struct NSTDApp {
     /// The application event callback function pointers.
-    events: NSTDAppEvents,
+    pub events: NSTDAppEvents,
     /// Private app data.
     inner: Box<AppData>,
 }
@@ -78,21 +78,6 @@ pub extern "C" fn nstd_app_new() -> NSTDApp {
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_app_handle(app: &NSTDApp) -> NSTDAppHandle {
     &app.inner.event_loop
-}
-
-/// Returns a mutable reference to an `NSTDApp`'s event table.
-///
-/// # Parameters:
-///
-/// - `NSTDApp *app` - A pointer to the `nstd` app.
-///
-/// # Returns
-///
-/// `NSTDAppEvents *events` - A pointer to the application event table.
-#[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_app_events(app: &mut NSTDApp) -> &mut NSTDAppEvents {
-    &mut app.events
 }
 
 /// Runs an `NSTDApp`'s event loop.
