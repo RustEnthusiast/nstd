@@ -10,8 +10,8 @@ use crate::{
         optional::{gen_optional, NSTDOptional},
         ptr::raw::{nstd_core_ptr_raw_dangling, nstd_core_ptr_raw_dangling_mut},
         slice::{
-            nstd_core_slice_as_ptr, nstd_core_slice_len, nstd_core_slice_mut_new,
-            nstd_core_slice_new, nstd_core_slice_stride, NSTDSlice, NSTDSliceMut,
+            nstd_core_slice_as_ptr, nstd_core_slice_len, nstd_core_slice_mut_new_unchecked,
+            nstd_core_slice_new_unchecked, nstd_core_slice_stride, NSTDSlice, NSTDSliceMut,
         },
     },
     NSTDAny, NSTDAnyMut, NSTDUInt, NSTD_NULL,
@@ -424,9 +424,12 @@ pub extern "C" fn nstd_vec_reserved(vec: &NSTDVec) -> NSTDUInt {
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_vec_as_slice(vec: &NSTDVec) -> NSTDSlice {
-    match vec.ptr.is_null() {
-        false => nstd_core_slice_new(vec.ptr, vec.stride, vec.len),
-        _ => nstd_core_slice_new(nstd_core_ptr_raw_dangling(), vec.stride, 0),
+    // SAFETY: `vec.ptr` is checked.
+    unsafe {
+        match vec.ptr.is_null() {
+            false => nstd_core_slice_new_unchecked(vec.ptr, vec.stride, vec.len),
+            _ => nstd_core_slice_new_unchecked(nstd_core_ptr_raw_dangling(), vec.stride, 0),
+        }
     }
 }
 
@@ -442,9 +445,12 @@ pub extern "C" fn nstd_vec_as_slice(vec: &NSTDVec) -> NSTDSlice {
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_vec_as_slice_mut(vec: &mut NSTDVec) -> NSTDSliceMut {
-    match vec.ptr.is_null() {
-        false => nstd_core_slice_mut_new(vec.ptr, vec.stride, vec.len),
-        _ => nstd_core_slice_mut_new(nstd_core_ptr_raw_dangling_mut(), vec.stride, 0),
+    // SAFETY: `vec.ptr` is checked.
+    unsafe {
+        match vec.ptr.is_null() {
+            false => nstd_core_slice_mut_new_unchecked(vec.ptr, vec.stride, vec.len),
+            _ => nstd_core_slice_mut_new_unchecked(nstd_core_ptr_raw_dangling_mut(), vec.stride, 0),
+        }
     }
 }
 

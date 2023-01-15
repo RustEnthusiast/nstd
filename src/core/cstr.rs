@@ -5,7 +5,7 @@ use crate::{
     core::{
         mem::nstd_core_mem_search,
         optional::{gen_optional, NSTDOptional},
-        slice::{nstd_core_slice_new, NSTDSlice},
+        slice::{nstd_core_slice_new_unchecked, NSTDSlice},
     },
     NSTDBool, NSTDChar, NSTDUInt,
 };
@@ -216,7 +216,8 @@ pub unsafe extern "C" fn nstd_core_cstr_from_raw_with_null(raw: *const NSTDChar)
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_cstr_as_bytes(cstr: &NSTDCStr) -> NSTDSlice {
-    nstd_core_slice_new(cstr.ptr.cast(), 1, cstr.len)
+    // SAFETY: `cstr.ptr` is never null.
+    unsafe { nstd_core_slice_new_unchecked(cstr.ptr.cast(), 1, cstr.len) }
 }
 
 /// Returns a pointer to the first character in a C string slice.
@@ -674,7 +675,8 @@ pub unsafe extern "C" fn nstd_core_cstr_mut_from_raw_with_null(raw: *mut NSTDCha
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_cstr_mut_as_const(cstr: &NSTDCStrMut) -> NSTDCStr {
-    nstd_core_cstr_new(cstr.ptr, cstr.len)
+    // SAFETY: `cstr.ptr` is never null.
+    unsafe { nstd_core_cstr_new_unchecked(cstr.ptr, cstr.len) }
 }
 
 /// Returns a byte slice of a C string slice's data.
@@ -706,7 +708,8 @@ pub extern "C" fn nstd_core_cstr_mut_as_const(cstr: &NSTDCStrMut) -> NSTDCStr {
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_cstr_mut_as_bytes(cstr: &NSTDCStrMut) -> NSTDSlice {
-    nstd_core_slice_new(cstr.ptr.cast(), 1, cstr.len)
+    // SAFETY: `cstr.ptr` is never null.
+    unsafe { nstd_core_slice_new_unchecked(cstr.ptr.cast(), 1, cstr.len) }
 }
 
 /// Returns a pointer to the first character in a C string slice.

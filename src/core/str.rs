@@ -3,7 +3,7 @@ use crate::{
     core::{
         cstr::{
             nstd_core_cstr_as_ptr, nstd_core_cstr_len, nstd_core_cstr_mut_as_ptr,
-            nstd_core_cstr_mut_len, nstd_core_cstr_new,
+            nstd_core_cstr_mut_len, nstd_core_cstr_new_unchecked,
             raw::{nstd_core_cstr_raw_len, nstd_core_cstr_raw_len_with_null},
             NSTDCStr, NSTDCStrMut,
         },
@@ -17,8 +17,8 @@ use crate::{
         range::NSTDURange,
         slice::{
             nstd_core_slice_as_ptr, nstd_core_slice_len, nstd_core_slice_mut_as_ptr,
-            nstd_core_slice_mut_len, nstd_core_slice_mut_new, nstd_core_slice_mut_stride,
-            nstd_core_slice_new, nstd_core_slice_stride, NSTDSlice, NSTDSliceMut,
+            nstd_core_slice_mut_len, nstd_core_slice_mut_new_unchecked, nstd_core_slice_mut_stride,
+            nstd_core_slice_new_unchecked, nstd_core_slice_stride, NSTDSlice, NSTDSliceMut,
         },
         unichar::NSTDOptionalUnichar,
     },
@@ -391,7 +391,8 @@ pub unsafe extern "C" fn nstd_core_str_from_bytes_unchecked(bytes: &NSTDSlice) -
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_str_as_cstr(str: &NSTDStr) -> NSTDCStr {
-    nstd_core_cstr_new(str.ptr.cast(), str.len)
+    // SAFETY: `str.ptr` is never null.
+    unsafe { nstd_core_cstr_new_unchecked(str.ptr.cast(), str.len) }
 }
 
 /// Returns an immutable byte slice over `str`'s data.
@@ -422,7 +423,8 @@ pub extern "C" fn nstd_core_str_as_cstr(str: &NSTDStr) -> NSTDCStr {
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_str_as_bytes(str: &NSTDStr) -> NSTDSlice {
-    nstd_core_slice_new(str.ptr.cast(), 1, str.len)
+    // SAFETY: `str.ptr` is never null.
+    unsafe { nstd_core_slice_new_unchecked(str.ptr.cast(), 1, str.len) }
 }
 
 /// Returns a raw pointer to a string slice's memory.
@@ -603,7 +605,7 @@ pub unsafe extern "C" fn nstd_core_str_substr(str: &NSTDStr, range: NSTDURange) 
     assert!(range.start <= isize::MAX as usize && range.start <= range.end && range.end <= str.len);
     // Create the byte slice with `range` and use it to create the new string slice.
     let start = str.ptr.add(range.start).cast();
-    let bytes = nstd_core_slice_new(start, 1, range.end - range.start);
+    let bytes = nstd_core_slice_new_unchecked(start, 1, range.end - range.start);
     nstd_core_str_from_bytes(&bytes)
 }
 
@@ -1205,7 +1207,8 @@ pub extern "C" fn nstd_core_str_mut_as_const(str: &NSTDStrMut) -> NSTDStr {
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_str_mut_as_cstr(str: &NSTDStrMut) -> NSTDCStr {
-    nstd_core_cstr_new(str.ptr.cast(), str.len)
+    // SAFETY: `str.ptr` is never null.
+    unsafe { nstd_core_cstr_new_unchecked(str.ptr.cast(), str.len) }
 }
 
 /// Returns an immutable byte slice over `str`'s data.
@@ -1238,7 +1241,8 @@ pub extern "C" fn nstd_core_str_mut_as_cstr(str: &NSTDStrMut) -> NSTDCStr {
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_str_mut_as_bytes(str: &NSTDStrMut) -> NSTDSlice {
-    nstd_core_slice_new(str.ptr.cast(), 1, str.len)
+    // SAFETY: `str.ptr` is never null.
+    unsafe { nstd_core_slice_new_unchecked(str.ptr.cast(), 1, str.len) }
 }
 
 /// Returns an immutable raw pointer to a string slice's memory.
@@ -1429,7 +1433,7 @@ pub unsafe extern "C" fn nstd_core_str_mut_substr(
     assert!(range.start <= isize::MAX as usize && range.start <= range.end && range.end <= str.len);
     // Create the byte slice with `range` and use it to create the new string slice.
     let start = str.ptr.add(range.start).cast();
-    let mut bytes = nstd_core_slice_mut_new(start, 1, range.end - range.start);
+    let mut bytes = nstd_core_slice_mut_new_unchecked(start, 1, range.end - range.start);
     nstd_core_str_mut_from_bytes(&mut bytes)
 }
 

@@ -33,9 +33,10 @@ impl NSTDSlice {
     #[inline]
     #[allow(dead_code)]
     pub(crate) fn from_slice<T>(s: &[T]) -> Self {
-        Self {
-            ptr: nstd_core_ptr_new(s.as_ptr() as _, core::mem::size_of::<T>()),
-            len: s.len(),
+        // SAFETY: Rust references are never null.
+        unsafe {
+            let ptr = nstd_core_ptr_new_unchecked(s.as_ptr() as _, core::mem::size_of::<T>());
+            Self { ptr, len: s.len() }
         }
     }
 
@@ -480,7 +481,8 @@ pub unsafe extern "C" fn nstd_core_slice_mut_new_unchecked(
 pub extern "C" fn nstd_core_slice_mut_as_const(slice: &NSTDSliceMut) -> NSTDSlice {
     let ptr = nstd_core_slice_mut_as_ptr_const(slice);
     let stride = nstd_core_slice_mut_stride(slice);
-    nstd_core_slice_new(ptr, stride, slice.len)
+    // SAFETY: `ptr` is never null.
+    unsafe { nstd_core_slice_new_unchecked(ptr, stride, slice.len) }
 }
 
 /// Returns a raw pointer to the slice's memory.

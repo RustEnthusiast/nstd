@@ -198,7 +198,8 @@ pub unsafe extern "C" fn nstd_core_ptr_mut_new_unchecked(
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_ptr_mut_as_const(ptr: &NSTDPtrMut) -> NSTDPtr {
-    nstd_core_ptr_new(ptr.raw, ptr.size)
+    // SAFETY: `ptr.raw` is never null.
+    unsafe { nstd_core_ptr_new_unchecked(ptr.raw, ptr.size) }
 }
 
 /// Returns the size of the object being pointed to.

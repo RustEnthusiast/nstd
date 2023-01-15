@@ -5,7 +5,7 @@ use crate::{
     core::{
         def::NSTDByte,
         optional::{gen_optional, NSTDOptional},
-        slice::{nstd_core_slice_new, NSTDSlice},
+        slice::{nstd_core_slice_new_unchecked, NSTDSlice},
         str::{
             nstd_core_str_as_bytes, nstd_core_str_from_bytes_unchecked, nstd_core_str_len,
             nstd_core_str_mut_from_bytes_unchecked, NSTDStr, NSTDStrMut,
@@ -373,9 +373,11 @@ pub extern "C" fn nstd_string_push(string: &mut NSTDString, chr: NSTDUnichar) ->
     let chr = char::from(chr);
     let mut buf = [0; 4];
     chr.encode_utf8(&mut buf);
-    let buf = nstd_core_slice_new(buf.as_ptr().cast(), 1, chr.len_utf8());
     // SAFETY: `buf`'s data is stored on the stack.
-    unsafe { nstd_vec_extend(&mut string.bytes, &buf) }
+    unsafe {
+        let buf = nstd_core_slice_new_unchecked(buf.as_ptr() as _, 1, chr.len_utf8());
+        nstd_vec_extend(&mut string.bytes, &buf)
+    }
 }
 
 /// Appends a string slice to the end of a string.

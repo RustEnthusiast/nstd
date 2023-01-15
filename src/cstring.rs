@@ -4,7 +4,7 @@ use crate::{
     core::{
         cstr::{
             nstd_core_cstr_as_bytes, nstd_core_cstr_get_null, nstd_core_cstr_is_null_terminated,
-            nstd_core_cstr_new, NSTDCStr,
+            nstd_core_cstr_new, nstd_core_cstr_new_unchecked, NSTDCStr,
         },
         optional::{gen_optional, NSTDOptional},
         slice::NSTDSlice,
@@ -221,7 +221,8 @@ pub extern "C" fn nstd_cstring_clone(cstring: &NSTDCString) -> NSTDCString {
 pub extern "C" fn nstd_cstring_as_cstr(cstring: &NSTDCString) -> NSTDCStr {
     let ptr = nstd_vec_as_ptr(&cstring.bytes);
     let len = nstd_vec_len(&cstring.bytes);
-    nstd_core_cstr_new(ptr.cast(), len)
+    // SAFETY: `ptr` is never null, owned C strings always have at least one byte allocated.
+    unsafe { nstd_core_cstr_new_unchecked(ptr as _, len) }
 }
 
 /// Returns an immutable byte slice of the C string's active data, including the null byte.
