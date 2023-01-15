@@ -75,6 +75,42 @@ pub extern "C" fn nstd_core_cstr_new(raw: *const NSTDChar, len: NSTDUInt) -> NST
     NSTDCStr { ptr: raw, len }
 }
 
+/// Creates a new C string slice from a raw pointer and a size without checking if `raw` is null.
+///
+/// # Parameters:
+///
+/// - `const NSTDChar *raw` - A pointer to the first character to be in the C string slice.
+///
+/// - `NSTDUInt len` - The length of the C string slice.
+///
+/// # Returns
+///
+/// `NSTDCStr cstr` - The new C string slice, referencing `raw`'s data.
+///
+/// # Safety
+///
+/// The user of this function must ensure that `raw` is not null.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::cstr::{nstd_core_cstr_is_null_terminated, nstd_core_cstr_new_unchecked};
+///
+/// let str = "This is a null-terminated C string slice.\0";
+/// unsafe {
+///     let cstr = nstd_core_cstr_new_unchecked(str.as_ptr().cast(), str.len());
+///     assert!(nstd_core_cstr_is_null_terminated(&cstr));
+/// }
+/// ```
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_core_cstr_new_unchecked(
+    raw: *const NSTDChar,
+    len: NSTDUInt,
+) -> NSTDCStr {
+    NSTDCStr { ptr: raw, len }
+}
+
 /// Creates a new instance of `NSTDCStr` from a raw C string, excluding the null byte.
 ///
 /// # Parameters:
@@ -494,6 +530,44 @@ gen_optional!(NSTDOptionalCStrMut, NSTDCStrMut);
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_cstr_mut_new(raw: *mut NSTDChar, len: NSTDUInt) -> NSTDCStrMut {
     assert!(!raw.is_null());
+    NSTDCStrMut { ptr: raw, len }
+}
+
+/// Creates a new C string slice from a raw pointer and a size without checking if `raw` is null.
+///
+/// # Parameters:
+///
+/// - `NSTDChar *raw` - A pointer to the first character to be in the C string slice.
+///
+/// - `NSTDUInt len` - The length of the C string slice.
+///
+/// # Returns
+///
+/// `NSTDCStrMut cstr` - The new C string slice, referencing `raw`'s data.
+///
+/// # Safety
+///
+/// The user of this function must ensure that `raw` is not null.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::cstr::{
+///     nstd_core_cstr_mut_is_null_terminated, nstd_core_cstr_mut_new_unchecked,
+/// };
+///
+/// let mut str = String::from("This is a null-terminated C string slice.\0");
+/// unsafe {
+///     let cstr = nstd_core_cstr_mut_new_unchecked(str.as_mut_ptr().cast(), str.len());
+///     assert!(nstd_core_cstr_mut_is_null_terminated(&cstr));
+/// }
+/// ```
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_core_cstr_mut_new_unchecked(
+    raw: *mut NSTDChar,
+    len: NSTDUInt,
+) -> NSTDCStrMut {
     NSTDCStrMut { ptr: raw, len }
 }
 

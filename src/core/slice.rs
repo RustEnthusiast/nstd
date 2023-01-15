@@ -6,8 +6,9 @@ use crate::{
         optional::{gen_optional, NSTDOptional},
         ptr::{
             nstd_core_ptr_get, nstd_core_ptr_mut_get, nstd_core_ptr_mut_get_const,
-            nstd_core_ptr_mut_new, nstd_core_ptr_mut_size, nstd_core_ptr_new, nstd_core_ptr_size,
-            NSTDPtr, NSTDPtrMut,
+            nstd_core_ptr_mut_new, nstd_core_ptr_mut_new_unchecked, nstd_core_ptr_mut_size,
+            nstd_core_ptr_new, nstd_core_ptr_new_unchecked, nstd_core_ptr_size, NSTDPtr,
+            NSTDPtrMut,
         },
     },
     NSTDAny, NSTDAnyMut, NSTDUInt, NSTD_NULL,
@@ -96,6 +97,36 @@ pub extern "C" fn nstd_core_slice_new(
 ) -> NSTDSlice {
     NSTDSlice {
         ptr: nstd_core_ptr_new(ptr, element_size),
+        len,
+    }
+}
+
+/// Creates a new slice from raw data without checking if `ptr` is null.
+///
+/// # Parameters:
+///
+/// - `NSTDAny ptr` - A pointer to the first element in the sequence.
+///
+/// - `NSTDUInt element_size` - The number of bytes each element occupies.
+///
+/// - `NSTDUInt len` - The number of elements in the sequence.
+///
+/// # Returns
+///
+/// `NSTDSlice slice` - The new slice.
+///
+/// # Safety
+///
+/// The user of this function must ensure that `ptr` is not null.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_core_slice_new_unchecked(
+    ptr: NSTDAny,
+    element_size: NSTDUInt,
+    len: NSTDUInt,
+) -> NSTDSlice {
+    NSTDSlice {
+        ptr: nstd_core_ptr_new_unchecked(ptr, element_size),
         len,
     }
 }
@@ -401,6 +432,36 @@ pub extern "C" fn nstd_core_slice_mut_new(
 ) -> NSTDSliceMut {
     NSTDSliceMut {
         ptr: nstd_core_ptr_mut_new(ptr, element_size),
+        len,
+    }
+}
+
+/// Creates a new slice from raw data without checking if `ptr` is null.
+///
+/// # Parameters:
+///
+/// - `NSTDAnyMut ptr` - A pointer to the first element in the sequence.
+///
+/// - `NSTDUInt element_size` - The number of bytes each element occupies.
+///
+/// - `NSTDUInt len` - The number of elements in the sequence.
+///
+/// # Returns
+///
+/// `NSTDSliceMut slice` - The new slice.
+///
+/// # Safety
+///
+/// The user of this function must ensure that `ptr` is not null.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_core_slice_mut_new_unchecked(
+    ptr: NSTDAnyMut,
+    element_size: NSTDUInt,
+    len: NSTDUInt,
+) -> NSTDSliceMut {
+    NSTDSliceMut {
+        ptr: nstd_core_ptr_mut_new_unchecked(ptr, element_size),
         len,
     }
 }

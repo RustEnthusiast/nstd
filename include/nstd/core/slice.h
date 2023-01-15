@@ -38,8 +38,26 @@ NSTDOptional(NSTDSlice) NSTDOptionalSlice;
 /// # Panics
 ///
 /// Panics if `ptr` is null.
-NSTDAPI NSTDSlice nstd_core_slice_new(NSTDAny ptr, NSTDUInt element_size,
-NSTDUInt len);
+NSTDAPI NSTDSlice nstd_core_slice_new(NSTDAny ptr, NSTDUInt element_size, NSTDUInt len);
+
+/// Creates a new slice from raw data without checking if `ptr` is null.
+///
+/// # Parameters:
+///
+/// - `NSTDAny ptr` - A pointer to the first element in the sequence.
+///
+/// - `NSTDUInt element_size` - The number of bytes each element occupies.
+///
+/// - `NSTDUInt len` - The number of elements in the sequence.
+///
+/// # Returns
+///
+/// `NSTDSlice slice` - The new slice.
+///
+/// # Safety
+///
+/// The user of this function must ensure that `ptr` is not null.
+NSTDAPI NSTDSlice nstd_core_slice_new_unchecked(NSTDAny ptr, NSTDUInt element_size, NSTDUInt len);
 
 /// Returns a raw pointer to the slice's memory.
 ///
@@ -155,6 +173,26 @@ NSTDOptional(NSTDSliceMut) NSTDOptionalSliceMut;
 ///
 /// Panics if `ptr` is null.
 NSTDAPI NSTDSliceMut nstd_core_slice_mut_new(NSTDAnyMut ptr, NSTDUInt element_size, NSTDUInt len);
+
+/// Creates a new slice from raw data without checking if `ptr` is null.
+///
+/// # Parameters:
+///
+/// - `NSTDAnyMut ptr` - A pointer to the first element in the sequence.
+///
+/// - `NSTDUInt element_size` - The number of bytes each element occupies.
+///
+/// - `NSTDUInt len` - The number of elements in the sequence.
+///
+/// # Returns
+///
+/// `NSTDSliceMut slice` - The new slice.
+///
+/// # Safety
+///
+/// The user of this function must ensure that `ptr` is not null.
+NSTDAPI NSTDSliceMut nstd_core_slice_mut_new_unchecked(NSTDAnyMut ptr, NSTDUInt element_size,
+NSTDUInt len);
 
 /// Creates an immutable version of a mutable slice.
 ///

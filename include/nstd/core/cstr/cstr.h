@@ -37,6 +37,23 @@ NSTDOptional(NSTDCStr) NSTDOptionalCStr;
 /// Panics if `raw` is null.
 NSTDAPI NSTDCStr nstd_core_cstr_new(const NSTDChar *raw, NSTDUInt len);
 
+/// Creates a new C string slice from a raw pointer and a size without checking if `raw` is null.
+///
+/// # Parameters:
+///
+/// - `const NSTDChar *raw` - A pointer to the first character to be in the C string slice.
+///
+/// - `NSTDUInt len` - The length of the C string slice.
+///
+/// # Returns
+///
+/// `NSTDCStr cstr` - The new C string slice, referencing `raw`'s data.
+///
+/// # Safety
+///
+/// The user of this function must ensure that `raw` is not null.
+NSTDAPI NSTDCStr nstd_core_cstr_new_unchecked(const NSTDChar *raw, NSTDUInt len);
+
 /// Creates a new instance of `NSTDCStr` from a raw C string, excluding the null byte.
 ///
 /// # Parameters:
@@ -224,6 +241,23 @@ NSTDOptional(NSTDCStrMut) NSTDOptionalCStrMut;
 ///
 /// Panics if `raw` is null.
 NSTDAPI NSTDCStrMut nstd_core_cstr_mut_new(NSTDChar *raw, NSTDUInt len);
+
+/// Creates a new C string slice from a raw pointer and a size without checking if `raw` is null.
+///
+/// # Parameters:
+///
+/// - `NSTDChar *raw` - A pointer to the first character to be in the C string slice.
+///
+/// - `NSTDUInt len` - The length of the C string slice.
+///
+/// # Returns
+///
+/// `NSTDCStrMut cstr` - The new C string slice, referencing `raw`'s data.
+///
+/// # Safety
+///
+/// The user of this function must ensure that `raw` is not null.
+NSTDAPI NSTDCStrMut nstd_core_cstr_mut_new_unchecked(NSTDChar *raw, NSTDUInt len);
 
 /// Creates a new instance of `NSTDCStrMut` from a raw C string, excluding the null byte.
 ///

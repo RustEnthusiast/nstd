@@ -46,6 +46,27 @@ pub extern "C" fn nstd_core_ptr_new(obj: NSTDAny, size: NSTDUInt) -> NSTDPtr {
     NSTDPtr { raw: obj, size }
 }
 
+/// Creates a new instance of `NSTDPtr` without checking if `obj` is null.
+///
+/// # Parameters:
+///
+/// - `NSTDAny obj` - The object to point to.
+///
+/// - `NSTDUInt size` - The number of bytes that `obj`'s type occupies.
+///
+/// # Returns
+///
+/// `NSTDPtr ptr` - A new instance of `NSTDPtr` that points to `obj`.
+///
+/// # Safety
+///
+/// The user of this function must ensure that `obj` is not null.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_core_ptr_new_unchecked(obj: NSTDAny, size: NSTDUInt) -> NSTDPtr {
+    NSTDPtr { raw: obj, size }
+}
+
 /// Returns the size of the object being pointed to.
 ///
 /// # Parameters:
@@ -138,6 +159,30 @@ gen_optional!(NSTDOptionalPtrMut, NSTDPtrMut);
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_core_ptr_mut_new(obj: NSTDAnyMut, size: NSTDUInt) -> NSTDPtrMut {
     assert!(!obj.is_null());
+    NSTDPtrMut { raw: obj, size }
+}
+
+/// Creates a new instance of `NSTDPtrMut` without checking if `obj` is null.
+///
+/// # Parameters:
+///
+/// - `NSTDAnyMut obj` - The object to point to.
+///
+/// - `NSTDUInt size` - The number of bytes that `obj`'s type occupies.
+///
+/// # Returns
+///
+/// `NSTDPtrMut ptr` - A new instance of `NSTDPtrMut` that points to `obj`.
+///
+/// # Safety
+///
+/// The user of this function must ensure that `obj` is not null.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_core_ptr_mut_new_unchecked(
+    obj: NSTDAnyMut,
+    size: NSTDUInt,
+) -> NSTDPtrMut {
     NSTDPtrMut { raw: obj, size }
 }
 
