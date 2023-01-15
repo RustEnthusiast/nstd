@@ -89,7 +89,7 @@ gen_optional!(NSTDOptionalString, NSTDString);
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_string_new() -> NSTDString {
+pub const extern "C" fn nstd_string_new() -> NSTDString {
     NSTDString {
         bytes: nstd_vec_new(1),
     }
@@ -269,7 +269,7 @@ pub extern "C" fn nstd_string_as_bytes(string: &NSTDString) -> NSTDSlice {
 /// `const NSTDByte *ptr` - A raw pointer to a string's memory.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_string_as_ptr(string: &NSTDString) -> *const NSTDByte {
+pub const extern "C" fn nstd_string_as_ptr(string: &NSTDString) -> *const NSTDByte {
     nstd_vec_as_ptr(&string.bytes).cast()
 }
 
@@ -320,7 +320,7 @@ pub extern "C" fn nstd_string_len(string: &NSTDString) -> NSTDUInt {
 /// `NSTDUInt byte_len` - The number of bytes in the string.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_string_byte_len(string: &NSTDString) -> NSTDUInt {
+pub const extern "C" fn nstd_string_byte_len(string: &NSTDString) -> NSTDUInt {
     nstd_vec_len(&string.bytes)
 }
 
@@ -337,7 +337,7 @@ pub extern "C" fn nstd_string_byte_len(string: &NSTDString) -> NSTDUInt {
 /// `NSTDUInt cap` - The string's capacity.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_string_cap(string: &NSTDString) -> NSTDUInt {
+pub const extern "C" fn nstd_string_cap(string: &NSTDString) -> NSTDUInt {
     nstd_vec_cap(&string.bytes)
 }
 

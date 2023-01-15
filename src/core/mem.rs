@@ -408,7 +408,7 @@ pub unsafe extern "C" fn nstd_core_mem_fill(buf: *mut NSTDByte, size: NSTDUInt, 
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_mem_copy(
+pub const unsafe extern "C" fn nstd_core_mem_copy(
     dest: *mut NSTDByte,
     src: *const NSTDByte,
     num: NSTDUInt,
@@ -434,7 +434,7 @@ pub unsafe extern "C" fn nstd_core_mem_copy(
 /// of a buffer.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_mem_copy_overlapping(
+pub const unsafe extern "C" fn nstd_core_mem_copy_overlapping(
     dest: *mut NSTDByte,
     src: *const NSTDByte,
     num: NSTDUInt,

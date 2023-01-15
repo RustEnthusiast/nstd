@@ -56,13 +56,13 @@ impl NSTDVec {
 
     /// Returns the number of active bytes in the vector.
     #[inline]
-    fn byte_len(&self) -> usize {
+    const fn byte_len(&self) -> usize {
         self.len * self.stride
     }
 
     /// Returns the number of bytes in the vector's memory buffer.
     #[inline]
-    fn buffer_byte_len(&self) -> usize {
+    const fn buffer_byte_len(&self) -> usize {
         self.cap * self.stride
     }
 
@@ -101,7 +101,7 @@ impl NSTDVec {
     ///
     /// The vector must have already allocated memory.
     #[inline]
-    unsafe fn end(&self) -> NSTDAnyMut {
+    unsafe fn end(&mut self) -> NSTDAnyMut {
         let len = self.byte_len();
         assert!(len <= isize::MAX as usize);
         self.ptr.add(len)
@@ -184,7 +184,7 @@ gen_optional!(NSTDOptionalVec, NSTDVec);
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_vec_new(element_size: NSTDUInt) -> NSTDVec {
+pub const extern "C" fn nstd_vec_new(element_size: NSTDUInt) -> NSTDVec {
     assert!(element_size != 0);
     NSTDVec {
         ptr: NSTD_NULL,
@@ -352,7 +352,7 @@ pub extern "C" fn nstd_vec_clone(vec: &NSTDVec) -> NSTDVec {
 /// `NSTDUInt len` - The length of the vector.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_vec_len(vec: &NSTDVec) -> NSTDUInt {
+pub const extern "C" fn nstd_vec_len(vec: &NSTDVec) -> NSTDUInt {
     vec.len
 }
 
@@ -369,7 +369,7 @@ pub extern "C" fn nstd_vec_len(vec: &NSTDVec) -> NSTDUInt {
 /// `NSTDUInt cap` - The vector's capacity.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_vec_cap(vec: &NSTDVec) -> NSTDUInt {
+pub const extern "C" fn nstd_vec_cap(vec: &NSTDVec) -> NSTDUInt {
     vec.cap
 }
 
@@ -384,7 +384,7 @@ pub extern "C" fn nstd_vec_cap(vec: &NSTDVec) -> NSTDUInt {
 /// `NSTDUInt stride` - The size of each value in the vector.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_vec_stride(vec: &NSTDVec) -> NSTDUInt {
+pub const extern "C" fn nstd_vec_stride(vec: &NSTDVec) -> NSTDUInt {
     vec.stride
 }
 
@@ -408,7 +408,7 @@ pub extern "C" fn nstd_vec_stride(vec: &NSTDVec) -> NSTDUInt {
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_vec_reserved(vec: &NSTDVec) -> NSTDUInt {
+pub const extern "C" fn nstd_vec_reserved(vec: &NSTDVec) -> NSTDUInt {
     vec.cap - vec.len
 }
 
@@ -465,7 +465,7 @@ pub extern "C" fn nstd_vec_as_slice_mut(vec: &mut NSTDVec) -> NSTDSliceMut {
 /// `NSTDAny ptr` - A pointer to the vector's raw data.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_vec_as_ptr(vec: &NSTDVec) -> NSTDAny {
+pub const extern "C" fn nstd_vec_as_ptr(vec: &NSTDVec) -> NSTDAny {
     vec.ptr
 }
 
@@ -586,7 +586,7 @@ pub extern "C" fn nstd_vec_end_mut(vec: &mut NSTDVec) -> NSTDAnyMut {
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_vec_get(vec: &NSTDVec, mut pos: NSTDUInt) -> NSTDAny {
+pub const extern "C" fn nstd_vec_get(vec: &NSTDVec, mut pos: NSTDUInt) -> NSTDAny {
     if pos < vec.len {
         pos *= vec.stride;
         assert!(pos <= isize::MAX as usize);

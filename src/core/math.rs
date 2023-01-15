@@ -84,7 +84,7 @@ macro_rules! gen_abs {
         /// ```
         #[inline]
         #[cfg_attr(feature = "clib", no_mangle)]
-        pub extern "C" fn $name(x: $T) -> $T {
+        pub const extern "C" fn $name(x: $T) -> $T {
             x.abs()
         }
     };
@@ -119,7 +119,7 @@ macro_rules! gen_pow {
         /// ```
         #[inline]
         #[cfg_attr(feature = "clib", no_mangle)]
-        pub extern "C" fn $name(x: $T, exp: NSTDUInt32) -> $T {
+        pub const extern "C" fn $name(x: $T, exp: NSTDUInt32) -> $T {
             x.pow(exp)
         }
     };
@@ -410,7 +410,7 @@ macro_rules! gen_div_ceil {
         #[inline]
         #[cfg_attr(feature = "clib", no_mangle)]
         #[allow(unused_comparisons)]
-        pub extern "C" fn $name(x: $T, y: $T) -> $T {
+        pub const extern "C" fn $name(x: $T, y: $T) -> $T {
             let d = x / y;
             let r = x % y;
             if (r > 0 && y > 0) || (r < 0 && y < 0) {
@@ -463,7 +463,7 @@ macro_rules! gen_div_floor {
         #[inline]
         #[cfg_attr(feature = "clib", no_mangle)]
         #[allow(unused_comparisons)]
-        pub extern "C" fn $name(x: $T, y: $T) -> $T {
+        pub const extern "C" fn $name(x: $T, y: $T) -> $T {
             let d = x / y;
             let r = x % y;
             if (r > 0 && y < 0) || (r < 0 && y > 0) {

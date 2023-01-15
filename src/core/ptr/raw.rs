@@ -11,7 +11,7 @@ pub(crate) const MAX_ALIGN: usize = 16;
 
 /// Checks if `align` is a power of 2.
 #[inline]
-fn is_power_of_two(align: NSTDUInt) -> NSTDBool {
+const fn is_power_of_two(align: NSTDUInt) -> NSTDBool {
     (align != 0) && ((align & (align - 1)) == 0)
 }
 
@@ -30,7 +30,7 @@ fn is_power_of_two(align: NSTDUInt) -> NSTDBool {
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_ptr_raw_dangling() -> NSTDAny {
+pub const extern "C" fn nstd_core_ptr_raw_dangling() -> NSTDAny {
     MAX_ALIGN as NSTDAny
 }
 
@@ -49,7 +49,7 @@ pub extern "C" fn nstd_core_ptr_raw_dangling() -> NSTDAny {
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_ptr_raw_dangling_mut() -> NSTDAnyMut {
+pub const extern "C" fn nstd_core_ptr_raw_dangling_mut() -> NSTDAnyMut {
     MAX_ALIGN as NSTDAnyMut
 }
 

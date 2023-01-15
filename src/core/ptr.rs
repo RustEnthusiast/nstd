@@ -63,7 +63,10 @@ pub extern "C" fn nstd_core_ptr_new(obj: NSTDAny, size: NSTDUInt) -> NSTDPtr {
 /// The user of this function must ensure that `obj` is not null.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_ptr_new_unchecked(obj: NSTDAny, size: NSTDUInt) -> NSTDPtr {
+pub const unsafe extern "C" fn nstd_core_ptr_new_unchecked(
+    obj: NSTDAny,
+    size: NSTDUInt,
+) -> NSTDPtr {
     NSTDPtr { raw: obj, size }
 }
 
@@ -90,7 +93,7 @@ pub unsafe extern "C" fn nstd_core_ptr_new_unchecked(obj: NSTDAny, size: NSTDUIn
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_ptr_size(ptr: &NSTDPtr) -> NSTDUInt {
+pub const extern "C" fn nstd_core_ptr_size(ptr: &NSTDPtr) -> NSTDUInt {
     ptr.size
 }
 
@@ -119,7 +122,7 @@ pub extern "C" fn nstd_core_ptr_size(ptr: &NSTDPtr) -> NSTDUInt {
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_ptr_get(ptr: &NSTDPtr) -> NSTDAny {
+pub const extern "C" fn nstd_core_ptr_get(ptr: &NSTDPtr) -> NSTDAny {
     ptr.raw
 }
 
@@ -179,7 +182,7 @@ pub extern "C" fn nstd_core_ptr_mut_new(obj: NSTDAnyMut, size: NSTDUInt) -> NSTD
 /// The user of this function must ensure that `obj` is not null.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_ptr_mut_new_unchecked(
+pub const unsafe extern "C" fn nstd_core_ptr_mut_new_unchecked(
     obj: NSTDAnyMut,
     size: NSTDUInt,
 ) -> NSTDPtrMut {
@@ -197,7 +200,7 @@ pub unsafe extern "C" fn nstd_core_ptr_mut_new_unchecked(
 /// `NSTDPtr ptr_const` - The immutable copy of `ptr`.
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_ptr_mut_as_const(ptr: &NSTDPtrMut) -> NSTDPtr {
+pub const extern "C" fn nstd_core_ptr_mut_as_const(ptr: &NSTDPtrMut) -> NSTDPtr {
     // SAFETY: `ptr.raw` is never null.
     unsafe { nstd_core_ptr_new_unchecked(ptr.raw, ptr.size) }
 }
@@ -225,7 +228,7 @@ pub extern "C" fn nstd_core_ptr_mut_as_const(ptr: &NSTDPtrMut) -> NSTDPtr {
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_ptr_mut_size(ptr: &NSTDPtrMut) -> NSTDUInt {
+pub const extern "C" fn nstd_core_ptr_mut_size(ptr: &NSTDPtrMut) -> NSTDUInt {
     ptr.size
 }
 
@@ -285,7 +288,7 @@ pub extern "C" fn nstd_core_ptr_mut_get(ptr: &mut NSTDPtrMut) -> NSTDAnyMut {
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_ptr_mut_get_const(ptr: &NSTDPtrMut) -> NSTDAny {
+pub const extern "C" fn nstd_core_ptr_mut_get_const(ptr: &NSTDPtrMut) -> NSTDAny {
     ptr.raw
 }
 
