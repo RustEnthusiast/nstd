@@ -30,6 +30,8 @@ pub enum NSTDUnixIOError {
     NSTD_UNIX_IO_ERROR_BROKEN_PIPE,
     /// The operation needs to block to complete.
     NSTD_UNIX_IO_ERROR_BLOCKING,
+    /// A pathname was expected to refer to a regular file, but a directory was found.
+    NSTD_UNIX_IO_ERROR_IS_DIR,
     /// Some input parameter was incorrect.
     NSTD_UNIX_IO_ERROR_INVALID_INPUT,
     /// Some input/output data had an incorrect format.
@@ -59,7 +61,8 @@ impl NSTDUnixIOError {
             ESPIPE => Self::NSTD_UNIX_IO_ERROR_INVALID_SEEK,
             EPIPE => Self::NSTD_UNIX_IO_ERROR_BROKEN_PIPE,
             EAGAIN | EWOULDBLOCK => Self::NSTD_UNIX_IO_ERROR_BLOCKING,
-            EINVAL | EISDIR => Self::NSTD_UNIX_IO_ERROR_INVALID_INPUT,
+            EISDIR => Self::NSTD_UNIX_IO_ERROR_IS_DIR,
+            EINVAL => Self::NSTD_UNIX_IO_ERROR_INVALID_INPUT,
             ETIMEDOUT => Self::NSTD_UNIX_IO_ERROR_TIMED_OUT,
             EINTR => Self::NSTD_UNIX_IO_ERROR_INTERRUPTED,
             ENOMEM => Self::NSTD_UNIX_IO_ERROR_OUT_OF_MEMORY,

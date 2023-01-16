@@ -13,6 +13,7 @@
 ### `nstd.heap_ptr`
 - Added `NSTDOptionalHeapPtr`.
 ### `nstd.os`
+- Added `NSTD_UNIX_IO_ERROR_IS_DIR`.
 - Added `nstd.os.unix.io`.
 - `nstd_os_windows_shared_lib_load` now accepts Unicode.
 - Added `nstd_os_windows_str_to_utf16`.
