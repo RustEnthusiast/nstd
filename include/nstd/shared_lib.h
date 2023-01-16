@@ -4,8 +4,12 @@
 #include "core/str.h"
 #include "nstd.h"
 #include "os/os.h"
-#include "os/unix/shared_lib.h"
-#include "os/windows/shared_lib.h"
+#ifdef NSTD_OS_UNIX
+#   include "os/unix/shared_lib.h"
+#endif
+#ifdef NSTD_OS_WINDOWS
+#   include "os/windows/shared_lib.h"
+#endif
 
 /// A handle to a dynamically loaded library.
 #if defined(NSTD_OS_UNIX)
