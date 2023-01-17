@@ -50,6 +50,7 @@ int main()
         - `stdin` - A handle to the standard input stream.
         - `stdout` - A handle to the standard output stream.
     - `math` - High level math operations.
+    - `mutex` - A mutual exclusion primitive useful for protecting shared data.
     - `os` - Operating system specific functionality.
         - `unix` - Low level Unix-like operating system support.
             - `alloc` - Memory allocation for Unix-like systems.

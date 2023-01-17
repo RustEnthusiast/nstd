@@ -8,6 +8,7 @@
 #include "nstd/heap_ptr.h"
 #include "nstd/io.h"
 #include "nstd/math.h"
+#include "nstd/mutex.h"
 #include "nstd/nstd.h"
 #include "nstd/os.h"
 #include "nstd/proc.h"
