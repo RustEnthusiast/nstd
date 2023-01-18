@@ -32,6 +32,20 @@ NSTDOptional(NSTDMutexLockResult) NSTDOptionalMutexLockResult;
 /// `NSTDMutex mutex` - The new mutex protecting `data`.
 NSTDAPI NSTDMutex nstd_mutex_new(NSTDHeapPtr data);
 
+/// Determines whether or not a mutex's data is poisoned.
+///
+/// Mutexes are poisoned when a thread that owns the mutex guard panics. This function is useful
+/// for those that configure `nstd` to unwind the stack instead of aborting on panic.
+///
+/// # Parameters:
+///
+/// - `const NSTDMutex *mutex` - The mutex.
+///
+/// # Returns
+///
+/// `NSTDBool is_poisoned` - A boolean value indicating whether or not `mutex` is poisoned.
+NSTDAPI NSTDBool nstd_mutex_is_poisoned(const NSTDMutex *mutex);
+
 /// Waits for a mutex lock to become acquired, returning a guard wrapping the protected data.
 ///
 /// Attempting to call this function on a thread that already owns the lock will either result in a

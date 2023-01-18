@@ -2,7 +2,7 @@
 use crate::{
     core::{optional::NSTDOptional, result::NSTDResult},
     heap_ptr::{nstd_heap_ptr_get, nstd_heap_ptr_get_mut, NSTDHeapPtr},
-    NSTDAny, NSTDAnyMut,
+    NSTDAny, NSTDAnyMut, NSTDBool,
 };
 use std::sync::{Mutex, MutexGuard, TryLockError};
 
@@ -35,6 +35,24 @@ pub type NSTDOptionalMutexLockResult<'a> = NSTDOptional<NSTDMutexLockResult<'a>>
 #[cfg_attr(feature = "clib", no_mangle)]
 pub extern "C" fn nstd_mutex_new(data: NSTDHeapPtr) -> NSTDMutex {
     Box::new(Mutex::new(data))
+}
+
+/// Determines whether or not a mutex's data is poisoned.
+///
+/// Mutexes are poisoned when a thread that owns the mutex guard panics. This function is useful
+/// for those that configure `nstd` to unwind the stack instead of aborting on panic.
+///
+/// # Parameters:
+///
+/// - `const NSTDMutex *mutex` - The mutex.
+///
+/// # Returns
+///
+/// `NSTDBool is_poisoned` - A boolean value indicating whether or not `mutex` is poisoned.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_mutex_is_poisoned(mutex: &NSTDMutex) -> NSTDBool {
+    mutex.is_poisoned()
 }
 
 /// Waits for a mutex lock to become acquired, returning a guard wrapping the protected data.
