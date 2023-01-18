@@ -55,6 +55,7 @@ int main()
         - `unix` - Low level Unix-like operating system support.
             - `alloc` - Memory allocation for Unix-like systems.
             - `io` - Provides functionality for working with input & output on Unix platforms.
+            - `mutex` - A mutual exclusion primitive useful for protecting shared data.
             - `shared_lib` - Provides shared library access for Unix-like systems.
         - `windows` - OS support for Windows.
             - `alloc` - Low level memory allocation for Windows.
