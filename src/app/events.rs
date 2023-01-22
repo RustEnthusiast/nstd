@@ -1,8 +1,12 @@
 //! Contains callback based events through function pointers.
 use crate::{
     app::data::NSTDAppData,
-    core::{str::NSTDStr, unichar::NSTDUnichar},
-    NSTDBool, NSTDFloat32, NSTDFloat64, NSTDInt32, NSTDUInt16, NSTDUInt32,
+    core::{
+        optional::{NSTDOptional, NSTDOptionalUInt16},
+        str::NSTDStr,
+        unichar::NSTDUnichar,
+    },
+    NSTDBool, NSTDFloat32, NSTDFloat64, NSTDInt32, NSTDUInt32,
 };
 use gilrs::{Axis, Button, GamepadId};
 use winit::{
@@ -122,7 +126,7 @@ pub struct NSTDMouseInput {
     /// The mouse button that received input.
     pub button: NSTDMouseButton,
     /// The ID of the mouse button that received input.
-    pub id: NSTDUInt16,
+    pub id: NSTDOptionalUInt16,
 }
 impl NSTDMouseInput {
     /// Converts [winit] [MouseButton] into [NSTDMouseInput].
@@ -130,19 +134,19 @@ impl NSTDMouseInput {
         match button {
             MouseButton::Left => Self {
                 button: NSTDMouseButton::NSTD_MOUSE_BUTTON_LEFT,
-                id: 0,
+                id: NSTDOptional::None,
             },
             MouseButton::Middle => Self {
                 button: NSTDMouseButton::NSTD_MOUSE_BUTTON_MIDDLE,
-                id: 1,
+                id: NSTDOptional::None,
             },
             MouseButton::Right => Self {
                 button: NSTDMouseButton::NSTD_MOUSE_BUTTON_RIGHT,
-                id: 2,
+                id: NSTDOptional::None,
             },
             MouseButton::Other(id) => Self {
                 button: NSTDMouseButton::NSTD_MOUSE_BUTTON_OTHER,
-                id,
+                id: NSTDOptional::Some(id),
             },
         }
     }

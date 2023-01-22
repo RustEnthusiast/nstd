@@ -1,6 +1,8 @@
 #ifndef NSTD_APP_EVENTS_H
 #define NSTD_APP_EVENTS_H
+#include "../core/optional.h"
 #include "../core/str.h"
+#include "../core/unichar.h"
 #include "../nstd.h"
 #include "data.h"
 
@@ -66,7 +68,7 @@ typedef struct {
     /// The mouse button that received input.
     NSTDMouseButton button;
     /// The ID of the mouse button that received input.
-    NSTDUInt16 id;
+    NSTDOptionalUInt16 id;
 } NSTDMouseInput;
 
 /// Represents a key on a keyboard.
