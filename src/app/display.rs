@@ -20,7 +20,7 @@ pub type NSTDDisplayModeHandle<'a> = &'a VideoMode;
 
 /// Represents the size of a display.
 #[repr(C)]
-#[derive(Clone, Copy, Debug, Default)]
+#[derive(Clone, Copy)]
 pub struct NSTDDisplaySize {
     /// The width of the display.
     pub width: NSTDUInt32,
@@ -30,7 +30,7 @@ pub struct NSTDDisplaySize {
 
 /// Represents the position of a display.
 #[repr(C)]
-#[derive(Clone, Copy, Debug, Default)]
+#[derive(Clone, Copy)]
 pub struct NSTDDisplayPosition {
     /// The position of the display on the x-axis.
     pub x: NSTDInt32,

@@ -28,7 +28,7 @@ pub type NSTDButtonID = NSTDUInt32;
 
 /// An enumeration of device event filtering modes.
 #[repr(C)]
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 #[allow(non_camel_case_types)]
 pub enum NSTDDeviceEventFilter {
     /// Always dispatch device events.
@@ -51,7 +51,7 @@ impl From<NSTDDeviceEventFilter> for DeviceEventFilter {
 
 /// Describes a mouse wheel's scroll delta.
 #[repr(C)]
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 #[allow(non_camel_case_types)]
 pub enum NSTDScrollDelta {
     /// The scroll was measured in lines.
@@ -75,7 +75,7 @@ impl NSTDScrollDelta {
 
 /// Describes a touch-screen's state.
 #[repr(C)]
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 #[allow(non_camel_case_types)]
 pub enum NSTDTouchState {
     /// The touch event has just started.
@@ -102,7 +102,7 @@ impl NSTDTouchState {
 
 /// Represents a mouse button.
 #[repr(C)]
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 #[allow(non_camel_case_types)]
 pub enum NSTDMouseButton {
     /// The left mouse button.
@@ -117,7 +117,7 @@ pub enum NSTDMouseButton {
 
 /// Represents some type of mouse button input.
 #[repr(C)]
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub struct NSTDMouseInput {
     /// The mouse button that received input.
     pub button: NSTDMouseButton,
@@ -150,7 +150,7 @@ impl NSTDMouseInput {
 
 /// Represents a key on a keyboard.
 #[repr(C)]
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 #[allow(non_camel_case_types)]
 pub enum NSTDKey {
     /// An unknown keyboard key.
@@ -383,7 +383,7 @@ impl NSTDKey {
 
 /// Represents a gamepad button.
 #[repr(C)]
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 #[allow(non_camel_case_types)]
 pub enum NSTDGamepadButton {
     /// The upper action pad button.
@@ -464,7 +464,7 @@ impl NSTDGamepadButton {
 
 /// Represents a gamepad axis.
 #[repr(C)]
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 #[allow(non_camel_case_types)]
 pub enum NSTDGamepadAxis {
     /// The left stick x-axis.
