@@ -188,6 +188,13 @@ NSTDAPI void nstd_thread_sleep(NSTDFloat64 secs);
 /// use on success, or the I/O error code on failure.
 NSTDAPI NSTDThreadCountResult nstd_thread_count();
 
+/// Checks if the current thread is unwinding due to a panic.
+///
+/// # Returns
+///
+/// `NSTDBool is_panicking` - Determines whether or not the calling thread is panicking.
+NSTDAPI NSTDBool nstd_thread_is_panicking();
+
 /// Compares two thread identifiers.
 ///
 /// # Parameters:

@@ -318,6 +318,17 @@ pub extern "C" fn nstd_thread_count() -> NSTDThreadCountResult {
     }
 }
 
+/// Checks if the current thread is unwinding due to a panic.
+///
+/// # Returns
+///
+/// `NSTDBool is_panicking` - Determines whether or not the calling thread is panicking.
+#[inline]
+#[cfg_attr(feature = "clib", no_mangle)]
+pub extern "C" fn nstd_thread_is_panicking() -> NSTDBool {
+    std::thread::panicking()
+}
+
 /// Compares two thread identifiers.
 ///
 /// # Parameters:
