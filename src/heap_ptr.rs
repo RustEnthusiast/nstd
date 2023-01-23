@@ -46,6 +46,16 @@ impl Drop for NSTDHeapPtr {
         }
     }
 }
+/// # Safety
+///
+/// The data that the heap pointer holds must be able to be safely sent between threads.
+// SAFETY: The user guarantees that the data is thread-safe.
+unsafe impl Send for NSTDHeapPtr {}
+/// # Safety
+///
+/// The data that the heap pointer holds must be able to be safely shared between threads.
+// SAFETY: The user guarantees that the data is thread-safe.
+unsafe impl Sync for NSTDHeapPtr {}
 gen_optional!(NSTDOptionalHeapPtr, NSTDHeapPtr);
 
 /// Creates a new initialized heap allocated object.

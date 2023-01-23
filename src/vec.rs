@@ -157,6 +157,16 @@ impl<A> FromIterator<A> for NSTDVec {
         s
     }
 }
+/// # Safety
+///
+/// The data that the vector holds must be able to be safely sent between threads.
+// SAFETY: The user guarantees that the data is thread-safe.
+unsafe impl Send for NSTDVec {}
+/// # Safety
+///
+/// The data that the vector holds must be able to be safely shared between threads.
+// SAFETY: The user guarantees that the data is thread-safe.
+unsafe impl Sync for NSTDVec {}
 gen_optional!(NSTDOptionalVec, NSTDVec);
 
 /// Creates a new vector without allocating any resources.
