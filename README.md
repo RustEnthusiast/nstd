@@ -94,7 +94,7 @@ can easily use the API.
 Users can refer to the [docs](https://docs.rs/nstd-sys/latest/nstd_sys/) to see which APIs expect
 or return valid references.
 
-- Reference data is assumed to remain unaltered by other code/threads.
+- Input reference data is assumed to remain unaltered by other code/threads.
 
 - Private (non-`pub`) structure members must not be directly accessed by the user.
 
@@ -103,17 +103,21 @@ or return valid references.
 
 - Data is *moved* when using the value-copy semantic on a type that does not implement `Copy`.
 
-- The panic behavior is set to abort by default, as it is undefined behavior to unwind from Rust
-code into foreign code (though this is
-[subject to change](https://rust-lang.github.io/rfcs/2945-c-unwind-abi.html)).
+- Types that do not implement the `Send` trait must not be sent between threads.
+
+- Types that do not implement the `Sync` trait must not be shared between threads.
 
 ## Contributor safety notes
 
-- Any operation that may cause undefined behavior must be marked unsafe.
-
-- Any operation that may cause data races must be marked unsafe.
+- Any operation that may cause
+[undefined behavior](https://doc.rust-lang.org/reference/behavior-considered-undefined.html) must
+be marked unsafe.
 
 - All C function pointers taken as input by the API must be marked unsafe.
+
+- The panic behavior is set to abort by default, as it is undefined behavior to unwind from Rust
+code into foreign code (though this is
+[subject to change](https://rust-lang.github.io/rfcs/2945-c-unwind-abi.html)).
 
 # How to build
 `nstd` lets you decide what features you want to use.
