@@ -1,5 +1,6 @@
 #ifndef NSTD_TIME_H
 #define NSTD_TIME_H
+#include "core/optional.h"
 #include "nstd.h"
 
 /// A structure representing system time since January 1st 1970.
@@ -9,6 +10,9 @@ typedef struct {
     /// The remaining nanoseconds.
     NSTDUInt32 nanos;
 } NSTDTime;
+
+/// Represents an optional value of type `NSTDTime`.
+NSTDOptional(NSTDTime) NSTDOptionalTime;
 
 /// Returns the current system time as an `NSTDTime` object.
 ///

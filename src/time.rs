@@ -1,5 +1,8 @@
 //! Time utilities.
-use crate::{NSTDInt64, NSTDUInt32};
+use crate::{
+    core::optional::{gen_optional, NSTDOptional},
+    NSTDInt64, NSTDUInt32,
+};
 use std::time::{SystemTime, UNIX_EPOCH};
 
 /// A structure representing system time since January 1st 1970.
@@ -29,6 +32,7 @@ impl From<SystemTime> for NSTDTime {
         }
     }
 }
+gen_optional!(NSTDOptionalTime, NSTDTime);
 
 /// Returns the current system time as an `NSTDTime` object.
 ///
