@@ -51,6 +51,9 @@ pub(crate) mod test;
 #[cfg(feature = "nstd_thread")]
 #[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_thread")))]
 pub mod thread;
+#[cfg(feature = "nstd_time")]
+#[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_time")))]
+pub mod time;
 #[cfg(feature = "nstd_vec")]
 #[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_vec")))]
 pub mod vec;

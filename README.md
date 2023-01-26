@@ -66,6 +66,7 @@ int main()
     - `shared_ptr` - A reference counting smart pointer.
     - `string` - Dynamically sized UTF-8 encoded byte string.
     - `thread` - Thread spawning, joining, and detaching.
+    - `time` - Time utilities.
     - `vec` - A dynamically sized contiguous sequence of values.
 
 # Platform support
