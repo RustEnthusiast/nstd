@@ -1,12 +1,53 @@
 //! Provides access to the file system.
 pub mod file;
 use crate::{
-    core::{result::NSTDResult, slice::NSTDSlice, str::NSTDStr},
+    core::{optional::NSTDOptional, result::NSTDResult, slice::NSTDSlice, str::NSTDStr},
     io::{NSTDIOBufferResult, NSTDIOError, NSTDIOStringResult},
     string::NSTDString,
+    time::{NSTDOptionalTime, NSTDTime},
     vec::NSTDVec,
+    NSTDUInt64, NSTDUInt8,
 };
 use std::fs::File;
+
+/// A bit flag describing a file with read access.
+pub const NSTD_FILE_PERMISSION_READ: NSTDUInt8 = 1;
+
+/// Describes the type of a file.
+#[repr(C)]
+#[derive(Clone, Copy, PartialEq, Eq)]
+#[allow(non_camel_case_types)]
+pub enum NSTDFileType {
+    /// An unknown file type.
+    NSTD_FILE_TYPE_UNKNOWN,
+    /// A normal text/binary file.
+    NSTD_FILE_TYPE_REGULAR,
+    /// A directory/folder.
+    NSTD_FILE_TYPE_DIRECTORY,
+    /// A symbolic link.
+    NSTD_FILE_TYPE_SYMLINK,
+}
+
+/// Represents file metadata.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NSTDFileMetadata {
+    /// The size of the file in bytes.
+    pub size: NSTDUInt64,
+    /// The time that the file was created.
+    pub created: NSTDOptionalTime,
+    /// The time that the file was last accessed.
+    pub accessed: NSTDOptionalTime,
+    /// The time that the file was last modified.
+    pub modified: NSTDOptionalTime,
+    /// The file type.
+    pub file_type: NSTDFileType,
+    /// A bit mask representing the file's permissions.
+    pub permissions: NSTDUInt8,
+}
+
+/// A result type returned from `nstd_fs_metadata`.
+pub type NSTDFileMetadataResult = NSTDResult<NSTDFileMetadata, NSTDIOError>;
 
 /// Creates a new file on the file system.
 ///
@@ -340,6 +381,54 @@ pub unsafe extern "C" fn nstd_fs_absolute(path: &NSTDStr) -> NSTDIOStringResult 
             Ok(path) => NSTDResult::Ok(NSTDString::from_str(&path)),
             _ => NSTDResult::Err(NSTDIOError::NSTD_IO_ERROR_INVALID_DATA),
         },
+        Err(err) => NSTDResult::Err(NSTDIOError::from_err(err.kind())),
+    }
+}
+
+/// Retrieves metadata about a file pointed to by `path`.
+///
+/// # Parameters:
+///
+/// - `const NSTDStr *path` - A path to the file to retrieve metadata for.
+///
+/// # Returns
+///
+/// `NSTDFileMetadataResult metadata` - Metadata describing the file.
+///
+/// # Panics
+///
+/// This operation will panic if `path`'s length in bytes exceeds `NSTDInt`'s max value.
+///
+/// # Safety
+///
+/// `path` must be valid for reads.
+#[cfg_attr(feature = "clib", no_mangle)]
+pub unsafe extern "C" fn nstd_fs_metadata(path: &NSTDStr) -> NSTDFileMetadataResult {
+    match std::fs::metadata(path.as_str()) {
+        Ok(metadata) => NSTDResult::Ok(NSTDFileMetadata {
+            size: metadata.len(),
+            created: metadata.created().map_or(NSTDOptional::None, |t| {
+                NSTDOptional::Some(NSTDTime::from(t))
+            }),
+            accessed: metadata.accessed().map_or(NSTDOptional::None, |t| {
+                NSTDOptional::Some(NSTDTime::from(t))
+            }),
+            modified: metadata.modified().map_or(NSTDOptional::None, |t| {
+                NSTDOptional::Some(NSTDTime::from(t))
+            }),
+            file_type: {
+                if metadata.is_file() {
+                    NSTDFileType::NSTD_FILE_TYPE_REGULAR
+                } else if metadata.is_dir() {
+                    NSTDFileType::NSTD_FILE_TYPE_DIRECTORY
+                } else if metadata.is_symlink() {
+                    NSTDFileType::NSTD_FILE_TYPE_SYMLINK
+                } else {
+                    NSTDFileType::NSTD_FILE_TYPE_UNKNOWN
+                }
+            },
+            permissions: metadata.permissions().readonly() as _,
+        }),
         Err(err) => NSTDResult::Err(NSTDIOError::from_err(err.kind())),
     }
 }
