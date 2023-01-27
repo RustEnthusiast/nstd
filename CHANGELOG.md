@@ -1,6 +1,7 @@
 # TBD
 ### `nstd`
 - Moved `NSTDUnichar` into `core`.
+- Added `nstd.time`.
 ### `nstd.core`
 - Added `nstd_core_[ptr|slice|cstr][_mut]_new_unchecked`.
 - `nstd_core_ops_sh[l|r]_*` now take `NSTDUInt32` as their right operand.
@@ -10,6 +11,8 @@
 - Added `nstd_core_panic_with_msg`.
 ### `nstd.cstring`
 - Added `NSTDOptionalCString`.
+### `nstd.fs`
+- Added `nstd_fs_metadata`.
 ### `nstd.heap_ptr`
 - Added `NSTDOptionalHeapPtr`.
 ### `nstd.os`
