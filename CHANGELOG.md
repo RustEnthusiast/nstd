@@ -2,6 +2,7 @@
 ### `nstd`
 - Moved `NSTDUnichar` into `core`.
 - Added `nstd.time`.
+- Updated `windows-sys` to version 0.45.
 ### `nstd.core`
 - Added `nstd_core_[ptr|slice|cstr][_mut]_new_unchecked`.
 - `nstd_core_ops_sh[l|r]_*` now take `NSTDUInt32` as their right operand.

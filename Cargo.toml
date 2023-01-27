@@ -58,4 +58,4 @@ nstd_vec = ["nstd_alloc", "nstd_core"]
 libc = { version = "0.2", optional = true, default-features = false }
 
 [target.'cfg(windows)'.dependencies]
-windows-sys = { version = "0.42", optional = true, features = ["Win32_Foundation"] }
+windows-sys = { version = "0.45", optional = true, features = ["Win32_Foundation"] }
