@@ -1,3 +1,7 @@
+# 0.4.1
+### `nstd`
+- Fixed missing panic handler compiler error for embedded builds.
+
 # 0.4.0
 ### `nstd`
 - Added `nstd.env`.
