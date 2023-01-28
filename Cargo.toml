@@ -17,9 +17,6 @@ rustdoc-args = ["--cfg", "doc_cfg"]
 overflow-checks = true
 panic = "abort"
 
-[lib]
-crate-type = ["cdylib", "rlib", "staticlib"]
-
 [features]
 default = ["std", "nstd_core"]
 std = []

@@ -7,7 +7,7 @@ Rust syntax).
 
 # Example using C
 ```c
-// Build nstd with `cargo build --features "clib nstd_core nstd_io"`.
+// Build nstd with features set to "clib nstd_core nstd_io".
 #include <nstd.h>
 
 /// Main entry point of the program.
@@ -109,6 +109,10 @@ code into foreign code (though this is
 - All C function pointers taken as input by the API must be marked unsafe.
 
 # How to build
+Building `nstd` as a C library requires you to specify the "crate-type" manually. To do this you
+must pass a `--crate-type` of either `cdylib` or `staticlib` to rustc. Rust allows you to use this
+flag multiple times in case you need both.
+
 `nstd` lets you decide what features you want to use.
 
 Any module that falls under the top level module has a dedicated feature flag, for example
@@ -129,12 +133,12 @@ The `asm` feature permits the library to use assembly to optimize certain build 
 
 Example:
 ```sh
-cargo build --release --features "clib nstd_io nstd_string nstd_vec"
+cargo rustc --release --crate-type cdylib --crate-type staticlib --features "clib nstd_alloc"
 ```
 
 To build with all features:
 ```sh
-cargo build --release --all-features
+cargo rustc --release --crate-type cdylib --crate-type staticlib --all-features
 ```
 
 # Releases
