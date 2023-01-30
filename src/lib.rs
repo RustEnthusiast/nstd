@@ -54,9 +54,6 @@ pub mod thread;
 #[cfg(feature = "nstd_time")]
 #[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_time")))]
 pub mod time;
-#[cfg(feature = "nstd_timed_mutex")]
-#[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_timed_mutex")))]
-pub mod timed_mutex;
 #[cfg(feature = "nstd_vec")]
 #[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_vec")))]
 pub mod vec;

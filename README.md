@@ -67,7 +67,6 @@ int main()
     - `string` - Dynamically sized UTF-8 encoded byte string.
     - `thread` - Thread spawning, joining, and detaching.
     - `time` - Time utilities.
-    - `timed_mutex` - A mutual exclusion primitive with a timed locking mechanism.
     - `vec` - A dynamically sized contiguous sequence of values.
 
 # Platform support
