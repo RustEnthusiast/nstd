@@ -21,7 +21,7 @@ use crate::{core::unichar::NSTDUnichar, NSTDBool, NSTDChar, NSTDChar32, NSTDUInt
 /// ```
 #[inline]
 #[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_cty_is_unicode(chr: NSTDChar32) -> NSTDBool {
+pub const extern "C" fn nstd_core_cty_is_unicode(chr: NSTDChar32) -> NSTDBool {
     char::from_u32(chr).is_some()
 }
 
