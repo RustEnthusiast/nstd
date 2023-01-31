@@ -27,7 +27,7 @@ NSTDAPI NSTDTimedMutex nstd_timed_mutex_new(const NSTDHeapPtr data)
     try
     {
         const std::timed_mutex *const mutex{new std::timed_mutex{}};
-        return {.inner = (NSTDAnyMut)mutex, .data = data, .poisoned = NSTD_FALSE};
+        return NSTDTimedMutex{(NSTDAnyMut)mutex, data, NSTD_FALSE};
     }
     catch (...)
     {
@@ -82,15 +82,9 @@ NSTDAPI NSTDTimedMutexLockResult nstd_timed_mutex_lock(const NSTDTimedMutex *con
     {
         ((std::timed_mutex *)mutex->inner)->lock();
         if (mutex->poisoned)
-            return NSTDTimedMutexLockResult{
-                .status = NSTD_RESULT_STATUS_ERR,
-                .err = NSTDTimedMutexGuard{.mutex = mutex}
-            };
+            return NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_ERR, NSTDTimedMutexGuard{mutex}};
         else
-            return NSTDTimedMutexLockResult{
-                .status = NSTD_RESULT_STATUS_OK,
-                .ok = NSTDTimedMutexGuard{.mutex = mutex}
-            };
+            return NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_OK, NSTDTimedMutexGuard{mutex}};
     }
     catch (...)
     {
@@ -123,21 +117,15 @@ const NSTDTimedMutex *const mutex)
 {
     if (((std::timed_mutex *)mutex->inner)->try_lock())
     {
-        NSTDOptionalTimedMutexLockResult ret{.status = NSTD_OPTIONAL_STATUS_SOME, {}};
+        NSTDOptionalTimedMutexLockResult ret{NSTD_OPTIONAL_STATUS_SOME};
         if (mutex->poisoned)
-            ret.some = NSTDTimedMutexLockResult{
-                .status = NSTD_RESULT_STATUS_ERR,
-                .err = NSTDTimedMutexGuard{.mutex = mutex}
-            };
+            ret.some = NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_ERR, NSTDTimedMutexGuard{mutex}};
         else
-            ret.some = NSTDTimedMutexLockResult{
-                .status = NSTD_RESULT_STATUS_OK,
-                .ok = NSTDTimedMutexGuard{.mutex = mutex}
-            };
+            ret.some = NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_OK, NSTDTimedMutexGuard{mutex}};
         return ret;
     }
     else
-        return NSTDOptionalTimedMutexLockResult{.status = NSTD_OPTIONAL_STATUS_NONE, {}};
+        return NSTDOptionalTimedMutexLockResult{NSTD_OPTIONAL_STATUS_NONE};
 }
 
 /// The timed variant of `nstd_timed_mutex_lock` returning an uninitialized "none" result if
@@ -165,21 +153,15 @@ const NSTDTimedMutex *const mutex, const NSTDFloat64 seconds)
     const std::chrono::duration<NSTDFloat64> duration{seconds};
     if (((std::timed_mutex *)mutex->inner)->try_lock_for(duration))
     {
-        NSTDOptionalTimedMutexLockResult ret{.status = NSTD_OPTIONAL_STATUS_SOME, {}};
+        NSTDOptionalTimedMutexLockResult ret{NSTD_OPTIONAL_STATUS_SOME};
         if (mutex->poisoned)
-            ret.some = NSTDTimedMutexLockResult{
-                .status = NSTD_RESULT_STATUS_ERR,
-                .err = NSTDTimedMutexGuard{.mutex = mutex}
-            };
+            ret.some = NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_ERR, NSTDTimedMutexGuard{mutex}};
         else
-            ret.some = NSTDTimedMutexLockResult{
-                .status = NSTD_RESULT_STATUS_OK,
-                .ok = NSTDTimedMutexGuard{.mutex = mutex}
-            };
+            ret.some = NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_OK, NSTDTimedMutexGuard{mutex}};
         return ret;
     }
     else
-        return NSTDOptionalTimedMutexLockResult{.status = NSTD_OPTIONAL_STATUS_NONE, {}};
+        return NSTDOptionalTimedMutexLockResult{NSTD_OPTIONAL_STATUS_NONE};
 }
 
 /// Returns an immutable raw pointer to a timed mutex guard's protected data.

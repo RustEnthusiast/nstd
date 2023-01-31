@@ -8,7 +8,7 @@
 #endif
 #ifdef NSTD_OS_WINDOWS
 #   ifdef NSTDCPP
-#       define NSTDAPI __declspec(dllexport) extern "C"
+#       define NSTDAPI extern "C" __declspec(dllexport)
 #   else
 #       define NSTDAPI __declspec(dllexport)
 #   endif

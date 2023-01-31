@@ -48,7 +48,7 @@ fn main() {
             name: "nstd_timed_mutex",
             src: &["src/timed_mutex.cpp"],
             cpp: true,
-            flags: &["-std=c++11"],
+            flags: &["-std=c++11", "/std:c++11"],
             ..Default::default()
         };
         nstd_timed_mutex.build();
