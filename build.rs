@@ -27,7 +27,9 @@ impl CModule {
                     cc.flag_if_supported(flag);
                 }
                 // Compile.
-                cc.include("include")
+                cc.flag_if_supported("-pedantic-errors")
+                    .flag_if_supported("/permissive-")
+                    .include("include")
                     .warnings(true)
                     .extra_warnings(true)
                     .cpp(self.cpp)
