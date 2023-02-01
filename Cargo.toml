@@ -12,6 +12,13 @@ readme = "README.md"
 all-features = true
 rustdoc-args = ["--cfg", "doc_cfg"]
 
+[package.metadata.capi]
+library.name = "nstd"
+pkg_config.name = "libnstd"
+pkg_config.filename = "nstd"
+header.generation = false
+install.include.asset = [{from = "include/**/*", to = ""}]
+
 [profile.release]
 overflow-checks = true
 panic = "abort"

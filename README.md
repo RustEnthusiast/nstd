@@ -154,6 +154,29 @@ To build with all features:
 cargo rustc --release --crate-type cdylib --crate-type staticlib --all-features
 ```
 
+# Installing with `cargo-c`
+`nstd` also allows you to use `cargo-c` to build or install the library.
+
+Install `cargo-c`:
+```sh
+cargo install cargo-c
+```
+
+Here is an example of how to build the library for a Unix machine with all features enabled:
+```sh
+cargo cinstall --release --all-features --destdir=./install --prefix=/usr --libdir=/usr/lib
+```
+This will create a new `install` directory with the installation contents.
+
+You can now copy the contents to the root folder using `cp`:
+```sh
+sudo cp -a ./install/* /
+```
+
+More information can be found in the [cargo-c](https://github.com/lu-zero/cargo-c) repo and in this
+[blog post](https://dev.to/luzero/building-crates-so-they-look-like-c-abi-libraries-1ibn) by Luca
+Barbato.
+
 # Releases
 `nstd` versions follow the Semantic Versioning rules. Each release is given a major, minor, and
 patch number that makes up that version of the library (major.minor.patch).
