@@ -44,8 +44,8 @@ typedef NSTDAnyMut NSTDChildProcess;
 ///
 /// The user must ensure that all of `program`, `args`, and `vars` and their data remain valid for
 /// reads while this function is executing.
-NSTDAPI NSTDChildProcess nstd_proc_spawn(const NSTDStr *program, const NSTDSlice *args,
-const NSTDSlice *vars);
+NSTDAPI NSTDChildProcess
+nstd_proc_spawn(const NSTDStr *program, const NSTDSlice *args, const NSTDSlice *vars);
 
 /// Returns the OS-assigned ID of a child process.
 ///

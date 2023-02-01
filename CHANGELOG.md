@@ -2,6 +2,7 @@
 ### `nstd`
 - Moved `NSTDUnichar` into `core`.
 - Added `nstd.mutex`.
+- Added `nstd.timed_mutex`.
 - Added `nstd.time`.
 - Updated `windows-sys` to version 0.45.
 ### `nstd.core`
