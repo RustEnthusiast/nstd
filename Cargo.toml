@@ -7,7 +7,6 @@ homepage = "https://github.com/RustEnthusiast/nstd"
 repository = "https://github.com/RustEnthusiast/nstd"
 description = "Cross platform general purpose C library written in Rust."
 readme = "README.md"
-exclude = ["include"]
 
 [package.metadata.docs.rs]
 all-features = true
