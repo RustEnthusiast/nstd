@@ -196,13 +196,8 @@ NSTDAPI void nstd_timed_mutex_unlock(const NSTDTimedMutexGuard guard) {
 ///
 /// # Panics
 ///
-/// This operation will panic if freeing the timed mutex or it's data fails.
+/// This operation will panic if freeing the timed mutex's data fails.
 NSTDAPI void nstd_timed_mutex_free(const NSTDTimedMutex mutex) {
-    try {
-        delete (std::timed_mutex *)mutex.inner;
-        nstd_heap_ptr_free(mutex.data);
-    } catch (...) {
-        const NSTDStr msg{nstd_core_str_from_raw_cstr("failed to free a timed mutex")};
-        nstd_core_panic_with_msg(&msg);
-    }
+    delete (std::timed_mutex *)mutex.inner;
+    nstd_heap_ptr_free(mutex.data);
 }

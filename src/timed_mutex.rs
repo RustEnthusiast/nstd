@@ -200,6 +200,6 @@ extern "C" {
     ///
     /// # Panics
     ///
-    /// This operation will panic if freeing the timed mutex or it's data fails.
+    /// This operation will panic if freeing the timed mutex's data fails.
     pub fn nstd_timed_mutex_free(mutex: NSTDTimedMutex);
 }

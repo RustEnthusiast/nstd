@@ -160,7 +160,7 @@ NSTDAPI void nstd_timed_mutex_unlock(NSTDTimedMutexGuard guard);
 ///
 /// # Panics
 ///
-/// This operation will panic if freeing the timed mutex or it's data fails.
+/// This operation will panic if freeing the timed mutex's data fails.
 NSTDAPI void nstd_timed_mutex_free(NSTDTimedMutex mutex);
 
 #endif
