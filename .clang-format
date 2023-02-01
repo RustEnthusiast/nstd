@@ -1,0 +1,10 @@
+BasedOnStyle: Webkit
+PointerAlignment: Right
+BreakBeforeBraces: Attach
+AlignAfterOpenBracket: BlockIndent
+IndentPPDirectives: AfterHash
+AlignEscapedNewlines: Left
+SortIncludes: Never
+ColumnLimit: 100
+SpaceBeforeCpp11BracedList: false
+Cpp11BracedListStyle: true

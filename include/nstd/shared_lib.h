@@ -5,10 +5,10 @@
 #include "nstd.h"
 #include "os/os.h"
 #ifdef NSTD_OS_UNIX
-#   include "os/unix/shared_lib.h"
+#    include "os/unix/shared_lib.h"
 #endif
 #ifdef NSTD_OS_WINDOWS
-#   include "os/windows/shared_lib.h"
+#    include "os/windows/shared_lib.h"
 #endif
 
 /// A handle to a dynamically loaded library.

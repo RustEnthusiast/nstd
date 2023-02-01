@@ -4,27 +4,27 @@
 #include <stddef.h>
 #include <stdint.h>
 #ifdef __cplusplus
-#   define NSTDCPP __cplusplus
+#    define NSTDCPP __cplusplus
 #endif
 #ifdef NSTD_OS_WINDOWS
-#   ifdef NSTDCPP
-#       define NSTDAPI extern "C" __declspec(dllexport)
-#   else
-#       define NSTDAPI __declspec(dllexport)
-#   endif
+#    ifdef NSTDCPP
+#        define NSTDAPI extern "C" __declspec(dllexport)
+#    else
+#        define NSTDAPI __declspec(dllexport)
+#    endif
 #else
-#   ifdef NSTDCPP
-#       define NSTDAPI extern "C"
-#   else
-#       define NSTDAPI
-#   endif
+#    ifdef NSTDCPP
+#        define NSTDAPI extern "C"
+#    else
+#        define NSTDAPI
+#    endif
 #endif
 
 /// A null pointer value constant.
 #ifndef NSTDCPP
-#   define NSTD_NULL NULL
+#    define NSTD_NULL NULL
 #else
-#   define NSTD_NULL nullptr
+#    define NSTD_NULL nullptr
 #endif
 
 /// Boolean value false (0).

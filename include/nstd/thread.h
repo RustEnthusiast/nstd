@@ -89,8 +89,9 @@ NSTDAPI NSTDThread nstd_thread_spawn(NSTDThreadResult (*thread_fn)(NSTDHeapPtr),
 /// - This operation can cause undefined behavior if `desc`'s data is invalid.
 ///
 /// - The data type that `data` holds must be able to be safely sent between threads.
-NSTDAPI NSTDThread nstd_thread_spawn_with_desc(NSTDThreadResult (*thread_fn)(NSTDHeapPtr),
-NSTDHeapPtr data, const NSTDThreadDescriptor *desc);
+NSTDAPI NSTDThread nstd_thread_spawn_with_desc(
+    NSTDThreadResult (*thread_fn)(NSTDHeapPtr), NSTDHeapPtr data, const NSTDThreadDescriptor *desc
+);
 
 /// Returns a handle to the calling thread.
 ///

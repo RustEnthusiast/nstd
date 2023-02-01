@@ -22,15 +22,11 @@
 /// # Panics
 ///
 /// This operation will panic if creating the timed mutex fails.
-NSTDAPI NSTDTimedMutex nstd_timed_mutex_new(const NSTDHeapPtr data)
-{
-    try
-    {
+NSTDAPI NSTDTimedMutex nstd_timed_mutex_new(const NSTDHeapPtr data) {
+    try {
         const std::timed_mutex *const mutex{new std::timed_mutex{}};
         return NSTDTimedMutex{(NSTDAnyMut)mutex, data, NSTD_FALSE};
-    }
-    catch (...)
-    {
+    } catch (...) {
         const NSTDStr msg{nstd_core_str_from_raw_cstr("failed to create a timed mutex")};
         nstd_core_panic_with_msg(&msg);
     }
@@ -50,8 +46,7 @@ NSTDAPI NSTDTimedMutex nstd_timed_mutex_new(const NSTDHeapPtr data)
 /// # Returns
 ///
 /// `NSTDBool is_poisoned` - A boolean value indicating whether or not `mutex` is poisoned.
-NSTDAPI NSTDBool nstd_timed_mutex_is_poisoned(const NSTDTimedMutex *const mutex)
-{
+NSTDAPI NSTDBool nstd_timed_mutex_is_poisoned(const NSTDTimedMutex *const mutex) {
     return mutex->poisoned;
 }
 
@@ -76,18 +71,14 @@ NSTDAPI NSTDBool nstd_timed_mutex_is_poisoned(const NSTDTimedMutex *const mutex)
 /// # Safety
 ///
 /// The mutex lock must not already be owned by the calling thread.
-NSTDAPI NSTDTimedMutexLockResult nstd_timed_mutex_lock(const NSTDTimedMutex *const mutex)
-{
-    try
-    {
+NSTDAPI NSTDTimedMutexLockResult nstd_timed_mutex_lock(const NSTDTimedMutex *const mutex) {
+    try {
         ((std::timed_mutex *)mutex->inner)->lock();
         if (mutex->poisoned)
             return NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_ERR, {NSTDTimedMutexGuard{mutex}}};
         else
             return NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_OK, {NSTDTimedMutexGuard{mutex}}};
-    }
-    catch (...)
-    {
+    } catch (...) {
         const NSTDStr msg{nstd_core_str_from_raw_cstr("failed to lock a timed mutex")};
         nstd_core_panic_with_msg(&msg);
     }
@@ -112,11 +103,9 @@ NSTDAPI NSTDTimedMutexLockResult nstd_timed_mutex_lock(const NSTDTimedMutex *con
 /// # Safety
 ///
 /// The mutex lock must not already be owned by the calling thread.
-NSTDAPI NSTDOptionalTimedMutexLockResult nstd_timed_mutex_try_lock(
-const NSTDTimedMutex *const mutex)
-{
-    if (((std::timed_mutex *)mutex->inner)->try_lock())
-    {
+NSTDAPI NSTDOptionalTimedMutexLockResult nstd_timed_mutex_try_lock(const NSTDTimedMutex *const mutex
+) {
+    if (((std::timed_mutex *)mutex->inner)->try_lock()) {
         NSTDOptionalTimedMutexLockResult ret{NSTD_OPTIONAL_STATUS_SOME, {}};
         const NSTDTimedMutexGuard guard{mutex};
         if (mutex->poisoned)
@@ -124,8 +113,7 @@ const NSTDTimedMutex *const mutex)
         else
             ret.some = NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_OK, {guard}};
         return ret;
-    }
-    else
+    } else
         return NSTDOptionalTimedMutexLockResult{NSTD_OPTIONAL_STATUS_NONE, {}};
 }
 
@@ -148,12 +136,10 @@ const NSTDTimedMutex *const mutex)
 /// # Safety
 ///
 /// The mutex lock must not already be owned by the calling thread.
-NSTDAPI NSTDOptionalTimedMutexLockResult nstd_timed_mutex_timed_lock(
-const NSTDTimedMutex *const mutex, const NSTDFloat64 seconds)
-{
+NSTDAPI NSTDOptionalTimedMutexLockResult
+nstd_timed_mutex_timed_lock(const NSTDTimedMutex *const mutex, const NSTDFloat64 seconds) {
     const std::chrono::duration<NSTDFloat64> duration{seconds};
-    if (((std::timed_mutex *)mutex->inner)->try_lock_for(duration))
-    {
+    if (((std::timed_mutex *)mutex->inner)->try_lock_for(duration)) {
         NSTDOptionalTimedMutexLockResult ret{NSTD_OPTIONAL_STATUS_SOME, {}};
         const NSTDTimedMutexGuard guard{mutex};
         if (mutex->poisoned)
@@ -161,8 +147,7 @@ const NSTDTimedMutex *const mutex, const NSTDFloat64 seconds)
         else
             ret.some = NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_OK, {guard}};
         return ret;
-    }
-    else
+    } else
         return NSTDOptionalTimedMutexLockResult{NSTD_OPTIONAL_STATUS_NONE, {}};
 }
 
@@ -175,8 +160,7 @@ const NSTDTimedMutex *const mutex, const NSTDFloat64 seconds)
 /// # Returns
 ///
 /// `NSTDAny data` - A pointer to the guard's protected data.
-NSTDAPI NSTDAny nstd_timed_mutex_get(const NSTDTimedMutexGuard *const guard)
-{
+NSTDAPI NSTDAny nstd_timed_mutex_get(const NSTDTimedMutexGuard *const guard) {
     return nstd_heap_ptr_get(&guard->mutex->data);
 }
 
@@ -189,8 +173,7 @@ NSTDAPI NSTDAny nstd_timed_mutex_get(const NSTDTimedMutexGuard *const guard)
 /// # Returns
 ///
 /// `NSTDAnyMut data` - A pointer to the guard's protected data.
-NSTDAPI NSTDAnyMut nstd_timed_mutex_get_mut(NSTDTimedMutexGuard *const guard)
-{
+NSTDAPI NSTDAnyMut nstd_timed_mutex_get_mut(NSTDTimedMutexGuard *const guard) {
     return nstd_heap_ptr_get_mut(const_cast<NSTDHeapPtr *>(&guard->mutex->data));
 }
 
@@ -199,8 +182,7 @@ NSTDAPI NSTDAnyMut nstd_timed_mutex_get_mut(NSTDTimedMutexGuard *const guard)
 /// # Parameters:
 ///
 /// - `NSTDTimedMutexGuard guard` - The mutex guard.
-NSTDAPI void nstd_timed_mutex_unlock(const NSTDTimedMutexGuard guard)
-{
+NSTDAPI void nstd_timed_mutex_unlock(const NSTDTimedMutexGuard guard) {
     if (nstd_thread_is_panicking())
         const_cast<NSTDTimedMutex *>(guard.mutex)->poisoned = NSTD_TRUE;
     ((std::timed_mutex *)guard.mutex->inner)->unlock();
@@ -215,15 +197,11 @@ NSTDAPI void nstd_timed_mutex_unlock(const NSTDTimedMutexGuard guard)
 /// # Panics
 ///
 /// This operation will panic if freeing the timed mutex or it's data fails.
-NSTDAPI void nstd_timed_mutex_free(const NSTDTimedMutex mutex)
-{
-    try
-    {
+NSTDAPI void nstd_timed_mutex_free(const NSTDTimedMutex mutex) {
+    try {
         delete (std::timed_mutex *)mutex.inner;
         nstd_heap_ptr_free(mutex.data);
-    }
-    catch (...)
-    {
+    } catch (...) {
         const NSTDStr msg{nstd_core_str_from_raw_cstr("failed to free a timed mutex")};
         nstd_core_panic_with_msg(&msg);
     }

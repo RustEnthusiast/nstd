@@ -120,8 +120,8 @@ NSTDAPI NSTDOptionalTimedMutexLockResult nstd_timed_mutex_try_lock(const NSTDTim
 /// # Safety
 ///
 /// The mutex lock must not already be owned by the calling thread.
-NSTDAPI NSTDOptionalTimedMutexLockResult nstd_timed_mutex_timed_lock(const NSTDTimedMutex *mutex,
-NSTDFloat64 seconds);
+NSTDAPI NSTDOptionalTimedMutexLockResult
+nstd_timed_mutex_timed_lock(const NSTDTimedMutex *mutex, NSTDFloat64 seconds);
 
 /// Returns an immutable raw pointer to a timed mutex guard's protected data.
 ///
