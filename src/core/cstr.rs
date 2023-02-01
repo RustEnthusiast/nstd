@@ -69,7 +69,7 @@ gen_optional!(NSTDOptionalCStr, NSTDCStr);
 /// assert!(unsafe { nstd_core_cstr_is_null_terminated(&cstr) });
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_core_cstr_new(raw: *const NSTDChar, len: NSTDUInt) -> NSTDCStr {
     assert!(!raw.is_null());
     NSTDCStr { ptr: raw, len }
@@ -103,7 +103,7 @@ pub extern "C" fn nstd_core_cstr_new(raw: *const NSTDChar, len: NSTDUInt) -> NST
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub const unsafe extern "C" fn nstd_core_cstr_new_unchecked(
     raw: *const NSTDChar,
     len: NSTDUInt,
@@ -143,7 +143,7 @@ pub const unsafe extern "C" fn nstd_core_cstr_new_unchecked(
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_core_cstr_from_raw(raw: *const NSTDChar) -> NSTDCStr {
     let len = nstd_core_cstr_raw_len(raw);
     nstd_core_cstr_new(raw, len)
@@ -181,7 +181,7 @@ pub unsafe extern "C" fn nstd_core_cstr_from_raw(raw: *const NSTDChar) -> NSTDCS
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_core_cstr_from_raw_with_null(raw: *const NSTDChar) -> NSTDCStr {
     let len = nstd_core_cstr_raw_len_with_null(raw);
     nstd_core_cstr_new(raw, len)
@@ -214,7 +214,7 @@ pub unsafe extern "C" fn nstd_core_cstr_from_raw_with_null(raw: *const NSTDChar)
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub const extern "C" fn nstd_core_cstr_as_bytes(cstr: &NSTDCStr) -> NSTDSlice {
     // SAFETY: `cstr.ptr` is never null.
     unsafe { nstd_core_slice_new_unchecked(cstr.ptr.cast(), 1, cstr.len) }
@@ -241,7 +241,7 @@ pub const extern "C" fn nstd_core_cstr_as_bytes(cstr: &NSTDCStr) -> NSTDSlice {
 /// assert!(str_ptr == nstd_core_cstr_as_ptr(&cstr));
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub const extern "C" fn nstd_core_cstr_as_ptr(cstr: &NSTDCStr) -> *const NSTDChar {
     cstr.ptr
 }
@@ -266,7 +266,7 @@ pub const extern "C" fn nstd_core_cstr_as_ptr(cstr: &NSTDCStr) -> *const NSTDCha
 /// assert!(nstd_core_cstr_len(&cstr) == 19);
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub const extern "C" fn nstd_core_cstr_len(cstr: &NSTDCStr) -> NSTDUInt {
     cstr.len
 }
@@ -315,7 +315,7 @@ pub const extern "C" fn nstd_core_cstr_len(cstr: &NSTDCStr) -> NSTDUInt {
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_core_cstr_is_null_terminated(cstr: &NSTDCStr) -> NSTDBool {
     nstd_core_mem_search(cstr.ptr.cast(), cstr.len, 0) == nstd_core_cstr_last(cstr).cast()
 }
@@ -361,7 +361,7 @@ pub unsafe extern "C" fn nstd_core_cstr_is_null_terminated(cstr: &NSTDCStr) -> N
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_core_cstr_get_null(cstr: &NSTDCStr) -> *const NSTDChar {
     nstd_core_mem_search(cstr.ptr.cast(), cstr.len, 0).cast()
 }
@@ -398,7 +398,7 @@ pub unsafe extern "C" fn nstd_core_cstr_get_null(cstr: &NSTDCStr) -> *const NSTD
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub const extern "C" fn nstd_core_cstr_get(cstr: &NSTDCStr, pos: NSTDUInt) -> *const NSTDChar {
     if pos < cstr.len && pos <= isize::MAX as usize {
         // SAFETY: We've checked `pos`.
@@ -431,7 +431,7 @@ pub const extern "C" fn nstd_core_cstr_get(cstr: &NSTDCStr, pos: NSTDUInt) -> *c
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub const extern "C" fn nstd_core_cstr_first(cstr: &NSTDCStr) -> *const NSTDChar {
     match cstr.len > 0 {
         true => cstr.ptr,
@@ -460,7 +460,7 @@ pub const extern "C" fn nstd_core_cstr_first(cstr: &NSTDCStr) -> *const NSTDChar
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub const extern "C" fn nstd_core_cstr_last(cstr: &NSTDCStr) -> *const NSTDChar {
     match cstr.len > 0 {
         true => nstd_core_cstr_get(cstr, cstr.len - 1),
@@ -528,7 +528,7 @@ gen_optional!(NSTDOptionalCStrMut, NSTDCStrMut);
 /// assert!(unsafe { nstd_core_cstr_mut_is_null_terminated(&cstr) });
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_core_cstr_mut_new(raw: *mut NSTDChar, len: NSTDUInt) -> NSTDCStrMut {
     assert!(!raw.is_null());
     NSTDCStrMut { ptr: raw, len }
@@ -564,7 +564,7 @@ pub extern "C" fn nstd_core_cstr_mut_new(raw: *mut NSTDChar, len: NSTDUInt) -> N
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub const unsafe extern "C" fn nstd_core_cstr_mut_new_unchecked(
     raw: *mut NSTDChar,
     len: NSTDUInt,
@@ -604,7 +604,7 @@ pub const unsafe extern "C" fn nstd_core_cstr_mut_new_unchecked(
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_core_cstr_mut_from_raw(raw: *mut NSTDChar) -> NSTDCStrMut {
     let len = nstd_core_cstr_raw_len(raw);
     nstd_core_cstr_mut_new(raw, len)
@@ -642,7 +642,7 @@ pub unsafe extern "C" fn nstd_core_cstr_mut_from_raw(raw: *mut NSTDChar) -> NSTD
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_core_cstr_mut_from_raw_with_null(raw: *mut NSTDChar) -> NSTDCStrMut {
     let len = nstd_core_cstr_raw_len_with_null(raw);
     nstd_core_cstr_mut_new(raw, len)
@@ -673,7 +673,7 @@ pub unsafe extern "C" fn nstd_core_cstr_mut_from_raw_with_null(raw: *mut NSTDCha
 /// assert!(nstd_cstring_len(&cstring) == nstd_core_cstr_len(&cstr));
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub const extern "C" fn nstd_core_cstr_mut_as_const(cstr: &NSTDCStrMut) -> NSTDCStr {
     // SAFETY: `cstr.ptr` is never null.
     unsafe { nstd_core_cstr_new_unchecked(cstr.ptr, cstr.len) }
@@ -706,7 +706,7 @@ pub const extern "C" fn nstd_core_cstr_mut_as_const(cstr: &NSTDCStrMut) -> NSTDC
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub const extern "C" fn nstd_core_cstr_mut_as_bytes(cstr: &NSTDCStrMut) -> NSTDSlice {
     // SAFETY: `cstr.ptr` is never null.
     unsafe { nstd_core_slice_new_unchecked(cstr.ptr.cast(), 1, cstr.len) }
@@ -733,7 +733,7 @@ pub const extern "C" fn nstd_core_cstr_mut_as_bytes(cstr: &NSTDCStrMut) -> NSTDS
 /// assert!(str_ptr == nstd_core_cstr_mut_as_ptr(&mut cstr));
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_core_cstr_mut_as_ptr(cstr: &mut NSTDCStrMut) -> *mut NSTDChar {
     cstr.ptr
 }
@@ -758,7 +758,7 @@ pub extern "C" fn nstd_core_cstr_mut_as_ptr(cstr: &mut NSTDCStrMut) -> *mut NSTD
 /// assert!(str.as_ptr().cast() == nstd_core_cstr_mut_as_ptr_const(&cstr));
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub const extern "C" fn nstd_core_cstr_mut_as_ptr_const(cstr: &NSTDCStrMut) -> *const NSTDChar {
     cstr.ptr
 }
@@ -783,7 +783,7 @@ pub const extern "C" fn nstd_core_cstr_mut_as_ptr_const(cstr: &NSTDCStrMut) -> *
 /// assert!(nstd_core_cstr_mut_len(&cstr) == 19);
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub const extern "C" fn nstd_core_cstr_mut_len(cstr: &NSTDCStrMut) -> NSTDUInt {
     cstr.len
 }
@@ -832,7 +832,7 @@ pub const extern "C" fn nstd_core_cstr_mut_len(cstr: &NSTDCStrMut) -> NSTDUInt {
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_core_cstr_mut_is_null_terminated(cstr: &NSTDCStrMut) -> NSTDBool {
     let cstr_const = nstd_core_cstr_mut_as_const(cstr);
     nstd_core_cstr_is_null_terminated(&cstr_const)
@@ -879,7 +879,7 @@ pub unsafe extern "C" fn nstd_core_cstr_mut_is_null_terminated(cstr: &NSTDCStrMu
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_core_cstr_mut_get_null(cstr: &mut NSTDCStrMut) -> *mut NSTDChar {
     nstd_core_cstr_mut_get_null_const(cstr) as *mut NSTDChar
 }
@@ -925,7 +925,7 @@ pub unsafe extern "C" fn nstd_core_cstr_mut_get_null(cstr: &mut NSTDCStrMut) -> 
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_core_cstr_mut_get_null_const(cstr: &NSTDCStrMut) -> *const NSTDChar {
     let cstr_const = nstd_core_cstr_mut_as_const(cstr);
     nstd_core_cstr_get_null(&cstr_const)
@@ -967,7 +967,7 @@ pub unsafe extern "C" fn nstd_core_cstr_mut_get_null_const(cstr: &NSTDCStrMut) -
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_core_cstr_mut_get(cstr: &mut NSTDCStrMut, pos: NSTDUInt) -> *mut NSTDChar {
     nstd_core_cstr_mut_get_const(cstr, pos) as *mut NSTDChar
 }
@@ -1004,7 +1004,7 @@ pub extern "C" fn nstd_core_cstr_mut_get(cstr: &mut NSTDCStrMut, pos: NSTDUInt) 
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub const extern "C" fn nstd_core_cstr_mut_get_const(
     cstr: &NSTDCStrMut,
     pos: NSTDUInt,
@@ -1043,7 +1043,7 @@ pub const extern "C" fn nstd_core_cstr_mut_get_const(
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_core_cstr_mut_first(cstr: &mut NSTDCStrMut) -> *mut NSTDChar {
     match cstr.len > 0 {
         true => cstr.ptr,
@@ -1077,7 +1077,7 @@ pub extern "C" fn nstd_core_cstr_mut_first(cstr: &mut NSTDCStrMut) -> *mut NSTDC
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub const extern "C" fn nstd_core_cstr_mut_first_const(cstr: &NSTDCStrMut) -> *const NSTDChar {
     match cstr.len > 0 {
         true => cstr.ptr,
@@ -1112,7 +1112,7 @@ pub const extern "C" fn nstd_core_cstr_mut_first_const(cstr: &NSTDCStrMut) -> *c
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_core_cstr_mut_last(cstr: &mut NSTDCStrMut) -> *mut NSTDChar {
     match cstr.len > 0 {
         true => nstd_core_cstr_mut_get(cstr, cstr.len - 1),
@@ -1145,7 +1145,7 @@ pub extern "C" fn nstd_core_cstr_mut_last(cstr: &mut NSTDCStrMut) -> *mut NSTDCh
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub const extern "C" fn nstd_core_cstr_mut_last_const(cstr: &NSTDCStrMut) -> *const NSTDChar {
     match cstr.len > 0 {
         true => nstd_core_cstr_mut_get_const(cstr, cstr.len - 1),

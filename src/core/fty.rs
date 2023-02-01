@@ -15,7 +15,7 @@ use crate::{NSTDFloat32, NSTDFloat64};
 /// assert!(nstd_core_fty_min_f32() == f32::MIN);
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub const extern "C" fn nstd_core_fty_min_f32() -> NSTDFloat32 {
     NSTDFloat32::MIN
 }
@@ -33,7 +33,7 @@ pub const extern "C" fn nstd_core_fty_min_f32() -> NSTDFloat32 {
 /// assert!(nstd_core_fty_max_f32() == f32::MAX);
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub const extern "C" fn nstd_core_fty_max_f32() -> NSTDFloat32 {
     NSTDFloat32::MAX
 }
@@ -51,7 +51,7 @@ pub const extern "C" fn nstd_core_fty_max_f32() -> NSTDFloat32 {
 /// assert!(nstd_core_fty_min_f64() == f64::MIN);
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub const extern "C" fn nstd_core_fty_min_f64() -> NSTDFloat64 {
     NSTDFloat64::MIN
 }
@@ -69,7 +69,7 @@ pub const extern "C" fn nstd_core_fty_min_f64() -> NSTDFloat64 {
 /// assert!(nstd_core_fty_max_f64() == f64::MAX);
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub const extern "C" fn nstd_core_fty_max_f64() -> NSTDFloat64 {
     NSTDFloat64::MAX
 }
@@ -80,7 +80,7 @@ pub const extern "C" fn nstd_core_fty_max_f64() -> NSTDFloat64 {
 ///
 /// `NSTDFloat32 nan` - NaN represented as `NSTDFloat32`.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub const extern "C" fn nstd_core_fty_nan_f32() -> NSTDFloat32 {
     NSTDFloat32::NAN
 }
@@ -90,7 +90,7 @@ pub const extern "C" fn nstd_core_fty_nan_f32() -> NSTDFloat32 {
 ///
 /// `NSTDFloat64 nan` - NaN represented as `NSTDFloat64`.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub const extern "C" fn nstd_core_fty_nan_f64() -> NSTDFloat64 {
     NSTDFloat64::NAN
 }
@@ -109,7 +109,7 @@ pub const extern "C" fn nstd_core_fty_nan_f64() -> NSTDFloat64 {
 /// assert!(nstd_core_fty_inf_f32() == f32::INFINITY);
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub const extern "C" fn nstd_core_fty_inf_f32() -> NSTDFloat32 {
     NSTDFloat32::INFINITY
 }
@@ -127,7 +127,7 @@ pub const extern "C" fn nstd_core_fty_inf_f32() -> NSTDFloat32 {
 /// assert!(nstd_core_fty_inf_f64() == f64::INFINITY);
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub const extern "C" fn nstd_core_fty_inf_f64() -> NSTDFloat64 {
     NSTDFloat64::INFINITY
 }
@@ -146,7 +146,7 @@ pub const extern "C" fn nstd_core_fty_inf_f64() -> NSTDFloat64 {
 /// assert!(nstd_core_fty_neg_inf_f32() == f32::NEG_INFINITY);
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub const extern "C" fn nstd_core_fty_neg_inf_f32() -> NSTDFloat32 {
     NSTDFloat32::NEG_INFINITY
 }
@@ -164,7 +164,7 @@ pub const extern "C" fn nstd_core_fty_neg_inf_f32() -> NSTDFloat32 {
 /// assert!(nstd_core_fty_neg_inf_f64() == f64::NEG_INFINITY);
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub const extern "C" fn nstd_core_fty_neg_inf_f64() -> NSTDFloat64 {
     NSTDFloat64::NEG_INFINITY
 }

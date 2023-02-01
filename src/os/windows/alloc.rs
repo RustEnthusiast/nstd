@@ -60,7 +60,7 @@ pub enum NSTDWindowsAllocError {
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_os_windows_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
     match GetProcessHeap() {
         0 => NSTD_NULL,
@@ -100,7 +100,7 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_allocate(size: NSTDUInt) -> NSTDA
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_os_windows_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMut {
     match GetProcessHeap() {
         0 => NSTD_NULL,
@@ -152,7 +152,7 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_allocate_zeroed(size: NSTDUInt) -
 ///     assert!(errc == NSTD_WINDOWS_ALLOC_ERROR_NONE);
 /// }
 /// ```
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_os_windows_alloc_reallocate(
     ptr: &mut NSTDAnyMut,
     new_size: NSTDUInt,
@@ -198,7 +198,7 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_reallocate(
 ///     assert!(nstd_os_windows_alloc_deallocate(&mut buf) == NSTD_WINDOWS_ALLOC_ERROR_NONE);
 /// }
 /// ```
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_os_windows_alloc_deallocate(
     ptr: &mut NSTDAnyMut,
 ) -> NSTDWindowsAllocError {

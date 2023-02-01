@@ -69,7 +69,7 @@ pub type NSTDOptionalSharedLib = NSTDOptional<NSTDSharedLib>;
 /// - `path`'s data must be valid for reads.
 ///
 /// - The loaded library may have platform-specific initialization routines ran when it is loaded.
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_shared_lib_load(path: &NSTDStr) -> NSTDOptionalSharedLib {
     #[cfg(unix)]
     {
@@ -107,7 +107,7 @@ pub unsafe extern "C" fn nstd_shared_lib_load(path: &NSTDStr) -> NSTDOptionalSha
 ///
 /// Undefined behavior may occur if `symbol`'s data is invalid.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_shared_lib_get(
     lib: &NSTDSharedLib,
     symbol: *const NSTDChar,
@@ -135,7 +135,7 @@ pub unsafe extern "C" fn nstd_shared_lib_get(
 ///
 /// Undefined behavior may occur if `symbol`'s data is invalid.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_shared_lib_get_mut(
     lib: &mut NSTDSharedLib,
     symbol: *const NSTDChar,
@@ -156,6 +156,6 @@ pub unsafe extern "C" fn nstd_shared_lib_get_mut(
 ///
 /// Panics if unloading the library fails.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 #[allow(unused_variables)]
 pub extern "C" fn nstd_shared_lib_free(lib: NSTDSharedLib) {}

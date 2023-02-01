@@ -7,7 +7,7 @@ Rust syntax).
 
 # Example using C
 ```c
-// Build nstd with features set to "clib nstd_core nstd_io".
+// Build nstd with features set to "capi nstd_core nstd_io".
 #include <nstd.h>
 
 /// Main entry point of the program.
@@ -136,7 +136,7 @@ Each module may have additional features, for example `nstd.os` has the addition
 the low level memory allocation API for Windows without enabling memory allocation for other
 operating systems.
 
-The `clib` feature flag is used to build `nstd` as a C library.
+The `capi` feature flag is used to build `nstd` as a C library.
 
 The `std` feature flag links the Rust standard library into the binary.
 
@@ -146,7 +146,7 @@ The `asm` feature permits the library to use assembly to optimize certain build 
 
 Example:
 ```sh
-cargo rustc --release --crate-type cdylib --crate-type staticlib --features "clib nstd_alloc"
+cargo rustc --release --crate-type cdylib --crate-type staticlib --features "capi nstd_alloc"
 ```
 
 To build with all features:

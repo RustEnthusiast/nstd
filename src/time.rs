@@ -40,7 +40,7 @@ gen_optional!(NSTDOptionalTime, NSTDTime);
 ///
 /// `NSTDTime time` - The current time.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_time_now() -> NSTDTime {
     NSTDTime::from(SystemTime::now())
 }

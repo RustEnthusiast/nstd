@@ -1,5 +1,6 @@
 # TBD
 ### `nstd`
+- Renamed the `clib` feature to `capi`.
 - Moved `NSTDUnichar` into `core`.
 - Added `nstd.mutex`.
 - Added `nstd.timed_mutex`.

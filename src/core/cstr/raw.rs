@@ -25,7 +25,7 @@ use crate::{NSTDBool, NSTDChar, NSTDUInt};
 /// assert!(unsafe { nstd_core_cstr_raw_len(cstr.as_ptr().cast()) } == 13);
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 #[allow(unused_mut)]
 pub unsafe extern "C" fn nstd_core_cstr_raw_len(mut cstr: *const NSTDChar) -> NSTDUInt {
     #[cfg(not(all(any(unix, windows), feature = "libc")))]
@@ -107,7 +107,7 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_len(mut cstr: *const NSTDChar) -> NS
 /// assert!(unsafe { nstd_core_cstr_raw_len_with_null(cstr.as_ptr().cast()) } == 14);
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_core_cstr_raw_len_with_null(cstr: *const NSTDChar) -> NSTDUInt {
     nstd_core_cstr_raw_len(cstr) + 1
 }
@@ -140,7 +140,7 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_len_with_null(cstr: *const NSTDChar)
 ///
 /// assert!(unsafe { nstd_core_cstr_raw_compare(cstr1, cstr2) } == NSTD_FALSE);
 /// ```
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 #[allow(unused_mut)]
 pub unsafe extern "C" fn nstd_core_cstr_raw_compare(
     mut cstr1: *const NSTDChar,
@@ -254,7 +254,7 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_compare(
 /// assert!(&buffer == cstr);
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 #[allow(unused_mut)]
 pub unsafe extern "C" fn nstd_core_cstr_raw_copy(
     mut dest: *mut NSTDChar,
@@ -344,7 +344,7 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_copy(
 /// assert!(&buffer == cstr);
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 #[allow(unused_mut)]
 pub unsafe extern "C" fn nstd_core_cstr_raw_copy_with_null(
     mut dest: *mut NSTDChar,

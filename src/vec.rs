@@ -193,7 +193,7 @@ gen_optional!(NSTDOptionalVec, NSTDVec);
 /// let vec = nstd_vec_new(SIZE);
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub const extern "C" fn nstd_vec_new(element_size: NSTDUInt) -> NSTDVec {
     assert!(element_size != 0);
     NSTDVec {
@@ -248,7 +248,7 @@ pub const extern "C" fn nstd_vec_new(element_size: NSTDUInt) -> NSTDVec {
 ///     }
 /// }
 /// ```
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_vec_new_with_cap(element_size: NSTDUInt, mut cap: NSTDUInt) -> NSTDVec {
     // Ensure that neither `element_size` or `cap` are zero.
     assert!(element_size != 0 && cap != 0);
@@ -307,7 +307,7 @@ pub extern "C" fn nstd_vec_new_with_cap(element_size: NSTDUInt, mut cap: NSTDUIn
 ///     }
 /// }
 /// ```
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_vec_from_slice(slice: &NSTDSlice) -> NSTDVec {
     let stride = nstd_core_slice_stride(slice);
     let len = nstd_core_slice_len(slice);
@@ -337,7 +337,7 @@ pub unsafe extern "C" fn nstd_vec_from_slice(slice: &NSTDSlice) -> NSTDVec {
 /// # Panics
 ///
 /// This operation will panic if allocating for the new vector fails.
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_vec_clone(vec: &NSTDVec) -> NSTDVec {
     if vec.len > 0 {
         let mut cloned = nstd_vec_new_with_cap(vec.stride, vec.len);
@@ -361,7 +361,7 @@ pub extern "C" fn nstd_vec_clone(vec: &NSTDVec) -> NSTDVec {
 ///
 /// `NSTDUInt len` - The length of the vector.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub const extern "C" fn nstd_vec_len(vec: &NSTDVec) -> NSTDUInt {
     vec.len
 }
@@ -378,7 +378,7 @@ pub const extern "C" fn nstd_vec_len(vec: &NSTDVec) -> NSTDUInt {
 ///
 /// `NSTDUInt cap` - The vector's capacity.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub const extern "C" fn nstd_vec_cap(vec: &NSTDVec) -> NSTDUInt {
     vec.cap
 }
@@ -393,7 +393,7 @@ pub const extern "C" fn nstd_vec_cap(vec: &NSTDVec) -> NSTDUInt {
 ///
 /// `NSTDUInt stride` - The size of each value in the vector.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub const extern "C" fn nstd_vec_stride(vec: &NSTDVec) -> NSTDUInt {
     vec.stride
 }
@@ -417,7 +417,7 @@ pub const extern "C" fn nstd_vec_stride(vec: &NSTDVec) -> NSTDUInt {
 /// assert!(nstd_vec_reserved(&vec) == 16);
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub const extern "C" fn nstd_vec_reserved(vec: &NSTDVec) -> NSTDUInt {
     vec.cap - vec.len
 }
@@ -432,7 +432,7 @@ pub const extern "C" fn nstd_vec_reserved(vec: &NSTDVec) -> NSTDUInt {
 ///
 /// `NSTDSlice slice` - An *immutable* view into the vector.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_vec_as_slice(vec: &NSTDVec) -> NSTDSlice {
     // SAFETY: `vec.ptr` is checked.
     unsafe {
@@ -453,7 +453,7 @@ pub extern "C" fn nstd_vec_as_slice(vec: &NSTDVec) -> NSTDSlice {
 ///
 /// `NSTDSliceMut slice` - A *mutable* view into the vector.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_vec_as_slice_mut(vec: &mut NSTDVec) -> NSTDSliceMut {
     // SAFETY: `vec.ptr` is checked.
     unsafe {
@@ -474,7 +474,7 @@ pub extern "C" fn nstd_vec_as_slice_mut(vec: &mut NSTDVec) -> NSTDSliceMut {
 ///
 /// `NSTDAny ptr` - A pointer to the vector's raw data.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub const extern "C" fn nstd_vec_as_ptr(vec: &NSTDVec) -> NSTDAny {
     vec.ptr
 }
@@ -489,7 +489,7 @@ pub const extern "C" fn nstd_vec_as_ptr(vec: &NSTDVec) -> NSTDAny {
 ///
 /// `NSTDAnyMut ptr` - A pointer to the vector's raw data.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_vec_as_ptr_mut(vec: &mut NSTDVec) -> NSTDAnyMut {
     vec.ptr
 }
@@ -511,7 +511,7 @@ pub extern "C" fn nstd_vec_as_ptr_mut(vec: &mut NSTDVec) -> NSTDAnyMut {
 ///
 /// Panics if the total length of the vector's buffer exceeds `isize::MAX` bytes.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_vec_end(vec: &NSTDVec) -> NSTDAny {
     if !vec.ptr.is_null() {
         let len = vec.byte_len();
@@ -539,7 +539,7 @@ pub extern "C" fn nstd_vec_end(vec: &NSTDVec) -> NSTDAny {
 ///
 /// Panics if the total length of the vector's buffer exceeds `isize::MAX` bytes.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_vec_end_mut(vec: &mut NSTDVec) -> NSTDAnyMut {
     if !vec.ptr.is_null() {
         let len = vec.byte_len();
@@ -595,7 +595,7 @@ pub extern "C" fn nstd_vec_end_mut(vec: &mut NSTDVec) -> NSTDAnyMut {
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub const extern "C" fn nstd_vec_get(vec: &NSTDVec, mut pos: NSTDUInt) -> NSTDAny {
     if pos < vec.len {
         pos *= vec.stride;
@@ -656,7 +656,7 @@ pub const extern "C" fn nstd_vec_get(vec: &NSTDVec, mut pos: NSTDUInt) -> NSTDAn
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_vec_get_mut(vec: &mut NSTDVec, pos: NSTDUInt) -> NSTDAnyMut {
     nstd_vec_get(vec, pos) as NSTDAnyMut
 }
@@ -698,7 +698,7 @@ pub extern "C" fn nstd_vec_get_mut(vec: &mut NSTDVec, pos: NSTDUInt) -> NSTDAnyM
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_vec_push(vec: &mut NSTDVec, value: NSTDAny) -> NSTDAllocError {
     // Attempt to reserve space for the push.
     let errc = vec.try_reserve();
@@ -752,7 +752,7 @@ pub unsafe extern "C" fn nstd_vec_push(vec: &mut NSTDVec, value: NSTDAny) -> NST
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_vec_pop(vec: &mut NSTDVec) -> NSTDAny {
     if vec.len > 0 {
         vec.len -= 1;
@@ -815,7 +815,7 @@ pub extern "C" fn nstd_vec_pop(vec: &mut NSTDVec) -> NSTDAny {
 ///     }
 /// }
 /// ```
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_vec_insert(
     vec: &mut NSTDVec,
     value: NSTDAny,
@@ -885,7 +885,7 @@ pub unsafe extern "C" fn nstd_vec_insert(
 ///     }
 /// }
 /// ```
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_vec_remove(vec: &mut NSTDVec, mut index: NSTDUInt) -> NSTDErrorCode {
     // Make sure `index` is valid. This also ensures that `vec.len` is at least 1.
     if index < vec.len {
@@ -955,7 +955,7 @@ pub extern "C" fn nstd_vec_remove(vec: &mut NSTDVec, mut index: NSTDUInt) -> NST
 ///     }
 /// }
 /// ```
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_vec_extend(vec: &mut NSTDVec, values: &NSTDSlice) -> NSTDAllocError {
     // Ensure value sizes are the same for both the vector and the slice.
     assert!(vec.stride == nstd_core_slice_stride(values));
@@ -988,7 +988,7 @@ pub unsafe extern "C" fn nstd_vec_extend(vec: &mut NSTDVec, values: &NSTDSlice) 
 ///
 /// - `NSTDUInt len` - The number of elements to keep.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_vec_truncate(vec: &mut NSTDVec, len: NSTDUInt) {
     if vec.len > len {
         vec.len = len;
@@ -1012,7 +1012,7 @@ pub extern "C" fn nstd_vec_truncate(vec: &mut NSTDVec, len: NSTDUInt) {
 /// If `len` is greater than the vector's current length, care must be taken to ensure that the new
 /// elements are properly initialized.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_vec_set_len(vec: &mut NSTDVec, len: NSTDUInt) -> NSTDErrorCode {
     match len <= vec.cap {
         true => {
@@ -1035,7 +1035,7 @@ pub unsafe extern "C" fn nstd_vec_set_len(vec: &mut NSTDVec, len: NSTDUInt) -> N
 /// # Returns
 ///
 /// `NSTDAllocError errc` - The allocation operation error code.
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_vec_reserve(vec: &mut NSTDVec, size: NSTDUInt) -> NSTDAllocError {
     // Check `size`.
     if size == 0 {
@@ -1080,7 +1080,7 @@ pub extern "C" fn nstd_vec_reserve(vec: &mut NSTDVec, size: NSTDUInt) -> NSTDAll
 /// # Returns
 ///
 /// `NSTDAllocError errc` - The allocation operation error code.
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_vec_shrink(vec: &mut NSTDVec) -> NSTDAllocError {
     // Make sure the vector is non-null and it's capacity is greater than it's length.
     if !vec.ptr.is_null() && vec.len < vec.cap {
@@ -1104,7 +1104,7 @@ pub extern "C" fn nstd_vec_shrink(vec: &mut NSTDVec) -> NSTDAllocError {
 ///
 /// - `NSTDVec *vec` - The vector to clear.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_vec_clear(vec: &mut NSTDVec) {
     vec.len = 0;
 }
@@ -1119,6 +1119,6 @@ pub extern "C" fn nstd_vec_clear(vec: &mut NSTDVec) {
 ///
 /// Panics if deallocating fails.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 #[allow(unused_variables)]
 pub extern "C" fn nstd_vec_free(vec: NSTDVec) {}

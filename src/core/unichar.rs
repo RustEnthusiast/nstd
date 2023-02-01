@@ -42,7 +42,7 @@ gen_optional!(NSTDOptionalUnichar, NSTDUnichar);
 ///
 /// `NSTDOptionalUnichar unichar` - The new Unicode scalar value on success.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub const extern "C" fn nstd_core_unichar_new(value: NSTDChar32) -> NSTDOptionalUnichar {
     match char::from_u32(value) {
         Some(_) => NSTDOptional::Some(NSTDUnichar { value }),

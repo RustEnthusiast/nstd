@@ -75,7 +75,7 @@ impl From<NSTDWindowsAllocError> for NSTDAllocError {
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
     #[cfg(not(any(unix, windows)))]
     {
@@ -122,7 +122,7 @@ pub unsafe extern "C" fn nstd_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMut {
     #[cfg(not(any(unix, windows)))]
     {
@@ -187,7 +187,7 @@ pub unsafe extern "C" fn nstd_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMu
 /// }
 /// ```
 #[cfg_attr(any(unix, windows), inline)]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 #[cfg_attr(any(unix, windows), allow(unused_variables))]
 pub unsafe extern "C" fn nstd_alloc_reallocate(
     ptr: &mut NSTDAnyMut,
@@ -249,7 +249,7 @@ pub unsafe extern "C" fn nstd_alloc_reallocate(
 /// }
 /// ```
 #[cfg_attr(any(unix, windows), inline)]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 #[cfg_attr(any(unix, windows), allow(unused_variables))]
 pub unsafe extern "C" fn nstd_alloc_deallocate(
     ptr: &mut NSTDAnyMut,
