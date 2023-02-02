@@ -9,7 +9,6 @@ typedef struct {
     NSTDChar32 value;
 } NSTDUnichar;
 
-
 /// Represents an optional value of type `NSTDUnichar`.
 NSTDOptional(NSTDUnichar) NSTDOptionalUnichar;
 

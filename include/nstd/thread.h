@@ -89,8 +89,9 @@ NSTDAPI NSTDThread nstd_thread_spawn(NSTDThreadResult (*thread_fn)(NSTDHeapPtr),
 /// - This operation can cause undefined behavior if `desc`'s data is invalid.
 ///
 /// - The data type that `data` holds must be able to be safely sent between threads.
-NSTDAPI NSTDThread nstd_thread_spawn_with_desc(NSTDThreadResult (*thread_fn)(NSTDHeapPtr),
-NSTDHeapPtr data, const NSTDThreadDescriptor *desc);
+NSTDAPI NSTDThread nstd_thread_spawn_with_desc(
+    NSTDThreadResult (*thread_fn)(NSTDHeapPtr), NSTDHeapPtr data, const NSTDThreadDescriptor *desc
+);
 
 /// Returns a handle to the calling thread.
 ///
@@ -187,6 +188,13 @@ NSTDAPI void nstd_thread_sleep(NSTDFloat64 secs);
 /// `NSTDThreadCountResult threads` - The estimated default amount of parallelism a program should
 /// use on success, or the I/O error code on failure.
 NSTDAPI NSTDThreadCountResult nstd_thread_count();
+
+/// Checks if the current thread is unwinding due to a panic.
+///
+/// # Returns
+///
+/// `NSTDBool is_panicking` - Determines whether or not the calling thread is panicking.
+NSTDAPI NSTDBool nstd_thread_is_panicking();
 
 /// Compares two thread identifiers.
 ///

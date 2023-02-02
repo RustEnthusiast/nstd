@@ -15,14 +15,14 @@ macro_rules! gen_min_max {
     ) => {
         $(#[$minmeta])*
         #[inline]
-        #[cfg_attr(feature = "clib", no_mangle)]
+        #[cfg_attr(feature = "capi", no_mangle)]
         pub const extern "C" fn $minname() -> $T {
             <$T>::MIN
         }
 
         $(#[$maxmeta])*
         #[inline]
-        #[cfg_attr(feature = "clib", no_mangle)]
+        #[cfg_attr(feature = "capi", no_mangle)]
         pub const extern "C" fn $maxname() -> $T {
             <$T>::MAX
         }

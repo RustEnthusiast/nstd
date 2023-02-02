@@ -42,7 +42,7 @@ pub type NSTDWindowsOptionalSharedLib = NSTDOptional<NSTDWindowsSharedLib>;
 /// See
 /// <https://docs.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-loadlibraryw>.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_os_windows_shared_lib_load(
     name: *const NSTDChar16,
 ) -> NSTDWindowsOptionalSharedLib {
@@ -62,7 +62,7 @@ pub unsafe extern "C" fn nstd_os_windows_shared_lib_load(
 ///
 /// `NSTDWindowsHandle handle` - A native handle to the dynamically loaded library.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_os_windows_shared_lib_handle(
     lib: &NSTDWindowsSharedLib,
 ) -> NSTDWindowsHandle {
@@ -85,7 +85,7 @@ pub extern "C" fn nstd_os_windows_shared_lib_handle(
 ///
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-getprocaddress>.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_os_windows_shared_lib_get(
     lib: &NSTDWindowsSharedLib,
     symbol: *const NSTDChar,
@@ -110,7 +110,7 @@ pub unsafe extern "C" fn nstd_os_windows_shared_lib_get(
 ///
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-getprocaddress>.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_os_windows_shared_lib_get_mut(
     lib: &mut NSTDWindowsSharedLib,
     symbol: *const NSTDChar,
@@ -133,6 +133,6 @@ pub unsafe extern "C" fn nstd_os_windows_shared_lib_get_mut(
 /// See
 /// <https://docs.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-freelibrary>.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 #[allow(unused_variables)]
 pub unsafe extern "C" fn nstd_os_windows_shared_lib_free(lib: NSTDWindowsSharedLib) {}

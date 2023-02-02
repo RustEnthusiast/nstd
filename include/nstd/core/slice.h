@@ -191,8 +191,8 @@ NSTDAPI NSTDSliceMut nstd_core_slice_mut_new(NSTDAnyMut ptr, NSTDUInt element_si
 /// # Safety
 ///
 /// The user of this function must ensure that `ptr` is not null.
-NSTDAPI NSTDSliceMut nstd_core_slice_mut_new_unchecked(NSTDAnyMut ptr, NSTDUInt element_size,
-NSTDUInt len);
+NSTDAPI NSTDSliceMut
+nstd_core_slice_mut_new_unchecked(NSTDAnyMut ptr, NSTDUInt element_size, NSTDUInt len);
 
 /// Creates an immutable version of a mutable slice.
 ///

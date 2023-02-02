@@ -46,6 +46,16 @@ impl Drop for NSTDHeapPtr {
         }
     }
 }
+/// # Safety
+///
+/// The data that the heap pointer holds must be able to be safely sent between threads.
+// SAFETY: The user guarantees that the data is thread-safe.
+unsafe impl Send for NSTDHeapPtr {}
+/// # Safety
+///
+/// The data that the heap pointer holds must be able to be safely shared between threads.
+// SAFETY: The user guarantees that the data is thread-safe.
+unsafe impl Sync for NSTDHeapPtr {}
 gen_optional!(NSTDOptionalHeapPtr, NSTDHeapPtr);
 
 /// Creates a new initialized heap allocated object.
@@ -79,7 +89,7 @@ gen_optional!(NSTDOptionalHeapPtr, NSTDHeapPtr);
 /// let v = '🦀';
 /// let hptr = unsafe { nstd_heap_ptr_new(SIZE, addr_of!(v).cast()) };
 /// ```
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_heap_ptr_new(element_size: NSTDUInt, init: NSTDAny) -> NSTDHeapPtr {
     if element_size == 0 {
         NSTDHeapPtr::zero_sized()
@@ -125,7 +135,7 @@ pub unsafe extern "C" fn nstd_heap_ptr_new(element_size: NSTDUInt, init: NSTDAny
 ///     assert!(*nstd_heap_ptr_get(&hptr).cast::<u64>() == 0);
 /// }
 /// ```
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_heap_ptr_new_zeroed(element_size: NSTDUInt) -> NSTDHeapPtr {
     if element_size == 0 {
         NSTDHeapPtr::zero_sized()
@@ -153,7 +163,7 @@ pub unsafe extern "C" fn nstd_heap_ptr_new_zeroed(element_size: NSTDUInt) -> NST
 /// # Panics
 ///
 /// This function will panic if allocation fails.
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_heap_ptr_clone(hptr: &NSTDHeapPtr) -> NSTDHeapPtr {
     let size = nstd_heap_ptr_size(hptr);
     if size == 0 {
@@ -189,7 +199,7 @@ pub extern "C" fn nstd_heap_ptr_clone(hptr: &NSTDHeapPtr) -> NSTDHeapPtr {
 /// assert!(nstd_heap_ptr_size(&hptr) == SIZE);
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_heap_ptr_size(hptr: &NSTDHeapPtr) -> NSTDUInt {
     hptr.size
 }
@@ -223,7 +233,7 @@ pub extern "C" fn nstd_heap_ptr_size(hptr: &NSTDHeapPtr) -> NSTDUInt {
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_heap_ptr_get(hptr: &NSTDHeapPtr) -> NSTDAny {
     hptr.ptr
 }
@@ -260,7 +270,7 @@ pub extern "C" fn nstd_heap_ptr_get(hptr: &NSTDHeapPtr) -> NSTDAny {
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_heap_ptr_get_mut(hptr: &mut NSTDHeapPtr) -> NSTDAnyMut {
     hptr.ptr
 }
@@ -275,6 +285,6 @@ pub extern "C" fn nstd_heap_ptr_get_mut(hptr: &mut NSTDHeapPtr) -> NSTDAnyMut {
 ///
 /// Panics if freeing the heap memory fails.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 #[allow(unused_variables)]
 pub extern "C" fn nstd_heap_ptr_free(hptr: NSTDHeapPtr) {}

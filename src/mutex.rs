@@ -32,7 +32,7 @@ pub type NSTDOptionalMutexLockResult<'a> = NSTDOptional<NSTDMutexLockResult<'a>>
 ///
 /// `NSTDMutex mutex` - The new mutex protecting `data`.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_mutex_new(data: NSTDHeapPtr) -> NSTDMutex {
     Box::new(Mutex::new(data))
 }
@@ -50,7 +50,7 @@ pub extern "C" fn nstd_mutex_new(data: NSTDHeapPtr) -> NSTDMutex {
 ///
 /// `NSTDBool is_poisoned` - A boolean value indicating whether or not `mutex` is poisoned.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_mutex_is_poisoned(mutex: &NSTDMutex) -> NSTDBool {
     mutex.is_poisoned()
 }
@@ -71,7 +71,7 @@ pub extern "C" fn nstd_mutex_is_poisoned(mutex: &NSTDMutex) -> NSTDBool {
 /// # Panics
 ///
 /// This operation may panic if the lock is already held by the current thread.
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_mutex_lock(mutex: &NSTDMutex) -> NSTDMutexLockResult {
     match mutex.lock() {
         Ok(guard) => NSTDResult::Ok(Box::new(guard)),
@@ -89,7 +89,7 @@ pub extern "C" fn nstd_mutex_lock(mutex: &NSTDMutex) -> NSTDMutexLockResult {
 /// # Returns
 ///
 /// `NSTDOptionalMutexLockResult guard` - A handle to the mutex's protected data.
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_mutex_try_lock(mutex: &NSTDMutex) -> NSTDOptionalMutexLockResult {
     match mutex.try_lock() {
         Ok(guard) => NSTDOptional::Some(NSTDResult::Ok(Box::new(guard))),
@@ -112,7 +112,7 @@ pub extern "C" fn nstd_mutex_try_lock(mutex: &NSTDMutex) -> NSTDOptionalMutexLoc
 ///
 /// `NSTDAny data` - A pointer to the mutex's data.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_mutex_get(guard: &NSTDMutexGuard) -> NSTDAny {
     nstd_heap_ptr_get(guard)
 }
@@ -127,7 +127,7 @@ pub extern "C" fn nstd_mutex_get(guard: &NSTDMutexGuard) -> NSTDAny {
 ///
 /// `NSTDAnyMut data` - A mutable pointer to the mutex's data.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_mutex_get_mut(guard: &mut NSTDMutexGuard) -> NSTDAnyMut {
     nstd_heap_ptr_get_mut(guard)
 }
@@ -138,7 +138,7 @@ pub extern "C" fn nstd_mutex_get_mut(guard: &mut NSTDMutexGuard) -> NSTDAnyMut {
 ///
 /// - `NSTDMutexGuard guard` - The mutex guard.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 #[allow(unused_variables)]
 pub extern "C" fn nstd_mutex_unlock(guard: NSTDMutexGuard) {}
 
@@ -148,6 +148,6 @@ pub extern "C" fn nstd_mutex_unlock(guard: NSTDMutexGuard) {}
 ///
 /// - `NSTDMutex mutex` - The mutex to free.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 #[allow(unused_variables)]
 pub extern "C" fn nstd_mutex_free(mutex: NSTDMutex) {}

@@ -16,5 +16,7 @@
 #include "nstd/shared_ptr.h"
 #include "nstd/string.h"
 #include "nstd/thread.h"
+#include "nstd/time.h"
+#include "nstd/timed_mutex.h"
 #include "nstd/vec.h"
 #endif

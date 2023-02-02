@@ -47,7 +47,7 @@ use crate::{core::def::NSTDByte, NSTDBool, NSTDUInt};
 ///     assert!(nstd_core_mem_compare(ptr1, ptr2, num) == NSTD_TRUE);
 /// }
 /// ```
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_core_mem_compare(
     buf1: *const NSTDByte,
     buf2: *const NSTDByte,
@@ -110,7 +110,7 @@ pub unsafe extern "C" fn nstd_core_mem_compare(
 ///     assert!(nstd_core_mem_search(ptr, buffer.len(), 0) == ptr.add(13));
 /// }
 /// ```
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_core_mem_search(
     buf: *const NSTDByte,
     size: NSTDUInt,
@@ -211,7 +211,7 @@ pub unsafe extern "C" fn nstd_core_mem_search(
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_core_mem_zero(buf: *mut NSTDByte, size: NSTDUInt) {
     #[cfg(not(all(any(unix, windows), feature = "libc")))]
     {
@@ -322,7 +322,7 @@ pub unsafe extern "C" fn nstd_core_mem_zero(buf: *mut NSTDByte, size: NSTDUInt) 
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_core_mem_fill(buf: *mut NSTDByte, size: NSTDUInt, fill: NSTDByte) {
     #[cfg(not(all(any(unix, windows), feature = "libc")))]
     {
@@ -407,7 +407,7 @@ pub unsafe extern "C" fn nstd_core_mem_fill(buf: *mut NSTDByte, size: NSTDUInt, 
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub const unsafe extern "C" fn nstd_core_mem_copy(
     dest: *mut NSTDByte,
     src: *const NSTDByte,
@@ -433,7 +433,7 @@ pub const unsafe extern "C" fn nstd_core_mem_copy(
 /// quickly leading to undefined behavior if this function ends up reading or writing past the end
 /// of a buffer.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub const unsafe extern "C" fn nstd_core_mem_copy_overlapping(
     dest: *mut NSTDByte,
     src: *const NSTDByte,
@@ -471,7 +471,7 @@ pub const unsafe extern "C" fn nstd_core_mem_copy_overlapping(
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_core_mem_swap(x: *mut NSTDByte, y: *mut NSTDByte, num: NSTDUInt) {
     core::ptr::swap_nonoverlapping(x, y, num);
 }

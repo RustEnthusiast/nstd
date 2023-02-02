@@ -28,7 +28,7 @@ use libc::{calloc, free, malloc, realloc};
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_os_unix_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
     malloc(size)
 }
@@ -64,7 +64,7 @@ pub unsafe extern "C" fn nstd_os_unix_alloc_allocate(size: NSTDUInt) -> NSTDAnyM
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_os_unix_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMut {
     calloc(size, 1)
 }
@@ -105,7 +105,7 @@ pub unsafe extern "C" fn nstd_os_unix_alloc_allocate_zeroed(size: NSTDUInt) -> N
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_os_unix_alloc_reallocate(
     ptr: &mut NSTDAnyMut,
     new_size: NSTDUInt,
@@ -140,7 +140,7 @@ pub unsafe extern "C" fn nstd_os_unix_alloc_reallocate(
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_os_unix_alloc_deallocate(ptr: &mut NSTDAnyMut) {
     free(*ptr);
     *ptr = NSTD_NULL;

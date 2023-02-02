@@ -134,7 +134,7 @@ pub type NSTDIOStringResult = NSTDResult<NSTDString, NSTDIOError>;
 ///
 /// The provided string slice's data must be valid, else this function can cause garbage bytes to
 /// be written to stdout.
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_io_print(output: &NSTDStr) -> NSTDIOError {
     let mut stdout = std::io::stdout();
     if let Err(err) = stdout.write_all(output.as_str().as_bytes()) {
@@ -163,7 +163,7 @@ pub unsafe extern "C" fn nstd_io_print(output: &NSTDStr) -> NSTDIOError {
 ///
 /// The provided string slice's data must be valid, else this function can cause garbage bytes to
 /// be written to stdout.
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_io_print_line(output: &NSTDStr) -> NSTDIOError {
     let mut stdout = std::io::stdout();
     if let Err(err) = stdout.write_all(output.as_str().as_bytes()) {
@@ -187,7 +187,7 @@ pub unsafe extern "C" fn nstd_io_print_line(output: &NSTDStr) -> NSTDIOError {
 ///
 /// Panics if allocating the string fails or the input's length in bytes exceeds `NSTDInt`'s max
 /// value.
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_io_read() -> NSTDIOStringResult {
     let mut res = nstd_io_read_line();
     if let NSTDResult::Ok(input) = &mut res {
@@ -206,7 +206,7 @@ pub extern "C" fn nstd_io_read() -> NSTDIOStringResult {
 /// # Panics
 ///
 /// Panics if allocating the string fails.
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_io_read_line() -> NSTDIOStringResult {
     // Attempt to read a line from stdin.
     let mut input = String::new();

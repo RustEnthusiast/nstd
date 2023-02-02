@@ -20,8 +20,8 @@ use crate::{core::unichar::NSTDUnichar, NSTDBool, NSTDChar, NSTDChar32, NSTDUInt
 /// assert!(!nstd_core_cty_is_unicode(NSTDChar32::MAX));
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_cty_is_unicode(chr: NSTDChar32) -> NSTDBool {
+#[cfg_attr(feature = "capi", no_mangle)]
+pub const extern "C" fn nstd_core_cty_is_unicode(chr: NSTDChar32) -> NSTDBool {
     char::from_u32(chr).is_some()
 }
 
@@ -39,7 +39,7 @@ pub extern "C" fn nstd_core_cty_is_unicode(chr: NSTDChar32) -> NSTDBool {
 /// assert!(nstd_core_cty_replacement_char() == char::REPLACEMENT_CHARACTER.into());
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_core_cty_replacement_char() -> NSTDUnichar {
     char::REPLACEMENT_CHARACTER.into()
 }
@@ -53,7 +53,7 @@ macro_rules! gen_deterministic {
     ) => {
         $(#[$meta])*
         #[inline]
-        #[cfg_attr(feature = "clib", no_mangle)]
+        #[cfg_attr(feature = "capi", no_mangle)]
         pub extern "C" fn $name(chr: NSTDUnichar) -> NSTDBool {
             char::from(chr).$method()
         }
@@ -245,7 +245,7 @@ gen_deterministic!(
 /// assert!(nstd_core_cty_is_digit('F'.into(), 10) == NSTD_FALSE);
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_core_cty_is_digit(chr: NSTDUnichar, radix: NSTDUInt32) -> NSTDBool {
     char::from(chr).is_digit(radix)
 }
@@ -273,7 +273,7 @@ pub extern "C" fn nstd_core_cty_is_digit(chr: NSTDUnichar, radix: NSTDUInt32) ->
 /// assert!(nstd_core_cty_is_ascii_punctuation(b'y' as NSTDChar) == NSTD_FALSE);
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub const extern "C" fn nstd_core_cty_is_ascii_punctuation(chr: NSTDChar) -> NSTDBool {
     matches!(chr, 0x21..=0x2F | 0x3A..=0x40 | 0x5B..=0x60 | 0x7B..=0x7E)
 }
@@ -301,7 +301,7 @@ pub const extern "C" fn nstd_core_cty_is_ascii_punctuation(chr: NSTDChar) -> NST
 /// assert!(nstd_core_cty_is_ascii_graphic(b'\t' as NSTDChar) == NSTD_FALSE);
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub const extern "C" fn nstd_core_cty_is_ascii_graphic(chr: NSTDChar) -> NSTDBool {
     matches!(chr, 0x21..=0x7E)
 }
@@ -333,7 +333,7 @@ pub const extern "C" fn nstd_core_cty_is_ascii_graphic(chr: NSTDChar) -> NSTDBoo
 /// assert!(z == 'z');
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_core_cty_to_ascii_lowercase(chr: NSTDUnichar) -> NSTDUnichar {
     char::from(chr).to_ascii_lowercase().into()
 }
@@ -364,7 +364,7 @@ pub extern "C" fn nstd_core_cty_to_ascii_lowercase(chr: NSTDUnichar) -> NSTDUnic
 /// assert!(z == 'Z');
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_core_cty_to_ascii_uppercase(chr: NSTDUnichar) -> NSTDUnichar {
     char::from(chr).to_ascii_uppercase().into()
 }

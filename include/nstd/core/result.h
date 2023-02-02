@@ -10,9 +10,13 @@ typedef enum {
 } NSTDResultStatus;
 
 /// Defines a "result" type with success and error variants.
-#define NSTDResult(T, E) typedef struct {\
-    NSTDResultStatus status;\
-    union { T ok; E err; };\
-}
+#define NSTDResult(T, E)         \
+    typedef struct {             \
+        NSTDResultStatus status; \
+        union {                  \
+            T ok;                \
+            E err;               \
+        };                       \
+    }
 
 #endif
