@@ -27,8 +27,8 @@ use self::str::NSTDStr;
 ///
 /// This function will always panic.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_panic() -> ! {
+#[cfg_attr(feature = "capi", no_mangle)]
+pub const extern "C" fn nstd_core_panic() -> ! {
     panic!();
 }
 
@@ -48,7 +48,7 @@ pub extern "C" fn nstd_core_panic() -> ! {
 ///
 /// `msg`'s data must be valid for reads.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_panic_with_msg(msg: &NSTDStr) -> ! {
+#[cfg_attr(feature = "capi", no_mangle)]
+pub const unsafe extern "C" fn nstd_core_panic_with_msg(msg: &NSTDStr) -> ! {
     panic!("{}", msg.as_str());
 }

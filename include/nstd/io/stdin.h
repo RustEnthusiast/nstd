@@ -86,8 +86,8 @@ NSTDAPI NSTDIOError nstd_io_stdin_read_all(NSTDStdin *handle, NSTDVec *buffer, N
 /// # Panics
 ///
 /// This function will panic if `buffer`'s length in bytes ends up exceeding `NSTDInt`'s max value.
-NSTDAPI NSTDIOError nstd_io_stdin_read_to_string(NSTDStdin *handle, NSTDString *buffer,
-NSTDUInt *read);
+NSTDAPI NSTDIOError
+nstd_io_stdin_read_to_string(NSTDStdin *handle, NSTDString *buffer, NSTDUInt *read);
 
 /// Reads enough data from stdin to fill the entirety of `buffer`.
 ///
@@ -128,8 +128,7 @@ NSTDAPI NSTDIOError nstd_io_stdin_read_exact(NSTDStdin *handle, NSTDSliceMut *bu
 /// # Panics
 ///
 /// This function will panic if `buffer`'s length in bytes exceeds `NSTDInt`'s max value.
-NSTDAPI NSTDIOError nstd_io_stdin_read_line(NSTDStdin *handle, NSTDString *buffer,
-NSTDUInt *read);
+NSTDAPI NSTDIOError nstd_io_stdin_read_line(NSTDStdin *handle, NSTDString *buffer, NSTDUInt *read);
 
 /// Frees an instance of `NSTDStdin`.
 ///

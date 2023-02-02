@@ -19,7 +19,7 @@ use std::env::VarError;
 /// # Panics
 ///
 /// This operation will panic if allocating the string fails.
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_env_current_dir() -> NSTDIOStringResult {
     match std::env::current_dir() {
         Ok(dir) => NSTDResult::Ok(NSTDString::from_str(&dir.to_string_lossy())),
@@ -44,7 +44,7 @@ pub extern "C" fn nstd_env_current_dir() -> NSTDIOStringResult {
 /// # Panics
 ///
 /// This operation will panic if allocating the string fails.
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_env_current_exe() -> NSTDIOStringResult {
     match std::env::current_exe() {
         Ok(exe) => NSTDResult::Ok(NSTDString::from_str(&exe.to_string_lossy())),
@@ -64,7 +64,7 @@ pub extern "C" fn nstd_env_current_exe() -> NSTDIOStringResult {
 ///
 /// This operation will panic if allocating the string fails.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_env_temp_dir() -> NSTDString {
     NSTDString::from_str(&std::env::temp_dir().to_string_lossy())
 }
@@ -86,7 +86,7 @@ pub extern "C" fn nstd_env_temp_dir() -> NSTDString {
 /// # Safety
 ///
 /// The user of this function must ensure that `path` is valid for reads.
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_env_set_current_dir(path: &NSTDStr) -> NSTDIOError {
     match std::env::set_current_dir(path.as_str()) {
         Err(err) => NSTDIOError::from_err(err.kind()),
@@ -114,7 +114,7 @@ pub unsafe extern "C" fn nstd_env_set_current_dir(path: &NSTDStr) -> NSTDIOError
 /// # Safety
 ///
 /// The user of this function must ensure that `key` is valid for reads.
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_env_var(key: &NSTDStr) -> NSTDIOStringResult {
     match std::env::var(key.as_str()) {
         Ok(var) => NSTDResult::Ok(NSTDString::from_str(&var)),
@@ -145,7 +145,7 @@ pub unsafe extern "C" fn nstd_env_var(key: &NSTDStr) -> NSTDIOStringResult {
 ///
 /// The user of this function must ensure that both `key` and `value` are valid for reads.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_env_set_var(key: &NSTDStr, value: &NSTDStr) {
     std::env::set_var(key.as_str(), value.as_str());
 }
@@ -170,7 +170,7 @@ pub unsafe extern "C" fn nstd_env_set_var(key: &NSTDStr, value: &NSTDStr) {
 ///
 /// The user of this function must ensure that `key` is valid for reads.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_env_remove_var(key: &NSTDStr) {
     std::env::remove_var(key.as_str());
 }
@@ -190,7 +190,7 @@ pub unsafe extern "C" fn nstd_env_remove_var(key: &NSTDStr) {
 /// - Allocating for any of the arguments fails.
 ///
 /// - The total number of bytes required for the vector exceeds `NSTDInt`'s max value.
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_env_args() -> NSTDVec {
     let args = std::env::args();
     NSTDVec::from_iter(args.map(|arg| NSTDString::from_str(&arg)))
@@ -212,7 +212,7 @@ pub extern "C" fn nstd_env_args() -> NSTDVec {
 /// - Allocating for any of the keys/values fails.
 ///
 /// - The total number of bytes required for the vector exceeds `NSTDInt`'s max value.
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_env_vars() -> NSTDVec {
     let vars = std::env::vars();
     NSTDVec::from_iter(vars.map(|(k, v)| [NSTDString::from_str(&k), NSTDString::from_str(&v)]))

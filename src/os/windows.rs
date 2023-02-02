@@ -8,7 +8,7 @@ pub mod shared_lib;
 #[cfg(feature = "nstd_os_windows_str")]
 #[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_os_windows_str")))]
 pub mod str;
-use crate::NSTDInt;
+use windows_sys::Win32::Foundation::HANDLE;
 
 /// A raw handle to a resource managed by the Windows kernel.
-pub type NSTDWindowsHandle = NSTDInt;
+pub type NSTDWindowsHandle = HANDLE;

@@ -1,7 +1,13 @@
-# TBD
+# 0.5.0
 ### `nstd`
+- Renamed the `clib` feature to `capi`.
 - Moved `NSTDUnichar` into `core`.
+- Added `nstd.mutex`.
+- Added `nstd.timed_mutex`.
+- Added `nstd.time`.
+- Updated `windows-sys` to version 0.45.
 ### `nstd.core`
+- Added `nstd_core_[ptr|slice|cstr][_mut]_new_unchecked`.
 - `nstd_core_ops_sh[l|r]_*` now take `NSTDUInt32` as their right operand.
 - Removed floating-point operations from `nstd.core.ops`.
 - `nstd_core_str[_mut]_get` now returns `NSTDOptionalUnichar`.
@@ -9,9 +15,12 @@
 - Added `nstd_core_panic_with_msg`.
 ### `nstd.cstring`
 - Added `NSTDOptionalCString`.
+### `nstd.fs`
+- Added `nstd_fs_metadata`.
 ### `nstd.heap_ptr`
 - Added `NSTDOptionalHeapPtr`.
 ### `nstd.os`
+- Added `NSTD_UNIX_IO_ERROR_IS_DIR`.
 - Added `nstd.os.unix.io`.
 - `nstd_os_windows_shared_lib_load` now accepts Unicode.
 - Added `nstd_os_windows_str_to_utf16`.
@@ -27,6 +36,10 @@
 ### `nstd.vec`
 - Added `NSTDOptionalVec`.
 - Added `nstd_vec_reserved`.
+
+# 0.4.1
+### `nstd`
+- Fixed missing panic handler compiler error for embedded builds.
 
 # 0.4.0
 ### `nstd`

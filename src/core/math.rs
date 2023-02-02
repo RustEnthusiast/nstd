@@ -14,7 +14,7 @@ use crate::{
 ///
 /// `NSTDFloat32 deg` - The radians value converted to degrees.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_core_math_deg_f32(rad: NSTDFloat32) -> NSTDFloat32 {
     rad.to_degrees()
 }
@@ -28,7 +28,7 @@ pub extern "C" fn nstd_core_math_deg_f32(rad: NSTDFloat32) -> NSTDFloat32 {
 ///
 /// `NSTDFloat64 deg` - The radians value converted to degrees.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_core_math_deg_f64(rad: NSTDFloat64) -> NSTDFloat64 {
     rad.to_degrees()
 }
@@ -43,7 +43,7 @@ pub extern "C" fn nstd_core_math_deg_f64(rad: NSTDFloat64) -> NSTDFloat64 {
 ///
 /// `NSTDFloat32 rad` - The degrees value converted to radians.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_core_math_rad_f32(deg: NSTDFloat32) -> NSTDFloat32 {
     deg.to_radians()
 }
@@ -57,7 +57,7 @@ pub extern "C" fn nstd_core_math_rad_f32(deg: NSTDFloat32) -> NSTDFloat32 {
 ///
 /// `NSTDFloat64 rad` - The degrees value converted to radians.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_core_math_rad_f64(deg: NSTDFloat64) -> NSTDFloat64 {
     deg.to_radians()
 }
@@ -83,8 +83,8 @@ macro_rules! gen_abs {
         #[doc = concat!("assert!(", stringify!($name), "(-10) == 10);")]
         /// ```
         #[inline]
-        #[cfg_attr(feature = "clib", no_mangle)]
-        pub extern "C" fn $name(x: $T) -> $T {
+        #[cfg_attr(feature = "capi", no_mangle)]
+        pub const extern "C" fn $name(x: $T) -> $T {
             x.abs()
         }
     };
@@ -118,8 +118,8 @@ macro_rules! gen_pow {
         #[doc = concat!("assert!(", stringify!($name), "(2, 5) == 32);")]
         /// ```
         #[inline]
-        #[cfg_attr(feature = "clib", no_mangle)]
-        pub extern "C" fn $name(x: $T, exp: NSTDUInt32) -> $T {
+        #[cfg_attr(feature = "capi", no_mangle)]
+        pub const extern "C" fn $name(x: $T, exp: NSTDUInt32) -> $T {
             x.pow(exp)
         }
     };
@@ -156,7 +156,7 @@ macro_rules! gen_clamp {
         #[doc = concat!("`", stringify!($T), " v` - The clamped value.")]
         $(#[$meta])*
         #[inline]
-        #[cfg_attr(feature = "clib", no_mangle)]
+        #[cfg_attr(feature = "capi", no_mangle)]
         pub extern "C" fn $name(x: $T, min: $T, max: $T) -> $T {
             x.clamp(min, max)
         }
@@ -408,9 +408,9 @@ macro_rules! gen_div_ceil {
         #[doc = concat!("assert!(", stringify!($name), "(8, 2) == 4);")]
         /// ```
         #[inline]
-        #[cfg_attr(feature = "clib", no_mangle)]
+        #[cfg_attr(feature = "capi", no_mangle)]
         #[allow(unused_comparisons)]
-        pub extern "C" fn $name(x: $T, y: $T) -> $T {
+        pub const extern "C" fn $name(x: $T, y: $T) -> $T {
             let d = x / y;
             let r = x % y;
             if (r > 0 && y > 0) || (r < 0 && y < 0) {
@@ -461,9 +461,9 @@ macro_rules! gen_div_floor {
         #[doc = concat!("assert!(", stringify!($name), "(23, 5) == 4);")]
         /// ```
         #[inline]
-        #[cfg_attr(feature = "clib", no_mangle)]
+        #[cfg_attr(feature = "capi", no_mangle)]
         #[allow(unused_comparisons)]
-        pub extern "C" fn $name(x: $T, y: $T) -> $T {
+        pub const extern "C" fn $name(x: $T, y: $T) -> $T {
             let d = x / y;
             let r = x % y;
             if (r > 0 && y < 0) || (r < 0 && y > 0) {

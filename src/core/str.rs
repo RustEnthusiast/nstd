@@ -3,7 +3,7 @@ use crate::{
     core::{
         cstr::{
             nstd_core_cstr_as_ptr, nstd_core_cstr_len, nstd_core_cstr_mut_as_ptr,
-            nstd_core_cstr_mut_len, nstd_core_cstr_new,
+            nstd_core_cstr_mut_len, nstd_core_cstr_new_unchecked,
             raw::{nstd_core_cstr_raw_len, nstd_core_cstr_raw_len_with_null},
             NSTDCStr, NSTDCStrMut,
         },
@@ -17,8 +17,8 @@ use crate::{
         range::NSTDURange,
         slice::{
             nstd_core_slice_as_ptr, nstd_core_slice_len, nstd_core_slice_mut_as_ptr,
-            nstd_core_slice_mut_len, nstd_core_slice_mut_new, nstd_core_slice_mut_stride,
-            nstd_core_slice_new, nstd_core_slice_stride, NSTDSlice, NSTDSliceMut,
+            nstd_core_slice_mut_len, nstd_core_slice_mut_new_unchecked, nstd_core_slice_mut_stride,
+            nstd_core_slice_new_unchecked, nstd_core_slice_stride, NSTDSlice, NSTDSliceMut,
         },
         unichar::NSTDOptionalUnichar,
     },
@@ -52,7 +52,7 @@ macro_rules! gen_to_primitive {
         ///
         $(#[$meta])*
         #[inline]
-        #[cfg_attr(feature = "clib", no_mangle)]
+        #[cfg_attr(feature = "capi", no_mangle)]
         pub unsafe extern "C" fn $name(str: &$StrT) -> $RetT {
             match str.as_str().parse() {
                 Ok(v) => NSTDOptional::Some(v),
@@ -80,7 +80,7 @@ impl NSTDStr {
     /// Creates a new [NSTDStr] from a Rust [&str].
     #[inline]
     #[allow(dead_code)]
-    pub(crate) fn from_str(str: &str) -> Self {
+    pub(crate) const fn from_str(str: &str) -> Self {
         Self {
             ptr: str.as_ptr(),
             len: str.len(),
@@ -98,7 +98,7 @@ impl NSTDStr {
     /// This string slice's data must remain valid UTF-8 and left unmodified while the returned
     /// string slice is in use.
     #[inline]
-    pub(crate) unsafe fn as_str(&self) -> &str {
+    pub(crate) const unsafe fn as_str(&self) -> &str {
         assert!(self.len <= isize::MAX as usize);
         let bytes = core::slice::from_raw_parts(self.ptr, self.len);
         core::str::from_utf8_unchecked(bytes)
@@ -143,8 +143,8 @@ gen_optional!(NSTDOptionalStr, NSTDStr);
 ///     assert!(nstd_core_str_byte_len(&str) == 13);
 /// }
 /// ```
-#[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_str_from_cstr(cstr: &NSTDCStr) -> NSTDStr {
+#[cfg_attr(feature = "capi", no_mangle)]
+pub const unsafe extern "C" fn nstd_core_str_from_cstr(cstr: &NSTDCStr) -> NSTDStr {
     assert!(core::str::from_utf8(cstr.as_bytes()).is_ok());
     let ptr = nstd_core_cstr_as_ptr(cstr).cast();
     let len = nstd_core_cstr_len(cstr);
@@ -182,8 +182,8 @@ pub unsafe extern "C" fn nstd_core_str_from_cstr(cstr: &NSTDCStr) -> NSTDStr {
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_str_from_cstr_unchecked(cstr: &NSTDCStr) -> NSTDStr {
+#[cfg_attr(feature = "capi", no_mangle)]
+pub const unsafe extern "C" fn nstd_core_str_from_cstr_unchecked(cstr: &NSTDCStr) -> NSTDStr {
     let ptr = nstd_core_cstr_as_ptr(cstr).cast();
     let len = nstd_core_cstr_len(cstr);
     NSTDStr { ptr, len }
@@ -225,7 +225,7 @@ pub unsafe extern "C" fn nstd_core_str_from_cstr_unchecked(cstr: &NSTDCStr) -> N
 ///     assert!(nstd_core_str_byte_len(&str) == 30);
 /// }
 /// ```
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_from_raw_cstr(cstr: *const NSTDChar) -> NSTDStr {
     assert!(!cstr.is_null());
     let ptr = cstr.cast();
@@ -272,7 +272,7 @@ pub unsafe extern "C" fn nstd_core_str_from_raw_cstr(cstr: *const NSTDChar) -> N
 ///     assert!(nstd_core_str_byte_len(&str) == 19);
 /// }
 /// ```
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_from_raw_cstr_with_null(cstr: *const NSTDChar) -> NSTDStr {
     assert!(!cstr.is_null());
     let ptr = cstr.cast();
@@ -325,8 +325,8 @@ pub unsafe extern "C" fn nstd_core_str_from_raw_cstr_with_null(cstr: *const NSTD
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_str_from_bytes(bytes: &NSTDSlice) -> NSTDStr {
+#[cfg_attr(feature = "capi", no_mangle)]
+pub const unsafe extern "C" fn nstd_core_str_from_bytes(bytes: &NSTDSlice) -> NSTDStr {
     assert!(core::str::from_utf8(bytes.as_slice()).is_ok());
     let ptr = nstd_core_slice_as_ptr(bytes).cast();
     let len = nstd_core_slice_len(bytes);
@@ -371,8 +371,8 @@ pub unsafe extern "C" fn nstd_core_str_from_bytes(bytes: &NSTDSlice) -> NSTDStr 
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_str_from_bytes_unchecked(bytes: &NSTDSlice) -> NSTDStr {
+#[cfg_attr(feature = "capi", no_mangle)]
+pub const unsafe extern "C" fn nstd_core_str_from_bytes_unchecked(bytes: &NSTDSlice) -> NSTDStr {
     assert!(nstd_core_slice_stride(bytes) == 1);
     let ptr = nstd_core_slice_as_ptr(bytes).cast();
     let len = nstd_core_slice_len(bytes);
@@ -389,9 +389,10 @@ pub unsafe extern "C" fn nstd_core_str_from_bytes_unchecked(bytes: &NSTDSlice) -
 ///
 /// `NSTDCStr cstr` - The new C string slice.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_str_as_cstr(str: &NSTDStr) -> NSTDCStr {
-    nstd_core_cstr_new(str.ptr.cast(), str.len)
+#[cfg_attr(feature = "capi", no_mangle)]
+pub const extern "C" fn nstd_core_str_as_cstr(str: &NSTDStr) -> NSTDCStr {
+    // SAFETY: `str.ptr` is never null.
+    unsafe { nstd_core_cstr_new_unchecked(str.ptr.cast(), str.len) }
 }
 
 /// Returns an immutable byte slice over `str`'s data.
@@ -420,9 +421,10 @@ pub extern "C" fn nstd_core_str_as_cstr(str: &NSTDStr) -> NSTDCStr {
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_str_as_bytes(str: &NSTDStr) -> NSTDSlice {
-    nstd_core_slice_new(str.ptr.cast(), 1, str.len)
+#[cfg_attr(feature = "capi", no_mangle)]
+pub const extern "C" fn nstd_core_str_as_bytes(str: &NSTDStr) -> NSTDSlice {
+    // SAFETY: `str.ptr` is never null.
+    unsafe { nstd_core_slice_new_unchecked(str.ptr.cast(), 1, str.len) }
 }
 
 /// Returns a raw pointer to a string slice's memory.
@@ -435,8 +437,8 @@ pub extern "C" fn nstd_core_str_as_bytes(str: &NSTDStr) -> NSTDSlice {
 ///
 /// `const NSTDByte *ptr` - A raw pointer to a string slice's memory.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_str_as_ptr(str: &NSTDStr) -> *const NSTDByte {
+#[cfg_attr(feature = "capi", no_mangle)]
+pub const extern "C" fn nstd_core_str_as_ptr(str: &NSTDStr) -> *const NSTDByte {
     str.ptr
 }
 
@@ -471,7 +473,7 @@ pub extern "C" fn nstd_core_str_as_ptr(str: &NSTDStr) -> *const NSTDByte {
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_len(str: &NSTDStr) -> NSTDUInt {
     str.as_str().chars().count()
 }
@@ -498,8 +500,8 @@ pub unsafe extern "C" fn nstd_core_str_len(str: &NSTDStr) -> NSTDUInt {
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_str_byte_len(str: &NSTDStr) -> NSTDUInt {
+#[cfg_attr(feature = "capi", no_mangle)]
+pub const extern "C" fn nstd_core_str_byte_len(str: &NSTDStr) -> NSTDUInt {
     str.len
 }
 
@@ -540,7 +542,7 @@ pub extern "C" fn nstd_core_str_byte_len(str: &NSTDStr) -> NSTDUInt {
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_get(str: &NSTDStr, pos: NSTDUInt) -> NSTDOptionalUnichar {
     match str.as_str().chars().nth(pos) {
         Some(chr) => NSTDOptional::Some(chr.into()),
@@ -597,13 +599,13 @@ pub unsafe extern "C" fn nstd_core_str_get(str: &NSTDStr, pos: NSTDUInt) -> NSTD
 ///     assert!(nstd_core_str_byte_len(&marrow) == 6);
 /// }
 /// ```
-#[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_core_str_substr(str: &NSTDStr, range: NSTDURange) -> NSTDStr {
+#[cfg_attr(feature = "capi", no_mangle)]
+pub const unsafe extern "C" fn nstd_core_str_substr(str: &NSTDStr, range: NSTDURange) -> NSTDStr {
     // Make sure the range is valid for the bounds of `str`.
     assert!(range.start <= isize::MAX as usize && range.start <= range.end && range.end <= str.len);
     // Create the byte slice with `range` and use it to create the new string slice.
     let start = str.ptr.add(range.start).cast();
-    let bytes = nstd_core_slice_new(start, 1, range.end - range.start);
+    let bytes = nstd_core_slice_new_unchecked(start, 1, range.end - range.start);
     nstd_core_str_from_bytes(&bytes)
 }
 
@@ -887,7 +889,7 @@ impl NSTDStrMut {
     /// This string slice's data must remain valid UTF-8 and left unmodified while the returned
     /// string slice is in use.
     #[inline]
-    unsafe fn as_str(&self) -> &str {
+    const unsafe fn as_str(&self) -> &str {
         assert!(self.len <= isize::MAX as usize);
         let bytes = core::slice::from_raw_parts(self.ptr, self.len);
         core::str::from_utf8_unchecked(bytes)
@@ -932,7 +934,7 @@ gen_optional!(NSTDOptionalStrMut, NSTDStrMut);
 ///     assert!(nstd_core_str_mut_byte_len(&str) == 13);
 /// }
 /// ```
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_mut_from_cstr(cstr: &mut NSTDCStrMut) -> NSTDStrMut {
     assert!(core::str::from_utf8(cstr.as_bytes()).is_ok());
     let ptr = nstd_core_cstr_mut_as_ptr(cstr).cast();
@@ -971,7 +973,7 @@ pub unsafe extern "C" fn nstd_core_str_mut_from_cstr(cstr: &mut NSTDCStrMut) -> 
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_mut_from_cstr_unchecked(
     cstr: &mut NSTDCStrMut,
 ) -> NSTDStrMut {
@@ -1016,7 +1018,7 @@ pub unsafe extern "C" fn nstd_core_str_mut_from_cstr_unchecked(
 ///     assert!(nstd_core_str_mut_byte_len(&str) == 30);
 /// }
 /// ```
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_mut_from_raw_cstr(cstr: *mut NSTDChar) -> NSTDStrMut {
     assert!(!cstr.is_null());
     let ptr = cstr.cast();
@@ -1065,7 +1067,7 @@ pub unsafe extern "C" fn nstd_core_str_mut_from_raw_cstr(cstr: *mut NSTDChar) ->
 ///     assert!(nstd_core_str_mut_byte_len(&str) == 19);
 /// }
 /// ```
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_mut_from_raw_cstr_with_null(
     cstr: *mut NSTDChar,
 ) -> NSTDStrMut {
@@ -1120,7 +1122,7 @@ pub unsafe extern "C" fn nstd_core_str_mut_from_raw_cstr_with_null(
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_mut_from_bytes(bytes: &mut NSTDSliceMut) -> NSTDStrMut {
     assert!(core::str::from_utf8(bytes.as_slice()).is_ok());
     let ptr = nstd_core_slice_mut_as_ptr(bytes).cast();
@@ -1166,7 +1168,7 @@ pub unsafe extern "C" fn nstd_core_str_mut_from_bytes(bytes: &mut NSTDSliceMut) 
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_mut_from_bytes_unchecked(
     bytes: &mut NSTDSliceMut,
 ) -> NSTDStrMut {
@@ -1186,8 +1188,8 @@ pub unsafe extern "C" fn nstd_core_str_mut_from_bytes_unchecked(
 ///
 /// `NSTDStr str_const` - The immutable copy of `str`.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_str_mut_as_const(str: &NSTDStrMut) -> NSTDStr {
+#[cfg_attr(feature = "capi", no_mangle)]
+pub const extern "C" fn nstd_core_str_mut_as_const(str: &NSTDStrMut) -> NSTDStr {
     let bytes = nstd_core_str_mut_as_bytes(str);
     // SAFETY: String slices are UTF-8 encoded.
     unsafe { nstd_core_str_from_bytes_unchecked(&bytes) }
@@ -1203,9 +1205,10 @@ pub extern "C" fn nstd_core_str_mut_as_const(str: &NSTDStrMut) -> NSTDStr {
 ///
 /// `NSTDCStr cstr` - The new C string slice.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_str_mut_as_cstr(str: &NSTDStrMut) -> NSTDCStr {
-    nstd_core_cstr_new(str.ptr.cast(), str.len)
+#[cfg_attr(feature = "capi", no_mangle)]
+pub const extern "C" fn nstd_core_str_mut_as_cstr(str: &NSTDStrMut) -> NSTDCStr {
+    // SAFETY: `str.ptr` is never null.
+    unsafe { nstd_core_cstr_new_unchecked(str.ptr.cast(), str.len) }
 }
 
 /// Returns an immutable byte slice over `str`'s data.
@@ -1236,9 +1239,10 @@ pub extern "C" fn nstd_core_str_mut_as_cstr(str: &NSTDStrMut) -> NSTDCStr {
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_str_mut_as_bytes(str: &NSTDStrMut) -> NSTDSlice {
-    nstd_core_slice_new(str.ptr.cast(), 1, str.len)
+#[cfg_attr(feature = "capi", no_mangle)]
+pub const extern "C" fn nstd_core_str_mut_as_bytes(str: &NSTDStrMut) -> NSTDSlice {
+    // SAFETY: `str.ptr` is never null.
+    unsafe { nstd_core_slice_new_unchecked(str.ptr.cast(), 1, str.len) }
 }
 
 /// Returns an immutable raw pointer to a string slice's memory.
@@ -1251,8 +1255,8 @@ pub extern "C" fn nstd_core_str_mut_as_bytes(str: &NSTDStrMut) -> NSTDSlice {
 ///
 /// `const NSTDByte *ptr` - A raw pointer to a string slice's memory.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_str_mut_as_ptr(str: &NSTDStrMut) -> *const NSTDByte {
+#[cfg_attr(feature = "capi", no_mangle)]
+pub const extern "C" fn nstd_core_str_mut_as_ptr(str: &NSTDStrMut) -> *const NSTDByte {
     str.ptr
 }
 
@@ -1287,7 +1291,7 @@ pub extern "C" fn nstd_core_str_mut_as_ptr(str: &NSTDStrMut) -> *const NSTDByte 
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_mut_len(str: &NSTDStrMut) -> NSTDUInt {
     str.as_str().chars().count()
 }
@@ -1316,8 +1320,8 @@ pub unsafe extern "C" fn nstd_core_str_mut_len(str: &NSTDStrMut) -> NSTDUInt {
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_str_mut_byte_len(str: &NSTDStrMut) -> NSTDUInt {
+#[cfg_attr(feature = "capi", no_mangle)]
+pub const extern "C" fn nstd_core_str_mut_byte_len(str: &NSTDStrMut) -> NSTDUInt {
     str.len
 }
 
@@ -1358,7 +1362,7 @@ pub extern "C" fn nstd_core_str_mut_byte_len(str: &NSTDStrMut) -> NSTDUInt {
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_mut_get(
     str: &NSTDStrMut,
     pos: NSTDUInt,
@@ -1420,7 +1424,7 @@ pub unsafe extern "C" fn nstd_core_str_mut_get(
 ///     assert!(nstd_core_str_mut_byte_len(&marrow) == 6);
 /// }
 /// ```
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_core_str_mut_substr(
     str: &mut NSTDStrMut,
     range: NSTDURange,
@@ -1429,7 +1433,7 @@ pub unsafe extern "C" fn nstd_core_str_mut_substr(
     assert!(range.start <= isize::MAX as usize && range.start <= range.end && range.end <= str.len);
     // Create the byte slice with `range` and use it to create the new string slice.
     let start = str.ptr.add(range.start).cast();
-    let mut bytes = nstd_core_slice_mut_new(start, 1, range.end - range.start);
+    let mut bytes = nstd_core_slice_mut_new_unchecked(start, 1, range.end - range.start);
     nstd_core_str_mut_from_bytes(&mut bytes)
 }
 

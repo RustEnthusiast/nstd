@@ -13,7 +13,7 @@ pub type NSTDStdout = Box<Stdout>;
 ///
 /// `NSTDStdout handle` - A handle to the standard output stream.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_io_stdout() -> NSTDStdout {
     NSTDStdout::new(std::io::stdout())
 }
@@ -42,7 +42,7 @@ pub extern "C" fn nstd_io_stdout() -> NSTDStdout {
 ///
 /// This function can cause undefined behavior if `bytes`'s data is invalid.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_io_stdout_write(
     handle: &mut NSTDStdout,
     bytes: &NSTDSlice,
@@ -83,7 +83,7 @@ pub unsafe extern "C" fn nstd_io_stdout_write(
 ///
 /// This function can cause undefined behavior if `bytes`'s data is invalid.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_io_stdout_write_all(
     handle: &mut NSTDStdout,
     bytes: &NSTDSlice,
@@ -104,7 +104,7 @@ pub unsafe extern "C" fn nstd_io_stdout_write_all(
 ///
 /// `NSTDIOError errc` - The I/O operation error code.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_io_stdout_flush(handle: &mut NSTDStdout) -> NSTDIOError {
     crate::io::stdio::flush(handle)
 }
@@ -115,6 +115,6 @@ pub extern "C" fn nstd_io_stdout_flush(handle: &mut NSTDStdout) -> NSTDIOError {
 ///
 /// - `NSTDStdout handle` - A handle to the standard output stream.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 #[allow(unused_variables)]
 pub extern "C" fn nstd_io_stdout_free(handle: NSTDStdout) {}
