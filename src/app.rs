@@ -48,7 +48,7 @@ pub struct NSTDApp {
 /// - This function was not called on the "main" thread.
 ///
 /// - Creating the gamepad input handler fails.
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_app_new() -> NSTDApp {
     let event_loop = EventLoop::new();
     event_loop.set_device_event_filter(DeviceEventFilter::Never);
@@ -75,7 +75,7 @@ pub extern "C" fn nstd_app_new() -> NSTDApp {
 ///
 /// `NSTDAppHandle handle` - A handle to the application's event loop.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_app_handle(app: &NSTDApp) -> NSTDAppHandle {
     &app.inner.event_loop
 }
@@ -95,7 +95,7 @@ pub extern "C" fn nstd_app_handle(app: &NSTDApp) -> NSTDAppHandle {
 /// # Safety
 ///
 /// This function's caller must guarantee validity of the `app`'s event callbacks.
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_app_run(app: NSTDApp, mut data: NSTDOptionalHeapPtr) -> ! {
     let AppData {
         event_loop,
@@ -384,7 +384,7 @@ pub unsafe extern "C" fn nstd_app_run(app: NSTDApp, mut data: NSTDOptionalHeapPt
 ///
 /// - `NSTDApp app` - The `nstd` application.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 #[allow(unused_variables)]
 pub extern "C" fn nstd_app_free(app: NSTDApp) {}
 
@@ -402,7 +402,7 @@ pub extern "C" fn nstd_app_free(app: NSTDApp) {}
 ///
 /// The user of this function must guarantee that `callback` is a valid C function pointer.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_app_displays(
     app: NSTDAppHandle,
     callback: Option<unsafe extern "C" fn(NSTDDisplayHandle, NSTDAnyMut)>,
@@ -425,7 +425,7 @@ pub unsafe extern "C" fn nstd_app_displays(
 ///
 /// `NSTDDisplay display` - A handle to the primary display, null on error.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_app_primary_display(app: NSTDAppHandle) -> Option<NSTDDisplay> {
     app.primary_monitor().map(Box::new)
 }
@@ -438,7 +438,7 @@ pub extern "C" fn nstd_app_primary_display(app: NSTDAppHandle) -> Option<NSTDDis
 ///
 /// - `NSTDDeviceEventFilter filter` - The device event filtering mode to use.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_app_set_device_event_filter(
     app: NSTDAppHandle,
     filter: NSTDDeviceEventFilter,
@@ -452,7 +452,7 @@ pub extern "C" fn nstd_app_set_device_event_filter(
 ///
 /// - `NSTDAppData *app` - The application data received from an event.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_app_exit(app: &mut NSTDAppData) {
     *app.control_flow() = ControlFlow::Exit;
 }
@@ -465,7 +465,7 @@ pub extern "C" fn nstd_app_exit(app: &mut NSTDAppData) {
 ///
 /// - `NSTDErrorCode errc` - The error code to exit the application event loop with.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_app_exit_with_code(app: &mut NSTDAppData, errc: NSTDErrorCode) {
     *app.control_flow() = ControlFlow::ExitWithCode(errc);
 }
@@ -482,7 +482,7 @@ pub extern "C" fn nstd_app_exit_with_code(app: &mut NSTDAppData, errc: NSTDError
 ///
 /// `NSTDBool is_eq` - `NSTD_TRUE` if the two window IDs compare equal.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_app_window_id_compare(id1: &NSTDWindowID, id2: &NSTDWindowID) -> NSTDBool {
     id1 == id2
 }
@@ -493,7 +493,7 @@ pub extern "C" fn nstd_app_window_id_compare(id1: &NSTDWindowID, id2: &NSTDWindo
 ///
 /// - `NSTDWindowID id` - The window ID to free.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 #[allow(unused_variables)]
 pub extern "C" fn nstd_app_window_id_free(id: NSTDWindowID) {}
 
@@ -509,7 +509,7 @@ pub extern "C" fn nstd_app_window_id_free(id: NSTDWindowID) {}
 ///
 /// `NSTDBool is_eq` - `NSTD_TRUE` if the two device IDs compare equal.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_app_device_id_compare(id1: &NSTDDeviceID, id2: &NSTDDeviceID) -> NSTDBool {
     id1 == id2
 }
@@ -520,7 +520,7 @@ pub extern "C" fn nstd_app_device_id_compare(id1: &NSTDDeviceID, id2: &NSTDDevic
 ///
 /// - `NSTDDeviceID id` - The device ID to free.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 #[allow(unused_variables)]
 pub extern "C" fn nstd_app_device_id_free(id: NSTDDeviceID) {}
 
@@ -536,7 +536,7 @@ pub extern "C" fn nstd_app_device_id_free(id: NSTDDeviceID) {}
 ///
 /// `NSTDBool is_eq` - `NSTD_TRUE` if the two gamepad IDs compare equal.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_app_gamepad_id_compare(
     id1: &NSTDGamepadID,
     id2: &NSTDGamepadID,
@@ -550,6 +550,6 @@ pub extern "C" fn nstd_app_gamepad_id_compare(
 ///
 /// - `NSTDGamepadID id` - The gamepad ID to free.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 #[allow(unused_variables)]
 pub extern "C" fn nstd_app_gamepad_id_free(id: NSTDGamepadID) {}
