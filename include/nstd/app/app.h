@@ -46,17 +46,6 @@ NSTDAPI NSTDApp nstd_app_new();
 /// `NSTDAppHandle handle` - A handle to the application's event loop.
 NSTDAPI NSTDAppHandle nstd_app_handle(const NSTDApp *app);
 
-/// Returns a mutable reference to an `NSTDApp`'s event table.
-///
-/// # Parameters:
-///
-/// - `NSTDApp *app` - A pointer to the `nstd` app.
-///
-/// # Returns
-///
-/// `NSTDAppEvents *events` - A pointer to the application event table.
-NSTDAPI NSTDAppEvents *nstd_app_events(NSTDApp *app);
-
 /// Runs an `NSTDApp`'s event loop.
 ///
 /// # Note

@@ -1,8 +1,12 @@
 //! Contains callback based events through function pointers.
 use crate::{
     app::data::NSTDAppData,
-    core::{str::NSTDStr, unichar::NSTDUnichar},
-    NSTDBool, NSTDFloat32, NSTDFloat64, NSTDInt32, NSTDUInt16, NSTDUInt32,
+    core::{
+        optional::{NSTDOptional, NSTDOptionalUInt16},
+        str::NSTDStr,
+        unichar::NSTDUnichar,
+    },
+    NSTDBool, NSTDFloat32, NSTDFloat64, NSTDInt32, NSTDUInt32,
 };
 use gilrs::{Axis, Button, GamepadId};
 use winit::{
@@ -28,7 +32,7 @@ pub type NSTDButtonID = NSTDUInt32;
 
 /// An enumeration of device event filtering modes.
 #[repr(C)]
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 #[allow(non_camel_case_types)]
 pub enum NSTDDeviceEventFilter {
     /// Always dispatch device events.
@@ -51,7 +55,7 @@ impl From<NSTDDeviceEventFilter> for DeviceEventFilter {
 
 /// Describes a mouse wheel's scroll delta.
 #[repr(C)]
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 #[allow(non_camel_case_types)]
 pub enum NSTDScrollDelta {
     /// The scroll was measured in lines.
@@ -75,7 +79,7 @@ impl NSTDScrollDelta {
 
 /// Describes a touch-screen's state.
 #[repr(C)]
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 #[allow(non_camel_case_types)]
 pub enum NSTDTouchState {
     /// The touch event has just started.
@@ -102,7 +106,7 @@ impl NSTDTouchState {
 
 /// Represents a mouse button.
 #[repr(C)]
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 #[allow(non_camel_case_types)]
 pub enum NSTDMouseButton {
     /// The left mouse button.
@@ -117,12 +121,12 @@ pub enum NSTDMouseButton {
 
 /// Represents some type of mouse button input.
 #[repr(C)]
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub struct NSTDMouseInput {
     /// The mouse button that received input.
     pub button: NSTDMouseButton,
     /// The ID of the mouse button that received input.
-    pub id: NSTDUInt16,
+    pub id: NSTDOptionalUInt16,
 }
 impl NSTDMouseInput {
     /// Converts [winit] [MouseButton] into [NSTDMouseInput].
@@ -130,19 +134,19 @@ impl NSTDMouseInput {
         match button {
             MouseButton::Left => Self {
                 button: NSTDMouseButton::NSTD_MOUSE_BUTTON_LEFT,
-                id: 0,
+                id: NSTDOptional::None,
             },
             MouseButton::Middle => Self {
                 button: NSTDMouseButton::NSTD_MOUSE_BUTTON_MIDDLE,
-                id: 1,
+                id: NSTDOptional::None,
             },
             MouseButton::Right => Self {
                 button: NSTDMouseButton::NSTD_MOUSE_BUTTON_RIGHT,
-                id: 2,
+                id: NSTDOptional::None,
             },
             MouseButton::Other(id) => Self {
                 button: NSTDMouseButton::NSTD_MOUSE_BUTTON_OTHER,
-                id,
+                id: NSTDOptional::Some(id),
             },
         }
     }
@@ -150,7 +154,7 @@ impl NSTDMouseInput {
 
 /// Represents a key on a keyboard.
 #[repr(C)]
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 #[allow(non_camel_case_types)]
 pub enum NSTDKey {
     /// An unknown keyboard key.
@@ -383,7 +387,7 @@ impl NSTDKey {
 
 /// Represents a gamepad button.
 #[repr(C)]
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 #[allow(non_camel_case_types)]
 pub enum NSTDGamepadButton {
     /// The upper action pad button.
@@ -464,7 +468,7 @@ impl NSTDGamepadButton {
 
 /// Represents a gamepad axis.
 #[repr(C)]
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 #[allow(non_camel_case_types)]
 pub enum NSTDGamepadAxis {
     /// The left stick x-axis.
