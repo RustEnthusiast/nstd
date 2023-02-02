@@ -1,8 +1,8 @@
 //! Provides functionality for working with input & output on Unix platforms.
 pub(crate) mod stdio;
 use libc::{
-    EACCES, EAGAIN, EBADF, ECONNRESET, EINTR, EISDIR, ENETDOWN, ENETUNREACH, ENOMEM, ENOTCONN,
-    EPIPE, ESPIPE, ETIMEDOUT, EWOULDBLOCK,
+    EACCES, EAGAIN, EBADF, ECONNRESET, EINTR, EINVAL, EISDIR, ENETDOWN, ENETUNREACH, ENOMEM,
+    ENOTCONN, EPIPE, ESPIPE, ETIMEDOUT, EWOULDBLOCK,
 };
 use std::{ffi::c_int, io::Error};
 
@@ -30,6 +30,8 @@ pub enum NSTDUnixIOError {
     NSTD_UNIX_IO_ERROR_BROKEN_PIPE,
     /// The operation needs to block to complete.
     NSTD_UNIX_IO_ERROR_BLOCKING,
+    /// A pathname was expected to refer to a regular file, but a directory was found.
+    NSTD_UNIX_IO_ERROR_IS_DIR,
     /// Some input parameter was incorrect.
     NSTD_UNIX_IO_ERROR_INVALID_INPUT,
     /// Some input/output data had an incorrect format.
@@ -59,7 +61,8 @@ impl NSTDUnixIOError {
             ESPIPE => Self::NSTD_UNIX_IO_ERROR_INVALID_SEEK,
             EPIPE => Self::NSTD_UNIX_IO_ERROR_BROKEN_PIPE,
             EAGAIN | EWOULDBLOCK => Self::NSTD_UNIX_IO_ERROR_BLOCKING,
-            EISDIR => Self::NSTD_UNIX_IO_ERROR_INVALID_INPUT,
+            EISDIR => Self::NSTD_UNIX_IO_ERROR_IS_DIR,
+            EINVAL => Self::NSTD_UNIX_IO_ERROR_INVALID_INPUT,
             ETIMEDOUT => Self::NSTD_UNIX_IO_ERROR_TIMED_OUT,
             EINTR => Self::NSTD_UNIX_IO_ERROR_INTERRUPTED,
             ENOMEM => Self::NSTD_UNIX_IO_ERROR_OUT_OF_MEMORY,

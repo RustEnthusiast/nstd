@@ -54,9 +54,10 @@ NSTDAPI NSTDWindowsHandle nstd_os_windows_shared_lib_handle(const NSTDWindowsSha
 ///
 /// # Safety
 ///
-/// See <https://docs.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-getprocaddress>.
-NSTDAPI NSTDAny nstd_os_windows_shared_lib_get(const NSTDWindowsSharedLib *lib,
-const NSTDChar *symbol);
+/// See
+/// <https://docs.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-getprocaddress>.
+NSTDAPI NSTDAny
+nstd_os_windows_shared_lib_get(const NSTDWindowsSharedLib *lib, const NSTDChar *symbol);
 
 /// Gets a mutable pointer to a function or static variable in a dynamically loaded library by
 /// symbol name.
@@ -73,9 +74,10 @@ const NSTDChar *symbol);
 ///
 /// # Safety
 ///
-/// See <https://docs.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-getprocaddress>.
-NSTDAPI NSTDAnyMut nstd_os_windows_shared_lib_get_mut(NSTDWindowsSharedLib *lib,
-const NSTDChar *symbol);
+/// See
+/// <https://docs.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-getprocaddress>.
+NSTDAPI NSTDAnyMut
+nstd_os_windows_shared_lib_get_mut(NSTDWindowsSharedLib *lib, const NSTDChar *symbol);
 
 /// Unloads and frees a dynamically loaded shared library.
 ///

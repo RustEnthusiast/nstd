@@ -37,8 +37,8 @@ NSTDAPI NSTDStdout nstd_io_stdout();
 /// # Safety
 ///
 /// This function can cause undefined behavior if `bytes`'s data is invalid.
-NSTDAPI NSTDIOError nstd_io_stdout_write(NSTDStdout *handle, const NSTDSlice *bytes,
-NSTDUInt *written);
+NSTDAPI NSTDIOError
+nstd_io_stdout_write(NSTDStdout *handle, const NSTDSlice *bytes, NSTDUInt *written);
 
 /// Writes an entire buffer to the standard output stream.
 ///

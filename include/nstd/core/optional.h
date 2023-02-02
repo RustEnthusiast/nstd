@@ -11,10 +11,13 @@ typedef enum {
 } NSTDOptionalStatus;
 
 /// Represents an optional (possibly uninitialized) value.
-#define NSTDOptional(T) typedef struct {\
-    NSTDOptionalStatus status;\
-    union { T some; };\
-}
+#define NSTDOptional(T)            \
+    typedef struct {               \
+        NSTDOptionalStatus status; \
+        union {                    \
+            T some;                \
+        };                         \
+    }
 
 /// Represents an optional value of type `NSTDBool`.
 NSTDOptional(NSTDBool) NSTDOptionalBool;

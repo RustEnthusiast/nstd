@@ -19,3 +19,20 @@ pub enum NSTDResult<T, E> {
     /// The error variant.
     Err(E),
 }
+impl<T, E> NSTDResult<T, E> {
+    /// Attempts to return the contained `Ok` value in an `NSTDResult`.
+    ///
+    /// This operation is only useful for testing code, it's use in production should be
+    /// discouraged.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `self` is an `Err` value.
+    #[inline]
+    pub fn unwrap(self) -> T {
+        match self {
+            Self::Ok(value) => value,
+            _ => panic!("called `NSTDResult::unwrap()` on an `Err` value"),
+        }
+    }
+}

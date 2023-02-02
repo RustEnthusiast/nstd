@@ -7,7 +7,7 @@ Rust syntax).
 
 # Example using C
 ```c
-// Build nstd with `cargo build --features "clib nstd_core nstd_io"`.
+// Build nstd with features set to "capi nstd_core nstd_io".
 #include <nstd.h>
 
 /// Main entry point of the program.
@@ -54,6 +54,7 @@ int main()
         - `stdin` - A handle to the standard input stream.
         - `stdout` - A handle to the standard output stream.
     - `math` - High level math operations.
+    - `mutex` - A mutual exclusion primitive useful for protecting shared data.
     - `os` - Operating system specific functionality.
         - `unix` - Low level Unix-like operating system support.
             - `alloc` - Memory allocation for Unix-like systems.
@@ -69,6 +70,8 @@ int main()
     - `shared_ptr` - A reference counting smart pointer.
     - `string` - Dynamically sized UTF-8 encoded byte string.
     - `thread` - Thread spawning, joining, and detaching.
+    - `time` - Time utilities.
+    - `timed_mutex` - A mutual exclusion primitive with a timed locking mechanism.
     - `vec` - A dynamically sized contiguous sequence of values.
 
 # Platform support
@@ -97,7 +100,7 @@ can easily use the API.
 Users can refer to the [docs](https://docs.rs/nstd-sys/latest/nstd_sys/) to see which APIs expect
 or return valid references.
 
-- Reference data is assumed to remain unaltered by other code/threads.
+- Input reference data is assumed to remain unaltered by other code/threads.
 
 - Private (non-`pub`) structure members must not be directly accessed by the user.
 
@@ -106,19 +109,27 @@ or return valid references.
 
 - Data is *moved* when using the value-copy semantic on a type that does not implement `Copy`.
 
+- Types that do not implement the `Send` trait must not be sent between threads.
+
+- Types that do not implement the `Sync` trait must not be shared between threads.
+
+## Contributor safety notes
+
+- Any operation that may cause
+[undefined behavior](https://doc.rust-lang.org/reference/behavior-considered-undefined.html) must
+be marked unsafe.
+
+- All C function pointers taken as input by the API must be marked unsafe.
+
 - The panic behavior is set to abort by default, as it is undefined behavior to unwind from Rust
 code into foreign code (though this is
 [subject to change](https://rust-lang.github.io/rfcs/2945-c-unwind-abi.html)).
 
-## Contributor safety notes
-
-- Any operation that may cause undefined behavior must be marked unsafe.
-
-- Any operation that may cause data races must be marked unsafe.
-
-- All C function pointers taken as input by the API must be marked unsafe.
-
 # How to build
+Building `nstd` as a C library requires you to specify the "crate-type" manually. To do this you
+must pass a `--crate-type` of either `cdylib` or `staticlib` to rustc. Rust allows you to use this
+flag multiple times in case you need both.
+
 `nstd` lets you decide what features you want to use.
 
 Any module that falls under the top level module has a dedicated feature flag, for example
@@ -129,7 +140,7 @@ Each module may have additional features, for example `nstd.os` has the addition
 the low level memory allocation API for Windows without enabling memory allocation for other
 operating systems.
 
-The `clib` feature flag is used to build `nstd` as a C library.
+The `capi` feature flag is used to build `nstd` as a C library.
 
 The `std` feature flag links the Rust standard library into the binary.
 
@@ -139,13 +150,36 @@ The `asm` feature permits the library to use assembly to optimize certain build 
 
 Example:
 ```sh
-cargo build --release --features "clib nstd_io nstd_string nstd_vec"
+cargo rustc --release --crate-type cdylib --crate-type staticlib --features "capi nstd_alloc"
 ```
 
 To build with all features:
 ```sh
-cargo build --release --all-features
+cargo rustc --release --crate-type cdylib --crate-type staticlib --all-features
 ```
+
+# Installing with `cargo-c`
+`nstd` also allows you to use `cargo-c` to build or install the library.
+
+Install `cargo-c`:
+```sh
+cargo install cargo-c
+```
+
+Here is an example of how to build the library for a Unix machine with all features enabled:
+```sh
+cargo cinstall --release --all-features --destdir=./install --prefix=/usr --libdir=/usr/lib
+```
+This will create a new `install` directory with the installation contents.
+
+You can now copy the contents to the root folder using `cp`:
+```sh
+sudo cp -a ./install/* /
+```
+
+More information can be found in the [cargo-c](https://github.com/lu-zero/cargo-c) repo and in this
+[blog post](https://dev.to/luzero/building-crates-so-they-look-like-c-abi-libraries-1ibn) by Luca
+Barbato.
 
 # Releases
 `nstd` versions follow the Semantic Versioning rules. Each release is given a major, minor, and
