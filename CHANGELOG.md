@@ -1,3 +1,7 @@
+# TBD
+### `nstd.os`
+- Added `nstd.os.unix.mutex`.
+
 # 0.5.0
 ### `nstd`
 - Renamed the `clib` feature to `capi`.
