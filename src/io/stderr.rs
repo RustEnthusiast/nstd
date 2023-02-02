@@ -1,6 +1,8 @@
 //! A handle to the standard error stream.
 use crate::{core::slice::NSTDSlice, io::NSTDIOError, NSTDUInt};
 use std::io::Stderr;
+#[cfg(unix)]
+use std::os::unix::io::AsRawFd;
 
 /// A handle to the standard error stream.
 pub type NSTDStderr = Box<Stderr>;
@@ -11,7 +13,7 @@ pub type NSTDStderr = Box<Stderr>;
 ///
 /// `NSTDStderr handle` - A handle to the standard error stream.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_io_stderr() -> NSTDStderr {
     NSTDStderr::new(std::io::stderr())
 }
@@ -40,13 +42,24 @@ pub extern "C" fn nstd_io_stderr() -> NSTDStderr {
 ///
 /// This function can cause undefined behavior if `bytes`'s data is invalid.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_io_stderr_write(
     handle: &mut NSTDStderr,
     bytes: &NSTDSlice,
     written: &mut NSTDUInt,
 ) -> NSTDIOError {
-    crate::io::stdio::write(handle, bytes, written)
+    #[cfg(not(unix))]
+    {
+        let (err, w) = crate::io::stdio::write(handle, bytes);
+        *written = w;
+        err
+    }
+    #[cfg(unix)]
+    {
+        let (err, w) = crate::os::unix::io::stdio::write(handle.lock().as_raw_fd(), bytes);
+        *written = w;
+        err.into()
+    }
 }
 
 /// Writes an entire buffer to the standard error stream.
@@ -70,12 +83,15 @@ pub unsafe extern "C" fn nstd_io_stderr_write(
 ///
 /// This function can cause undefined behavior if `bytes`'s data is invalid.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_io_stderr_write_all(
     handle: &mut NSTDStderr,
     bytes: &NSTDSlice,
 ) -> NSTDIOError {
-    crate::io::stdio::write_all(handle, bytes)
+    #[cfg(not(unix))]
+    return crate::io::stdio::write_all(handle, bytes);
+    #[cfg(unix)]
+    return crate::os::unix::io::stdio::write_all(handle.lock().as_raw_fd(), bytes).into();
 }
 
 /// Flushes the standard error stream.
@@ -88,7 +104,7 @@ pub unsafe extern "C" fn nstd_io_stderr_write_all(
 ///
 /// `NSTDIOError errc` - The I/O operation error code.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_io_stderr_flush(handle: &mut NSTDStderr) -> NSTDIOError {
     crate::io::stdio::flush(handle)
 }
@@ -99,6 +115,6 @@ pub extern "C" fn nstd_io_stderr_flush(handle: &mut NSTDStderr) -> NSTDIOError {
 ///
 /// - `NSTDStderr handle` - A handle to the standard error stream.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 #[allow(unused_variables)]
 pub extern "C" fn nstd_io_stderr_free(handle: NSTDStderr) {}

@@ -4,27 +4,27 @@
 #include <stddef.h>
 #include <stdint.h>
 #ifdef __cplusplus
-#   define NSTDCPP __cplusplus
+#    define NSTDCPP __cplusplus
 #endif
 #ifdef NSTD_OS_WINDOWS
-#   ifdef NSTDCPP
-#       define NSTDAPI __declspec(dllexport) extern "C"
-#   else
-#       define NSTDAPI __declspec(dllexport)
-#   endif
+#    ifdef NSTDCPP
+#        define NSTDAPI extern "C" __declspec(dllexport)
+#    else
+#        define NSTDAPI __declspec(dllexport)
+#    endif
 #else
-#   ifdef NSTDCPP
-#       define NSTDAPI extern "C"
-#   else
-#       define NSTDAPI
-#   endif
+#    ifdef NSTDCPP
+#        define NSTDAPI extern "C"
+#    else
+#        define NSTDAPI
+#    endif
 #endif
 
 /// A null pointer value constant.
 #ifndef NSTDCPP
-#   define NSTD_NULL NULL
+#    define NSTD_NULL NULL
 #else
-#   define NSTD_NULL nullptr
+#    define NSTD_NULL nullptr
 #endif
 
 /// Boolean value false (0).
@@ -67,22 +67,20 @@ typedef NSTDUInt8 NSTDChar8;
 typedef NSTDUInt16 NSTDChar16;
 /// A 32-bit character type.
 typedef NSTDUInt32 NSTDChar32;
-/// Represents a Unicode scalar value.
-typedef NSTDChar32 NSTDUnichar;
 
-/// A void pointer to some immutable data.
+/// An opaque pointer to some immutable data.
 ///
 /// # Safety
 ///
 /// Accessing any data through this pointer type is unsafe. Raw pointers have no way of knowing if
 /// the data being pointed to is or isn't valid.
 typedef const void *NSTDAny;
-/// A void pointer (a pointer to some arbitrary type).
+/// An opaque pointer to some mutable data.
 ///
 /// # Safety
 ///
-/// Accessing any data through this pointer type is unsafe. Raw pointers have no way of knowing if
-/// the data being pointed to is or isn't valid.
+/// Accessing or mutating any data through this pointer type is unsafe. Raw pointers have no way of
+/// knowing if the data being pointed to is or isn't valid.
 typedef void *NSTDAnyMut;
 
 /// A boolean type, can either be `NSTD_TRUE` (1) or `NSTD_FALSE` (0).

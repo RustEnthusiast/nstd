@@ -2,8 +2,10 @@
 #define NSTD_STRING_H
 #include "alloc.h"
 #include "core/def.h"
+#include "core/optional.h"
 #include "core/slice.h"
 #include "core/str.h"
+#include "core/unichar.h"
 #include "nstd.h"
 #include "vec.h"
 
@@ -12,6 +14,9 @@ typedef struct {
     /// The underlying UTF-8 encoded byte buffer.
     NSTDVec bytes;
 } NSTDString;
+
+/// Represents an optional value of type `NSTDString`.
+NSTDOptional(NSTDString) NSTDOptionalString;
 
 /// Creates a new instance of `NSTDString`.
 ///
@@ -53,6 +58,27 @@ NSTDAPI NSTDString nstd_string_new_with_cap(NSTDUInt cap);
 ///
 /// The caller of this function must ensure that `str`'s data is valid for reads.
 NSTDAPI NSTDString nstd_string_from_str(const NSTDStr *str);
+
+/// Creates a new string from owned UTF-8 data.
+///
+/// # Parameters:
+///
+/// - `NSTDVec bytes` - The owned UTF-8 encoded buffer to take ownership of.
+///
+/// # Returns
+///
+/// `NSTDString string` - The new UTF-8 encoded string with ownership of `bytes`.
+///
+/// # Panics
+///
+/// This operation will panic in the following situations:
+///
+/// - `bytes`'s stride is not 1.
+///
+/// - `bytes`'s length is greater than `NSTDInt`'s max value.
+///
+/// - `bytes`'s data is not valid UTF-8.
+NSTDAPI NSTDString nstd_string_from_bytes(NSTDVec bytes);
 
 /// Creates a deep copy of a string.
 ///
@@ -173,13 +199,12 @@ NSTDAPI NSTDUInt nstd_string_cap(const NSTDString *string);
 ///
 /// # Returns
 ///
-/// `NSTDErrorCode errc` - Nonzero on error.
+/// `NSTDAllocError errc` - The allocation operation error code.
 ///
 /// # Panics
 ///
-/// Panics if the current length in bytes exceeds `NSTDInt`'s max value or getting a handle to the
-/// heap fails.
-NSTDAPI NSTDErrorCode nstd_string_push(NSTDString *string, NSTDUnichar chr);
+/// Panics if the current length in bytes exceeds `NSTDInt`'s max value.
+NSTDAPI NSTDAllocError nstd_string_push(NSTDString *string, NSTDUnichar chr);
 
 /// Appends a string slice to the end of a string.
 ///
@@ -195,8 +220,7 @@ NSTDAPI NSTDErrorCode nstd_string_push(NSTDString *string, NSTDUnichar chr);
 ///
 /// # Panics
 ///
-/// Panics if the current length in bytes exceeds `NSTDInt`'s max value or getting a handle to the
-/// heap fails.
+/// Panics if the current length in bytes exceeds `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -211,12 +235,19 @@ NSTDAPI NSTDAllocError nstd_string_push_str(NSTDString *string, const NSTDStr *s
 ///
 /// # Returns
 ///
-/// `NSTDUnichar chr` - The removed character, or the Unicode replacement character on error.
+/// `NSTDOptionalUnichar chr` - The removed character on success.
 ///
 /// # Panics
 ///
 /// This operation will panic if the string's length in bytes exceeds `NSTDInt`'s max value.
-NSTDAPI NSTDUnichar nstd_string_pop(NSTDString *string);
+NSTDAPI NSTDOptionalUnichar nstd_string_pop(NSTDString *string);
+
+/// Sets a string's length to zero.
+///
+/// # Parameters:
+///
+/// - `NSTDString *string` - The string to clear.
+NSTDAPI void nstd_string_clear(NSTDString *string);
 
 /// Creates a new `NSTDString` from an `NSTDFloat32`.
 ///
@@ -406,7 +437,7 @@ NSTDAPI NSTDString nstd_string_from_u64(NSTDUInt64 v);
 ///
 /// # Panics
 ///
-/// This operation may panic if getting a handle to the heap fails.
+/// Panics if deallocating fails.
 NSTDAPI void nstd_string_free(NSTDString string);
 
 #endif

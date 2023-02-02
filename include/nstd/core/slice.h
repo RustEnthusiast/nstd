@@ -2,15 +2,24 @@
 #define NSTD_CORE_SLICE_H
 #include "../nstd.h"
 #include "def.h"
+#include "optional.h"
 #include "ptr.h"
 
 /// An immutable view into a sequence of values in memory.
+///
+/// # Safety
+///
+/// The user of this structure must ensure that the pointed-to data remains valid and unmodified
+/// while an instance of this structure is in use.
 typedef struct {
     /// A pointer to the first element in the slice.
     NSTDPtr ptr;
     /// The number of elements in the slice.
     NSTDUInt len;
 } NSTDSlice;
+
+/// Represents an optional value of type `NSTDSlice`.
+NSTDOptional(NSTDSlice) NSTDOptionalSlice;
 
 /// Creates a new slice from raw data.
 ///
@@ -25,8 +34,30 @@ typedef struct {
 /// # Returns
 ///
 /// `NSTDSlice slice` - The new slice.
-NSTDAPI NSTDSlice nstd_core_slice_new(NSTDAny ptr, NSTDUInt element_size,
-NSTDUInt len);
+///
+/// # Panics
+///
+/// Panics if `ptr` is null.
+NSTDAPI NSTDSlice nstd_core_slice_new(NSTDAny ptr, NSTDUInt element_size, NSTDUInt len);
+
+/// Creates a new slice from raw data without checking if `ptr` is null.
+///
+/// # Parameters:
+///
+/// - `NSTDAny ptr` - A pointer to the first element in the sequence.
+///
+/// - `NSTDUInt element_size` - The number of bytes each element occupies.
+///
+/// - `NSTDUInt len` - The number of elements in the sequence.
+///
+/// # Returns
+///
+/// `NSTDSlice slice` - The new slice.
+///
+/// # Safety
+///
+/// The user of this function must ensure that `ptr` is not null.
+NSTDAPI NSTDSlice nstd_core_slice_new_unchecked(NSTDAny ptr, NSTDUInt element_size, NSTDUInt len);
 
 /// Returns a raw pointer to the slice's memory.
 ///
@@ -108,12 +139,21 @@ NSTDAPI NSTDAny nstd_core_slice_first(const NSTDSlice *slice);
 NSTDAPI NSTDAny nstd_core_slice_last(const NSTDSlice *slice);
 
 /// A view into a sequence of values in memory.
+///
+/// # Safety
+///
+/// The user of this structure must ensure that the pointed-to data remains valid, unmodified, and
+/// unreferenced in any other code while an instance of this structure is in use, else data races
+/// may occur.
 typedef struct {
     /// A pointer to the first element in the slice.
     NSTDPtrMut ptr;
     /// The number of elements in the slice.
     NSTDUInt len;
 } NSTDSliceMut;
+
+/// Represents an optional value of type `NSTDSliceMut`.
+NSTDOptional(NSTDSliceMut) NSTDOptionalSliceMut;
 
 /// Creates a new slice from raw data.
 ///
@@ -128,7 +168,31 @@ typedef struct {
 /// # Returns
 ///
 /// `NSTDSliceMut slice` - The new slice.
+///
+/// # Panics
+///
+/// Panics if `ptr` is null.
 NSTDAPI NSTDSliceMut nstd_core_slice_mut_new(NSTDAnyMut ptr, NSTDUInt element_size, NSTDUInt len);
+
+/// Creates a new slice from raw data without checking if `ptr` is null.
+///
+/// # Parameters:
+///
+/// - `NSTDAnyMut ptr` - A pointer to the first element in the sequence.
+///
+/// - `NSTDUInt element_size` - The number of bytes each element occupies.
+///
+/// - `NSTDUInt len` - The number of elements in the sequence.
+///
+/// # Returns
+///
+/// `NSTDSliceMut slice` - The new slice.
+///
+/// # Safety
+///
+/// The user of this function must ensure that `ptr` is not null.
+NSTDAPI NSTDSliceMut
+nstd_core_slice_mut_new_unchecked(NSTDAnyMut ptr, NSTDUInt element_size, NSTDUInt len);
 
 /// Creates an immutable version of a mutable slice.
 ///
@@ -289,7 +353,7 @@ NSTDAPI NSTDAny nstd_core_slice_mut_last_const(const NSTDSliceMut *slice);
 ///
 /// `NSTDErrorCode errc` - Nonzero on error.
 ///
-/// # Possible errors
+/// # Errors
 ///
 /// - `1` - The two buffer's lengths do not match.
 ///

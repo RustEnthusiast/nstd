@@ -13,6 +13,9 @@ pub mod core;
 #[cfg(feature = "nstd_cstring")]
 #[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_cstring")))]
 pub mod cstring;
+#[cfg(feature = "nstd_env")]
+#[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_env")))]
+pub mod env;
 #[cfg(feature = "nstd_fs")]
 #[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_fs")))]
 pub mod fs;
@@ -28,9 +31,15 @@ pub mod io;
 #[cfg(feature = "nstd_math")]
 #[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_math")))]
 pub mod math;
+#[cfg(feature = "nstd_mutex")]
+#[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_mutex")))]
+pub mod mutex;
 #[cfg(feature = "nstd_os")]
 #[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_os")))]
 pub mod os;
+#[cfg(feature = "nstd_proc")]
+#[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_proc")))]
+pub mod proc;
 #[cfg(feature = "nstd_shared_lib")]
 #[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_shared_lib")))]
 pub mod shared_lib;
@@ -42,6 +51,15 @@ pub mod shared_ptr;
 pub mod string;
 #[cfg(test)]
 pub(crate) mod test;
+#[cfg(feature = "nstd_thread")]
+#[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_thread")))]
+pub mod thread;
+#[cfg(feature = "nstd_time")]
+#[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_time")))]
+pub mod time;
+#[cfg(feature = "nstd_timed_mutex")]
+#[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_timed_mutex")))]
+pub mod timed_mutex;
 #[cfg(feature = "nstd_vec")]
 #[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_vec")))]
 pub mod vec;
@@ -90,22 +108,20 @@ pub type NSTDChar8 = NSTDUInt8;
 pub type NSTDChar16 = NSTDUInt16;
 /// A 32-bit character type.
 pub type NSTDChar32 = NSTDUInt32;
-/// Represents a Unicode scalar value.
-pub type NSTDUnichar = NSTDChar32;
 
-/// A void pointer to some immutable data.
+/// An opaque pointer to some immutable data.
 ///
 /// # Safety
 ///
 /// Accessing any data through this pointer type is unsafe. Raw pointers have no way of knowing if
 /// the data being pointed to is or isn't valid.
 pub type NSTDAny = *const c_void;
-/// A void pointer (a pointer to some arbitrary type).
+/// An opaque pointer to some mutable data.
 ///
 /// # Safety
 ///
-/// Accessing any data through this pointer type is unsafe. Raw pointers have no way of knowing if
-/// the data being pointed to is or isn't valid.
+/// Accessing or mutating any data through this pointer type is unsafe. Raw pointers have no way of
+/// knowing if the data being pointed to is or isn't valid.
 pub type NSTDAnyMut = *mut c_void;
 
 /// A boolean type, can either be `NSTD_TRUE` (1) or `NSTD_FALSE` (0).

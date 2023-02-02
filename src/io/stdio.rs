@@ -1,10 +1,11 @@
 //! Contains common I/O operations for [Read] & [Write] with `nstd` types.
+#![allow(dead_code)]
 use crate::{
     alloc::NSTDAllocError,
     core::{
         slice::{
             nstd_core_slice_len, nstd_core_slice_mut_len, nstd_core_slice_mut_stride,
-            nstd_core_slice_new, nstd_core_slice_stride, NSTDSlice, NSTDSliceMut,
+            nstd_core_slice_stride, NSTDSlice, NSTDSliceMut,
         },
         str::nstd_core_str_from_bytes_unchecked,
     },
@@ -20,31 +21,18 @@ const ISIZE_MAX: usize = isize::MAX as usize;
 
 /// Writes some `nstd` bytes to a [Write] stream.
 ///
-/// `written` will return as the number of bytes written to the stream.
-///
 /// # Safety
 ///
 /// This function can cause undefined behavior if `bytes`'s data is invalid.
-pub(crate) unsafe fn write<W: Write>(
-    stream: &mut W,
-    bytes: &NSTDSlice,
-    written: &mut NSTDUInt,
-) -> NSTDIOError {
+pub(crate) unsafe fn write<W: Write>(stream: &mut W, bytes: &NSTDSlice) -> (NSTDIOError, NSTDUInt) {
     // Make sure the slice's element size is 1.
     if nstd_core_slice_stride(bytes) != 1 || nstd_core_slice_len(bytes) > ISIZE_MAX {
-        *written = 0;
-        return NSTDIOError::NSTD_IO_ERROR_INVALID_INPUT;
+        return (NSTDIOError::NSTD_IO_ERROR_INVALID_INPUT, 0);
     }
     // Attempt to write the bytes to stdout.
     match stream.write(bytes.as_slice()) {
-        Ok(w) => {
-            *written = w;
-            NSTDIOError::NSTD_IO_ERROR_NONE
-        }
-        Err(err) => {
-            *written = 0;
-            NSTDIOError::from_err(err.kind())
-        }
+        Ok(w) => (NSTDIOError::NSTD_IO_ERROR_NONE, w),
+        Err(err) => (NSTDIOError::from_err(err.kind()), 0),
     }
 }
 
@@ -76,31 +64,21 @@ pub(crate) fn flush<W: Write>(stream: &mut W) -> NSTDIOError {
 
 /// Reads some data from a [Read] stream into an `nstd` byte slice.
 ///
-/// `read` will return as the number of bytes read from the stream.
-///
 /// # Safety
 ///
 /// `buffer`'s data must be valid for writes.
 pub(crate) unsafe fn read<R: Read>(
     stream: &mut R,
     buffer: &mut NSTDSliceMut,
-    read: &mut NSTDUInt,
-) -> NSTDIOError {
+) -> (NSTDIOError, NSTDUInt) {
     // Make sure the buffer's element size is 1.
     if nstd_core_slice_mut_stride(buffer) != 1 || nstd_core_slice_mut_len(buffer) > ISIZE_MAX {
-        *read = 0;
-        return NSTDIOError::NSTD_IO_ERROR_INVALID_INPUT;
+        return (NSTDIOError::NSTD_IO_ERROR_INVALID_INPUT, 0);
     }
     // Attempt to read bytes into the buffer.
     match stream.read(buffer.as_slice_mut()) {
-        Ok(r) => {
-            *read = r;
-            NSTDIOError::NSTD_IO_ERROR_NONE
-        }
-        Err(err) => {
-            *read = 0;
-            NSTDIOError::from_err(err.kind())
-        }
+        Ok(r) => (NSTDIOError::NSTD_IO_ERROR_NONE, r),
+        Err(err) => (NSTDIOError::from_err(err.kind()), 0),
     }
 }
 
@@ -109,39 +87,24 @@ pub(crate) unsafe fn read<R: Read>(
 /// # Note
 ///
 /// If extending the buffer fails, an error code of `NSTD_IO_ERROR_OUT_OF_MEMORY` will be returned.
-/// This does not mean `read` will return as 0 in this case.
-///
-/// `read` will return as the number of bytes read from the stream.
-///
-/// # Panics
-///
-/// This function will panic if getting a handle to the heap fails.
-pub(crate) fn read_all<R: Read>(
-    stream: &mut R,
-    buffer: &mut NSTDVec,
-    read: &mut NSTDUInt,
-) -> NSTDIOError {
+/// This does not mean the number of bytes read will return as 0 in this case.
+pub(crate) fn read_all<R: Read>(stream: &mut R, buffer: &mut NSTDVec) -> (NSTDIOError, NSTDUInt) {
     // Make sure the buffer's element size is 1.
     if nstd_vec_stride(buffer) != 1 || nstd_vec_len(buffer) > ISIZE_MAX {
-        *read = 0;
-        return NSTDIOError::NSTD_IO_ERROR_INVALID_INPUT;
+        return (NSTDIOError::NSTD_IO_ERROR_INVALID_INPUT, 0);
     }
     // Attempt to read data into `buffer`.
     let mut buf = Vec::new();
     match stream.read_to_end(&mut buf) {
         Ok(r) => {
-            *read = r;
-            let bytes = nstd_core_slice_new(buf.as_ptr().cast(), 1, buf.len());
+            let bytes = NSTDSlice::from_slice(buf.as_slice());
             // SAFETY: `bytes` refers to `buf`'s data, which is still valid here.
             match unsafe { nstd_vec_extend(buffer, &bytes) } {
-                NSTDAllocError::NSTD_ALLOC_ERROR_NONE => NSTDIOError::NSTD_IO_ERROR_NONE,
-                _ => NSTDIOError::NSTD_IO_ERROR_OUT_OF_MEMORY,
+                NSTDAllocError::NSTD_ALLOC_ERROR_NONE => (NSTDIOError::NSTD_IO_ERROR_NONE, r),
+                _ => (NSTDIOError::NSTD_IO_ERROR_OUT_OF_MEMORY, r),
             }
         }
-        Err(err) => {
-            *read = 0;
-            NSTDIOError::from_err(err.kind())
-        }
+        Err(err) => (NSTDIOError::from_err(err.kind()), 0),
     }
 }
 
@@ -152,39 +115,28 @@ pub(crate) fn read_all<R: Read>(
 /// If extending the buffer fails, an error code of `NSTD_IO_ERROR_OUT_OF_MEMORY` will be returned.
 /// This does not mean `read` will return as 0 in this case.
 ///
-/// `read` will return as the number of bytes read from the stream.
-///
 /// # Panics
 ///
-/// This function will panic in the following situations:
-///
-/// - `buffer`'s length in bytes exceeds `NSTDInt`'s max value.
-///
-/// - Getting a handle to the heap fails.
+/// This function will panic if `buffer`'s length in bytes exceeds `NSTDInt`'s max value.
 pub(crate) fn read_to_string<R: Read>(
     stream: &mut R,
     buffer: &mut NSTDString,
-    read: &mut NSTDUInt,
-) -> NSTDIOError {
+) -> (NSTDIOError, NSTDUInt) {
     // Attempt to read data into `buffer`.
     let mut buf = String::new();
     match stream.read_to_string(&mut buf) {
         Ok(r) => {
-            *read = r;
-            let bytes = nstd_core_slice_new(buf.as_ptr().cast(), 1, buf.len());
+            let bytes = NSTDSlice::from_slice(buf.as_bytes());
             // SAFETY: `bytes` refers to `buf`'s data, which is still valid UTF-8 here.
             unsafe {
                 let str = nstd_core_str_from_bytes_unchecked(&bytes);
                 match nstd_string_push_str(buffer, &str) {
-                    NSTDAllocError::NSTD_ALLOC_ERROR_NONE => NSTDIOError::NSTD_IO_ERROR_NONE,
-                    _ => NSTDIOError::NSTD_IO_ERROR_OUT_OF_MEMORY,
+                    NSTDAllocError::NSTD_ALLOC_ERROR_NONE => (NSTDIOError::NSTD_IO_ERROR_NONE, r),
+                    _ => (NSTDIOError::NSTD_IO_ERROR_OUT_OF_MEMORY, r),
                 }
             }
         }
-        Err(err) => {
-            *read = 0;
-            NSTDIOError::from_err(err.kind())
-        }
+        Err(err) => (NSTDIOError::from_err(err.kind()), 0),
     }
 }
 

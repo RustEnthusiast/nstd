@@ -1,6 +1,18 @@
 #ifndef NSTD_CORE_CTY_H
 #define NSTD_CORE_CTY_H
 #include "../nstd.h"
+#include "unichar.h"
+
+/// Determines whether or not a 32-bit character value is a valid Unicode scalar value.
+///
+/// # Parameters:
+///
+/// - `NSTDChar32 chr` - The 32-bit character value to check.
+///
+/// # Returns
+///
+/// `NSTDBool is_unicode` - True if `chr` is a valid Unicode character.
+NSTDAPI NSTDBool nstd_core_cty_is_unicode(NSTDChar32 chr);
 
 /// Returns the Unicode replacement character (�).
 ///

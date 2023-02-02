@@ -1,5 +1,6 @@
 #ifndef NSTD_HEAP_PTR_H
 #define NSTD_HEAP_PTR_H
+#include "core/optional.h"
 #include "nstd.h"
 
 /// A pointer type for single value heap allocation.
@@ -9,6 +10,9 @@ typedef struct {
     /// The size of the object in bytes.
     NSTDUInt size;
 } NSTDHeapPtr;
+
+/// Represents an optional value of type `NSTDHeapPtr`.
+NSTDOptional(NSTDHeapPtr) NSTDOptionalHeapPtr;
 
 /// Creates a new initialized heap allocated object.
 ///
@@ -24,7 +28,7 @@ typedef struct {
 ///
 /// # Panics
 ///
-/// This function will panic if either `element_size` is zero, or allocation fails.
+/// This function will panic if allocation fails.
 ///
 /// # Safety
 ///
@@ -43,7 +47,12 @@ NSTDAPI NSTDHeapPtr nstd_heap_ptr_new(NSTDUInt element_size, NSTDAny init);
 ///
 /// # Panics
 ///
-/// This function will panic if either `element_size` is zero, or allocation fails.
+/// This function will panic if allocation fails.
+///
+/// # Safety
+///
+/// The data to be stored in the heap pointer must be safely representable by an all-zero byte
+/// pattern.
 NSTDAPI NSTDHeapPtr nstd_heap_ptr_new_zeroed(NSTDUInt element_size);
 
 /// Creates a clone of a heap allocated object.
@@ -74,6 +83,10 @@ NSTDAPI NSTDUInt nstd_heap_ptr_size(const NSTDHeapPtr *hptr);
 
 /// Returns an immutable raw pointer to the object on the heap.
 ///
+/// # Note
+///
+/// This will always return null if the size of the object being stored on the heap is 0.
+///
 /// # Parameters:
 ///
 /// - `const NSTDHeapPtr *hptr` - The heap pointer.
@@ -84,6 +97,10 @@ NSTDAPI NSTDUInt nstd_heap_ptr_size(const NSTDHeapPtr *hptr);
 NSTDAPI NSTDAny nstd_heap_ptr_get(const NSTDHeapPtr *hptr);
 
 /// Returns a raw pointer to the object on the heap.
+///
+/// # Note
+///
+/// This will always return null if the size of the object being stored on the heap is 0.
 ///
 /// # Parameters:
 ///
@@ -102,7 +119,7 @@ NSTDAPI NSTDAnyMut nstd_heap_ptr_get_mut(NSTDHeapPtr *hptr);
 ///
 /// # Panics
 ///
-/// This operation may panic if getting a handle to the heap fails.
+/// Panics if freeing the heap memory fails.
 NSTDAPI void nstd_heap_ptr_free(NSTDHeapPtr hptr);
 
 #endif

@@ -1,6 +1,7 @@
 //! A handle to an opened file.
 use crate::{
     core::{
+        result::NSTDResult,
         slice::{NSTDSlice, NSTDSliceMut},
         str::NSTDStr,
     },
@@ -10,27 +11,32 @@ use crate::{
     NSTDUInt, NSTDUInt8,
 };
 use std::fs::File;
+#[cfg(unix)]
+use std::os::unix::io::AsRawFd;
 
 /// Creates the file upon opening if it does not already exist.
 ///
 /// Either of the `NSTD_FILE_WRITE` or `NSTD_FILE_APPEND` options must also be toggled for the file
 /// to be created.
-pub const NSTD_FILE_CREATE: NSTDUInt8 = 0b00000001;
+pub const NSTD_FILE_CREATE: NSTDUInt8 = 1;
 
 /// Open a file in read mode.
-pub const NSTD_FILE_READ: NSTDUInt8 = 0b00000010;
+pub const NSTD_FILE_READ: NSTDUInt8 = 1 << 1;
 
 /// Open a file in write mode.
-pub const NSTD_FILE_WRITE: NSTDUInt8 = 0b00000100;
+pub const NSTD_FILE_WRITE: NSTDUInt8 = 1 << 2;
 
 /// Open a file in writing mode without overwriting saved data.
-pub const NSTD_FILE_APPEND: NSTDUInt8 = 0b00001000;
+pub const NSTD_FILE_APPEND: NSTDUInt8 = 1 << 3;
 
 /// Open a file in truncate mode, this will set the file's length to 0 upon opening.
-pub const NSTD_FILE_TRUNC: NSTDUInt8 = 0b00010000;
+pub const NSTD_FILE_TRUNC: NSTDUInt8 = 1 << 4;
 
 /// A handle to an opened file.
 pub type NSTDFile = Box<File>;
+
+/// A result type yielding an `NSTDFile` on success.
+pub type NSTDFileResult = NSTDResult<NSTDFile, NSTDIOError>;
 
 /// Opens file on the filesystem and returns a handle to it.
 ///
@@ -40,11 +46,9 @@ pub type NSTDFile = Box<File>;
 ///
 /// - `NSTDUInt8 mask` - A bit mask for toggling the file's different open options.
 ///
-/// - `NSTDIOError *errc` - Returns as the I/O operation error code.
-///
 /// # Returns
 ///
-/// `NSTDFile file` - A handle to the opened file, or null if an error occurs.
+/// `NSTDFileResult file` - A handle to the opened file, or the IO error on failure.
 ///
 /// # Panics
 ///
@@ -53,12 +57,8 @@ pub type NSTDFile = Box<File>;
 /// # Safety
 ///
 /// This operation can cause undefined behavior if `name`'s data is invalid.
-#[cfg_attr(feature = "clib", no_mangle)]
-pub unsafe extern "C" fn nstd_fs_file_open(
-    name: &NSTDStr,
-    mask: NSTDUInt8,
-    errc: &mut NSTDIOError,
-) -> Option<NSTDFile> {
+#[cfg_attr(feature = "capi", no_mangle)]
+pub unsafe extern "C" fn nstd_fs_file_open(name: &NSTDStr, mask: NSTDUInt8) -> NSTDFileResult {
     // Attempt to create/open the file in write mode.
     match File::options()
         .create((mask & NSTD_FILE_CREATE) != 0)
@@ -68,14 +68,8 @@ pub unsafe extern "C" fn nstd_fs_file_open(
         .truncate((mask & NSTD_FILE_TRUNC) != 0)
         .open(name.as_str())
     {
-        Ok(f) => {
-            *errc = NSTDIOError::NSTD_IO_ERROR_NONE;
-            Some(Box::new(f))
-        }
-        Err(err) => {
-            *errc = NSTDIOError::from_err(err.kind());
-            None
-        }
+        Ok(f) => NSTDResult::Ok(Box::new(f)),
+        Err(err) => NSTDResult::Err(NSTDIOError::from_err(err.kind())),
     }
 }
 
@@ -97,13 +91,24 @@ pub unsafe extern "C" fn nstd_fs_file_open(
 ///
 /// This function's caller must guarantee validity of `bytes`.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_fs_file_write(
     file: &mut NSTDFile,
     bytes: &NSTDSlice,
     written: &mut NSTDUInt,
 ) -> NSTDIOError {
-    crate::io::stdio::write(file, bytes, written)
+    #[cfg(not(unix))]
+    {
+        let (err, w) = crate::io::stdio::write(file, bytes);
+        *written = w;
+        err
+    }
+    #[cfg(unix)]
+    {
+        let (err, w) = crate::os::unix::io::stdio::write(file.as_raw_fd(), bytes);
+        *written = w;
+        err.into()
+    }
 }
 
 /// Writes a whole buffer to a file.
@@ -122,12 +127,15 @@ pub unsafe extern "C" fn nstd_fs_file_write(
 ///
 /// This function's caller must guarantee validity of `bytes`.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_fs_file_write_all(
     file: &mut NSTDFile,
     bytes: &NSTDSlice,
 ) -> NSTDIOError {
-    crate::io::stdio::write_all(file, bytes)
+    #[cfg(not(unix))]
+    return crate::io::stdio::write_all(file, bytes);
+    #[cfg(unix)]
+    return crate::os::unix::io::stdio::write_all(file.as_raw_fd(), bytes).into();
 }
 
 /// Flushes a file stream.
@@ -140,7 +148,7 @@ pub unsafe extern "C" fn nstd_fs_file_write_all(
 ///
 /// `NSTDIOError errc` - The I/O operation error code.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_fs_file_flush(file: &mut NSTDFile) -> NSTDIOError {
     crate::io::stdio::flush(file)
 }
@@ -163,13 +171,24 @@ pub extern "C" fn nstd_fs_file_flush(file: &mut NSTDFile) -> NSTDIOError {
 ///
 /// `buffer`'s data must be valid for writes.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_fs_file_read(
     file: &mut NSTDFile,
     buffer: &mut NSTDSliceMut,
     read: &mut NSTDUInt,
 ) -> NSTDIOError {
-    crate::io::stdio::read(file, buffer, read)
+    #[cfg(not(unix))]
+    {
+        let (err, r) = crate::io::stdio::read(file, buffer);
+        *read = r;
+        err
+    }
+    #[cfg(unix)]
+    {
+        let (err, r) = crate::os::unix::io::stdio::read(file.as_raw_fd(), buffer);
+        *read = r;
+        err.into()
+    }
 }
 
 /// Continuously reads data from `file` into a buffer until EOF is reached.
@@ -193,15 +212,27 @@ pub unsafe extern "C" fn nstd_fs_file_read(
 ///
 /// # Panics
 ///
-/// Panics if getting a handle to the heap fails.
+/// This function will panic if `buffer`'s length in bytes ends up exceeding `NSTDInt`'s max value.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_fs_file_read_all(
     file: &mut NSTDFile,
     buffer: &mut NSTDVec,
     read: &mut NSTDUInt,
 ) -> NSTDIOError {
-    crate::io::stdio::read_all(file, buffer, read)
+    #[cfg(not(unix))]
+    {
+        let (err, r) = crate::io::stdio::read_all(file, buffer);
+        *read = r;
+        err
+    }
+    #[cfg(unix)]
+    {
+        // SAFETY: `file` owns the file descriptor.
+        let (err, r) = unsafe { crate::os::unix::io::stdio::read_all(file.as_raw_fd(), buffer) };
+        *read = r;
+        err.into()
+    }
 }
 
 /// Continuously reads UTF-8 data from `file` into a string buffer until EOF is reached.
@@ -225,19 +256,29 @@ pub extern "C" fn nstd_fs_file_read_all(
 ///
 /// # Panics
 ///
-/// This function will panic in the following situations:
-///
-/// - `buffer`'s length in bytes exceeds `NSTDInt`'s max value.
-///
-/// - Getting a handle to the heap fails.
+/// This function will panic if `buffer`'s length in bytes ends up exceeding `NSTDInt`'s max value.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_fs_file_read_to_string(
     file: &mut NSTDFile,
     buffer: &mut NSTDString,
     read: &mut NSTDUInt,
 ) -> NSTDIOError {
-    crate::io::stdio::read_to_string(file, buffer, read)
+    #[cfg(not(unix))]
+    {
+        let (err, r) = crate::io::stdio::read_to_string(file, buffer);
+        *read = r;
+        err
+    }
+    #[cfg(unix)]
+    {
+        // SAFETY: `file` owns the file descriptor.
+        unsafe {
+            let (err, r) = crate::os::unix::io::stdio::read_to_string(file.as_raw_fd(), buffer);
+            *read = r;
+            err.into()
+        }
+    }
 }
 
 /// Reads enough data from `file` to fill the entirety of `buffer`.
@@ -261,12 +302,15 @@ pub extern "C" fn nstd_fs_file_read_to_string(
 ///
 /// `buffer` must be valid for writes.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_fs_file_read_exact(
     file: &mut NSTDFile,
     buffer: &mut NSTDSliceMut,
 ) -> NSTDIOError {
-    crate::io::stdio::read_exact(file, buffer)
+    #[cfg(not(unix))]
+    return crate::io::stdio::read_exact(file, buffer);
+    #[cfg(unix)]
+    return crate::os::unix::io::stdio::read_exact(file.as_raw_fd(), buffer).into();
 }
 
 /// Closes a file handle.
@@ -275,6 +319,6 @@ pub unsafe extern "C" fn nstd_fs_file_read_exact(
 ///
 /// - `NSTDFile file` - The file handle to close.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 #[allow(unused_variables)]
 pub extern "C" fn nstd_fs_file_close(file: NSTDFile) {}

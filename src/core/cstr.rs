@@ -4,14 +4,20 @@ use self::raw::{nstd_core_cstr_raw_len, nstd_core_cstr_raw_len_with_null};
 use crate::{
     core::{
         mem::nstd_core_mem_search,
-        slice::{nstd_core_slice_new, NSTDSlice},
+        optional::{gen_optional, NSTDOptional},
+        slice::{nstd_core_slice_new_unchecked, NSTDSlice},
     },
-    NSTDBool, NSTDChar, NSTDUInt, NSTD_FALSE,
+    NSTDBool, NSTDChar, NSTDUInt,
 };
 
 /// An immutable slice of a C string.
+///
+/// # Safety
+///
+/// The user of this structure must ensure that the pointed-to data remains valid and unmodified
+/// while an instance of this structure is in use.
 #[repr(C)]
-#[derive(Clone, Copy, Debug, Hash)]
+#[derive(Clone, Copy, Debug)]
 pub struct NSTDCStr {
     /// A pointer to the first character in the C string.
     ptr: *const NSTDChar,
@@ -30,12 +36,12 @@ impl NSTDCStr {
     /// This C string slice's data must remain valid and unmodified while the returned byte slice
     /// is in use.
     #[inline]
-    #[allow(dead_code)]
-    pub(crate) unsafe fn as_bytes(&self) -> &[u8] {
+    pub(crate) const unsafe fn as_bytes(&self) -> &[u8] {
         assert!(self.len <= isize::MAX as usize);
         core::slice::from_raw_parts(self.ptr.cast(), self.len)
     }
 }
+gen_optional!(NSTDOptionalCStr, NSTDCStr);
 
 /// Creates a new C string slice from a raw pointer and a size.
 ///
@@ -48,9 +54,60 @@ impl NSTDCStr {
 /// # Returns
 ///
 /// `NSTDCStr cstr` - The new C string slice, referencing `raw`'s data.
+///
+/// # Panics
+///
+/// Panics if `raw` is null.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::cstr::{nstd_core_cstr_is_null_terminated, nstd_core_cstr_new};
+///
+/// let str = "This is a null-terminated C string slice.\0";
+/// let cstr = nstd_core_cstr_new(str.as_ptr().cast(), str.len());
+/// assert!(unsafe { nstd_core_cstr_is_null_terminated(&cstr) });
+/// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_core_cstr_new(raw: *const NSTDChar, len: NSTDUInt) -> NSTDCStr {
+    assert!(!raw.is_null());
+    NSTDCStr { ptr: raw, len }
+}
+
+/// Creates a new C string slice from a raw pointer and a size without checking if `raw` is null.
+///
+/// # Parameters:
+///
+/// - `const NSTDChar *raw` - A pointer to the first character to be in the C string slice.
+///
+/// - `NSTDUInt len` - The length of the C string slice.
+///
+/// # Returns
+///
+/// `NSTDCStr cstr` - The new C string slice, referencing `raw`'s data.
+///
+/// # Safety
+///
+/// The user of this function must ensure that `raw` is not null.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::cstr::{nstd_core_cstr_is_null_terminated, nstd_core_cstr_new_unchecked};
+///
+/// let str = "This is a null-terminated C string slice.\0";
+/// unsafe {
+///     let cstr = nstd_core_cstr_new_unchecked(str.as_ptr().cast(), str.len());
+///     assert!(nstd_core_cstr_is_null_terminated(&cstr));
+/// }
+/// ```
+#[inline]
+#[cfg_attr(feature = "capi", no_mangle)]
+pub const unsafe extern "C" fn nstd_core_cstr_new_unchecked(
+    raw: *const NSTDChar,
+    len: NSTDUInt,
+) -> NSTDCStr {
     NSTDCStr { ptr: raw, len }
 }
 
@@ -64,10 +121,14 @@ pub extern "C" fn nstd_core_cstr_new(raw: *const NSTDChar, len: NSTDUInt) -> NST
 ///
 /// `NSTDCStr cstr` - The new C string slice, referencing `raw`'s data.
 ///
+/// # Panics
+///
+/// Panics if `raw` is null.
+///
 /// # Safety
 ///
-/// This operation may attempt to access data that is unowned by the raw C string, which can lead
-/// to undefined behavior.
+/// `raw` must point to a character array that is valid for reads up until and including it's
+/// null-terminating byte.
 ///
 /// # Example
 ///
@@ -82,7 +143,7 @@ pub extern "C" fn nstd_core_cstr_new(raw: *const NSTDChar, len: NSTDUInt) -> NST
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_core_cstr_from_raw(raw: *const NSTDChar) -> NSTDCStr {
     let len = nstd_core_cstr_raw_len(raw);
     nstd_core_cstr_new(raw, len)
@@ -98,10 +159,14 @@ pub unsafe extern "C" fn nstd_core_cstr_from_raw(raw: *const NSTDChar) -> NSTDCS
 ///
 /// `NSTDCStr cstr` - The new C string slice, referencing `raw`'s data.
 ///
+/// # Panics
+///
+/// Panics if `raw` is null.
+///
 /// # Safety
 ///
-/// This operation may attempt to access data that is unowned by the raw C string, which can lead
-/// to undefined behavior.
+/// `raw` must point to a character array that is valid for reads up until and including it's
+/// null-terminating byte.
 ///
 /// # Example
 ///
@@ -116,7 +181,7 @@ pub unsafe extern "C" fn nstd_core_cstr_from_raw(raw: *const NSTDChar) -> NSTDCS
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_core_cstr_from_raw_with_null(raw: *const NSTDChar) -> NSTDCStr {
     let len = nstd_core_cstr_raw_len_with_null(raw);
     nstd_core_cstr_new(raw, len)
@@ -149,9 +214,10 @@ pub unsafe extern "C" fn nstd_core_cstr_from_raw_with_null(raw: *const NSTDChar)
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_cstr_as_bytes(cstr: &NSTDCStr) -> NSTDSlice {
-    nstd_core_slice_new(cstr.ptr.cast(), 1, cstr.len)
+#[cfg_attr(feature = "capi", no_mangle)]
+pub const extern "C" fn nstd_core_cstr_as_bytes(cstr: &NSTDCStr) -> NSTDSlice {
+    // SAFETY: `cstr.ptr` is never null.
+    unsafe { nstd_core_slice_new_unchecked(cstr.ptr.cast(), 1, cstr.len) }
 }
 
 /// Returns a pointer to the first character in a C string slice.
@@ -163,9 +229,20 @@ pub extern "C" fn nstd_core_cstr_as_bytes(cstr: &NSTDCStr) -> NSTDSlice {
 /// # Returns
 ///
 /// `const NSTDChar *ptr` - A pointer to the first character in the C string.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::cstr::{nstd_core_cstr_as_ptr, nstd_core_cstr_new};
+///
+/// let str = "assert!(Rust + C >= God)";
+/// let str_ptr = str.as_ptr().cast();
+/// let cstr = nstd_core_cstr_new(str_ptr, str.len());
+/// assert!(str_ptr == nstd_core_cstr_as_ptr(&cstr));
+/// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_cstr_as_ptr(cstr: &NSTDCStr) -> *const NSTDChar {
+#[cfg_attr(feature = "capi", no_mangle)]
+pub const extern "C" fn nstd_core_cstr_as_ptr(cstr: &NSTDCStr) -> *const NSTDChar {
     cstr.ptr
 }
 
@@ -178,9 +255,19 @@ pub extern "C" fn nstd_core_cstr_as_ptr(cstr: &NSTDCStr) -> *const NSTDChar {
 /// # Returns
 ///
 /// `NSTDUInt len` - The length of the C string slice.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::cstr::{nstd_core_cstr_from_raw, nstd_core_cstr_len};
+///
+/// let str = "Sunflower seeds yum\0";
+/// let cstr = unsafe { nstd_core_cstr_from_raw(str.as_ptr().cast()) };
+/// assert!(nstd_core_cstr_len(&cstr) == 19);
+/// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_cstr_len(cstr: &NSTDCStr) -> NSTDUInt {
+#[cfg_attr(feature = "capi", no_mangle)]
+pub const extern "C" fn nstd_core_cstr_len(cstr: &NSTDCStr) -> NSTDUInt {
     cstr.len
 }
 
@@ -198,11 +285,11 @@ pub extern "C" fn nstd_core_cstr_len(cstr: &NSTDCStr) -> NSTDUInt {
 ///
 /// # Panics
 ///
-/// This function will panic if `cstr`'s length is greater than `NSTDInt`'s maximum value.
+/// This function may panic if `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
-/// Undefined behavior may occur if `cstr`'s data is invalid.
+/// The caller must ensure that `cstr` is valid for reads.
 ///
 /// # Example
 ///
@@ -227,24 +314,13 @@ pub extern "C" fn nstd_core_cstr_len(cstr: &NSTDCStr) -> NSTDUInt {
 ///     assert!(nstd_core_cstr_is_null_terminated(&mn_cstr) == NSTD_FALSE);
 /// }
 /// ```
-#[cfg_attr(feature = "clib", no_mangle)]
+#[inline]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_core_cstr_is_null_terminated(cstr: &NSTDCStr) -> NSTDBool {
-    assert!(cstr.len <= isize::MAX as usize);
-    let mut i = 0;
-    while i < cstr.len {
-        if *cstr.ptr.add(i) == 0 {
-            return i == cstr.len - 1;
-        }
-        i += 1;
-    }
-    NSTD_FALSE
+    nstd_core_mem_search(cstr.ptr.cast(), cstr.len, 0) == nstd_core_cstr_last(cstr).cast()
 }
 
 /// Returns a pointer to the first null byte in a C string slice if one is present.
-///
-/// # Note
-///
-/// This will always return null if `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Parameters:
 ///
@@ -255,9 +331,13 @@ pub unsafe extern "C" fn nstd_core_cstr_is_null_terminated(cstr: &NSTDCStr) -> N
 /// `const NSTDChar *nul` - A pointer to the first null byte in `cstr`, or null if the C string
 /// slice doesn't contain a null byte.
 ///
+/// # Panics
+///
+/// This operation may panic if `cstr`'s length is greater than `NSTDInt`'s max value.
+///
 /// # Safety
 ///
-/// Undefined behavior may occur if `cstr`'s data is invalid.
+/// The caller must ensure that `cstr` is valid for reads.
 ///
 /// # Example
 ///
@@ -281,12 +361,12 @@ pub unsafe extern "C" fn nstd_core_cstr_is_null_terminated(cstr: &NSTDCStr) -> N
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_core_cstr_get_null(cstr: &NSTDCStr) -> *const NSTDChar {
     nstd_core_mem_search(cstr.ptr.cast(), cstr.len, 0).cast()
 }
 
-/// Return a pointer the character at `pos` in `cstr`.
+/// Return a pointer to the character at index `pos` in `cstr`.
 ///
 /// # Note
 ///
@@ -318,8 +398,8 @@ pub unsafe extern "C" fn nstd_core_cstr_get_null(cstr: &NSTDCStr) -> *const NSTD
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_cstr_get(cstr: &NSTDCStr, pos: NSTDUInt) -> *const NSTDChar {
+#[cfg_attr(feature = "capi", no_mangle)]
+pub const extern "C" fn nstd_core_cstr_get(cstr: &NSTDCStr, pos: NSTDUInt) -> *const NSTDChar {
     if pos < cstr.len && pos <= isize::MAX as usize {
         // SAFETY: We've checked `pos`.
         return unsafe { cstr.ptr.add(pos) };
@@ -327,15 +407,100 @@ pub extern "C" fn nstd_core_cstr_get(cstr: &NSTDCStr, pos: NSTDUInt) -> *const N
     core::ptr::null()
 }
 
+/// Returns a pointer to the first character in a C string slice, or null if it is empty.
+///
+/// # Parameters:
+///
+/// - `const NSTDCStr *cstr` - The C string slice.
+///
+/// # Returns
+///
+/// `const NSTDChar *first` - If present, a pointer to the first character in the C string slice.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::{
+///     core::cstr::{nstd_core_cstr_first, nstd_core_cstr_from_raw},
+///     NSTDChar,
+/// };
+///
+/// unsafe {
+///     let cstr = nstd_core_cstr_from_raw("Tea\0".as_ptr().cast());
+///     assert!(*nstd_core_cstr_first(&cstr) == b'T' as NSTDChar);
+/// }
+/// ```
+#[inline]
+#[cfg_attr(feature = "capi", no_mangle)]
+pub const extern "C" fn nstd_core_cstr_first(cstr: &NSTDCStr) -> *const NSTDChar {
+    match cstr.len > 0 {
+        true => cstr.ptr,
+        false => core::ptr::null(),
+    }
+}
+
+/// Returns a pointer to the last character in a C string slice, or null if it is empty.
+///
+/// # Parameters:
+///
+/// - `const NSTDCStr *cstr` - The C string slice.
+///
+/// # Returns
+///
+/// `const NSTDChar *last` - If present, a pointer to the last character in the C string slice.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::cstr::{nstd_core_cstr_from_raw_with_null, nstd_core_cstr_last};
+///
+/// unsafe {
+///     let cstr = nstd_core_cstr_from_raw_with_null("Tea\0".as_ptr().cast());
+///     assert!(*nstd_core_cstr_last(&cstr) == 0);
+/// }
+/// ```
+#[inline]
+#[cfg_attr(feature = "capi", no_mangle)]
+pub const extern "C" fn nstd_core_cstr_last(cstr: &NSTDCStr) -> *const NSTDChar {
+    match cstr.len > 0 {
+        true => nstd_core_cstr_get(cstr, cstr.len - 1),
+        false => core::ptr::null(),
+    }
+}
+
 /// A mutable slice of a C string.
+///
+/// # Safety
+///
+/// The user of this structure must ensure that the pointed-to data remains valid, unmodified, and
+/// unreferenced in any other code while an instance of this structure is in use, else data races
+/// may occur.
 #[repr(C)]
-#[derive(Clone, Copy, Debug, Hash)]
+#[derive(Debug)]
 pub struct NSTDCStrMut {
     /// A pointer to the first character in the C string.
     ptr: *mut NSTDChar,
     /// The length of the C string slice.
     len: NSTDUInt,
 }
+impl NSTDCStrMut {
+    /// Interprets a C string slice as a byte slice.
+    ///
+    /// # Panics
+    ///
+    /// This operation will panic if the C string slice's length is greater than `isize::MAX`.
+    ///
+    /// # Safety
+    ///
+    /// This C string slice's data must remain valid and unmodified while the returned byte slice
+    /// is in use.
+    #[inline]
+    pub(crate) const unsafe fn as_bytes(&self) -> &[u8] {
+        assert!(self.len <= isize::MAX as usize);
+        core::slice::from_raw_parts(self.ptr.cast(), self.len)
+    }
+}
+gen_optional!(NSTDOptionalCStrMut, NSTDCStrMut);
 
 /// Creates a new C string slice from a raw pointer and a size.
 ///
@@ -348,9 +513,62 @@ pub struct NSTDCStrMut {
 /// # Returns
 ///
 /// `NSTDCStrMut cstr` - The new C string slice, referencing `raw`'s data.
+///
+/// # Panics
+///
+/// Panics if `raw` is null.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::cstr::{nstd_core_cstr_mut_is_null_terminated, nstd_core_cstr_mut_new};
+///
+/// let mut str = String::from("This is a null-terminated C string slice.\0");
+/// let cstr = nstd_core_cstr_mut_new(str.as_mut_ptr().cast(), str.len());
+/// assert!(unsafe { nstd_core_cstr_mut_is_null_terminated(&cstr) });
+/// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_core_cstr_mut_new(raw: *mut NSTDChar, len: NSTDUInt) -> NSTDCStrMut {
+    assert!(!raw.is_null());
+    NSTDCStrMut { ptr: raw, len }
+}
+
+/// Creates a new C string slice from a raw pointer and a size without checking if `raw` is null.
+///
+/// # Parameters:
+///
+/// - `NSTDChar *raw` - A pointer to the first character to be in the C string slice.
+///
+/// - `NSTDUInt len` - The length of the C string slice.
+///
+/// # Returns
+///
+/// `NSTDCStrMut cstr` - The new C string slice, referencing `raw`'s data.
+///
+/// # Safety
+///
+/// The user of this function must ensure that `raw` is not null.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::cstr::{
+///     nstd_core_cstr_mut_is_null_terminated, nstd_core_cstr_mut_new_unchecked,
+/// };
+///
+/// let mut str = String::from("This is a null-terminated C string slice.\0");
+/// unsafe {
+///     let cstr = nstd_core_cstr_mut_new_unchecked(str.as_mut_ptr().cast(), str.len());
+///     assert!(nstd_core_cstr_mut_is_null_terminated(&cstr));
+/// }
+/// ```
+#[inline]
+#[cfg_attr(feature = "capi", no_mangle)]
+pub const unsafe extern "C" fn nstd_core_cstr_mut_new_unchecked(
+    raw: *mut NSTDChar,
+    len: NSTDUInt,
+) -> NSTDCStrMut {
     NSTDCStrMut { ptr: raw, len }
 }
 
@@ -364,10 +582,14 @@ pub extern "C" fn nstd_core_cstr_mut_new(raw: *mut NSTDChar, len: NSTDUInt) -> N
 ///
 /// `NSTDCStrMut cstr` - The new C string slice, referencing `raw`'s data.
 ///
+/// # Panics
+///
+/// Panics if `raw` is null.
+///
 /// # Safety
 ///
-/// This operation may attempt to access data that is unowned by the raw C string, which can lead
-/// to undefined behavior.
+/// `raw` must point to a character array that is valid for reads up until and including it's
+/// null-terminating byte.
 ///
 /// # Example
 ///
@@ -382,7 +604,7 @@ pub extern "C" fn nstd_core_cstr_mut_new(raw: *mut NSTDChar, len: NSTDUInt) -> N
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_core_cstr_mut_from_raw(raw: *mut NSTDChar) -> NSTDCStrMut {
     let len = nstd_core_cstr_raw_len(raw);
     nstd_core_cstr_mut_new(raw, len)
@@ -398,10 +620,14 @@ pub unsafe extern "C" fn nstd_core_cstr_mut_from_raw(raw: *mut NSTDChar) -> NSTD
 ///
 /// `NSTDCStrMut cstr` - The new C string slice, referencing `raw`'s data.
 ///
+/// # Panics
+///
+/// Panics if `raw` is null.
+///
 /// # Safety
 ///
-/// This operation may attempt to access data that is unowned by the raw C string, which can lead
-/// to undefined behavior.
+/// `raw` must point to a character array that is valid for reads up until and including it's
+/// null-terminating byte.
 ///
 /// # Example
 ///
@@ -416,7 +642,7 @@ pub unsafe extern "C" fn nstd_core_cstr_mut_from_raw(raw: *mut NSTDChar) -> NSTD
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_core_cstr_mut_from_raw_with_null(raw: *mut NSTDChar) -> NSTDCStrMut {
     let len = nstd_core_cstr_raw_len_with_null(raw);
     nstd_core_cstr_mut_new(raw, len)
@@ -431,10 +657,26 @@ pub unsafe extern "C" fn nstd_core_cstr_mut_from_raw_with_null(raw: *mut NSTDCha
 /// # Returns
 ///
 /// `NSTDCStr cstr_const` - The immutable copy of `cstr`.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::{
+///     core::cstr::{nstd_core_cstr_len, nstd_core_cstr_mut_as_const, nstd_core_cstr_mut_new},
+///     cstring::{nstd_cstring_from_cstr, nstd_cstring_len},
+/// };
+///
+/// let mut str = String::from("Faded than a ho");
+/// let cstr = nstd_core_cstr_mut_new(str.as_mut_ptr().cast(), str.len());
+/// let cstr = nstd_core_cstr_mut_as_const(&cstr);
+/// let cstring = unsafe { nstd_cstring_from_cstr(&cstr) };
+/// assert!(nstd_cstring_len(&cstring) == nstd_core_cstr_len(&cstr));
+/// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_cstr_mut_as_const(cstr: &NSTDCStrMut) -> NSTDCStr {
-    nstd_core_cstr_new(cstr.ptr, cstr.len)
+#[cfg_attr(feature = "capi", no_mangle)]
+pub const extern "C" fn nstd_core_cstr_mut_as_const(cstr: &NSTDCStrMut) -> NSTDCStr {
+    // SAFETY: `cstr.ptr` is never null.
+    unsafe { nstd_core_cstr_new_unchecked(cstr.ptr, cstr.len) }
 }
 
 /// Returns a byte slice of a C string slice's data.
@@ -464,9 +706,10 @@ pub extern "C" fn nstd_core_cstr_mut_as_const(cstr: &NSTDCStrMut) -> NSTDCStr {
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_cstr_mut_as_bytes(cstr: &NSTDCStrMut) -> NSTDSlice {
-    nstd_core_slice_new(cstr.ptr.cast(), 1, cstr.len)
+#[cfg_attr(feature = "capi", no_mangle)]
+pub const extern "C" fn nstd_core_cstr_mut_as_bytes(cstr: &NSTDCStrMut) -> NSTDSlice {
+    // SAFETY: `cstr.ptr` is never null.
+    unsafe { nstd_core_slice_new_unchecked(cstr.ptr.cast(), 1, cstr.len) }
 }
 
 /// Returns a pointer to the first character in a C string slice.
@@ -478,8 +721,19 @@ pub extern "C" fn nstd_core_cstr_mut_as_bytes(cstr: &NSTDCStrMut) -> NSTDSlice {
 /// # Returns
 ///
 /// `NSTDChar *ptr` - A pointer to the first character in the C string.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::cstr::{nstd_core_cstr_mut_as_ptr, nstd_core_cstr_mut_new};
+///
+/// let mut str = String::from("assert!(Rust + C >= God)");
+/// let str_ptr = str.as_mut_ptr().cast();
+/// let mut cstr = nstd_core_cstr_mut_new(str_ptr, str.len());
+/// assert!(str_ptr == nstd_core_cstr_mut_as_ptr(&mut cstr));
+/// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_core_cstr_mut_as_ptr(cstr: &mut NSTDCStrMut) -> *mut NSTDChar {
     cstr.ptr
 }
@@ -493,9 +747,19 @@ pub extern "C" fn nstd_core_cstr_mut_as_ptr(cstr: &mut NSTDCStrMut) -> *mut NSTD
 /// # Returns
 ///
 /// `const NSTDChar *ptr` - A pointer to the first character in the C string.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::cstr::{nstd_core_cstr_mut_as_ptr_const, nstd_core_cstr_mut_new};
+///
+/// let mut str = String::from("assert!(Rust + C >= God)");
+/// let cstr = nstd_core_cstr_mut_new(str.as_mut_ptr().cast(), str.len());
+/// assert!(str.as_ptr().cast() == nstd_core_cstr_mut_as_ptr_const(&cstr));
+/// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_cstr_mut_as_ptr_const(cstr: &NSTDCStrMut) -> *const NSTDChar {
+#[cfg_attr(feature = "capi", no_mangle)]
+pub const extern "C" fn nstd_core_cstr_mut_as_ptr_const(cstr: &NSTDCStrMut) -> *const NSTDChar {
     cstr.ptr
 }
 
@@ -508,9 +772,19 @@ pub extern "C" fn nstd_core_cstr_mut_as_ptr_const(cstr: &NSTDCStrMut) -> *const 
 /// # Returns
 ///
 /// `NSTDUInt len` - The length of the C string slice.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::cstr::{nstd_core_cstr_mut_from_raw, nstd_core_cstr_mut_len};
+///
+/// let mut str = String::from("Sunflower seeds yum\0");
+/// let cstr = unsafe { nstd_core_cstr_mut_from_raw(str.as_mut_ptr().cast()) };
+/// assert!(nstd_core_cstr_mut_len(&cstr) == 19);
+/// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_cstr_mut_len(cstr: &NSTDCStrMut) -> NSTDUInt {
+#[cfg_attr(feature = "capi", no_mangle)]
+pub const extern "C" fn nstd_core_cstr_mut_len(cstr: &NSTDCStrMut) -> NSTDUInt {
     cstr.len
 }
 
@@ -532,7 +806,7 @@ pub extern "C" fn nstd_core_cstr_mut_len(cstr: &NSTDCStrMut) -> NSTDUInt {
 ///
 /// # Safety
 ///
-/// Undefined behavior may occur if `cstr`'s data is invalid.
+/// The caller must ensure that `cstr` is valid for reads.
 ///
 /// # Example
 ///
@@ -558,17 +832,13 @@ pub extern "C" fn nstd_core_cstr_mut_len(cstr: &NSTDCStrMut) -> NSTDUInt {
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_core_cstr_mut_is_null_terminated(cstr: &NSTDCStrMut) -> NSTDBool {
     let cstr_const = nstd_core_cstr_mut_as_const(cstr);
     nstd_core_cstr_is_null_terminated(&cstr_const)
 }
 
 /// Returns a pointer to the first null byte in a C string slice if one is present.
-///
-/// # Note
-///
-/// This will always return null if `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Parameters:
 ///
@@ -579,10 +849,13 @@ pub unsafe extern "C" fn nstd_core_cstr_mut_is_null_terminated(cstr: &NSTDCStrMu
 /// `NSTDChar *nul` - A pointer to the first null byte in `cstr`, or null if the C string
 /// slice doesn't contain a null byte.
 ///
+/// # Panics
+///
+/// This operation may panic if `cstr`'s length is greater than `NSTDInt`'s max value.
+///
 /// # Safety
 ///
-/// This operation may attempt to access data that is unowned by the raw C string, which can lead
-/// to undefined behavior.
+/// The caller must ensure that `cstr` is valid for reads.
 ///
 /// # Example
 ///
@@ -606,16 +879,12 @@ pub unsafe extern "C" fn nstd_core_cstr_mut_is_null_terminated(cstr: &NSTDCStrMu
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_core_cstr_mut_get_null(cstr: &mut NSTDCStrMut) -> *mut NSTDChar {
     nstd_core_cstr_mut_get_null_const(cstr) as *mut NSTDChar
 }
 
 /// Returns an immutable pointer to the first null byte in a C string slice if one is present.
-///
-/// # Note
-///
-/// This will always return null if `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Parameters:
 ///
@@ -626,10 +895,13 @@ pub unsafe extern "C" fn nstd_core_cstr_mut_get_null(cstr: &mut NSTDCStrMut) -> 
 /// `const NSTDChar *nul` - A pointer to the first null byte in `cstr`, or null if the C string
 /// slice doesn't contain a null byte.
 ///
+/// # Panics
+///
+/// This operation may panic if `cstr`'s length is greater than `NSTDInt`'s max value.
+///
 /// # Safety
 ///
-/// This operation may attempt to access data that is unowned by the raw C string, which can lead
-/// to undefined behavior.
+/// The caller must ensure that `cstr` is valid for reads.
 ///
 /// # Example
 ///
@@ -653,13 +925,13 @@ pub unsafe extern "C" fn nstd_core_cstr_mut_get_null(cstr: &mut NSTDCStrMut) -> 
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_core_cstr_mut_get_null_const(cstr: &NSTDCStrMut) -> *const NSTDChar {
     let cstr_const = nstd_core_cstr_mut_as_const(cstr);
     nstd_core_cstr_get_null(&cstr_const)
 }
 
-/// Return a pointer the character at `pos` in `cstr`.
+/// Return a pointer to the character at index `pos` in `cstr`.
 ///
 /// # Note
 ///
@@ -695,12 +967,12 @@ pub unsafe extern "C" fn nstd_core_cstr_mut_get_null_const(cstr: &NSTDCStrMut) -
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_core_cstr_mut_get(cstr: &mut NSTDCStrMut, pos: NSTDUInt) -> *mut NSTDChar {
     nstd_core_cstr_mut_get_const(cstr, pos) as *mut NSTDChar
 }
 
-/// Return an immutable pointer the character at `pos` in `cstr`.
+/// Return an immutable pointer to the character at index `pos` in `cstr`.
 ///
 /// # Note
 ///
@@ -732,8 +1004,8 @@ pub extern "C" fn nstd_core_cstr_mut_get(cstr: &mut NSTDCStrMut, pos: NSTDUInt) 
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_cstr_mut_get_const(
+#[cfg_attr(feature = "capi", no_mangle)]
+pub const extern "C" fn nstd_core_cstr_mut_get_const(
     cstr: &NSTDCStrMut,
     pos: NSTDUInt,
 ) -> *const NSTDChar {
@@ -742,4 +1014,141 @@ pub extern "C" fn nstd_core_cstr_mut_get_const(
         return unsafe { cstr.ptr.add(pos) };
     }
     core::ptr::null_mut()
+}
+
+/// Returns a pointer to the first character in a C string slice, or null if it is empty.
+///
+/// # Parameters:
+///
+/// - `NSTDCStrMut *cstr` - The C string slice.
+///
+/// # Returns
+///
+/// `NSTDChar *first` - If present, a pointer to the first character in the C string slice.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::{
+///     core::cstr::{nstd_core_cstr_mut_first, nstd_core_cstr_mut_from_raw},
+///     NSTDChar,
+/// };
+///
+/// let mut s_str = String::from("Bea\0");
+///
+/// unsafe {
+///     let mut cstr = nstd_core_cstr_mut_from_raw(s_str.as_mut_ptr().cast());
+///     *nstd_core_cstr_mut_first(&mut cstr) = b'T' as NSTDChar;
+///     assert!(s_str == "Tea\0");
+/// }
+/// ```
+#[inline]
+#[cfg_attr(feature = "capi", no_mangle)]
+pub extern "C" fn nstd_core_cstr_mut_first(cstr: &mut NSTDCStrMut) -> *mut NSTDChar {
+    match cstr.len > 0 {
+        true => cstr.ptr,
+        false => core::ptr::null_mut(),
+    }
+}
+
+/// Returns an immutable pointer to the first character in a C string slice, or null if it is empty.
+///
+/// # Parameters:
+///
+/// - `const NSTDCStrMut *cstr` - The C string slice.
+///
+/// # Returns
+///
+/// `const NSTDChar *first` - If present, a pointer to the first character in the C string slice.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::{
+///     core::cstr::{nstd_core_cstr_mut_first_const, nstd_core_cstr_mut_from_raw},
+///     NSTDChar,
+/// };
+///
+/// let mut s_str = String::from("Tea\0");
+///
+/// unsafe {
+///     let cstr = nstd_core_cstr_mut_from_raw(s_str.as_mut_ptr().cast());
+///     assert!(*nstd_core_cstr_mut_first_const(&cstr) == b'T' as NSTDChar);
+/// }
+/// ```
+#[inline]
+#[cfg_attr(feature = "capi", no_mangle)]
+pub const extern "C" fn nstd_core_cstr_mut_first_const(cstr: &NSTDCStrMut) -> *const NSTDChar {
+    match cstr.len > 0 {
+        true => cstr.ptr,
+        false => core::ptr::null(),
+    }
+}
+
+/// Returns a pointer to the last character in a C string slice, or null if it is empty.
+///
+/// # Parameters:
+///
+/// - `NSTDCStrMut *cstr` - The C string slice.
+///
+/// # Returns
+///
+/// `NSTDChar *last` - If present, a pointer to the last character in the C string slice.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::{
+///     core::cstr::{nstd_core_cstr_mut_from_raw, nstd_core_cstr_mut_last},
+///     NSTDChar,
+/// };
+///
+/// let mut s_str = String::from("Ted\0");
+///
+/// unsafe {
+///     let mut cstr = nstd_core_cstr_mut_from_raw(s_str.as_mut_ptr().cast());
+///     *nstd_core_cstr_mut_last(&mut cstr) = b'a' as NSTDChar;
+///     assert!(s_str == "Tea\0");
+/// }
+/// ```
+#[inline]
+#[cfg_attr(feature = "capi", no_mangle)]
+pub extern "C" fn nstd_core_cstr_mut_last(cstr: &mut NSTDCStrMut) -> *mut NSTDChar {
+    match cstr.len > 0 {
+        true => nstd_core_cstr_mut_get(cstr, cstr.len - 1),
+        false => core::ptr::null_mut(),
+    }
+}
+
+/// Returns an immutable pointer to the last character in a C string slice, or null if it is empty.
+///
+/// # Parameters:
+///
+/// - `const NSTDCStrMut *cstr` - The C string slice.
+///
+/// # Returns
+///
+/// `const NSTDChar *last` - If present, a pointer to the last character in the C string slice.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::cstr::{
+///     nstd_core_cstr_mut_from_raw_with_null, nstd_core_cstr_mut_last_const,
+/// };
+///
+/// let mut s_str = String::from("Tea\0");
+///
+/// unsafe {
+///     let cstr = nstd_core_cstr_mut_from_raw_with_null(s_str.as_mut_ptr().cast());
+///     assert!(*nstd_core_cstr_mut_last_const(&cstr) == 0);
+/// }
+/// ```
+#[inline]
+#[cfg_attr(feature = "capi", no_mangle)]
+pub const extern "C" fn nstd_core_cstr_mut_last_const(cstr: &NSTDCStrMut) -> *const NSTDChar {
+    match cstr.len > 0 {
+        true => nstd_core_cstr_mut_get_const(cstr, cstr.len - 1),
+        false => core::ptr::null(),
+    }
 }

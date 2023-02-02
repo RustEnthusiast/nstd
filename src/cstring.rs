@@ -3,15 +3,16 @@ use crate::{
     alloc::NSTDAllocError,
     core::{
         cstr::{
-            nstd_core_cstr_as_bytes, nstd_core_cstr_get_null, nstd_core_cstr_mut_new,
-            nstd_core_cstr_new, NSTDCStr, NSTDCStrMut,
+            nstd_core_cstr_as_bytes, nstd_core_cstr_get_null, nstd_core_cstr_is_null_terminated,
+            nstd_core_cstr_new, nstd_core_cstr_new_unchecked, NSTDCStr,
         },
+        optional::{gen_optional, NSTDOptional},
         slice::NSTDSlice,
     },
     vec::{
-        nstd_vec_as_mut_ptr, nstd_vec_as_ptr, nstd_vec_as_slice, nstd_vec_cap, nstd_vec_clone,
+        nstd_vec_as_ptr, nstd_vec_as_slice, nstd_vec_cap, nstd_vec_clear, nstd_vec_clone,
         nstd_vec_extend, nstd_vec_from_slice, nstd_vec_get_mut, nstd_vec_len,
-        nstd_vec_new_with_cap, nstd_vec_pop, nstd_vec_push, NSTDVec,
+        nstd_vec_new_with_cap, nstd_vec_pop, nstd_vec_push, nstd_vec_stride, NSTDVec,
     },
     NSTDChar, NSTDUInt,
 };
@@ -21,11 +22,12 @@ use core::ptr::addr_of;
 ///
 /// Managed C strings (`NSTDCString`) will always contain a null byte until freed.
 #[repr(C)]
-#[derive(Debug, Hash)]
+#[derive(Debug)]
 pub struct NSTDCString {
     /// The underlying vector of `NSTDChar`s.
     bytes: NSTDVec,
 }
+gen_optional!(NSTDOptionalCString, NSTDCString);
 
 /// Creates a new empty `NSTDCString`.
 ///
@@ -45,7 +47,7 @@ pub struct NSTDCString {
 /// let cstring = nstd_cstring_new();
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_cstring_new() -> NSTDCString {
     nstd_cstring_new_with_cap(1)
 }
@@ -72,7 +74,7 @@ pub extern "C" fn nstd_cstring_new() -> NSTDCString {
 /// let cstring = nstd_cstring_new_with_cap(10);
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_cstring_new_with_cap(cap: NSTDUInt) -> NSTDCString {
     let mut bytes = nstd_vec_new_with_cap(1, cap);
     let nul: NSTDChar = 0;
@@ -118,14 +120,70 @@ pub extern "C" fn nstd_cstring_new_with_cap(cap: NSTDUInt) -> NSTDCString {
 ///     let cstring = nstd_cstring_from_cstr(&cstr);
 /// }
 /// ```
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_cstring_from_cstr(cstr: &NSTDCStr) -> NSTDCString {
     assert!(nstd_core_cstr_get_null(cstr).is_null());
+    nstd_cstring_from_cstr_unchecked(cstr)
+}
+
+/// Creates an owned version of an unowned C string slice without checking if the slice contains
+/// any null bytes.
+///
+/// # Parameters:
+///
+/// - `const NSTDCStr *cstr` - The unowned C string slice.
+///
+/// # Returns
+///
+/// `NSTDCString cstring` The new owned version of `cstr`.
+///
+/// # Panics
+///
+/// This operation will panic if `cstr`'s length is greater than `NSTDInt`'s max value or
+/// allocating fails.
+///
+/// # Safety
+///
+/// The caller of this function must ensure the following preconditions:
+///
+/// - `cstr`'s data is valid for reads.
+///
+/// - `cstr` does not contain any null (`'\0'`) bytes.
+#[cfg_attr(feature = "capi", no_mangle)]
+pub unsafe extern "C" fn nstd_cstring_from_cstr_unchecked(cstr: &NSTDCStr) -> NSTDCString {
     let bytes = nstd_core_cstr_as_bytes(cstr);
     let mut bytes = nstd_vec_from_slice(&bytes);
     let null: NSTDChar = 0;
     let null = addr_of!(null).cast();
     assert!(nstd_vec_push(&mut bytes, null) == NSTDAllocError::NSTD_ALLOC_ERROR_NONE);
+    NSTDCString { bytes }
+}
+
+/// Creates a new C string from owned data.
+///
+/// # Parameters:
+///
+/// - `NSTDVec bytes` - The bytes to take ownership of.
+///
+/// # Returns
+///
+/// `NSTDCString cstring` - The new C string with ownership of `bytes`.
+///
+/// # Panics
+///
+/// This operation will panic in the following situations:
+///
+/// - `bytes`'s stride is not 1.
+///
+/// - `bytes`'s data does not end with a 0 byte.
+///
+/// - `bytes`'s length is greater than `NSTDInt`'s max value.
+#[cfg_attr(feature = "capi", no_mangle)]
+pub extern "C" fn nstd_cstring_from_bytes(bytes: NSTDVec) -> NSTDCString {
+    assert!(nstd_vec_stride(&bytes) == 1);
+    let cstr = nstd_core_cstr_new(nstd_vec_as_ptr(&bytes) as _, nstd_vec_len(&bytes));
+    // SAFETY: `cstr`'s data is owned by `bytes`.
+    assert!(unsafe { nstd_core_cstr_is_null_terminated(&cstr) });
     NSTDCString { bytes }
 }
 
@@ -143,7 +201,7 @@ pub unsafe extern "C" fn nstd_cstring_from_cstr(cstr: &NSTDCStr) -> NSTDCString 
 ///
 /// This function will panic if allocating for the new C string fails.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_cstring_clone(cstring: &NSTDCString) -> NSTDCString {
     NSTDCString {
         bytes: nstd_vec_clone(&cstring.bytes),
@@ -159,29 +217,12 @@ pub extern "C" fn nstd_cstring_clone(cstring: &NSTDCString) -> NSTDCString {
 /// # Returns
 ///
 /// `NSTDCStr cstr` - The new C string slice.
-#[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_cstring_as_cstr(cstring: &NSTDCString) -> NSTDCStr {
-    let ptr = nstd_vec_as_ptr(&cstring.bytes).cast();
+    let ptr = nstd_vec_as_ptr(&cstring.bytes);
     let len = nstd_vec_len(&cstring.bytes);
-    nstd_core_cstr_new(ptr, len)
-}
-
-/// Creates a C string slice containing the contents of `cstring`.
-///
-/// # Parameters:
-///
-/// - `NSTDCString *cstring` - The C string.
-///
-/// # Returns
-///
-/// `NSTDCStrMut cstr` - The new C string slice.
-#[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_cstring_as_cstr_mut(cstring: &mut NSTDCString) -> NSTDCStrMut {
-    let ptr = nstd_vec_as_mut_ptr(&mut cstring.bytes).cast();
-    let len = nstd_vec_len(&cstring.bytes);
-    nstd_core_cstr_mut_new(ptr, len)
+    // SAFETY: `ptr` is never null, owned C strings always have at least one byte allocated.
+    unsafe { nstd_core_cstr_new_unchecked(ptr as _, len) }
 }
 
 /// Returns an immutable byte slice of the C string's active data, including the null byte.
@@ -194,7 +235,7 @@ pub extern "C" fn nstd_cstring_as_cstr_mut(cstring: &mut NSTDCString) -> NSTDCSt
 ///
 /// `NSTDSlice bytes` - The C string's active data.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_cstring_as_bytes(cstring: &NSTDCString) -> NSTDSlice {
     nstd_vec_as_slice(&cstring.bytes)
 }
@@ -209,7 +250,7 @@ pub extern "C" fn nstd_cstring_as_bytes(cstring: &NSTDCString) -> NSTDSlice {
 ///
 /// `const NSTDChar *ptr` - A raw pointer to a C string's memory.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_cstring_as_ptr(cstring: &NSTDCString) -> *const NSTDChar {
     nstd_vec_as_ptr(&cstring.bytes).cast()
 }
@@ -224,7 +265,7 @@ pub extern "C" fn nstd_cstring_as_ptr(cstring: &NSTDCString) -> *const NSTDChar 
 ///
 /// `NSTDVec bytes` - The C string's raw data.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_cstring_into_bytes(cstring: NSTDCString) -> NSTDVec {
     cstring.bytes
 }
@@ -239,7 +280,7 @@ pub extern "C" fn nstd_cstring_into_bytes(cstring: NSTDCString) -> NSTDVec {
 ///
 /// `NSTDUInt len` - The length of the C string without it's null byte.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_cstring_len(cstring: &NSTDCString) -> NSTDUInt {
     nstd_vec_len(&cstring.bytes) - 1
 }
@@ -254,7 +295,7 @@ pub extern "C" fn nstd_cstring_len(cstring: &NSTDCString) -> NSTDUInt {
 ///
 /// `NSTDUInt len` - The length of the C string including it's null byte.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_cstring_len_with_null(cstring: &NSTDCString) -> NSTDUInt {
     nstd_vec_len(&cstring.bytes)
 }
@@ -271,7 +312,7 @@ pub extern "C" fn nstd_cstring_len_with_null(cstring: &NSTDCString) -> NSTDUInt 
 ///
 /// `NSTDUInt cap` - The C string's capacity.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_cstring_cap(cstring: &NSTDCString) -> NSTDUInt {
     nstd_vec_cap(&cstring.bytes)
 }
@@ -301,7 +342,7 @@ pub extern "C" fn nstd_cstring_cap(cstring: &NSTDCString) -> NSTDUInt {
 /// let mut cstring = nstd_cstring_new();
 /// nstd_cstring_push(&mut cstring, b'!' as NSTDChar);
 /// ```
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_cstring_push(cstring: &mut NSTDCString, chr: NSTDChar) {
     // SAFETY: C strings always contain an exclusive null byte at the end.
     unsafe {
@@ -362,7 +403,7 @@ pub extern "C" fn nstd_cstring_push(cstring: &mut NSTDCString, chr: NSTDChar) {
 ///     assert!(nstd_cstring_push_cstr(&mut cstring, &cstr) == NSTD_ALLOC_ERROR_NONE);
 /// }
 /// ```
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_cstring_push_cstr(
     cstring: &mut NSTDCString,
     cstr: &NSTDCStr,
@@ -409,7 +450,7 @@ pub unsafe extern "C" fn nstd_cstring_push_cstr(
 ///     assert!(nstd_cstring_pop(&mut cstring) == b'3' as NSTDChar);
 /// }
 /// ```
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_cstring_pop(cstring: &mut NSTDCString) -> NSTDChar {
     let mut ret = 0;
     let len = nstd_cstring_len(cstring);
@@ -428,6 +469,17 @@ pub extern "C" fn nstd_cstring_pop(cstring: &mut NSTDCString) -> NSTDChar {
     ret
 }
 
+/// Sets a C string's length to zero.
+///
+/// # Parameters:
+///
+/// - `NSTDCString *cstring` - The C string to clear.
+#[inline]
+#[cfg_attr(feature = "capi", no_mangle)]
+pub extern "C" fn nstd_cstring_clear(cstring: &mut NSTDCString) {
+    nstd_vec_clear(&mut cstring.bytes);
+}
+
 /// Frees an instance of `NSTDCString`.
 ///
 /// # Parameters:
@@ -436,8 +488,8 @@ pub extern "C" fn nstd_cstring_pop(cstring: &mut NSTDCString) -> NSTDChar {
 ///
 /// # Panics
 ///
-/// This operation may panic if getting a handle to the heap fails.
+/// Panics if deallocating fails.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 #[allow(unused_variables)]
 pub extern "C" fn nstd_cstring_free(cstring: NSTDCString) {}

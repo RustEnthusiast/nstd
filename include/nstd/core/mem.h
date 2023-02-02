@@ -23,17 +23,15 @@
 ///
 /// # Safety
 ///
-/// This function is highly unsafe as it does not know how large either of the memory buffers
+/// - This function is highly unsafe as it does not know how large either of the memory buffers
 /// actually are, which can lead to undefined behavior if either of the buffers' length are less
 /// than `num`.
+///
+/// - `buf1` and `buf2` must be non-null.
 NSTDAPI NSTDBool nstd_core_mem_compare(const NSTDByte *buf1, const NSTDByte *buf2, NSTDUInt num);
 
 /// Iterates through each byte in a raw memory buffer until `delim` is reached, returning a pointer
 /// to the delimiter byte if it is found.
-///
-/// # Note
-///
-/// This will always return null if `size` is greater than `NSTDInt`'s max value.
 ///
 /// # Parameters:
 ///
@@ -46,6 +44,10 @@ NSTDAPI NSTDBool nstd_core_mem_compare(const NSTDByte *buf1, const NSTDByte *buf
 /// # Returns
 ///
 /// `const NSTDByte *delim_ptr` - A pointer to the delimiter byte, or null if it was not found.
+///
+/// # Panics
+///
+/// This operation may panic if `size` is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -61,10 +63,13 @@ NSTDAPI const NSTDByte *nstd_core_mem_search(const NSTDByte *buf, NSTDUInt size,
 ///
 /// - `NSTDUInt size` - The number of bytes to set to 0.
 ///
+/// # Panics
+///
+/// This operation will panic if `size` is greater than `NSTDInt`'s max value.
+///
 /// # Safety
 ///
-/// This operation can cause undefined behavior if the caller does not ensure that the memory
-/// buffer is at least `size` bytes in size.
+/// The caller must ensure that `buf` is valid for reads of `size` contiguous bytes.
 NSTDAPI void nstd_core_mem_zero(NSTDByte *buf, NSTDUInt size);
 
 /// Fills the memory buffer `buf` with byte `fill`.
@@ -76,6 +81,10 @@ NSTDAPI void nstd_core_mem_zero(NSTDByte *buf, NSTDUInt size);
 /// - `NSTDUInt size` - The size of the memory buffer.
 ///
 /// - `NSTDByte fill` - The byte value to fill the memory buffer with.
+///
+/// # Panics
+///
+/// This operation will panic if `size` is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///

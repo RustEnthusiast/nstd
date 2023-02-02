@@ -1,7 +1,7 @@
 //! Provides core functionality for `nstd`.
 //!
-//! This library makes no use of Rust's [std] module, and is looking to be dependency free in the
-//! near future, meaning that this will only make use of the [core] standard library module.
+//! The entire `nstd.core` module is dependency free and makes no use of Rust's [std] library,
+//! making it fit for resource constrained/embedded environments.
 pub mod cstr;
 pub mod cty;
 pub mod def;
@@ -9,10 +9,15 @@ pub mod fty;
 pub mod ity;
 pub mod math;
 pub mod mem;
+pub mod ops;
+pub mod optional;
 pub mod ptr;
 pub mod range;
+pub mod result;
 pub mod slice;
 pub mod str;
+pub mod unichar;
+use self::str::NSTDStr;
 
 /// Invokes the runtime's panic handler.
 ///
@@ -22,7 +27,28 @@ pub mod str;
 ///
 /// This function will always panic.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_panic() -> ! {
+#[cfg_attr(feature = "capi", no_mangle)]
+pub const extern "C" fn nstd_core_panic() -> ! {
     panic!();
+}
+
+/// Invokes the runtime's panic handler with a UTF-8 encoded payload.
+///
+/// This operation will never return.
+///
+/// # Parameters:
+///
+/// - `const NSTDStr *msg` - The message to panic with.
+///
+/// # Panics
+///
+/// This function will always panic.
+///
+/// # Safety
+///
+/// `msg`'s data must be valid for reads.
+#[inline]
+#[cfg_attr(feature = "capi", no_mangle)]
+pub const unsafe extern "C" fn nstd_core_panic_with_msg(msg: &NSTDStr) -> ! {
+    panic!("{}", msg.as_str());
 }

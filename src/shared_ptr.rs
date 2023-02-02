@@ -1,7 +1,13 @@
 //! A reference counting smart pointer.
 use crate::{
-    alloc::{nstd_alloc_allocate, nstd_alloc_allocate_zeroed, nstd_alloc_deallocate},
-    core::mem::nstd_core_mem_copy,
+    alloc::{
+        nstd_alloc_allocate, nstd_alloc_allocate_zeroed, nstd_alloc_deallocate,
+        NSTDAllocError::NSTD_ALLOC_ERROR_NONE,
+    },
+    core::{
+        mem::nstd_core_mem_copy,
+        optional::{gen_optional, NSTDOptional},
+    },
     NSTDAny, NSTDAnyMut, NSTDUInt,
 };
 
@@ -10,7 +16,7 @@ const USIZE_SIZE: usize = core::mem::size_of::<usize>();
 
 /// A reference counting smart pointer.
 #[repr(C)]
-#[derive(Debug, Hash, PartialEq, Eq)]
+#[derive(Debug)]
 pub struct NSTDSharedPtr {
     /// A raw pointer to private data about the shared object.
     ptr: NSTDAnyMut,
@@ -24,10 +30,15 @@ impl NSTDSharedPtr {
         // SAFETY:
         // - Shared pointers are always non-null.
         // - Shared pointers never allocate more than `isize::MAX` bytes for their value.
-        unsafe { *self.ptr.add(nstd_shared_ptr_size(self)).cast() }
+        unsafe { core::ptr::read_unaligned(self.ptr.add(nstd_shared_ptr_size(self)).cast()) }
     }
 
     /// Returns a mutable pointer to the number of pointers sharing the object.
+    ///
+    /// # Note
+    ///
+    /// The returned pointer may be unaligned, so reading/writing must be done with
+    /// [core::ptr::read_unaligned] and [core::ptr::write_unaligned].
     #[inline]
     fn ptrs_mut(&self) -> *mut usize {
         // SAFETY:
@@ -41,20 +52,22 @@ impl Drop for NSTDSharedPtr {
     ///
     /// # Panics
     ///
-    /// This operation may panic if getting a handle to the heap fails.
+    /// Panics if deallocating fails.
     fn drop(&mut self) {
         // SAFETY: Shared pointers are always non-null.
         unsafe {
             // Update the pointer count.
             let ptrs = self.ptrs_mut();
-            *ptrs -= 1;
+            let new_size = self.ptrs() - 1;
+            core::ptr::write_unaligned(ptrs, new_size);
             // If the pointer count is zero, free the data.
-            if *ptrs == 0 {
-                nstd_alloc_deallocate(&mut self.ptr, self.size);
+            if new_size == 0 {
+                assert!(nstd_alloc_deallocate(&mut self.ptr, self.size) == NSTD_ALLOC_ERROR_NONE);
             }
         }
     }
 }
+gen_optional!(NSTDOptionalSharedPtr, NSTDSharedPtr);
 
 /// Creates a new initialized instance of a shared pointer.
 ///
@@ -91,7 +104,7 @@ impl Drop for NSTDSharedPtr {
 ///     assert!(*nstd_shared_ptr_get(&shared_ptr).cast::<i16>() == v);
 /// }
 /// ```
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_shared_ptr_new(
     element_size: NSTDUInt,
     init: NSTDAny,
@@ -105,7 +118,7 @@ pub unsafe extern "C" fn nstd_shared_ptr_new(
     nstd_core_mem_copy(raw.cast(), init.cast(), element_size);
     // Set the pointer count to one.
     let ptrs = raw.add(element_size).cast::<usize>();
-    *ptrs = 1;
+    core::ptr::write_unaligned(ptrs, 1);
     // Construct the pointer.
     NSTDSharedPtr {
         ptr: raw,
@@ -128,6 +141,11 @@ pub unsafe extern "C" fn nstd_shared_ptr_new(
 /// This operation will panic if either `element_size` is greater than `NSTDInt`'s max value or
 /// allocating fails.
 ///
+/// # Safety
+///
+/// The data to be stored in the shared pointer must be safely representable by an all-zero byte
+/// pattern.
+///
 /// # Example
 ///
 /// ```
@@ -140,8 +158,8 @@ pub unsafe extern "C" fn nstd_shared_ptr_new(
 ///     assert!(*nstd_shared_ptr_get(&shared_ptr).cast::<u128>() == 0);
 /// }
 /// ```
-#[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_shared_ptr_new_zeroed(element_size: NSTDUInt) -> NSTDSharedPtr {
+#[cfg_attr(feature = "capi", no_mangle)]
+pub unsafe extern "C" fn nstd_shared_ptr_new_zeroed(element_size: NSTDUInt) -> NSTDSharedPtr {
     // SAFETY: The allocated memory is validated after allocation.
     unsafe {
         assert!(element_size <= isize::MAX as usize);
@@ -151,7 +169,7 @@ pub extern "C" fn nstd_shared_ptr_new_zeroed(element_size: NSTDUInt) -> NSTDShar
         assert!(!raw.is_null());
         // Set the pointer count to one.
         let ptrs = raw.add(element_size).cast::<usize>();
-        *ptrs = 1;
+        core::ptr::write_unaligned(ptrs, 1);
         // Construct the pointer.
         NSTDSharedPtr {
             ptr: raw,
@@ -189,13 +207,13 @@ pub extern "C" fn nstd_shared_ptr_new_zeroed(element_size: NSTDUInt) -> NSTDShar
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_shared_ptr_share(shared_ptr: &NSTDSharedPtr) -> NSTDSharedPtr {
     // SAFETY: Shared pointers are always non-null.
     unsafe {
         // Update the pointer count.
         let ptrs = shared_ptr.ptrs_mut();
-        *ptrs += 1;
+        core::ptr::write_unaligned(ptrs, shared_ptr.ptrs() + 1);
         // Construct the new shared pointer instance.
         NSTDSharedPtr {
             ptr: shared_ptr.ptr,
@@ -242,7 +260,7 @@ pub extern "C" fn nstd_shared_ptr_share(shared_ptr: &NSTDSharedPtr) -> NSTDShare
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_shared_ptr_owners(shared_ptr: &NSTDSharedPtr) -> NSTDUInt {
     shared_ptr.ptrs()
 }
@@ -264,11 +282,11 @@ pub extern "C" fn nstd_shared_ptr_owners(shared_ptr: &NSTDSharedPtr) -> NSTDUInt
 ///
 /// const SIZE: usize = core::mem::size_of::<f64>();
 ///
-/// let shared_ptr = nstd_shared_ptr_new_zeroed(SIZE);
+/// let shared_ptr = unsafe { nstd_shared_ptr_new_zeroed(SIZE) };
 /// assert!(nstd_shared_ptr_size(&shared_ptr) == SIZE);
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_shared_ptr_size(shared_ptr: &NSTDSharedPtr) -> NSTDUInt {
     shared_ptr.size - USIZE_SIZE
 }
@@ -298,7 +316,7 @@ pub extern "C" fn nstd_shared_ptr_size(shared_ptr: &NSTDSharedPtr) -> NSTDUInt {
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_shared_ptr_get(shared_ptr: &NSTDSharedPtr) -> NSTDAny {
     shared_ptr.ptr
 }
@@ -311,7 +329,8 @@ pub extern "C" fn nstd_shared_ptr_get(shared_ptr: &NSTDSharedPtr) -> NSTDAny {
 ///
 /// # Panics
 ///
-/// This operation may panic if getting a handle to the heap fails.
-#[cfg_attr(feature = "clib", no_mangle)]
+/// Panics if there are no more shared pointers referencing the shared data and freeing the heap
+/// memory fails.
+#[cfg_attr(feature = "capi", no_mangle)]
 #[allow(unused_variables)]
 pub extern "C" fn nstd_shared_ptr_free(shared_ptr: NSTDSharedPtr) {}

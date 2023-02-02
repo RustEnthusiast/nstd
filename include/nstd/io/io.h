@@ -1,8 +1,10 @@
 #ifndef NSTD_IO_IO_H
 #define NSTD_IO_IO_H
+#include "../core/result.h"
 #include "../core/str.h"
 #include "../nstd.h"
 #include "../string.h"
+#include "../vec.h"
 
 /// An error type for I/O operations.
 typedef enum {
@@ -50,6 +52,12 @@ typedef enum {
     NSTD_IO_ERROR_OUT_OF_MEMORY,
 } NSTDIOError;
 
+/// A result type that yields an [NSTDVec] on success and an I/O operation error code on failure.
+NSTDResult(NSTDVec, NSTDIOError) NSTDIOBufferResult;
+
+/// A result type that yields a UTF-8 string on success and an I/O operation error code on failure.
+NSTDResult(NSTDString, NSTDIOError) NSTDIOStringResult;
+
 /// Writes a string slice to stdout.
 ///
 /// # Parameters:
@@ -90,36 +98,29 @@ NSTDAPI NSTDIOError nstd_io_print(const NSTDStr *output);
 /// be written to stdout.
 NSTDAPI NSTDIOError nstd_io_print_line(const NSTDStr *output);
 
-/// Reads a line of UTF-8 input from stdin and pushes it onto `buffer` without the newline.
-///
-/// # Parameters:
-///
-/// - `NSTDString *buffer` - The string buffer to be extended with input from stdin.
+/// Reads a line of UTF-8 input from stdin, discarding the newline character.
 ///
 /// # Returns
 ///
-/// `NSTDIOError errc` - The I/O operation error code.
+/// `NSTDIOStringResult input` - The UTF-8 input from stdin on success and the I/O operation error
+/// code on failure.
 ///
 /// # Panics
 ///
-/// Panics if `buffer`'s length in bytes exceeds `NSTDInt`'s max value or getting a handle to the
-/// heap fails.
-NSTDAPI NSTDIOError nstd_io_read(NSTDString *buffer);
+/// Panics if allocating the string fails or the input's length in bytes exceeds `NSTDInt`'s max
+/// value.
+NSTDAPI NSTDIOStringResult nstd_io_read();
 
-/// Reads a line of UTF-8 input from stdin and pushes it onto `buffer`.
-///
-/// # Parameters:
-///
-/// - `NSTDString *buffer` - The string buffer to be extended with input from stdin.
+/// Reads a line of UTF-8 input from stdin.
 ///
 /// # Returns
 ///
-/// `NSTDIOError errc` - The I/O operation error code.
+/// `NSTDIOStringResult input` - The UTF-8 input from stdin on success and the I/O operation error
+/// code on failure.
 ///
 /// # Panics
 ///
-/// Panics if `buffer`'s length in bytes exceeds `NSTDInt`'s max value or getting a handle to the
-/// heap fails.
-NSTDAPI NSTDIOError nstd_io_read_line(NSTDString *buffer);
+/// Panics if allocating the string fails.
+NSTDAPI NSTDIOStringResult nstd_io_read_line();
 
 #endif

@@ -1,5 +1,6 @@
 #ifndef NSTD_SHARED_PTR_H
 #define NSTD_SHARED_PTR_H
+#include "core/optional.h"
 #include "nstd.h"
 
 /// A reference counting smart pointer.
@@ -9,6 +10,9 @@ typedef struct {
     /// The size of the shared pointer's memory buffer.
     NSTDUInt size;
 } NSTDSharedPtr;
+
+/// Represents an optional value of type `NSTDSharedPtr`.
+NSTDOptional(NSTDSharedPtr) NSTDOptionalSharedPtr;
 
 /// Creates a new initialized instance of a shared pointer.
 ///
@@ -46,6 +50,11 @@ NSTDAPI NSTDSharedPtr nstd_shared_ptr_new(NSTDUInt element_size, NSTDAny init);
 ///
 /// This operation will panic if either `element_size` is greater than `NSTDInt`'s max value or
 /// allocating fails.
+///
+/// # Safety
+///
+/// The data to be stored in the shared pointer must be safely representable by an all-zero byte
+/// pattern.
 NSTDAPI NSTDSharedPtr nstd_shared_ptr_new_zeroed(NSTDUInt element_size);
 
 /// Shares `shared_ptr`.
@@ -100,7 +109,8 @@ NSTDAPI NSTDAny nstd_shared_ptr_get(const NSTDSharedPtr *shared_ptr);
 ///
 /// # Panics
 ///
-/// This operation may panic if getting a handle to the heap fails.
+/// Panics if there are no more shared pointers referencing the shared data and freeing the heap
+/// memory fails.
 NSTDAPI void nstd_shared_ptr_free(NSTDSharedPtr shared_ptr);
 
 #endif

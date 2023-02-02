@@ -2,7 +2,7 @@
 use crate::{
     alloc::NSTDAllocError,
     core::{
-        slice::{nstd_core_slice_new, NSTDSliceMut},
+        slice::{NSTDSlice, NSTDSliceMut},
         str::nstd_core_str_from_bytes_unchecked,
     },
     io::NSTDIOError,
@@ -11,6 +11,8 @@ use crate::{
     NSTDUInt,
 };
 use std::io::Stdin;
+#[cfg(unix)]
+use std::os::unix::io::AsRawFd;
 
 /// A handle to the standard input stream.
 pub type NSTDStdin = Box<Stdin>;
@@ -21,7 +23,7 @@ pub type NSTDStdin = Box<Stdin>;
 ///
 /// `NSTDStdin handle` - A handle to the standard input stream.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_io_stdin() -> NSTDStdin {
     NSTDStdin::new(std::io::stdin())
 }
@@ -49,13 +51,24 @@ pub extern "C" fn nstd_io_stdin() -> NSTDStdin {
 ///
 /// `buffer`'s data must be valid for writes.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_io_stdin_read(
     handle: &mut NSTDStdin,
     buffer: &mut NSTDSliceMut,
     read: &mut NSTDUInt,
 ) -> NSTDIOError {
-    crate::io::stdio::read(handle, buffer, read)
+    #[cfg(not(unix))]
+    {
+        let (err, r) = crate::io::stdio::read(handle, buffer);
+        *read = r;
+        err
+    }
+    #[cfg(unix)]
+    {
+        let (err, r) = crate::os::unix::io::stdio::read(handle.lock().as_raw_fd(), buffer);
+        *read = r;
+        err.into()
+    }
 }
 
 /// Continuously reads data from stdin into a buffer until EOF is reached.
@@ -79,15 +92,29 @@ pub unsafe extern "C" fn nstd_io_stdin_read(
 ///
 /// # Panics
 ///
-/// This function will panic if getting a handle to the heap fails.
+/// This function will panic if `buffer`'s length in bytes ends up exceeding `NSTDInt`'s max value.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_io_stdin_read_all(
     handle: &mut NSTDStdin,
     buffer: &mut NSTDVec,
     read: &mut NSTDUInt,
 ) -> NSTDIOError {
-    crate::io::stdio::read_all(handle, buffer, read)
+    #[cfg(not(unix))]
+    {
+        let (err, r) = crate::io::stdio::read_all(handle, buffer);
+        *read = r;
+        err
+    }
+    #[cfg(unix)]
+    {
+        // SAFETY: `handle` owns the file descriptor.
+        unsafe {
+            let (err, r) = crate::os::unix::io::stdio::read_all(handle.lock().as_raw_fd(), buffer);
+            *read = r;
+            err.into()
+        }
+    }
 }
 
 /// Continuously reads UTF-8 data from stdin into a string buffer until EOF is reached.
@@ -111,19 +138,30 @@ pub extern "C" fn nstd_io_stdin_read_all(
 ///
 /// # Panics
 ///
-/// This function will panic in the following situations:
-///
-/// - `buffer`'s length in bytes exceeds `NSTDInt`'s max value.
-///
-/// - Getting a handle to the heap fails.
+/// This function will panic if `buffer`'s length in bytes ends up exceeding `NSTDInt`'s max value.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_io_stdin_read_to_string(
     handle: &mut NSTDStdin,
     buffer: &mut NSTDString,
     read: &mut NSTDUInt,
 ) -> NSTDIOError {
-    crate::io::stdio::read_to_string(handle, buffer, read)
+    #[cfg(not(unix))]
+    {
+        let (err, r) = crate::io::stdio::read_to_string(handle, buffer);
+        *read = r;
+        err
+    }
+    #[cfg(unix)]
+    {
+        // SAFETY: `handle` owns the file descriptor.
+        unsafe {
+            let handle = handle.lock();
+            let (err, r) = crate::os::unix::io::stdio::read_to_string(handle.as_raw_fd(), buffer);
+            *read = r;
+            err.into()
+        }
+    }
 }
 
 /// Reads enough data from stdin to fill the entirety of `buffer`.
@@ -147,12 +185,15 @@ pub extern "C" fn nstd_io_stdin_read_to_string(
 ///
 /// `buffer` must be valid for writes.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_io_stdin_read_exact(
     handle: &mut NSTDStdin,
     buffer: &mut NSTDSliceMut,
 ) -> NSTDIOError {
-    crate::io::stdio::read_exact(handle, buffer)
+    #[cfg(not(unix))]
+    return crate::io::stdio::read_exact(handle, buffer);
+    #[cfg(unix)]
+    return crate::os::unix::io::stdio::read_exact(handle.lock().as_raw_fd(), buffer).into();
 }
 
 /// Reads a line from stdin and appends it to `buffer`.
@@ -171,12 +212,8 @@ pub unsafe extern "C" fn nstd_io_stdin_read_exact(
 ///
 /// # Panics
 ///
-/// This function will panic in the following situations:
-///
-/// - `buffer`'s length in bytes exceeds `NSTDInt`'s max value.
-///
-/// - Getting a handle to the heap fails.
-#[cfg_attr(feature = "clib", no_mangle)]
+/// This function will panic if `buffer`'s length in bytes exceeds `NSTDInt`'s max value.
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_io_stdin_read_line(
     handle: &mut NSTDStdin,
     buffer: &mut NSTDString,
@@ -186,7 +223,7 @@ pub extern "C" fn nstd_io_stdin_read_line(
     match handle.read_line(&mut buf) {
         Ok(r) => {
             *read = r;
-            let bytes = nstd_core_slice_new(buf.as_ptr().cast(), 1, buf.len());
+            let bytes = NSTDSlice::from_slice(buf.as_bytes());
             // SAFETY: `bytes` refers to `buf`'s data, which is still valid UTF-8 here.
             unsafe {
                 let str = nstd_core_str_from_bytes_unchecked(&bytes);
@@ -209,6 +246,6 @@ pub extern "C" fn nstd_io_stdin_read_line(
 ///
 /// - `NSTDStdin handle` - A handle to the standard input stream.
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 #[allow(unused_variables)]
 pub extern "C" fn nstd_io_stdin_free(handle: NSTDStdin) {}

@@ -3,19 +3,18 @@ pub mod stderr;
 pub mod stdin;
 pub(crate) mod stdio;
 pub mod stdout;
+#[cfg(unix)]
+use crate::os::unix::io::NSTDUnixIOError::{self, *};
 use crate::{
-    alloc::NSTDAllocError,
-    core::{
-        slice::nstd_core_slice_new,
-        str::{nstd_core_str_from_bytes_unchecked, NSTDStr},
-    },
-    string::{nstd_string_pop, nstd_string_push_str, NSTDString},
+    core::{result::NSTDResult, str::NSTDStr},
+    string::{nstd_string_pop, NSTDString},
+    vec::NSTDVec,
 };
 use std::io::{ErrorKind, Write};
 
 /// An error type for I/O operations.
 #[repr(C)]
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[allow(non_camel_case_types)]
 pub enum NSTDIOError {
     /// No error occurred.
@@ -88,6 +87,34 @@ impl NSTDIOError {
         }
     }
 }
+#[cfg(unix)]
+impl From<NSTDUnixIOError> for NSTDIOError {
+    /// Converts an [NSTDUnixIOError] into an [NSTDIOError].
+    fn from(err: NSTDUnixIOError) -> Self {
+        match err {
+            NSTD_UNIX_IO_ERROR_NONE => Self::NSTD_IO_ERROR_NONE,
+            NSTD_UNIX_IO_ERROR_NOT_FOUND => Self::NSTD_IO_ERROR_NOT_FOUND,
+            NSTD_UNIX_IO_ERROR_PERMISSION_DENIED => Self::NSTD_IO_ERROR_PERMISSION_DENIED,
+            NSTD_UNIX_IO_ERROR_CONNECTION_RESET => Self::NSTD_IO_ERROR_CONNECTION_RESET,
+            NSTD_UNIX_IO_ERROR_NO_CONNECTION => Self::NSTD_IO_ERROR_NO_CONNECTION,
+            NSTD_UNIX_IO_ERROR_BROKEN_PIPE => Self::NSTD_IO_ERROR_BROKEN_PIPE,
+            NSTD_UNIX_IO_ERROR_BLOCKING => Self::NSTD_IO_ERROR_BLOCKING,
+            NSTD_UNIX_IO_ERROR_INVALID_INPUT => Self::NSTD_IO_ERROR_INVALID_INPUT,
+            NSTD_UNIX_IO_ERROR_INVALID_DATA => Self::NSTD_IO_ERROR_INVALID_DATA,
+            NSTD_UNIX_IO_ERROR_TIMED_OUT => Self::NSTD_IO_ERROR_TIMED_OUT,
+            NSTD_UNIX_IO_ERROR_INTERRUPTED => Self::NSTD_IO_ERROR_INTERRUPTED,
+            NSTD_UNIX_IO_ERROR_UNEXPECTED_EOF => Self::NSTD_IO_ERROR_UNEXPECTED_EOF,
+            NSTD_UNIX_IO_ERROR_OUT_OF_MEMORY => Self::NSTD_IO_ERROR_OUT_OF_MEMORY,
+            _ => Self::NSTD_IO_ERROR_UNKNOWN,
+        }
+    }
+}
+
+/// A result type that yields an [NSTDVec] on success and an I/O operation error code on failure.
+pub type NSTDIOBufferResult = NSTDResult<NSTDVec, NSTDIOError>;
+
+/// A result type that yields a UTF-8 string on success and an I/O operation error code on failure.
+pub type NSTDIOStringResult = NSTDResult<NSTDString, NSTDIOError>;
 
 /// Writes a string slice to stdout.
 ///
@@ -107,7 +134,7 @@ impl NSTDIOError {
 ///
 /// The provided string slice's data must be valid, else this function can cause garbage bytes to
 /// be written to stdout.
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_io_print(output: &NSTDStr) -> NSTDIOError {
     let mut stdout = std::io::stdout();
     if let Err(err) = stdout.write_all(output.as_str().as_bytes()) {
@@ -136,7 +163,7 @@ pub unsafe extern "C" fn nstd_io_print(output: &NSTDStr) -> NSTDIOError {
 ///
 /// The provided string slice's data must be valid, else this function can cause garbage bytes to
 /// be written to stdout.
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub unsafe extern "C" fn nstd_io_print_line(output: &NSTDStr) -> NSTDIOError {
     let mut stdout = std::io::stdout();
     if let Err(err) = stdout.write_all(output.as_str().as_bytes()) {
@@ -149,57 +176,42 @@ pub unsafe extern "C" fn nstd_io_print_line(output: &NSTDStr) -> NSTDIOError {
     NSTDIOError::NSTD_IO_ERROR_NONE
 }
 
-/// Reads a line of UTF-8 input from stdin and pushes it onto `buffer` without the newline.
-///
-/// # Parameters:
-///
-/// - `NSTDString *buffer` - The string buffer to be extended with input from stdin.
+/// Reads a line of UTF-8 input from stdin, discarding the newline character.
 ///
 /// # Returns
 ///
-/// `NSTDIOError errc` - The I/O operation error code.
+/// `NSTDIOStringResult input` - The UTF-8 input from stdin on success and the I/O operation error
+/// code on failure.
 ///
 /// # Panics
 ///
-/// Panics if `buffer`'s length in bytes exceeds `NSTDInt`'s max value or getting a handle to the
-/// heap fails.
-#[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_io_read(buffer: &mut NSTDString) -> NSTDIOError {
-    let errc = nstd_io_read_line(buffer);
-    nstd_string_pop(buffer);
-    errc
+/// Panics if allocating the string fails or the input's length in bytes exceeds `NSTDInt`'s max
+/// value.
+#[cfg_attr(feature = "capi", no_mangle)]
+pub extern "C" fn nstd_io_read() -> NSTDIOStringResult {
+    let mut res = nstd_io_read_line();
+    if let NSTDResult::Ok(input) = &mut res {
+        nstd_string_pop(input);
+    }
+    res
 }
 
-/// Reads a line of UTF-8 input from stdin and pushes it onto `buffer`.
-///
-/// # Parameters:
-///
-/// - `NSTDString *buffer` - The string buffer to be extended with input from stdin.
+/// Reads a line of UTF-8 input from stdin.
 ///
 /// # Returns
 ///
-/// `NSTDIOError errc` - The I/O operation error code.
+/// `NSTDIOStringResult input` - The UTF-8 input from stdin on success and the I/O operation error
+/// code on failure.
 ///
 /// # Panics
 ///
-/// Panics if `buffer`'s length in bytes exceeds `NSTDInt`'s max value or getting a handle to the
-/// heap fails.
-#[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_io_read_line(buffer: &mut NSTDString) -> NSTDIOError {
+/// Panics if allocating the string fails.
+#[cfg_attr(feature = "capi", no_mangle)]
+pub extern "C" fn nstd_io_read_line() -> NSTDIOStringResult {
     // Attempt to read a line from stdin.
     let mut input = String::new();
     if let Err(err) = std::io::stdin().read_line(&mut input) {
-        return NSTDIOError::from_err(err.kind());
+        return NSTDResult::Err(NSTDIOError::from_err(err.kind()));
     }
-    // SAFETY: Rust strings are UTF-8 encoded.
-    unsafe {
-        // Extend the string buffer with the input from stdin.
-        let bytes = nstd_core_slice_new(input.as_ptr().cast(), 1, input.len());
-        let str = nstd_core_str_from_bytes_unchecked(&bytes);
-        match nstd_string_push_str(buffer, &str) {
-            NSTDAllocError::NSTD_ALLOC_ERROR_NONE => NSTDIOError::NSTD_IO_ERROR_NONE,
-            _ => NSTDIOError::NSTD_IO_ERROR_OUT_OF_MEMORY,
-        }
-    }
+    NSTDResult::Ok(NSTDString::from_str(&input))
 }

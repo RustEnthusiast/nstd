@@ -1,7 +1,8 @@
 #ifndef NSTD_CSTRING_H
 #define NSTD_CSTRING_H
 #include "alloc.h"
-#include "core/cstr.h"
+#include "core/cstr/cstr.h"
+#include "core/optional.h"
 #include "core/slice.h"
 #include "nstd.h"
 #include "vec.h"
@@ -13,6 +14,9 @@ typedef struct {
     /// The underlying vector of `NSTDChar`s.
     NSTDVec bytes;
 } NSTDCString;
+
+/// Represents an optional value of type `NSTDCString`.
+NSTDOptional(NSTDCString) NSTDOptionalCString;
 
 /// Creates a new empty `NSTDCString`.
 ///
@@ -65,6 +69,52 @@ NSTDAPI NSTDCString nstd_cstring_new_with_cap(NSTDUInt cap);
 /// The caller of this function must ensure that `cstr`'s data is valid for reads.
 NSTDAPI NSTDCString nstd_cstring_from_cstr(const NSTDCStr *cstr);
 
+/// Creates an owned version of an unowned C string slice without checking if the slice contains
+/// any null bytes.
+///
+/// # Parameters:
+///
+/// - `const NSTDCStr *cstr` - The unowned C string slice.
+///
+/// # Returns
+///
+/// `NSTDCString cstring` The new owned version of `cstr`.
+///
+/// # Panics
+///
+/// This operation will panic if `cstr`'s length is greater than `NSTDInt`'s max value or
+/// allocating fails.
+///
+/// # Safety
+///
+/// The caller of this function must ensure the following preconditions:
+///
+/// - `cstr`'s data is valid for reads.
+///
+/// - `cstr` does not contain any null (`'\0'`) bytes.
+NSTDAPI NSTDCString nstd_cstring_from_cstr_unchecked(const NSTDCStr *cstr);
+
+/// Creates a new C string from owned data.
+///
+/// # Parameters:
+///
+/// - `NSTDVec bytes` - The bytes to take ownership of.
+///
+/// # Returns
+///
+/// `NSTDCString cstring` - The new C string with ownership of `bytes`.
+///
+/// # Panics
+///
+/// This operation will panic in the following situations:
+///
+/// - `bytes`'s stride is not 1.
+///
+/// - `bytes`'s data does not end with a 0 byte.
+///
+/// - `bytes`'s length is greater than `NSTDInt`'s max value.
+NSTDAPI NSTDCString nstd_cstring_from_bytes(NSTDVec bytes);
+
 /// Creates a deep copy of an `NSTDCString`.
 ///
 /// # Parameters:
@@ -90,17 +140,6 @@ NSTDAPI NSTDCString nstd_cstring_clone(const NSTDCString *cstring);
 ///
 /// `NSTDCStr cstr` - The new C string slice.
 NSTDAPI NSTDCStr nstd_cstring_as_cstr(const NSTDCString *cstring);
-
-/// Creates a C string slice containing the contents of `cstring`.
-///
-/// # Parameters:
-///
-/// - `NSTDCString *cstring` - The C string.
-///
-/// # Returns
-///
-/// `NSTDCStrMut cstr` - The new C string slice.
-NSTDAPI NSTDCStrMut nstd_cstring_as_cstr_mut(NSTDCString *cstring);
 
 /// Returns an immutable byte slice of the C string's active data, including the null byte.
 ///
@@ -229,6 +268,13 @@ NSTDAPI NSTDAllocError nstd_cstring_push_cstr(NSTDCString *cstring, const NSTDCS
 /// This function will panic if getting a pointer to the C string's last character fails.
 NSTDAPI NSTDChar nstd_cstring_pop(NSTDCString *cstring);
 
+/// Sets a C string's length to zero.
+///
+/// # Parameters:
+///
+/// - `NSTDCString *cstring` - The C string to clear.
+NSTDAPI void nstd_cstring_clear(NSTDCString *cstring);
+
 /// Frees an instance of `NSTDCString`.
 ///
 /// # Parameters:
@@ -237,7 +283,7 @@ NSTDAPI NSTDChar nstd_cstring_pop(NSTDCString *cstring);
 ///
 /// # Panics
 ///
-/// This operation may panic if getting a handle to the heap fails.
+/// Panics if deallocating fails.
 NSTDAPI void nstd_cstring_free(NSTDCString cstring);
 
 #endif

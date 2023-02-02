@@ -1,5 +1,29 @@
 //! Provides functions for examining and operating on character types.
-use crate::{NSTDBool, NSTDChar, NSTDUInt32, NSTDUnichar, NSTD_FALSE};
+use crate::{core::unichar::NSTDUnichar, NSTDBool, NSTDChar, NSTDChar32, NSTDUInt32};
+
+/// Determines whether or not a 32-bit character value is a valid Unicode scalar value.
+///
+/// # Parameters:
+///
+/// - `NSTDChar32 chr` - The 32-bit character value to check.
+///
+/// # Returns
+///
+/// `NSTDBool is_unicode` - True if `chr` is a valid Unicode character.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::{core::cty::nstd_core_cty_is_unicode, NSTDChar32};
+///
+/// assert!(nstd_core_cty_is_unicode('🦀' as NSTDChar32));
+/// assert!(!nstd_core_cty_is_unicode(NSTDChar32::MAX));
+/// ```
+#[inline]
+#[cfg_attr(feature = "capi", no_mangle)]
+pub const extern "C" fn nstd_core_cty_is_unicode(chr: NSTDChar32) -> NSTDBool {
+    char::from_u32(chr).is_some()
+}
 
 /// Returns the Unicode replacement character (�).
 ///
@@ -15,7 +39,7 @@ use crate::{NSTDBool, NSTDChar, NSTDUInt32, NSTDUnichar, NSTD_FALSE};
 /// assert!(nstd_core_cty_replacement_char() == char::REPLACEMENT_CHARACTER.into());
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_core_cty_replacement_char() -> NSTDUnichar {
     char::REPLACEMENT_CHARACTER.into()
 }
@@ -29,12 +53,9 @@ macro_rules! gen_deterministic {
     ) => {
         $(#[$meta])*
         #[inline]
-        #[cfg_attr(feature = "clib", no_mangle)]
+        #[cfg_attr(feature = "capi", no_mangle)]
         pub extern "C" fn $name(chr: NSTDUnichar) -> NSTDBool {
-            match char::from_u32(chr) {
-                Some(chr) => chr.$method(),
-                _ => NSTD_FALSE,
-            }
+            char::from(chr).$method()
         }
     };
 }
@@ -224,12 +245,9 @@ gen_deterministic!(
 /// assert!(nstd_core_cty_is_digit('F'.into(), 10) == NSTD_FALSE);
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_core_cty_is_digit(chr: NSTDUnichar, radix: NSTDUInt32) -> NSTDBool {
-    if let Some(chr) = char::from_u32(chr) {
-        return chr.is_digit(radix);
-    }
-    NSTD_FALSE
+    char::from(chr).is_digit(radix)
 }
 
 /// Determines whether or not `chr` is punctuation.
@@ -255,8 +273,8 @@ pub extern "C" fn nstd_core_cty_is_digit(chr: NSTDUnichar, radix: NSTDUInt32) ->
 /// assert!(nstd_core_cty_is_ascii_punctuation(b'y' as NSTDChar) == NSTD_FALSE);
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_cty_is_ascii_punctuation(chr: NSTDChar) -> NSTDBool {
+#[cfg_attr(feature = "capi", no_mangle)]
+pub const extern "C" fn nstd_core_cty_is_ascii_punctuation(chr: NSTDChar) -> NSTDBool {
     matches!(chr, 0x21..=0x2F | 0x3A..=0x40 | 0x5B..=0x60 | 0x7B..=0x7E)
 }
 
@@ -283,8 +301,8 @@ pub extern "C" fn nstd_core_cty_is_ascii_punctuation(chr: NSTDChar) -> NSTDBool 
 /// assert!(nstd_core_cty_is_ascii_graphic(b'\t' as NSTDChar) == NSTD_FALSE);
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
-pub extern "C" fn nstd_core_cty_is_ascii_graphic(chr: NSTDChar) -> NSTDBool {
+#[cfg_attr(feature = "capi", no_mangle)]
+pub const extern "C" fn nstd_core_cty_is_ascii_graphic(chr: NSTDChar) -> NSTDBool {
     matches!(chr, 0x21..=0x7E)
 }
 
@@ -305,20 +323,19 @@ pub extern "C" fn nstd_core_cty_is_ascii_graphic(chr: NSTDChar) -> NSTDBool {
 /// # Example
 ///
 /// ```
-/// use nstd_sys::{core::cty::nstd_core_cty_to_ascii_lowercase, NSTDChar};
+/// use nstd_sys::core::{cty::nstd_core_cty_to_ascii_lowercase, unichar::nstd_core_unichar_new};
 ///
-/// let a = char::from_u32(nstd_core_cty_to_ascii_lowercase('A'.into())).unwrap();
-/// let z = char::from_u32(nstd_core_cty_to_ascii_lowercase('Z'.into())).unwrap();
+/// let a = nstd_core_unichar_new('A'.into()).unwrap();
+/// let z = nstd_core_unichar_new('Z'.into()).unwrap();
+/// let a = char::from(nstd_core_cty_to_ascii_lowercase(a));
+/// let z = char::from(nstd_core_cty_to_ascii_lowercase(z));
 /// assert!(a == 'a');
 /// assert!(z == 'z');
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_core_cty_to_ascii_lowercase(chr: NSTDUnichar) -> NSTDUnichar {
-    match char::from_u32(chr) {
-        Some(chr) => chr.to_ascii_lowercase().into(),
-        _ => chr,
-    }
+    char::from(chr).to_ascii_lowercase().into()
 }
 /// Returns the uppercase version of `chr`, or `chr` if there is no uppercase version.
 ///
@@ -337,18 +354,17 @@ pub extern "C" fn nstd_core_cty_to_ascii_lowercase(chr: NSTDUnichar) -> NSTDUnic
 /// # Example
 ///
 /// ```
-/// use nstd_sys::{core::cty::nstd_core_cty_to_ascii_uppercase, NSTDChar};
+/// use nstd_sys::core::{cty::nstd_core_cty_to_ascii_uppercase, unichar::nstd_core_unichar_new};
 ///
-/// let a = char::from_u32(nstd_core_cty_to_ascii_uppercase('a'.into())).unwrap();
-/// let z = char::from_u32(nstd_core_cty_to_ascii_uppercase('z'.into())).unwrap();
+/// let a = nstd_core_unichar_new('a'.into()).unwrap();
+/// let z = nstd_core_unichar_new('z'.into()).unwrap();
+/// let a = char::from(nstd_core_cty_to_ascii_uppercase(a));
+/// let z = char::from(nstd_core_cty_to_ascii_uppercase(z));
 /// assert!(a == 'A');
 /// assert!(z == 'Z');
 /// ```
 #[inline]
-#[cfg_attr(feature = "clib", no_mangle)]
+#[cfg_attr(feature = "capi", no_mangle)]
 pub extern "C" fn nstd_core_cty_to_ascii_uppercase(chr: NSTDUnichar) -> NSTDUnichar {
-    match char::from_u32(chr) {
-        Some(chr) => chr.to_ascii_uppercase().into(),
-        _ => chr,
-    }
+    char::from(chr).to_ascii_uppercase().into()
 }
