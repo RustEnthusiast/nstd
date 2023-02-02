@@ -1,4 +1,4 @@
-# TBD
+# 0.5.0
 ### `nstd`
 - Renamed the `clib` feature to `capi`.
 - Moved `NSTDUnichar` into `core`.
