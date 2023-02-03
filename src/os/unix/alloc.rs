@@ -1,6 +1,7 @@
 //! Memory allocation for Unix-like systems.
 use crate::{core::def::NSTDErrorCode, NSTDAnyMut, NSTDUInt, NSTD_NULL};
 use libc::{calloc, free, malloc, realloc};
+use nstdapi::nstdapi;
 
 /// Allocates a block of memory on the heap, returning a pointer to it.
 ///
@@ -28,8 +29,8 @@ use libc::{calloc, free, malloc, realloc};
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub unsafe extern "C" fn nstd_os_unix_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
+#[nstdapi]
+pub unsafe fn nstd_os_unix_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
     malloc(size)
 }
 
@@ -64,8 +65,8 @@ pub unsafe extern "C" fn nstd_os_unix_alloc_allocate(size: NSTDUInt) -> NSTDAnyM
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub unsafe extern "C" fn nstd_os_unix_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMut {
+#[nstdapi]
+pub unsafe fn nstd_os_unix_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMut {
     calloc(size, 1)
 }
 
@@ -105,8 +106,8 @@ pub unsafe extern "C" fn nstd_os_unix_alloc_allocate_zeroed(size: NSTDUInt) -> N
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub unsafe extern "C" fn nstd_os_unix_alloc_reallocate(
+#[nstdapi]
+pub unsafe fn nstd_os_unix_alloc_reallocate(
     ptr: &mut NSTDAnyMut,
     new_size: NSTDUInt,
 ) -> NSTDErrorCode {
@@ -140,8 +141,8 @@ pub unsafe extern "C" fn nstd_os_unix_alloc_reallocate(
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub unsafe extern "C" fn nstd_os_unix_alloc_deallocate(ptr: &mut NSTDAnyMut) {
+#[nstdapi]
+pub unsafe fn nstd_os_unix_alloc_deallocate(ptr: &mut NSTDAnyMut) {
     free(*ptr);
     *ptr = NSTD_NULL;
 }

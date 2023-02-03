@@ -1,5 +1,6 @@
 //! Raw C string processing.
 use crate::{NSTDBool, NSTDChar, NSTDUInt};
+use nstdapi::nstdapi;
 
 /// Gets the length of a raw null terminated C string, excluding the null-terminator.
 ///
@@ -25,9 +26,9 @@ use crate::{NSTDBool, NSTDChar, NSTDUInt};
 /// assert!(unsafe { nstd_core_cstr_raw_len(cstr.as_ptr().cast()) } == 13);
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
+#[nstdapi]
 #[allow(unused_mut)]
-pub unsafe extern "C" fn nstd_core_cstr_raw_len(mut cstr: *const NSTDChar) -> NSTDUInt {
+pub unsafe fn nstd_core_cstr_raw_len(mut cstr: *const NSTDChar) -> NSTDUInt {
     #[cfg(not(all(any(unix, windows), feature = "libc")))]
     {
         #[cfg(not(all(
@@ -107,8 +108,8 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_len(mut cstr: *const NSTDChar) -> NS
 /// assert!(unsafe { nstd_core_cstr_raw_len_with_null(cstr.as_ptr().cast()) } == 14);
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub unsafe extern "C" fn nstd_core_cstr_raw_len_with_null(cstr: *const NSTDChar) -> NSTDUInt {
+#[nstdapi]
+pub unsafe fn nstd_core_cstr_raw_len_with_null(cstr: *const NSTDChar) -> NSTDUInt {
     nstd_core_cstr_raw_len(cstr) + 1
 }
 
@@ -140,9 +141,9 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_len_with_null(cstr: *const NSTDChar)
 ///
 /// assert!(unsafe { nstd_core_cstr_raw_compare(cstr1, cstr2) } == NSTD_FALSE);
 /// ```
-#[cfg_attr(feature = "capi", no_mangle)]
+#[nstdapi]
 #[allow(unused_mut)]
-pub unsafe extern "C" fn nstd_core_cstr_raw_compare(
+pub unsafe fn nstd_core_cstr_raw_compare(
     mut cstr1: *const NSTDChar,
     mut cstr2: *const NSTDChar,
 ) -> NSTDBool {
@@ -254,12 +255,9 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_compare(
 /// assert!(&buffer == cstr);
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
+#[nstdapi]
 #[allow(unused_mut)]
-pub unsafe extern "C" fn nstd_core_cstr_raw_copy(
-    mut dest: *mut NSTDChar,
-    mut src: *const NSTDChar,
-) {
+pub unsafe fn nstd_core_cstr_raw_copy(mut dest: *mut NSTDChar, mut src: *const NSTDChar) {
     #[cfg(not(all(
         feature = "asm",
         any(
@@ -344,12 +342,9 @@ pub unsafe extern "C" fn nstd_core_cstr_raw_copy(
 /// assert!(&buffer == cstr);
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
+#[nstdapi]
 #[allow(unused_mut)]
-pub unsafe extern "C" fn nstd_core_cstr_raw_copy_with_null(
-    mut dest: *mut NSTDChar,
-    mut src: *const NSTDChar,
-) {
+pub unsafe fn nstd_core_cstr_raw_copy_with_null(mut dest: *mut NSTDChar, mut src: *const NSTDChar) {
     #[cfg(not(all(any(unix, windows), feature = "libc")))]
     {
         #[cfg(not(all(

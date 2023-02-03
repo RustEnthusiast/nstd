@@ -21,6 +21,7 @@ use crate::{
     NSTDUInt16, NSTDUInt32, NSTDUInt64, NSTDUInt8,
 };
 use alloc::string::ToString;
+use nstdapi::nstdapi;
 
 /// Generates the `nstd_string_from_[i|u|f]*` functions.
 macro_rules! gen_from_primitive {
@@ -34,7 +35,7 @@ macro_rules! gen_from_primitive {
         ///
         /// Panics if allocating fails.
         #[inline]
-        #[cfg_attr(feature = "capi", no_mangle)]
+        #[nstdapi]
         pub extern "C" fn $name(v: $FromT) -> NSTDString {
             NSTDString::from_str(&v.to_string())
         }
@@ -42,7 +43,7 @@ macro_rules! gen_from_primitive {
 }
 
 /// Dynamically sized UTF-8 encoded byte string.
-#[repr(C)]
+#[nstdapi]
 #[derive(Debug)]
 pub struct NSTDString {
     /// The underlying UTF-8 encoded byte buffer.
@@ -88,8 +89,8 @@ gen_optional!(NSTDOptionalString, NSTDString);
 /// let string = nstd_string_new();
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub const extern "C" fn nstd_string_new() -> NSTDString {
+#[nstdapi]
+pub const fn nstd_string_new() -> NSTDString {
     NSTDString {
         bytes: nstd_vec_new(1),
     }
@@ -117,8 +118,8 @@ pub const extern "C" fn nstd_string_new() -> NSTDString {
 /// let string = nstd_string_new_with_cap(20);
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_string_new_with_cap(cap: NSTDUInt) -> NSTDString {
+#[nstdapi]
+pub fn nstd_string_new_with_cap(cap: NSTDUInt) -> NSTDString {
     NSTDString {
         bytes: nstd_vec_new_with_cap(1, cap),
     }
@@ -153,8 +154,8 @@ pub extern "C" fn nstd_string_new_with_cap(cap: NSTDUInt) -> NSTDString {
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub unsafe extern "C" fn nstd_string_from_str(str: &NSTDStr) -> NSTDString {
+#[nstdapi]
+pub unsafe fn nstd_string_from_str(str: &NSTDStr) -> NSTDString {
     let bytes = nstd_core_str_as_bytes(str);
     NSTDString {
         bytes: nstd_vec_from_slice(&bytes),
@@ -181,8 +182,8 @@ pub unsafe extern "C" fn nstd_string_from_str(str: &NSTDStr) -> NSTDString {
 ///
 /// - `bytes`'s data is not valid UTF-8.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_string_from_bytes(bytes: NSTDVec) -> NSTDString {
+#[nstdapi]
+pub fn nstd_string_from_bytes(bytes: NSTDVec) -> NSTDString {
     // SAFETY: We're ensuring that the vector is properly encoded as UTF-8.
     assert!(core::str::from_utf8(unsafe { bytes.as_slice() }).is_ok());
     NSTDString { bytes }
@@ -202,8 +203,8 @@ pub extern "C" fn nstd_string_from_bytes(bytes: NSTDVec) -> NSTDString {
 ///
 /// This function will panic if allocating for the new string fails.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_string_clone(string: &NSTDString) -> NSTDString {
+#[nstdapi]
+pub fn nstd_string_clone(string: &NSTDString) -> NSTDString {
     NSTDString {
         bytes: nstd_vec_clone(&string.bytes),
     }
@@ -219,8 +220,8 @@ pub extern "C" fn nstd_string_clone(string: &NSTDString) -> NSTDString {
 ///
 /// `NSTDStr str` - The new string slice.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_string_as_str(string: &NSTDString) -> NSTDStr {
+#[nstdapi]
+pub fn nstd_string_as_str(string: &NSTDString) -> NSTDStr {
     let bytes = nstd_vec_as_slice(&string.bytes);
     // SAFETY: The string's bytes are always be UTF-8 encoded.
     unsafe { nstd_core_str_from_bytes_unchecked(&bytes) }
@@ -236,8 +237,8 @@ pub extern "C" fn nstd_string_as_str(string: &NSTDString) -> NSTDStr {
 ///
 /// `NSTDStrMut str` - The new string slice.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_string_as_str_mut(string: &mut NSTDString) -> NSTDStrMut {
+#[nstdapi]
+pub fn nstd_string_as_str_mut(string: &mut NSTDString) -> NSTDStrMut {
     let mut bytes = nstd_vec_as_slice_mut(&mut string.bytes);
     // SAFETY: The string's bytes are always be UTF-8 encoded.
     unsafe { nstd_core_str_mut_from_bytes_unchecked(&mut bytes) }
@@ -253,8 +254,8 @@ pub extern "C" fn nstd_string_as_str_mut(string: &mut NSTDString) -> NSTDStrMut 
 ///
 /// `NSTDSlice bytes` - The string's active data.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_string_as_bytes(string: &NSTDString) -> NSTDSlice {
+#[nstdapi]
+pub fn nstd_string_as_bytes(string: &NSTDString) -> NSTDSlice {
     nstd_vec_as_slice(&string.bytes)
 }
 
@@ -268,8 +269,8 @@ pub extern "C" fn nstd_string_as_bytes(string: &NSTDString) -> NSTDSlice {
 ///
 /// `const NSTDByte *ptr` - A raw pointer to a string's memory.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub const extern "C" fn nstd_string_as_ptr(string: &NSTDString) -> *const NSTDByte {
+#[nstdapi]
+pub const fn nstd_string_as_ptr(string: &NSTDString) -> *const NSTDByte {
     nstd_vec_as_ptr(&string.bytes).cast()
 }
 
@@ -283,8 +284,8 @@ pub const extern "C" fn nstd_string_as_ptr(string: &NSTDString) -> *const NSTDBy
 ///
 /// `NSTDVec bytes` - The string's raw data.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_string_into_bytes(string: NSTDString) -> NSTDVec {
+#[nstdapi]
+pub fn nstd_string_into_bytes(string: NSTDString) -> NSTDVec {
     string.bytes
 }
 
@@ -302,8 +303,8 @@ pub extern "C" fn nstd_string_into_bytes(string: NSTDString) -> NSTDVec {
 ///
 /// This operation will panic if the string's length is greater than `NSTDInt`'s max value.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_string_len(string: &NSTDString) -> NSTDUInt {
+#[nstdapi]
+pub fn nstd_string_len(string: &NSTDString) -> NSTDUInt {
     let str = nstd_string_as_str(string);
     // SAFETY: The string's data is valid here.
     unsafe { nstd_core_str_len(&str) }
@@ -319,8 +320,8 @@ pub extern "C" fn nstd_string_len(string: &NSTDString) -> NSTDUInt {
 ///
 /// `NSTDUInt byte_len` - The number of bytes in the string.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub const extern "C" fn nstd_string_byte_len(string: &NSTDString) -> NSTDUInt {
+#[nstdapi]
+pub const fn nstd_string_byte_len(string: &NSTDString) -> NSTDUInt {
     nstd_vec_len(&string.bytes)
 }
 
@@ -336,8 +337,8 @@ pub const extern "C" fn nstd_string_byte_len(string: &NSTDString) -> NSTDUInt {
 ///
 /// `NSTDUInt cap` - The string's capacity.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub const extern "C" fn nstd_string_cap(string: &NSTDString) -> NSTDUInt {
+#[nstdapi]
+pub const fn nstd_string_cap(string: &NSTDString) -> NSTDUInt {
     nstd_vec_cap(&string.bytes)
 }
 
@@ -368,8 +369,8 @@ pub const extern "C" fn nstd_string_cap(string: &NSTDString) -> NSTDUInt {
 /// let mut string = nstd_string_new();
 /// assert!(nstd_string_push(&mut string, '🦀'.into()) == NSTD_ALLOC_ERROR_NONE);
 /// ```
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_string_push(string: &mut NSTDString, chr: NSTDUnichar) -> NSTDAllocError {
+#[nstdapi]
+pub fn nstd_string_push(string: &mut NSTDString, chr: NSTDUnichar) -> NSTDAllocError {
     let chr = char::from(chr);
     let mut buf = [0; 4];
     chr.encode_utf8(&mut buf);
@@ -416,11 +417,8 @@ pub extern "C" fn nstd_string_push(string: &mut NSTDString, chr: NSTDUnichar) ->
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub unsafe extern "C" fn nstd_string_push_str(
-    string: &mut NSTDString,
-    str: &NSTDStr,
-) -> NSTDAllocError {
+#[nstdapi]
+pub unsafe fn nstd_string_push_str(string: &mut NSTDString, str: &NSTDStr) -> NSTDAllocError {
     let str_bytes = nstd_core_str_as_bytes(str);
     nstd_vec_extend(&mut string.bytes, &str_bytes)
 }
@@ -453,8 +451,8 @@ pub unsafe extern "C" fn nstd_string_push_str(
 ///     assert!(nstd_string_pop(&mut string) == NSTDOptional::Some('\0'.into()));
 /// }
 /// ```
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_string_pop(string: &mut NSTDString) -> NSTDOptionalUnichar {
+#[nstdapi]
+pub fn nstd_string_pop(string: &mut NSTDString) -> NSTDOptionalUnichar {
     // SAFETY: `NSTDString` is always UTF-8 encoded.
     let str = unsafe { core::str::from_utf8_unchecked(string.bytes.as_slice()) };
     if let Some(chr) = str.chars().last() {
@@ -471,8 +469,8 @@ pub extern "C" fn nstd_string_pop(string: &mut NSTDString) -> NSTDOptionalUnicha
 ///
 /// - `NSTDString *string` - The string to clear.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_string_clear(string: &mut NSTDString) {
+#[nstdapi]
+pub fn nstd_string_clear(string: &mut NSTDString) {
     nstd_vec_clear(&mut string.bytes);
 }
 
@@ -643,6 +641,6 @@ gen_from_primitive!(
 ///
 /// Panics if deallocating fails.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
+#[nstdapi]
 #[allow(unused_variables)]
-pub extern "C" fn nstd_string_free(string: NSTDString) {}
+pub fn nstd_string_free(string: NSTDString) {}

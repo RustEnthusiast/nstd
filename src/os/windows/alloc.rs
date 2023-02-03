@@ -1,12 +1,13 @@
 //! Low level memory allocation for Windows.
 pub mod heap;
 use crate::{NSTDAnyMut, NSTDUInt, NSTD_NULL};
+use nstdapi::nstdapi;
 use windows_sys::Win32::System::Memory::{
     GetProcessHeap, HeapAlloc, HeapFree, HeapReAlloc, HEAP_ZERO_MEMORY,
 };
 
 /// Describes an error returned from allocation functions for Windows.
-#[repr(C)]
+#[nstdapi]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[allow(non_camel_case_types)]
 pub enum NSTDWindowsAllocError {
@@ -60,8 +61,8 @@ pub enum NSTDWindowsAllocError {
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub unsafe extern "C" fn nstd_os_windows_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
+#[nstdapi]
+pub unsafe fn nstd_os_windows_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
     match GetProcessHeap() {
         0 => NSTD_NULL,
         heap => HeapAlloc(heap, 0, size),
@@ -100,8 +101,8 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_allocate(size: NSTDUInt) -> NSTDA
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub unsafe extern "C" fn nstd_os_windows_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMut {
+#[nstdapi]
+pub unsafe fn nstd_os_windows_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMut {
     match GetProcessHeap() {
         0 => NSTD_NULL,
         heap => HeapAlloc(heap, HEAP_ZERO_MEMORY, size),
@@ -152,8 +153,8 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_allocate_zeroed(size: NSTDUInt) -
 ///     assert!(errc == NSTD_WINDOWS_ALLOC_ERROR_NONE);
 /// }
 /// ```
-#[cfg_attr(feature = "capi", no_mangle)]
-pub unsafe extern "C" fn nstd_os_windows_alloc_reallocate(
+#[nstdapi]
+pub unsafe fn nstd_os_windows_alloc_reallocate(
     ptr: &mut NSTDAnyMut,
     new_size: NSTDUInt,
 ) -> NSTDWindowsAllocError {
@@ -198,10 +199,8 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_reallocate(
 ///     assert!(nstd_os_windows_alloc_deallocate(&mut buf) == NSTD_WINDOWS_ALLOC_ERROR_NONE);
 /// }
 /// ```
-#[cfg_attr(feature = "capi", no_mangle)]
-pub unsafe extern "C" fn nstd_os_windows_alloc_deallocate(
-    ptr: &mut NSTDAnyMut,
-) -> NSTDWindowsAllocError {
+#[nstdapi]
+pub unsafe fn nstd_os_windows_alloc_deallocate(ptr: &mut NSTDAnyMut) -> NSTDWindowsAllocError {
     match GetProcessHeap() {
         0 => NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_HEAP_NOT_FOUND,
         heap => match HeapFree(heap, 0, *ptr) {

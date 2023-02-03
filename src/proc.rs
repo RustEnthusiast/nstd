@@ -4,6 +4,7 @@ use crate::{
     io::NSTDIOError,
     NSTDInt32, NSTDUInt32,
 };
+use nstdapi::nstdapi;
 use std::process::{Child, Command};
 
 /// A handle to a child process.
@@ -45,8 +46,8 @@ pub type NSTDChildProcess = Box<Child>;
 ///
 /// The user must ensure that all of `program`, `args`, and `vars` and their data remain valid for
 /// reads while this function is executing.
-#[cfg_attr(feature = "capi", no_mangle)]
-pub unsafe extern "C" fn nstd_proc_spawn(
+#[nstdapi]
+pub unsafe fn nstd_proc_spawn(
     program: &NSTDStr,
     args: &NSTDSlice,
     vars: &NSTDSlice,
@@ -76,8 +77,8 @@ pub unsafe extern "C" fn nstd_proc_spawn(
 ///
 /// `NSTDUInt32 ID` - The child process ID.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_proc_child_id(handle: &NSTDChildProcess) -> NSTDUInt32 {
+#[nstdapi]
+pub fn nstd_proc_child_id(handle: &NSTDChildProcess) -> NSTDUInt32 {
     handle.id()
 }
 
@@ -91,8 +92,8 @@ pub extern "C" fn nstd_proc_child_id(handle: &NSTDChildProcess) -> NSTDUInt32 {
 ///
 /// `NSTDIOError errc` - The operation error code.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_proc_kill(handle: &mut NSTDChildProcess) -> NSTDIOError {
+#[nstdapi]
+pub fn nstd_proc_kill(handle: &mut NSTDChildProcess) -> NSTDIOError {
     if let Err(err) = handle.kill() {
         return NSTDIOError::from_err(err.kind());
     }
@@ -108,8 +109,8 @@ pub extern "C" fn nstd_proc_kill(handle: &mut NSTDChildProcess) -> NSTDIOError {
 /// # Returns
 ///
 /// `NSTDIOError errc` - The operation error code.
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_proc_join(handle: &mut NSTDChildProcess) -> NSTDIOError {
+#[nstdapi]
+pub fn nstd_proc_join(handle: &mut NSTDChildProcess) -> NSTDIOError {
     match handle.wait() {
         Ok(status) if status.success() => NSTDIOError::NSTD_IO_ERROR_NONE,
         Err(err) => NSTDIOError::from_err(err.kind()),
@@ -123,9 +124,9 @@ pub extern "C" fn nstd_proc_join(handle: &mut NSTDChildProcess) -> NSTDIOError {
 ///
 /// - `NSTDChildProcess handle` - A handle to the child process.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
+#[nstdapi]
 #[allow(unused_variables)]
-pub extern "C" fn nstd_proc_free(handle: NSTDChildProcess) {}
+pub fn nstd_proc_free(handle: NSTDChildProcess) {}
 
 /// Terminates the process with the given `exit_code`.
 ///
@@ -141,15 +142,15 @@ pub extern "C" fn nstd_proc_free(handle: NSTDChildProcess) {}
 /// nstd_proc_exit(0);
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_proc_exit(exit_code: NSTDInt32) -> ! {
+#[nstdapi]
+pub fn nstd_proc_exit(exit_code: NSTDInt32) -> ! {
     std::process::exit(exit_code);
 }
 
 /// Terminates the program in an abnormal fashion.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_proc_abort() -> ! {
+#[nstdapi]
+pub fn nstd_proc_abort() -> ! {
     std::process::abort();
 }
 
@@ -159,7 +160,7 @@ pub extern "C" fn nstd_proc_abort() -> ! {
 ///
 /// `NSTDUInt32 ID` - The process ID.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_proc_id() -> NSTDUInt32 {
+#[nstdapi]
+pub fn nstd_proc_id() -> NSTDUInt32 {
     std::process::id()
 }

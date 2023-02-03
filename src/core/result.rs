@@ -1,7 +1,8 @@
 //! Defines a "result" type with success and error variants.
+use nstdapi::nstdapi;
 
 /// Describes an `NSTDResult` variant.
-#[repr(C)]
+#[nstdapi]
 #[allow(non_camel_case_types)]
 pub enum NSTDResultStatus {
     /// A successful variant.
@@ -11,7 +12,7 @@ pub enum NSTDResultStatus {
 }
 
 /// Defines a "result" type with success and error variants.
-#[repr(C)]
+#[nstdapi]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum NSTDResult<T, E> {
     /// The success variant.

@@ -7,6 +7,7 @@ use crate::{
     },
     NSTDAny, NSTDAnyMut, NSTDUInt,
 };
+use nstdapi::nstdapi;
 
 /// A sized immutable pointer to some arbitrary type.
 ///
@@ -14,7 +15,7 @@ use crate::{
 ///
 /// The user of this structure must ensure that the pointed-to data remains valid and unmodified
 /// while an instance of this structure is in use.
-#[repr(C)]
+#[nstdapi]
 #[derive(Clone, Copy, Debug)]
 pub struct NSTDPtr {
     /// A raw pointer to the data.
@@ -40,8 +41,8 @@ gen_optional!(NSTDOptionalPtr, NSTDPtr);
 ///
 /// Panics if `obj` is null.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_core_ptr_new(obj: NSTDAny, size: NSTDUInt) -> NSTDPtr {
+#[nstdapi]
+pub fn nstd_core_ptr_new(obj: NSTDAny, size: NSTDUInt) -> NSTDPtr {
     assert!(!obj.is_null());
     NSTDPtr { raw: obj, size }
 }
@@ -62,11 +63,8 @@ pub extern "C" fn nstd_core_ptr_new(obj: NSTDAny, size: NSTDUInt) -> NSTDPtr {
 ///
 /// The user of this function must ensure that `obj` is not null.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub const unsafe extern "C" fn nstd_core_ptr_new_unchecked(
-    obj: NSTDAny,
-    size: NSTDUInt,
-) -> NSTDPtr {
+#[nstdapi]
+pub const unsafe fn nstd_core_ptr_new_unchecked(obj: NSTDAny, size: NSTDUInt) -> NSTDPtr {
     NSTDPtr { raw: obj, size }
 }
 
@@ -92,8 +90,8 @@ pub const unsafe extern "C" fn nstd_core_ptr_new_unchecked(
 /// assert!(nstd_core_ptr_size(&ptr) == VALUE_SIZE);
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub const extern "C" fn nstd_core_ptr_size(ptr: &NSTDPtr) -> NSTDUInt {
+#[nstdapi]
+pub const fn nstd_core_ptr_size(ptr: &NSTDPtr) -> NSTDUInt {
     ptr.size
 }
 
@@ -121,8 +119,8 @@ pub const extern "C" fn nstd_core_ptr_size(ptr: &NSTDPtr) -> NSTDUInt {
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub const extern "C" fn nstd_core_ptr_get(ptr: &NSTDPtr) -> NSTDAny {
+#[nstdapi]
+pub const fn nstd_core_ptr_get(ptr: &NSTDPtr) -> NSTDAny {
     ptr.raw
 }
 
@@ -133,7 +131,7 @@ pub const extern "C" fn nstd_core_ptr_get(ptr: &NSTDPtr) -> NSTDAny {
 /// The user of this structure must ensure that the pointed-to data remains valid, unmodified, and
 /// unreferenced in any other code while an instance of this structure is in use, else data races
 /// may occur.
-#[repr(C)]
+#[nstdapi]
 #[derive(Debug)]
 pub struct NSTDPtrMut {
     /// A raw pointer to the data.
@@ -159,8 +157,8 @@ gen_optional!(NSTDOptionalPtrMut, NSTDPtrMut);
 ///
 /// Panics if `obj` is null.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_core_ptr_mut_new(obj: NSTDAnyMut, size: NSTDUInt) -> NSTDPtrMut {
+#[nstdapi]
+pub fn nstd_core_ptr_mut_new(obj: NSTDAnyMut, size: NSTDUInt) -> NSTDPtrMut {
     assert!(!obj.is_null());
     NSTDPtrMut { raw: obj, size }
 }
@@ -181,11 +179,8 @@ pub extern "C" fn nstd_core_ptr_mut_new(obj: NSTDAnyMut, size: NSTDUInt) -> NSTD
 ///
 /// The user of this function must ensure that `obj` is not null.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub const unsafe extern "C" fn nstd_core_ptr_mut_new_unchecked(
-    obj: NSTDAnyMut,
-    size: NSTDUInt,
-) -> NSTDPtrMut {
+#[nstdapi]
+pub const unsafe fn nstd_core_ptr_mut_new_unchecked(obj: NSTDAnyMut, size: NSTDUInt) -> NSTDPtrMut {
     NSTDPtrMut { raw: obj, size }
 }
 
@@ -199,8 +194,8 @@ pub const unsafe extern "C" fn nstd_core_ptr_mut_new_unchecked(
 ///
 /// `NSTDPtr ptr_const` - The immutable copy of `ptr`.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub const extern "C" fn nstd_core_ptr_mut_as_const(ptr: &NSTDPtrMut) -> NSTDPtr {
+#[nstdapi]
+pub const fn nstd_core_ptr_mut_as_const(ptr: &NSTDPtrMut) -> NSTDPtr {
     // SAFETY: `ptr.raw` is never null.
     unsafe { nstd_core_ptr_new_unchecked(ptr.raw, ptr.size) }
 }
@@ -227,8 +222,8 @@ pub const extern "C" fn nstd_core_ptr_mut_as_const(ptr: &NSTDPtrMut) -> NSTDPtr 
 /// assert!(nstd_core_ptr_mut_size(&ptr) == VALUE_SIZE);
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub const extern "C" fn nstd_core_ptr_mut_size(ptr: &NSTDPtrMut) -> NSTDUInt {
+#[nstdapi]
+pub const fn nstd_core_ptr_mut_size(ptr: &NSTDPtrMut) -> NSTDUInt {
     ptr.size
 }
 
@@ -258,8 +253,8 @@ pub const extern "C" fn nstd_core_ptr_mut_size(ptr: &NSTDPtrMut) -> NSTDUInt {
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_core_ptr_mut_get(ptr: &mut NSTDPtrMut) -> NSTDAnyMut {
+#[nstdapi]
+pub fn nstd_core_ptr_mut_get(ptr: &mut NSTDPtrMut) -> NSTDAnyMut {
     ptr.raw
 }
 
@@ -287,8 +282,8 @@ pub extern "C" fn nstd_core_ptr_mut_get(ptr: &mut NSTDPtrMut) -> NSTDAnyMut {
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub const extern "C" fn nstd_core_ptr_mut_get_const(ptr: &NSTDPtrMut) -> NSTDAny {
+#[nstdapi]
+pub const fn nstd_core_ptr_mut_get_const(ptr: &NSTDPtrMut) -> NSTDAny {
     ptr.raw
 }
 
@@ -327,7 +322,7 @@ pub const extern "C" fn nstd_core_ptr_mut_get_const(ptr: &NSTDPtrMut) -> NSTDAny
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub unsafe extern "C" fn nstd_core_ptr_mut_write(ptr: &mut NSTDPtrMut, obj: NSTDAny) {
+#[nstdapi]
+pub unsafe fn nstd_core_ptr_mut_write(ptr: &mut NSTDPtrMut, obj: NSTDAny) {
     nstd_core_mem_copy(ptr.raw.cast(), obj.cast(), ptr.size);
 }

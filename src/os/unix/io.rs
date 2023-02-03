@@ -4,10 +4,11 @@ use libc::{
     EACCES, EAGAIN, EBADF, ECONNRESET, EINTR, EINVAL, EISDIR, ENETDOWN, ENETUNREACH, ENOMEM,
     ENOTCONN, EPIPE, ESPIPE, ETIMEDOUT, EWOULDBLOCK,
 };
+use nstdapi::nstdapi;
 use std::{ffi::c_int, io::Error};
 
 /// An error type for Unix I/O operations.
-#[repr(C)]
+#[nstdapi]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[allow(non_camel_case_types)]
 pub enum NSTDUnixIOError {
