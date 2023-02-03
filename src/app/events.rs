@@ -9,6 +9,7 @@ use crate::{
     NSTDBool, NSTDFloat32, NSTDFloat64, NSTDInt32, NSTDUInt32,
 };
 use gilrs::{Axis, Button, GamepadId};
+use nstdapi::nstdapi;
 use winit::{
     event::{DeviceId, MouseButton, MouseScrollDelta, TouchPhase, VirtualKeyCode},
     event_loop::DeviceEventFilter,
@@ -31,7 +32,7 @@ pub type NSTDAnalogAxisID = NSTDUInt32;
 pub type NSTDButtonID = NSTDUInt32;
 
 /// An enumeration of device event filtering modes.
-#[repr(C)]
+#[nstdapi]
 #[derive(Clone, Copy, PartialEq, Eq)]
 #[allow(non_camel_case_types)]
 pub enum NSTDDeviceEventFilter {
@@ -54,7 +55,7 @@ impl From<NSTDDeviceEventFilter> for DeviceEventFilter {
 }
 
 /// Describes a mouse wheel's scroll delta.
-#[repr(C)]
+#[nstdapi]
 #[derive(Clone, Copy, PartialEq, Eq)]
 #[allow(non_camel_case_types)]
 pub enum NSTDScrollDelta {
@@ -78,7 +79,7 @@ impl NSTDScrollDelta {
 }
 
 /// Describes a touch-screen's state.
-#[repr(C)]
+#[nstdapi]
 #[derive(Clone, Copy, PartialEq, Eq)]
 #[allow(non_camel_case_types)]
 pub enum NSTDTouchState {
@@ -105,7 +106,7 @@ impl NSTDTouchState {
 }
 
 /// Represents a mouse button.
-#[repr(C)]
+#[nstdapi]
 #[derive(Clone, Copy, PartialEq, Eq)]
 #[allow(non_camel_case_types)]
 pub enum NSTDMouseButton {
@@ -120,7 +121,7 @@ pub enum NSTDMouseButton {
 }
 
 /// Represents some type of mouse button input.
-#[repr(C)]
+#[nstdapi]
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub struct NSTDMouseInput {
     /// The mouse button that received input.
@@ -153,7 +154,7 @@ impl NSTDMouseInput {
 }
 
 /// Represents a key on a keyboard.
-#[repr(C)]
+#[nstdapi]
 #[derive(Clone, Copy, PartialEq, Eq)]
 #[allow(non_camel_case_types)]
 pub enum NSTDKey {
@@ -386,7 +387,7 @@ impl NSTDKey {
 }
 
 /// Represents a gamepad button.
-#[repr(C)]
+#[nstdapi]
 #[derive(Clone, Copy, PartialEq, Eq)]
 #[allow(non_camel_case_types)]
 pub enum NSTDGamepadButton {
@@ -467,7 +468,7 @@ impl NSTDGamepadButton {
 }
 
 /// Represents a gamepad axis.
-#[repr(C)]
+#[nstdapi]
 #[derive(Clone, Copy, PartialEq, Eq)]
 #[allow(non_camel_case_types)]
 pub enum NSTDGamepadAxis {
@@ -508,7 +509,7 @@ impl NSTDGamepadAxis {
 }
 
 /// Contains callback based events through function pointers.
-#[repr(C)]
+#[nstdapi]
 #[derive(Default)]
 pub struct NSTDAppEvents {
     /// Called once before starting the application event loop.

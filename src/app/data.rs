@@ -1,13 +1,14 @@
 //! Application data passed to each event.
 use crate::heap_ptr::NSTDOptionalHeapPtr;
 use gilrs::{Event as GamepadEvent, Gilrs};
+use nstdapi::nstdapi;
 use winit::event_loop::{ControlFlow, EventLoop, EventLoopWindowTarget};
 
 /// A handle to the application event loop.
 pub type NSTDAppHandle<'a> = &'a EventLoopWindowTarget<()>;
 
 /// Application data passed to each event.
-#[repr(C)]
+#[nstdapi]
 pub struct NSTDAppData<'a> {
     /// A handle to the `nstd` app.
     pub handle: NSTDAppHandle<'a>,
