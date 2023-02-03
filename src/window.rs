@@ -8,6 +8,7 @@ use crate::{
     image::{nstd_image_as_bytes, nstd_image_height, nstd_image_width, NSTDImage},
     NSTDBool, NSTDFloat64, NSTDInt32, NSTDUInt32,
 };
+use nstdapi::nstdapi;
 use winit::{
     dpi::{PhysicalPosition, PhysicalSize},
     window::{Icon, Window},
@@ -17,7 +18,7 @@ use winit::{
 pub type NSTDWindow = Box<Window>;
 
 /// Describes the position of a window.
-#[repr(C)]
+#[nstdapi]
 #[derive(Clone, Copy)]
 pub struct NSTDWindowPosition {
     /// The position of the window from the left of the screen.
@@ -27,7 +28,7 @@ pub struct NSTDWindowPosition {
 }
 
 /// Describes the size of a window.
-#[repr(C)]
+#[nstdapi]
 #[derive(Clone, Copy)]
 pub struct NSTDWindowSize {
     /// The width of the window.
@@ -46,8 +47,8 @@ gen_optional!(NSTDOptionalWindowSize, NSTDWindowSize);
 /// # Returns
 ///
 /// `NSTDWindow window` - A handle to the newly created window, or null on error.
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_window_new(app: NSTDAppHandle) -> Option<NSTDWindow> {
+#[nstdapi]
+pub fn nstd_window_new(app: NSTDAppHandle) -> Option<NSTDWindow> {
     let window = match Window::new(app) {
         Ok(window) => window,
         _ => return None,
@@ -66,8 +67,8 @@ pub extern "C" fn nstd_window_new(app: NSTDAppHandle) -> Option<NSTDWindow> {
 ///
 /// `NSTDWindowID window_id` - The window's unique identifier.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_window_id(window: &NSTDWindow) -> NSTDWindowID {
+#[nstdapi]
+pub fn nstd_window_id(window: &NSTDWindow) -> NSTDWindowID {
     Box::new(window.id())
 }
 
@@ -87,8 +88,8 @@ pub extern "C" fn nstd_window_id(window: &NSTDWindow) -> NSTDWindowID {
 ///
 /// This function can cause undefined behavior if `title`'s data is invalid.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub unsafe extern "C" fn nstd_window_set_title(window: &NSTDWindow, title: &NSTDStr) {
+#[nstdapi]
+pub unsafe fn nstd_window_set_title(window: &NSTDWindow, title: &NSTDStr) {
     window.set_title(title.as_str())
 }
 
@@ -103,8 +104,8 @@ pub unsafe extern "C" fn nstd_window_set_title(window: &NSTDWindow, title: &NSTD
 /// # Panics
 ///
 /// Panics if the image's length in bytes exceeds `NSTDInt`'s max value.
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_window_set_icon(window: &NSTDWindow, icon: &NSTDImage) {
+#[nstdapi]
+pub fn nstd_window_set_icon(window: &NSTDWindow, icon: &NSTDImage) {
     let width = nstd_image_width(icon);
     let height = nstd_image_height(icon);
     let bytes = nstd_image_as_bytes(icon);
@@ -121,8 +122,8 @@ pub extern "C" fn nstd_window_set_icon(window: &NSTDWindow, icon: &NSTDImage) {
 ///
 /// - `NSTDWindowPosition pos` - The position of the window.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_window_set_position(window: &NSTDWindow, pos: NSTDWindowPosition) {
+#[nstdapi]
+pub fn nstd_window_set_position(window: &NSTDWindow, pos: NSTDWindowPosition) {
     window.set_outer_position(PhysicalPosition::new(pos.x, pos.y));
 }
 
@@ -138,8 +139,8 @@ pub extern "C" fn nstd_window_set_position(window: &NSTDWindow, pos: NSTDWindowP
 ///
 /// `NSTDWindowPosition pos` - The position of the window.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_window_get_position(window: &NSTDWindow) -> NSTDWindowPosition {
+#[nstdapi]
+pub fn nstd_window_get_position(window: &NSTDWindow) -> NSTDWindowPosition {
     if let Ok(pos) = window.outer_position() {
         return NSTDWindowPosition { x: pos.x, y: pos.y };
     }
@@ -158,8 +159,8 @@ pub extern "C" fn nstd_window_get_position(window: &NSTDWindow) -> NSTDWindowPos
 ///
 /// `NSTDWindowPosition pos` - The position of the window's client area.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_window_get_inner_position(window: &NSTDWindow) -> NSTDWindowPosition {
+#[nstdapi]
+pub fn nstd_window_get_inner_position(window: &NSTDWindow) -> NSTDWindowPosition {
     if let Ok(pos) = window.inner_position() {
         return NSTDWindowPosition { x: pos.x, y: pos.y };
     }
@@ -174,8 +175,8 @@ pub extern "C" fn nstd_window_get_inner_position(window: &NSTDWindow) -> NSTDWin
 ///
 /// - `NSTDWindowSize size` - The new size of the window.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_window_set_size(window: &NSTDWindow, size: NSTDWindowSize) {
+#[nstdapi]
+pub fn nstd_window_set_size(window: &NSTDWindow, size: NSTDWindowSize) {
     window.set_inner_size(PhysicalSize::new(size.width, size.height));
 }
 
@@ -189,8 +190,8 @@ pub extern "C" fn nstd_window_set_size(window: &NSTDWindow, size: NSTDWindowSize
 ///
 /// `NSTDWindowSize size` - The size of the window.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_window_get_size(window: &NSTDWindow) -> NSTDWindowSize {
+#[nstdapi]
+pub fn nstd_window_get_size(window: &NSTDWindow) -> NSTDWindowSize {
     let size = window.inner_size();
     NSTDWindowSize {
         width: size.width,
@@ -208,8 +209,8 @@ pub extern "C" fn nstd_window_get_size(window: &NSTDWindow) -> NSTDWindowSize {
 ///
 /// `NSTDWindowSize size` - The size of the window.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_window_get_outer_size(window: &NSTDWindow) -> NSTDWindowSize {
+#[nstdapi]
+pub fn nstd_window_get_outer_size(window: &NSTDWindow) -> NSTDWindowSize {
     let size = window.outer_size();
     NSTDWindowSize {
         width: size.width,
@@ -225,8 +226,8 @@ pub extern "C" fn nstd_window_get_outer_size(window: &NSTDWindow) -> NSTDWindowS
 ///
 /// - `NSTDOptionalWindowSize size` - The minimum window size, pass none to disable clamping.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_window_set_min_size(window: &NSTDWindow, size: NSTDOptionalWindowSize) {
+#[nstdapi]
+pub fn nstd_window_set_min_size(window: &NSTDWindow, size: NSTDOptionalWindowSize) {
     let size = match size {
         NSTDOptional::Some(size) => Some(PhysicalSize::new(size.width, size.height)),
         _ => None,
@@ -242,8 +243,8 @@ pub extern "C" fn nstd_window_set_min_size(window: &NSTDWindow, size: NSTDOption
 ///
 /// - `NSTDOptionalWindowSize size` - The maximum window size, pass none to disable clamping.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_window_set_max_size(window: &NSTDWindow, size: NSTDOptionalWindowSize) {
+#[nstdapi]
+pub fn nstd_window_set_max_size(window: &NSTDWindow, size: NSTDOptionalWindowSize) {
     let size = match size {
         NSTDOptional::Some(size) => Some(PhysicalSize::new(size.width, size.height)),
         _ => None,
@@ -261,8 +262,8 @@ pub extern "C" fn nstd_window_set_max_size(window: &NSTDWindow, size: NSTDOption
 ///
 /// `NSTDFloat64 scale_factor` - The window's scale factor.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_window_scale_factor(window: &NSTDWindow) -> NSTDFloat64 {
+#[nstdapi]
+pub fn nstd_window_scale_factor(window: &NSTDWindow) -> NSTDFloat64 {
     window.scale_factor()
 }
 
@@ -274,8 +275,8 @@ pub extern "C" fn nstd_window_scale_factor(window: &NSTDWindow) -> NSTDFloat64 {
 ///
 /// - `NSTDBool resizable` - True if the window should be resizable.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_window_set_resizable(window: &NSTDWindow, resizable: NSTDBool) {
+#[nstdapi]
+pub fn nstd_window_set_resizable(window: &NSTDWindow, resizable: NSTDBool) {
     window.set_resizable(resizable);
 }
 
@@ -289,8 +290,8 @@ pub extern "C" fn nstd_window_set_resizable(window: &NSTDWindow, resizable: NSTD
 ///
 /// `NSTDBool is_resizable` - Returns true if the window is resizable.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_window_is_resizable(window: &NSTDWindow) -> NSTDBool {
+#[nstdapi]
+pub fn nstd_window_is_resizable(window: &NSTDWindow) -> NSTDBool {
     window.is_resizable()
 }
 
@@ -300,6 +301,6 @@ pub extern "C" fn nstd_window_is_resizable(window: &NSTDWindow) -> NSTDBool {
 ///
 /// - `NSTDWindow window` - The window to close.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
+#[nstdapi]
 #[allow(unused_variables)]
-pub extern "C" fn nstd_window_close(window: NSTDWindow) {}
+pub fn nstd_window_close(window: NSTDWindow) {}
