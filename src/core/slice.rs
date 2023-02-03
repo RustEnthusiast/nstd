@@ -13,6 +13,7 @@ use crate::{
     },
     NSTDAny, NSTDAnyMut, NSTDUInt, NSTD_NULL,
 };
+use nstdapi::nstdapi;
 
 /// An immutable view into a sequence of values in memory.
 ///
@@ -20,7 +21,7 @@ use crate::{
 ///
 /// The user of this structure must ensure that the pointed-to data remains valid and unmodified
 /// while an instance of this structure is in use.
-#[repr(C)]
+#[nstdapi]
 #[derive(Clone, Copy, Debug)]
 pub struct NSTDSlice {
     /// A pointer to the first element in the slice.
@@ -90,12 +91,8 @@ gen_optional!(NSTDOptionalSlice, NSTDSlice);
 ///
 /// Panics if `ptr` is null.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_core_slice_new(
-    ptr: NSTDAny,
-    element_size: NSTDUInt,
-    len: NSTDUInt,
-) -> NSTDSlice {
+#[nstdapi]
+pub fn nstd_core_slice_new(ptr: NSTDAny, element_size: NSTDUInt, len: NSTDUInt) -> NSTDSlice {
     NSTDSlice {
         ptr: nstd_core_ptr_new(ptr, element_size),
         len,
@@ -120,8 +117,8 @@ pub extern "C" fn nstd_core_slice_new(
 ///
 /// The user of this function must ensure that `ptr` is not null.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub const unsafe extern "C" fn nstd_core_slice_new_unchecked(
+#[nstdapi]
+pub const unsafe fn nstd_core_slice_new_unchecked(
     ptr: NSTDAny,
     element_size: NSTDUInt,
     len: NSTDUInt,
@@ -153,8 +150,8 @@ pub const unsafe extern "C" fn nstd_core_slice_new_unchecked(
 /// assert!(nstd_core_slice_as_ptr(&slice) == bytes_ptr);
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub const extern "C" fn nstd_core_slice_as_ptr(slice: &NSTDSlice) -> NSTDAny {
+#[nstdapi]
+pub const fn nstd_core_slice_as_ptr(slice: &NSTDSlice) -> NSTDAny {
     nstd_core_ptr_get(&slice.ptr)
 }
 
@@ -179,8 +176,8 @@ pub const extern "C" fn nstd_core_slice_as_ptr(slice: &NSTDSlice) -> NSTDAny {
 /// assert!(nstd_core_slice_len(&slice) == len);
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub const extern "C" fn nstd_core_slice_len(slice: &NSTDSlice) -> NSTDUInt {
+#[nstdapi]
+pub const fn nstd_core_slice_len(slice: &NSTDSlice) -> NSTDUInt {
     slice.len
 }
 
@@ -204,8 +201,8 @@ pub const extern "C" fn nstd_core_slice_len(slice: &NSTDSlice) -> NSTDUInt {
 /// assert!(nstd_core_slice_stride(&slice) == 1);
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub const extern "C" fn nstd_core_slice_stride(slice: &NSTDSlice) -> NSTDUInt {
+#[nstdapi]
+pub const fn nstd_core_slice_stride(slice: &NSTDSlice) -> NSTDUInt {
     nstd_core_ptr_size(&slice.ptr)
 }
 
@@ -244,8 +241,8 @@ pub const extern "C" fn nstd_core_slice_stride(slice: &NSTDSlice) -> NSTDUInt {
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub const extern "C" fn nstd_core_slice_get(slice: &NSTDSlice, mut pos: NSTDUInt) -> NSTDAny {
+#[nstdapi]
+pub const fn nstd_core_slice_get(slice: &NSTDSlice, mut pos: NSTDUInt) -> NSTDAny {
     if pos < slice.len {
         pos *= nstd_core_slice_stride(slice);
         assert!(pos <= isize::MAX as usize);
@@ -285,8 +282,8 @@ pub const extern "C" fn nstd_core_slice_get(slice: &NSTDSlice, mut pos: NSTDUInt
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub const extern "C" fn nstd_core_slice_first(slice: &NSTDSlice) -> NSTDAny {
+#[nstdapi]
+pub const fn nstd_core_slice_first(slice: &NSTDSlice) -> NSTDAny {
     match slice.len > 0 {
         true => nstd_core_slice_as_ptr(slice),
         false => NSTD_NULL,
@@ -326,8 +323,8 @@ pub const extern "C" fn nstd_core_slice_first(slice: &NSTDSlice) -> NSTDAny {
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub const extern "C" fn nstd_core_slice_last(slice: &NSTDSlice) -> NSTDAny {
+#[nstdapi]
+pub const fn nstd_core_slice_last(slice: &NSTDSlice) -> NSTDAny {
     match slice.len > 0 {
         true => nstd_core_slice_get(slice, slice.len - 1),
         false => NSTD_NULL,
@@ -341,7 +338,7 @@ pub const extern "C" fn nstd_core_slice_last(slice: &NSTDSlice) -> NSTDAny {
 /// The user of this structure must ensure that the pointed-to data remains valid, unmodified, and
 /// unreferenced in any other code while an instance of this structure is in use, else data races
 /// may occur.
-#[repr(C)]
+#[nstdapi]
 #[derive(Debug)]
 pub struct NSTDSliceMut {
     /// A pointer to the first element in the slice.
@@ -425,8 +422,8 @@ gen_optional!(NSTDOptionalSliceMut, NSTDSliceMut);
 ///
 /// Panics if `ptr` is null.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_core_slice_mut_new(
+#[nstdapi]
+pub fn nstd_core_slice_mut_new(
     ptr: NSTDAnyMut,
     element_size: NSTDUInt,
     len: NSTDUInt,
@@ -455,8 +452,8 @@ pub extern "C" fn nstd_core_slice_mut_new(
 ///
 /// The user of this function must ensure that `ptr` is not null.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub const unsafe extern "C" fn nstd_core_slice_mut_new_unchecked(
+#[nstdapi]
+pub const unsafe fn nstd_core_slice_mut_new_unchecked(
     ptr: NSTDAnyMut,
     element_size: NSTDUInt,
     len: NSTDUInt,
@@ -477,8 +474,8 @@ pub const unsafe extern "C" fn nstd_core_slice_mut_new_unchecked(
 ///
 /// `NSTDSlice slice_const` - The immutable copy of `slice`.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub const extern "C" fn nstd_core_slice_mut_as_const(slice: &NSTDSliceMut) -> NSTDSlice {
+#[nstdapi]
+pub const fn nstd_core_slice_mut_as_const(slice: &NSTDSliceMut) -> NSTDSlice {
     let ptr = nstd_core_slice_mut_as_ptr_const(slice);
     let stride = nstd_core_slice_mut_stride(slice);
     // SAFETY: `ptr` is never null.
@@ -513,8 +510,8 @@ pub const extern "C" fn nstd_core_slice_mut_as_const(slice: &NSTDSliceMut) -> NS
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_core_slice_mut_as_ptr(slice: &mut NSTDSliceMut) -> NSTDAnyMut {
+#[nstdapi]
+pub fn nstd_core_slice_mut_as_ptr(slice: &mut NSTDSliceMut) -> NSTDAnyMut {
     nstd_core_ptr_mut_get(&mut slice.ptr)
 }
 
@@ -539,8 +536,8 @@ pub extern "C" fn nstd_core_slice_mut_as_ptr(slice: &mut NSTDSliceMut) -> NSTDAn
 /// assert!(nstd_core_slice_mut_as_ptr_const(&slice) == raw_ptr);
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub const extern "C" fn nstd_core_slice_mut_as_ptr_const(slice: &NSTDSliceMut) -> NSTDAny {
+#[nstdapi]
+pub const fn nstd_core_slice_mut_as_ptr_const(slice: &NSTDSliceMut) -> NSTDAny {
     nstd_core_ptr_mut_get_const(&slice.ptr)
 }
 
@@ -565,8 +562,8 @@ pub const extern "C" fn nstd_core_slice_mut_as_ptr_const(slice: &NSTDSliceMut) -
 /// assert!(nstd_core_slice_mut_len(&slice) == len);
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub const extern "C" fn nstd_core_slice_mut_len(slice: &NSTDSliceMut) -> NSTDUInt {
+#[nstdapi]
+pub const fn nstd_core_slice_mut_len(slice: &NSTDSliceMut) -> NSTDUInt {
     slice.len
 }
 
@@ -590,8 +587,8 @@ pub const extern "C" fn nstd_core_slice_mut_len(slice: &NSTDSliceMut) -> NSTDUIn
 /// assert!(nstd_core_slice_mut_stride(&slice) == 1);
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub const extern "C" fn nstd_core_slice_mut_stride(slice: &NSTDSliceMut) -> NSTDUInt {
+#[nstdapi]
+pub const fn nstd_core_slice_mut_stride(slice: &NSTDSliceMut) -> NSTDUInt {
     nstd_core_ptr_mut_size(&slice.ptr)
 }
 
@@ -630,8 +627,8 @@ pub const extern "C" fn nstd_core_slice_mut_stride(slice: &NSTDSliceMut) -> NSTD
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_core_slice_mut_get(slice: &mut NSTDSliceMut, pos: NSTDUInt) -> NSTDAnyMut {
+#[nstdapi]
+pub fn nstd_core_slice_mut_get(slice: &mut NSTDSliceMut, pos: NSTDUInt) -> NSTDAnyMut {
     nstd_core_slice_mut_get_const(slice, pos) as NSTDAnyMut
 }
 
@@ -670,11 +667,8 @@ pub extern "C" fn nstd_core_slice_mut_get(slice: &mut NSTDSliceMut, pos: NSTDUIn
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub const extern "C" fn nstd_core_slice_mut_get_const(
-    slice: &NSTDSliceMut,
-    mut pos: NSTDUInt,
-) -> NSTDAny {
+#[nstdapi]
+pub const fn nstd_core_slice_mut_get_const(slice: &NSTDSliceMut, mut pos: NSTDUInt) -> NSTDAny {
     if pos < slice.len {
         pos *= nstd_core_slice_mut_stride(slice);
         assert!(pos <= isize::MAX as usize);
@@ -709,8 +703,8 @@ pub const extern "C" fn nstd_core_slice_mut_get_const(
 /// assert!(numbers[0] == 101);
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_core_slice_mut_first(slice: &mut NSTDSliceMut) -> NSTDAnyMut {
+#[nstdapi]
+pub fn nstd_core_slice_mut_first(slice: &mut NSTDSliceMut) -> NSTDAnyMut {
     nstd_core_slice_mut_first_const(slice) as NSTDAnyMut
 }
 
@@ -744,8 +738,8 @@ pub extern "C" fn nstd_core_slice_mut_first(slice: &mut NSTDSliceMut) -> NSTDAny
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub const extern "C" fn nstd_core_slice_mut_first_const(slice: &NSTDSliceMut) -> NSTDAny {
+#[nstdapi]
+pub const fn nstd_core_slice_mut_first_const(slice: &NSTDSliceMut) -> NSTDAny {
     match slice.len > 0 {
         true => nstd_core_slice_mut_as_ptr_const(slice),
         false => NSTD_NULL,
@@ -781,8 +775,8 @@ pub const extern "C" fn nstd_core_slice_mut_first_const(slice: &NSTDSliceMut) ->
 /// assert!(numbers[2] == 1738);
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_core_slice_mut_last(slice: &mut NSTDSliceMut) -> NSTDAnyMut {
+#[nstdapi]
+pub fn nstd_core_slice_mut_last(slice: &mut NSTDSliceMut) -> NSTDAnyMut {
     nstd_core_slice_mut_last_const(slice) as NSTDAnyMut
 }
 
@@ -819,8 +813,8 @@ pub extern "C" fn nstd_core_slice_mut_last(slice: &mut NSTDSliceMut) -> NSTDAnyM
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub const extern "C" fn nstd_core_slice_mut_last_const(slice: &NSTDSliceMut) -> NSTDAny {
+#[nstdapi]
+pub const fn nstd_core_slice_mut_last_const(slice: &NSTDSliceMut) -> NSTDAny {
     match slice.len > 0 {
         true => nstd_core_slice_mut_get_const(slice, slice.len - 1),
         false => NSTD_NULL,
@@ -867,11 +861,8 @@ pub const extern "C" fn nstd_core_slice_mut_last_const(slice: &NSTDSliceMut) -> 
 /// unsafe { nstd_core_slice_mut_copy(&mut dest, &src) };
 /// assert!(dest_arr == src_arr);
 /// ```
-#[cfg_attr(feature = "capi", no_mangle)]
-pub unsafe extern "C" fn nstd_core_slice_mut_copy(
-    dest: &mut NSTDSliceMut,
-    src: &NSTDSlice,
-) -> NSTDErrorCode {
+#[nstdapi]
+pub unsafe fn nstd_core_slice_mut_copy(dest: &mut NSTDSliceMut, src: &NSTDSlice) -> NSTDErrorCode {
     if dest.len != src.len {
         1
     } else if nstd_core_slice_mut_stride(dest) != nstd_core_slice_stride(src) {

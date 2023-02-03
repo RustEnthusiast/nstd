@@ -1,5 +1,6 @@
 //! Provides useful utilities for working with raw pointers.
 use crate::{NSTDAny, NSTDAnyMut, NSTDBool, NSTDUInt};
+use nstdapi::nstdapi;
 
 /// The default alignment suitable for any scalar type.
 ///
@@ -29,8 +30,8 @@ const fn is_power_of_two(align: NSTDUInt) -> NSTDBool {
 /// let slice = nstd_core_slice_new(nstd_core_ptr_raw_dangling(), 1, 0);
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub const extern "C" fn nstd_core_ptr_raw_dangling() -> NSTDAny {
+#[nstdapi]
+pub const fn nstd_core_ptr_raw_dangling() -> NSTDAny {
     MAX_ALIGN as NSTDAny
 }
 
@@ -48,8 +49,8 @@ pub const extern "C" fn nstd_core_ptr_raw_dangling() -> NSTDAny {
 /// let slice = nstd_core_slice_mut_new(nstd_core_ptr_raw_dangling_mut(), 1, 0);
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub const extern "C" fn nstd_core_ptr_raw_dangling_mut() -> NSTDAnyMut {
+#[nstdapi]
+pub const fn nstd_core_ptr_raw_dangling_mut() -> NSTDAnyMut {
     MAX_ALIGN as NSTDAnyMut
 }
 
@@ -73,8 +74,8 @@ pub const extern "C" fn nstd_core_ptr_raw_dangling_mut() -> NSTDAnyMut {
 ///
 /// Both `ptr` and the resulting pointer must be either in bounds or one byte past the end of the
 /// same allocated object.
-#[cfg_attr(feature = "capi", no_mangle)]
-pub unsafe extern "C" fn nstd_core_ptr_raw_align(ptr: NSTDAny, align: NSTDUInt) -> NSTDAny {
+#[nstdapi]
+pub unsafe fn nstd_core_ptr_raw_align(ptr: NSTDAny, align: NSTDUInt) -> NSTDAny {
     assert!(is_power_of_two(align));
     ((ptr as NSTDUInt)
         .checked_add(align - 1)
@@ -103,11 +104,8 @@ pub unsafe extern "C" fn nstd_core_ptr_raw_align(ptr: NSTDAny, align: NSTDUInt) 
 /// Both `ptr` and the resulting pointer must be either in bounds or one byte past the end of the
 /// same allocated object.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub unsafe extern "C" fn nstd_core_ptr_raw_align_mut(
-    ptr: NSTDAnyMut,
-    align: NSTDUInt,
-) -> NSTDAnyMut {
+#[nstdapi]
+pub unsafe fn nstd_core_ptr_raw_align_mut(ptr: NSTDAnyMut, align: NSTDUInt) -> NSTDAnyMut {
     nstd_core_ptr_raw_align(ptr, align) as NSTDAnyMut
 }
 
@@ -144,8 +142,8 @@ pub unsafe extern "C" fn nstd_core_ptr_raw_align_mut(
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_core_ptr_raw_is_aligned(ptr: NSTDAny, align: NSTDUInt) -> NSTDBool {
+#[nstdapi]
+pub fn nstd_core_ptr_raw_is_aligned(ptr: NSTDAny, align: NSTDUInt) -> NSTDBool {
     assert!(is_power_of_two(align));
     ptr as NSTDUInt & (align - 1) == 0
 }

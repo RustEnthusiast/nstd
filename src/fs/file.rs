@@ -10,6 +10,7 @@ use crate::{
     vec::NSTDVec,
     NSTDUInt, NSTDUInt8,
 };
+use nstdapi::nstdapi;
 use std::fs::File;
 #[cfg(unix)]
 use std::os::unix::io::AsRawFd;
@@ -57,8 +58,8 @@ pub type NSTDFileResult = NSTDResult<NSTDFile, NSTDIOError>;
 /// # Safety
 ///
 /// This operation can cause undefined behavior if `name`'s data is invalid.
-#[cfg_attr(feature = "capi", no_mangle)]
-pub unsafe extern "C" fn nstd_fs_file_open(name: &NSTDStr, mask: NSTDUInt8) -> NSTDFileResult {
+#[nstdapi]
+pub unsafe fn nstd_fs_file_open(name: &NSTDStr, mask: NSTDUInt8) -> NSTDFileResult {
     // Attempt to create/open the file in write mode.
     match File::options()
         .create((mask & NSTD_FILE_CREATE) != 0)
@@ -91,8 +92,8 @@ pub unsafe extern "C" fn nstd_fs_file_open(name: &NSTDStr, mask: NSTDUInt8) -> N
 ///
 /// This function's caller must guarantee validity of `bytes`.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub unsafe extern "C" fn nstd_fs_file_write(
+#[nstdapi]
+pub unsafe fn nstd_fs_file_write(
     file: &mut NSTDFile,
     bytes: &NSTDSlice,
     written: &mut NSTDUInt,
@@ -127,11 +128,8 @@ pub unsafe extern "C" fn nstd_fs_file_write(
 ///
 /// This function's caller must guarantee validity of `bytes`.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub unsafe extern "C" fn nstd_fs_file_write_all(
-    file: &mut NSTDFile,
-    bytes: &NSTDSlice,
-) -> NSTDIOError {
+#[nstdapi]
+pub unsafe fn nstd_fs_file_write_all(file: &mut NSTDFile, bytes: &NSTDSlice) -> NSTDIOError {
     #[cfg(not(unix))]
     return crate::io::stdio::write_all(file, bytes);
     #[cfg(unix)]
@@ -148,8 +146,8 @@ pub unsafe extern "C" fn nstd_fs_file_write_all(
 ///
 /// `NSTDIOError errc` - The I/O operation error code.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_fs_file_flush(file: &mut NSTDFile) -> NSTDIOError {
+#[nstdapi]
+pub fn nstd_fs_file_flush(file: &mut NSTDFile) -> NSTDIOError {
     crate::io::stdio::flush(file)
 }
 
@@ -171,8 +169,8 @@ pub extern "C" fn nstd_fs_file_flush(file: &mut NSTDFile) -> NSTDIOError {
 ///
 /// `buffer`'s data must be valid for writes.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub unsafe extern "C" fn nstd_fs_file_read(
+#[nstdapi]
+pub unsafe fn nstd_fs_file_read(
     file: &mut NSTDFile,
     buffer: &mut NSTDSliceMut,
     read: &mut NSTDUInt,
@@ -214,8 +212,8 @@ pub unsafe extern "C" fn nstd_fs_file_read(
 ///
 /// This function will panic if `buffer`'s length in bytes ends up exceeding `NSTDInt`'s max value.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_fs_file_read_all(
+#[nstdapi]
+pub fn nstd_fs_file_read_all(
     file: &mut NSTDFile,
     buffer: &mut NSTDVec,
     read: &mut NSTDUInt,
@@ -258,8 +256,8 @@ pub extern "C" fn nstd_fs_file_read_all(
 ///
 /// This function will panic if `buffer`'s length in bytes ends up exceeding `NSTDInt`'s max value.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_fs_file_read_to_string(
+#[nstdapi]
+pub fn nstd_fs_file_read_to_string(
     file: &mut NSTDFile,
     buffer: &mut NSTDString,
     read: &mut NSTDUInt,
@@ -302,8 +300,8 @@ pub extern "C" fn nstd_fs_file_read_to_string(
 ///
 /// `buffer` must be valid for writes.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub unsafe extern "C" fn nstd_fs_file_read_exact(
+#[nstdapi]
+pub unsafe fn nstd_fs_file_read_exact(
     file: &mut NSTDFile,
     buffer: &mut NSTDSliceMut,
 ) -> NSTDIOError {
@@ -319,6 +317,6 @@ pub unsafe extern "C" fn nstd_fs_file_read_exact(
 ///
 /// - `NSTDFile file` - The file handle to close.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
+#[nstdapi]
 #[allow(unused_variables)]
-pub extern "C" fn nstd_fs_file_close(file: NSTDFile) {}
+pub fn nstd_fs_file_close(file: NSTDFile) {}

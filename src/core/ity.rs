@@ -3,6 +3,7 @@ use crate::{
     NSTDInt, NSTDInt16, NSTDInt32, NSTDInt64, NSTDInt8, NSTDUInt, NSTDUInt16, NSTDUInt32,
     NSTDUInt64, NSTDUInt8,
 };
+use nstdapi::nstdapi;
 
 /// Generates the `min` and `max` functions.
 macro_rules! gen_min_max {
@@ -15,14 +16,14 @@ macro_rules! gen_min_max {
     ) => {
         $(#[$minmeta])*
         #[inline]
-        #[cfg_attr(feature = "capi", no_mangle)]
+        #[nstdapi]
         pub const extern "C" fn $minname() -> $T {
             <$T>::MIN
         }
 
         $(#[$maxmeta])*
         #[inline]
-        #[cfg_attr(feature = "capi", no_mangle)]
+        #[nstdapi]
         pub const extern "C" fn $maxname() -> $T {
             <$T>::MAX
         }

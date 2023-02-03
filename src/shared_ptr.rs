@@ -10,12 +10,13 @@ use crate::{
     },
     NSTDAny, NSTDAnyMut, NSTDUInt,
 };
+use nstdapi::nstdapi;
 
 /// The size (in bytes) of [usize].
 const USIZE_SIZE: usize = core::mem::size_of::<usize>();
 
 /// A reference counting smart pointer.
-#[repr(C)]
+#[nstdapi]
 #[derive(Debug)]
 pub struct NSTDSharedPtr {
     /// A raw pointer to private data about the shared object.
@@ -104,11 +105,8 @@ gen_optional!(NSTDOptionalSharedPtr, NSTDSharedPtr);
 ///     assert!(*nstd_shared_ptr_get(&shared_ptr).cast::<i16>() == v);
 /// }
 /// ```
-#[cfg_attr(feature = "capi", no_mangle)]
-pub unsafe extern "C" fn nstd_shared_ptr_new(
-    element_size: NSTDUInt,
-    init: NSTDAny,
-) -> NSTDSharedPtr {
+#[nstdapi]
+pub unsafe fn nstd_shared_ptr_new(element_size: NSTDUInt, init: NSTDAny) -> NSTDSharedPtr {
     assert!(element_size <= isize::MAX as usize);
     // Allocate a region of memory for the object and the pointer count.
     let buffer_size = element_size + USIZE_SIZE;
@@ -158,8 +156,8 @@ pub unsafe extern "C" fn nstd_shared_ptr_new(
 ///     assert!(*nstd_shared_ptr_get(&shared_ptr).cast::<u128>() == 0);
 /// }
 /// ```
-#[cfg_attr(feature = "capi", no_mangle)]
-pub unsafe extern "C" fn nstd_shared_ptr_new_zeroed(element_size: NSTDUInt) -> NSTDSharedPtr {
+#[nstdapi]
+pub unsafe fn nstd_shared_ptr_new_zeroed(element_size: NSTDUInt) -> NSTDSharedPtr {
     // SAFETY: The allocated memory is validated after allocation.
     unsafe {
         assert!(element_size <= isize::MAX as usize);
@@ -207,8 +205,8 @@ pub unsafe extern "C" fn nstd_shared_ptr_new_zeroed(element_size: NSTDUInt) -> N
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_shared_ptr_share(shared_ptr: &NSTDSharedPtr) -> NSTDSharedPtr {
+#[nstdapi]
+pub fn nstd_shared_ptr_share(shared_ptr: &NSTDSharedPtr) -> NSTDSharedPtr {
     // SAFETY: Shared pointers are always non-null.
     unsafe {
         // Update the pointer count.
@@ -260,8 +258,8 @@ pub extern "C" fn nstd_shared_ptr_share(shared_ptr: &NSTDSharedPtr) -> NSTDShare
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_shared_ptr_owners(shared_ptr: &NSTDSharedPtr) -> NSTDUInt {
+#[nstdapi]
+pub fn nstd_shared_ptr_owners(shared_ptr: &NSTDSharedPtr) -> NSTDUInt {
     shared_ptr.ptrs()
 }
 
@@ -286,8 +284,8 @@ pub extern "C" fn nstd_shared_ptr_owners(shared_ptr: &NSTDSharedPtr) -> NSTDUInt
 /// assert!(nstd_shared_ptr_size(&shared_ptr) == SIZE);
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_shared_ptr_size(shared_ptr: &NSTDSharedPtr) -> NSTDUInt {
+#[nstdapi]
+pub fn nstd_shared_ptr_size(shared_ptr: &NSTDSharedPtr) -> NSTDUInt {
     shared_ptr.size - USIZE_SIZE
 }
 
@@ -316,8 +314,8 @@ pub extern "C" fn nstd_shared_ptr_size(shared_ptr: &NSTDSharedPtr) -> NSTDUInt {
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_shared_ptr_get(shared_ptr: &NSTDSharedPtr) -> NSTDAny {
+#[nstdapi]
+pub fn nstd_shared_ptr_get(shared_ptr: &NSTDSharedPtr) -> NSTDAny {
     shared_ptr.ptr
 }
 
@@ -331,6 +329,6 @@ pub extern "C" fn nstd_shared_ptr_get(shared_ptr: &NSTDSharedPtr) -> NSTDAny {
 ///
 /// Panics if there are no more shared pointers referencing the shared data and freeing the heap
 /// memory fails.
-#[cfg_attr(feature = "capi", no_mangle)]
+#[nstdapi]
 #[allow(unused_variables)]
-pub extern "C" fn nstd_shared_ptr_free(shared_ptr: NSTDSharedPtr) {}
+pub fn nstd_shared_ptr_free(shared_ptr: NSTDSharedPtr) {}

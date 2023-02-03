@@ -13,9 +13,10 @@ use crate::os::windows::alloc::{
     NSTDWindowsAllocError::{self, *},
 };
 use crate::{NSTDAnyMut, NSTDUInt};
+use nstdapi::nstdapi;
 
 /// Describes an error returned from allocation functions.
-#[repr(C)]
+#[nstdapi]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[allow(non_camel_case_types)]
 pub enum NSTDAllocError {
@@ -75,8 +76,8 @@ impl From<NSTDWindowsAllocError> for NSTDAllocError {
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub unsafe extern "C" fn nstd_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
+#[nstdapi]
+pub unsafe fn nstd_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
     #[cfg(not(any(unix, windows)))]
     {
         use crate::{core::ptr::raw::MAX_ALIGN, NSTD_NULL};
@@ -122,8 +123,8 @@ pub unsafe extern "C" fn nstd_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub unsafe extern "C" fn nstd_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMut {
+#[nstdapi]
+pub unsafe fn nstd_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMut {
     #[cfg(not(any(unix, windows)))]
     {
         use crate::{core::ptr::raw::MAX_ALIGN, NSTD_NULL};
@@ -187,9 +188,9 @@ pub unsafe extern "C" fn nstd_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMu
 /// }
 /// ```
 #[cfg_attr(any(unix, windows), inline)]
-#[cfg_attr(feature = "capi", no_mangle)]
+#[nstdapi]
 #[cfg_attr(any(unix, windows), allow(unused_variables))]
-pub unsafe extern "C" fn nstd_alloc_reallocate(
+pub unsafe fn nstd_alloc_reallocate(
     ptr: &mut NSTDAnyMut,
     size: NSTDUInt,
     new_size: NSTDUInt,
@@ -249,12 +250,9 @@ pub unsafe extern "C" fn nstd_alloc_reallocate(
 /// }
 /// ```
 #[cfg_attr(any(unix, windows), inline)]
-#[cfg_attr(feature = "capi", no_mangle)]
+#[nstdapi]
 #[cfg_attr(any(unix, windows), allow(unused_variables))]
-pub unsafe extern "C" fn nstd_alloc_deallocate(
-    ptr: &mut NSTDAnyMut,
-    size: NSTDUInt,
-) -> NSTDAllocError {
+pub unsafe fn nstd_alloc_deallocate(ptr: &mut NSTDAnyMut, size: NSTDUInt) -> NSTDAllocError {
     #[cfg(not(any(unix, windows)))]
     {
         use crate::{core::ptr::raw::MAX_ALIGN, NSTD_NULL};
