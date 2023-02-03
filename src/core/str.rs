@@ -54,7 +54,7 @@ macro_rules! gen_to_primitive {
         $(#[$meta])*
         #[inline]
         #[nstdapi]
-        pub unsafe extern "C" fn $name(str: &$StrT) -> $RetT {
+        pub unsafe fn $name(str: &$StrT) -> $RetT {
             match str.as_str().parse() {
                 Ok(v) => NSTDOptional::Some(v),
                 _ => NSTDOptional::None,

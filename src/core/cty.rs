@@ -55,7 +55,7 @@ macro_rules! gen_deterministic {
         $(#[$meta])*
         #[inline]
         #[nstdapi]
-        pub extern "C" fn $name(chr: NSTDUnichar) -> NSTDBool {
+        pub fn $name(chr: NSTDUnichar) -> NSTDBool {
             char::from(chr).$method()
         }
     };

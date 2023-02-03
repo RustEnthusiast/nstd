@@ -36,7 +36,7 @@ macro_rules! gen_from_primitive {
         /// Panics if allocating fails.
         #[inline]
         #[nstdapi]
-        pub extern "C" fn $name(v: $FromT) -> NSTDString {
+        pub fn $name(v: $FromT) -> NSTDString {
             NSTDString::from_str(&v.to_string())
         }
     };
