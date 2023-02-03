@@ -11,6 +11,7 @@ use crate::{
     io::NSTDIOError,
     NSTDBool, NSTDFloat64, NSTDUInt,
 };
+use nstdapi::nstdapi;
 use std::{
     thread::{Builder, JoinHandle, Thread, ThreadId},
     time::Duration,
@@ -28,7 +29,7 @@ pub type NSTDThreadID = Box<ThreadId>;
 /// Describes the creation of a new thread.
 ///
 /// This type is passed to the `nstd_thread_spawn_with_desc` function.
-#[repr(C)]
+#[nstdapi]
 #[derive(Clone, Copy, Debug)]
 pub struct NSTDThreadDescriptor {
     /// The name of the thread.
@@ -101,8 +102,8 @@ impl From<ThreadData> for NSTDHeapPtr {
 ///     }
 /// }
 /// ```
-#[cfg_attr(feature = "capi", no_mangle)]
-pub unsafe extern "C" fn nstd_thread_spawn(
+#[nstdapi]
+pub unsafe fn nstd_thread_spawn(
     thread_fn: Option<unsafe extern "C" fn(NSTDHeapPtr) -> NSTDThreadResult>,
     data: NSTDHeapPtr,
 ) -> Option<NSTDThread> {
@@ -144,8 +145,8 @@ pub unsafe extern "C" fn nstd_thread_spawn(
 /// - This operation can cause undefined behavior if `desc`'s data is invalid.
 ///
 /// - The data type that `data` holds must be able to be safely sent between threads.
-#[cfg_attr(feature = "capi", no_mangle)]
-pub unsafe extern "C" fn nstd_thread_spawn_with_desc(
+#[nstdapi]
+pub unsafe fn nstd_thread_spawn_with_desc(
     thread_fn: Option<unsafe extern "C" fn(NSTDHeapPtr) -> NSTDThreadResult>,
     data: NSTDHeapPtr,
     desc: &NSTDThreadDescriptor,
@@ -181,8 +182,8 @@ pub unsafe extern "C" fn nstd_thread_spawn_with_desc(
 ///
 /// `NSTDThreadHandle handle` - A handle to the current thread.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_thread_current() -> NSTDThreadHandle {
+#[nstdapi]
+pub fn nstd_thread_current() -> NSTDThreadHandle {
     Box::new(std::thread::current())
 }
 
@@ -196,8 +197,8 @@ pub extern "C" fn nstd_thread_current() -> NSTDThreadHandle {
 ///
 /// `NSTDThreadHandle handle` - A raw handle to the thread.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_thread_handle(thread: &NSTDThread) -> NSTDThreadHandle {
+#[nstdapi]
+pub fn nstd_thread_handle(thread: &NSTDThread) -> NSTDThreadHandle {
     Box::new(thread.thread().clone())
 }
 
@@ -211,8 +212,8 @@ pub extern "C" fn nstd_thread_handle(thread: &NSTDThread) -> NSTDThreadHandle {
 ///
 /// `NSTDBool is_finished` - True if the thread associated with the handle has finished executing.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_thread_is_finished(thread: &NSTDThread) -> NSTDBool {
+#[nstdapi]
+pub fn nstd_thread_is_finished(thread: &NSTDThread) -> NSTDBool {
     thread.is_finished()
 }
 
@@ -227,8 +228,8 @@ pub extern "C" fn nstd_thread_is_finished(thread: &NSTDThread) -> NSTDBool {
 /// `NSTDOptionalThreadResult errc` - The thread function's return code, or none if joining the
 /// thread fails.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_thread_join(thread: NSTDThread) -> NSTDOptionalThreadResult {
+#[nstdapi]
+pub fn nstd_thread_join(thread: NSTDThread) -> NSTDOptionalThreadResult {
     match thread.join() {
         Ok(errc) => NSTDOptional::Some(errc),
         _ => NSTDOptional::None,
@@ -241,9 +242,9 @@ pub extern "C" fn nstd_thread_join(thread: NSTDThread) -> NSTDOptionalThreadResu
 ///
 /// - `NSTDThread thread` - The thread handle.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
+#[nstdapi]
 #[allow(unused_variables)]
-pub extern "C" fn nstd_thread_detach(thread: NSTDThread) {}
+pub fn nstd_thread_detach(thread: NSTDThread) {}
 
 /// Returns the name of a thread.
 ///
@@ -255,8 +256,8 @@ pub extern "C" fn nstd_thread_detach(thread: NSTDThread) {}
 ///
 /// `NSTDOptionalStr name` - The name of the thread, or none if the thread is unnamed.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_thread_name(handle: &NSTDThreadHandle) -> NSTDOptionalStr {
+#[nstdapi]
+pub fn nstd_thread_name(handle: &NSTDThreadHandle) -> NSTDOptionalStr {
     match handle.name() {
         Some(name) => NSTDOptional::Some(NSTDStr::from_str(name)),
         _ => NSTDOptional::None,
@@ -273,8 +274,8 @@ pub extern "C" fn nstd_thread_name(handle: &NSTDThreadHandle) -> NSTDOptionalStr
 ///
 /// `NSTDThreadID id` - The thread's unique ID.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_thread_id(handle: &NSTDThreadHandle) -> NSTDThreadID {
+#[nstdapi]
+pub fn nstd_thread_id(handle: &NSTDThreadHandle) -> NSTDThreadID {
     Box::new(handle.id())
 }
 
@@ -284,9 +285,9 @@ pub extern "C" fn nstd_thread_id(handle: &NSTDThreadHandle) -> NSTDThreadID {
 ///
 /// - `NSTDThreadHandle handle` - The handle to free.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
+#[nstdapi]
 #[allow(unused_variables)]
-pub extern "C" fn nstd_thread_handle_free(handle: NSTDThreadHandle) {}
+pub fn nstd_thread_handle_free(handle: NSTDThreadHandle) {}
 
 /// Puts the current thread to sleep for a specified number of seconds.
 ///
@@ -298,8 +299,8 @@ pub extern "C" fn nstd_thread_handle_free(handle: NSTDThreadHandle) {}
 ///
 /// Panics if `secs` is negative, overflows Rust's `Duration` structure, or is non-finite.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_thread_sleep(secs: NSTDFloat64) {
+#[nstdapi]
+pub fn nstd_thread_sleep(secs: NSTDFloat64) {
     std::thread::sleep(Duration::from_secs_f64(secs));
 }
 
@@ -310,8 +311,8 @@ pub extern "C" fn nstd_thread_sleep(secs: NSTDFloat64) {
 /// `NSTDThreadCountResult threads` - The estimated default amount of parallelism a program should
 /// use on success, or the I/O error code on failure.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_thread_count() -> NSTDThreadCountResult {
+#[nstdapi]
+pub fn nstd_thread_count() -> NSTDThreadCountResult {
     match std::thread::available_parallelism() {
         Ok(threads) => NSTDResult::Ok(threads.get()),
         Err(err) => NSTDResult::Err(NSTDIOError::from_err(err.kind())),
@@ -324,8 +325,8 @@ pub extern "C" fn nstd_thread_count() -> NSTDThreadCountResult {
 ///
 /// `NSTDBool is_panicking` - Determines whether or not the calling thread is panicking.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_thread_is_panicking() -> NSTDBool {
+#[nstdapi]
+pub fn nstd_thread_is_panicking() -> NSTDBool {
     std::thread::panicking()
 }
 
@@ -341,8 +342,8 @@ pub extern "C" fn nstd_thread_is_panicking() -> NSTDBool {
 ///
 /// `NSTDBool is_eq` - True if the two identifiers refer to the same thread.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_thread_id_compare(xid: &NSTDThreadID, yid: &NSTDThreadID) -> NSTDBool {
+#[nstdapi]
+pub fn nstd_thread_id_compare(xid: &NSTDThreadID, yid: &NSTDThreadID) -> NSTDBool {
     xid == yid
 }
 
@@ -352,6 +353,6 @@ pub extern "C" fn nstd_thread_id_compare(xid: &NSTDThreadID, yid: &NSTDThreadID)
 ///
 /// - `NSTDThreadID id` - A thread identifier.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
+#[nstdapi]
 #[allow(unused_variables)]
-pub extern "C" fn nstd_thread_id_free(id: NSTDThreadID) {}
+pub fn nstd_thread_id_free(id: NSTDThreadID) {}

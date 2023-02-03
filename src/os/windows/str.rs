@@ -4,6 +4,7 @@ use crate::{
     vec::{nstd_vec_as_ptr_mut, nstd_vec_new, nstd_vec_new_with_cap, nstd_vec_set_len, NSTDVec},
     NSTDChar16, NSTDUInt,
 };
+use nstdapi::nstdapi;
 use windows_sys::Win32::Globalization::{u_strFromUTF8, U_BUFFER_OVERFLOW_ERROR, U_ZERO_ERROR};
 
 /// Converts a UTF-8 string slice into a null-terminated UTF-16 encoded buffer.
@@ -25,8 +26,8 @@ use windows_sys::Win32::Globalization::{u_strFromUTF8, U_BUFFER_OVERFLOW_ERROR, 
 /// # Safety
 ///
 /// `str`'s data must be valid for reads, especially in terms of UTF-8 conformance.
-#[cfg_attr(feature = "capi", no_mangle)]
-pub unsafe extern "C" fn nstd_os_windows_str_to_utf16(str: &NSTDStr) -> NSTDVec {
+#[nstdapi]
+pub unsafe fn nstd_os_windows_str_to_utf16(str: &NSTDStr) -> NSTDVec {
     // The size of a UTF-16 code point.
     const CHAR_SIZE: NSTDUInt = core::mem::size_of::<NSTDChar16>();
     // Make sure the string slice's length is greater than 0.

@@ -26,7 +26,7 @@ panic = "abort"
 [features]
 default = ["std", "nstd_core"]
 std = []
-capi = []
+capi = ["nstdapi/capi"]
 asm = []
 nstd_alloc = ["nstd_core", "nstd_os_unix_alloc", "nstd_os_windows_alloc"]
 nstd_core = []
@@ -58,6 +58,7 @@ nstd_timed_mutex = ["cc", "nstd_core", "nstd_heap_ptr", "nstd_thread"]
 nstd_vec = ["nstd_alloc", "nstd_core"]
 
 [dependencies]
+nstdapi = "0.1"
 
 [target.'cfg(any(unix, windows))'.dependencies]
 libc = { version = "0.2", optional = true, default-features = false }

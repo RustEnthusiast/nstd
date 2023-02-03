@@ -10,6 +10,7 @@ use libc::{
     pthread_mutexattr_settype, pthread_mutexattr_t, EBUSY, PTHREAD_MUTEX_INITIALIZER,
     PTHREAD_MUTEX_NORMAL,
 };
+use nstdapi::nstdapi;
 use std::{
     cell::{Cell, UnsafeCell},
     marker::PhantomData,
@@ -85,7 +86,7 @@ impl Drop for MutexAttrs {
 }
 
 /// A mutual exclusion primitive useful for protecting shared data.
-#[repr(C)]
+#[nstdapi]
 pub struct NSTDUnixMutex {
     /// The underlying mutex.
     inner: RawMutex,
@@ -106,7 +107,7 @@ unsafe impl Send for NSTDUnixMutex {}
 unsafe impl Sync for NSTDUnixMutex {}
 
 /// A handle to a mutex's protected data.
-#[repr(C)]
+#[nstdapi]
 pub struct NSTDUnixMutexGuard<'a> {
     /// A reference to the mutex.
     mutex: &'a NSTDUnixMutex,
@@ -154,8 +155,8 @@ pub type NSTDUnixOptionalMutexLockResult<'a> = NSTDOptional<NSTDUnixMutexLockRes
 /// # Panics
 ///
 /// This operation will panic if creating the mutex fails.
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_os_unix_mutex_new(data: NSTDHeapPtr) -> NSTDUnixMutex {
+#[nstdapi]
+pub fn nstd_os_unix_mutex_new(data: NSTDHeapPtr) -> NSTDUnixMutex {
     let mutex = RawMutex(UnsafeCell::new(PTHREAD_MUTEX_INITIALIZER));
     let attrs = MutexAttrs::new();
     // SAFETY: `attrs` is properly initialized.
@@ -177,8 +178,8 @@ pub extern "C" fn nstd_os_unix_mutex_new(data: NSTDHeapPtr) -> NSTDUnixMutex {
 ///
 /// `NSTDBool is_poisoned` - `NSTD_TRUE` if the mutex's data is poisoned.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_os_unix_mutex_is_poisoned(mutex: &NSTDUnixMutex) -> NSTDBool {
+#[nstdapi]
+pub fn nstd_os_unix_mutex_is_poisoned(mutex: &NSTDUnixMutex) -> NSTDBool {
     mutex.poisoned.get()
 }
 
@@ -195,8 +196,8 @@ pub extern "C" fn nstd_os_unix_mutex_is_poisoned(mutex: &NSTDUnixMutex) -> NSTDB
 /// # Panics
 ///
 /// This operation will panic if locking the mutex fails.
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_os_unix_mutex_lock(mutex: &NSTDUnixMutex) -> NSTDUnixMutexLockResult {
+#[nstdapi]
+pub fn nstd_os_unix_mutex_lock(mutex: &NSTDUnixMutex) -> NSTDUnixMutexLockResult {
     // SAFETY: `mutex` is behind an initialized reference.
     unsafe { assert!(pthread_mutex_lock(mutex.inner.0.get()) == 0) };
     let guard = NSTDUnixMutexGuard {
@@ -224,10 +225,8 @@ pub extern "C" fn nstd_os_unix_mutex_lock(mutex: &NSTDUnixMutex) -> NSTDUnixMute
 /// # Panics
 ///
 /// This operation will panic if locking the mutex fails.
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_os_unix_mutex_try_lock(
-    mutex: &NSTDUnixMutex,
-) -> NSTDUnixOptionalMutexLockResult {
+#[nstdapi]
+pub fn nstd_os_unix_mutex_try_lock(mutex: &NSTDUnixMutex) -> NSTDUnixOptionalMutexLockResult {
     // SAFETY: `mutex` is behind an initialized reference.
     match unsafe { pthread_mutex_trylock(mutex.inner.0.get()) } {
         0 => {
@@ -257,8 +256,8 @@ pub extern "C" fn nstd_os_unix_mutex_try_lock(
 ///
 /// `NSTDAny data` - A pointer to the mutex's data.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_os_unix_mutex_get(guard: &NSTDUnixMutexGuard) -> NSTDAny {
+#[nstdapi]
+pub fn nstd_os_unix_mutex_get(guard: &NSTDUnixMutexGuard) -> NSTDAny {
     // SAFETY: `mutex` is behind a valid reference.
     nstd_heap_ptr_get(unsafe { &*guard.mutex.data.get() })
 }
@@ -273,8 +272,8 @@ pub extern "C" fn nstd_os_unix_mutex_get(guard: &NSTDUnixMutexGuard) -> NSTDAny 
 ///
 /// `NSTDAnyMut data` - A pointer to the mutex's data.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_os_unix_mutex_get_mut(guard: &mut NSTDUnixMutexGuard) -> NSTDAnyMut {
+#[nstdapi]
+pub fn nstd_os_unix_mutex_get_mut(guard: &mut NSTDUnixMutexGuard) -> NSTDAnyMut {
     // SAFETY: `mutex` is behind a valid reference.
     nstd_heap_ptr_get_mut(unsafe { &mut *guard.mutex.data.get() })
 }
@@ -285,9 +284,9 @@ pub extern "C" fn nstd_os_unix_mutex_get_mut(guard: &mut NSTDUnixMutexGuard) -> 
 ///
 /// - `NSTDUnixMutexGuard guard` - The mutex guard to take ownership of.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
+#[nstdapi]
 #[allow(unused_variables)]
-pub extern "C" fn nstd_os_unix_mutex_unlock(guard: NSTDUnixMutexGuard) {}
+pub fn nstd_os_unix_mutex_unlock(guard: NSTDUnixMutexGuard) {}
 
 /// Frees a mutex and the data it is protecting.
 ///
@@ -299,6 +298,6 @@ pub extern "C" fn nstd_os_unix_mutex_unlock(guard: NSTDUnixMutexGuard) {}
 ///
 /// This operation will panic if destroying the mutex fails.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
+#[nstdapi]
 #[allow(unused_variables)]
-pub extern "C" fn nstd_os_unix_mutex_free(mutex: NSTDUnixMutex) {}
+pub fn nstd_os_unix_mutex_free(mutex: NSTDUnixMutex) {}

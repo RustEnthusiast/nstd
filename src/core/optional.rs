@@ -4,9 +4,10 @@ use crate::{
     NSTDInt16, NSTDInt32, NSTDInt64, NSTDInt8, NSTDUInt, NSTDUInt16, NSTDUInt32, NSTDUInt64,
     NSTDUInt8,
 };
+use nstdapi::nstdapi;
 
 /// Describes an `NSTDOptional` variant.
-#[repr(C)]
+#[nstdapi]
 #[allow(non_camel_case_types)]
 pub enum NSTDOptionalStatus {
     /// No value.
@@ -16,7 +17,7 @@ pub enum NSTDOptionalStatus {
 }
 
 /// Represents an optional (possibly uninitialized) value.
-#[repr(C)]
+#[nstdapi]
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
 pub enum NSTDOptional<T> {
     /// The uninitialized variant.

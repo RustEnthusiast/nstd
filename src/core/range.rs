@@ -3,6 +3,7 @@ use crate::{
     NSTDFloat32, NSTDFloat64, NSTDInt, NSTDInt16, NSTDInt32, NSTDInt64, NSTDInt8, NSTDUInt,
     NSTDUInt16, NSTDUInt32, NSTDUInt64, NSTDUInt8,
 };
+use nstdapi::nstdapi;
 
 /// Generates the `NSTD*Range*` structs.
 macro_rules! gen_range_struct {
@@ -11,7 +12,7 @@ macro_rules! gen_range_struct {
         $name: ident, $T: ty
     ) => {
         $(#[$meta])*
-        #[repr(C)]
+        #[nstdapi]
         #[derive(Clone, Copy, Debug, Default)]
         pub struct $name {
             /// The lower bound of the range.

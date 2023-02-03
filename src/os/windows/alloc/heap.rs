@@ -4,13 +4,14 @@ use crate::{
     os::windows::{alloc::NSTDWindowsAllocError, NSTDWindowsHandle},
     NSTDAny, NSTDAnyMut, NSTDUInt, NSTD_NULL,
 };
+use nstdapi::nstdapi;
 use windows_sys::Win32::System::Memory::{
     GetProcessHeap, HeapAlloc, HeapCreate, HeapDestroy, HeapFree, HeapReAlloc, HeapSize,
     HeapValidate, HEAP_ZERO_MEMORY,
 };
 
 /// A handle to a process heap.
-#[repr(C)]
+#[nstdapi]
 pub struct NSTDWindowsHeap {
     /// The private handle.
     handle: NSTDWindowsHandle,
@@ -66,8 +67,8 @@ pub type NSTDWindowsHeapResult = NSTDResult<NSTDWindowsHeap, NSTDWindowsAllocErr
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub unsafe extern "C" fn nstd_os_windows_alloc_heap_default() -> NSTDWindowsHeapResult {
+#[nstdapi]
+pub unsafe fn nstd_os_windows_alloc_heap_default() -> NSTDWindowsHeapResult {
     match GetProcessHeap() {
         0 => NSTDResult::Err(NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_HEAP_NOT_FOUND),
         handle => NSTDResult::Ok(NSTDWindowsHeap { handle }),
@@ -114,8 +115,8 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_heap_default() -> NSTDWindowsHeap
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub unsafe extern "C" fn nstd_os_windows_alloc_heap_new(size: NSTDUInt) -> NSTDWindowsHeapResult {
+#[nstdapi]
+pub unsafe fn nstd_os_windows_alloc_heap_new(size: NSTDUInt) -> NSTDWindowsHeapResult {
     match HeapCreate(0, size, 0) {
         0 => NSTDResult::Err(NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_HEAP_NOT_FOUND),
         handle => NSTDResult::Ok(NSTDWindowsHeap { handle }),
@@ -148,8 +149,8 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_heap_new(size: NSTDUInt) -> NSTDW
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_os_windows_alloc_heap_handle(heap: &NSTDWindowsHeap) -> NSTDWindowsHandle {
+#[nstdapi]
+pub fn nstd_os_windows_alloc_heap_handle(heap: &NSTDWindowsHeap) -> NSTDWindowsHandle {
     heap.handle
 }
 
@@ -193,11 +194,8 @@ pub extern "C" fn nstd_os_windows_alloc_heap_handle(heap: &NSTDWindowsHeap) -> N
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub unsafe extern "C" fn nstd_os_windows_alloc_heap_size(
-    heap: &NSTDWindowsHeap,
-    ptr: NSTDAny,
-) -> NSTDUInt {
+#[nstdapi]
+pub unsafe fn nstd_os_windows_alloc_heap_size(heap: &NSTDWindowsHeap, ptr: NSTDAny) -> NSTDUInt {
     HeapSize(heap.handle, 0, ptr)
 }
 
@@ -246,8 +244,8 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_heap_size(
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub unsafe extern "C" fn nstd_os_windows_alloc_heap_validate(
+#[nstdapi]
+pub unsafe fn nstd_os_windows_alloc_heap_validate(
     heap: &NSTDWindowsHeap,
     ptr: NSTDAny,
 ) -> NSTDWindowsAllocError {
@@ -303,8 +301,8 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_heap_validate(
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub unsafe extern "C" fn nstd_os_windows_alloc_heap_allocate(
+#[nstdapi]
+pub unsafe fn nstd_os_windows_alloc_heap_allocate(
     heap: &NSTDWindowsHeap,
     size: NSTDUInt,
 ) -> NSTDAnyMut {
@@ -355,8 +353,8 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_heap_allocate(
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub unsafe extern "C" fn nstd_os_windows_alloc_heap_allocate_zeroed(
+#[nstdapi]
+pub unsafe fn nstd_os_windows_alloc_heap_allocate_zeroed(
     heap: &NSTDWindowsHeap,
     size: NSTDUInt,
 ) -> NSTDAnyMut {
@@ -409,8 +407,8 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_heap_allocate_zeroed(
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub unsafe extern "C" fn nstd_os_windows_alloc_heap_reallocate(
+#[nstdapi]
+pub unsafe fn nstd_os_windows_alloc_heap_reallocate(
     heap: &NSTDWindowsHeap,
     ptr: &mut NSTDAnyMut,
     size: NSTDUInt,
@@ -465,8 +463,8 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_heap_reallocate(
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub unsafe extern "C" fn nstd_os_windows_alloc_heap_deallocate(
+#[nstdapi]
+pub unsafe fn nstd_os_windows_alloc_heap_deallocate(
     heap: &NSTDWindowsHeap,
     ptr: &mut NSTDAnyMut,
 ) -> NSTDWindowsAllocError {
@@ -512,6 +510,6 @@ pub unsafe extern "C" fn nstd_os_windows_alloc_heap_deallocate(
 /// }
 /// ```
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
+#[nstdapi]
 #[allow(unused_variables)]
-pub unsafe extern "C" fn nstd_os_windows_alloc_heap_free(heap: NSTDWindowsHeap) {}
+pub unsafe fn nstd_os_windows_alloc_heap_free(heap: NSTDWindowsHeap) {}

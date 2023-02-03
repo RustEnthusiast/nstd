@@ -1,9 +1,10 @@
 //! Provides shared library access for Unix like systems.
 use crate::{core::optional::NSTDOptional, NSTDAny, NSTDAnyMut, NSTDChar};
 use libc::{dlclose, dlopen, dlsym, RTLD_LAZY, RTLD_LOCAL};
+use nstdapi::nstdapi;
 
 /// Represents an owned handle to a dynamically loaded library.
-#[repr(C)]
+#[nstdapi]
 pub struct NSTDUnixSharedLib {
     /// A raw handle to the shared library.
     handle: NSTDAnyMut,
@@ -42,10 +43,8 @@ pub type NSTDUnixOptionalSharedLib = NSTDOptional<NSTDUnixSharedLib>;
 ///
 /// See <https://man7.org/linux/man-pages/man3/dlopen.3.html>.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub unsafe extern "C" fn nstd_os_unix_shared_lib_load(
-    path: *const NSTDChar,
-) -> NSTDUnixOptionalSharedLib {
+#[nstdapi]
+pub unsafe fn nstd_os_unix_shared_lib_load(path: *const NSTDChar) -> NSTDUnixOptionalSharedLib {
     let handle = dlopen(path, RTLD_LAZY | RTLD_LOCAL);
     if handle.is_null() {
         return NSTDOptional::None;
@@ -63,8 +62,8 @@ pub unsafe extern "C" fn nstd_os_unix_shared_lib_load(
 ///
 /// `NSTDAnyMut handle` - A raw handle to the dynamically loaded library.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_os_unix_shared_lib_handle(lib: &NSTDUnixSharedLib) -> NSTDAnyMut {
+#[nstdapi]
+pub fn nstd_os_unix_shared_lib_handle(lib: &NSTDUnixSharedLib) -> NSTDAnyMut {
     lib.handle
 }
 
@@ -84,8 +83,8 @@ pub extern "C" fn nstd_os_unix_shared_lib_handle(lib: &NSTDUnixSharedLib) -> NST
 ///
 /// See <https://man7.org/linux/man-pages/man3/dlsym.3.html>.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub unsafe extern "C" fn nstd_os_unix_shared_lib_get(
+#[nstdapi]
+pub unsafe fn nstd_os_unix_shared_lib_get(
     lib: &NSTDUnixSharedLib,
     symbol: *const NSTDChar,
 ) -> NSTDAny {
@@ -108,8 +107,8 @@ pub unsafe extern "C" fn nstd_os_unix_shared_lib_get(
 ///
 /// See <https://man7.org/linux/man-pages/man3/dlsym.3.html>.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub unsafe extern "C" fn nstd_os_unix_shared_lib_get_mut(
+#[nstdapi]
+pub unsafe fn nstd_os_unix_shared_lib_get_mut(
     lib: &mut NSTDUnixSharedLib,
     symbol: *const NSTDChar,
 ) -> NSTDAnyMut {
@@ -130,6 +129,6 @@ pub unsafe extern "C" fn nstd_os_unix_shared_lib_get_mut(
 ///
 /// See <https://man7.org/linux/man-pages/man3/dlclose.3p.html>.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
+#[nstdapi]
 #[allow(unused_variables)]
-pub unsafe extern "C" fn nstd_os_unix_shared_lib_free(lib: NSTDUnixSharedLib) {}
+pub unsafe fn nstd_os_unix_shared_lib_free(lib: NSTDUnixSharedLib) {}

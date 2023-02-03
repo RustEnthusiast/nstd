@@ -31,6 +31,7 @@ use crate::{
     },
     vec::nstd_vec_as_ptr,
 };
+use nstdapi::nstdapi;
 
 /// A handle to a dynamically loaded library.
 #[cfg(unix)]
@@ -69,8 +70,8 @@ pub type NSTDOptionalSharedLib = NSTDOptional<NSTDSharedLib>;
 /// - `path`'s data must be valid for reads.
 ///
 /// - The loaded library may have platform-specific initialization routines ran when it is loaded.
-#[cfg_attr(feature = "capi", no_mangle)]
-pub unsafe extern "C" fn nstd_shared_lib_load(path: &NSTDStr) -> NSTDOptionalSharedLib {
+#[nstdapi]
+pub unsafe fn nstd_shared_lib_load(path: &NSTDStr) -> NSTDOptionalSharedLib {
     #[cfg(unix)]
     {
         // Check if `path` is already null terminated.
@@ -107,11 +108,8 @@ pub unsafe extern "C" fn nstd_shared_lib_load(path: &NSTDStr) -> NSTDOptionalSha
 ///
 /// Undefined behavior may occur if `symbol`'s data is invalid.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub unsafe extern "C" fn nstd_shared_lib_get(
-    lib: &NSTDSharedLib,
-    symbol: *const NSTDChar,
-) -> NSTDAny {
+#[nstdapi]
+pub unsafe fn nstd_shared_lib_get(lib: &NSTDSharedLib, symbol: *const NSTDChar) -> NSTDAny {
     #[cfg(unix)]
     return nstd_os_unix_shared_lib_get(lib, symbol);
     #[cfg(windows)]
@@ -135,8 +133,8 @@ pub unsafe extern "C" fn nstd_shared_lib_get(
 ///
 /// Undefined behavior may occur if `symbol`'s data is invalid.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub unsafe extern "C" fn nstd_shared_lib_get_mut(
+#[nstdapi]
+pub unsafe fn nstd_shared_lib_get_mut(
     lib: &mut NSTDSharedLib,
     symbol: *const NSTDChar,
 ) -> NSTDAnyMut {
@@ -156,6 +154,6 @@ pub unsafe extern "C" fn nstd_shared_lib_get_mut(
 ///
 /// Panics if unloading the library fails.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
+#[nstdapi]
 #[allow(unused_variables)]
-pub extern "C" fn nstd_shared_lib_free(lib: NSTDSharedLib) {}
+pub fn nstd_shared_lib_free(lib: NSTDSharedLib) {}

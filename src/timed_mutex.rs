@@ -5,9 +5,10 @@ use crate::{
     NSTDAny, NSTDAnyMut, NSTDBool, NSTDFloat64,
 };
 use core::{marker::PhantomData, mem::ManuallyDrop};
+use nstdapi::nstdapi;
 
 /// A mutual exclusion primitive with a timed locking mechanism.
-#[repr(C)]
+#[nstdapi]
 pub struct NSTDTimedMutex {
     /// The underlying mutex.
     inner: NSTDAnyMut,
@@ -36,7 +37,7 @@ unsafe impl Send for NSTDTimedMutex {}
 unsafe impl Sync for NSTDTimedMutex {}
 
 /// A handle to a timed mutex's data.
-#[repr(C)]
+#[nstdapi]
 pub struct NSTDTimedMutexGuard<'a> {
     /// A reference to the mutex.
     mutex: &'a NSTDTimedMutex,
