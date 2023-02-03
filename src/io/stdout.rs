@@ -1,5 +1,6 @@
 //! A handle to the standard output stream.
 use crate::{core::slice::NSTDSlice, io::NSTDIOError, NSTDUInt};
+use nstdapi::nstdapi;
 use std::io::Stdout;
 #[cfg(unix)]
 use std::os::unix::io::AsRawFd;
@@ -13,8 +14,8 @@ pub type NSTDStdout = Box<Stdout>;
 ///
 /// `NSTDStdout handle` - A handle to the standard output stream.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_io_stdout() -> NSTDStdout {
+#[nstdapi]
+pub fn nstd_io_stdout() -> NSTDStdout {
     NSTDStdout::new(std::io::stdout())
 }
 
@@ -42,8 +43,8 @@ pub extern "C" fn nstd_io_stdout() -> NSTDStdout {
 ///
 /// This function can cause undefined behavior if `bytes`'s data is invalid.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub unsafe extern "C" fn nstd_io_stdout_write(
+#[nstdapi]
+pub unsafe fn nstd_io_stdout_write(
     handle: &mut NSTDStdout,
     bytes: &NSTDSlice,
     written: &mut NSTDUInt,
@@ -83,11 +84,8 @@ pub unsafe extern "C" fn nstd_io_stdout_write(
 ///
 /// This function can cause undefined behavior if `bytes`'s data is invalid.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub unsafe extern "C" fn nstd_io_stdout_write_all(
-    handle: &mut NSTDStdout,
-    bytes: &NSTDSlice,
-) -> NSTDIOError {
+#[nstdapi]
+pub unsafe fn nstd_io_stdout_write_all(handle: &mut NSTDStdout, bytes: &NSTDSlice) -> NSTDIOError {
     #[cfg(not(unix))]
     return crate::io::stdio::write_all(handle, bytes);
     #[cfg(unix)]
@@ -104,8 +102,8 @@ pub unsafe extern "C" fn nstd_io_stdout_write_all(
 ///
 /// `NSTDIOError errc` - The I/O operation error code.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_io_stdout_flush(handle: &mut NSTDStdout) -> NSTDIOError {
+#[nstdapi]
+pub fn nstd_io_stdout_flush(handle: &mut NSTDStdout) -> NSTDIOError {
     crate::io::stdio::flush(handle)
 }
 
@@ -115,6 +113,6 @@ pub extern "C" fn nstd_io_stdout_flush(handle: &mut NSTDStdout) -> NSTDIOError {
 ///
 /// - `NSTDStdout handle` - A handle to the standard output stream.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
+#[nstdapi]
 #[allow(unused_variables)]
-pub extern "C" fn nstd_io_stdout_free(handle: NSTDStdout) {}
+pub fn nstd_io_stdout_free(handle: NSTDStdout) {}

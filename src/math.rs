@@ -2,6 +2,7 @@
 //!
 //! This library provides access to math functions that require the use of the "std" feature.
 use crate::{NSTDFloat32, NSTDFloat64, NSTDInt32};
+use nstdapi::nstdapi;
 
 /// Returns the absolute value of `x`.
 ///
@@ -13,8 +14,8 @@ use crate::{NSTDFloat32, NSTDFloat64, NSTDInt32};
 ///
 /// `NSTDFloat32 abs` - The absolute value of `x`.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_math_abs_f32(x: NSTDFloat32) -> NSTDFloat32 {
+#[nstdapi]
+pub fn nstd_math_abs_f32(x: NSTDFloat32) -> NSTDFloat32 {
     x.abs()
 }
 /// Returns the absolute value of `x`.
@@ -27,8 +28,8 @@ pub extern "C" fn nstd_math_abs_f32(x: NSTDFloat32) -> NSTDFloat32 {
 ///
 /// `NSTDFloat64 abs` - The absolute value of `x`.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_math_abs_f64(x: NSTDFloat64) -> NSTDFloat64 {
+#[nstdapi]
+pub fn nstd_math_abs_f64(x: NSTDFloat64) -> NSTDFloat64 {
     x.abs()
 }
 
@@ -42,8 +43,8 @@ pub extern "C" fn nstd_math_abs_f64(x: NSTDFloat64) -> NSTDFloat64 {
 ///
 /// `NSTDFloat32 value` - The value rounded down to the nearest integral value.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_math_floor_f32(x: NSTDFloat32) -> NSTDFloat32 {
+#[nstdapi]
+pub fn nstd_math_floor_f32(x: NSTDFloat32) -> NSTDFloat32 {
     x.floor()
 }
 /// Rounds the value `x` down to the closest integral value.
@@ -56,8 +57,8 @@ pub extern "C" fn nstd_math_floor_f32(x: NSTDFloat32) -> NSTDFloat32 {
 ///
 /// `NSTDFloat64 value` - The value rounded down to the nearest integral value.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_math_floor_f64(x: NSTDFloat64) -> NSTDFloat64 {
+#[nstdapi]
+pub fn nstd_math_floor_f64(x: NSTDFloat64) -> NSTDFloat64 {
     x.floor()
 }
 
@@ -71,8 +72,8 @@ pub extern "C" fn nstd_math_floor_f64(x: NSTDFloat64) -> NSTDFloat64 {
 ///
 /// `NSTDFloat32 value` - The value rounded up to the nearest integral value.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_math_ceil_f32(x: NSTDFloat32) -> NSTDFloat32 {
+#[nstdapi]
+pub fn nstd_math_ceil_f32(x: NSTDFloat32) -> NSTDFloat32 {
     x.ceil()
 }
 /// Rounds the value `x` up to the closest integral value.
@@ -85,8 +86,8 @@ pub extern "C" fn nstd_math_ceil_f32(x: NSTDFloat32) -> NSTDFloat32 {
 ///
 /// `NSTDFloat64 value` - The value rounded up to the nearest integral value.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_math_ceil_f64(x: NSTDFloat64) -> NSTDFloat64 {
+#[nstdapi]
+pub fn nstd_math_ceil_f64(x: NSTDFloat64) -> NSTDFloat64 {
     x.ceil()
 }
 
@@ -102,8 +103,8 @@ pub extern "C" fn nstd_math_ceil_f64(x: NSTDFloat64) -> NSTDFloat64 {
 ///
 /// `NSTDFloat32 pow` - `x` raised to the power of `exp`.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_math_pow_f32(x: NSTDFloat32, exp: NSTDInt32) -> NSTDFloat32 {
+#[nstdapi]
+pub fn nstd_math_pow_f32(x: NSTDFloat32, exp: NSTDInt32) -> NSTDFloat32 {
     x.powi(exp)
 }
 /// Raises `x` to an integral power.
@@ -118,8 +119,8 @@ pub extern "C" fn nstd_math_pow_f32(x: NSTDFloat32, exp: NSTDInt32) -> NSTDFloat
 ///
 /// `NSTDFloat64 pow` - `x` raised to the power of `exp`.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_math_pow_f64(x: NSTDFloat64, exp: NSTDInt32) -> NSTDFloat64 {
+#[nstdapi]
+pub fn nstd_math_pow_f64(x: NSTDFloat64, exp: NSTDInt32) -> NSTDFloat64 {
     x.powi(exp)
 }
 
@@ -133,8 +134,8 @@ pub extern "C" fn nstd_math_pow_f64(x: NSTDFloat64, exp: NSTDInt32) -> NSTDFloat
 ///
 /// `NSTDFloat32 sqrt` - The square root of `x`.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_math_sqrt_f32(x: NSTDFloat32) -> NSTDFloat32 {
+#[nstdapi]
+pub fn nstd_math_sqrt_f32(x: NSTDFloat32) -> NSTDFloat32 {
     x.sqrt()
 }
 /// Computes the square root of `x`.
@@ -147,8 +148,8 @@ pub extern "C" fn nstd_math_sqrt_f32(x: NSTDFloat32) -> NSTDFloat32 {
 ///
 /// `NSTDFloat64 sqrt` - The square root of `x`.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_math_sqrt_f64(x: NSTDFloat64) -> NSTDFloat64 {
+#[nstdapi]
+pub fn nstd_math_sqrt_f64(x: NSTDFloat64) -> NSTDFloat64 {
     x.sqrt()
 }
 
@@ -162,8 +163,8 @@ pub extern "C" fn nstd_math_sqrt_f64(x: NSTDFloat64) -> NSTDFloat64 {
 ///
 /// `NSTDFloat32 sin` - The sine value of `x`.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_math_sin_f32(x: NSTDFloat32) -> NSTDFloat32 {
+#[nstdapi]
+pub fn nstd_math_sin_f32(x: NSTDFloat32) -> NSTDFloat32 {
     x.sin()
 }
 /// Computes the sine of `x`.
@@ -176,8 +177,8 @@ pub extern "C" fn nstd_math_sin_f32(x: NSTDFloat32) -> NSTDFloat32 {
 ///
 /// `NSTDFloat64 sin` - The sine value of `x`.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_math_sin_f64(x: NSTDFloat64) -> NSTDFloat64 {
+#[nstdapi]
+pub fn nstd_math_sin_f64(x: NSTDFloat64) -> NSTDFloat64 {
     x.sin()
 }
 
@@ -191,8 +192,8 @@ pub extern "C" fn nstd_math_sin_f64(x: NSTDFloat64) -> NSTDFloat64 {
 ///
 /// `NSTDFloat32 cos` - The cosine value of `x`.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_math_cos_f32(x: NSTDFloat32) -> NSTDFloat32 {
+#[nstdapi]
+pub fn nstd_math_cos_f32(x: NSTDFloat32) -> NSTDFloat32 {
     x.cos()
 }
 /// Computes the cosine of `x`.
@@ -205,8 +206,8 @@ pub extern "C" fn nstd_math_cos_f32(x: NSTDFloat32) -> NSTDFloat32 {
 ///
 /// `NSTDFloat64 cos` - The cosine value of `x`.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_math_cos_f64(x: NSTDFloat64) -> NSTDFloat64 {
+#[nstdapi]
+pub fn nstd_math_cos_f64(x: NSTDFloat64) -> NSTDFloat64 {
     x.cos()
 }
 
@@ -220,8 +221,8 @@ pub extern "C" fn nstd_math_cos_f64(x: NSTDFloat64) -> NSTDFloat64 {
 ///
 /// `NSTDFloat32 tan` - The tangent value of `x`.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_math_tan_f32(x: NSTDFloat32) -> NSTDFloat32 {
+#[nstdapi]
+pub fn nstd_math_tan_f32(x: NSTDFloat32) -> NSTDFloat32 {
     x.tan()
 }
 /// Computes the tangent of `x`.
@@ -234,8 +235,8 @@ pub extern "C" fn nstd_math_tan_f32(x: NSTDFloat32) -> NSTDFloat32 {
 ///
 /// `NSTDFloat64 tan` - The tangent value of `x`.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_math_tan_f64(x: NSTDFloat64) -> NSTDFloat64 {
+#[nstdapi]
+pub fn nstd_math_tan_f64(x: NSTDFloat64) -> NSTDFloat64 {
     x.tan()
 }
 
@@ -249,8 +250,8 @@ pub extern "C" fn nstd_math_tan_f64(x: NSTDFloat64) -> NSTDFloat64 {
 ///
 /// `NSTDFloat32 asin` - The arcsine value of `x`.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_math_asin_f32(x: NSTDFloat32) -> NSTDFloat32 {
+#[nstdapi]
+pub fn nstd_math_asin_f32(x: NSTDFloat32) -> NSTDFloat32 {
     x.asin()
 }
 /// Computes the arcsine of `x`.
@@ -263,8 +264,8 @@ pub extern "C" fn nstd_math_asin_f32(x: NSTDFloat32) -> NSTDFloat32 {
 ///
 /// `NSTDFloat64 asin` - The arcsine value of `x`.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_math_asin_f64(x: NSTDFloat64) -> NSTDFloat64 {
+#[nstdapi]
+pub fn nstd_math_asin_f64(x: NSTDFloat64) -> NSTDFloat64 {
     x.asin()
 }
 
@@ -278,8 +279,8 @@ pub extern "C" fn nstd_math_asin_f64(x: NSTDFloat64) -> NSTDFloat64 {
 ///
 /// `NSTDFloat32 acos` - The arccosine value of `x`.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_math_acos_f32(x: NSTDFloat32) -> NSTDFloat32 {
+#[nstdapi]
+pub fn nstd_math_acos_f32(x: NSTDFloat32) -> NSTDFloat32 {
     x.acos()
 }
 /// Computes the arccosine of `x`.
@@ -292,8 +293,8 @@ pub extern "C" fn nstd_math_acos_f32(x: NSTDFloat32) -> NSTDFloat32 {
 ///
 /// `NSTDFloat64 acos` - The arccosine value of `x`.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_math_acos_f64(x: NSTDFloat64) -> NSTDFloat64 {
+#[nstdapi]
+pub fn nstd_math_acos_f64(x: NSTDFloat64) -> NSTDFloat64 {
     x.acos()
 }
 
@@ -307,8 +308,8 @@ pub extern "C" fn nstd_math_acos_f64(x: NSTDFloat64) -> NSTDFloat64 {
 ///
 /// `NSTDFloat32 atan` - The arctangent value of `x`.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_math_atan_f32(x: NSTDFloat32) -> NSTDFloat32 {
+#[nstdapi]
+pub fn nstd_math_atan_f32(x: NSTDFloat32) -> NSTDFloat32 {
     x.atan()
 }
 /// Computes the arctangent of `x`.
@@ -321,8 +322,8 @@ pub extern "C" fn nstd_math_atan_f32(x: NSTDFloat32) -> NSTDFloat32 {
 ///
 /// `NSTDFloat64 atan` - The arctangent value of `x`.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_math_atan_f64(x: NSTDFloat64) -> NSTDFloat64 {
+#[nstdapi]
+pub fn nstd_math_atan_f64(x: NSTDFloat64) -> NSTDFloat64 {
     x.atan()
 }
 
@@ -338,8 +339,8 @@ pub extern "C" fn nstd_math_atan_f64(x: NSTDFloat64) -> NSTDFloat64 {
 ///
 /// `NSTDFloat32 atan2` - The four quadrant arctangent of `x` & `y`.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_math_atan2_f32(x: NSTDFloat32, y: NSTDFloat32) -> NSTDFloat32 {
+#[nstdapi]
+pub fn nstd_math_atan2_f32(x: NSTDFloat32, y: NSTDFloat32) -> NSTDFloat32 {
     x.atan2(y)
 }
 /// Computes the four quadrant arctangent of `x` & `y`.
@@ -354,8 +355,8 @@ pub extern "C" fn nstd_math_atan2_f32(x: NSTDFloat32, y: NSTDFloat32) -> NSTDFlo
 ///
 /// `NSTDFloat64 atan2` - The four quadrant arctangent of `x` & `y`.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_math_atan2_f64(x: NSTDFloat64, y: NSTDFloat64) -> NSTDFloat64 {
+#[nstdapi]
+pub fn nstd_math_atan2_f64(x: NSTDFloat64, y: NSTDFloat64) -> NSTDFloat64 {
     x.atan2(y)
 }
 
@@ -369,8 +370,8 @@ pub extern "C" fn nstd_math_atan2_f64(x: NSTDFloat64, y: NSTDFloat64) -> NSTDFlo
 ///
 /// `NSTDFloat32 sinh` - The hyperbolic sine of `x`.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_math_sinh_f32(x: NSTDFloat32) -> NSTDFloat32 {
+#[nstdapi]
+pub fn nstd_math_sinh_f32(x: NSTDFloat32) -> NSTDFloat32 {
     x.sinh()
 }
 /// Computes the hyperbolic sine of `x`.
@@ -383,8 +384,8 @@ pub extern "C" fn nstd_math_sinh_f32(x: NSTDFloat32) -> NSTDFloat32 {
 ///
 /// `NSTDFloat64 sinh` - The hyperbolic sine of `x`.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_math_sinh_f64(x: NSTDFloat64) -> NSTDFloat64 {
+#[nstdapi]
+pub fn nstd_math_sinh_f64(x: NSTDFloat64) -> NSTDFloat64 {
     x.sinh()
 }
 
@@ -398,8 +399,8 @@ pub extern "C" fn nstd_math_sinh_f64(x: NSTDFloat64) -> NSTDFloat64 {
 ///
 /// `NSTDFloat32 cosh` - The hyperbolic cosine of `x`.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_math_cosh_f32(x: NSTDFloat32) -> NSTDFloat32 {
+#[nstdapi]
+pub fn nstd_math_cosh_f32(x: NSTDFloat32) -> NSTDFloat32 {
     x.cosh()
 }
 /// Computes the hyperbolic cosine of `x`.
@@ -412,8 +413,8 @@ pub extern "C" fn nstd_math_cosh_f32(x: NSTDFloat32) -> NSTDFloat32 {
 ///
 /// `NSTDFloat64 cosh` - The hyperbolic cosine of `x`.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_math_cosh_f64(x: NSTDFloat64) -> NSTDFloat64 {
+#[nstdapi]
+pub fn nstd_math_cosh_f64(x: NSTDFloat64) -> NSTDFloat64 {
     x.cosh()
 }
 
@@ -427,8 +428,8 @@ pub extern "C" fn nstd_math_cosh_f64(x: NSTDFloat64) -> NSTDFloat64 {
 ///
 /// `NSTDFloat32 tanh` - The hyperbolic tangent of `x`.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_math_tanh_f32(x: NSTDFloat32) -> NSTDFloat32 {
+#[nstdapi]
+pub fn nstd_math_tanh_f32(x: NSTDFloat32) -> NSTDFloat32 {
     x.tanh()
 }
 /// Computes the hyperbolic tangent of `x`.
@@ -441,7 +442,7 @@ pub extern "C" fn nstd_math_tanh_f32(x: NSTDFloat32) -> NSTDFloat32 {
 ///
 /// `NSTDFloat64 tanh` - The hyperbolic tangent of `x`.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_math_tanh_f64(x: NSTDFloat64) -> NSTDFloat64 {
+#[nstdapi]
+pub fn nstd_math_tanh_f64(x: NSTDFloat64) -> NSTDFloat64 {
     x.tanh()
 }

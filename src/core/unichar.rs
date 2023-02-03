@@ -7,9 +7,10 @@ use crate::{
     core::optional::{gen_optional, NSTDOptional},
     NSTDChar32,
 };
+use nstdapi::nstdapi;
 
 /// Represents a unicode scalar value.
-#[repr(C)]
+#[nstdapi]
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct NSTDUnichar {
     /// The 32-bit value.
@@ -42,8 +43,8 @@ gen_optional!(NSTDOptionalUnichar, NSTDUnichar);
 ///
 /// `NSTDOptionalUnichar unichar` - The new Unicode scalar value on success.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub const extern "C" fn nstd_core_unichar_new(value: NSTDChar32) -> NSTDOptionalUnichar {
+#[nstdapi]
+pub const fn nstd_core_unichar_new(value: NSTDChar32) -> NSTDOptionalUnichar {
     match char::from_u32(value) {
         Some(_) => NSTDOptional::Some(NSTDUnichar { value }),
         _ => NSTDOptional::None,

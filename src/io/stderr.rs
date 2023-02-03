@@ -1,5 +1,6 @@
 //! A handle to the standard error stream.
 use crate::{core::slice::NSTDSlice, io::NSTDIOError, NSTDUInt};
+use nstdapi::nstdapi;
 use std::io::Stderr;
 #[cfg(unix)]
 use std::os::unix::io::AsRawFd;
@@ -13,8 +14,8 @@ pub type NSTDStderr = Box<Stderr>;
 ///
 /// `NSTDStderr handle` - A handle to the standard error stream.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_io_stderr() -> NSTDStderr {
+#[nstdapi]
+pub fn nstd_io_stderr() -> NSTDStderr {
     NSTDStderr::new(std::io::stderr())
 }
 
@@ -42,8 +43,8 @@ pub extern "C" fn nstd_io_stderr() -> NSTDStderr {
 ///
 /// This function can cause undefined behavior if `bytes`'s data is invalid.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub unsafe extern "C" fn nstd_io_stderr_write(
+#[nstdapi]
+pub unsafe fn nstd_io_stderr_write(
     handle: &mut NSTDStderr,
     bytes: &NSTDSlice,
     written: &mut NSTDUInt,
@@ -83,11 +84,8 @@ pub unsafe extern "C" fn nstd_io_stderr_write(
 ///
 /// This function can cause undefined behavior if `bytes`'s data is invalid.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub unsafe extern "C" fn nstd_io_stderr_write_all(
-    handle: &mut NSTDStderr,
-    bytes: &NSTDSlice,
-) -> NSTDIOError {
+#[nstdapi]
+pub unsafe fn nstd_io_stderr_write_all(handle: &mut NSTDStderr, bytes: &NSTDSlice) -> NSTDIOError {
     #[cfg(not(unix))]
     return crate::io::stdio::write_all(handle, bytes);
     #[cfg(unix)]
@@ -104,8 +102,8 @@ pub unsafe extern "C" fn nstd_io_stderr_write_all(
 ///
 /// `NSTDIOError errc` - The I/O operation error code.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_io_stderr_flush(handle: &mut NSTDStderr) -> NSTDIOError {
+#[nstdapi]
+pub fn nstd_io_stderr_flush(handle: &mut NSTDStderr) -> NSTDIOError {
     crate::io::stdio::flush(handle)
 }
 
@@ -115,6 +113,6 @@ pub extern "C" fn nstd_io_stderr_flush(handle: &mut NSTDStderr) -> NSTDIOError {
 ///
 /// - `NSTDStderr handle` - A handle to the standard error stream.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
+#[nstdapi]
 #[allow(unused_variables)]
-pub extern "C" fn nstd_io_stderr_free(handle: NSTDStderr) {}
+pub fn nstd_io_stderr_free(handle: NSTDStderr) {}

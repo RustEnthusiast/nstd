@@ -8,6 +8,7 @@ use crate::{
     NSTDInt, NSTDInt16, NSTDInt32, NSTDInt64, NSTDInt8, NSTDUInt, NSTDUInt16, NSTDUInt32,
     NSTDUInt64, NSTDUInt8,
 };
+use nstdapi::nstdapi;
 
 /// Generates the increment (++) operator implementations.
 macro_rules! gen_inc {
@@ -32,7 +33,7 @@ macro_rules! gen_inc {
         /// assert!(x == 6);
         /// ```
         #[inline]
-        #[cfg_attr(feature = "capi", no_mangle)]
+        #[nstdapi]
         pub extern "C" fn $name(x: $T) {
             *x = x
                 .checked_add(1)
@@ -74,7 +75,7 @@ macro_rules! gen_dec {
         /// assert!(x == 4);
         /// ```
         #[inline]
-        #[cfg_attr(feature = "capi", no_mangle)]
+        #[nstdapi]
         pub extern "C" fn $name(x: $T) {
             *x = x
                 .checked_sub(1)
@@ -119,7 +120,7 @@ macro_rules! gen_neg {
         #[doc = concat!("assert!(", stringify!($name), "(69) == -69);")]
         /// ```
         #[inline]
-        #[cfg_attr(feature = "capi", no_mangle)]
+        #[nstdapi]
         pub extern "C" fn $name(x: $T) -> $T {
             x.checked_neg().expect("attempt to negate with overflow")
         }
@@ -158,7 +159,7 @@ macro_rules! gen_add {
         #[doc = concat!("assert!(", stringify!($name), "(4, 5) == 9);")]
         /// ```
         #[inline]
-        #[cfg_attr(feature = "capi", no_mangle)]
+        #[nstdapi]
         pub extern "C" fn $name(x: $T, y: $T) -> $T {
             x.checked_add(y).expect("attempt to add with overflow")
         }
@@ -202,7 +203,7 @@ macro_rules! gen_sub {
         #[doc = concat!("assert!(", stringify!($name), "(9, 5) == 4);")]
         /// ```
         #[inline]
-        #[cfg_attr(feature = "capi", no_mangle)]
+        #[nstdapi]
         pub extern "C" fn $name(x: $T, y: $T) -> $T {
             x.checked_sub(y).expect("attempt to subtract with overflow")
         }
@@ -246,7 +247,7 @@ macro_rules! gen_mul {
         #[doc = concat!("assert!(", stringify!($name), "(3, 4) == 12);")]
         /// ```
         #[inline]
-        #[cfg_attr(feature = "capi", no_mangle)]
+        #[nstdapi]
         pub extern "C" fn $name(x: $T, y: $T) -> $T {
             x.checked_mul(y).expect("attempt to multiply with overflow")
         }
@@ -290,7 +291,7 @@ macro_rules! gen_div {
         #[doc = concat!("assert!(", stringify!($name), "(15, 3) == 5);")]
         /// ```
         #[inline]
-        #[cfg_attr(feature = "capi", no_mangle)]
+        #[nstdapi]
         pub extern "C" fn $name(x: $T, y: $T) -> $T {
             if y == 0 {
                 panic!("attempt to divide by zero");
@@ -337,7 +338,7 @@ macro_rules! gen_rem {
         #[doc = concat!("assert!(", stringify!($name), "(23, 5) == 3);")]
         /// ```
         #[inline]
-        #[cfg_attr(feature = "capi", no_mangle)]
+        #[nstdapi]
         pub extern "C" fn $name(x: $T, y: $T) -> $T {
             if y == 0 {
                 panic!("attempt to calculate the remainder with a divisor of zero");
@@ -385,7 +386,7 @@ macro_rules! gen_shl {
         #[doc = concat!("assert!(", stringify!($name), "(1, 4) == 16);")]
         /// ```
         #[inline]
-        #[cfg_attr(feature = "capi", no_mangle)]
+        #[nstdapi]
         pub extern "C" fn $name(x: $T, y: NSTDUInt32) -> $T {
             x.checked_shl(y)
                 .expect("attempt to shift left with overflow")
@@ -430,7 +431,7 @@ macro_rules! gen_shr {
         #[doc = concat!("assert!(", stringify!($name), "(16, 4) == 1);")]
         /// ```
         #[inline]
-        #[cfg_attr(feature = "capi", no_mangle)]
+        #[nstdapi]
         pub extern "C" fn $name(x: $T, y: NSTDUInt32) -> $T {
             x.checked_shr(y)
                 .expect("attempt to shift right with overflow")

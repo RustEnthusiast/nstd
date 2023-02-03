@@ -3,10 +3,11 @@ use crate::{
     core::optional::{gen_optional, NSTDOptional},
     NSTDInt64, NSTDUInt32,
 };
+use nstdapi::nstdapi;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 /// A structure representing system time since January 1st 1970.
-#[repr(C)]
+#[nstdapi]
 #[derive(Clone, Copy)]
 pub struct NSTDTime {
     /// The number of seconds since January 1st 1970.
@@ -40,7 +41,7 @@ gen_optional!(NSTDOptionalTime, NSTDTime);
 ///
 /// `NSTDTime time` - The current time.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_time_now() -> NSTDTime {
+#[nstdapi]
+pub fn nstd_time_now() -> NSTDTime {
     NSTDTime::from(SystemTime::now())
 }
