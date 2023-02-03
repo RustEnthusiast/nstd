@@ -4,6 +4,7 @@ use crate::{
     string::{NSTDOptionalString, NSTDString},
     NSTDAnyMut, NSTDFloat64, NSTDInt32, NSTDUInt16, NSTDUInt32,
 };
+use nstdapi::nstdapi;
 use winit::monitor::{MonitorHandle, VideoMode};
 
 /// Represents a monitor/display.
@@ -19,7 +20,7 @@ pub type NSTDDisplayMode = Box<VideoMode>;
 pub type NSTDDisplayModeHandle<'a> = &'a VideoMode;
 
 /// Represents the size of a display.
-#[repr(C)]
+#[nstdapi]
 #[derive(Clone, Copy)]
 pub struct NSTDDisplaySize {
     /// The width of the display.
@@ -29,7 +30,7 @@ pub struct NSTDDisplaySize {
 }
 
 /// Represents the position of a display.
-#[repr(C)]
+#[nstdapi]
 #[derive(Clone, Copy)]
 pub struct NSTDDisplayPosition {
     /// The position of the display on the x-axis.
@@ -48,8 +49,8 @@ pub struct NSTDDisplayPosition {
 ///
 /// `NSTDDisplay display` - An owned handle to the display.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_app_display_new(handle: NSTDDisplayHandle) -> NSTDDisplay {
+#[nstdapi]
+pub fn nstd_app_display_new(handle: NSTDDisplayHandle) -> NSTDDisplay {
     Box::new(handle.clone())
 }
 
@@ -63,8 +64,8 @@ pub extern "C" fn nstd_app_display_new(handle: NSTDDisplayHandle) -> NSTDDisplay
 ///
 /// `NSTDDisplayHandle handle` - A borrowed handle to the display.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_app_display_handle(display: &NSTDDisplay) -> NSTDDisplayHandle {
+#[nstdapi]
+pub fn nstd_app_display_handle(display: &NSTDDisplay) -> NSTDDisplayHandle {
     display
 }
 
@@ -78,8 +79,8 @@ pub extern "C" fn nstd_app_display_handle(display: &NSTDDisplay) -> NSTDDisplayH
 ///
 /// `NSTDOptionalString name` - The name of the display if it could be obtained.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_app_display_name(display: NSTDDisplayHandle) -> NSTDOptionalString {
+#[nstdapi]
+pub fn nstd_app_display_name(display: NSTDDisplayHandle) -> NSTDOptionalString {
     match display.name() {
         Some(name) => NSTDOptional::Some(NSTDString::from_str(&name)),
         _ => NSTDOptional::None,
@@ -96,8 +97,8 @@ pub extern "C" fn nstd_app_display_name(display: NSTDDisplayHandle) -> NSTDOptio
 ///
 /// `NSTDDisplaySize size` - The size of the display.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_app_display_size(display: NSTDDisplayHandle) -> NSTDDisplaySize {
+#[nstdapi]
+pub fn nstd_app_display_size(display: NSTDDisplayHandle) -> NSTDDisplaySize {
     let size = display.size();
     NSTDDisplaySize {
         width: size.width,
@@ -115,8 +116,8 @@ pub extern "C" fn nstd_app_display_size(display: NSTDDisplayHandle) -> NSTDDispl
 ///
 /// `NSTDDisplayPosition position` - The position of the display.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_app_display_position(display: NSTDDisplayHandle) -> NSTDDisplayPosition {
+#[nstdapi]
+pub fn nstd_app_display_position(display: NSTDDisplayHandle) -> NSTDDisplayPosition {
     let position = display.position();
     NSTDDisplayPosition {
         x: position.x,
@@ -134,8 +135,8 @@ pub extern "C" fn nstd_app_display_position(display: NSTDDisplayHandle) -> NSTDD
 ///
 /// `NSTDUInt32 refresh_rate` - The display's refresh rate, possibly 0 on error.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_app_display_refresh_rate(display: NSTDDisplayHandle) -> NSTDUInt32 {
+#[nstdapi]
+pub fn nstd_app_display_refresh_rate(display: NSTDDisplayHandle) -> NSTDUInt32 {
     display.refresh_rate_millihertz().unwrap_or_default()
 }
 
@@ -149,8 +150,8 @@ pub extern "C" fn nstd_app_display_refresh_rate(display: NSTDDisplayHandle) -> N
 ///
 /// `NSTDFloat64 scale_factor` - The display's scale factor.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_app_display_scale_factor(display: NSTDDisplayHandle) -> NSTDFloat64 {
+#[nstdapi]
+pub fn nstd_app_display_scale_factor(display: NSTDDisplayHandle) -> NSTDFloat64 {
     display.scale_factor()
 }
 
@@ -168,8 +169,8 @@ pub extern "C" fn nstd_app_display_scale_factor(display: NSTDDisplayHandle) -> N
 ///
 /// The user of this function must guarantee that `callback` is a valid C function pointer.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub unsafe extern "C" fn nstd_app_display_modes(
+#[nstdapi]
+pub unsafe fn nstd_app_display_modes(
     display: NSTDDisplayHandle,
     callback: Option<unsafe extern "C" fn(NSTDDisplayModeHandle, NSTDAnyMut)>,
     data: NSTDAnyMut,
@@ -191,8 +192,8 @@ pub unsafe extern "C" fn nstd_app_display_modes(
 ///
 /// `NSTDDisplayMode mode` - An owned representation of the display mode.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_app_display_mode_new(handle: NSTDDisplayModeHandle) -> NSTDDisplayMode {
+#[nstdapi]
+pub fn nstd_app_display_mode_new(handle: NSTDDisplayModeHandle) -> NSTDDisplayMode {
     Box::new(handle.clone())
 }
 
@@ -206,8 +207,8 @@ pub extern "C" fn nstd_app_display_mode_new(handle: NSTDDisplayModeHandle) -> NS
 ///
 /// `NSTDDisplayModeHandle handle` - A borrowed handle to the display mode.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_app_display_mode_handle(mode: &NSTDDisplayMode) -> NSTDDisplayModeHandle {
+#[nstdapi]
+pub fn nstd_app_display_mode_handle(mode: &NSTDDisplayMode) -> NSTDDisplayModeHandle {
     mode
 }
 
@@ -221,8 +222,8 @@ pub extern "C" fn nstd_app_display_mode_handle(mode: &NSTDDisplayMode) -> NSTDDi
 ///
 /// `NSTDDisplaySize size` - The display mode's size.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_app_display_mode_size(mode: NSTDDisplayModeHandle) -> NSTDDisplaySize {
+#[nstdapi]
+pub fn nstd_app_display_mode_size(mode: NSTDDisplayModeHandle) -> NSTDDisplaySize {
     let size = mode.size();
     NSTDDisplaySize {
         width: size.width,
@@ -240,8 +241,8 @@ pub extern "C" fn nstd_app_display_mode_size(mode: NSTDDisplayModeHandle) -> NST
 ///
 /// `NSTDUInt16 bit_depth` - The display mode's bit depth.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_app_display_mode_bit_depth(mode: NSTDDisplayModeHandle) -> NSTDUInt16 {
+#[nstdapi]
+pub fn nstd_app_display_mode_bit_depth(mode: NSTDDisplayModeHandle) -> NSTDUInt16 {
     mode.bit_depth()
 }
 
@@ -255,7 +256,7 @@ pub extern "C" fn nstd_app_display_mode_bit_depth(mode: NSTDDisplayModeHandle) -
 ///
 /// `NSTDUInt32 refresh_rate` - The display's refresh rate.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_app_display_mode_refresh_rate(mode: NSTDDisplayModeHandle) -> NSTDUInt32 {
+#[nstdapi]
+pub fn nstd_app_display_mode_refresh_rate(mode: NSTDDisplayModeHandle) -> NSTDUInt32 {
     mode.refresh_rate_millihertz()
 }
