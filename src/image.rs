@@ -4,6 +4,7 @@ use crate::{
     NSTDUInt32,
 };
 use image::DynamicImage;
+use nstdapi::nstdapi;
 
 /// An image of any format.
 pub type NSTDImage = Box<DynamicImage>;
@@ -30,8 +31,8 @@ pub type NSTDImage = Box<DynamicImage>;
 ///
 /// This operation can cause undefined behavior if `buffer`'s data is invalid.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub unsafe extern "C" fn nstd_image_load(buffer: &NSTDSlice) -> Option<NSTDImage> {
+#[nstdapi]
+pub unsafe fn nstd_image_load(buffer: &NSTDSlice) -> Option<NSTDImage> {
     match image::load_from_memory(buffer.as_slice()) {
         Ok(img) => Some(Box::new(img)),
         _ => None,
@@ -48,8 +49,8 @@ pub unsafe extern "C" fn nstd_image_load(buffer: &NSTDSlice) -> Option<NSTDImage
 ///
 /// `NSTDSlice bytes` - The image's raw pixel data.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_image_as_bytes(img: &NSTDImage) -> NSTDSlice {
+#[nstdapi]
+pub fn nstd_image_as_bytes(img: &NSTDImage) -> NSTDSlice {
     let bytes = img.as_bytes();
     nstd_core_slice_new(bytes.as_ptr().cast(), 1, bytes.len())
 }
@@ -64,8 +65,8 @@ pub extern "C" fn nstd_image_as_bytes(img: &NSTDImage) -> NSTDSlice {
 ///
 /// `NSTDUInt32 width` - The width of the image.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_image_width(img: &NSTDImage) -> NSTDUInt32 {
+#[nstdapi]
+pub fn nstd_image_width(img: &NSTDImage) -> NSTDUInt32 {
     img.width()
 }
 
@@ -79,8 +80,8 @@ pub extern "C" fn nstd_image_width(img: &NSTDImage) -> NSTDUInt32 {
 ///
 /// `NSTDUInt32 height` - The height of the image.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
-pub extern "C" fn nstd_image_height(img: &NSTDImage) -> NSTDUInt32 {
+#[nstdapi]
+pub fn nstd_image_height(img: &NSTDImage) -> NSTDUInt32 {
     img.height()
 }
 
@@ -90,6 +91,6 @@ pub extern "C" fn nstd_image_height(img: &NSTDImage) -> NSTDUInt32 {
 ///
 /// - `NSTDImage img` - The image.
 #[inline]
-#[cfg_attr(feature = "capi", no_mangle)]
+#[nstdapi]
 #[allow(unused_variables)]
-pub extern "C" fn nstd_image_free(img: NSTDImage) {}
+pub fn nstd_image_free(img: NSTDImage) {}
