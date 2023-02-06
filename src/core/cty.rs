@@ -218,10 +218,6 @@ gen_deterministic!(
 
 /// Determines whether or not `chr` is a digit, depending on `radix`.
 ///
-/// # Note
-///
-/// This will always return false when given a base greater than 36.
-///
 /// # Parameters:
 ///
 /// - `NSTDUnichar chr` - The character to check.
