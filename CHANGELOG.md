@@ -1,5 +1,7 @@
 # TBD
 ### `nstd.core`
+- Added `nstd_core_unichar_is_[ascii|alphabetic|numeric|alphanumeric|lowercase|uppercase|whitespace|control|digit]`.
+- Added `nstd_core_unichar_replacement`.
 - `nstd_core_str[_mut]_substr` now returns `NSTDOptionalStr[Mut]`.
 - `nstd_core_str[_mut]_from_[cstr|raw_cstr[_with_null]|bytes]` now returns `NSTDOptionalStr[Mut]`.
 - `nstd_core_cstr[_mut]_new` now returns `NSTDOptionalCStr[Mut]`.

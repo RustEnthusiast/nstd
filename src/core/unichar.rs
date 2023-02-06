@@ -5,7 +5,7 @@
 //! worrying about Unicode validity.
 use crate::{
     core::optional::{gen_optional, NSTDOptional},
-    NSTDChar32,
+    NSTDBool, NSTDChar32, NSTDUInt32,
 };
 use nstdapi::nstdapi;
 
@@ -49,4 +49,247 @@ pub const fn nstd_core_unichar_new(value: NSTDChar32) -> NSTDOptionalUnichar {
         Some(_) => NSTDOptional::Some(NSTDUnichar { value }),
         _ => NSTDOptional::None,
     }
+}
+
+/// Returns the Unicode replacement character (�).
+///
+/// # Returns
+///
+/// `NSTDUnichar replacement_char` - The Unicode replacement character (�).
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::unichar::nstd_core_unichar_replacement;
+///
+/// assert!(nstd_core_unichar_replacement() == char::REPLACEMENT_CHARACTER.into());
+/// ```
+#[inline]
+#[nstdapi]
+pub fn nstd_core_unichar_replacement() -> NSTDUnichar {
+    char::REPLACEMENT_CHARACTER.into()
+}
+
+/// Generates deterministic functions such as `is_alphabetic` or `is_numeric`.
+macro_rules! gen_deterministic {
+    (
+        $(#[$meta:meta])*
+        $name: ident,
+        $method: ident
+    ) => {
+        $(#[$meta])*
+        #[inline]
+        #[nstdapi]
+        pub fn $name(chr: NSTDUnichar) -> NSTDBool {
+            char::from(chr).$method()
+        }
+    };
+}
+gen_deterministic!(
+    /// Determines whether or not `chr` is an ASCII character.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDUnichar chr` - The character to check.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDBool is_ascii` - `NSTD_TRUE` if `chr` is an ASCII character.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::{core::unichar::nstd_core_unichar_is_ascii, NSTD_FALSE};
+    ///
+    /// assert!(nstd_core_unichar_is_ascii('='.into()) != NSTD_FALSE);
+    /// assert!(nstd_core_unichar_is_ascii('💯'.into()) == NSTD_FALSE);
+    /// ```
+    nstd_core_unichar_is_ascii,
+    is_ascii
+);
+gen_deterministic!(
+    /// Determines whether or not `chr` is alphabetic according to the Unicode standard.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDUnichar chr` - The character to check.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDBool is_alphabetic` - `NSTD_TRUE` if `chr` is alphabetic.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::{core::unichar::nstd_core_unichar_is_alphabetic, NSTD_FALSE};
+    ///
+    /// assert!(nstd_core_unichar_is_alphabetic('G'.into()) != NSTD_FALSE);
+    /// assert!(nstd_core_unichar_is_alphabetic('0'.into()) == NSTD_FALSE);
+    /// ```
+    nstd_core_unichar_is_alphabetic,
+    is_alphabetic
+);
+gen_deterministic!(
+    /// Determines whether or not `chr` is numeric according to the Unicode standard.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDUnichar chr` - The character to check.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDBool is_numeric` - `NSTD_TRUE` if `chr` is numeric.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::{core::unichar::nstd_core_unichar_is_numeric, NSTD_FALSE};
+    ///
+    /// assert!(nstd_core_unichar_is_numeric('9'.into()) != NSTD_FALSE);
+    /// assert!(nstd_core_unichar_is_numeric('a'.into()) == NSTD_FALSE);
+    /// ```
+    nstd_core_unichar_is_numeric,
+    is_numeric
+);
+gen_deterministic!(
+    /// Determines whether or not `chr` is alphabetic or numeric according to the Unicode standard.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDUnichar chr` - The character to check.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDBool is_alphanumeric` - `NSTD_TRUE` if `chr` is alphabetic or numeric.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::{core::unichar::nstd_core_unichar_is_alphanumeric, NSTD_FALSE};
+    ///
+    /// assert!(nstd_core_unichar_is_alphanumeric('Z'.into()) != NSTD_FALSE);
+    /// assert!(nstd_core_unichar_is_alphanumeric('5'.into()) != NSTD_FALSE);
+    /// assert!(nstd_core_unichar_is_alphanumeric(';'.into()) == NSTD_FALSE);
+    /// ```
+    nstd_core_unichar_is_alphanumeric,
+    is_alphanumeric
+);
+gen_deterministic!(
+    /// Determines whether or not `chr` is lowercase according to the Unicode standard.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDUnichar chr` - The character to check.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDBool is_lowercase` - `NSTD_TRUE` if `chr` is lowercase.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::{core::unichar::nstd_core_unichar_is_lowercase, NSTD_FALSE};
+    ///
+    /// assert!(nstd_core_unichar_is_lowercase('v'.into()) != NSTD_FALSE);
+    /// assert!(nstd_core_unichar_is_lowercase('M'.into()) == NSTD_FALSE);
+    /// ```
+    nstd_core_unichar_is_lowercase,
+    is_lowercase
+);
+gen_deterministic!(
+    /// Determines whether or not `chr` is uppercase according to the Unicode standard.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDUnichar chr` - The character to check.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDBool is_uppercase` - `NSTD_TRUE` if `chr` is uppercase.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::{core::unichar::nstd_core_unichar_is_uppercase, NSTD_FALSE};
+    ///
+    /// assert!(nstd_core_unichar_is_uppercase('P'.into()) != NSTD_FALSE);
+    /// assert!(nstd_core_unichar_is_uppercase('s'.into()) == NSTD_FALSE);
+    /// ```
+    nstd_core_unichar_is_uppercase,
+    is_uppercase
+);
+gen_deterministic!(
+    /// Determines whether or not `chr` is white space according to the Unicode standard.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDUnichar chr` - The character to check.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDBool is_whitespace` - `NSTD_TRUE` if `chr` is white space.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::{core::unichar::nstd_core_unichar_is_whitespace, NSTD_FALSE};
+    ///
+    /// assert!(nstd_core_unichar_is_whitespace('\n'.into()) != NSTD_FALSE);
+    /// assert!(nstd_core_unichar_is_whitespace('.'.into()) == NSTD_FALSE);
+    /// ```
+    nstd_core_unichar_is_whitespace,
+    is_whitespace
+);
+gen_deterministic!(
+    /// Determines whether or not `chr` is a control character according to the Unicode standard.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDUnichar chr` - The character to check.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDBool is_control` - `NSTD_TRUE` if `chr` is a control character.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use nstd_sys::{core::unichar::nstd_core_unichar_is_control, NSTD_FALSE};
+    ///
+    /// assert!(nstd_core_unichar_is_control('\0'.into()) != NSTD_FALSE);
+    /// assert!(nstd_core_unichar_is_control('\\'.into()) == NSTD_FALSE);
+    /// ```
+    nstd_core_unichar_is_control,
+    is_control
+);
+
+/// Determines whether or not `chr` is a digit, depending on `radix`.
+///
+/// # Parameters:
+///
+/// - `NSTDUnichar chr` - The character to check.
+///
+/// - `NSTDUInt32 radix` - The base.
+///
+/// # Returns
+///
+/// `NSTDBool is_digit` - `NSTD_TRUE` if `chr` is a digit.
+///
+/// # Panics
+///
+/// This function will panic if `radix` is greater than 36.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::{core::unichar::nstd_core_unichar_is_digit, NSTD_FALSE};
+///
+/// assert!(nstd_core_unichar_is_digit('5'.into(), 16) != NSTD_FALSE);
+/// assert!(nstd_core_unichar_is_digit('E'.into(), 16) != NSTD_FALSE);
+/// assert!(nstd_core_unichar_is_digit('F'.into(), 10) == NSTD_FALSE);
+/// ```
+#[inline]
+#[nstdapi]
+pub fn nstd_core_unichar_is_digit(chr: NSTDUnichar, radix: NSTDUInt32) -> NSTDBool {
+    char::from(chr).is_digit(radix)
 }
