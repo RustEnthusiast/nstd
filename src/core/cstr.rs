@@ -54,11 +54,8 @@ gen_optional!(NSTDOptionalCStr, NSTDCStr);
 ///
 /// # Returns
 ///
-/// `NSTDCStr cstr` - The new C string slice, referencing `raw`'s data.
-///
-/// # Panics
-///
-/// Panics if `raw` is null.
+/// `NSTDOptionalCStr cstr` - The new C string slice referencing `raw`'s data on success, or a
+/// "none" variant if `raw` is null.
 ///
 /// # Example
 ///
@@ -66,14 +63,16 @@ gen_optional!(NSTDOptionalCStr, NSTDCStr);
 /// use nstd_sys::core::cstr::{nstd_core_cstr_is_null_terminated, nstd_core_cstr_new};
 ///
 /// let str = "This is a null-terminated C string slice.\0";
-/// let cstr = nstd_core_cstr_new(str.as_ptr().cast(), str.len());
+/// let cstr = nstd_core_cstr_new(str.as_ptr().cast(), str.len()).unwrap();
 /// assert!(unsafe { nstd_core_cstr_is_null_terminated(&cstr) });
 /// ```
 #[inline]
 #[nstdapi]
-pub fn nstd_core_cstr_new(raw: *const NSTDChar, len: NSTDUInt) -> NSTDCStr {
-    assert!(!raw.is_null());
-    NSTDCStr { ptr: raw, len }
+pub fn nstd_core_cstr_new(raw: *const NSTDChar, len: NSTDUInt) -> NSTDOptionalCStr {
+    match raw.is_null() {
+        true => NSTDOptional::None,
+        false => NSTDOptional::Some(NSTDCStr { ptr: raw, len }),
+    }
 }
 
 /// Creates a new C string slice from a raw pointer and a size without checking if `raw` is null.
@@ -119,10 +118,6 @@ pub const unsafe fn nstd_core_cstr_new_unchecked(raw: *const NSTDChar, len: NSTD
 ///
 /// `NSTDCStr cstr` - The new C string slice, referencing `raw`'s data.
 ///
-/// # Panics
-///
-/// Panics if `raw` is null.
-///
 /// # Safety
 ///
 /// `raw` must point to a character array that is valid for reads up until and including it's
@@ -144,7 +139,7 @@ pub const unsafe fn nstd_core_cstr_new_unchecked(raw: *const NSTDChar, len: NSTD
 #[nstdapi]
 pub unsafe fn nstd_core_cstr_from_raw(raw: *const NSTDChar) -> NSTDCStr {
     let len = nstd_core_cstr_raw_len(raw);
-    nstd_core_cstr_new(raw, len)
+    nstd_core_cstr_new_unchecked(raw, len)
 }
 
 /// Creates a new instance of `NSTDCStr` from a raw C string, including the null byte.
@@ -156,10 +151,6 @@ pub unsafe fn nstd_core_cstr_from_raw(raw: *const NSTDChar) -> NSTDCStr {
 /// # Returns
 ///
 /// `NSTDCStr cstr` - The new C string slice, referencing `raw`'s data.
-///
-/// # Panics
-///
-/// Panics if `raw` is null.
 ///
 /// # Safety
 ///
@@ -182,7 +173,7 @@ pub unsafe fn nstd_core_cstr_from_raw(raw: *const NSTDChar) -> NSTDCStr {
 #[nstdapi]
 pub unsafe fn nstd_core_cstr_from_raw_with_null(raw: *const NSTDChar) -> NSTDCStr {
     let len = nstd_core_cstr_raw_len_with_null(raw);
-    nstd_core_cstr_new(raw, len)
+    nstd_core_cstr_new_unchecked(raw, len)
 }
 
 /// Returns a byte slice of a C string slice's data.
@@ -235,7 +226,7 @@ pub const fn nstd_core_cstr_as_bytes(cstr: &NSTDCStr) -> NSTDSlice {
 ///
 /// let str = "assert!(Rust + C >= God)";
 /// let str_ptr = str.as_ptr().cast();
-/// let cstr = nstd_core_cstr_new(str_ptr, str.len());
+/// let cstr = nstd_core_cstr_new(str_ptr, str.len()).unwrap();
 /// assert!(str_ptr == nstd_core_cstr_as_ptr(&cstr));
 /// ```
 #[inline]
@@ -298,13 +289,13 @@ pub const fn nstd_core_cstr_len(cstr: &NSTDCStr) -> NSTDUInt {
 /// };
 ///
 /// let nn_bytes = "Hello, world!";
-/// let nn_cstr = nstd_core_cstr_new(nn_bytes.as_ptr().cast(), nn_bytes.len());
+/// let nn_cstr = nstd_core_cstr_new(nn_bytes.as_ptr().cast(), nn_bytes.len()).unwrap();
 ///
 /// let nt_bytes = "Hello, world!\0";
-/// let nt_cstr = nstd_core_cstr_new(nt_bytes.as_ptr().cast(), nt_bytes.len());
+/// let nt_cstr = nstd_core_cstr_new(nt_bytes.as_ptr().cast(), nt_bytes.len()).unwrap();
 ///
 /// let mn_bytes = "Hello, \0world!";
-/// let mn_cstr = nstd_core_cstr_new(mn_bytes.as_ptr().cast(), mn_bytes.len());
+/// let mn_cstr = nstd_core_cstr_new(mn_bytes.as_ptr().cast(), mn_bytes.len()).unwrap();
 ///
 /// unsafe {
 ///     assert!(nstd_core_cstr_is_null_terminated(&nn_cstr) == NSTD_FALSE);
@@ -510,11 +501,8 @@ gen_optional!(NSTDOptionalCStrMut, NSTDCStrMut);
 ///
 /// # Returns
 ///
-/// `NSTDCStrMut cstr` - The new C string slice, referencing `raw`'s data.
-///
-/// # Panics
-///
-/// Panics if `raw` is null.
+/// `NSTDOptionalCStrMut cstr` - The new C string slice referencing `raw`'s data on success, or a
+/// "none" variant if `raw` is null.
 ///
 /// # Example
 ///
@@ -522,14 +510,16 @@ gen_optional!(NSTDOptionalCStrMut, NSTDCStrMut);
 /// use nstd_sys::core::cstr::{nstd_core_cstr_mut_is_null_terminated, nstd_core_cstr_mut_new};
 ///
 /// let mut str = String::from("This is a null-terminated C string slice.\0");
-/// let cstr = nstd_core_cstr_mut_new(str.as_mut_ptr().cast(), str.len());
+/// let cstr = nstd_core_cstr_mut_new(str.as_mut_ptr().cast(), str.len()).unwrap();
 /// assert!(unsafe { nstd_core_cstr_mut_is_null_terminated(&cstr) });
 /// ```
 #[inline]
 #[nstdapi]
-pub fn nstd_core_cstr_mut_new(raw: *mut NSTDChar, len: NSTDUInt) -> NSTDCStrMut {
-    assert!(!raw.is_null());
-    NSTDCStrMut { ptr: raw, len }
+pub fn nstd_core_cstr_mut_new(raw: *mut NSTDChar, len: NSTDUInt) -> NSTDOptionalCStrMut {
+    match raw.is_null() {
+        true => NSTDOptional::None,
+        false => NSTDOptional::Some(NSTDCStrMut { ptr: raw, len }),
+    }
 }
 
 /// Creates a new C string slice from a raw pointer and a size without checking if `raw` is null.
@@ -580,10 +570,6 @@ pub const unsafe fn nstd_core_cstr_mut_new_unchecked(
 ///
 /// `NSTDCStrMut cstr` - The new C string slice, referencing `raw`'s data.
 ///
-/// # Panics
-///
-/// Panics if `raw` is null.
-///
 /// # Safety
 ///
 /// `raw` must point to a character array that is valid for reads up until and including it's
@@ -605,7 +591,7 @@ pub const unsafe fn nstd_core_cstr_mut_new_unchecked(
 #[nstdapi]
 pub unsafe fn nstd_core_cstr_mut_from_raw(raw: *mut NSTDChar) -> NSTDCStrMut {
     let len = nstd_core_cstr_raw_len(raw);
-    nstd_core_cstr_mut_new(raw, len)
+    nstd_core_cstr_mut_new_unchecked(raw, len)
 }
 
 /// Creates a new instance of `NSTDCStrMut` from a raw C string, including the null byte.
@@ -617,10 +603,6 @@ pub unsafe fn nstd_core_cstr_mut_from_raw(raw: *mut NSTDChar) -> NSTDCStrMut {
 /// # Returns
 ///
 /// `NSTDCStrMut cstr` - The new C string slice, referencing `raw`'s data.
-///
-/// # Panics
-///
-/// Panics if `raw` is null.
 ///
 /// # Safety
 ///
@@ -643,7 +625,7 @@ pub unsafe fn nstd_core_cstr_mut_from_raw(raw: *mut NSTDChar) -> NSTDCStrMut {
 #[nstdapi]
 pub unsafe fn nstd_core_cstr_mut_from_raw_with_null(raw: *mut NSTDChar) -> NSTDCStrMut {
     let len = nstd_core_cstr_raw_len_with_null(raw);
-    nstd_core_cstr_mut_new(raw, len)
+    nstd_core_cstr_mut_new_unchecked(raw, len)
 }
 
 /// Creates an immutable version of a mutable C string slice.
@@ -665,7 +647,7 @@ pub unsafe fn nstd_core_cstr_mut_from_raw_with_null(raw: *mut NSTDChar) -> NSTDC
 /// };
 ///
 /// let mut str = String::from("Faded than a ho");
-/// let cstr = nstd_core_cstr_mut_new(str.as_mut_ptr().cast(), str.len());
+/// let cstr = nstd_core_cstr_mut_new(str.as_mut_ptr().cast(), str.len()).unwrap();
 /// let cstr = nstd_core_cstr_mut_as_const(&cstr);
 /// let cstring = unsafe { nstd_cstring_from_cstr(&cstr) };
 /// assert!(nstd_cstring_len(&cstring) == nstd_core_cstr_len(&cstr));
@@ -727,7 +709,7 @@ pub const fn nstd_core_cstr_mut_as_bytes(cstr: &NSTDCStrMut) -> NSTDSlice {
 ///
 /// let mut str = String::from("assert!(Rust + C >= God)");
 /// let str_ptr = str.as_mut_ptr().cast();
-/// let mut cstr = nstd_core_cstr_mut_new(str_ptr, str.len());
+/// let mut cstr = nstd_core_cstr_mut_new(str_ptr, str.len()).unwrap();
 /// assert!(str_ptr == nstd_core_cstr_mut_as_ptr(&mut cstr));
 /// ```
 #[inline]
@@ -752,7 +734,7 @@ pub fn nstd_core_cstr_mut_as_ptr(cstr: &mut NSTDCStrMut) -> *mut NSTDChar {
 /// use nstd_sys::core::cstr::{nstd_core_cstr_mut_as_ptr_const, nstd_core_cstr_mut_new};
 ///
 /// let mut str = String::from("assert!(Rust + C >= God)");
-/// let cstr = nstd_core_cstr_mut_new(str.as_mut_ptr().cast(), str.len());
+/// let cstr = nstd_core_cstr_mut_new(str.as_mut_ptr().cast(), str.len()).unwrap();
 /// assert!(str.as_ptr().cast() == nstd_core_cstr_mut_as_ptr_const(&cstr));
 /// ```
 #[inline]
@@ -815,13 +797,13 @@ pub const fn nstd_core_cstr_mut_len(cstr: &NSTDCStrMut) -> NSTDUInt {
 /// };
 ///
 /// let mut nn_bytes = String::from("Hello, world!");
-/// let nn_cstr = nstd_core_cstr_mut_new(nn_bytes.as_mut_ptr().cast(), nn_bytes.len());
+/// let nn_cstr = nstd_core_cstr_mut_new(nn_bytes.as_mut_ptr().cast(), nn_bytes.len()).unwrap();
 ///
 /// let mut nt_bytes = String::from("Hello, world!\0");
-/// let nt_cstr = nstd_core_cstr_mut_new(nt_bytes.as_mut_ptr().cast(), nt_bytes.len());
+/// let nt_cstr = nstd_core_cstr_mut_new(nt_bytes.as_mut_ptr().cast(), nt_bytes.len()).unwrap();
 ///
 /// let mut mn_bytes = String::from("Hello, \0world!");
-/// let mn_cstr = nstd_core_cstr_mut_new(mn_bytes.as_mut_ptr().cast(), mn_bytes.len());
+/// let mn_cstr = nstd_core_cstr_mut_new(mn_bytes.as_mut_ptr().cast(), mn_bytes.len()).unwrap();
 ///
 /// unsafe {
 ///     assert!(nstd_core_cstr_mut_is_null_terminated(&nn_cstr) == NSTD_FALSE);

@@ -237,7 +237,7 @@ pub const fn nstd_vec_new(element_size: NSTDUInt) -> NSTDVec {
 /// const SIZE: usize = core::mem::size_of::<i16>();
 ///
 /// let numbers = [642i16, 324i16, 190i16];
-/// let numbers = nstd_core_slice_new(numbers.as_ptr().cast(), SIZE, 3);
+/// let numbers = nstd_core_slice_new(numbers.as_ptr().cast(), SIZE, 3).unwrap();
 /// let mut vec = nstd_vec_new_with_cap(SIZE, 3);
 /// unsafe {
 ///     assert!(nstd_vec_extend(&mut vec, &numbers) == NSTD_ALLOC_ERROR_NONE);
@@ -297,7 +297,7 @@ pub fn nstd_vec_new_with_cap(element_size: NSTDUInt, mut cap: NSTDUInt) -> NSTDV
 /// const SIZE: usize = core::mem::size_of::<u128>();
 ///
 /// let numbers = [59237u128, 13953u128, 50285u128];
-/// let numbers = nstd_core_slice_new(numbers.as_ptr().cast(), SIZE, 3);
+/// let numbers = nstd_core_slice_new(numbers.as_ptr().cast(), SIZE, 3).unwrap();
 /// unsafe {
 ///     let mut vec = nstd_vec_from_slice(&numbers);
 ///     for i in 0..nstd_vec_len(&vec) {
@@ -584,7 +584,7 @@ pub fn nstd_vec_end_mut(vec: &mut NSTDVec) -> NSTDAnyMut {
 /// const SIZE: usize = core::mem::size_of::<i64>();
 ///
 /// let numbers = [-639i64, 429i64, -440i64];
-/// let numbers = nstd_core_slice_new(numbers.as_ptr().cast(), SIZE, 3);
+/// let numbers = nstd_core_slice_new(numbers.as_ptr().cast(), SIZE, 3).unwrap();
 /// unsafe {
 ///     let mut vec = nstd_vec_from_slice(&numbers);
 ///     for i in 0..nstd_vec_len(&vec) {
@@ -640,7 +640,7 @@ pub const fn nstd_vec_get(vec: &NSTDVec, mut pos: NSTDUInt) -> NSTDAny {
 /// const SIZE: usize = core::mem::size_of::<i64>();
 ///
 /// let numbers = [639i64, -429i64, 440i64];
-/// let numbers = nstd_core_slice_new(numbers.as_ptr().cast(), SIZE, 3);
+/// let numbers = nstd_core_slice_new(numbers.as_ptr().cast(), SIZE, 3).unwrap();
 /// unsafe {
 ///     let mut vec = nstd_vec_from_slice(&numbers);
 ///     for i in 0..nstd_vec_len(&vec) {
@@ -744,7 +744,7 @@ pub unsafe fn nstd_vec_push(vec: &mut NSTDVec, value: NSTDAny) -> NSTDAllocError
 ///
 /// let mut vec = nstd_vec_new(SIZE);
 /// let values: [f64; 3] = [9.4, 3.1, 6.0];
-/// let values_slice = nstd_core_slice_new(values.as_ptr().cast(), SIZE, 3);
+/// let values_slice = nstd_core_slice_new(values.as_ptr().cast(), SIZE, 3).unwrap();
 /// unsafe {
 ///     nstd_vec_extend(&mut vec, &values_slice);
 ///     for value in values.iter().rev() {
@@ -804,7 +804,7 @@ pub fn nstd_vec_pop(vec: &mut NSTDVec) -> NSTDAny {
 /// const SIZE: usize = core::mem::size_of::<u32>();
 ///
 /// let slice: [u32; 4] = [1, 2, 3, 5];
-/// let slice = nstd_core_slice_new(slice.as_ptr().cast(), SIZE, 4);
+/// let slice = nstd_core_slice_new(slice.as_ptr().cast(), SIZE, 4).unwrap();
 /// unsafe {
 ///     let mut vec = nstd_vec_from_slice(&slice);
 ///     let four = 4u32;
@@ -874,7 +874,7 @@ pub unsafe fn nstd_vec_insert(
 /// const SIZE: usize = core::mem::size_of::<u32>();
 ///
 /// let slice: [u32; 5] = [1, 2, 3, 4, 5];
-/// let slice = nstd_core_slice_new(slice.as_ptr().cast(), SIZE, 5);
+/// let slice = nstd_core_slice_new(slice.as_ptr().cast(), SIZE, 5).unwrap();
 /// unsafe {
 ///     let mut vec = nstd_vec_from_slice(&slice);
 ///     assert!(nstd_vec_remove(&mut vec, 0) == 0);
@@ -945,7 +945,7 @@ pub fn nstd_vec_remove(vec: &mut NSTDVec, mut index: NSTDUInt) -> NSTDErrorCode 
 /// const SIZE: usize = core::mem::size_of::<i128>();
 ///
 /// let values: [i128; 5] = [1, 2, 3, 4, 5];
-/// let slice = nstd_core_slice_new(values.as_ptr().cast(), SIZE, 5);
+/// let slice = nstd_core_slice_new(values.as_ptr().cast(), SIZE, 5).unwrap();
 /// unsafe {
 ///     let mut vec = nstd_vec_new(SIZE);
 ///     assert!(nstd_vec_extend(&mut vec, &slice) == NSTD_ALLOC_ERROR_NONE);

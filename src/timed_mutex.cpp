@@ -27,8 +27,8 @@ NSTDAPI NSTDTimedMutex nstd_timed_mutex_new(const NSTDHeapPtr data) {
         const std::timed_mutex *const mutex{new std::timed_mutex{}};
         return NSTDTimedMutex{(NSTDAnyMut)mutex, data, NSTD_FALSE};
     } catch (...) {
-        const NSTDStr msg{nstd_core_str_from_raw_cstr("failed to create a timed mutex")};
-        nstd_core_panic_with_msg(&msg);
+        const NSTDOptionalStr msg{nstd_core_str_from_raw_cstr("failed to create a timed mutex")};
+        msg.status ? nstd_core_panic_with_msg(&msg.some) : nstd_core_panic();
     }
     // Unreachable.
     return NSTDTimedMutex{};
@@ -79,8 +79,8 @@ NSTDAPI NSTDTimedMutexLockResult nstd_timed_mutex_lock(const NSTDTimedMutex *con
         else
             return NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_OK, {NSTDTimedMutexGuard{mutex}}};
     } catch (...) {
-        const NSTDStr msg{nstd_core_str_from_raw_cstr("failed to lock a timed mutex")};
-        nstd_core_panic_with_msg(&msg);
+        const NSTDOptionalStr msg{nstd_core_str_from_raw_cstr("failed to lock a timed mutex")};
+        msg.status ? nstd_core_panic_with_msg(&msg.some) : nstd_core_panic();
     }
     // Unreachable.
     return NSTDTimedMutexLockResult{};

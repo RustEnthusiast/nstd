@@ -1,4 +1,10 @@
 # TBD
+### `nstd.core`
+- `nstd_core_str[_mut]_substr` now returns `NSTDOptionalStr[Mut]`.
+- `nstd_core_str[_mut]_from_[cstr|raw_cstr[_with_null]|bytes]` now returns `NSTDOptionalStr[Mut]`.
+- `nstd_core_cstr[_mut]_new` now returns `NSTDOptionalCStr[Mut]`.
+- `nstd_core_slice[_mut]_new` now returns `NSTDOptionalSlice[Mut]`.
+- `nstd_core_ptr[_mut]_new` now returns `NSTDOptionalPtr[Mut]`.
 ### `nstd.os`
 - Added `nstd.os.unix.mutex`.
 

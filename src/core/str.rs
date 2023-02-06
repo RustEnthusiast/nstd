@@ -115,15 +115,12 @@ gen_optional!(NSTDOptionalStr, NSTDStr);
 ///
 /// # Returns
 ///
-/// `NSTDStr str` - The new `NSTDStr` instance.
+/// `NSTDOptionalStr str` - The new `NSTDStr` instance on success, or a "none" variant if the
+/// result is not valid UTF-8.
 ///
 /// # Panics
 ///
-/// This function will panic in the following situations:
-///
-/// - `cstr`'s data is not valid UTF-8.
-///
-/// - `cstr`'s length is greater than `NSTDInt`'s max value.
+/// This function will panic if `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -140,16 +137,20 @@ gen_optional!(NSTDOptionalStr, NSTDStr);
 /// let s_str = "Hello, world!\0";
 /// unsafe {
 ///     let cstr = nstd_core_cstr_from_raw(s_str.as_ptr().cast());
-///     let str = nstd_core_str_from_cstr(&cstr);
+///     let str = nstd_core_str_from_cstr(&cstr).unwrap();
 ///     assert!(nstd_core_str_byte_len(&str) == 13);
 /// }
 /// ```
 #[nstdapi]
-pub const unsafe fn nstd_core_str_from_cstr(cstr: &NSTDCStr) -> NSTDStr {
-    assert!(core::str::from_utf8(cstr.as_bytes()).is_ok());
-    let ptr = nstd_core_cstr_as_ptr(cstr).cast();
-    let len = nstd_core_cstr_len(cstr);
-    NSTDStr { ptr, len }
+pub const unsafe fn nstd_core_str_from_cstr(cstr: &NSTDCStr) -> NSTDOptionalStr {
+    match core::str::from_utf8(cstr.as_bytes()).is_ok() {
+        true => {
+            let ptr = nstd_core_cstr_as_ptr(cstr).cast();
+            let len = nstd_core_cstr_len(cstr);
+            NSTDOptional::Some(NSTDStr { ptr, len })
+        }
+        false => NSTDOptional::None,
+    }
 }
 
 /// Creates a new instance of an `NSTDStr` from a C string slice.
@@ -198,15 +199,14 @@ pub const unsafe fn nstd_core_str_from_cstr_unchecked(cstr: &NSTDCStr) -> NSTDSt
 ///
 /// # Returns
 ///
-/// `NSTDStr str` - The new string slice.
+/// `NSTDOptionalStr str` - The new string slice on success, or a "none" variant if the
+/// result is not valid UTF-8.
 ///
 /// # Panics
 ///
 /// This function will panic in the following situations:
 ///
 /// - `cstr` is null.
-///
-/// - `cstr`'s data is not valid UTF-8.
 ///
 /// - `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
@@ -222,19 +222,21 @@ pub const unsafe fn nstd_core_str_from_cstr_unchecked(cstr: &NSTDCStr) -> NSTDSt
 ///
 /// let s_str = "Where I live is where I bleed.\0";
 /// unsafe {
-///     let str = nstd_core_str_from_raw_cstr(s_str.as_ptr().cast());
+///     let str = nstd_core_str_from_raw_cstr(s_str.as_ptr().cast()).unwrap();
 ///     assert!(nstd_core_str_byte_len(&str) == 30);
 /// }
 /// ```
 #[nstdapi]
-pub unsafe fn nstd_core_str_from_raw_cstr(cstr: *const NSTDChar) -> NSTDStr {
+pub unsafe fn nstd_core_str_from_raw_cstr(cstr: *const NSTDChar) -> NSTDOptionalStr {
     assert!(!cstr.is_null());
     let ptr = cstr.cast();
     let len = nstd_core_cstr_raw_len(cstr);
     assert!(len <= isize::MAX as NSTDUInt);
     let bytes = core::slice::from_raw_parts(ptr, len);
-    assert!(core::str::from_utf8(bytes).is_ok());
-    NSTDStr { ptr, len }
+    match core::str::from_utf8(bytes).is_ok() {
+        true => NSTDOptional::Some(NSTDStr { ptr, len }),
+        false => NSTDOptional::None,
+    }
 }
 
 /// Creates a new `NSTDStr` from a raw C string, including the null byte.
@@ -245,15 +247,14 @@ pub unsafe fn nstd_core_str_from_raw_cstr(cstr: *const NSTDChar) -> NSTDStr {
 ///
 /// # Returns
 ///
-/// `NSTDStr str` - The new string slice.
+/// `NSTDOptionalStr str` - The new string slice on success, or a "none" variant if the
+/// result is not valid UTF-8.
 ///
 /// # Panics
 ///
 /// This function will panic in the following situations:
 ///
 /// - `cstr` is null.
-///
-/// - `cstr`'s data is not valid UTF-8.
 ///
 /// - `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
@@ -269,19 +270,21 @@ pub unsafe fn nstd_core_str_from_raw_cstr(cstr: *const NSTDChar) -> NSTDStr {
 ///
 /// let s_str = "{Hello, world!}}}%\0";
 /// unsafe {
-///     let str = nstd_core_str_from_raw_cstr_with_null(s_str.as_ptr().cast());
+///     let str = nstd_core_str_from_raw_cstr_with_null(s_str.as_ptr().cast()).unwrap();
 ///     assert!(nstd_core_str_byte_len(&str) == 19);
 /// }
 /// ```
 #[nstdapi]
-pub unsafe fn nstd_core_str_from_raw_cstr_with_null(cstr: *const NSTDChar) -> NSTDStr {
+pub unsafe fn nstd_core_str_from_raw_cstr_with_null(cstr: *const NSTDChar) -> NSTDOptionalStr {
     assert!(!cstr.is_null());
     let ptr = cstr.cast();
     let len = nstd_core_cstr_raw_len_with_null(cstr);
     assert!(len <= isize::MAX as NSTDUInt);
     let bytes = core::slice::from_raw_parts(ptr, len);
-    assert!(core::str::from_utf8(bytes).is_ok());
-    NSTDStr { ptr, len }
+    match core::str::from_utf8(bytes).is_ok() {
+        true => NSTDOptional::Some(NSTDStr { ptr, len }),
+        false => NSTDOptional::None,
+    }
 }
 
 /// Creates a string slice from raw bytes.
@@ -292,7 +295,8 @@ pub unsafe fn nstd_core_str_from_raw_cstr_with_null(cstr: *const NSTDChar) -> NS
 ///
 /// # Returns
 ///
-/// `NSTDStr str` - The new string slice.
+/// `NSTDOptionalStr str` - The new string slice on success, or a "none" variant if the
+/// result is not valid UTF-8.
 ///
 /// # Panics
 ///
@@ -301,8 +305,6 @@ pub unsafe fn nstd_core_str_from_raw_cstr_with_null(cstr: *const NSTDChar) -> NS
 /// - `bytes`'s stride is not 1.
 ///
 /// - `bytes`'s length is greater than `NSTDInt`'s max value.
-///
-/// - `bytes` is not valid UTF-8.
 ///
 /// # Safety
 ///
@@ -320,18 +322,21 @@ pub unsafe fn nstd_core_str_from_raw_cstr_with_null(cstr: *const NSTDChar) -> NS
 ///
 /// let s_str = "Hello, world!\0";
 /// unsafe {
-///     let bytes = nstd_core_slice_new(s_str.as_ptr().cast(), 1, s_str.len());
-///     let str = nstd_core_str_from_bytes(&bytes);
+///     let bytes = nstd_core_slice_new(s_str.as_ptr().cast(), 1, s_str.len()).unwrap();
+///     let str = nstd_core_str_from_bytes(&bytes).unwrap();
 ///     assert!(nstd_core_str_byte_len(&str) == 14);
 /// }
 /// ```
-#[inline]
 #[nstdapi]
-pub const unsafe fn nstd_core_str_from_bytes(bytes: &NSTDSlice) -> NSTDStr {
-    assert!(core::str::from_utf8(bytes.as_slice()).is_ok());
-    let ptr = nstd_core_slice_as_ptr(bytes).cast();
-    let len = nstd_core_slice_len(bytes);
-    NSTDStr { ptr, len }
+pub const unsafe fn nstd_core_str_from_bytes(bytes: &NSTDSlice) -> NSTDOptionalStr {
+    match core::str::from_utf8(bytes.as_slice()).is_ok() {
+        true => {
+            let ptr = nstd_core_slice_as_ptr(bytes).cast();
+            let len = nstd_core_slice_len(bytes);
+            NSTDOptional::Some(NSTDStr { ptr, len })
+        }
+        false => NSTDOptional::None,
+    }
 }
 
 /// Creates a string slice from raw bytes, without checking for UTF-8.
@@ -366,7 +371,7 @@ pub const unsafe fn nstd_core_str_from_bytes(bytes: &NSTDSlice) -> NSTDStr {
 ///
 /// let s_str = "Goodbye, world!\0";
 /// unsafe {
-///     let bytes = nstd_core_slice_new(s_str.as_ptr().cast(), 1, s_str.len());
+///     let bytes = nstd_core_slice_new(s_str.as_ptr().cast(), 1, s_str.len()).unwrap();
 ///     let str = nstd_core_str_from_bytes_unchecked(&bytes);
 ///     assert!(nstd_core_str_byte_len(&str) == 16);
 /// }
@@ -416,7 +421,7 @@ pub const fn nstd_core_str_as_cstr(str: &NSTDStr) -> NSTDCStr {
 ///
 /// let s_str = "We won't be alone 🎶\0";
 /// unsafe {
-///     let str = nstd_core_str_from_raw_cstr(s_str.as_ptr().cast());
+///     let str = nstd_core_str_from_raw_cstr(s_str.as_ptr().cast()).unwrap();
 ///     let bytes = nstd_core_str_as_bytes(&str);
 ///     assert!(nstd_core_str_byte_len(&str) == nstd_core_slice_len(&bytes));
 /// }
@@ -469,7 +474,7 @@ pub const fn nstd_core_str_as_ptr(str: &NSTDStr) -> *const NSTDByte {
 ///
 /// let s_str = "Hello, 🌎!\0";
 /// unsafe {
-///     let str = nstd_core_str_from_raw_cstr(s_str.as_ptr().cast());
+///     let str = nstd_core_str_from_raw_cstr(s_str.as_ptr().cast()).unwrap();
 ///     assert!(nstd_core_str_len(&str) == 9);
 /// }
 /// ```
@@ -496,7 +501,7 @@ pub unsafe fn nstd_core_str_len(str: &NSTDStr) -> NSTDUInt {
 ///
 /// let s_str = "Hello, 🌎!\0";
 /// unsafe {
-///     let str = nstd_core_str_from_raw_cstr_with_null(s_str.as_ptr().cast());
+///     let str = nstd_core_str_from_raw_cstr_with_null(s_str.as_ptr().cast()).unwrap();
 ///     assert!(nstd_core_str_byte_len(&str) == s_str.len());
 /// }
 /// ```
@@ -538,7 +543,7 @@ pub const fn nstd_core_str_byte_len(str: &NSTDStr) -> NSTDUInt {
 ///
 /// let s_str = "🦀🚀🦀!\0";
 /// unsafe {
-///     let str = nstd_core_str_from_raw_cstr(s_str.as_ptr().cast());
+///     let str = nstd_core_str_from_raw_cstr(s_str.as_ptr().cast()).unwrap();
 ///     assert!(nstd_core_str_get(&str, 1).unwrap() == '🚀'.into());
 /// }
 /// ```
@@ -561,7 +566,8 @@ pub unsafe fn nstd_core_str_get(str: &NSTDStr, pos: NSTDUInt) -> NSTDOptionalUni
 ///
 /// # Returns
 ///
-/// `NSTDStr substr` - The new substring.
+/// `NSTDOptionalStr substr` - The new substring on success, or a "none" variant if the
+/// result is not valid UTF-8.
 ///
 /// # Panics
 ///
@@ -574,8 +580,6 @@ pub unsafe fn nstd_core_str_get(str: &NSTDStr, pos: NSTDUInt) -> NSTDOptionalUni
 /// - `range.end` is greater than `str.len`.
 ///
 /// - `range.end` - `range.start` is greater than `NSTDInt`'s max value.
-///
-/// - The substring bytes are not valid UTF-8.
 ///
 /// # Safety
 ///
@@ -591,17 +595,17 @@ pub unsafe fn nstd_core_str_get(str: &NSTDStr, pos: NSTDUInt) -> NSTDOptionalUni
 ///
 /// let s_str = "33marrow\0";
 /// unsafe {
-///     let str = nstd_core_str_from_raw_cstr(s_str.as_ptr().cast());
+///     let str = nstd_core_str_from_raw_cstr(s_str.as_ptr().cast()).unwrap();
 ///     let range = NSTDURange {
 ///         start: 2,
 ///         end: nstd_core_str_byte_len(&str),
 ///     };
-///     let marrow = nstd_core_str_substr(&str, range);
+///     let marrow = nstd_core_str_substr(&str, range).unwrap();
 ///     assert!(nstd_core_str_byte_len(&marrow) == 6);
 /// }
 /// ```
 #[nstdapi]
-pub const unsafe fn nstd_core_str_substr(str: &NSTDStr, range: NSTDURange) -> NSTDStr {
+pub const unsafe fn nstd_core_str_substr(str: &NSTDStr, range: NSTDURange) -> NSTDOptionalStr {
     // Make sure the range is valid for the bounds of `str`.
     assert!(range.start <= isize::MAX as usize && range.start <= range.end && range.end <= str.len);
     // Create the byte slice with `range` and use it to create the new string slice.
@@ -621,7 +625,7 @@ gen_to_primitive!(
     ///
     /// let str = "-420.69\0";
     /// unsafe {
-    ///     let str = nstd_core_str_from_raw_cstr(str.as_ptr().cast());
+    ///     let str = nstd_core_str_from_raw_cstr(str.as_ptr().cast()).unwrap();
     ///     let v = nstd_core_str_to_f32(&str);
     ///     assert!(v == NSTDOptional::Some(-420.69));
     /// }
@@ -642,7 +646,7 @@ gen_to_primitive!(
     ///
     /// let str = "-420.69\0";
     /// unsafe {
-    ///     let str = nstd_core_str_from_raw_cstr(str.as_ptr().cast());
+    ///     let str = nstd_core_str_from_raw_cstr(str.as_ptr().cast()).unwrap();
     ///     let v = nstd_core_str_to_f64(&str);
     ///     assert!(v == NSTDOptional::Some(-420.69));
     /// }
@@ -663,7 +667,7 @@ gen_to_primitive!(
     ///
     /// let str = "33\0";
     /// unsafe {
-    ///     let str = nstd_core_str_from_raw_cstr(str.as_ptr().cast());
+    ///     let str = nstd_core_str_from_raw_cstr(str.as_ptr().cast()).unwrap();
     ///     let v = nstd_core_str_to_int(&str);
     ///     assert!(v == NSTDOptional::Some(33));
     /// }
@@ -684,7 +688,7 @@ gen_to_primitive!(
     ///
     /// let str = "33\0";
     /// unsafe {
-    ///     let str = nstd_core_str_from_raw_cstr(str.as_ptr().cast());
+    ///     let str = nstd_core_str_from_raw_cstr(str.as_ptr().cast()).unwrap();
     ///     let v = nstd_core_str_to_uint(&str);
     ///     assert!(v == NSTDOptional::Some(33));
     /// }
@@ -705,7 +709,7 @@ gen_to_primitive!(
     ///
     /// let str = "33\0";
     /// unsafe {
-    ///     let str = nstd_core_str_from_raw_cstr(str.as_ptr().cast());
+    ///     let str = nstd_core_str_from_raw_cstr(str.as_ptr().cast()).unwrap();
     ///     let v = nstd_core_str_to_i8(&str);
     ///     assert!(v == NSTDOptional::Some(33));
     /// }
@@ -726,7 +730,7 @@ gen_to_primitive!(
     ///
     /// let str = "33\0";
     /// unsafe {
-    ///     let str = nstd_core_str_from_raw_cstr(str.as_ptr().cast());
+    ///     let str = nstd_core_str_from_raw_cstr(str.as_ptr().cast()).unwrap();
     ///     let v = nstd_core_str_to_u8(&str);
     ///     assert!(v == NSTDOptional::Some(33));
     /// }
@@ -747,7 +751,7 @@ gen_to_primitive!(
     ///
     /// let str = "33\0";
     /// unsafe {
-    ///     let str = nstd_core_str_from_raw_cstr(str.as_ptr().cast());
+    ///     let str = nstd_core_str_from_raw_cstr(str.as_ptr().cast()).unwrap();
     ///     let v = nstd_core_str_to_i16(&str);
     ///     assert!(v == NSTDOptional::Some(33));
     /// }
@@ -768,7 +772,7 @@ gen_to_primitive!(
     ///
     /// let str = "33\0";
     /// unsafe {
-    ///     let str = nstd_core_str_from_raw_cstr(str.as_ptr().cast());
+    ///     let str = nstd_core_str_from_raw_cstr(str.as_ptr().cast()).unwrap();
     ///     let v = nstd_core_str_to_u16(&str);
     ///     assert!(v == NSTDOptional::Some(33));
     /// }
@@ -789,7 +793,7 @@ gen_to_primitive!(
     ///
     /// let str = "33\0";
     /// unsafe {
-    ///     let str = nstd_core_str_from_raw_cstr(str.as_ptr().cast());
+    ///     let str = nstd_core_str_from_raw_cstr(str.as_ptr().cast()).unwrap();
     ///     let v = nstd_core_str_to_i32(&str);
     ///     assert!(v == NSTDOptional::Some(33));
     /// }
@@ -810,7 +814,7 @@ gen_to_primitive!(
     ///
     /// let str = "33\0";
     /// unsafe {
-    ///     let str = nstd_core_str_from_raw_cstr(str.as_ptr().cast());
+    ///     let str = nstd_core_str_from_raw_cstr(str.as_ptr().cast()).unwrap();
     ///     let v = nstd_core_str_to_u32(&str);
     ///     assert!(v == NSTDOptional::Some(33));
     /// }
@@ -831,7 +835,7 @@ gen_to_primitive!(
     ///
     /// let str = "33\0";
     /// unsafe {
-    ///     let str = nstd_core_str_from_raw_cstr(str.as_ptr().cast());
+    ///     let str = nstd_core_str_from_raw_cstr(str.as_ptr().cast()).unwrap();
     ///     let v = nstd_core_str_to_i64(&str);
     ///     assert!(v == NSTDOptional::Some(33));
     /// }
@@ -852,7 +856,7 @@ gen_to_primitive!(
     ///
     /// let str = "33\0";
     /// unsafe {
-    ///     let str = nstd_core_str_from_raw_cstr(str.as_ptr().cast());
+    ///     let str = nstd_core_str_from_raw_cstr(str.as_ptr().cast()).unwrap();
     ///     let v = nstd_core_str_to_u64(&str);
     ///     assert!(v == NSTDOptional::Some(33));
     /// }
@@ -906,15 +910,12 @@ gen_optional!(NSTDOptionalStrMut, NSTDStrMut);
 ///
 /// # Returns
 ///
-/// `NSTDStrMut str` - The new `NSTDStrMut` instance.
+/// `NSTDOptionalStrMut str` - The new `NSTDStrMut` instance on success, or a "none" variant if the
+/// result is not valid UTF-8.
 ///
 /// # Panics
 ///
-/// This function will panic in the following situations:
-///
-/// - `cstr`'s data is not valid UTF-8.
-///
-/// - `cstr`'s length is greater than `NSTDInt`'s max value.
+/// This function will panic if `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -931,16 +932,20 @@ gen_optional!(NSTDOptionalStrMut, NSTDStrMut);
 /// let mut s_str = String::from("Hello, world!\0");
 /// unsafe {
 ///     let mut cstr = nstd_core_cstr_mut_from_raw(s_str.as_mut_ptr().cast());
-///     let str = nstd_core_str_mut_from_cstr(&mut cstr);
+///     let str = nstd_core_str_mut_from_cstr(&mut cstr).unwrap();
 ///     assert!(nstd_core_str_mut_byte_len(&str) == 13);
 /// }
 /// ```
 #[nstdapi]
-pub unsafe fn nstd_core_str_mut_from_cstr(cstr: &mut NSTDCStrMut) -> NSTDStrMut {
-    assert!(core::str::from_utf8(cstr.as_bytes()).is_ok());
-    let ptr = nstd_core_cstr_mut_as_ptr(cstr).cast();
-    let len = nstd_core_cstr_mut_len(cstr);
-    NSTDStrMut { ptr, len }
+pub unsafe fn nstd_core_str_mut_from_cstr(cstr: &mut NSTDCStrMut) -> NSTDOptionalStrMut {
+    match core::str::from_utf8(cstr.as_bytes()).is_ok() {
+        true => {
+            let ptr = nstd_core_cstr_mut_as_ptr(cstr).cast();
+            let len = nstd_core_cstr_mut_len(cstr);
+            NSTDOptional::Some(NSTDStrMut { ptr, len })
+        }
+        false => NSTDOptional::None,
+    }
 }
 
 /// Creates a new instance of an `NSTDStrMut` from a C string slice.
@@ -989,15 +994,14 @@ pub unsafe fn nstd_core_str_mut_from_cstr_unchecked(cstr: &mut NSTDCStrMut) -> N
 ///
 /// # Returns
 ///
-/// `NSTDStrMut str` - The new string slice.
+/// `NSTDOptionalStrMut str` - The new string slice on success, or a "none" variant if the
+/// result is not valid UTF-8.
 ///
 /// # Panics
 ///
 /// This function will panic in the following situations:
 ///
 /// - `cstr` is null.
-///
-/// - `cstr`'s data is not valid UTF-8.
 ///
 /// - `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
@@ -1013,19 +1017,21 @@ pub unsafe fn nstd_core_str_mut_from_cstr_unchecked(cstr: &mut NSTDCStrMut) -> N
 ///
 /// let mut s_str = String::from("Where I live is where I bleed.\0");
 /// unsafe {
-///     let str = nstd_core_str_mut_from_raw_cstr(s_str.as_mut_ptr().cast());
+///     let str = nstd_core_str_mut_from_raw_cstr(s_str.as_mut_ptr().cast()).unwrap();
 ///     assert!(nstd_core_str_mut_byte_len(&str) == 30);
 /// }
 /// ```
 #[nstdapi]
-pub unsafe fn nstd_core_str_mut_from_raw_cstr(cstr: *mut NSTDChar) -> NSTDStrMut {
+pub unsafe fn nstd_core_str_mut_from_raw_cstr(cstr: *mut NSTDChar) -> NSTDOptionalStrMut {
     assert!(!cstr.is_null());
     let ptr = cstr.cast();
     let len = nstd_core_cstr_raw_len(cstr);
     assert!(len <= isize::MAX as usize);
     let bytes = core::slice::from_raw_parts(ptr, len);
-    assert!(core::str::from_utf8(bytes).is_ok());
-    NSTDStrMut { ptr, len }
+    match core::str::from_utf8(bytes).is_ok() {
+        true => NSTDOptional::Some(NSTDStrMut { ptr, len }),
+        false => NSTDOptional::None,
+    }
 }
 
 /// Creates a new `NSTDStrMut` from a raw C string, including the null byte.
@@ -1036,15 +1042,14 @@ pub unsafe fn nstd_core_str_mut_from_raw_cstr(cstr: *mut NSTDChar) -> NSTDStrMut
 ///
 /// # Returns
 ///
-/// `NSTDStrMut str` - The new string slice.
+/// `NSTDOptionalStrMut str` - The new string slice on success, or a "none" variant if the
+/// result is not valid UTF-8.
 ///
 /// # Panics
 ///
 /// This function will panic in the following situations:
 ///
 /// - `cstr` is null.
-///
-/// - `cstr`'s data is not valid UTF-8.
 ///
 /// - `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
@@ -1062,19 +1067,21 @@ pub unsafe fn nstd_core_str_mut_from_raw_cstr(cstr: *mut NSTDChar) -> NSTDStrMut
 ///
 /// let mut s_str = String::from("{Hello, world!}}}%\0");
 /// unsafe {
-///     let str = nstd_core_str_mut_from_raw_cstr_with_null(s_str.as_mut_ptr().cast());
+///     let str = nstd_core_str_mut_from_raw_cstr_with_null(s_str.as_mut_ptr().cast()).unwrap();
 ///     assert!(nstd_core_str_mut_byte_len(&str) == 19);
 /// }
 /// ```
 #[nstdapi]
-pub unsafe fn nstd_core_str_mut_from_raw_cstr_with_null(cstr: *mut NSTDChar) -> NSTDStrMut {
+pub unsafe fn nstd_core_str_mut_from_raw_cstr_with_null(cstr: *mut NSTDChar) -> NSTDOptionalStrMut {
     assert!(!cstr.is_null());
     let ptr = cstr.cast();
     let len = nstd_core_cstr_raw_len_with_null(cstr);
     assert!(len <= isize::MAX as usize);
     let bytes = core::slice::from_raw_parts(ptr, len);
-    assert!(core::str::from_utf8(bytes).is_ok());
-    NSTDStrMut { ptr, len }
+    match core::str::from_utf8(bytes).is_ok() {
+        true => NSTDOptional::Some(NSTDStrMut { ptr, len }),
+        false => NSTDOptional::None,
+    }
 }
 
 /// Creates a string slice from raw bytes.
@@ -1085,7 +1092,8 @@ pub unsafe fn nstd_core_str_mut_from_raw_cstr_with_null(cstr: *mut NSTDChar) -> 
 ///
 /// # Returns
 ///
-/// `NSTDStrMut str` - The new string slice.
+/// `NSTDOptionalStrMut str` - The new string slice on success, or a "none" variant if the
+/// result is not valid UTF-8.
 ///
 /// # Panics
 ///
@@ -1094,8 +1102,6 @@ pub unsafe fn nstd_core_str_mut_from_raw_cstr_with_null(cstr: *mut NSTDChar) -> 
 /// - `bytes`'s stride is not 1.
 ///
 /// - `bytes`'s length is greater than `NSTDInt`'s max value.
-///
-/// - `bytes` is not valid UTF-8.
 ///
 /// # Safety
 ///
@@ -1113,18 +1119,21 @@ pub unsafe fn nstd_core_str_mut_from_raw_cstr_with_null(cstr: *mut NSTDChar) -> 
 ///
 /// let mut s_str = String::from("Hello, world!\0");
 /// unsafe {
-///     let mut bytes = nstd_core_slice_mut_new(s_str.as_mut_ptr().cast(), 1, s_str.len());
-///     let str = nstd_core_str_mut_from_bytes(&mut bytes);
+///     let mut bytes = nstd_core_slice_mut_new(s_str.as_mut_ptr().cast(), 1, s_str.len()).unwrap();
+///     let str = nstd_core_str_mut_from_bytes(&mut bytes).unwrap();
 ///     assert!(nstd_core_str_mut_byte_len(&str) == 14);
 /// }
 /// ```
-#[inline]
 #[nstdapi]
-pub unsafe fn nstd_core_str_mut_from_bytes(bytes: &mut NSTDSliceMut) -> NSTDStrMut {
-    assert!(core::str::from_utf8(bytes.as_slice()).is_ok());
-    let ptr = nstd_core_slice_mut_as_ptr(bytes).cast();
-    let len = nstd_core_slice_mut_len(bytes);
-    NSTDStrMut { ptr, len }
+pub unsafe fn nstd_core_str_mut_from_bytes(bytes: &mut NSTDSliceMut) -> NSTDOptionalStrMut {
+    match core::str::from_utf8(bytes.as_slice()).is_ok() {
+        true => {
+            let ptr = nstd_core_slice_mut_as_ptr(bytes).cast();
+            let len = nstd_core_slice_mut_len(bytes);
+            NSTDOptional::Some(NSTDStrMut { ptr, len })
+        }
+        false => NSTDOptional::None,
+    }
 }
 
 /// Creates a string slice from raw bytes, without checking for UTF-8.
@@ -1159,7 +1168,7 @@ pub unsafe fn nstd_core_str_mut_from_bytes(bytes: &mut NSTDSliceMut) -> NSTDStrM
 ///
 /// let mut s_str = String::from("Goodbye, world!\0");
 /// unsafe {
-///     let mut bytes = nstd_core_slice_mut_new(s_str.as_mut_ptr().cast(), 1, s_str.len());
+///     let mut bytes = nstd_core_slice_mut_new(s_str.as_mut_ptr().cast(), 1, s_str.len()).unwrap();
 ///     let str = nstd_core_str_mut_from_bytes_unchecked(&mut bytes);
 ///     assert!(nstd_core_str_mut_byte_len(&str) == 16);
 /// }
@@ -1228,7 +1237,7 @@ pub const fn nstd_core_str_mut_as_cstr(str: &NSTDStrMut) -> NSTDCStr {
 ///
 /// let mut s_str = String::from("We won't be alone 🎶\0");
 /// unsafe {
-///     let mut str = nstd_core_str_mut_from_raw_cstr(s_str.as_mut_ptr().cast());
+///     let mut str = nstd_core_str_mut_from_raw_cstr(s_str.as_mut_ptr().cast()).unwrap();
 ///     let bytes = nstd_core_str_mut_as_bytes(&str);
 ///     assert!(nstd_core_str_mut_byte_len(&str) == nstd_core_slice_len(&bytes));
 /// }
@@ -1281,7 +1290,7 @@ pub const fn nstd_core_str_mut_as_ptr(str: &NSTDStrMut) -> *const NSTDByte {
 ///
 /// let mut s_str = String::from("Hello, 🌎!\0");
 /// unsafe {
-///     let str = nstd_core_str_mut_from_raw_cstr(s_str.as_mut_ptr().cast());
+///     let str = nstd_core_str_mut_from_raw_cstr(s_str.as_mut_ptr().cast()).unwrap();
 ///     assert!(nstd_core_str_mut_len(&str) == 9);
 /// }
 /// ```
@@ -1310,7 +1319,7 @@ pub unsafe fn nstd_core_str_mut_len(str: &NSTDStrMut) -> NSTDUInt {
 ///
 /// let mut s_str = String::from("Hello, 🌎!\0");
 /// unsafe {
-///     let str = nstd_core_str_mut_from_raw_cstr_with_null(s_str.as_mut_ptr().cast());
+///     let str = nstd_core_str_mut_from_raw_cstr_with_null(s_str.as_mut_ptr().cast()).unwrap();
 ///     assert!(nstd_core_str_mut_byte_len(&str) == s_str.len());
 /// }
 /// ```
@@ -1352,7 +1361,7 @@ pub const fn nstd_core_str_mut_byte_len(str: &NSTDStrMut) -> NSTDUInt {
 ///
 /// let mut s_str = String::from("🦀🚀🦀!\0");
 /// unsafe {
-///     let str = nstd_core_str_mut_from_raw_cstr(s_str.as_mut_ptr().cast());
+///     let str = nstd_core_str_mut_from_raw_cstr(s_str.as_mut_ptr().cast()).unwrap();
 ///     assert!(nstd_core_str_mut_get(&str, 1).unwrap() == '🚀'.into());
 /// }
 /// ```
@@ -1375,7 +1384,8 @@ pub unsafe fn nstd_core_str_mut_get(str: &NSTDStrMut, pos: NSTDUInt) -> NSTDOpti
 ///
 /// # Returns
 ///
-/// `NSTDStrMut substr` - The new substring.
+/// `NSTDOptionalStrMut substr` - The new substring on success, or a "none" variant if the
+/// result is not valid UTF-8.
 ///
 /// # Panics
 ///
@@ -1388,8 +1398,6 @@ pub unsafe fn nstd_core_str_mut_get(str: &NSTDStrMut, pos: NSTDUInt) -> NSTDOpti
 /// - `range.end` is greater than `str.len`.
 ///
 /// - `range.end` - `range.start` is greater than `NSTDInt`'s max value.
-///
-/// - The substring bytes are not valid UTF-8.
 ///
 /// # Safety
 ///
@@ -1407,17 +1415,20 @@ pub unsafe fn nstd_core_str_mut_get(str: &NSTDStrMut, pos: NSTDUInt) -> NSTDOpti
 ///
 /// let mut s_str = String::from("33marrow\0");
 /// unsafe {
-///     let mut str = nstd_core_str_mut_from_raw_cstr(s_str.as_mut_ptr().cast());
+///     let mut str = nstd_core_str_mut_from_raw_cstr(s_str.as_mut_ptr().cast()).unwrap();
 ///     let range = NSTDURange {
 ///         start: 2,
 ///         end: nstd_core_str_mut_byte_len(&str),
 ///     };
-///     let marrow = nstd_core_str_mut_substr(&mut str, range);
+///     let marrow = nstd_core_str_mut_substr(&mut str, range).unwrap();
 ///     assert!(nstd_core_str_mut_byte_len(&marrow) == 6);
 /// }
 /// ```
 #[nstdapi]
-pub unsafe fn nstd_core_str_mut_substr(str: &mut NSTDStrMut, range: NSTDURange) -> NSTDStrMut {
+pub unsafe fn nstd_core_str_mut_substr(
+    str: &mut NSTDStrMut,
+    range: NSTDURange,
+) -> NSTDOptionalStrMut {
     // Make sure the range is valid for the bounds of `str`.
     assert!(range.start <= isize::MAX as usize && range.start <= range.end && range.end <= str.len);
     // Create the byte slice with `range` and use it to create the new string slice.
@@ -1437,7 +1448,7 @@ gen_to_primitive!(
     ///
     /// let mut str = String::from("-420.69\0");
     /// unsafe {
-    ///     let str = nstd_core_str_mut_from_raw_cstr(str.as_mut_ptr().cast());
+    ///     let str = nstd_core_str_mut_from_raw_cstr(str.as_mut_ptr().cast()).unwrap();
     ///     let v = nstd_core_str_mut_to_f32(&str);
     ///     assert!(v == NSTDOptional::Some(-420.69));
     /// }
@@ -1458,7 +1469,7 @@ gen_to_primitive!(
     ///
     /// let mut str = String::from("-420.69\0");
     /// unsafe {
-    ///     let str = nstd_core_str_mut_from_raw_cstr(str.as_mut_ptr().cast());
+    ///     let str = nstd_core_str_mut_from_raw_cstr(str.as_mut_ptr().cast()).unwrap();
     ///     let v = nstd_core_str_mut_to_f64(&str);
     ///     assert!(v == NSTDOptional::Some(-420.69));
     /// }
@@ -1479,7 +1490,7 @@ gen_to_primitive!(
     ///
     /// let mut str = String::from("33\0");
     /// unsafe {
-    ///     let str = nstd_core_str_mut_from_raw_cstr(str.as_mut_ptr().cast());
+    ///     let str = nstd_core_str_mut_from_raw_cstr(str.as_mut_ptr().cast()).unwrap();
     ///     let v = nstd_core_str_mut_to_int(&str);
     ///     assert!(v == NSTDOptional::Some(33));
     /// }
@@ -1500,7 +1511,7 @@ gen_to_primitive!(
     ///
     /// let mut str = String::from("33\0");
     /// unsafe {
-    ///     let str = nstd_core_str_mut_from_raw_cstr(str.as_mut_ptr().cast());
+    ///     let str = nstd_core_str_mut_from_raw_cstr(str.as_mut_ptr().cast()).unwrap();
     ///     let v = nstd_core_str_mut_to_uint(&str);
     ///     assert!(v == NSTDOptional::Some(33));
     /// }
@@ -1521,7 +1532,7 @@ gen_to_primitive!(
     ///
     /// let mut str = String::from("33\0");
     /// unsafe {
-    ///     let str = nstd_core_str_mut_from_raw_cstr(str.as_mut_ptr().cast());
+    ///     let str = nstd_core_str_mut_from_raw_cstr(str.as_mut_ptr().cast()).unwrap();
     ///     let v = nstd_core_str_mut_to_i8(&str);
     ///     assert!(v == NSTDOptional::Some(33));
     /// }
@@ -1542,7 +1553,7 @@ gen_to_primitive!(
     ///
     /// let mut str = String::from("33\0");
     /// unsafe {
-    ///     let str = nstd_core_str_mut_from_raw_cstr(str.as_mut_ptr().cast());
+    ///     let str = nstd_core_str_mut_from_raw_cstr(str.as_mut_ptr().cast()).unwrap();
     ///     let v = nstd_core_str_mut_to_u8(&str);
     ///     assert!(v == NSTDOptional::Some(33));
     /// }
@@ -1563,7 +1574,7 @@ gen_to_primitive!(
     ///
     /// let mut str = String::from("33\0");
     /// unsafe {
-    ///     let str = nstd_core_str_mut_from_raw_cstr(str.as_mut_ptr().cast());
+    ///     let str = nstd_core_str_mut_from_raw_cstr(str.as_mut_ptr().cast()).unwrap();
     ///     let v = nstd_core_str_mut_to_i16(&str);
     ///     assert!(v == NSTDOptional::Some(33));
     /// }
@@ -1584,7 +1595,7 @@ gen_to_primitive!(
     ///
     /// let mut str = String::from("33\0");
     /// unsafe {
-    ///     let str = nstd_core_str_mut_from_raw_cstr(str.as_mut_ptr().cast());
+    ///     let str = nstd_core_str_mut_from_raw_cstr(str.as_mut_ptr().cast()).unwrap();
     ///     let v = nstd_core_str_mut_to_u16(&str);
     ///     assert!(v == NSTDOptional::Some(33));
     /// }
@@ -1605,7 +1616,7 @@ gen_to_primitive!(
     ///
     /// let mut str = String::from("33\0");
     /// unsafe {
-    ///     let str = nstd_core_str_mut_from_raw_cstr(str.as_mut_ptr().cast());
+    ///     let str = nstd_core_str_mut_from_raw_cstr(str.as_mut_ptr().cast()).unwrap();
     ///     let v = nstd_core_str_mut_to_i32(&str);
     ///     assert!(v == NSTDOptional::Some(33));
     /// }
@@ -1626,7 +1637,7 @@ gen_to_primitive!(
     ///
     /// let mut str = String::from("33\0");
     /// unsafe {
-    ///     let str = nstd_core_str_mut_from_raw_cstr(str.as_mut_ptr().cast());
+    ///     let str = nstd_core_str_mut_from_raw_cstr(str.as_mut_ptr().cast()).unwrap();
     ///     let v = nstd_core_str_mut_to_u32(&str);
     ///     assert!(v == NSTDOptional::Some(33));
     /// }
@@ -1647,7 +1658,7 @@ gen_to_primitive!(
     ///
     /// let mut str = String::from("33\0");
     /// unsafe {
-    ///     let str = nstd_core_str_mut_from_raw_cstr(str.as_mut_ptr().cast());
+    ///     let str = nstd_core_str_mut_from_raw_cstr(str.as_mut_ptr().cast()).unwrap();
     ///     let v = nstd_core_str_mut_to_i64(&str);
     ///     assert!(v == NSTDOptional::Some(33));
     /// }
@@ -1668,7 +1679,7 @@ gen_to_primitive!(
     ///
     /// let mut str = String::from("33\0");
     /// unsafe {
-    ///     let str = nstd_core_str_mut_from_raw_cstr(str.as_mut_ptr().cast());
+    ///     let str = nstd_core_str_mut_from_raw_cstr(str.as_mut_ptr().cast()).unwrap();
     ///     let v = nstd_core_str_mut_to_u64(&str);
     ///     assert!(v == NSTDOptional::Some(33));
     /// }
