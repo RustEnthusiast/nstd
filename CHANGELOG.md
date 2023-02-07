@@ -1,5 +1,6 @@
 # TBD
 ### `nstd.core`
+- `nstd.core.cty`'s functions now use `NSTDChar`.
 - Added `nstd_core_unichar_is_[ascii|alphabetic|numeric|alphanumeric|lowercase|uppercase|whitespace|control|digit]`.
 - Added `nstd_core_unichar_replacement`.
 - `nstd_core_str[_mut]_substr` now returns `NSTDOptionalStr[Mut]`.
