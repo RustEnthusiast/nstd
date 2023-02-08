@@ -29,23 +29,22 @@ NSTDAPI NSTDStdin nstd_io_stdin();
 ///
 /// - `NSTDSliceMut *buffer` - The buffer to fill with data from stdin.
 ///
-/// - `NSTDUInt *read` - Returns as the number of bytes read from stdin.
-///
 /// # Returns
 ///
-/// `NSTDIOError errc` - The I/O operation error code.
+/// `NSTDIOResult read` - The number of bytes read from `handle` on success, or the I/O operation
+/// error code on failure.
 ///
 /// # Safety
 ///
 /// `buffer`'s data must be valid for writes.
-NSTDAPI NSTDIOError nstd_io_stdin_read(NSTDStdin *handle, NSTDSliceMut *buffer, NSTDUInt *read);
+NSTDAPI NSTDIOResult nstd_io_stdin_read(NSTDStdin *handle, NSTDSliceMut *buffer);
 
 /// Continuously reads data from stdin into a buffer until EOF is reached.
 ///
 /// # Note
 ///
 /// If extending the buffer fails, an error code of `NSTD_IO_ERROR_OUT_OF_MEMORY` will be returned.
-/// This does not mean `read` will return as 0 in this case.
+/// This does not mean there were no bytes read from `handle` in this case.
 ///
 /// # Parameters:
 ///
@@ -53,23 +52,22 @@ NSTDAPI NSTDIOError nstd_io_stdin_read(NSTDStdin *handle, NSTDSliceMut *buffer, 
 ///
 /// - `NSTDVec *buffer` - The buffer to be extended with data from stdin.
 ///
-/// - `NSTDUInt *read` - Returns as the number of bytes read from stdin.
-///
 /// # Returns
 ///
-/// `NSTDIOError errc` - The I/O operation error code.
+/// `NSTDIOResult read` - The number of bytes read from `handle` on success, or the I/O operation
+/// error code on failure.
 ///
 /// # Panics
 ///
 /// This function will panic if `buffer`'s length in bytes ends up exceeding `NSTDInt`'s max value.
-NSTDAPI NSTDIOError nstd_io_stdin_read_all(NSTDStdin *handle, NSTDVec *buffer, NSTDUInt *read);
+NSTDAPI NSTDIOResult nstd_io_stdin_read_all(NSTDStdin *handle, NSTDVec *buffer);
 
 /// Continuously reads UTF-8 data from stdin into a string buffer until EOF is reached.
 ///
 /// # Note
 ///
 /// If extending the buffer fails, an error code of `NSTD_IO_ERROR_OUT_OF_MEMORY` will be returned.
-/// This does not mean `read` will return as 0 in this case.
+/// This does not mean there were no bytes read from `handle` in this case.
 ///
 /// # Parameters:
 ///
@@ -77,17 +75,15 @@ NSTDAPI NSTDIOError nstd_io_stdin_read_all(NSTDStdin *handle, NSTDVec *buffer, N
 ///
 /// - `NSTDString *buffer` - The buffer to be extended with data from stdin.
 ///
-/// - `NSTDUInt *read` - Returns as the number of bytes read from stdin.
-///
 /// # Returns
 ///
-/// `NSTDIOError errc` - The I/O operation error code.
+/// `NSTDIOResult read` - The number of bytes read from `handle` on success, or the I/O operation
+/// error code on failure.
 ///
 /// # Panics
 ///
 /// This function will panic if `buffer`'s length in bytes ends up exceeding `NSTDInt`'s max value.
-NSTDAPI NSTDIOError
-nstd_io_stdin_read_to_string(NSTDStdin *handle, NSTDString *buffer, NSTDUInt *read);
+NSTDAPI NSTDIOResult nstd_io_stdin_read_to_string(NSTDStdin *handle, NSTDString *buffer);
 
 /// Reads enough data from stdin to fill the entirety of `buffer`.
 ///

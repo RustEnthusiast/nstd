@@ -28,17 +28,15 @@ NSTDAPI NSTDStdout nstd_io_stdout();
 ///
 /// - `const NSTDSlice *bytes` - The data to be written to stdout.
 ///
-/// - `NSTDUInt *written` - Returns as the number of bytes written.
-///
 /// # Returns
 ///
-/// `NSTDIOError errc` - The I/O operation error code.
+/// `NSTDIOResult written` - The number of bytes written to `handle` on success, or the I/O
+/// operation error code on failure.
 ///
 /// # Safety
 ///
 /// This function can cause undefined behavior if `bytes`'s data is invalid.
-NSTDAPI NSTDIOError
-nstd_io_stdout_write(NSTDStdout *handle, const NSTDSlice *bytes, NSTDUInt *written);
+NSTDAPI NSTDIOResult nstd_io_stdout_write(NSTDStdout *handle, const NSTDSlice *bytes);
 
 /// Writes an entire buffer to the standard output stream.
 ///

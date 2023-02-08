@@ -8,7 +8,11 @@
 - `nstd_core_cstr[_mut]_new` now returns `NSTDOptionalCStr[Mut]`.
 - `nstd_core_slice[_mut]_new` now returns `NSTDOptionalSlice[Mut]`.
 - `nstd_core_ptr[_mut]_new` now returns `NSTDOptionalPtr[Mut]`.
+### `nstd.fs`
+- `nstd_fs_file_[read[_all|_to_string]|write]` now returns `NSTDIOResult`.
 ### `nstd.io`
+- `nstd_io_[stdout|stderr]_write` now returns `NSTDIOResult`.
+- `nstd_io_stdin_read[_all|_to_string]` now returns `NSTDIOResult`.
 - Added `NSTDIOResult`.
 ### `nstd.os`
 - Added `NSTDUnixIOResult`.
