@@ -8,7 +8,10 @@
 - `nstd_core_cstr[_mut]_new` now returns `NSTDOptionalCStr[Mut]`.
 - `nstd_core_slice[_mut]_new` now returns `NSTDOptionalSlice[Mut]`.
 - `nstd_core_ptr[_mut]_new` now returns `NSTDOptionalPtr[Mut]`.
+### `nstd.io`
+- Added `NSTDIOResult`.
 ### `nstd.os`
+- Added `NSTDUnixIOResult`.
 - Added `nstd.os.unix.mutex`.
 
 # 0.5.0

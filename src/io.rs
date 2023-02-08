@@ -9,6 +9,7 @@ use crate::{
     core::{result::NSTDResult, str::NSTDStr},
     string::{nstd_string_pop, NSTDString},
     vec::NSTDVec,
+    NSTDUInt,
 };
 use nstdapi::nstdapi;
 use std::io::{ErrorKind, Write};
@@ -110,6 +111,10 @@ impl From<NSTDUnixIOError> for NSTDIOError {
         }
     }
 }
+
+/// A result type that yields an [NSTDUInt] representing the number of bytes read or written by an
+/// I/O operation on success and an I/O operation error code on failure.
+pub type NSTDIOResult = NSTDResult<NSTDUInt, NSTDIOError>;
 
 /// A result type that yields an [NSTDVec] on success and an I/O operation error code on failure.
 pub type NSTDIOBufferResult = NSTDResult<NSTDVec, NSTDIOError>;

@@ -52,6 +52,10 @@ typedef enum {
     NSTD_IO_ERROR_OUT_OF_MEMORY,
 } NSTDIOError;
 
+/// A result type that yields an [NSTDUInt] representing the number of bytes read or written by an
+/// I/O operation on success and an I/O operation error code on failure.
+NSTDResult(NSTDUInt, NSTDIOError) NSTDIOResult;
+
 /// A result type that yields an [NSTDVec] on success and an I/O operation error code on failure.
 NSTDResult(NSTDVec, NSTDIOError) NSTDIOBufferResult;
 

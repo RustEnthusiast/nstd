@@ -1,5 +1,6 @@
 //! Provides functionality for working with input & output on Unix platforms.
 pub(crate) mod stdio;
+use crate::{core::result::NSTDResult, NSTDUInt};
 use libc::{
     EACCES, EAGAIN, EBADF, ECONNRESET, EINTR, EINVAL, EISDIR, ENETDOWN, ENETUNREACH, ENOMEM,
     ENOTCONN, EPIPE, ESPIPE, ETIMEDOUT, EWOULDBLOCK,
@@ -71,6 +72,10 @@ impl NSTDUnixIOError {
         }
     }
 }
+
+/// A result type that yields an [NSTDUInt] representing the number of bytes read or written by a
+/// Unix I/O operation on success and a Unix I/O operation error code on failure.
+pub type NSTDUnixIOResult = NSTDResult<NSTDUInt, NSTDUnixIOError>;
 
 /// Represents a raw Unix file descriptor.
 pub type NSTDUnixFileDescriptor = c_int;
