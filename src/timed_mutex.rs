@@ -198,9 +198,5 @@ extern "C" {
     /// # Parameters:
     ///
     /// - `NSTDTimedMutex mutex` - The timed mutex to free.
-    ///
-    /// # Panics
-    ///
-    /// This operation will panic if freeing the timed mutex's data fails.
     pub fn nstd_timed_mutex_free(mutex: NSTDTimedMutex);
 }

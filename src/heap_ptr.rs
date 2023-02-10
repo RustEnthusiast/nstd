@@ -1,9 +1,6 @@
 //! A pointer type for single value heap allocation.
 use crate::{
-    alloc::{
-        nstd_alloc_allocate, nstd_alloc_allocate_zeroed, nstd_alloc_deallocate,
-        NSTDAllocError::NSTD_ALLOC_ERROR_NONE,
-    },
+    alloc::{nstd_alloc_allocate, nstd_alloc_allocate_zeroed, nstd_alloc_deallocate},
     core::{
         mem::nstd_core_mem_copy,
         optional::{gen_optional, NSTDOptional},
@@ -33,17 +30,11 @@ impl NSTDHeapPtr {
 }
 impl Drop for NSTDHeapPtr {
     /// [NSTDHeapPtr]'s destructor.
-    ///
-    /// # Panics
-    ///
-    /// Panics if deallocating fails.
     #[inline]
     fn drop(&mut self) {
         if self.size > 0 {
             // SAFETY: The heap object's size is non-zero.
-            unsafe {
-                assert!(nstd_alloc_deallocate(&mut self.ptr, self.size) == NSTD_ALLOC_ERROR_NONE);
-            }
+            unsafe { nstd_alloc_deallocate(&mut self.ptr, self.size) };
         }
     }
 }
@@ -281,10 +272,6 @@ pub fn nstd_heap_ptr_get_mut(hptr: &mut NSTDHeapPtr) -> NSTDAnyMut {
 /// # Parameters:
 ///
 /// - `NSTDHeapPtr hptr` - A pointer to the heap object.
-///
-/// # Panics
-///
-/// Panics if freeing the heap memory fails.
 #[inline]
 #[nstdapi]
 #[allow(unused_variables)]

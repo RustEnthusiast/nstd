@@ -485,10 +485,6 @@ pub fn nstd_cstring_clear(cstring: &mut NSTDCString) {
 /// # Parameters:
 ///
 /// - `NSTDCString cstring` - The C string to free.
-///
-/// # Panics
-///
-/// Panics if deallocating fails.
 #[inline]
 #[nstdapi]
 #[allow(unused_variables)]

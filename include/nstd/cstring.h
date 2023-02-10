@@ -280,10 +280,6 @@ NSTDAPI void nstd_cstring_clear(NSTDCString *cstring);
 /// # Parameters:
 ///
 /// - `NSTDCString cstring` - The C string to free.
-///
-/// # Panics
-///
-/// Panics if deallocating fails.
 NSTDAPI void nstd_cstring_free(NSTDCString cstring);
 
 #endif

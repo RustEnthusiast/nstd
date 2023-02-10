@@ -434,10 +434,6 @@ NSTDAPI NSTDString nstd_string_from_u64(NSTDUInt64 v);
 /// # Parameters:
 ///
 /// - `NSTDString string` - The string to free.
-///
-/// # Panics
-///
-/// Panics if deallocating fails.
 NSTDAPI void nstd_string_free(NSTDString string);
 
 #endif

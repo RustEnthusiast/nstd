@@ -124,10 +124,6 @@ NSTDAPI void nstd_os_unix_mutex_unlock(NSTDUnixMutexGuard guard);
 /// # Parameters:
 ///
 /// - `NSTDUnixMutex mutex` - The mutex to free.
-///
-/// # Panics
-///
-/// This operation will panic if destroying the mutex fails.
 NSTDAPI void nstd_os_unix_mutex_free(NSTDUnixMutex mutex);
 
 #endif

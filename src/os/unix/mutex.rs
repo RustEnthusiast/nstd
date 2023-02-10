@@ -24,34 +24,17 @@ use std::{
 struct RawMutex(UnsafeCell<pthread_mutex_t>);
 impl Drop for RawMutex {
     /// [RawMutex]'s destructor.
-    ///
-    /// # Panics
-    ///
-    /// This operation will panic if destroying the mutex fails.
     fn drop(&mut self) {
         // SAFETY: Destroying a locked mutex results in undefined behavior, so here we check if the
         // mutex is locked. If the mutex *is* locked then it's guard must have been leaked, in this
         // case we will leak the raw mutex data as well.
         unsafe {
-            match pthread_mutex_trylock(self.0.get()) {
-                0 => {
-                    // This shall only fail if the mutex is either robust,
-                    // `PTHREAD_MUTEX_ERRORCHECK`, or `PTHREAD_MUTEX_RECURSIVE` and the thread does
-                    // not own the mutex.
-                    pthread_mutex_unlock(self.0.get());
-                    #[cfg(not(target_os = "dragonfly"))]
-                    pthread_mutex_destroy(self.0.get());
-                    #[cfg(target_os = "dragonfly")]
-                    {
-                        use libc::EINVAL;
-                        let err = pthread_mutex_destroy(self.0.get());
-                        // On DragonFly BSD `pthread_mutex_destroy` returns `EINVAL` if called with
-                        // a mutex that was initialized with `PTHREAD_MUTEX_INITIALIZER`. Checking
-                        // this is useful in case of a panic in `nstd_os_unix_mutex_new`.
-                        assert!(err == 0 || err == EINVAL);
-                    }
-                }
-                lock_err => assert!(lock_err == EBUSY),
+            if pthread_mutex_trylock(self.0.get()) == 0 {
+                // This shall only fail if the mutex is either robust,
+                // `PTHREAD_MUTEX_ERRORCHECK`, or `PTHREAD_MUTEX_RECURSIVE` and the thread does
+                // not own the mutex.
+                pthread_mutex_unlock(self.0.get());
+                pthread_mutex_destroy(self.0.get());
             }
         }
     }
@@ -293,10 +276,6 @@ pub fn nstd_os_unix_mutex_unlock(guard: NSTDUnixMutexGuard) {}
 /// # Parameters:
 ///
 /// - `NSTDUnixMutex mutex` - The mutex to free.
-///
-/// # Panics
-///
-/// This operation will panic if destroying the mutex fails.
 #[inline]
 #[nstdapi]
 #[allow(unused_variables)]

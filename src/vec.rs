@@ -120,18 +120,12 @@ impl NSTDVec {
 }
 impl Drop for NSTDVec {
     /// [NSTDVec]'s destructor.
-    ///
-    /// # Panics
-    ///
-    /// Panics if deallocating fails.
     #[inline]
     fn drop(&mut self) {
         if !self.ptr.is_null() {
             let buffer_len = self.buffer_byte_len();
             // SAFETY: The vector has allocated.
-            unsafe {
-                assert!(nstd_alloc_deallocate(&mut self.ptr, buffer_len) == NSTD_ALLOC_ERROR_NONE);
-            }
+            unsafe { nstd_alloc_deallocate(&mut self.ptr, buffer_len) };
         }
     }
 }
@@ -1115,10 +1109,6 @@ pub fn nstd_vec_clear(vec: &mut NSTDVec) {
 /// # Parameters:
 ///
 /// - `NSTDVec vec` - The vector to free.
-///
-/// # Panics
-///
-/// Panics if deallocating fails.
 #[inline]
 #[nstdapi]
 #[allow(unused_variables)]

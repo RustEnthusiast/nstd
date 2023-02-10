@@ -636,10 +636,6 @@ gen_from_primitive!(
 /// # Parameters:
 ///
 /// - `NSTDString string` - The string to free.
-///
-/// # Panics
-///
-/// Panics if deallocating fails.
 #[inline]
 #[nstdapi]
 #[allow(unused_variables)]
