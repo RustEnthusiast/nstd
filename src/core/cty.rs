@@ -36,7 +36,7 @@ macro_rules! gen_deterministic {
         $(#[$meta])*
         #[inline]
         #[nstdapi]
-        pub fn $name(chr: NSTDChar) -> NSTDBool {
+        pub const fn $name(chr: NSTDChar) -> NSTDBool {
             (chr as u8).$method()
         }
     };
