@@ -66,8 +66,10 @@ pub const fn nstd_core_unichar_new(value: NSTDChar32) -> NSTDOptionalUnichar {
 /// ```
 #[inline]
 #[nstdapi]
-pub fn nstd_core_unichar_replacement() -> NSTDUnichar {
-    char::REPLACEMENT_CHARACTER.into()
+pub const fn nstd_core_unichar_replacement() -> NSTDUnichar {
+    NSTDUnichar {
+        value: char::REPLACEMENT_CHARACTER as _,
+    }
 }
 
 /// Generates deterministic functions such as `is_alphabetic` or `is_numeric`.
