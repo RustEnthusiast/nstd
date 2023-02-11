@@ -80,6 +80,14 @@ pub const fn nstd_core_fty_max_f64() -> NSTDFloat64 {
 /// # Returns
 ///
 /// `NSTDFloat32 nan` - NaN represented as `NSTDFloat32`.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::fty::nstd_core_fty_nan_f32;
+///
+/// assert!(nstd_core_fty_nan_f32().is_nan());
+/// ```
 #[inline]
 #[nstdapi]
 pub const fn nstd_core_fty_nan_f32() -> NSTDFloat32 {
@@ -90,6 +98,14 @@ pub const fn nstd_core_fty_nan_f32() -> NSTDFloat32 {
 /// # Returns
 ///
 /// `NSTDFloat64 nan` - NaN represented as `NSTDFloat64`.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::fty::nstd_core_fty_nan_f64;
+///
+/// assert!(nstd_core_fty_nan_f64().is_nan());
+/// ```
 #[inline]
 #[nstdapi]
 pub const fn nstd_core_fty_nan_f64() -> NSTDFloat64 {
