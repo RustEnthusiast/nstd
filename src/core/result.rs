@@ -5,20 +5,20 @@ use nstdapi::nstdapi;
 #[nstdapi]
 #[allow(non_camel_case_types)]
 pub enum NSTDResultStatus {
-    /// A successful variant.
-    NSTD_RESULT_STATUS_OK,
     /// An error variant.
     NSTD_RESULT_STATUS_ERR,
+    /// A successful variant.
+    NSTD_RESULT_STATUS_OK,
 }
 
 /// Defines a "result" type with success and error variants.
 #[nstdapi]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum NSTDResult<T, E> {
-    /// The success variant.
-    Ok(T),
     /// The error variant.
     Err(E),
+    /// The success variant.
+    Ok(T),
 }
 impl<T, E> NSTDResult<T, E> {
     /// Attempts to return the contained `Ok` value in an `NSTDResult`.
