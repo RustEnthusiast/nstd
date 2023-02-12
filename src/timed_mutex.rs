@@ -15,6 +15,8 @@ pub struct NSTDTimedMutex {
     data: ManuallyDrop<NSTDHeapPtr>,
     /// Determines whether or not the mutex is poisoned.
     poisoned: NSTDBool,
+    /// Determines whether or not the mutex is currently locked.
+    locked: NSTDBool,
 }
 impl Drop for NSTDTimedMutex {
     /// [NSTDTimedMutex]'s destructor.
