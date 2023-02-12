@@ -14,8 +14,7 @@ typedef NSTDAnyMut NSTDStdout;
 /// `NSTDStdout handle` - A handle to the standard output stream.
 NSTDAPI NSTDStdout nstd_io_stdout();
 
-/// Writes some data to the standard output stream, setting `written` to the number of bytes
-/// written.
+/// Writes some data to the standard output stream, returning how many bytes were written.
 ///
 /// # Note
 ///

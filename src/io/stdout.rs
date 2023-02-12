@@ -22,8 +22,7 @@ pub fn nstd_io_stdout() -> NSTDStdout {
     NSTDStdout::new(std::io::stdout())
 }
 
-/// Writes some data to the standard output stream, setting `written` to the number of bytes
-/// written.
+/// Writes some data to the standard output stream, returning how many bytes were written.
 ///
 /// # Note
 ///

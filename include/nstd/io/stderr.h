@@ -14,8 +14,7 @@ typedef NSTDAnyMut NSTDStderr;
 /// `NSTDStderr handle` - A handle to the standard error stream.
 NSTDAPI NSTDStderr nstd_io_stderr();
 
-/// Writes some data to the standard error stream, setting `written` to the number of bytes
-/// written.
+/// Writes some data to the standard error stream, returning how many bytes were written.
 ///
 /// # Note
 ///

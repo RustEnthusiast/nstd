@@ -106,6 +106,8 @@ or return valid references.
 
 - Data is *moved* when using the value-copy semantic on a type that does not implement `Copy`.
 
+- Data must not be moved while being referenced by another object.
+
 - Types that do not implement the `Send` trait must not be sent between threads.
 
 - Types that do not implement the `Sync` trait must not be shared between threads.

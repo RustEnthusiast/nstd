@@ -22,8 +22,7 @@ pub fn nstd_io_stderr() -> NSTDStderr {
     NSTDStderr::new(std::io::stderr())
 }
 
-/// Writes some data to the standard error stream, setting `written` to the number of bytes
-/// written.
+/// Writes some data to the standard error stream, returning how many bytes were written.
 ///
 /// # Note
 ///
