@@ -13,6 +13,8 @@ typedef struct {
     NSTDHeapPtr data;
     /// Determines whether or not the mutex is poisoned.
     NSTDBool poisoned;
+    /// Determines whether or not the mutex is currently locked.
+    NSTDBool locked;
 } NSTDTimedMutex;
 
 /// A handle to a timed mutex's data.
