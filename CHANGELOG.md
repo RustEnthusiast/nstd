@@ -11,6 +11,7 @@
 ### `nstd.fs`
 - `nstd_fs_file_[read[_all|_to_string]|write]` now returns `NSTDIOResult`.
 ### `nstd.io`
+- Added `NSTDStd[in|out|err]Lock`.
 - `nstd_io_[stdout|stderr]_write` now returns `NSTDIOResult`.
 - `nstd_io_stdin_read[_all|_to_string]` now returns `NSTDIOResult`.
 - Added `NSTDIOResult`.
