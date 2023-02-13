@@ -47,6 +47,17 @@ NSTDOptional(NSTDUnixMutexLockResult) NSTDUnixOptionalMutexLockResult;
 /// This operation will panic if creating the mutex fails.
 NSTDAPI NSTDUnixMutex nstd_os_unix_mutex_new(NSTDHeapPtr data);
 
+/// Returns a Unix mutex's native OS handle.
+///
+/// # Parameters:
+///
+/// - `const NSTDUnixMutex *mutex` - The mutex.
+///
+/// # Returns
+///
+/// `pthread_mutex_t raw` - The native mutex handle.
+NSTDAPI pthread_mutex_t nstd_os_unix_mutex_handle(const NSTDUnixMutex *mutex);
+
 /// Determines whether or not a mutex's data is poisoned.
 ///
 /// # Parameters:

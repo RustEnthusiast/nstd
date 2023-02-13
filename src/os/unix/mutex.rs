@@ -151,6 +151,22 @@ pub fn nstd_os_unix_mutex_new(data: NSTDHeapPtr) -> NSTDUnixMutex {
     }
 }
 
+/// Returns a Unix mutex's native OS handle.
+///
+/// # Parameters:
+///
+/// - `const NSTDUnixMutex *mutex` - The mutex.
+///
+/// # Returns
+///
+/// `pthread_mutex_t raw` - The native mutex handle.
+#[inline]
+#[nstdapi]
+pub fn nstd_os_unix_mutex_handle(mutex: &NSTDUnixMutex) -> pthread_mutex_t {
+    // SAFETY: `mutex` is behind an initialized reference.
+    unsafe { *mutex.inner.0.get() }
+}
+
 /// Determines whether or not a mutex's data is poisoned.
 ///
 /// # Parameters:
