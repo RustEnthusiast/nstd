@@ -2,7 +2,7 @@
 use crate::{
     core::{optional::NSTDOptional, result::NSTDResult},
     heap_ptr::{nstd_heap_ptr_get, nstd_heap_ptr_get_mut, NSTDHeapPtr},
-    time::{NSTDDuration, NSTDTime},
+    time::NSTDDuration,
     NSTDAny, NSTDAnyMut, NSTDBool, NSTD_FALSE, NSTD_TRUE,
 };
 use libc::{
@@ -16,7 +16,6 @@ use std::{
     cell::{Cell, UnsafeCell},
     marker::PhantomData,
     mem::MaybeUninit,
-    time::{Duration, SystemTime},
 };
 
 /// A raw mutex wrapping `pthread_mutex_t`.
@@ -293,13 +292,21 @@ pub fn nstd_os_unix_mutex_timed_lock<'a>(
         target_os = "solaris"
     ))]
     {
+        use crate::time::{
+            nstd_time_duration_nanoseconds, nstd_time_duration_seconds, nstd_time_nanoseconds,
+            nstd_time_seconds, NSTDTime,
+        };
         use libc::{pthread_mutex_timedlock, timespec, ETIMEDOUT};
+        use std::time::{Duration, SystemTime};
         let mut time = SystemTime::now();
-        time += Duration::new(duration.secs as _, duration.nanos);
-        let duration = NSTDTime::from(time);
+        time += Duration::new(
+            nstd_time_duration_seconds(&duration) as _,
+            nstd_time_duration_nanoseconds(&duration),
+        );
+        let time = NSTDTime::from(time);
         let duration = timespec {
-            tv_sec: duration.secs as _,
-            tv_nsec: duration.nanos as _,
+            tv_sec: nstd_time_seconds(&time) as _,
+            tv_nsec: nstd_time_nanoseconds(&time) as _,
         };
         // SAFETY: `mutex` is behind an initialized reference.
         match unsafe { pthread_mutex_timedlock(mutex.inner.0.get(), &duration) } {
