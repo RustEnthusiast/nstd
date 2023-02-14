@@ -4,6 +4,7 @@
 #include "../../core/result.h"
 #include "../../heap_ptr.h"
 #include "../../nstd.h"
+#include "../../time.h"
 #include <pthread.h>
 
 /// A mutual exclusion primitive useful for protecting shared data.
@@ -89,7 +90,7 @@ NSTDAPI NSTDUnixMutexLockResult nstd_os_unix_mutex_lock(const NSTDUnixMutex *mut
 ///
 /// # Parameters:
 ///
-/// - `const NSTDUnixMutex mutex` - The mutex to lock.
+/// - `const NSTDUnixMutex *mutex` - The mutex to lock.
 ///
 /// # Returns
 ///
@@ -100,6 +101,32 @@ NSTDAPI NSTDUnixMutexLockResult nstd_os_unix_mutex_lock(const NSTDUnixMutex *mut
 ///
 /// This operation will panic if locking the mutex fails.
 NSTDAPI NSTDUnixOptionalMutexLockResult nstd_os_unix_mutex_try_lock(const NSTDUnixMutex *mutex);
+
+/// The timed variant of `nstd_os_unix_mutex_lock`. This will return with an uninitialized "none"
+/// value if the mutex remains locked for the time span of `duration`.
+///
+/// # Note
+///
+/// This function will return immediately with a "none" value on unsupported platforms.
+/// Supported platforms include Android, DragonFly BSD, FreeBSD, NetBSD, OpenBSD, Fuchsia, Haiku,
+/// illumos, Linux, QNX Neutrino, Oracle Solaris, and VxWorks.
+///
+/// # Parameters:
+///
+/// - `const NSTDUnixMutex *mutex` - The mutex to lock.
+///
+/// - `const NSTDDuration *duration` - The amount of time to wait for the mutex to become available.
+///
+/// # Returns
+///
+/// `NSTDUnixOptionalMutexLockResult guard` - A handle to the mutex's data, or "none" if the mutex
+/// remains locked for the time span of `duration`.
+///
+/// # Panics
+///
+/// This operation will panic if locking the mutex fails.
+NSTDAPI NSTDUnixOptionalMutexLockResult
+nstd_os_unix_mutex_timed_lock(const NSTDUnixMutex *mutex, const NSTDDuration *duration);
 
 /// Returns a pointer to a mutex's raw data.
 ///
