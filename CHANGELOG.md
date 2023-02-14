@@ -18,6 +18,8 @@
 ### `nstd.os`
 - Added `NSTDUnixIOResult`.
 - Added `nstd.os.unix.mutex`.
+### `nstd.time`
+- Added `NSTD[Optional]Duration`.
 
 # 0.5.0
 ### `nstd`

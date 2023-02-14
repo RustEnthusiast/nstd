@@ -35,6 +35,17 @@ impl From<SystemTime> for NSTDTime {
 }
 gen_optional!(NSTDOptionalTime, NSTDTime);
 
+/// Represents a span of time.
+#[nstdapi]
+#[derive(Clone, Copy)]
+pub struct NSTDDuration {
+    /// The duration in seconds.
+    pub secs: NSTDInt64,
+    /// The nanoseconds.
+    pub nanos: NSTDUInt32,
+}
+gen_optional!(NSTDOptionalDuration, NSTDDuration);
+
 /// Returns the current system time as an `NSTDTime` object.
 ///
 /// # Returns

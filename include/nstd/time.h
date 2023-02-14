@@ -14,6 +14,17 @@ typedef struct {
 /// Represents an optional value of type `NSTDTime`.
 NSTDOptional(NSTDTime) NSTDOptionalTime;
 
+/// Represents a span of time.
+typedef struct {
+    /// The duration in seconds.
+    NSTDInt64 secs;
+    /// The nanoseconds.
+    NSTDUInt32 nanos;
+} NSTDDuration;
+
+/// Represents an optional value of type `NSTDDuration`.
+NSTDOptional(NSTDDuration) NSTDOptionalDuration;
+
 /// Returns the current system time as an `NSTDTime` object.
 ///
 /// # Returns
