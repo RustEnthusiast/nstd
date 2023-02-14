@@ -108,8 +108,8 @@ NSTDAPI NSTDUnixOptionalMutexLockResult nstd_os_unix_mutex_try_lock(const NSTDUn
 /// # Note
 ///
 /// This function will return immediately with a "none" value on unsupported platforms.
-/// Supported platforms include Android, DragonFly BSD, FreeBSD, NetBSD, OpenBSD, Fuchsia, Haiku,
-/// illumos, Linux, QNX Neutrino, Oracle Solaris, and VxWorks.
+/// Supported platforms include Android, DragonFly BSD, FreeBSD, NetBSD, OpenBSD, Haiku, illumos,
+/// Linux, QNX Neutrino, and Oracle Solaris.
 ///
 /// # Parameters:
 ///

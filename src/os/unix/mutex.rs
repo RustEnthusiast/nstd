@@ -257,8 +257,8 @@ pub fn nstd_os_unix_mutex_try_lock(mutex: &NSTDUnixMutex) -> NSTDUnixOptionalMut
 /// # Note
 ///
 /// This function will return immediately with a "none" value on unsupported platforms.
-/// Supported platforms include Android, DragonFly BSD, FreeBSD, NetBSD, OpenBSD, Fuchsia, Haiku,
-/// illumos, Linux, QNX Neutrino, Oracle Solaris, and VxWorks.
+/// Supported platforms include Android, DragonFly BSD, FreeBSD, NetBSD, OpenBSD, Haiku, illumos,
+/// Linux, QNX Neutrino, and Oracle Solaris.
 ///
 /// # Parameters:
 ///
@@ -284,15 +284,13 @@ pub fn nstd_os_unix_mutex_timed_lock<'a>(
         target_os = "android",
         target_os = "dragonfly",
         target_os = "freebsd",
-        target_os = "fuchsia",
         target_os = "haiku",
         target_os = "illumos",
         target_os = "linux",
         target_os = "netbsd",
         target_os = "nto",
         target_os = "openbsd",
-        target_os = "solaris",
-        target_os = "vxworks"
+        target_os = "solaris"
     ))]
     {
         use libc::{pthread_mutex_timedlock, timespec, ETIMEDOUT};
@@ -322,15 +320,13 @@ pub fn nstd_os_unix_mutex_timed_lock<'a>(
         target_os = "android",
         target_os = "dragonfly",
         target_os = "freebsd",
-        target_os = "fuchsia",
         target_os = "haiku",
         target_os = "illumos",
         target_os = "linux",
         target_os = "netbsd",
         target_os = "nto",
         target_os = "openbsd",
-        target_os = "solaris",
-        target_os = "vxworks"
+        target_os = "solaris"
     )))]
     return NSTDOptional::None;
 }
