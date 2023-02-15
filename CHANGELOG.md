@@ -16,6 +16,7 @@
 - `nstd_io_stdin_read[_all|_to_string]` now returns `NSTDIOResult`.
 - Added `NSTDIOResult`.
 ### `nstd.os`
+- Added `NSTD_OS_[IOS|ANDROID|DRAGONFLY|FREEBSD|NETBSD|OPENBSD|BSD|HAIKU|NTO|SOLARIS]`.
 - Added `NSTDUnixIOResult`.
 - Added `nstd.os.unix.mutex`.
 ### `nstd.time`
