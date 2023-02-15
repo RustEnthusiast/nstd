@@ -1,7 +1,7 @@
 //! Time utilities.
 use crate::{
     core::optional::{gen_optional, NSTDOptional},
-    NSTDInt64, NSTDUInt32,
+    NSTDInt64, NSTDUInt32, NSTDUInt64,
 };
 use nstdapi::nstdapi;
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -40,7 +40,7 @@ gen_optional!(NSTDOptionalTime, NSTDTime);
 #[derive(Clone, Copy)]
 pub struct NSTDDuration {
     /// The duration in seconds.
-    seconds: NSTDInt64,
+    seconds: NSTDUInt64,
     /// The nanoseconds.
     nanoseconds: NSTDUInt32,
 }
@@ -91,26 +91,24 @@ pub fn nstd_time_nanoseconds(time: &NSTDTime) -> NSTDUInt32 {
 ///
 /// # Parameters:
 ///
-/// - `NSTDInt64 seconds` - The time span in seconds.
+/// - `NSTDUInt64 seconds` - The time span in seconds.
 ///
 /// - `NSTDUInt32 nanoseconds` - The remaining nanoseconds.
 ///
 /// # Returns
 ///
 /// `NSTDDuration duration` - The time span represented as an `NSTDDuration` object.
+#[inline]
 #[nstdapi]
 pub const fn nstd_time_duration_new(
-    mut seconds: NSTDInt64,
+    mut seconds: NSTDUInt64,
     mut nanoseconds: NSTDUInt32,
 ) -> NSTDDuration {
     /// The number of nanoseconds in a whole second.
     const NANOS_IN_SEC: NSTDUInt32 = 1_000_000_000;
     let extra_secs = nanoseconds / NANOS_IN_SEC;
     nanoseconds -= NANOS_IN_SEC * extra_secs;
-    match seconds >= 0 {
-        true => seconds += extra_secs as NSTDInt64,
-        false => seconds -= extra_secs as NSTDInt64,
-    }
+    seconds += extra_secs as NSTDUInt64;
     NSTDDuration {
         seconds,
         nanoseconds,
@@ -122,7 +120,7 @@ pub const fn nstd_time_duration_new(
 ///
 /// # Parameters:
 ///
-/// - `NSTDInt64 seconds` - The time span in seconds.
+/// - `NSTDUInt64 seconds` - The time span in seconds.
 ///
 /// - `NSTDUInt32 nanoseconds` - The remaining nanoseconds.
 ///
@@ -137,7 +135,7 @@ pub const fn nstd_time_duration_new(
 #[inline]
 #[nstdapi]
 pub const unsafe fn nstd_time_duration_new_unchecked(
-    seconds: NSTDInt64,
+    seconds: NSTDUInt64,
     nanoseconds: NSTDUInt32,
 ) -> NSTDDuration {
     NSTDDuration {
@@ -154,10 +152,10 @@ pub const unsafe fn nstd_time_duration_new_unchecked(
 ///
 /// # Returns
 ///
-/// `NSTDInt64 seconds` - The number of seconds held in `duration`.
+/// `NSTDUInt64 seconds` - The number of seconds held in `duration`.
 #[inline]
 #[nstdapi]
-pub const fn nstd_time_duration_seconds(duration: &NSTDDuration) -> NSTDInt64 {
+pub const fn nstd_time_duration_seconds(duration: &NSTDDuration) -> NSTDUInt64 {
     duration.seconds
 }
 

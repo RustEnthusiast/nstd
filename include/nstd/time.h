@@ -17,7 +17,7 @@ NSTDOptional(NSTDTime) NSTDOptionalTime;
 /// Represents a span of time.
 typedef struct {
     /// The duration in seconds.
-    NSTDInt64 seconds;
+    NSTDUInt64 seconds;
     /// The nanoseconds.
     NSTDUInt32 nanoseconds;
 } NSTDDuration;
@@ -58,21 +58,21 @@ NSTDAPI NSTDUInt32 nstd_time_nanoseconds(const NSTDTime *time);
 ///
 /// # Parameters:
 ///
-/// - `NSTDInt64 seconds` - The time span in seconds.
+/// - `NSTDUInt64 seconds` - The time span in seconds.
 ///
 /// - `NSTDUInt32 nanoseconds` - The remaining nanoseconds.
 ///
 /// # Returns
 ///
 /// `NSTDDuration duration` - The time span represented as an `NSTDDuration` object.
-NSTDAPI NSTDDuration nstd_time_duration_new(NSTDInt64 seconds, NSTDUInt32 nanoseconds);
+NSTDAPI NSTDDuration nstd_time_duration_new(NSTDUInt64 seconds, NSTDUInt32 nanoseconds);
 
 /// Creates a new `NSTDDuration` object from seconds and nanoseconds without checking if the number
 /// of nanoseconds will overflow into the number of seconds.
 ///
 /// # Parameters:
 ///
-/// - `NSTDInt64 seconds` - The time span in seconds.
+/// - `NSTDUInt64 seconds` - The time span in seconds.
 ///
 /// - `NSTDUInt32 nanoseconds` - The remaining nanoseconds.
 ///
@@ -84,7 +84,7 @@ NSTDAPI NSTDDuration nstd_time_duration_new(NSTDInt64 seconds, NSTDUInt32 nanose
 ///
 /// This operation saves time by skipping the `nanoseconds` check. The user of this function must
 /// ensure that the number of `nanoseconds` cannot overflow into `seconds`.
-NSTDAPI NSTDDuration nstd_time_duration_new_unchecked(NSTDInt64 seconds, NSTDUInt32 nanoseconds);
+NSTDAPI NSTDDuration nstd_time_duration_new_unchecked(NSTDUInt64 seconds, NSTDUInt32 nanoseconds);
 
 /// Returns the number of seconds in an `NSTDDuration` object.
 ///
@@ -94,8 +94,8 @@ NSTDAPI NSTDDuration nstd_time_duration_new_unchecked(NSTDInt64 seconds, NSTDUIn
 ///
 /// # Returns
 ///
-/// `NSTDInt64 seconds` - The number of seconds held in `duration`.
-NSTDAPI NSTDInt64 nstd_time_duration_seconds(const NSTDDuration *duration);
+/// `NSTDUInt64 seconds` - The number of seconds held in `duration`.
+NSTDAPI NSTDUInt64 nstd_time_duration_seconds(const NSTDDuration *duration);
 
 /// Returns the number of nanoseconds in an `NSTDDuration` object.
 ///

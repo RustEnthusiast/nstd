@@ -300,7 +300,7 @@ pub fn nstd_os_unix_mutex_timed_lock<'a>(
         use std::time::{Duration, SystemTime};
         let mut time = SystemTime::now();
         time += Duration::new(
-            nstd_time_duration_seconds(&duration) as _,
+            nstd_time_duration_seconds(&duration),
             nstd_time_duration_nanoseconds(&duration),
         );
         let time = NSTDTime::from(time);
