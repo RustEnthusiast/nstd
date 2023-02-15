@@ -4,8 +4,22 @@
 #include "core/result.h"
 #include "heap_ptr.h"
 #include "nstd.h"
+#include "os/os.h"
+
+#if defined(NSTD_OS_ANDROID) || defined(NSTD_OS_DRAGONFLY) || defined(NSTD_OS_FREEBSD) \
+    || defined(NSTD_OS_HAIKU) || defined(NSTD_OS_LINUX) || defined(NSTD_OS_NETBSD)     \
+    || defined(NSTD_OS_NTO) || defined(NSTD_OS_OPENBSD) || defined(NSTD_OS_SOLARIS)
+#    define NSTD_TIMED_MUTEX_OS_UNIX_IMPL
+#endif
+
+#ifdef NSTD_TIMED_MUTEX_OS_UNIX_IMPL
+#    include "os/unix/mutex.h"
+#endif
 
 /// A mutual exclusion primitive with a timed locking mechanism.
+#ifdef NSTD_TIMED_MUTEX_OS_UNIX_IMPL
+typedef NSTDUnixMutex NSTDTimedMutex;
+#else
 typedef struct {
     /// The underlying mutex.
     NSTDAnyMut inner;
@@ -16,21 +30,34 @@ typedef struct {
     /// Determines whether or not the mutex is currently locked.
     NSTDBool locked;
 } NSTDTimedMutex;
+#endif
 
 /// A handle to a timed mutex's data.
+#ifdef NSTD_TIMED_MUTEX_OS_UNIX_IMPL
+typedef NSTDUnixMutexGuard NSTDTimedMutexGuard;
+#else
 typedef struct {
     /// A reference to the mutex.
     const NSTDTimedMutex *mutex;
 } NSTDTimedMutexGuard;
+#endif
 
 /// A result type containing a timed mutex lock whether or not the mutex is poisoned.
+#ifdef NSTD_TIMED_MUTEX_OS_UNIX_IMPL
+typedef NSTDUnixMutexLockResult NSTDTimedMutexLockResult;
+#else
 NSTDResult(NSTDTimedMutexGuard, NSTDTimedMutexGuard) NSTDTimedMutexLockResult;
+#endif
 
 /// An optional value of type `NSTDTimedMutexLockResult`.
 ///
 /// This type is returned from `nstd_timed_mutex_try_lock` where the uninitialized variant means
 /// that the function would block.
+#ifdef NSTD_TIMED_MUTEX_OS_UNIX_IMPL
+typedef NSTDUnixOptionalMutexLockResult NSTDOptionalTimedMutexLockResult;
+#else
 NSTDOptional(NSTDTimedMutexLockResult) NSTDOptionalTimedMutexLockResult;
+#endif
 
 /// Creates a new timed mutual exclusion primitive.
 ///
