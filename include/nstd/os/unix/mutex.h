@@ -4,7 +4,6 @@
 #include "../../core/result.h"
 #include "../../heap_ptr.h"
 #include "../../nstd.h"
-#include "../../time.h"
 #include <pthread.h>
 
 /// A mutual exclusion primitive useful for protecting shared data.
@@ -115,7 +114,7 @@ NSTDAPI NSTDUnixOptionalMutexLockResult nstd_os_unix_mutex_try_lock(const NSTDUn
 ///
 /// - `const NSTDUnixMutex *mutex` - The mutex to lock.
 ///
-/// - `const NSTDDuration *duration` - The amount of time to wait for the mutex to become available.
+/// - `NSTDFloat64 duration` - The number of seconds to wait for the mutex to become available.
 ///
 /// # Returns
 ///
@@ -126,7 +125,7 @@ NSTDAPI NSTDUnixOptionalMutexLockResult nstd_os_unix_mutex_try_lock(const NSTDUn
 ///
 /// This operation will panic if locking the mutex fails.
 NSTDAPI NSTDUnixOptionalMutexLockResult
-nstd_os_unix_mutex_timed_lock(const NSTDUnixMutex *mutex, const NSTDDuration *duration);
+nstd_os_unix_mutex_timed_lock(const NSTDUnixMutex *mutex, NSTDFloat64 duration);
 
 /// Returns a pointer to a mutex's raw data.
 ///

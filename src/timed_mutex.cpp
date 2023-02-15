@@ -5,11 +5,9 @@
 #include <nstd/heap_ptr.h>
 #include <nstd/nstd.h>
 #include <nstd/thread.h>
-#include <nstd/time.h>
 #include <nstd/timed_mutex.h>
 #include <chrono>
 #include <mutex>
-#include <ratio>
 
 #ifdef NSTD_TIMED_MUTEX_OS_UNIX_IMPL
 #    include <nstd/os/unix/mutex.h>
@@ -163,12 +161,7 @@ NSTDAPI NSTDOptionalTimedMutexLockResult nstd_timed_mutex_try_lock(const NSTDTim
 NSTDAPI NSTDOptionalTimedMutexLockResult
 nstd_timed_mutex_timed_lock(const NSTDTimedMutex *const mutex, const NSTDFloat64 seconds) {
 #ifdef NSTD_TIMED_MUTEX_OS_UNIX_IMPL
-    const NSTDUInt64 secs{static_cast<NSTDUInt64>(seconds)};
-    const NSTDUInt32 nanos{static_cast<NSTDUInt32>(
-        (seconds - static_cast<NSTDFloat64>(secs)) * static_cast<NSTDFloat64>(std::nano::den)
-    )};
-    const NSTDDuration duration{nstd_time_duration_new(secs, nanos)};
-    return nstd_os_unix_mutex_timed_lock(mutex, &duration);
+    return nstd_os_unix_mutex_timed_lock(mutex, seconds);
 #else
     const std::chrono::duration<NSTDFloat64> duration{seconds};
     if (((std::timed_mutex *)mutex->inner)->try_lock_for(duration)) {

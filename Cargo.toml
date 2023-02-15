@@ -55,8 +55,7 @@ nstd_string = ["nstd_alloc", "nstd_core", "nstd_vec"]
 nstd_thread = ["nstd_core", "nstd_heap_ptr", "nstd_io", "std"]
 nstd_time = ["nstd_core", "std"]
 nstd_timed_mutex = [
-    "capi", "cc", "cfg-if", "nstd_core", "nstd_heap_ptr", "nstd_os_unix_mutex", "nstd_thread",
-    "nstd_time"
+    "capi", "cc", "cfg-if", "nstd_core", "nstd_heap_ptr", "nstd_os_unix_mutex", "nstd_thread"
 ]
 nstd_vec = ["nstd_alloc", "nstd_core"]
 

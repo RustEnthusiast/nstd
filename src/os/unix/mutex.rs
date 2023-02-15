@@ -2,8 +2,7 @@
 use crate::{
     core::{optional::NSTDOptional, result::NSTDResult},
     heap_ptr::{nstd_heap_ptr_get, nstd_heap_ptr_get_mut, NSTDHeapPtr},
-    time::NSTDDuration,
-    NSTDAny, NSTDAnyMut, NSTDBool, NSTD_FALSE, NSTD_TRUE,
+    NSTDAny, NSTDAnyMut, NSTDBool, NSTDFloat64, NSTD_FALSE, NSTD_TRUE,
 };
 use cfg_if::cfg_if;
 use libc::{
@@ -264,7 +263,7 @@ pub fn nstd_os_unix_mutex_try_lock(mutex: &NSTDUnixMutex) -> NSTDUnixOptionalMut
 ///
 /// - `const NSTDUnixMutex *mutex` - The mutex to lock.
 ///
-/// - `const NSTDDuration *duration` - The amount of time to wait for the mutex to become available.
+/// - `NSTDFloat64 duration` - The number of seconds to wait for the mutex to become available.
 ///
 /// # Returns
 ///
@@ -278,7 +277,7 @@ pub fn nstd_os_unix_mutex_try_lock(mutex: &NSTDUnixMutex) -> NSTDUnixOptionalMut
 #[allow(unused_variables)]
 pub fn nstd_os_unix_mutex_timed_lock<'a>(
     mutex: &'a NSTDUnixMutex,
-    duration: &'_ NSTDDuration,
+    duration: NSTDFloat64,
 ) -> NSTDUnixOptionalMutexLockResult<'a> {
     cfg_if! {
         if #[cfg(any(
@@ -293,18 +292,10 @@ pub fn nstd_os_unix_mutex_timed_lock<'a>(
             target_os = "openbsd",
             target_os = "solaris"
         ))] {
-            use crate::time::{
-                nstd_time_duration_nanoseconds, nstd_time_duration_seconds, nstd_time_nanoseconds,
-                nstd_time_seconds, NSTDTime,
-            };
+            use crate::time::{nstd_time_nanoseconds, nstd_time_seconds, NSTDTime};
             use libc::{pthread_mutex_timedlock, timespec, ETIMEDOUT};
             use std::time::{Duration, SystemTime};
-            let mut time = SystemTime::now();
-            time += Duration::new(
-                nstd_time_duration_seconds(&duration),
-                nstd_time_duration_nanoseconds(&duration),
-            );
-            let time = NSTDTime::from(time);
+            let time = NSTDTime::from(SystemTime::now() + Duration::from_secs_f64(duration));
             let duration = timespec {
                 tv_sec: nstd_time_seconds(&time) as _,
                 tv_nsec: nstd_time_nanoseconds(&time) as _,
