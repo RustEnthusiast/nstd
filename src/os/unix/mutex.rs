@@ -5,6 +5,7 @@ use crate::{
     time::NSTDDuration,
     NSTDAny, NSTDAnyMut, NSTDBool, NSTD_FALSE, NSTD_TRUE,
 };
+use cfg_if::cfg_if;
 use libc::{
     pthread_mutex_destroy, pthread_mutex_init, pthread_mutex_lock, pthread_mutex_t,
     pthread_mutex_trylock, pthread_mutex_unlock, pthread_mutexattr_destroy, pthread_mutexattr_init,
@@ -279,63 +280,53 @@ pub fn nstd_os_unix_mutex_timed_lock<'a>(
     mutex: &'a NSTDUnixMutex,
     duration: &'_ NSTDDuration,
 ) -> NSTDUnixOptionalMutexLockResult<'a> {
-    #[cfg(any(
-        target_os = "android",
-        target_os = "dragonfly",
-        target_os = "freebsd",
-        target_os = "haiku",
-        target_os = "illumos",
-        target_os = "linux",
-        target_os = "netbsd",
-        target_os = "nto",
-        target_os = "openbsd",
-        target_os = "solaris"
-    ))]
-    {
-        use crate::time::{
-            nstd_time_duration_nanoseconds, nstd_time_duration_seconds, nstd_time_nanoseconds,
-            nstd_time_seconds, NSTDTime,
-        };
-        use libc::{pthread_mutex_timedlock, timespec, ETIMEDOUT};
-        use std::time::{Duration, SystemTime};
-        let mut time = SystemTime::now();
-        time += Duration::new(
-            nstd_time_duration_seconds(&duration),
-            nstd_time_duration_nanoseconds(&duration),
-        );
-        let time = NSTDTime::from(time);
-        let duration = timespec {
-            tv_sec: nstd_time_seconds(&time) as _,
-            tv_nsec: nstd_time_nanoseconds(&time) as _,
-        };
-        // SAFETY: `mutex` is behind an initialized reference.
-        match unsafe { pthread_mutex_timedlock(mutex.inner.0.get(), &duration) } {
-            0 => {
-                let guard = NSTDUnixMutexGuard::new(mutex);
-                NSTDOptional::Some(match mutex.poisoned.get() {
-                    true => NSTDResult::Err(guard),
-                    false => NSTDResult::Ok(guard),
-                })
+    cfg_if! {
+        if #[cfg(any(
+            target_os = "android",
+            target_os = "dragonfly",
+            target_os = "freebsd",
+            target_os = "haiku",
+            target_os = "illumos",
+            target_os = "linux",
+            target_os = "netbsd",
+            target_os = "nto",
+            target_os = "openbsd",
+            target_os = "solaris"
+        ))] {
+            use crate::time::{
+                nstd_time_duration_nanoseconds, nstd_time_duration_seconds, nstd_time_nanoseconds,
+                nstd_time_seconds, NSTDTime,
+            };
+            use libc::{pthread_mutex_timedlock, timespec, ETIMEDOUT};
+            use std::time::{Duration, SystemTime};
+            let mut time = SystemTime::now();
+            time += Duration::new(
+                nstd_time_duration_seconds(&duration),
+                nstd_time_duration_nanoseconds(&duration),
+            );
+            let time = NSTDTime::from(time);
+            let duration = timespec {
+                tv_sec: nstd_time_seconds(&time) as _,
+                tv_nsec: nstd_time_nanoseconds(&time) as _,
+            };
+            // SAFETY: `mutex` is behind an initialized reference.
+            match unsafe { pthread_mutex_timedlock(mutex.inner.0.get(), &duration) } {
+                0 => {
+                    let guard = NSTDUnixMutexGuard::new(mutex);
+                    NSTDOptional::Some(match mutex.poisoned.get() {
+                        true => NSTDResult::Err(guard),
+                        false => NSTDResult::Ok(guard),
+                    })
+                }
+                err => {
+                    assert!(err == ETIMEDOUT);
+                    NSTDOptional::None
+                }
             }
-            err => {
-                assert!(err == ETIMEDOUT);
-                NSTDOptional::None
-            }
+        } else {
+            return NSTDOptional::None;
         }
     }
-    #[cfg(not(any(
-        target_os = "android",
-        target_os = "dragonfly",
-        target_os = "freebsd",
-        target_os = "haiku",
-        target_os = "illumos",
-        target_os = "linux",
-        target_os = "netbsd",
-        target_os = "nto",
-        target_os = "openbsd",
-        target_os = "solaris"
-    )))]
-    return NSTDOptional::None;
 }
 
 /// Returns a pointer to a mutex's raw data.
