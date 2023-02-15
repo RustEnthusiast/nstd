@@ -8,7 +8,7 @@ typedef struct {
     /// The number of seconds since January 1st 1970.
     NSTDInt64 seconds;
     /// The remaining nanoseconds.
-    NSTDUInt32 nanoseconds;
+    NSTDInt64 nanoseconds;
 } NSTDTime;
 
 /// Represents an optional value of type `NSTDTime`.
@@ -51,8 +51,8 @@ NSTDAPI NSTDInt64 nstd_time_seconds(const NSTDTime *time);
 ///
 /// # Returns
 ///
-/// `NSTDUInt32 nanoseconds` - The number of nanoseconds held in `time`.
-NSTDAPI NSTDUInt32 nstd_time_nanoseconds(const NSTDTime *time);
+/// `NSTDInt64 nanoseconds` - The number of nanoseconds held in `time`.
+NSTDAPI NSTDInt64 nstd_time_nanoseconds(const NSTDTime *time);
 
 /// Creates a new `NSTDDuration` object from seconds and nanoseconds.
 ///

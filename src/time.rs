@@ -13,7 +13,7 @@ pub struct NSTDTime {
     /// The number of seconds since January 1st 1970.
     seconds: NSTDInt64,
     /// The remaining nanoseconds.
-    nanoseconds: NSTDUInt32,
+    nanoseconds: NSTDInt64,
 }
 impl From<SystemTime> for NSTDTime {
     /// Converts a [SystemTime] into an [NSTDTime] object.
@@ -21,13 +21,13 @@ impl From<SystemTime> for NSTDTime {
         match value.duration_since(UNIX_EPOCH) {
             Ok(dur) => NSTDTime {
                 seconds: dur.as_secs() as _,
-                nanoseconds: dur.subsec_nanos(),
+                nanoseconds: dur.subsec_nanos() as _,
             },
             Err(dur) => {
                 let dur = dur.duration();
                 NSTDTime {
                     seconds: -(dur.as_secs() as NSTDInt64),
-                    nanoseconds: dur.subsec_nanos(),
+                    nanoseconds: dur.subsec_nanos() as _,
                 }
             }
         }
@@ -80,10 +80,10 @@ pub fn nstd_time_seconds(time: &NSTDTime) -> NSTDInt64 {
 ///
 /// # Returns
 ///
-/// `NSTDUInt32 nanoseconds` - The number of nanoseconds held in `time`.
+/// `NSTDInt64 nanoseconds` - The number of nanoseconds held in `time`.
 #[inline]
 #[nstdapi]
-pub fn nstd_time_nanoseconds(time: &NSTDTime) -> NSTDUInt32 {
+pub fn nstd_time_nanoseconds(time: &NSTDTime) -> NSTDInt64 {
     time.nanoseconds
 }
 
