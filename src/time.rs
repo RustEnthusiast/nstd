@@ -25,9 +25,13 @@ impl From<SystemTime> for NSTDTime {
             },
             Err(dur) => {
                 let dur = dur.duration();
+                let seconds = -(dur.as_secs() as NSTDInt64);
                 NSTDTime {
-                    seconds: -(dur.as_secs() as NSTDInt64),
-                    nanoseconds: dur.subsec_nanos() as _,
+                    seconds,
+                    nanoseconds: match seconds {
+                        0 => -(dur.subsec_nanos() as NSTDInt64),
+                        _ => dur.subsec_nanos() as _,
+                    },
                 }
             }
         }
