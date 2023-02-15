@@ -1,53 +1,25 @@
 //! A mutual exclusion primitive with a timed locking mechanism.
-#[cfg(not(any(
-    target_os = "android",
-    target_os = "dragonfly",
-    target_os = "freebsd",
-    target_os = "haiku",
-    target_os = "linux",
-    target_os = "netbsd",
-    target_os = "nto",
-    target_os = "openbsd",
-    target_os = "solaris"
-)))]
-mod common;
-#[cfg(any(
-    target_os = "android",
-    target_os = "dragonfly",
-    target_os = "freebsd",
-    target_os = "haiku",
-    target_os = "linux",
-    target_os = "netbsd",
-    target_os = "nto",
-    target_os = "openbsd",
-    target_os = "solaris"
-))]
-mod unix;
-#[cfg(not(any(
-    target_os = "android",
-    target_os = "dragonfly",
-    target_os = "freebsd",
-    target_os = "haiku",
-    target_os = "linux",
-    target_os = "netbsd",
-    target_os = "nto",
-    target_os = "openbsd",
-    target_os = "solaris"
-)))]
-pub use self::common::*;
-#[cfg(any(
-    target_os = "android",
-    target_os = "dragonfly",
-    target_os = "freebsd",
-    target_os = "haiku",
-    target_os = "linux",
-    target_os = "netbsd",
-    target_os = "nto",
-    target_os = "openbsd",
-    target_os = "solaris"
-))]
-pub use self::unix::*;
+cfg_if! {
+    if #[cfg(any(
+        target_os = "android",
+        target_os = "dragonfly",
+        target_os = "freebsd",
+        target_os = "haiku",
+        target_os = "linux",
+        target_os = "netbsd",
+        target_os = "nto",
+        target_os = "openbsd",
+        target_os = "solaris"
+    ))] {
+        mod unix;
+        pub use unix::*;
+    } else {
+        mod common;
+        pub use common::*;
+    }
+}
 use crate::{heap_ptr::NSTDHeapPtr, NSTDAny, NSTDAnyMut, NSTDBool, NSTDFloat64};
+use cfg_if::cfg_if;
 
 extern "C" {
     /// Creates a new timed mutual exclusion primitive.
