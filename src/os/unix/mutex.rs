@@ -292,10 +292,14 @@ pub fn nstd_os_unix_mutex_timed_lock<'a>(
             target_os = "openbsd",
             target_os = "solaris"
         ))] {
-            use crate::time::{nstd_time_nanoseconds, nstd_time_seconds, NSTDTime};
+            use crate::time::{
+                nstd_time_add, nstd_time_duration_new, nstd_time_nanoseconds, nstd_time_now,
+                nstd_time_seconds,
+            };
             use libc::{pthread_mutex_timedlock, timespec, ETIMEDOUT};
-            use std::time::{Duration, SystemTime};
-            let time = NSTDTime::from(SystemTime::now() + Duration::from_secs_f64(duration));
+            let time = nstd_time_now();
+            let dur = nstd_time_duration_new(duration);
+            let time = nstd_time_add(&time, &dur);
             let duration = timespec {
                 tv_sec: nstd_time_seconds(&time) as _,
                 tv_nsec: nstd_time_nanoseconds(&time) as _,
