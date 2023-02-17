@@ -164,8 +164,8 @@ nstd_timed_mutex_timed_lock(const NSTDTimedMutex *const mutex, const NSTDDuratio
 #ifdef NSTD_TIMED_MUTEX_OS_UNIX_IMPL
     return nstd_os_unix_mutex_timed_lock(mutex, duration);
 #else
-    const std::chrono::duration<NSTDFloat64> duration{nstd_time_duration_get(duration)};
-    if (((std::timed_mutex *)mutex->inner)->try_lock_for(duration)) {
+    const std::chrono::duration<NSTDFloat64> dur{nstd_time_duration_get(duration)};
+    if (((std::timed_mutex *)mutex->inner)->try_lock_for(dur)) {
         const_cast<NSTDTimedMutex *>(mutex)->locked = NSTD_TRUE;
         NSTDOptionalTimedMutexLockResult ret{NSTD_OPTIONAL_STATUS_SOME, {}};
         const NSTDTimedMutexGuard guard{mutex};
