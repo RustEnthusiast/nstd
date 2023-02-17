@@ -1,12 +1,12 @@
 //! Provides functionality for working with input & output on Unix platforms.
 pub(crate) mod stdio;
 use crate::{core::result::NSTDResult, NSTDUInt};
+use core::ffi::c_int;
 use libc::{
     EACCES, EAGAIN, EBADF, ECONNRESET, EINTR, EINVAL, EISDIR, ENETDOWN, ENETUNREACH, ENOMEM,
     ENOTCONN, EPIPE, ESPIPE, ETIMEDOUT, EWOULDBLOCK,
 };
 use nstdapi::nstdapi;
-use std::{ffi::c_int, io::Error};
 
 /// An error type for Unix I/O operations.
 #[nstdapi]
@@ -51,10 +51,7 @@ impl NSTDUnixIOError {
     /// Retrieves the last system error and turns it into an `NSTDUnixIOError`.
     fn last() -> Self {
         #[allow(unreachable_patterns)]
-        match Error::last_os_error()
-            .raw_os_error()
-            .expect("`raw_os_error` should return Some")
-        {
+        match errno::errno().0 as c_int {
             0 => Self::NSTD_UNIX_IO_ERROR_NONE,
             EBADF => Self::NSTD_UNIX_IO_ERROR_NOT_FOUND,
             EACCES => Self::NSTD_UNIX_IO_ERROR_PERMISSION_DENIED,
