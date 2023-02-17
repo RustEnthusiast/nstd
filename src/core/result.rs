@@ -36,4 +36,17 @@ impl<T, E> NSTDResult<T, E> {
             _ => panic!("called `NSTDResult::unwrap()` on an `Err` value"),
         }
     }
+
+    /// Attempts to return the contained `Ok` value in an `NSTDResult`.
+    ///
+    /// # Panics
+    ///
+    /// Panics with `msg` if `self` is an `Err` value.
+    #[inline]
+    pub fn expect(self, msg: &str) -> T {
+        match self {
+            Self::Ok(value) => value,
+            _ => panic!("{msg}"),
+        }
+    }
 }
