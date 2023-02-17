@@ -5,6 +5,7 @@
 #include <nstd/heap_ptr.h>
 #include <nstd/nstd.h>
 #include <nstd/thread.h>
+#include <nstd/time.h>
 #include <nstd/timed_mutex.h>
 #include <chrono>
 #include <mutex>
@@ -149,7 +150,7 @@ NSTDAPI NSTDOptionalTimedMutexLockResult nstd_timed_mutex_try_lock(const NSTDTim
 ///
 /// - `const NSTDTimedMutex *mutex` - The mutex to lock.
 ///
-/// - `NSTDFloat64 seconds` - The number of seconds to block for.
+/// - `const NSTDDuration *duration` - The amount of time to block for.
 ///
 /// # Returns
 ///
@@ -159,11 +160,11 @@ NSTDAPI NSTDOptionalTimedMutexLockResult nstd_timed_mutex_try_lock(const NSTDTim
 ///
 /// The mutex lock must not already be owned by the calling thread.
 NSTDAPI NSTDOptionalTimedMutexLockResult
-nstd_timed_mutex_timed_lock(const NSTDTimedMutex *const mutex, const NSTDFloat64 seconds) {
+nstd_timed_mutex_timed_lock(const NSTDTimedMutex *const mutex, const NSTDDuration *const duration) {
 #ifdef NSTD_TIMED_MUTEX_OS_UNIX_IMPL
-    return nstd_os_unix_mutex_timed_lock(mutex, seconds);
+    return nstd_os_unix_mutex_timed_lock(mutex, duration);
 #else
-    const std::chrono::duration<NSTDFloat64> duration{seconds};
+    const std::chrono::duration<NSTDFloat64> duration{nstd_time_duration_get(duration)};
     if (((std::timed_mutex *)mutex->inner)->try_lock_for(duration)) {
         const_cast<NSTDTimedMutex *>(mutex)->locked = NSTD_TRUE;
         NSTDOptionalTimedMutexLockResult ret{NSTD_OPTIONAL_STATUS_SOME, {}};

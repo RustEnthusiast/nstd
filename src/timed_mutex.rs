@@ -18,7 +18,7 @@ cfg_if! {
         pub use common::*;
     }
 }
-use crate::{heap_ptr::NSTDHeapPtr, NSTDAny, NSTDAnyMut, NSTDBool, NSTDFloat64};
+use crate::{heap_ptr::NSTDHeapPtr, time::NSTDDuration, NSTDAny, NSTDAnyMut, NSTDBool};
 use cfg_if::cfg_if;
 
 extern "C" {
@@ -103,7 +103,7 @@ extern "C" {
     ///
     /// - `const NSTDTimedMutex *mutex` - The mutex to lock.
     ///
-    /// - `NSTDFloat64 seconds` - The number of seconds to block for.
+    /// - `const NSTDDuration *duration` - The amount of time to block for.
     ///
     /// # Returns
     ///
@@ -112,10 +112,10 @@ extern "C" {
     /// # Safety
     ///
     /// The mutex lock must not already be owned by the calling thread.
-    pub fn nstd_timed_mutex_timed_lock(
-        mutex: &NSTDTimedMutex,
-        seconds: NSTDFloat64,
-    ) -> NSTDOptionalTimedMutexLockResult;
+    pub fn nstd_timed_mutex_timed_lock<'a>(
+        mutex: &'a NSTDTimedMutex,
+        duration: &NSTDDuration,
+    ) -> NSTDOptionalTimedMutexLockResult<'a>;
 
     /// Returns an immutable raw pointer to a timed mutex guard's protected data.
     ///

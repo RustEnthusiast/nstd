@@ -2,7 +2,8 @@
 use crate::{
     core::{optional::NSTDOptional, result::NSTDResult},
     heap_ptr::{nstd_heap_ptr_get, nstd_heap_ptr_get_mut, NSTDHeapPtr},
-    NSTDAny, NSTDAnyMut, NSTDBool, NSTDFloat64, NSTD_FALSE, NSTD_TRUE,
+    time::NSTDDuration,
+    NSTDAny, NSTDAnyMut, NSTDBool, NSTD_FALSE, NSTD_TRUE,
 };
 use cfg_if::cfg_if;
 use libc::{
@@ -263,7 +264,7 @@ pub fn nstd_os_unix_mutex_try_lock(mutex: &NSTDUnixMutex) -> NSTDUnixOptionalMut
 ///
 /// - `const NSTDUnixMutex *mutex` - The mutex to lock.
 ///
-/// - `NSTDFloat64 duration` - The number of seconds to wait for the mutex to become available.
+/// - `const NSTDDuration *duration` - The amount of time to block for.
 ///
 /// # Returns
 ///
@@ -277,7 +278,7 @@ pub fn nstd_os_unix_mutex_try_lock(mutex: &NSTDUnixMutex) -> NSTDUnixOptionalMut
 #[allow(unused_variables)]
 pub fn nstd_os_unix_mutex_timed_lock<'a>(
     mutex: &'a NSTDUnixMutex,
-    duration: NSTDFloat64,
+    duration: &NSTDDuration,
 ) -> NSTDUnixOptionalMutexLockResult<'a> {
     cfg_if! {
         if #[cfg(any(
@@ -293,13 +294,11 @@ pub fn nstd_os_unix_mutex_timed_lock<'a>(
             target_os = "solaris"
         ))] {
             use crate::time::{
-                nstd_time_add, nstd_time_duration_new, nstd_time_nanoseconds, nstd_time_now,
-                nstd_time_seconds,
+                nstd_time_add, nstd_time_nanoseconds, nstd_time_now, nstd_time_seconds,
             };
             use libc::{pthread_mutex_timedlock, timespec, ETIMEDOUT};
-            let time = nstd_time_now();
-            let dur = nstd_time_duration_new(duration);
-            let time = nstd_time_add(&time, &dur);
+            let mut time = nstd_time_now();
+            time = nstd_time_add(&time, duration);
             let duration = timespec {
                 tv_sec: nstd_time_seconds(&time) as _,
                 tv_nsec: nstd_time_nanoseconds(&time) as _,

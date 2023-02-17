@@ -5,6 +5,7 @@
 #include "heap_ptr.h"
 #include "nstd.h"
 #include "os/os.h"
+#include "time.h"
 
 #if defined(NSTD_OS_ANDROID) || defined(NSTD_OS_DRAGONFLY) || defined(NSTD_OS_FREEBSD) \
     || defined(NSTD_OS_HAIKU) || defined(NSTD_OS_LINUX) || defined(NSTD_OS_NETBSD)     \
@@ -140,7 +141,7 @@ NSTDAPI NSTDOptionalTimedMutexLockResult nstd_timed_mutex_try_lock(const NSTDTim
 ///
 /// - `const NSTDTimedMutex *mutex` - The mutex to lock.
 ///
-/// - `NSTDFloat64 seconds` - The number of seconds to block for.
+/// - `const NSTDDuration *duration` - The amount of time to block for.
 ///
 /// # Returns
 ///
@@ -150,7 +151,7 @@ NSTDAPI NSTDOptionalTimedMutexLockResult nstd_timed_mutex_try_lock(const NSTDTim
 ///
 /// The mutex lock must not already be owned by the calling thread.
 NSTDAPI NSTDOptionalTimedMutexLockResult
-nstd_timed_mutex_timed_lock(const NSTDTimedMutex *mutex, NSTDFloat64 seconds);
+nstd_timed_mutex_timed_lock(const NSTDTimedMutex *mutex, const NSTDDuration *duration);
 
 /// Returns an immutable raw pointer to a timed mutex guard's protected data.
 ///
