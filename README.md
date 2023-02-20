@@ -11,8 +11,7 @@ Rust syntax).
 #include <nstd.h>
 
 /// Main entry point of the program.
-int main()
-{
+int main() {
     const NSTDStr output = nstd_core_str_from_raw_cstr("Hello, 🌎!");
     nstd_io_print_line(&output);
     return 0;
