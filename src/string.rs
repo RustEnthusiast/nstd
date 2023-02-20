@@ -36,7 +36,7 @@ macro_rules! gen_from_primitive {
         /// Panics if allocating fails.
         #[inline]
         #[nstdapi]
-        pub extern "C" fn $name(v: $FromT) -> NSTDString {
+        pub fn $name(v: $FromT) -> NSTDString {
             NSTDString::from_str(&v.to_string())
         }
     };
@@ -149,7 +149,7 @@ pub fn nstd_string_new_with_cap(cap: NSTDUInt) -> NSTDString {
 /// use nstd_sys::{core::str::nstd_core_str_from_raw_cstr, string::nstd_string_from_str};
 ///
 /// unsafe {
-///     let str = nstd_core_str_from_raw_cstr("Hello, world!\0".as_ptr().cast());
+///     let str = nstd_core_str_from_raw_cstr("Hello, world!\0".as_ptr().cast()).unwrap();
 ///     let string = nstd_string_from_str(&str);
 /// }
 /// ```
@@ -411,7 +411,7 @@ pub fn nstd_string_push(string: &mut NSTDString, chr: NSTDUnichar) -> NSTDAllocE
 /// };
 ///
 /// unsafe {
-///     let str = nstd_core_str_from_raw_cstr("Hello, 🌎!\0".as_ptr().cast());
+///     let str = nstd_core_str_from_raw_cstr("Hello, 🌎!\0".as_ptr().cast()).unwrap();
 ///     let mut string = nstd_string_new();
 ///     assert!(nstd_string_push_str(&mut string, &str) == NSTD_ALLOC_ERROR_NONE);
 /// }
@@ -446,7 +446,7 @@ pub unsafe fn nstd_string_push_str(string: &mut NSTDString, str: &NSTDStr) -> NS
 /// };
 ///
 /// unsafe {
-///     let str = nstd_core_str_from_raw_cstr_with_null("Hello, world!\0".as_ptr().cast());
+///     let str = nstd_core_str_from_raw_cstr_with_null("Hello, world!\0".as_ptr().cast()).unwrap();
 ///     let mut string = nstd_string_from_str(&str);
 ///     assert!(nstd_string_pop(&mut string) == NSTDOptional::Some('\0'.into()));
 /// }
@@ -636,10 +636,6 @@ gen_from_primitive!(
 /// # Parameters:
 ///
 /// - `NSTDString string` - The string to free.
-///
-/// # Panics
-///
-/// Panics if deallocating fails.
 #[inline]
 #[nstdapi]
 #[allow(unused_variables)]

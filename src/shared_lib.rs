@@ -149,10 +149,6 @@ pub unsafe fn nstd_shared_lib_get_mut(
 /// # Parameters:
 ///
 /// - `NSTDSharedLib lib` - The library handle.
-///
-/// # Panics
-///
-/// Panics if unloading the library fails.
 #[inline]
 #[nstdapi]
 #[allow(unused_variables)]

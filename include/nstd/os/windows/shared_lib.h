@@ -85,10 +85,6 @@ nstd_os_windows_shared_lib_get_mut(NSTDWindowsSharedLib *lib, const NSTDChar *sy
 ///
 /// - `NSTDWindowsSharedLib lib` - The library handle.
 ///
-/// # Panics
-///
-/// Panics if unloading the library fails.
-///
 /// # Safety
 ///
 /// See

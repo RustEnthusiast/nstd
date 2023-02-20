@@ -32,20 +32,17 @@ NSTDOptional(NSTDStr) NSTDOptionalStr;
 ///
 /// # Returns
 ///
-/// `NSTDStr str` - The new `NSTDStr` instance.
+/// `NSTDOptionalStr str` - The new `NSTDStr` instance on success, or a "none" variant if the
+/// result is not valid UTF-8.
 ///
 /// # Panics
 ///
-/// This function will panic in the following situations:
-///
-/// - `cstr`'s data is not valid UTF-8.
-///
-/// - `cstr`'s length is greater than `NSTDInt`'s max value.
+/// This function will panic if `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
 /// `cstr`'s data must be valid for reads of at least `cstr.len` consecutive bytes.
-NSTDAPI NSTDStr nstd_core_str_from_cstr(const NSTDCStr *cstr);
+NSTDAPI NSTDOptionalStr nstd_core_str_from_cstr(const NSTDCStr *cstr);
 
 /// Creates a new instance of an `NSTDStr` from a C string slice.
 ///
@@ -71,7 +68,8 @@ NSTDAPI NSTDStr nstd_core_str_from_cstr_unchecked(const NSTDCStr *cstr);
 ///
 /// # Returns
 ///
-/// `NSTDStr str` - The new string slice.
+/// `NSTDOptionalStr str` - The new string slice on success, or a "none" variant if the
+/// result is not valid UTF-8.
 ///
 /// # Panics
 ///
@@ -79,15 +77,13 @@ NSTDAPI NSTDStr nstd_core_str_from_cstr_unchecked(const NSTDCStr *cstr);
 ///
 /// - `cstr` is null.
 ///
-/// - `cstr`'s data is not valid UTF-8.
-///
 /// - `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
 /// This function makes access to raw pointer data, which can cause undefined behavior in the event
 /// that `cstr`'s data is invalid.
-NSTDAPI NSTDStr nstd_core_str_from_raw_cstr(const NSTDChar *cstr);
+NSTDAPI NSTDOptionalStr nstd_core_str_from_raw_cstr(const NSTDChar *cstr);
 
 /// Creates a new `NSTDStr` from a raw C string, including the null byte.
 ///
@@ -97,7 +93,8 @@ NSTDAPI NSTDStr nstd_core_str_from_raw_cstr(const NSTDChar *cstr);
 ///
 /// # Returns
 ///
-/// `NSTDStr str` - The new string slice.
+/// `NSTDOptionalStr str` - The new string slice on success, or a "none" variant if the
+/// result is not valid UTF-8.
 ///
 /// # Panics
 ///
@@ -105,15 +102,13 @@ NSTDAPI NSTDStr nstd_core_str_from_raw_cstr(const NSTDChar *cstr);
 ///
 /// - `cstr` is null.
 ///
-/// - `cstr`'s data is not valid UTF-8.
-///
 /// - `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
 /// This function makes access to raw pointer data, which can cause undefined behavior in the event
 /// that `cstr`'s data is invalid.
-NSTDAPI NSTDStr nstd_core_str_from_raw_cstr_with_null(const NSTDChar *cstr);
+NSTDAPI NSTDOptionalStr nstd_core_str_from_raw_cstr_with_null(const NSTDChar *cstr);
 
 /// Creates a string slice from raw bytes.
 ///
@@ -123,7 +118,8 @@ NSTDAPI NSTDStr nstd_core_str_from_raw_cstr_with_null(const NSTDChar *cstr);
 ///
 /// # Returns
 ///
-/// `NSTDStr str` - The new string slice.
+/// `NSTDOptionalStr str` - The new string slice on success, or a "none" variant if the
+/// result is not valid UTF-8.
 ///
 /// # Panics
 ///
@@ -133,14 +129,12 @@ NSTDAPI NSTDStr nstd_core_str_from_raw_cstr_with_null(const NSTDChar *cstr);
 ///
 /// - `bytes`'s length is greater than `NSTDInt`'s max value.
 ///
-/// - `bytes` is not valid UTF-8.
-///
 /// # Safety
 ///
 /// - `bytes` must remain valid while the returned string slice is in use.
 ///
 /// - `bytes`'s data must be valid for reads of at least `bytes.len` consecutive bytes.
-NSTDAPI NSTDStr nstd_core_str_from_bytes(const NSTDSlice *bytes);
+NSTDAPI NSTDOptionalStr nstd_core_str_from_bytes(const NSTDSlice *bytes);
 
 /// Creates a string slice from raw bytes, without checking for UTF-8.
 ///
@@ -265,7 +259,8 @@ NSTDAPI NSTDOptionalUnichar nstd_core_str_get(const NSTDStr *str, NSTDUInt pos);
 ///
 /// # Returns
 ///
-/// `NSTDStr substr` - The new substring.
+/// `NSTDOptionalStr substr` - The new substring on success, or a "none" variant if the
+/// result is not valid UTF-8.
 ///
 /// # Panics
 ///
@@ -279,12 +274,10 @@ NSTDAPI NSTDOptionalUnichar nstd_core_str_get(const NSTDStr *str, NSTDUInt pos);
 ///
 /// - `range.end` - `range.start` is greater than `NSTDInt`'s max value.
 ///
-/// - The substring bytes are not valid UTF-8.
-///
 /// # Safety
 ///
 /// `str`'s data must be valid for reads of at least `str.len` consecutive bytes.
-NSTDAPI NSTDStr nstd_core_str_substr(const NSTDStr *str, NSTDURange range);
+NSTDAPI NSTDOptionalStr nstd_core_str_substr(const NSTDStr *str, NSTDURange range);
 
 /// Attempts to parse a string slice as an `NSTDFloat32`.
 ///
@@ -540,20 +533,17 @@ NSTDOptional(NSTDStrMut) NSTDOptionalStrMut;
 ///
 /// # Returns
 ///
-/// `NSTDStrMut str` - The new `NSTDStrMut` instance.
+/// `NSTDOptionalStrMut str` - The new `NSTDStrMut` instance on success, or a "none" variant if the
+/// result is not valid UTF-8.
 ///
 /// # Panics
 ///
-/// This function will panic in the following situations:
-///
-/// - `cstr`'s data is not valid UTF-8.
-///
-/// - `cstr`'s length is greater than `NSTDInt`'s max value.
+/// This function will panic if `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
 /// `cstr`'s data must be valid for reads of at least `cstr.len` consecutive bytes.
-NSTDAPI NSTDStrMut nstd_core_str_mut_from_cstr(NSTDCStrMut *cstr);
+NSTDAPI NSTDOptionalStrMut nstd_core_str_mut_from_cstr(NSTDCStrMut *cstr);
 
 /// Creates a new instance of an `NSTDStrMut` from a C string slice.
 ///
@@ -579,7 +569,8 @@ NSTDAPI NSTDStrMut nstd_core_str_mut_from_cstr_unchecked(NSTDCStrMut *cstr);
 ///
 /// # Returns
 ///
-/// `NSTDStrMut str` - The new string slice.
+/// `NSTDOptionalStrMut str` - The new string slice on success, or a "none" variant if the
+/// result is not valid UTF-8.
 ///
 /// # Panics
 ///
@@ -587,15 +578,13 @@ NSTDAPI NSTDStrMut nstd_core_str_mut_from_cstr_unchecked(NSTDCStrMut *cstr);
 ///
 /// - `cstr` is null.
 ///
-/// - `cstr`'s data is not valid UTF-8.
-///
 /// - `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
 /// This function makes access to raw pointer data, which can cause undefined behavior in the event
 /// that `cstr`'s data is invalid.
-NSTDAPI NSTDStrMut nstd_core_str_mut_from_raw_cstr(NSTDChar *cstr);
+NSTDAPI NSTDOptionalStrMut nstd_core_str_mut_from_raw_cstr(NSTDChar *cstr);
 
 /// Creates a new `NSTDStrMut` from a raw C string, including the null byte.
 ///
@@ -605,7 +594,8 @@ NSTDAPI NSTDStrMut nstd_core_str_mut_from_raw_cstr(NSTDChar *cstr);
 ///
 /// # Returns
 ///
-/// `NSTDStrMut str` - The new string slice.
+/// `NSTDOptionalStrMut str` - The new string slice on success, or a "none" variant if the
+/// result is not valid UTF-8.
 ///
 /// # Panics
 ///
@@ -613,15 +603,13 @@ NSTDAPI NSTDStrMut nstd_core_str_mut_from_raw_cstr(NSTDChar *cstr);
 ///
 /// - `cstr` is null.
 ///
-/// - `cstr`'s data is not valid UTF-8.
-///
 /// - `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
 /// This function makes access to raw pointer data, which can cause undefined behavior in the event
 /// that `cstr`'s data is invalid.
-NSTDAPI NSTDStrMut nstd_core_str_mut_from_raw_cstr_with_null(NSTDChar *cstr);
+NSTDAPI NSTDOptionalStrMut nstd_core_str_mut_from_raw_cstr_with_null(NSTDChar *cstr);
 
 /// Creates a string slice from raw bytes.
 ///
@@ -631,7 +619,8 @@ NSTDAPI NSTDStrMut nstd_core_str_mut_from_raw_cstr_with_null(NSTDChar *cstr);
 ///
 /// # Returns
 ///
-/// `NSTDStrMut str` - The new string slice.
+/// `NSTDOptionalStrMut str` - The new string slice on success, or a "none" variant if the
+/// result is not valid UTF-8.
 ///
 /// # Panics
 ///
@@ -641,14 +630,12 @@ NSTDAPI NSTDStrMut nstd_core_str_mut_from_raw_cstr_with_null(NSTDChar *cstr);
 ///
 /// - `bytes`'s length is greater than `NSTDInt`'s max value.
 ///
-/// - `bytes` is not valid UTF-8.
-///
 /// # Safety
 ///
 /// - `bytes` must remain valid while the returned string slice is in use.
 ///
 /// - `bytes`'s data must be valid for reads of at least `bytes.len` consecutive bytes.
-NSTDAPI NSTDStrMut nstd_core_str_mut_from_bytes(NSTDSliceMut *bytes);
+NSTDAPI NSTDOptionalStrMut nstd_core_str_mut_from_bytes(NSTDSliceMut *bytes);
 
 /// Creates a string slice from raw bytes, without checking for UTF-8.
 ///
@@ -784,7 +771,8 @@ NSTDAPI NSTDOptionalUnichar nstd_core_str_mut_get(const NSTDStrMut *str, NSTDUIn
 ///
 /// # Returns
 ///
-/// `NSTDStrMut substr` - The new substring.
+/// `NSTDOptionalStrMut substr` - The new substring on success, or a "none" variant if the
+/// result is not valid UTF-8.
 ///
 /// # Panics
 ///
@@ -798,12 +786,10 @@ NSTDAPI NSTDOptionalUnichar nstd_core_str_mut_get(const NSTDStrMut *str, NSTDUIn
 ///
 /// - `range.end` - `range.start` is greater than `NSTDInt`'s max value.
 ///
-/// - The substring bytes are not valid UTF-8.
-///
 /// # Safety
 ///
 /// `str`'s data must be valid for reads of at least `str.len` consecutive bytes.
-NSTDAPI NSTDStrMut nstd_core_str_mut_substr(NSTDStrMut *str, NSTDURange range);
+NSTDAPI NSTDOptionalStrMut nstd_core_str_mut_substr(NSTDStrMut *str, NSTDURange range);
 
 /// Attempts to parse a string slice as an `NSTDFloat32`.
 ///

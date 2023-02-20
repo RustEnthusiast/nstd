@@ -92,10 +92,6 @@ NSTDAPI NSTDAnyMut nstd_shared_lib_get_mut(NSTDSharedLib *lib, const NSTDChar *s
 /// # Parameters:
 ///
 /// - `NSTDSharedLib lib` - The library handle.
-///
-/// # Panics
-///
-/// Panics if unloading the library fails.
 NSTDAPI void nstd_shared_lib_free(NSTDSharedLib lib);
 
 #endif

@@ -4,11 +4,15 @@ pub mod stdin;
 pub(crate) mod stdio;
 pub mod stdout;
 #[cfg(unix)]
-use crate::os::unix::io::NSTDUnixIOError::{self, *};
+use crate::os::unix::io::{
+    NSTDUnixIOError::{self, *},
+    NSTDUnixIOResult,
+};
 use crate::{
     core::{result::NSTDResult, str::NSTDStr},
     string::{nstd_string_pop, NSTDString},
     vec::NSTDVec,
+    NSTDUInt,
 };
 use nstdapi::nstdapi;
 use std::io::{ErrorKind, Write};
@@ -107,6 +111,21 @@ impl From<NSTDUnixIOError> for NSTDIOError {
             NSTD_UNIX_IO_ERROR_UNEXPECTED_EOF => Self::NSTD_IO_ERROR_UNEXPECTED_EOF,
             NSTD_UNIX_IO_ERROR_OUT_OF_MEMORY => Self::NSTD_IO_ERROR_OUT_OF_MEMORY,
             _ => Self::NSTD_IO_ERROR_UNKNOWN,
+        }
+    }
+}
+
+/// A result type that yields an [NSTDUInt] representing the number of bytes read or written by an
+/// I/O operation on success and an I/O operation error code on failure.
+pub type NSTDIOResult = NSTDResult<NSTDUInt, NSTDIOError>;
+#[cfg(unix)]
+impl From<NSTDUnixIOResult> for NSTDIOResult {
+    /// Converts an [NSTDUnixIOResult] into an [NSTDIOResult].
+    #[inline]
+    fn from(value: NSTDUnixIOResult) -> Self {
+        match value {
+            NSTDResult::Ok(value) => Self::Ok(value),
+            NSTDResult::Err(err) => Self::Err(err.into()),
         }
     }
 }

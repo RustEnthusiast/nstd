@@ -5,10 +5,10 @@ use crate::{
         slice::{NSTDSlice, NSTDSliceMut},
         str::NSTDStr,
     },
-    io::NSTDIOError,
+    io::{NSTDIOError, NSTDIOResult},
     string::NSTDString,
     vec::NSTDVec,
-    NSTDUInt, NSTDUInt8,
+    NSTDUInt8,
 };
 use nstdapi::nstdapi;
 use std::fs::File;
@@ -82,34 +82,21 @@ pub unsafe fn nstd_fs_file_open(name: &NSTDStr, mask: NSTDUInt8) -> NSTDFileResu
 ///
 /// - `const NSTDSlice *bytes` - The data to write to the file.
 ///
-/// - `NSTDUInt *written` - Returns as the number of bytes written to the file.
-///
 /// # Returns
 ///
-/// `NSTDIOError errc` - The I/O operation error code.
+/// `NSTDIOResult written` - The number of bytes written to `handle` on success, or the I/O
+/// operation error code on failure.
 ///
 /// # Safety
 ///
 /// This function's caller must guarantee validity of `bytes`.
 #[inline]
 #[nstdapi]
-pub unsafe fn nstd_fs_file_write(
-    file: &mut NSTDFile,
-    bytes: &NSTDSlice,
-    written: &mut NSTDUInt,
-) -> NSTDIOError {
+pub unsafe fn nstd_fs_file_write(file: &mut NSTDFile, bytes: &NSTDSlice) -> NSTDIOResult {
     #[cfg(not(unix))]
-    {
-        let (err, w) = crate::io::stdio::write(file, bytes);
-        *written = w;
-        err
-    }
+    return crate::io::stdio::write(file, bytes);
     #[cfg(unix)]
-    {
-        let (err, w) = crate::os::unix::io::stdio::write(file.as_raw_fd(), bytes);
-        *written = w;
-        err.into()
-    }
+    return crate::os::unix::io::stdio::write(file.as_raw_fd(), bytes).into();
 }
 
 /// Writes a whole buffer to a file.
@@ -159,34 +146,21 @@ pub fn nstd_fs_file_flush(file: &mut NSTDFile) -> NSTDIOError {
 ///
 /// - `NSTDSliceMut *buffer` - The buffer to start filling with data from the file.
 ///
-/// - `NSTDUInt *read` - Returns as the number of bytes read from the file.
-///
 /// # Returns
 ///
-/// `NSTDIOError errc` - The I/O operation error code.
+/// `NSTDIOResult read` - The number of bytes read from `handle` on success, or the I/O operation
+/// error code on failure.
 ///
 /// # Safety
 ///
 /// `buffer`'s data must be valid for writes.
 #[inline]
 #[nstdapi]
-pub unsafe fn nstd_fs_file_read(
-    file: &mut NSTDFile,
-    buffer: &mut NSTDSliceMut,
-    read: &mut NSTDUInt,
-) -> NSTDIOError {
+pub unsafe fn nstd_fs_file_read(file: &mut NSTDFile, buffer: &mut NSTDSliceMut) -> NSTDIOResult {
     #[cfg(not(unix))]
-    {
-        let (err, r) = crate::io::stdio::read(file, buffer);
-        *read = r;
-        err
-    }
+    return crate::io::stdio::read(file, buffer);
     #[cfg(unix)]
-    {
-        let (err, r) = crate::os::unix::io::stdio::read(file.as_raw_fd(), buffer);
-        *read = r;
-        err.into()
-    }
+    return crate::os::unix::io::stdio::read(file.as_raw_fd(), buffer).into();
 }
 
 /// Continuously reads data from `file` into a buffer until EOF is reached.
@@ -194,7 +168,7 @@ pub unsafe fn nstd_fs_file_read(
 /// # Note
 ///
 /// If extending the buffer fails, an error code of `NSTD_IO_ERROR_OUT_OF_MEMORY` will be returned.
-/// This does not mean `read` will return as 0 in this case.
+/// This does not mean there were no bytes read from `file` in this case.
 ///
 /// # Parameters:
 ///
@@ -202,35 +176,22 @@ pub unsafe fn nstd_fs_file_read(
 ///
 /// - `NSTDVec *buffer` - The buffer to be extended with data from the file.
 ///
-/// - `NSTDUInt *read` - Returns as the number of bytes read from the file.
-///
 /// # Returns
 ///
-/// `NSTDIOError errc` - The I/O operation error code.
+/// `NSTDIOResult read` - The number of bytes read from `handle` on success, or the I/O operation
+/// error code on failure.
 ///
 /// # Panics
 ///
 /// This function will panic if `buffer`'s length in bytes ends up exceeding `NSTDInt`'s max value.
 #[inline]
 #[nstdapi]
-pub fn nstd_fs_file_read_all(
-    file: &mut NSTDFile,
-    buffer: &mut NSTDVec,
-    read: &mut NSTDUInt,
-) -> NSTDIOError {
+pub fn nstd_fs_file_read_all(file: &mut NSTDFile, buffer: &mut NSTDVec) -> NSTDIOResult {
     #[cfg(not(unix))]
-    {
-        let (err, r) = crate::io::stdio::read_all(file, buffer);
-        *read = r;
-        err
-    }
+    return crate::io::stdio::read_all(file, buffer);
     #[cfg(unix)]
-    {
-        // SAFETY: `file` owns the file descriptor.
-        let (err, r) = unsafe { crate::os::unix::io::stdio::read_all(file.as_raw_fd(), buffer) };
-        *read = r;
-        err.into()
-    }
+    // SAFETY: `file` owns the file descriptor.
+    return unsafe { crate::os::unix::io::stdio::read_all(file.as_raw_fd(), buffer).into() };
 }
 
 /// Continuously reads UTF-8 data from `file` into a string buffer until EOF is reached.
@@ -238,7 +199,7 @@ pub fn nstd_fs_file_read_all(
 /// # Note
 ///
 /// If extending the buffer fails, an error code of `NSTD_IO_ERROR_OUT_OF_MEMORY` will be returned.
-/// This does not mean `read` will return as 0 in this case.
+/// This does not mean there were no bytes read from `file` in this case.
 ///
 /// # Parameters:
 ///
@@ -246,37 +207,22 @@ pub fn nstd_fs_file_read_all(
 ///
 /// - `NSTDString *buffer` - The buffer to be extended with data from the file.
 ///
-/// - `NSTDUInt *read` - Returns as the number of bytes read from the file.
-///
 /// # Returns
 ///
-/// `NSTDIOError errc` - The I/O operation error code.
+/// `NSTDIOResult read` - The number of bytes read from `handle` on success, or the I/O operation
+/// error code on failure.
 ///
 /// # Panics
 ///
 /// This function will panic if `buffer`'s length in bytes ends up exceeding `NSTDInt`'s max value.
 #[inline]
 #[nstdapi]
-pub fn nstd_fs_file_read_to_string(
-    file: &mut NSTDFile,
-    buffer: &mut NSTDString,
-    read: &mut NSTDUInt,
-) -> NSTDIOError {
+pub fn nstd_fs_file_read_to_string(file: &mut NSTDFile, buffer: &mut NSTDString) -> NSTDIOResult {
     #[cfg(not(unix))]
-    {
-        let (err, r) = crate::io::stdio::read_to_string(file, buffer);
-        *read = r;
-        err
-    }
+    return crate::io::stdio::read_to_string(file, buffer);
     #[cfg(unix)]
-    {
-        // SAFETY: `file` owns the file descriptor.
-        unsafe {
-            let (err, r) = crate::os::unix::io::stdio::read_to_string(file.as_raw_fd(), buffer);
-            *read = r;
-            err.into()
-        }
-    }
+    // SAFETY: `file` owns the file descriptor.
+    return unsafe { crate::os::unix::io::stdio::read_to_string(file.as_raw_fd(), buffer).into() };
 }
 
 /// Reads enough data from `file` to fill the entirety of `buffer`.

@@ -30,12 +30,9 @@ NSTDOptional(NSTDCStr) NSTDOptionalCStr;
 ///
 /// # Returns
 ///
-/// `NSTDCStr cstr` - The new C string slice, referencing `raw`'s data.
-///
-/// # Panics
-///
-/// Panics if `raw` is null.
-NSTDAPI NSTDCStr nstd_core_cstr_new(const NSTDChar *raw, NSTDUInt len);
+/// `NSTDOptionalCStr cstr` - The new C string slice referencing `raw`'s data on success, or a
+/// "none" variant if `raw` is null.
+NSTDAPI NSTDOptionalCStr nstd_core_cstr_new(const NSTDChar *raw, NSTDUInt len);
 
 /// Creates a new C string slice from a raw pointer and a size without checking if `raw` is null.
 ///
@@ -64,10 +61,6 @@ NSTDAPI NSTDCStr nstd_core_cstr_new_unchecked(const NSTDChar *raw, NSTDUInt len)
 ///
 /// `NSTDCStr cstr` - The new C string slice, referencing `raw`'s data.
 ///
-/// # Panics
-///
-/// Panics if `raw` is null.
-///
 /// # Safety
 ///
 /// `raw` must point to a character array that is valid for reads up until and including it's
@@ -83,10 +76,6 @@ NSTDAPI NSTDCStr nstd_core_cstr_from_raw(const NSTDChar *raw);
 /// # Returns
 ///
 /// `NSTDCStr cstr` - The new C string slice, referencing `raw`'s data.
-///
-/// # Panics
-///
-/// Panics if `raw` is null.
 ///
 /// # Safety
 ///
@@ -235,12 +224,9 @@ NSTDOptional(NSTDCStrMut) NSTDOptionalCStrMut;
 ///
 /// # Returns
 ///
-/// `NSTDCStrMut cstr` - The new C string slice, referencing `raw`'s data.
-///
-/// # Panics
-///
-/// Panics if `raw` is null.
-NSTDAPI NSTDCStrMut nstd_core_cstr_mut_new(NSTDChar *raw, NSTDUInt len);
+/// `NSTDOptionalCStrMut cstr` - The new C string slice referencing `raw`'s data on success, or a
+/// "none" variant if `raw` is null.
+NSTDAPI NSTDOptionalCStrMut nstd_core_cstr_mut_new(NSTDChar *raw, NSTDUInt len);
 
 /// Creates a new C string slice from a raw pointer and a size without checking if `raw` is null.
 ///
@@ -269,10 +255,6 @@ NSTDAPI NSTDCStrMut nstd_core_cstr_mut_new_unchecked(NSTDChar *raw, NSTDUInt len
 ///
 /// `NSTDCStrMut cstr` - The new C string slice, referencing `raw`'s data.
 ///
-/// # Panics
-///
-/// Panics if `raw` is null.
-///
 /// # Safety
 ///
 /// `raw` must point to a character array that is valid for reads up until and including it's
@@ -288,10 +270,6 @@ NSTDAPI NSTDCStrMut nstd_core_cstr_mut_from_raw(NSTDChar *raw);
 /// # Returns
 ///
 /// `NSTDCStrMut cstr` - The new C string slice, referencing `raw`'s data.
-///
-/// # Panics
-///
-/// Panics if `raw` is null.
 ///
 /// # Safety
 ///

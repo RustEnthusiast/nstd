@@ -106,11 +106,6 @@ NSTDAPI NSTDAny nstd_shared_ptr_get(const NSTDSharedPtr *shared_ptr);
 /// # Parameters:
 ///
 /// - `NSTDSharedPtr shared_ptr` - The shared object to free.
-///
-/// # Panics
-///
-/// Panics if there are no more shared pointers referencing the shared data and freeing the heap
-/// memory fails.
 NSTDAPI void nstd_shared_ptr_free(NSTDSharedPtr shared_ptr);
 
 #endif

@@ -42,6 +42,19 @@ impl<T> NSTDOptional<T> {
             _ => panic!("called `NSTDOptional::unwrap()` on a `None` value"),
         }
     }
+
+    /// Attempts to return the contained `Some` value in an `NSTDOptional`.
+    ///
+    /// # Panics
+    ///
+    /// Panics with `msg` if `self` is a `None` value.
+    #[inline]
+    pub fn expect(self, msg: &str) -> T {
+        match self {
+            Self::Some(value) => value,
+            _ => panic!("{msg}"),
+        }
+    }
 }
 
 /// Generates optional data structures.
