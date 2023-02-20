@@ -1,9 +1,6 @@
 //! A reference counting smart pointer.
 use crate::{
-    alloc::{
-        nstd_alloc_allocate, nstd_alloc_allocate_zeroed, nstd_alloc_deallocate,
-        NSTDAllocError::NSTD_ALLOC_ERROR_NONE,
-    },
+    alloc::{nstd_alloc_allocate, nstd_alloc_allocate_zeroed, nstd_alloc_deallocate},
     core::{
         mem::nstd_core_mem_copy,
         optional::{gen_optional, NSTDOptional},
@@ -50,10 +47,6 @@ impl NSTDSharedPtr {
 }
 impl Drop for NSTDSharedPtr {
     /// [NSTDSharedPtr]'s destructor.
-    ///
-    /// # Panics
-    ///
-    /// Panics if deallocating fails.
     fn drop(&mut self) {
         // SAFETY: Shared pointers are always non-null.
         unsafe {
@@ -63,7 +56,7 @@ impl Drop for NSTDSharedPtr {
             core::ptr::write_unaligned(ptrs, new_size);
             // If the pointer count is zero, free the data.
             if new_size == 0 {
-                assert!(nstd_alloc_deallocate(&mut self.ptr, self.size) == NSTD_ALLOC_ERROR_NONE);
+                nstd_alloc_deallocate(&mut self.ptr, self.size);
             }
         }
     }
@@ -324,11 +317,6 @@ pub fn nstd_shared_ptr_get(shared_ptr: &NSTDSharedPtr) -> NSTDAny {
 /// # Parameters:
 ///
 /// - `NSTDSharedPtr shared_ptr` - The shared object to free.
-///
-/// # Panics
-///
-/// Panics if there are no more shared pointers referencing the shared data and freeing the heap
-/// memory fails.
 #[nstdapi]
 #[allow(unused_variables)]
 pub fn nstd_shared_ptr_free(shared_ptr: NSTDSharedPtr) {}

@@ -447,10 +447,6 @@ NSTDAPI void nstd_vec_clear(NSTDVec *vec);
 /// # Parameters:
 ///
 /// - `NSTDVec vec` - The vector to free.
-///
-/// # Panics
-///
-/// Panics if deallocating fails.
 NSTDAPI void nstd_vec_free(NSTDVec vec);
 
 #endif

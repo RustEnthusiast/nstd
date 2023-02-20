@@ -17,14 +17,14 @@ macro_rules! gen_min_max {
         $(#[$minmeta])*
         #[inline]
         #[nstdapi]
-        pub const extern "C" fn $minname() -> $T {
+        pub const fn $minname() -> $T {
             <$T>::MIN
         }
 
         $(#[$maxmeta])*
         #[inline]
         #[nstdapi]
-        pub const extern "C" fn $maxname() -> $T {
+        pub const fn $maxname() -> $T {
             <$T>::MAX
         }
     };

@@ -1,7 +1,10 @@
 //! A handle to the standard error stream.
-use crate::{core::slice::NSTDSlice, io::NSTDIOError, NSTDUInt};
+use crate::{
+    core::slice::NSTDSlice,
+    io::{NSTDIOError, NSTDIOResult},
+};
 use nstdapi::nstdapi;
-use std::io::Stderr;
+use std::io::{Stderr, StderrLock};
 #[cfg(unix)]
 use std::os::unix::io::AsRawFd;
 
@@ -19,8 +22,7 @@ pub fn nstd_io_stderr() -> NSTDStderr {
     NSTDStderr::new(std::io::stderr())
 }
 
-/// Writes some data to the standard error stream, setting `written` to the number of bytes
-/// written.
+/// Writes some data to the standard error stream, returning how many bytes were written.
 ///
 /// # Note
 ///
@@ -33,34 +35,21 @@ pub fn nstd_io_stderr() -> NSTDStderr {
 ///
 /// - `const NSTDSlice *bytes` - The data to be written to stderr.
 ///
-/// - `NSTDUInt *written` - Returns as the number of bytes written.
-///
 /// # Returns
 ///
-/// `NSTDIOError errc` - The I/O operation error code.
+/// `NSTDIOResult written` - The number of bytes written to `handle` on success, or the I/O
+/// operation error code on failure.
 ///
 /// # Safety
 ///
 /// This function can cause undefined behavior if `bytes`'s data is invalid.
 #[inline]
 #[nstdapi]
-pub unsafe fn nstd_io_stderr_write(
-    handle: &mut NSTDStderr,
-    bytes: &NSTDSlice,
-    written: &mut NSTDUInt,
-) -> NSTDIOError {
+pub unsafe fn nstd_io_stderr_write(handle: &mut NSTDStderr, bytes: &NSTDSlice) -> NSTDIOResult {
     #[cfg(not(unix))]
-    {
-        let (err, w) = crate::io::stdio::write(handle, bytes);
-        *written = w;
-        err
-    }
+    return crate::io::stdio::write(handle, bytes);
     #[cfg(unix)]
-    {
-        let (err, w) = crate::os::unix::io::stdio::write(handle.lock().as_raw_fd(), bytes);
-        *written = w;
-        err.into()
-    }
+    return crate::os::unix::io::stdio::write(handle.lock().as_raw_fd(), bytes).into();
 }
 
 /// Writes an entire buffer to the standard error stream.
@@ -116,3 +105,107 @@ pub fn nstd_io_stderr_flush(handle: &mut NSTDStderr) -> NSTDIOError {
 #[nstdapi]
 #[allow(unused_variables)]
 pub fn nstd_io_stderr_free(handle: NSTDStderr) {}
+
+/// A locked handle to the standard error stream.
+pub type NSTDStderrLock = Box<StderrLock<'static>>;
+
+/// Constructs a new locked handle to the standard error stream.
+///
+/// # Returns
+///
+/// `NSTDStderrLock handle` - A locked handle to the standard error stream.
+#[inline]
+#[nstdapi]
+pub fn nstd_io_stderr_lock() -> NSTDStderrLock {
+    NSTDStderrLock::new(std::io::stderr().lock())
+}
+
+/// Writes some data to the standard error stream, returning how many bytes were written.
+///
+/// # Note
+///
+/// This function will return an error code of `NSTD_IO_ERROR_INVALID_INPUT` if the slice's element
+/// size is not 1.
+///
+/// # Parameters:
+///
+/// - `NSTDStderrLock *handle` - A locked handle to stderr.
+///
+/// - `const NSTDSlice *bytes` - The data to be written to stderr.
+///
+/// # Returns
+///
+/// `NSTDIOResult written` - The number of bytes written to `handle` on success, or the I/O
+/// operation error code on failure.
+///
+/// # Safety
+///
+/// This function can cause undefined behavior if `bytes`'s data is invalid.
+#[inline]
+#[nstdapi]
+pub unsafe fn nstd_io_stderr_lock_write(
+    handle: &mut NSTDStderrLock,
+    bytes: &NSTDSlice,
+) -> NSTDIOResult {
+    #[cfg(not(unix))]
+    return crate::io::stdio::write(handle, bytes);
+    #[cfg(unix)]
+    return crate::os::unix::io::stdio::write(handle.as_raw_fd(), bytes).into();
+}
+
+/// Writes an entire buffer to the standard error stream.
+///
+/// # Note
+///
+/// This function will return an error code of `NSTD_IO_ERROR_INVALID_INPUT` if the slice's element
+/// size is not 1.
+///
+/// # Parameters:
+///
+/// - `NSTDStderrLock *handle` - A locked handle to stderr.
+///
+/// - `const NSTDSlice *bytes` - The data to be written to stderr.
+///
+/// # Returns
+///
+/// `NSTDIOError errc` - The I/O operation error code.
+///
+/// # Safety
+///
+/// This function can cause undefined behavior if `bytes`'s data is invalid.
+#[inline]
+#[nstdapi]
+pub unsafe fn nstd_io_stderr_lock_write_all(
+    handle: &mut NSTDStderrLock,
+    bytes: &NSTDSlice,
+) -> NSTDIOError {
+    #[cfg(not(unix))]
+    return crate::io::stdio::write_all(handle, bytes);
+    #[cfg(unix)]
+    return crate::os::unix::io::stdio::write_all(handle.as_raw_fd(), bytes).into();
+}
+
+/// Flushes the standard error stream.
+///
+/// # Parameters:
+///
+/// - `NSTDStderrLock *handle` - A locked handle to stderr.
+///
+/// # Returns
+///
+/// `NSTDIOError errc` - The I/O operation error code.
+#[inline]
+#[nstdapi]
+pub fn nstd_io_stderr_lock_flush(handle: &mut NSTDStderrLock) -> NSTDIOError {
+    crate::io::stdio::flush(handle)
+}
+
+/// Frees and unlocks an instance of `NSTDStderrLock`.
+///
+/// # Parameters:
+///
+/// - `NSTDStderrLock handle` - A locked handle to the standard error stream.
+#[inline]
+#[nstdapi]
+#[allow(unused_variables)]
+pub fn nstd_io_stderr_unlock(handle: NSTDStderrLock) {}

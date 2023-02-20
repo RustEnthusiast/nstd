@@ -116,10 +116,6 @@ NSTDAPI NSTDAnyMut nstd_heap_ptr_get_mut(NSTDHeapPtr *hptr);
 /// # Parameters:
 ///
 /// - `NSTDHeapPtr hptr` - A pointer to the heap object.
-///
-/// # Panics
-///
-/// Panics if freeing the heap memory fails.
 NSTDAPI void nstd_heap_ptr_free(NSTDHeapPtr hptr);
 
 #endif

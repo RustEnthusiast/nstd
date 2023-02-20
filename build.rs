@@ -1,5 +1,6 @@
 //! `nstd`'s build script. Compiling and linking non-Rust modules is done here.
 #![allow(unused)]
+#![allow(clippy::needless_update)]
 
 /// Represents a C/C++ module's compilation configuration.
 #[derive(Default)]

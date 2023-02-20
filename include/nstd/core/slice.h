@@ -33,12 +33,8 @@ NSTDOptional(NSTDSlice) NSTDOptionalSlice;
 ///
 /// # Returns
 ///
-/// `NSTDSlice slice` - The new slice.
-///
-/// # Panics
-///
-/// Panics if `ptr` is null.
-NSTDAPI NSTDSlice nstd_core_slice_new(NSTDAny ptr, NSTDUInt element_size, NSTDUInt len);
+/// `NSTDOptionalSlice slice` - The new slice on success, or a "none" variant if `ptr` is null.
+NSTDAPI NSTDOptionalSlice nstd_core_slice_new(NSTDAny ptr, NSTDUInt element_size, NSTDUInt len);
 
 /// Creates a new slice from raw data without checking if `ptr` is null.
 ///
@@ -167,12 +163,9 @@ NSTDOptional(NSTDSliceMut) NSTDOptionalSliceMut;
 ///
 /// # Returns
 ///
-/// `NSTDSliceMut slice` - The new slice.
-///
-/// # Panics
-///
-/// Panics if `ptr` is null.
-NSTDAPI NSTDSliceMut nstd_core_slice_mut_new(NSTDAnyMut ptr, NSTDUInt element_size, NSTDUInt len);
+/// `NSTDOptionalSliceMut slice` - The new slice on success, or a "none" variant if `ptr` is null.
+NSTDAPI NSTDOptionalSliceMut
+nstd_core_slice_mut_new(NSTDAnyMut ptr, NSTDUInt element_size, NSTDUInt len);
 
 /// Creates a new slice from raw data without checking if `ptr` is null.
 ///

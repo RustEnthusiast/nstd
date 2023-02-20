@@ -2,13 +2,17 @@
 use super::{
     NSTDUnixFileDescriptor,
     NSTDUnixIOError::{self, *},
+    NSTDUnixIOResult,
 };
 use crate::{
     alloc::NSTDAllocError::NSTD_ALLOC_ERROR_NONE,
-    core::slice::{
-        nstd_core_slice_as_ptr, nstd_core_slice_len, nstd_core_slice_mut_as_ptr,
-        nstd_core_slice_mut_len, nstd_core_slice_mut_stride, nstd_core_slice_stride, NSTDSlice,
-        NSTDSliceMut,
+    core::{
+        result::NSTDResult,
+        slice::{
+            nstd_core_slice_as_ptr, nstd_core_slice_len, nstd_core_slice_mut_as_ptr,
+            nstd_core_slice_mut_len, nstd_core_slice_mut_stride, nstd_core_slice_stride, NSTDSlice,
+            NSTDSliceMut,
+        },
     },
     string::NSTDString,
     vec::{
@@ -32,23 +36,20 @@ const ISIZE_MAX: usize = isize::MAX as usize;
 /// the file is properly synchronized within the process(es).
 ///
 /// - `bytes` must be valid for reads.
-pub(crate) unsafe fn write(
-    fd: NSTDUnixFileDescriptor,
-    bytes: &NSTDSlice,
-) -> (NSTDUnixIOError, NSTDUInt) {
+pub(crate) unsafe fn write(fd: NSTDUnixFileDescriptor, bytes: &NSTDSlice) -> NSTDUnixIOResult {
     let len = nstd_core_slice_len(bytes);
     // Make sure the slice's element size is 1.
     if nstd_core_slice_stride(bytes) != 1 || len > ISIZE_MAX {
-        return (NSTD_UNIX_IO_ERROR_INVALID_INPUT, 0);
+        return NSTDResult::Err(NSTD_UNIX_IO_ERROR_INVALID_INPUT);
     }
     // Check if `len` is 0.
     if len == 0 {
-        return (NSTD_UNIX_IO_ERROR_NONE, 0);
+        return NSTDResult::Ok(0);
     }
     // Write the data.
     match libc::write(fd, nstd_core_slice_as_ptr(bytes), len) {
-        -1 => (NSTDUnixIOError::last(), 0),
-        w => (NSTD_UNIX_IO_ERROR_NONE, w as _),
+        -1 => NSTDResult::Err(NSTDUnixIOError::last()),
+        w => NSTDResult::Ok(w as _),
     }
 }
 
@@ -99,16 +100,16 @@ pub(crate) unsafe fn write_all(fd: NSTDUnixFileDescriptor, bytes: &NSTDSlice) ->
 pub(crate) unsafe fn read(
     fd: NSTDUnixFileDescriptor,
     buffer: &mut NSTDSliceMut,
-) -> (NSTDUnixIOError, NSTDUInt) {
+) -> NSTDUnixIOResult {
     // Make sure the buffer's element size is 1.
     let len = nstd_core_slice_mut_len(buffer);
     if nstd_core_slice_mut_stride(buffer) != 1 || len > ISIZE_MAX {
-        return (NSTD_UNIX_IO_ERROR_INVALID_INPUT, 0);
+        return NSTDResult::Err(NSTD_UNIX_IO_ERROR_INVALID_INPUT);
     }
     // Read data into `buffer`.
     match libc::read(fd, nstd_core_slice_mut_as_ptr(buffer), len) {
-        -1 => (NSTDUnixIOError::last(), 0),
-        r => (NSTD_UNIX_IO_ERROR_NONE, r as _),
+        -1 => NSTDResult::Err(NSTDUnixIOError::last()),
+        r => NSTDResult::Ok(r as _),
     }
 }
 
@@ -116,6 +117,9 @@ pub(crate) unsafe fn read(
 ///
 /// This will return an error variant of `NSTD_UNIX_IO_ERROR_INVALID_INPUT` in an attempt to read
 /// more than `NSTDInt::MAX` bytes.
+///
+/// If extending the buffer fails, an error code of `NSTD_UNIX_IO_ERROR_OUT_OF_MEMORY` will be
+/// returned. This does not mean there were no bytes read from `stream` in this case.
 ///
 /// # Panics
 ///
@@ -130,31 +134,31 @@ pub(crate) unsafe fn read(
 pub(crate) unsafe fn read_all(
     fd: NSTDUnixFileDescriptor,
     buffer: &mut NSTDVec,
-) -> (NSTDUnixIOError, NSTDUInt) {
+) -> NSTDUnixIOResult {
     /// The default buffer size for piped/FIFO/socket file objects.
     const PIPE_BUF_SIZE: NSTDUInt = 32;
     // Make sure the buffer's element size is 1.
     if nstd_vec_stride(buffer) != 1 {
-        return (NSTD_UNIX_IO_ERROR_INVALID_INPUT, 0);
+        return NSTDResult::Err(NSTD_UNIX_IO_ERROR_INVALID_INPUT);
     }
     // Get the number of bytes remaining in the file.
     let (mut buf_size, is_piped) = match lseek(fd, 0, SEEK_CUR) {
         -1 => match NSTDUnixIOError::last() {
             // The file is piped and cannot be used with `lseek`. Give it a default buffer size.
             NSTD_UNIX_IO_ERROR_INVALID_SEEK => (PIPE_BUF_SIZE, true),
-            err => return (err, 0),
+            err => return NSTDResult::Err(err),
         },
         offset => match lseek(fd, 0, SEEK_END) {
-            -1 => return (NSTDUnixIOError::last(), 0),
+            -1 => return NSTDResult::Err(NSTDUnixIOError::last()),
             size => match lseek(fd, offset, SEEK_SET) {
-                -1 => return (NSTDUnixIOError::last(), 0),
+                -1 => return NSTDResult::Err(NSTDUnixIOError::last()),
                 _ => ((size - offset) as _, false),
             },
         },
     };
     // Check `buf_size`.
     if buf_size > ISIZE_MAX {
-        return (NSTD_UNIX_IO_ERROR_INVALID_INPUT, 0);
+        return NSTDResult::Err(NSTD_UNIX_IO_ERROR_INVALID_INPUT);
     }
     // Read data into the vector.
     let start_len = nstd_vec_len(buffer);
@@ -167,16 +171,16 @@ pub(crate) unsafe fn read_all(
             if reserved < buf_size
                 && nstd_vec_reserve(buffer, buf_size - reserved) != NSTD_ALLOC_ERROR_NONE
             {
-                return (NSTD_UNIX_IO_ERROR_OUT_OF_MEMORY, len - start_len);
+                return NSTDResult::Err(NSTD_UNIX_IO_ERROR_OUT_OF_MEMORY);
             }
         }
         // Attempt to fill the rest of the vector's reserved buffer.
         match libc::read(fd, nstd_vec_end_mut(buffer), buf_size) {
             -1 => match NSTDUnixIOError::last() {
                 NSTD_UNIX_IO_ERROR_INTERRUPTED => (),
-                err => return (err, len - start_len),
+                err => return NSTDResult::Err(err),
             },
-            0 => return (NSTD_UNIX_IO_ERROR_NONE, len - start_len),
+            0 => return NSTDResult::Ok(len - start_len),
             r => {
                 let read = r as NSTDUInt;
                 nstd_vec_set_len(buffer, len + read);
@@ -197,6 +201,9 @@ pub(crate) unsafe fn read_all(
 /// This will return an error variant of `NSTD_UNIX_IO_ERROR_INVALID_INPUT` in an attempt to read
 /// more than `NSTDInt::MAX` bytes.
 ///
+/// If extending the buffer fails, an error code of `NSTD_UNIX_IO_ERROR_OUT_OF_MEMORY` will be
+/// returned. This does not mean there were no bytes read from `stream` in this case.
+///
 /// # Panics
 ///
 /// This operation will panic if `buffer`'s length in bytes ends up exceeding `NSTDInt::MAX`.
@@ -210,19 +217,21 @@ pub(crate) unsafe fn read_all(
 pub(crate) unsafe fn read_to_string(
     fd: NSTDUnixFileDescriptor,
     buffer: &mut NSTDString,
-) -> (NSTDUnixIOError, NSTDUInt) {
+) -> NSTDUnixIOResult {
     // Read data from the file.
     let buf = buffer.as_mut_vec();
-    let (mut err, read) = read_all(fd, buf);
+    let start_len = nstd_vec_len(buf);
+    let mut res = read_all(fd, buf);
+    let read = nstd_vec_len(buf) - start_len;
     // Make sure the successfully read data is valid UTF-8.
     let read_start = nstd_vec_end(buf).sub(read) as _;
     let bytes = core::slice::from_raw_parts(read_start, read);
     if core::str::from_utf8(bytes).is_err() {
         let len = nstd_vec_len(buf);
         nstd_vec_set_len(buf, len - read);
-        err = NSTD_UNIX_IO_ERROR_INVALID_DATA;
+        res = NSTDResult::Err(NSTD_UNIX_IO_ERROR_INVALID_DATA);
     }
-    (err, read)
+    res
 }
 
 /// Reads enough data from a Unix file to fill the entirety of `buffer`.

@@ -1,72 +1,107 @@
 //! A mutual exclusion primitive with a timed locking mechanism.
-use crate::{
-    core::{optional::NSTDOptional, result::NSTDResult},
-    heap_ptr::NSTDHeapPtr,
-    NSTDAny, NSTDAnyMut, NSTDBool, NSTDFloat64,
-};
-use core::{marker::PhantomData, mem::ManuallyDrop};
-use nstdapi::nstdapi;
+use crate::{heap_ptr::NSTDHeapPtr, time::NSTDDuration, NSTDAny, NSTDAnyMut, NSTDBool};
+use cfg_if::cfg_if;
 
-/// A mutual exclusion primitive with a timed locking mechanism.
-#[nstdapi]
-pub struct NSTDTimedMutex {
-    /// The underlying mutex.
-    inner: NSTDAnyMut,
-    /// The data to protect.
-    data: ManuallyDrop<NSTDHeapPtr>,
-    /// Determines whether or not the mutex is poisoned.
-    poisoned: NSTDBool,
-}
-impl Drop for NSTDTimedMutex {
-    /// [NSTDTimedMutex]'s destructor.
-    #[inline]
-    fn drop(&mut self) {
-        // SAFETY: `NSTDTimeMutex` has been initialized and is valid for reads.
-        unsafe { nstd_timed_mutex_free(core::ptr::read(self)) };
+cfg_if! {
+    if #[cfg(any(
+        target_os = "android",
+        target_os = "dragonfly",
+        target_os = "freebsd",
+        target_os = "haiku",
+        target_os = "linux",
+        target_os = "netbsd",
+        target_os = "nto",
+        target_os = "openbsd",
+        target_os = "solaris"
+    ))] {
+        use crate::os::unix::mutex::{
+            NSTDUnixMutex, NSTDUnixMutexGuard, NSTDUnixMutexLockResult,
+            NSTDUnixOptionalMutexLockResult,
+        };
+
+        /// A mutual exclusion primitive with a timed locking mechanism.
+        pub type NSTDTimedMutex = NSTDUnixMutex;
+
+        /// A handle to a timed mutex's data.
+        pub type NSTDTimedMutexGuard<'a> = NSTDUnixMutexGuard<'a>;
+
+        /// A result type containing a timed mutex lock whether or not the mutex is poisoned.
+        pub type NSTDTimedMutexLockResult<'a> = NSTDUnixMutexLockResult<'a>;
+
+        /// An optional value of type `NSTDTimedMutexLockResult`.
+        ///
+        /// This type is returned from `nstd_timed_mutex_try_lock` where the uninitialized variant
+        /// means that the function would block.
+        pub type NSTDOptionalTimedMutexLockResult<'a> = NSTDUnixOptionalMutexLockResult<'a>;
+    } else {
+        use crate::core::{optional::NSTDOptional, result::NSTDResult};
+        use core::{marker::PhantomData, mem::ManuallyDrop};
+        use nstdapi::nstdapi;
+
+        /// A mutual exclusion primitive with a timed locking mechanism.
+        #[nstdapi]
+        pub struct NSTDTimedMutex {
+            /// The underlying mutex.
+            inner: NSTDAnyMut,
+            /// The data to protect.
+            data: ManuallyDrop<NSTDHeapPtr>,
+            /// Determines whether or not the mutex is poisoned.
+            poisoned: NSTDBool,
+            /// Determines whether or not the mutex is currently locked.
+            locked: NSTDBool,
+        }
+        impl Drop for NSTDTimedMutex {
+            /// [NSTDTimedMutex]'s destructor.
+            #[inline]
+            fn drop(&mut self) {
+                // SAFETY: `NSTDTimeMutex` has been initialized and is valid for reads.
+                unsafe { nstd_timed_mutex_free(core::ptr::read(self)) };
+            }
+        }
+        /// # Safety
+        ///
+        /// The data that the mutex is protecting must be able to be safely sent between threads.
+        // SAFETY: The user guarantees that the data is thread-safe.
+        unsafe impl Send for NSTDTimedMutex {}
+        /// # Safety
+        ///
+        /// The data that the mutex is protecting must be able to be safely shared between threads.
+        // SAFETY: The user guarantees that the data is thread-safe.
+        unsafe impl Sync for NSTDTimedMutex {}
+
+        /// A handle to a timed mutex's data.
+        #[nstdapi]
+        pub struct NSTDTimedMutexGuard<'a> {
+            /// A reference to the mutex.
+            mutex: &'a NSTDTimedMutex,
+            /// Ensures that the guard is not [Send].
+            pd: PhantomData<*const ()>,
+        }
+        impl Drop for NSTDTimedMutexGuard<'_> {
+            /// [NSTDTimedMutexGuard]'s destructor.
+            #[inline]
+            fn drop(&mut self) {
+                // SAFETY: `self` is a valid guard for the mutex.
+                unsafe { nstd_timed_mutex_unlock(core::ptr::read(self)) };
+            }
+        }
+        // # Safety
+        ///
+        /// The data that the guard is protecting must be able to be safely shared between threads.
+        // SAFETY: The user guarantees that the data is thread-safe.
+        unsafe impl Sync for NSTDTimedMutexGuard<'_> {}
+
+        /// A result type containing a timed mutex lock whether or not the mutex is poisoned.
+        pub type NSTDTimedMutexLockResult<'a> =
+            NSTDResult<NSTDTimedMutexGuard<'a>, NSTDTimedMutexGuard<'a>>;
+
+        /// An optional value of type `NSTDTimedMutexLockResult`.
+        ///
+        /// This type is returned from `nstd_timed_mutex_try_lock` where the uninitialized variant
+        /// means that the function would block.
+        pub type NSTDOptionalTimedMutexLockResult<'a> = NSTDOptional<NSTDTimedMutexLockResult<'a>>;
     }
 }
-/// # Safety
-///
-/// The data that the mutex is protecting must be able to be safely sent between threads.
-// SAFETY: The user guarantees that the data is thread-safe.
-unsafe impl Send for NSTDTimedMutex {}
-/// # Safety
-///
-/// The data that the mutex is protecting must be able to be safely shared between threads.
-// SAFETY: The user guarantees that the data is thread-safe.
-unsafe impl Sync for NSTDTimedMutex {}
-
-/// A handle to a timed mutex's data.
-#[nstdapi]
-pub struct NSTDTimedMutexGuard<'a> {
-    /// A reference to the mutex.
-    mutex: &'a NSTDTimedMutex,
-    /// Ensures that the guard is not [Send].
-    pd: PhantomData<*const ()>,
-}
-impl Drop for NSTDTimedMutexGuard<'_> {
-    /// [NSTDTimedMutexGuard]'s destructor.
-    #[inline]
-    fn drop(&mut self) {
-        // SAFETY: `self` is a valid guard for the mutex.
-        unsafe { nstd_timed_mutex_unlock(core::ptr::read(self)) };
-    }
-}
-// # Safety
-///
-/// The data that the guard is protecting must be able to be safely shared between threads.
-// SAFETY: The user guarantees that the data is thread-safe.
-unsafe impl Sync for NSTDTimedMutexGuard<'_> {}
-
-/// A result type containing a timed mutex lock whether or not the mutex is poisoned.
-pub type NSTDTimedMutexLockResult<'a> =
-    NSTDResult<NSTDTimedMutexGuard<'a>, NSTDTimedMutexGuard<'a>>;
-
-/// An optional value of type `NSTDTimedMutexLockResult`.
-///
-/// This type is returned from `nstd_timed_mutex_try_lock` where the uninitialized variant means
-/// that the function would block.
-pub type NSTDOptionalTimedMutexLockResult<'a> = NSTDOptional<NSTDTimedMutexLockResult<'a>>;
 
 extern "C" {
     /// Creates a new timed mutual exclusion primitive.
@@ -150,7 +185,7 @@ extern "C" {
     ///
     /// - `const NSTDTimedMutex *mutex` - The mutex to lock.
     ///
-    /// - `NSTDFloat64 seconds` - The number of seconds to block for.
+    /// - `const NSTDDuration *duration` - The amount of time to block for.
     ///
     /// # Returns
     ///
@@ -159,10 +194,10 @@ extern "C" {
     /// # Safety
     ///
     /// The mutex lock must not already be owned by the calling thread.
-    pub fn nstd_timed_mutex_timed_lock(
-        mutex: &NSTDTimedMutex,
-        seconds: NSTDFloat64,
-    ) -> NSTDOptionalTimedMutexLockResult;
+    pub fn nstd_timed_mutex_timed_lock<'a>(
+        mutex: &'a NSTDTimedMutex,
+        duration: &NSTDDuration,
+    ) -> NSTDOptionalTimedMutexLockResult<'a>;
 
     /// Returns an immutable raw pointer to a timed mutex guard's protected data.
     ///
@@ -198,9 +233,5 @@ extern "C" {
     /// # Parameters:
     ///
     /// - `NSTDTimedMutex mutex` - The timed mutex to free.
-    ///
-    /// # Panics
-    ///
-    /// This operation will panic if freeing the timed mutex's data fails.
     pub fn nstd_timed_mutex_free(mutex: NSTDTimedMutex);
 }

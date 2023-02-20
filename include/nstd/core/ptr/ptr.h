@@ -29,12 +29,9 @@ NSTDOptional(NSTDPtr) NSTDOptionalPtr;
 ///
 /// # Returns
 ///
-/// `NSTDPtr ptr` - A new instance of `NSTDPtr` that points to `obj`.
-///
-/// # Panics
-///
-/// Panics if `obj` is null.
-NSTDAPI NSTDPtr nstd_core_ptr_new(NSTDAny obj, NSTDUInt size);
+/// `NSTDOptionalPtr ptr` - A new instance of `NSTDPtr` that points to `obj` on success, or
+/// a "none" variant if `obj` is null.
+NSTDAPI NSTDOptionalPtr nstd_core_ptr_new(NSTDAny obj, NSTDUInt size);
 
 /// Creates a new instance of `NSTDPtr` without checking if `obj` is null.
 ///
@@ -102,12 +99,9 @@ NSTDOptional(NSTDPtrMut) NSTDOptionalPtrMut;
 ///
 /// # Returns
 ///
-/// `NSTDPtrMut ptr` - A new instance of `NSTDPtrMut` that points to `obj`.
-///
-/// # Panics
-///
-/// Panics if `obj` is null.
-NSTDAPI NSTDPtrMut nstd_core_ptr_mut_new(NSTDAnyMut obj, NSTDUInt size);
+/// `NSTDOptionalPtrMut ptr` - A new instance of `NSTDPtrMut` that points to `obj` on success, or
+/// a "none" variant if `obj` is null.
+NSTDAPI NSTDOptionalPtrMut nstd_core_ptr_mut_new(NSTDAnyMut obj, NSTDUInt size);
 
 /// Creates a new instance of `NSTDPtrMut` without checking if `obj` is null.
 ///

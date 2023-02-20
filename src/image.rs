@@ -1,8 +1,5 @@
 //! Multi-format image processing.
-use crate::{
-    core::slice::{nstd_core_slice_new, NSTDSlice},
-    NSTDUInt32,
-};
+use crate::{core::slice::NSTDSlice, NSTDUInt32};
 use image::DynamicImage;
 use nstdapi::nstdapi;
 
@@ -51,8 +48,7 @@ pub unsafe fn nstd_image_load(buffer: &NSTDSlice) -> Option<NSTDImage> {
 #[inline]
 #[nstdapi]
 pub fn nstd_image_as_bytes(img: &NSTDImage) -> NSTDSlice {
-    let bytes = img.as_bytes();
-    nstd_core_slice_new(bytes.as_ptr().cast(), 1, bytes.len())
+    NSTDSlice::from_slice(img.as_bytes())
 }
 
 /// Returns the width of an image.
