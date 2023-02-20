@@ -85,17 +85,17 @@ gen_optional!(NSTDOptionalSlice, NSTDSlice);
 ///
 /// # Returns
 ///
-/// `NSTDSlice slice` - The new slice.
-///
-/// # Panics
-///
-/// Panics if `ptr` is null.
+/// `NSTDOptionalSlice slice` - The new slice on success, or a "none" variant if `ptr` is null.
 #[inline]
 #[nstdapi]
-pub fn nstd_core_slice_new(ptr: NSTDAny, element_size: NSTDUInt, len: NSTDUInt) -> NSTDSlice {
-    NSTDSlice {
-        ptr: nstd_core_ptr_new(ptr, element_size),
-        len,
+pub fn nstd_core_slice_new(
+    ptr: NSTDAny,
+    element_size: NSTDUInt,
+    len: NSTDUInt,
+) -> NSTDOptionalSlice {
+    match nstd_core_ptr_new(ptr, element_size) {
+        NSTDOptional::Some(ptr) => NSTDOptional::Some(NSTDSlice { ptr, len }),
+        _ => NSTDOptional::None,
     }
 }
 
@@ -146,7 +146,7 @@ pub const unsafe fn nstd_core_slice_new_unchecked(
 ///
 /// let bytes = "Hello, world!".as_bytes();
 /// let bytes_ptr = bytes.as_ptr().cast();
-/// let slice = nstd_core_slice_new(bytes_ptr, 1, bytes.len());
+/// let slice = nstd_core_slice_new(bytes_ptr, 1, bytes.len()).unwrap();
 /// assert!(nstd_core_slice_as_ptr(&slice) == bytes_ptr);
 /// ```
 #[inline]
@@ -172,7 +172,7 @@ pub const fn nstd_core_slice_as_ptr(slice: &NSTDSlice) -> NSTDAny {
 ///
 /// let bytes = "Goodbye, world!".as_bytes();
 /// let len = bytes.len();
-/// let slice = nstd_core_slice_new(bytes.as_ptr().cast(), 1, len);
+/// let slice = nstd_core_slice_new(bytes.as_ptr().cast(), 1, len).unwrap();
 /// assert!(nstd_core_slice_len(&slice) == len);
 /// ```
 #[inline]
@@ -197,7 +197,7 @@ pub const fn nstd_core_slice_len(slice: &NSTDSlice) -> NSTDUInt {
 /// use nstd_sys::core::slice::{nstd_core_slice_stride, nstd_core_slice_new};
 ///
 /// let bytes = "Hello, world!".as_bytes();
-/// let slice = nstd_core_slice_new(bytes.as_ptr().cast(), 1, bytes.len());
+/// let slice = nstd_core_slice_new(bytes.as_ptr().cast(), 1, bytes.len()).unwrap();
 /// assert!(nstd_core_slice_stride(&slice) == 1);
 /// ```
 #[inline]
@@ -231,7 +231,7 @@ pub const fn nstd_core_slice_stride(slice: &NSTDSlice) -> NSTDUInt {
 /// const STRIDE: usize = core::mem::size_of::<i32>();
 ///
 /// let numbers: [i32; 3] = [33, 103, 45];
-/// let slice = nstd_core_slice_new(numbers.as_ptr().cast(), STRIDE, numbers.len());
+/// let slice = nstd_core_slice_new(numbers.as_ptr().cast(), STRIDE, numbers.len()).unwrap();
 ///
 /// unsafe {
 ///     assert!(*nstd_core_slice_get(&slice, 0).cast::<i32>() == 33);
@@ -272,8 +272,8 @@ pub const fn nstd_core_slice_get(slice: &NSTDSlice, mut pos: NSTDUInt) -> NSTDAn
 ///
 /// let numbers: [u64; 3] = [707, 23043, 8008];
 /// let numbers_ptr = numbers.as_ptr().cast();
-/// let slice = nstd_core_slice_new(numbers_ptr, STRIDE, numbers.len());
-/// let empty = nstd_core_slice_new(numbers_ptr, STRIDE, 0);
+/// let slice = nstd_core_slice_new(numbers_ptr, STRIDE, numbers.len()).unwrap();
+/// let empty = nstd_core_slice_new(numbers_ptr, STRIDE, 0).unwrap();
 ///
 /// unsafe {
 ///     assert!(nstd_core_slice_first(&slice) == numbers_ptr);
@@ -314,8 +314,8 @@ pub const fn nstd_core_slice_first(slice: &NSTDSlice) -> NSTDAny {
 ///
 /// let numbers: [u64; 3] = [717, 421, 4317];
 /// let numbers_ptr = numbers.as_ptr().cast();
-/// let slice = nstd_core_slice_new(numbers_ptr, STRIDE, numbers.len());
-/// let empty = nstd_core_slice_new(numbers_ptr, STRIDE, 0);
+/// let slice = nstd_core_slice_new(numbers_ptr, STRIDE, numbers.len()).unwrap();
+/// let empty = nstd_core_slice_new(numbers_ptr, STRIDE, 0).unwrap();
 ///
 /// unsafe {
 ///     assert!(*nstd_core_slice_last(&slice).cast::<u64>() == 4317);
@@ -416,21 +416,17 @@ gen_optional!(NSTDOptionalSliceMut, NSTDSliceMut);
 ///
 /// # Returns
 ///
-/// `NSTDSliceMut slice` - The new slice.
-///
-/// # Panics
-///
-/// Panics if `ptr` is null.
+/// `NSTDOptionalSliceMut slice` - The new slice on success, or a "none" variant if `ptr` is null.
 #[inline]
 #[nstdapi]
 pub fn nstd_core_slice_mut_new(
     ptr: NSTDAnyMut,
     element_size: NSTDUInt,
     len: NSTDUInt,
-) -> NSTDSliceMut {
-    NSTDSliceMut {
-        ptr: nstd_core_ptr_mut_new(ptr, element_size),
-        len,
+) -> NSTDOptionalSliceMut {
+    match nstd_core_ptr_mut_new(ptr, element_size) {
+        NSTDOptional::Some(ptr) => NSTDOptional::Some(NSTDSliceMut { ptr, len }),
+        _ => NSTDOptional::None,
     }
 }
 
@@ -502,7 +498,7 @@ pub const fn nstd_core_slice_mut_as_const(slice: &NSTDSliceMut) -> NSTDSlice {
 /// const STRIDE: usize = core::mem::size_of::<u16>();
 ///
 /// let mut buf: [u16; 3] = [3, 5, 7];
-/// let mut slice = nstd_core_slice_mut_new(buf.as_mut_ptr().cast(), STRIDE, buf.len());
+/// let mut slice = nstd_core_slice_mut_new(buf.as_mut_ptr().cast(), STRIDE, buf.len()).unwrap();
 ///
 /// unsafe {
 ///     *nstd_core_slice_mut_as_ptr(&mut slice).cast::<u16>() = 1;
@@ -532,7 +528,7 @@ pub fn nstd_core_slice_mut_as_ptr(slice: &mut NSTDSliceMut) -> NSTDAnyMut {
 ///
 /// let mut m33 = String::from("33marrow");
 /// let raw_ptr = m33.as_mut_ptr().cast();
-/// let slice = nstd_core_slice_mut_new(raw_ptr, 1, m33.len());
+/// let slice = nstd_core_slice_mut_new(raw_ptr, 1, m33.len()).unwrap();
 /// assert!(nstd_core_slice_mut_as_ptr_const(&slice) == raw_ptr);
 /// ```
 #[inline]
@@ -558,7 +554,7 @@ pub const fn nstd_core_slice_mut_as_ptr_const(slice: &NSTDSliceMut) -> NSTDAny {
 ///
 /// let mut bye = String::from("Goodbye, cruel world!");
 /// let len = bye.len();
-/// let slice = nstd_core_slice_mut_new(bye.as_mut_ptr().cast(), 1, len);
+/// let slice = nstd_core_slice_mut_new(bye.as_mut_ptr().cast(), 1, len).unwrap();
 /// assert!(nstd_core_slice_mut_len(&slice) == len);
 /// ```
 #[inline]
@@ -583,7 +579,7 @@ pub const fn nstd_core_slice_mut_len(slice: &NSTDSliceMut) -> NSTDUInt {
 /// use nstd_sys::core::slice::{nstd_core_slice_mut_stride, nstd_core_slice_mut_new};
 ///
 /// let mut hw = String::from("Hello, world!");
-/// let slice = nstd_core_slice_mut_new(hw.as_mut_ptr().cast(), 1, hw.len());
+/// let slice = nstd_core_slice_mut_new(hw.as_mut_ptr().cast(), 1, hw.len()).unwrap();
 /// assert!(nstd_core_slice_mut_stride(&slice) == 1);
 /// ```
 #[inline]
@@ -617,7 +613,8 @@ pub const fn nstd_core_slice_mut_stride(slice: &NSTDSliceMut) -> NSTDUInt {
 /// const STRIDE: usize = core::mem::size_of::<i32>();
 ///
 /// let mut numbers = [0i32; 3];
-/// let mut slice = nstd_core_slice_mut_new(numbers.as_mut_ptr().cast(), STRIDE, numbers.len());
+/// let ptr = numbers.as_mut_ptr().cast();
+/// let mut slice = nstd_core_slice_mut_new(ptr, STRIDE, numbers.len()).unwrap();
 ///
 /// unsafe {
 ///     *nstd_core_slice_mut_get(&mut slice, 0).cast::<i32>() = 33;
@@ -657,7 +654,8 @@ pub fn nstd_core_slice_mut_get(slice: &mut NSTDSliceMut, pos: NSTDUInt) -> NSTDA
 /// const STRIDE: usize = core::mem::size_of::<i32>();
 ///
 /// let mut numbers: [i32; 3] = [33, 103, 45];
-/// let slice = nstd_core_slice_mut_new(numbers.as_mut_ptr().cast(), STRIDE, numbers.len());
+/// let ptr = numbers.as_mut_ptr().cast();
+/// let slice = nstd_core_slice_mut_new(ptr, STRIDE, numbers.len()).unwrap();
 ///
 /// unsafe {
 ///     assert!(*nstd_core_slice_mut_get_const(&slice, 0).cast::<i32>() == 33);
@@ -697,7 +695,8 @@ pub const fn nstd_core_slice_mut_get_const(slice: &NSTDSliceMut, mut pos: NSTDUI
 /// const STRIDE: usize = core::mem::size_of::<u64>();
 ///
 /// let mut numbers: [u64; 3] = [707, 23043, 8008];
-/// let mut slice = nstd_core_slice_mut_new(numbers.as_mut_ptr().cast(), STRIDE, numbers.len());
+/// let ptr = numbers.as_mut_ptr().cast();
+/// let mut slice = nstd_core_slice_mut_new(ptr, STRIDE, numbers.len()).unwrap();
 ///
 /// unsafe { *nstd_core_slice_mut_first(&mut slice).cast::<u64>() = 101 };
 /// assert!(numbers[0] == 101);
@@ -728,8 +727,8 @@ pub fn nstd_core_slice_mut_first(slice: &mut NSTDSliceMut) -> NSTDAnyMut {
 ///
 /// let mut numbers: [u64; 3] = [707, 23043, 8008];
 /// let numbers_ptr = numbers.as_mut_ptr().cast();
-/// let slice = nstd_core_slice_mut_new(numbers_ptr, STRIDE, numbers.len());
-/// let empty = nstd_core_slice_mut_new(numbers_ptr, STRIDE, 0);
+/// let slice = nstd_core_slice_mut_new(numbers_ptr, STRIDE, numbers.len()).unwrap();
+/// let empty = nstd_core_slice_mut_new(numbers_ptr, STRIDE, 0).unwrap();
 ///
 /// unsafe {
 ///     assert!(nstd_core_slice_mut_first_const(&slice) == numbers_ptr);
@@ -769,7 +768,8 @@ pub const fn nstd_core_slice_mut_first_const(slice: &NSTDSliceMut) -> NSTDAny {
 /// const STRIDE: usize = core::mem::size_of::<u64>();
 ///
 /// let mut numbers: [u64; 3] = [717, 421, 4317];
-/// let mut slice = nstd_core_slice_mut_new(numbers.as_mut_ptr().cast(), STRIDE, numbers.len());
+/// let ptr = numbers.as_mut_ptr().cast();
+/// let mut slice = nstd_core_slice_mut_new(ptr, STRIDE, numbers.len()).unwrap();
 ///
 /// unsafe { *nstd_core_slice_mut_last(&mut slice).cast::<u64>() = 1738 };
 /// assert!(numbers[2] == 1738);
@@ -804,8 +804,8 @@ pub fn nstd_core_slice_mut_last(slice: &mut NSTDSliceMut) -> NSTDAnyMut {
 ///
 /// let mut numbers: [u64; 3] = [717, 421, 4317];
 /// let numbers_ptr = numbers.as_mut_ptr().cast();
-/// let slice = nstd_core_slice_mut_new(numbers_ptr, STRIDE, numbers.len());
-/// let empty = nstd_core_slice_mut_new(numbers_ptr, STRIDE, 0);
+/// let slice = nstd_core_slice_mut_new(numbers_ptr, STRIDE, numbers.len()).unwrap();
+/// let empty = nstd_core_slice_mut_new(numbers_ptr, STRIDE, 0).unwrap();
 ///
 /// unsafe {
 ///     assert!(*nstd_core_slice_mut_last_const(&slice).cast::<u64>() == 4317);
@@ -855,8 +855,9 @@ pub const fn nstd_core_slice_mut_last_const(slice: &NSTDSliceMut) -> NSTDAny {
 /// let mut dest_arr = [0u32; 5];
 /// let src_arr: [u32; 5] = [7, 43, 32, 90, 15];
 ///
-/// let mut dest = nstd_core_slice_mut_new(dest_arr.as_mut_ptr().cast(), STRIDE, dest_arr.len());
-/// let src = nstd_core_slice_new(src_arr.as_ptr().cast(), STRIDE, src_arr.len());
+/// let ptr = dest_arr.as_mut_ptr().cast();
+/// let mut dest = nstd_core_slice_mut_new(ptr, STRIDE, dest_arr.len()).unwrap();
+/// let src = nstd_core_slice_new(src_arr.as_ptr().cast(), STRIDE, src_arr.len()).unwrap();
 ///
 /// unsafe { nstd_core_slice_mut_copy(&mut dest, &src) };
 /// assert!(dest_arr == src_arr);

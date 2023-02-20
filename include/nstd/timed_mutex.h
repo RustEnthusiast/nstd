@@ -4,8 +4,23 @@
 #include "core/result.h"
 #include "heap_ptr.h"
 #include "nstd.h"
+#include "os/os.h"
+#include "time.h"
+
+#if defined(NSTD_OS_ANDROID) || defined(NSTD_OS_DRAGONFLY) || defined(NSTD_OS_FREEBSD) \
+    || defined(NSTD_OS_HAIKU) || defined(NSTD_OS_LINUX) || defined(NSTD_OS_NETBSD)     \
+    || defined(NSTD_OS_NTO) || defined(NSTD_OS_OPENBSD) || defined(NSTD_OS_SOLARIS)
+#    define NSTD_TIMED_MUTEX_OS_UNIX_IMPL
+#endif
+
+#ifdef NSTD_TIMED_MUTEX_OS_UNIX_IMPL
+#    include "os/unix/mutex.h"
+#endif
 
 /// A mutual exclusion primitive with a timed locking mechanism.
+#ifdef NSTD_TIMED_MUTEX_OS_UNIX_IMPL
+typedef NSTDUnixMutex NSTDTimedMutex;
+#else
 typedef struct {
     /// The underlying mutex.
     NSTDAnyMut inner;
@@ -13,22 +28,37 @@ typedef struct {
     NSTDHeapPtr data;
     /// Determines whether or not the mutex is poisoned.
     NSTDBool poisoned;
+    /// Determines whether or not the mutex is currently locked.
+    NSTDBool locked;
 } NSTDTimedMutex;
+#endif
 
 /// A handle to a timed mutex's data.
+#ifdef NSTD_TIMED_MUTEX_OS_UNIX_IMPL
+typedef NSTDUnixMutexGuard NSTDTimedMutexGuard;
+#else
 typedef struct {
     /// A reference to the mutex.
     const NSTDTimedMutex *mutex;
 } NSTDTimedMutexGuard;
+#endif
 
 /// A result type containing a timed mutex lock whether or not the mutex is poisoned.
+#ifdef NSTD_TIMED_MUTEX_OS_UNIX_IMPL
+typedef NSTDUnixMutexLockResult NSTDTimedMutexLockResult;
+#else
 NSTDResult(NSTDTimedMutexGuard, NSTDTimedMutexGuard) NSTDTimedMutexLockResult;
+#endif
 
 /// An optional value of type `NSTDTimedMutexLockResult`.
 ///
 /// This type is returned from `nstd_timed_mutex_try_lock` where the uninitialized variant means
 /// that the function would block.
+#ifdef NSTD_TIMED_MUTEX_OS_UNIX_IMPL
+typedef NSTDUnixOptionalMutexLockResult NSTDOptionalTimedMutexLockResult;
+#else
 NSTDOptional(NSTDTimedMutexLockResult) NSTDOptionalTimedMutexLockResult;
+#endif
 
 /// Creates a new timed mutual exclusion primitive.
 ///
@@ -111,7 +141,7 @@ NSTDAPI NSTDOptionalTimedMutexLockResult nstd_timed_mutex_try_lock(const NSTDTim
 ///
 /// - `const NSTDTimedMutex *mutex` - The mutex to lock.
 ///
-/// - `NSTDFloat64 seconds` - The number of seconds to block for.
+/// - `const NSTDDuration *duration` - The amount of time to block for.
 ///
 /// # Returns
 ///
@@ -121,7 +151,7 @@ NSTDAPI NSTDOptionalTimedMutexLockResult nstd_timed_mutex_try_lock(const NSTDTim
 ///
 /// The mutex lock must not already be owned by the calling thread.
 NSTDAPI NSTDOptionalTimedMutexLockResult
-nstd_timed_mutex_timed_lock(const NSTDTimedMutex *mutex, NSTDFloat64 seconds);
+nstd_timed_mutex_timed_lock(const NSTDTimedMutex *mutex, const NSTDDuration *duration);
 
 /// Returns an immutable raw pointer to a timed mutex guard's protected data.
 ///
@@ -157,10 +187,6 @@ NSTDAPI void nstd_timed_mutex_unlock(NSTDTimedMutexGuard guard);
 /// # Parameters:
 ///
 /// - `NSTDTimedMutex mutex` - The timed mutex to free.
-///
-/// # Panics
-///
-/// This operation will panic if freeing the timed mutex's data fails.
 NSTDAPI void nstd_timed_mutex_free(NSTDTimedMutex mutex);
 
 #endif

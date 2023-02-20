@@ -61,16 +61,15 @@ NSTDAPI NSTDFileResult nstd_fs_file_open(const NSTDStr *name, NSTDUInt8 mask);
 ///
 /// - `const NSTDSlice *bytes` - The data to write to the file.
 ///
-/// - `NSTDUInt *written` - Returns as the number of bytes written to the file.
-///
 /// # Returns
 ///
-/// `NSTDIOError errc` - The I/O operation error code.
+/// `NSTDIOResult written` - The number of bytes written to `handle` on success, or the I/O
+/// operation error code on failure.
 ///
 /// # Safety
 ///
 /// This function's caller must guarantee validity of `bytes`.
-NSTDAPI NSTDIOError nstd_fs_file_write(NSTDFile *file, const NSTDSlice *bytes, NSTDUInt *written);
+NSTDAPI NSTDIOResult nstd_fs_file_write(NSTDFile *file, const NSTDSlice *bytes);
 
 /// Writes a whole buffer to a file.
 ///
@@ -108,23 +107,22 @@ NSTDAPI NSTDIOError nstd_fs_file_flush(NSTDFile *file);
 ///
 /// - `NSTDSliceMut *buffer` - The buffer to start filling with data from the file.
 ///
-/// - `NSTDUInt *read` - Returns as the number of bytes read from the file.
-///
 /// # Returns
 ///
-/// `NSTDIOError errc` - The I/O operation error code.
+/// `NSTDIOResult read` - The number of bytes read from `handle` on success, or the I/O operation
+/// error code on failure.
 ///
 /// # Safety
 ///
 /// `buffer`'s data must be valid for writes.
-NSTDAPI NSTDIOError nstd_fs_file_read(NSTDFile *file, NSTDSliceMut *buffer, NSTDUInt *read);
+NSTDAPI NSTDIOResult nstd_fs_file_read(NSTDFile *file, NSTDSliceMut *buffer);
 
 /// Continuously reads data from `file` into a buffer until EOF is reached.
 ///
 /// # Note
 ///
 /// If extending the buffer fails, an error code of `NSTD_IO_ERROR_OUT_OF_MEMORY` will be returned.
-/// This does not mean `read` will return as 0 in this case.
+/// This does not mean there were no bytes read from `file` in this case.
 ///
 /// # Parameters:
 ///
@@ -132,23 +130,22 @@ NSTDAPI NSTDIOError nstd_fs_file_read(NSTDFile *file, NSTDSliceMut *buffer, NSTD
 ///
 /// - `NSTDVec *buffer` - The buffer to be extended with data from the file.
 ///
-/// - `NSTDUInt *read` - Returns as the number of bytes read from the file.
-///
 /// # Returns
 ///
-/// `NSTDIOError errc` - The I/O operation error code.
+/// `NSTDIOResult read` - The number of bytes read from `handle` on success, or the I/O operation
+/// error code on failure.
 ///
 /// # Panics
 ///
 /// This function will panic if `buffer`'s length in bytes ends up exceeding `NSTDInt`'s max value.
-NSTDAPI NSTDIOError nstd_fs_file_read_all(NSTDFile *file, NSTDVec *buffer, NSTDUInt *read);
+NSTDAPI NSTDIOResult nstd_fs_file_read_all(NSTDFile *file, NSTDVec *buffer);
 
 /// Continuously reads UTF-8 data from `file` into a string buffer until EOF is reached.
 ///
 /// # Note
 ///
 /// If extending the buffer fails, an error code of `NSTD_IO_ERROR_OUT_OF_MEMORY` will be returned.
-/// This does not mean `read` will return as 0 in this case.
+/// This does not mean there were no bytes read from `file` in this case.
 ///
 /// # Parameters:
 ///
@@ -156,16 +153,15 @@ NSTDAPI NSTDIOError nstd_fs_file_read_all(NSTDFile *file, NSTDVec *buffer, NSTDU
 ///
 /// - `NSTDString *buffer` - The buffer to be extended with data from the file.
 ///
-/// - `NSTDUInt *read` - Returns as the number of bytes read from the file.
-///
 /// # Returns
 ///
-/// `NSTDIOError errc` - The I/O operation error code.
+/// `NSTDIOResult read` - The number of bytes read from `handle` on success, or the I/O operation
+/// error code on failure.
 ///
 /// # Panics
 ///
 /// This function will panic if `buffer`'s length in bytes ends up exceeding `NSTDInt`'s max value.
-NSTDAPI NSTDIOError nstd_fs_file_read_to_string(NSTDFile *file, NSTDString *buffer, NSTDUInt *read);
+NSTDAPI NSTDIOResult nstd_fs_file_read_to_string(NSTDFile *file, NSTDString *buffer);
 
 /// Reads enough data from `file` to fill the entirety of `buffer`.
 ///

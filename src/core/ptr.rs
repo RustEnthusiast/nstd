@@ -35,16 +35,15 @@ gen_optional!(NSTDOptionalPtr, NSTDPtr);
 ///
 /// # Returns
 ///
-/// `NSTDPtr ptr` - A new instance of `NSTDPtr` that points to `obj`.
-///
-/// # Panics
-///
-/// Panics if `obj` is null.
+/// `NSTDOptionalPtr ptr` - A new instance of `NSTDPtr` that points to `obj` on success, or
+/// a "none" variant if `obj` is null.
 #[inline]
 #[nstdapi]
-pub fn nstd_core_ptr_new(obj: NSTDAny, size: NSTDUInt) -> NSTDPtr {
-    assert!(!obj.is_null());
-    NSTDPtr { raw: obj, size }
+pub fn nstd_core_ptr_new(obj: NSTDAny, size: NSTDUInt) -> NSTDOptionalPtr {
+    match obj.is_null() {
+        true => NSTDOptional::None,
+        false => NSTDOptional::Some(NSTDPtr { raw: obj, size }),
+    }
 }
 
 /// Creates a new instance of `NSTDPtr` without checking if `obj` is null.
@@ -86,7 +85,7 @@ pub const unsafe fn nstd_core_ptr_new_unchecked(obj: NSTDAny, size: NSTDUInt) ->
 ///
 /// const VALUE_SIZE: usize = core::mem::size_of::<isize>();
 /// let x = 33isize;
-/// let ptr = nstd_core_ptr_new(addr_of!(x).cast(), VALUE_SIZE);
+/// let ptr = nstd_core_ptr_new(addr_of!(x).cast(), VALUE_SIZE).unwrap();
 /// assert!(nstd_core_ptr_size(&ptr) == VALUE_SIZE);
 /// ```
 #[inline]
@@ -113,7 +112,7 @@ pub const fn nstd_core_ptr_size(ptr: &NSTDPtr) -> NSTDUInt {
 ///
 /// const VALUE_SIZE: usize = core::mem::size_of::<u32>();
 /// let x = 45u32;
-/// let ptr = nstd_core_ptr_new(addr_of!(x).cast(), VALUE_SIZE);
+/// let ptr = nstd_core_ptr_new(addr_of!(x).cast(), VALUE_SIZE).unwrap();
 /// unsafe {
 ///     assert!(*nstd_core_ptr_get(&ptr).cast::<u32>() == x);
 /// }
@@ -151,16 +150,15 @@ gen_optional!(NSTDOptionalPtrMut, NSTDPtrMut);
 ///
 /// # Returns
 ///
-/// `NSTDPtrMut ptr` - A new instance of `NSTDPtrMut` that points to `obj`.
-///
-/// # Panics
-///
-/// Panics if `obj` is null.
+/// `NSTDOptionalPtrMut ptr` - A new instance of `NSTDPtrMut` that points to `obj` on success, or
+/// a "none" variant if `obj` is null.
 #[inline]
 #[nstdapi]
-pub fn nstd_core_ptr_mut_new(obj: NSTDAnyMut, size: NSTDUInt) -> NSTDPtrMut {
-    assert!(!obj.is_null());
-    NSTDPtrMut { raw: obj, size }
+pub fn nstd_core_ptr_mut_new(obj: NSTDAnyMut, size: NSTDUInt) -> NSTDOptionalPtrMut {
+    match obj.is_null() {
+        true => NSTDOptional::None,
+        false => NSTDOptional::Some(NSTDPtrMut { raw: obj, size }),
+    }
 }
 
 /// Creates a new instance of `NSTDPtrMut` without checking if `obj` is null.
@@ -218,7 +216,7 @@ pub const fn nstd_core_ptr_mut_as_const(ptr: &NSTDPtrMut) -> NSTDPtr {
 ///
 /// const VALUE_SIZE: usize = core::mem::size_of::<isize>();
 /// let mut x = 33isize;
-/// let ptr = nstd_core_ptr_mut_new(addr_of_mut!(x).cast(), VALUE_SIZE);
+/// let ptr = nstd_core_ptr_mut_new(addr_of_mut!(x).cast(), VALUE_SIZE).unwrap();
 /// assert!(nstd_core_ptr_mut_size(&ptr) == VALUE_SIZE);
 /// ```
 #[inline]
@@ -245,7 +243,7 @@ pub const fn nstd_core_ptr_mut_size(ptr: &NSTDPtrMut) -> NSTDUInt {
 ///
 /// const VALUE_SIZE: usize = core::mem::size_of::<u32>();
 /// let mut x = 8u32;
-/// let mut ptr = nstd_core_ptr_mut_new(addr_of_mut!(x).cast(), VALUE_SIZE);
+/// let mut ptr = nstd_core_ptr_mut_new(addr_of_mut!(x).cast(), VALUE_SIZE).unwrap();
 /// unsafe {
 ///     let x_ptr = nstd_core_ptr_mut_get(&mut ptr).cast();
 ///     *x_ptr *= 2;
@@ -276,7 +274,7 @@ pub fn nstd_core_ptr_mut_get(ptr: &mut NSTDPtrMut) -> NSTDAnyMut {
 ///
 /// const VALUE_SIZE: usize = core::mem::size_of::<u32>();
 /// let mut x = 45u32;
-/// let ptr = nstd_core_ptr_mut_new(addr_of_mut!(x).cast(), VALUE_SIZE);
+/// let ptr = nstd_core_ptr_mut_new(addr_of_mut!(x).cast(), VALUE_SIZE).unwrap();
 /// unsafe {
 ///     assert!(*nstd_core_ptr_mut_get_const(&ptr).cast::<u32>() == x);
 /// }
@@ -314,7 +312,7 @@ pub const fn nstd_core_ptr_mut_get_const(ptr: &NSTDPtrMut) -> NSTDAny {
 ///
 /// const VALUE_SIZE: usize = core::mem::size_of::<i64>();
 /// let mut x = -69i64;
-/// let mut ptr = nstd_core_ptr_mut_new(addr_of_mut!(x).cast(), VALUE_SIZE);
+/// let mut ptr = nstd_core_ptr_mut_new(addr_of_mut!(x).cast(), VALUE_SIZE).unwrap();
 /// unsafe {
 ///     let y = 420i64;
 ///     nstd_core_ptr_mut_write(&mut ptr, addr_of!(y).cast());

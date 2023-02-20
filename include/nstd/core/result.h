@@ -3,10 +3,10 @@
 
 /// Describes an `NSTDResult` variant.
 typedef enum {
-    /// A successful variant.
-    NSTD_RESULT_STATUS_OK,
     /// An error variant.
-    NSTD_RESULT_STATUS_ERR
+    NSTD_RESULT_STATUS_ERR,
+    /// A successful variant.
+    NSTD_RESULT_STATUS_OK
 } NSTDResultStatus;
 
 /// Defines a "result" type with success and error variants.
@@ -14,8 +14,8 @@ typedef enum {
     typedef struct {             \
         NSTDResultStatus status; \
         union {                  \
-            T ok;                \
             E err;               \
+            T ok;                \
         };                       \
     }
 

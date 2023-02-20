@@ -11,8 +11,7 @@ Rust syntax).
 #include <nstd.h>
 
 /// Main entry point of the program.
-int main()
-{
+int main() {
     const NSTDStr output = nstd_core_str_from_raw_cstr("Hello, 🌎!");
     nstd_io_print_line(&output);
     return 0;
@@ -111,6 +110,8 @@ or return valid references.
 `NSTDResult` types).
 
 - Data is *moved* when using the value-copy semantic on a type that does not implement `Copy`.
+
+- Data must not be moved while being referenced by another object.
 
 - Types that do not implement the `Send` trait must not be sent between threads.
 

@@ -11,14 +11,10 @@ pub struct NSTDUnixSharedLib {
 }
 impl Drop for NSTDUnixSharedLib {
     /// [NSTDUnixSharedLib]'s destructor.
-    ///
-    /// # Panics
-    ///
-    /// Panics if unloading the library fails.
     #[inline]
     fn drop(&mut self) {
         // SAFETY: `self.handle` is never null.
-        unsafe { assert!(dlclose(self.handle) == 0) };
+        unsafe { dlclose(self.handle) };
     }
 }
 // SAFETY: `NSTDUnixSharedLib` owns a handle to the dynamically loaded library.
@@ -120,10 +116,6 @@ pub unsafe fn nstd_os_unix_shared_lib_get_mut(
 /// # Parameters:
 ///
 /// - `NSTDUnixSharedLib lib` - A handle to the loaded library to unload.
-///
-/// # Panics
-///
-/// Panics if unloading the library fails.
 ///
 /// # Safety
 ///

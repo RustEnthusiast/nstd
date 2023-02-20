@@ -1,5 +1,7 @@
 #ifndef NSTD_OS_UNIX_IO_H
 #define NSTD_OS_UNIX_IO_H
+#include "../../core/result.h"
+#include "../../nstd.h"
 
 /// An error type for Unix I/O operations.
 typedef enum {
@@ -37,6 +39,10 @@ typedef enum {
     /// An operation could not be completed, because it failed to allocate enough memory.
     NSTD_UNIX_IO_ERROR_OUT_OF_MEMORY
 } NSTDUnixIOError;
+
+/// A result type that yields an [NSTDUInt] representing the number of bytes read or written by a
+/// Unix I/O operation on success and a Unix I/O operation error code on failure.
+NSTDResult(NSTDUInt, NSTDUnixIOError) NSTDUnixIOResult;
 
 /// Represents a raw Unix file descriptor.
 typedef int NSTDUnixFileDescriptor;

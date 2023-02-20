@@ -4,7 +4,7 @@ use crate::{
     core::{
         cstr::{
             nstd_core_cstr_as_bytes, nstd_core_cstr_get_null, nstd_core_cstr_is_null_terminated,
-            nstd_core_cstr_new, nstd_core_cstr_new_unchecked, NSTDCStr,
+            nstd_core_cstr_new_unchecked, NSTDCStr,
         },
         optional::{gen_optional, NSTDOptional},
         slice::NSTDSlice,
@@ -181,8 +181,10 @@ pub unsafe fn nstd_cstring_from_cstr_unchecked(cstr: &NSTDCStr) -> NSTDCString {
 /// - `bytes`'s length is greater than `NSTDInt`'s max value.
 #[nstdapi]
 pub fn nstd_cstring_from_bytes(bytes: NSTDVec) -> NSTDCString {
-    assert!(nstd_vec_stride(&bytes) == 1);
-    let cstr = nstd_core_cstr_new(nstd_vec_as_ptr(&bytes) as _, nstd_vec_len(&bytes));
+    let ptr = nstd_vec_as_ptr(&bytes) as *const NSTDChar;
+    assert!(!ptr.is_null() && nstd_vec_stride(&bytes) == 1);
+    // SAFETY: `ptr` is non-null.
+    let cstr = unsafe { nstd_core_cstr_new_unchecked(ptr, nstd_vec_len(&bytes)) };
     // SAFETY: `cstr`'s data is owned by `bytes`.
     assert!(unsafe { nstd_core_cstr_is_null_terminated(&cstr) });
     NSTDCString { bytes }
@@ -483,10 +485,6 @@ pub fn nstd_cstring_clear(cstring: &mut NSTDCString) {
 /// # Parameters:
 ///
 /// - `NSTDCString cstring` - The C string to free.
-///
-/// # Panics
-///
-/// Panics if deallocating fails.
 #[inline]
 #[nstdapi]
 #[allow(unused_variables)]

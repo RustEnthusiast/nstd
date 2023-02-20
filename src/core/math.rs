@@ -85,7 +85,7 @@ macro_rules! gen_abs {
         /// ```
         #[inline]
         #[nstdapi]
-        pub const extern "C" fn $name(x: $T) -> $T {
+        pub const fn $name(x: $T) -> $T {
             x.abs()
         }
     };
@@ -120,7 +120,7 @@ macro_rules! gen_pow {
         /// ```
         #[inline]
         #[nstdapi]
-        pub const extern "C" fn $name(x: $T, exp: NSTDUInt32) -> $T {
+        pub const fn $name(x: $T, exp: NSTDUInt32) -> $T {
             x.pow(exp)
         }
     };
@@ -158,7 +158,7 @@ macro_rules! gen_clamp {
         $(#[$meta])*
         #[inline]
         #[nstdapi]
-        pub extern "C" fn $name(x: $T, min: $T, max: $T) -> $T {
+        pub fn $name(x: $T, min: $T, max: $T) -> $T {
             x.clamp(min, max)
         }
     };
@@ -411,7 +411,7 @@ macro_rules! gen_div_ceil {
         #[inline]
         #[nstdapi]
         #[allow(unused_comparisons)]
-        pub const extern "C" fn $name(x: $T, y: $T) -> $T {
+        pub const fn $name(x: $T, y: $T) -> $T {
             let d = x / y;
             let r = x % y;
             if (r > 0 && y > 0) || (r < 0 && y < 0) {
@@ -464,7 +464,7 @@ macro_rules! gen_div_floor {
         #[inline]
         #[nstdapi]
         #[allow(unused_comparisons)]
-        pub const extern "C" fn $name(x: $T, y: $T) -> $T {
+        pub const fn $name(x: $T, y: $T) -> $T {
             let d = x / y;
             let r = x % y;
             if (r > 0 && y < 0) || (r < 0 && y > 0) {
