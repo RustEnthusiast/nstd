@@ -2,10 +2,16 @@
 use crate::{
     core::{optional::NSTDOptional, result::NSTDResult},
     heap_ptr::{nstd_heap_ptr_get, nstd_heap_ptr_get_mut, NSTDHeapPtr},
+    thread::nstd_thread_is_panicking,
     time::NSTDDuration,
     NSTDAny, NSTDAnyMut, NSTDBool, NSTD_FALSE, NSTD_TRUE,
 };
 use cfg_if::cfg_if;
+use core::{
+    cell::{Cell, UnsafeCell},
+    marker::PhantomData,
+    mem::MaybeUninit,
+};
 use libc::{
     pthread_mutex_destroy, pthread_mutex_init, pthread_mutex_lock, pthread_mutex_t,
     pthread_mutex_trylock, pthread_mutex_unlock, pthread_mutexattr_destroy, pthread_mutexattr_init,
@@ -13,11 +19,6 @@ use libc::{
     PTHREAD_MUTEX_NORMAL,
 };
 use nstdapi::nstdapi;
-use std::{
-    cell::{Cell, UnsafeCell},
-    marker::PhantomData,
-    mem::MaybeUninit,
-};
 
 /// A raw mutex wrapping `pthread_mutex_t`.
 ///
@@ -112,7 +113,7 @@ impl<'a> NSTDUnixMutexGuard<'a> {
 impl Drop for NSTDUnixMutexGuard<'_> {
     /// Drops the guard, releasing the lock for the mutex.
     fn drop(&mut self) {
-        if std::thread::panicking() {
+        if nstd_thread_is_panicking() {
             self.mutex.poisoned.set(NSTD_TRUE);
         }
         // SAFETY: `self` has a valid reference to the mutex.

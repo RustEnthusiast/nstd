@@ -327,7 +327,10 @@ pub fn nstd_thread_count() -> NSTDThreadCountResult {
 #[inline]
 #[nstdapi]
 pub fn nstd_thread_is_panicking() -> NSTDBool {
-    std::thread::panicking()
+    #[cfg(panic = "unwind")]
+    return std::thread::panicking();
+    #[cfg(panic = "abort")]
+    return false;
 }
 
 /// Compares two thread identifiers.
