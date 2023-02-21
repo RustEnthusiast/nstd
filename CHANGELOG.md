@@ -15,7 +15,7 @@
 ### `nstd.io`
 - Added `NSTDStd[in|out|err]Lock`.
 - `nstd_io_[stdout|stderr]_write` now returns `NSTDIOResult`.
-- `nstd_io_stdin_read[_all|_to_string]` now returns `NSTDIOResult`.
+- `nstd_io_stdin_read[_all|_to_string|_line]` now returns `NSTDIOResult`.
 - Added `NSTDIOResult`.
 ### `nstd.os`
 - Added `NSTD_OS_[IOS|ANDROID|DRAGONFLY|FREEBSD|NETBSD|OPENBSD|BSD|HAIKU|NTO|SOLARIS]`.

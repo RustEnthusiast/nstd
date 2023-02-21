@@ -115,16 +115,15 @@ NSTDAPI NSTDIOError nstd_io_stdin_read_exact(NSTDStdin *handle, NSTDSliceMut *bu
 ///
 /// - `NSTDString *buffer` - The string buffer to extend with a line from stdin.
 ///
-/// - `NSTDUInt *read` - Returns as the number of bytes read from stdin.
-///
 /// # Returns
 ///
-/// `NSTDIOError errc` - The I/O operation error code.
+/// `NSTDIOResult read` - The number of bytes read from `handle` on success, or the I/O operation
+/// error code on failure.
 ///
 /// # Panics
 ///
 /// This function will panic if `buffer`'s length in bytes exceeds `NSTDInt`'s max value.
-NSTDAPI NSTDIOError nstd_io_stdin_read_line(NSTDStdin *handle, NSTDString *buffer, NSTDUInt *read);
+NSTDAPI NSTDIOResult nstd_io_stdin_read_line(NSTDStdin *handle, NSTDString *buffer);
 
 /// Frees an instance of `NSTDStdin`.
 ///
