@@ -1,4 +1,6 @@
 # TBD
+### `nstd`
+- Added the `panic_handler` crate feature.
 ### `nstd.core`
 - `nstd.core.cty`'s functions now use `NSTDChar`.
 - Added `nstd_core_unichar_is_[ascii|alphabetic|numeric|alphanumeric|lowercase|uppercase|whitespace|control|digit]`.
