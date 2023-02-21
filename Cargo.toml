@@ -31,6 +31,7 @@ default = ["std", "nstd_core"]
 std = []
 capi = ["nstdapi/capi"]
 asm = []
+panic_handler = ["panic-halt"]
 nstd_alloc = ["nstd_core", "nstd_os_unix_alloc", "nstd_os_windows_alloc"]
 nstd_core = []
 nstd_cstring = ["nstd_alloc", "nstd_core", "nstd_vec"]
@@ -66,6 +67,7 @@ nstd_vec = ["nstd_alloc", "nstd_core"]
 cfg-if = "1.0"
 libc = { version = "0.2", optional = true, default-features = false }
 nstdapi = "0.1"
+panic-halt = { version = "0.2", optional = true }
 
 [target.'cfg(unix)'.dependencies]
 errno = { version = "0.3", optional = true, default-features = false }

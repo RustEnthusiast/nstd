@@ -144,6 +144,9 @@ The `std` feature flag links the Rust standard library into the binary.
 
 The `asm` feature permits the library to use assembly to optimize certain build configurations.
 
+The `panic_handler` feature provides a default panic handler for `#![no_std]` builds. Currently,
+this option makes use of the `panic-halt` crate.
+
 `std` and `nstd_core` are enabled by default.
 
 Example:
