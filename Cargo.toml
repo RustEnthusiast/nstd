@@ -19,6 +19,9 @@ pkg_config.filename = "nstd"
 header.generation = false
 install.include.asset = [{from = "include/**/*", to = ""}]
 
+[profile.dev]
+panic = "abort"
+
 [profile.release]
 overflow-checks = true
 panic = "abort"
