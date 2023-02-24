@@ -1,6 +1,9 @@
 //! A mutual exclusion primitive useful for protecting shared data.
 use crate::{
-    core::{optional::NSTDOptional, result::NSTDResult},
+    core::{
+        optional::{gen_optional, NSTDOptional},
+        result::NSTDResult,
+    },
     heap_ptr::{nstd_heap_ptr_get, nstd_heap_ptr_get_mut, NSTDHeapPtr},
     thread::nstd_thread_is_panicking,
     time::NSTDDuration,
@@ -47,19 +50,17 @@ impl Drop for RawMutex {
 struct MutexAttrs(pthread_mutexattr_t);
 impl MutexAttrs {
     /// Creates a new instance of [MutexAttrs].
-    ///
-    /// # Panics
-    ///
-    /// This operation will panic if creating the mutex attributes object fails.
-    fn new() -> Self {
+    fn new() -> Option<Self> {
         let mut attr = MaybeUninit::uninit();
         // SAFETY: All operations are thread-safe, errors are checked.
         unsafe {
-            assert!(pthread_mutexattr_init(attr.as_mut_ptr()) == 0);
-            // This shall never fail, PTHREAD_MUTEX_NORMAL is a valid type.
-            pthread_mutexattr_settype(attr.as_mut_ptr(), PTHREAD_MUTEX_NORMAL);
-            Self(attr.assume_init())
+            if pthread_mutexattr_init(attr.as_mut_ptr()) == 0 {
+                // This shall never fail, PTHREAD_MUTEX_NORMAL is a valid type.
+                pthread_mutexattr_settype(attr.as_mut_ptr(), PTHREAD_MUTEX_NORMAL);
+                return Some(Self(attr.assume_init()));
+            }
         }
+        None
     }
 }
 impl Drop for MutexAttrs {
@@ -91,6 +92,7 @@ unsafe impl Send for NSTDUnixMutex {}
 /// The data that the mutex is protecting must be able to be safely shared between threads.
 // SAFETY: The user guarantees that the data is thread-safe.
 unsafe impl Sync for NSTDUnixMutex {}
+gen_optional!(NSTDUnixOptionalMutex, NSTDUnixMutex);
 
 /// A handle to a mutex's protected data.
 #[nstdapi]
@@ -146,22 +148,22 @@ pub type NSTDUnixOptionalMutexLockResult<'a> = NSTDOptional<NSTDUnixMutexLockRes
 ///
 /// # Returns
 ///
-/// `NSTDUnixMutex mutex` - The new initialized mutex.
-///
-/// # Panics
-///
-/// This operation will panic if creating the mutex fails.
+/// `NSTDUnixOptionalMutex mutex` - The new initialized mutex on success, or an uninitialized "none"
+/// value if the OS was unable to create and initialize the mutex.
 #[nstdapi]
-pub fn nstd_os_unix_mutex_new(data: NSTDHeapPtr) -> NSTDUnixMutex {
+pub fn nstd_os_unix_mutex_new(data: NSTDHeapPtr) -> NSTDUnixOptionalMutex {
     let mutex = RawMutex(UnsafeCell::new(PTHREAD_MUTEX_INITIALIZER));
-    let attrs = MutexAttrs::new();
-    // SAFETY: `attrs` is properly initialized.
-    unsafe { assert!(pthread_mutex_init(mutex.0.get(), &attrs.0) == 0) };
-    NSTDUnixMutex {
-        inner: mutex,
-        data: UnsafeCell::new(data),
-        poisoned: Cell::new(NSTD_FALSE),
+    if let Some(attrs) = MutexAttrs::new() {
+        // SAFETY: `attrs` is properly initialized.
+        if unsafe { pthread_mutex_init(mutex.0.get(), &attrs.0) } == 0 {
+            return NSTDOptional::Some(NSTDUnixMutex {
+                inner: mutex,
+                data: UnsafeCell::new(data),
+                poisoned: Cell::new(NSTD_FALSE),
+            });
+        }
     }
+    NSTDOptional::None
 }
 
 /// Returns a Unix mutex's native OS handle.

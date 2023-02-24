@@ -33,6 +33,13 @@ typedef struct {
 } NSTDTimedMutex;
 #endif
 
+/// Represents an optional value of type `NSTDTimedMutex`.
+#ifdef NSTD_TIMED_MUTEX_OS_UNIX_IMPL
+typedef NSTDUnixOptionalMutex NSTDOptionalTimedMutex;
+#else
+NSTDOptional(NSTDTimedMutex) NSTDOptionalTimedMutex;
+#endif
+
 /// A handle to a timed mutex's data.
 #ifdef NSTD_TIMED_MUTEX_OS_UNIX_IMPL
 typedef NSTDUnixMutexGuard NSTDTimedMutexGuard;
@@ -68,12 +75,9 @@ NSTDOptional(NSTDTimedMutexLockResult) NSTDOptionalTimedMutexLockResult;
 ///
 /// # Returns
 ///
-/// `NSTDTimedMutex mutex` - The new mutex protecting `data`.
-///
-/// # Panics
-///
-/// This operation will panic if creating the timed mutex fails.
-NSTDAPI NSTDTimedMutex nstd_timed_mutex_new(NSTDHeapPtr data);
+/// `NSTDOptionalTimedMutex mutex` - The new mutex protecting `data` on success, or an
+/// uninitialized "none" value if the OS failed to initialize the mutex.
+NSTDAPI NSTDOptionalTimedMutex nstd_timed_mutex_new(NSTDHeapPtr data);
 
 /// Determines whether or not a timed mutex's data is poisoned.
 ///

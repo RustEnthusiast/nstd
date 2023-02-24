@@ -22,24 +22,19 @@
 ///
 /// # Returns
 ///
-/// `NSTDTimedMutex mutex` - The new mutex protecting `data`.
-///
-/// # Panics
-///
-/// This operation will panic if creating the timed mutex fails.
-NSTDAPI NSTDTimedMutex nstd_timed_mutex_new(const NSTDHeapPtr data) {
+/// `NSTDOptionalTimedMutex mutex` - The new mutex protecting `data` on success, or an
+/// uninitialized "none" value if the OS failed to initialize the mutex.
+NSTDAPI NSTDOptionalTimedMutex nstd_timed_mutex_new(const NSTDHeapPtr data) {
 #ifdef NSTD_TIMED_MUTEX_OS_UNIX_IMPL
     return nstd_os_unix_mutex_new(data);
 #else
     try {
         const std::timed_mutex *const mutex{new std::timed_mutex{}};
-        return NSTDTimedMutex{(NSTDAnyMut)mutex, data, NSTD_FALSE, NSTD_FALSE};
+        const NSTDTimedMutex timed_mutex{(NSTDAnyMut)mutex, data, NSTD_FALSE, NSTD_FALSE};
+        return NSTDOptionalTimedMutex{NSTD_OPTIONAL_STATUS_SOME, {timed_mutex}};
     } catch (...) {
-        const NSTDOptionalStr msg{nstd_core_str_from_raw_cstr("failed to create a timed mutex")};
-        msg.status ? nstd_core_panic_with_msg(&msg.some) : nstd_core_panic();
+        return NSTDOptionalTimedMutex{NSTD_OPTIONAL_STATUS_NONE, {}};
     }
-    // Unreachable.
-    return NSTDTimedMutex{};
 #endif
 }
 

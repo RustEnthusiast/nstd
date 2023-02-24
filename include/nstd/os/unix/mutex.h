@@ -17,6 +17,9 @@ typedef struct {
     NSTDBool poisoned;
 } NSTDUnixMutex;
 
+/// Represents an optional value of type `NSTDUnixMutex`.
+NSTDOptional(NSTDUnixMutex) NSTDUnixOptionalMutex;
+
 /// A handle to a mutex's protected data.
 typedef struct {
     /// A reference to the mutex.
@@ -41,12 +44,9 @@ NSTDOptional(NSTDUnixMutexLockResult) NSTDUnixOptionalMutexLockResult;
 ///
 /// # Returns
 ///
-/// `NSTDUnixMutex mutex` - The new initialized mutex.
-///
-/// # Panics
-///
-/// This operation will panic if creating the mutex fails.
-NSTDAPI NSTDUnixMutex nstd_os_unix_mutex_new(NSTDHeapPtr data);
+/// `NSTDUnixOptionalMutex mutex` - The new initialized mutex on success, or an uninitialized "none"
+/// value if the OS was unable to create and initialize the mutex.
+NSTDAPI NSTDUnixOptionalMutex nstd_os_unix_mutex_new(NSTDHeapPtr data);
 
 /// Returns a Unix mutex's native OS handle.
 ///
