@@ -2,10 +2,10 @@
 #define NSTD_TIMED_MUTEX_H
 #include "core/optional.h"
 #include "core/result.h"
+#include "core/time.h"
 #include "heap_ptr.h"
 #include "nstd.h"
 #include "os/os.h"
-#include "time.h"
 
 #if defined(NSTD_OS_ANDROID) || defined(NSTD_OS_DRAGONFLY) || defined(NSTD_OS_FREEBSD) \
     || defined(NSTD_OS_HAIKU) || defined(NSTD_OS_LINUX) || defined(NSTD_OS_NETBSD)     \

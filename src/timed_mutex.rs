@@ -1,5 +1,5 @@
 //! A mutual exclusion primitive with a timed locking mechanism.
-use crate::{heap_ptr::NSTDHeapPtr, time::NSTDDuration, NSTDAny, NSTDAnyMut, NSTDBool};
+use crate::{core::time::NSTDDuration, heap_ptr::NSTDHeapPtr, NSTDAny, NSTDAnyMut, NSTDBool};
 use cfg_if::cfg_if;
 
 cfg_if! {

@@ -2,9 +2,9 @@
 #define NSTD_OS_UNIX_MUTEX_H
 #include "../../core/optional.h"
 #include "../../core/result.h"
+#include "../../core/time.h"
 #include "../../heap_ptr.h"
 #include "../../nstd.h"
-#include "../../time.h"
 #include <pthread.h>
 
 /// A mutual exclusion primitive useful for protecting shared data.

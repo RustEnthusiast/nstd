@@ -1,9 +1,9 @@
 #include <nstd/core/optional.h>
 #include <nstd/core/result.h>
+#include <nstd/core/time.h>
 #include <nstd/heap_ptr.h>
 #include <nstd/nstd.h>
 #include <nstd/thread.h>
-#include <nstd/time.h>
 #include <nstd/timed_mutex.h>
 #include <chrono>
 #include <mutex>
@@ -153,7 +153,7 @@ nstd_timed_mutex_timed_lock(const NSTDTimedMutex *const mutex, const NSTDDuratio
 #ifdef NSTD_TIMED_MUTEX_OS_UNIX_IMPL
     return nstd_os_unix_mutex_timed_lock(mutex, duration);
 #else
-    const std::chrono::duration<NSTDFloat64> dur{nstd_time_duration_get(duration)};
+    const std::chrono::duration<NSTDFloat64> dur{nstd_core_time_duration_get(duration)};
     if (((std::timed_mutex *)mutex->inner)->try_lock_for(dur)) {
         const_cast<NSTDTimedMutex *>(mutex)->locked = NSTD_TRUE;
         NSTDOptionalTimedMutexLockResult ret{NSTD_OPTIONAL_STATUS_SOME, {}};

@@ -3,10 +3,10 @@ use crate::{
     core::{
         optional::{gen_optional, NSTDOptional},
         result::NSTDResult,
+        time::NSTDDuration,
     },
     heap_ptr::{nstd_heap_ptr_get, nstd_heap_ptr_get_mut, NSTDHeapPtr},
     thread::nstd_thread_is_panicking,
-    time::NSTDDuration,
     NSTDAny, NSTDAnyMut, NSTDBool, NSTD_FALSE, NSTD_TRUE,
 };
 use core::{
