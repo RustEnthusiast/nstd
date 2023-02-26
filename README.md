@@ -57,6 +57,7 @@ int main() {
             - `io` - Provides functionality for working with input & output on Unix platforms.
             - `mutex` - A mutual exclusion primitive useful for protecting shared data.
             - `shared_lib` - Provides shared library access for Unix-like systems.
+            - `time` - Unix time utilities.
         - `windows` - OS support for Windows.
             - `alloc` - Low level memory allocation for Windows.
                 - `heap` - Process heap management for Windows.
