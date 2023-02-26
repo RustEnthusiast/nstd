@@ -104,17 +104,13 @@ NSTDAPI NSTDBool nstd_timed_mutex_is_poisoned(const NSTDTimedMutex *mutex);
 ///
 /// # Returns
 ///
-/// `NSTDTimedMutexLockResult guard` - A handle to the mutex's protected data.
-///
-/// # Panics
-///
-/// This operation will panic if locking the mutex fails, this includes the situation where the
-/// calling thread already owns the mutex lock.
+/// `NSTDOptionalTimedMutexLockResult guard` - A handle to the mutex's protected data, or an
+/// uninitialized "none" value if the OS fails to lock the mutex.
 ///
 /// # Safety
 ///
 /// The mutex lock must not already be owned by the calling thread.
-NSTDAPI NSTDTimedMutexLockResult nstd_timed_mutex_lock(const NSTDTimedMutex *mutex);
+NSTDAPI NSTDOptionalTimedMutexLockResult nstd_timed_mutex_lock(const NSTDTimedMutex *mutex);
 
 /// The non-blocking variant of `nstd_timed_mutex_lock` returning an uninitialized "none" result if
 /// the mutex is locked by another thread.

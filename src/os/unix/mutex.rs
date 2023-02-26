@@ -9,7 +9,6 @@ use crate::{
     time::NSTDDuration,
     NSTDAny, NSTDAnyMut, NSTDBool, NSTD_FALSE, NSTD_TRUE,
 };
-use cfg_if::cfg_if;
 use core::{
     cell::{Cell, UnsafeCell},
     marker::PhantomData,
@@ -18,7 +17,7 @@ use core::{
 use libc::{
     pthread_mutex_destroy, pthread_mutex_init, pthread_mutex_lock, pthread_mutex_t,
     pthread_mutex_trylock, pthread_mutex_unlock, pthread_mutexattr_destroy, pthread_mutexattr_init,
-    pthread_mutexattr_settype, pthread_mutexattr_t, EBUSY, PTHREAD_MUTEX_INITIALIZER,
+    pthread_mutexattr_settype, pthread_mutexattr_t, PTHREAD_MUTEX_INITIALIZER,
     PTHREAD_MUTEX_NORMAL,
 };
 use nstdapi::nstdapi;
@@ -205,24 +204,27 @@ pub fn nstd_os_unix_mutex_is_poisoned(mutex: &NSTDUnixMutex) -> NSTDBool {
 ///
 /// # Returns
 ///
-/// `NSTDUnixMutexLockResult guard` - A handle to the mutex's protected data.
-///
-/// # Panics
-///
-/// This operation will panic if locking the mutex fails.
+/// `NSTDUnixOptionalMutexLockResult guard` - A handle to the mutex's protected data on success, or
+/// an uninitialized "none" value if the OS failed to lock the mutex.
 #[nstdapi]
-pub fn nstd_os_unix_mutex_lock(mutex: &NSTDUnixMutex) -> NSTDUnixMutexLockResult {
+pub fn nstd_os_unix_mutex_lock(mutex: &NSTDUnixMutex) -> NSTDUnixOptionalMutexLockResult {
     // SAFETY: `mutex` is behind an initialized reference.
-    unsafe { assert!(pthread_mutex_lock(mutex.inner.0.get()) == 0) };
-    let guard = NSTDUnixMutexGuard::new(mutex);
-    match mutex.poisoned.get() {
-        true => NSTDResult::Err(guard),
-        false => NSTDResult::Ok(guard),
+    if unsafe { pthread_mutex_lock(mutex.inner.0.get()) } == 0 {
+        let guard = NSTDUnixMutexGuard::new(mutex);
+        return NSTDOptional::Some(match mutex.poisoned.get() {
+            true => NSTDResult::Err(guard),
+            false => NSTDResult::Ok(guard),
+        });
     }
+    NSTDOptional::None
 }
 
 /// The non-blocking variant of `nstd_os_unix_mutex_lock`. This will return immediately with an
 /// uninitialized "none" value if the mutex is locked.
+///
+/// # Note
+///
+/// This operation may return a "none" value in the case that the OS fails to lock the mutex.
 ///
 /// # Parameters:
 ///
@@ -232,32 +234,25 @@ pub fn nstd_os_unix_mutex_lock(mutex: &NSTDUnixMutex) -> NSTDUnixMutexLockResult
 ///
 /// `NSTDUnixOptionalMutexLockResult guard` - A handle to the mutex's data, or "none" if the mutex
 /// is locked.
-///
-/// # Panics
-///
-/// This operation will panic if locking the mutex fails.
 #[nstdapi]
 pub fn nstd_os_unix_mutex_try_lock(mutex: &NSTDUnixMutex) -> NSTDUnixOptionalMutexLockResult {
     // SAFETY: `mutex` is behind an initialized reference.
-    match unsafe { pthread_mutex_trylock(mutex.inner.0.get()) } {
-        0 => {
-            let guard = NSTDUnixMutexGuard::new(mutex);
-            NSTDOptional::Some(match mutex.poisoned.get() {
-                true => NSTDResult::Err(guard),
-                false => NSTDResult::Ok(guard),
-            })
-        }
-        err => {
-            assert!(err == EBUSY);
-            NSTDOptional::None
-        }
+    if unsafe { pthread_mutex_trylock(mutex.inner.0.get()) } == 0 {
+        let guard = NSTDUnixMutexGuard::new(mutex);
+        return NSTDOptional::Some(match mutex.poisoned.get() {
+            true => NSTDResult::Err(guard),
+            false => NSTDResult::Ok(guard),
+        });
     }
+    NSTDOptional::None
 }
 
 /// The timed variant of `nstd_os_unix_mutex_lock`. This will return with an uninitialized "none"
 /// value if the mutex remains locked for the time span of `duration`.
 ///
-/// # Note
+/// # Notes
+///
+/// This operation may return a "none" value in the case that the OS fails to lock the mutex.
 ///
 /// This function will return immediately with a "none" value on unsupported platforms.
 /// Supported platforms include Android, DragonFly BSD, FreeBSD, NetBSD, OpenBSD, Haiku, illumos,
@@ -273,57 +268,43 @@ pub fn nstd_os_unix_mutex_try_lock(mutex: &NSTDUnixMutex) -> NSTDUnixOptionalMut
 ///
 /// `NSTDUnixOptionalMutexLockResult guard` - A handle to the mutex's data, or "none" if the mutex
 /// remains locked for the time span of `duration`.
-///
-/// # Panics
-///
-/// This operation will panic if locking the mutex fails.
 #[nstdapi]
 #[allow(unused_variables)]
 pub fn nstd_os_unix_mutex_timed_lock<'a>(
     mutex: &'a NSTDUnixMutex,
     duration: &NSTDDuration,
 ) -> NSTDUnixOptionalMutexLockResult<'a> {
-    cfg_if! {
-        if #[cfg(any(
-            target_os = "android",
-            target_os = "dragonfly",
-            target_os = "freebsd",
-            target_os = "haiku",
-            target_os = "illumos",
-            target_os = "linux",
-            target_os = "netbsd",
-            target_os = "nto",
-            target_os = "openbsd",
-            target_os = "solaris"
-        ))] {
-            use crate::time::{
-                nstd_time_add, nstd_time_nanoseconds, nstd_time_now, nstd_time_seconds,
-            };
-            use libc::{pthread_mutex_timedlock, timespec, ETIMEDOUT};
-            let mut time = nstd_time_now();
-            time = nstd_time_add(&time, duration);
-            let duration = timespec {
-                tv_sec: nstd_time_seconds(&time) as _,
-                tv_nsec: nstd_time_nanoseconds(&time) as _,
-            };
-            // SAFETY: `mutex` is behind an initialized reference.
-            match unsafe { pthread_mutex_timedlock(mutex.inner.0.get(), &duration) } {
-                0 => {
-                    let guard = NSTDUnixMutexGuard::new(mutex);
-                    NSTDOptional::Some(match mutex.poisoned.get() {
-                        true => NSTDResult::Err(guard),
-                        false => NSTDResult::Ok(guard),
-                    })
-                }
-                err => {
-                    assert!(err == ETIMEDOUT);
-                    NSTDOptional::None
-                }
-            }
-        } else {
-            return NSTDOptional::None;
+    #[cfg(any(
+        target_os = "android",
+        target_os = "dragonfly",
+        target_os = "freebsd",
+        target_os = "haiku",
+        target_os = "illumos",
+        target_os = "linux",
+        target_os = "netbsd",
+        target_os = "nto",
+        target_os = "openbsd",
+        target_os = "solaris"
+    ))]
+    {
+        use crate::time::{nstd_time_add, nstd_time_nanoseconds, nstd_time_now, nstd_time_seconds};
+        use libc::{pthread_mutex_timedlock, timespec};
+        let mut time = nstd_time_now();
+        time = nstd_time_add(&time, duration);
+        let duration = timespec {
+            tv_sec: nstd_time_seconds(&time) as _,
+            tv_nsec: nstd_time_nanoseconds(&time) as _,
+        };
+        // SAFETY: `mutex` is behind an initialized reference.
+        if unsafe { pthread_mutex_timedlock(mutex.inner.0.get(), &duration) } == 0 {
+            let guard = NSTDUnixMutexGuard::new(mutex);
+            return NSTDOptional::Some(match mutex.poisoned.get() {
+                true => NSTDResult::Err(guard),
+                false => NSTDResult::Ok(guard),
+            });
         }
     }
+    NSTDOptional::None
 }
 
 /// Returns a pointer to a mutex's raw data.
