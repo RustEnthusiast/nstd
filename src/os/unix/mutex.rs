@@ -287,21 +287,25 @@ pub fn nstd_os_unix_mutex_timed_lock<'a>(
         target_os = "solaris"
     ))]
     {
-        use crate::time::{nstd_time_add, nstd_time_nanoseconds, nstd_time_now, nstd_time_seconds};
-        use libc::{pthread_mutex_timedlock, timespec};
-        let mut time = nstd_time_now();
-        time = nstd_time_add(&time, duration);
-        let duration = timespec {
-            tv_sec: nstd_time_seconds(&time) as _,
-            tv_nsec: nstd_time_nanoseconds(&time) as _,
+        use crate::os::unix::time::{
+            nstd_os_unix_time_add, nstd_os_unix_time_nanoseconds, nstd_os_unix_time_now,
+            nstd_os_unix_time_seconds,
         };
-        // SAFETY: `mutex` is behind an initialized reference.
-        if unsafe { pthread_mutex_timedlock(mutex.inner.0.get(), &duration) } == 0 {
-            let guard = NSTDUnixMutexGuard::new(mutex);
-            return NSTDOptional::Some(match mutex.poisoned.get() {
-                true => NSTDResult::Err(guard),
-                false => NSTDResult::Ok(guard),
-            });
+        use libc::{pthread_mutex_timedlock, timespec};
+        if let NSTDOptional::Some(mut time) = nstd_os_unix_time_now() {
+            time = nstd_os_unix_time_add(&time, duration);
+            let duration = timespec {
+                tv_sec: nstd_os_unix_time_seconds(&time) as _,
+                tv_nsec: nstd_os_unix_time_nanoseconds(&time) as _,
+            };
+            // SAFETY: `mutex` is behind an initialized reference.
+            if unsafe { pthread_mutex_timedlock(mutex.inner.0.get(), &duration) } == 0 {
+                let guard = NSTDUnixMutexGuard::new(mutex);
+                return NSTDOptional::Some(match mutex.poisoned.get() {
+                    true => NSTDResult::Err(guard),
+                    false => NSTDResult::Ok(guard),
+                });
+            }
         }
     }
     NSTDOptional::None
