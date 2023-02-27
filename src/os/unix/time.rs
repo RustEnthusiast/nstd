@@ -10,7 +10,7 @@ use crate::{
     NSTDFloat64, NSTDInt64, NSTDUInt32,
 };
 use core::mem::MaybeUninit;
-use libc::{clock_gettime, timespec, CLOCK_MONOTONIC};
+use libc::{clock_gettime, timespec, CLOCK_REALTIME};
 use nstdapi::nstdapi;
 
 /// A structure representing system time since January 1st 1970.
@@ -44,7 +44,7 @@ gen_optional!(NSTDUnixOptionalTime, NSTDUnixTime);
 pub fn nstd_os_unix_time_now() -> NSTDUnixOptionalTime {
     let mut timespec = MaybeUninit::uninit();
     // SAFETY: `clock_gettime` is safe.
-    if unsafe { clock_gettime(CLOCK_MONOTONIC, timespec.as_mut_ptr()) } == 0 {
+    if unsafe { clock_gettime(CLOCK_REALTIME, timespec.as_mut_ptr()) } == 0 {
         // SAFETY: `timespec` is initialized.
         return NSTDOptional::Some(NSTDUnixTime::from(unsafe { timespec.assume_init() }));
     }
