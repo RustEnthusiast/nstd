@@ -42,6 +42,7 @@ int main() {
         - `result` - Defines a "result" type with success and error variants.
         - `slice` - A view into a sequence of values in memory.
         - `str` - An unowned view into a UTF-8 encoded byte string.
+        - `time` - Low level time utilities.
         - `unichar` - A Unicode scalar value.
     - `cstring` - A dynamically sized, null terminated, C string.
     - `env` - Process environment management.
@@ -61,6 +62,7 @@ int main() {
             - `io` - Provides functionality for working with input & output on Unix platforms.
             - `mutex` - A mutual exclusion primitive useful for protecting shared data.
             - `shared_lib` - Provides shared library access for Unix-like systems.
+            - `time` - Unix time utilities.
         - `windows` - OS support for Windows.
             - `alloc` - Low level memory allocation for Windows.
                 - `heap` - Process heap management for Windows.
