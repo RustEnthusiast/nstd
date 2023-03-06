@@ -1,11 +1,13 @@
 //! Low level memory allocation.
-#[cfg(not(any(unix, windows)))]
+#[cfg(not(any(
+    unix,
+    windows,
+    any(target_env = "wasi", target_os = "wasi"),
+    target_os = "fuchsia",
+    target_os = "solid_asp3",
+    target_os = "vxworks"
+)))]
 extern crate alloc;
-#[cfg(unix)]
-use crate::os::unix::alloc::{
-    nstd_os_unix_alloc_allocate, nstd_os_unix_alloc_allocate_zeroed, nstd_os_unix_alloc_deallocate,
-    nstd_os_unix_alloc_reallocate,
-};
 #[cfg(windows)]
 use crate::os::windows::alloc::{
     nstd_os_windows_alloc_allocate, nstd_os_windows_alloc_allocate_zeroed,
@@ -13,6 +15,7 @@ use crate::os::windows::alloc::{
     NSTDWindowsAllocError::{self, *},
 };
 use crate::{NSTDAnyMut, NSTDUInt};
+use cfg_if::cfg_if;
 use nstdapi::nstdapi;
 
 /// Describes an error returned from allocation functions.
@@ -78,19 +81,26 @@ impl From<NSTDWindowsAllocError> for NSTDAllocError {
 #[inline]
 #[nstdapi]
 pub unsafe fn nstd_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
-    #[cfg(not(any(unix, windows)))]
-    {
-        use crate::{core::ptr::raw::MAX_ALIGN, NSTD_NULL};
-        use alloc::alloc::Layout;
-        if let Ok(layout) = Layout::from_size_align(size, MAX_ALIGN) {
-            return alloc::alloc::alloc(layout).cast();
+    cfg_if! {
+        if #[cfg(any(
+            unix,
+            any(target_env = "wasi", target_os = "wasi"),
+            target_os = "fuchsia",
+            target_os = "solid_asp3",
+            target_os = "vxworks"
+        ))] {
+            libc::malloc(size)
+        } else if #[cfg(windows)] {
+            nstd_os_windows_alloc_allocate(size)
+        } else {
+            use crate::{core::ptr::raw::MAX_ALIGN, NSTD_NULL};
+            use alloc::alloc::Layout;
+            if let Ok(layout) = Layout::from_size_align(size, MAX_ALIGN) {
+                return alloc::alloc::alloc(layout).cast();
+            }
+            NSTD_NULL
         }
-        NSTD_NULL
     }
-    #[cfg(unix)]
-    return nstd_os_unix_alloc_allocate(size);
-    #[cfg(windows)]
-    return nstd_os_windows_alloc_allocate(size);
 }
 
 /// Allocates a block of zero-initialized memory on the heap.
@@ -125,19 +135,26 @@ pub unsafe fn nstd_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
 #[inline]
 #[nstdapi]
 pub unsafe fn nstd_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMut {
-    #[cfg(not(any(unix, windows)))]
-    {
-        use crate::{core::ptr::raw::MAX_ALIGN, NSTD_NULL};
-        use alloc::alloc::Layout;
-        if let Ok(layout) = Layout::from_size_align(size, MAX_ALIGN) {
-            return alloc::alloc::alloc_zeroed(layout).cast();
+    cfg_if! {
+        if #[cfg(any(
+            unix,
+            any(target_env = "wasi", target_os = "wasi"),
+            target_os = "fuchsia",
+            target_os = "solid_asp3",
+            target_os = "vxworks"
+        ))] {
+            libc::calloc(size, 1)
+        } else if #[cfg(windows)] {
+            nstd_os_windows_alloc_allocate_zeroed(size)
+        } else {
+            use crate::{core::ptr::raw::MAX_ALIGN, NSTD_NULL};
+            use alloc::alloc::Layout;
+            if let Ok(layout) = Layout::from_size_align(size, MAX_ALIGN) {
+                return alloc::alloc::alloc_zeroed(layout).cast();
+            }
+            NSTD_NULL
         }
-        NSTD_NULL
     }
-    #[cfg(unix)]
-    return nstd_os_unix_alloc_allocate_zeroed(size);
-    #[cfg(windows)]
-    return nstd_os_windows_alloc_allocate_zeroed(size);
 }
 
 /// Reallocates a block of memory previously allocated by `nstd_alloc_allocate[_zeroed]`.
@@ -187,37 +204,44 @@ pub unsafe fn nstd_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMut {
 ///     nstd_alloc_deallocate(&mut mem, SIZE);
 /// }
 /// ```
-#[cfg_attr(any(unix, windows), inline)]
+#[cfg_attr(windows, inline)]
 #[nstdapi]
-#[cfg_attr(any(unix, windows), allow(unused_variables))]
+#[allow(unused_variables)]
 pub unsafe fn nstd_alloc_reallocate(
     ptr: &mut NSTDAnyMut,
     size: NSTDUInt,
     new_size: NSTDUInt,
 ) -> NSTDAllocError {
-    #[cfg(not(any(unix, windows)))]
-    {
-        use crate::core::ptr::raw::MAX_ALIGN;
-        use alloc::alloc::Layout;
-        if let Ok(layout) = Layout::from_size_align(size, MAX_ALIGN) {
-            let new_mem = alloc::alloc::realloc((*ptr).cast(), layout, new_size);
+    cfg_if! {
+        if #[cfg(any(
+            unix,
+            any(target_env = "wasi", target_os = "wasi"),
+            target_os = "fuchsia",
+            target_os = "solid_asp3",
+            target_os = "vxworks"
+        ))] {
+            let new_mem = libc::realloc(*ptr, new_size);
             if new_mem.is_null() {
                 return NSTDAllocError::NSTD_ALLOC_ERROR_OUT_OF_MEMORY;
             }
-            *ptr = new_mem.cast();
-            return NSTDAllocError::NSTD_ALLOC_ERROR_NONE;
+            *ptr = new_mem;
+            NSTDAllocError::NSTD_ALLOC_ERROR_NONE
+        } else if #[cfg(windows)] {
+            nstd_os_windows_alloc_reallocate(ptr, new_size).into()
+        } else {
+            use crate::core::ptr::raw::MAX_ALIGN;
+            use alloc::alloc::Layout;
+            if let Ok(layout) = Layout::from_size_align(size, MAX_ALIGN) {
+                let new_mem = alloc::alloc::realloc((*ptr).cast(), layout, new_size);
+                if new_mem.is_null() {
+                    return NSTDAllocError::NSTD_ALLOC_ERROR_OUT_OF_MEMORY;
+                }
+                *ptr = new_mem.cast();
+                return NSTDAllocError::NSTD_ALLOC_ERROR_NONE;
+            }
+            NSTDAllocError::NSTD_ALLOC_ERROR_INVALID_LAYOUT
         }
-        NSTDAllocError::NSTD_ALLOC_ERROR_INVALID_LAYOUT
     }
-    #[cfg(unix)]
-    {
-        match nstd_os_unix_alloc_reallocate(ptr, new_size) {
-            0 => NSTDAllocError::NSTD_ALLOC_ERROR_NONE,
-            _ => NSTDAllocError::NSTD_ALLOC_ERROR_OUT_OF_MEMORY,
-        }
-    }
-    #[cfg(windows)]
-    return nstd_os_windows_alloc_reallocate(ptr, new_size).into();
 }
 
 /// Deallocates a block of memory previously allocated by `nstd_alloc_allocate[_zeroed]`.
@@ -249,26 +273,33 @@ pub unsafe fn nstd_alloc_reallocate(
 ///     nstd_alloc_deallocate(&mut mem, 24);
 /// }
 /// ```
-#[cfg_attr(any(unix, windows), inline)]
+#[inline]
 #[nstdapi]
-#[cfg_attr(any(unix, windows), allow(unused_variables))]
+#[allow(unused_variables)]
 pub unsafe fn nstd_alloc_deallocate(ptr: &mut NSTDAnyMut, size: NSTDUInt) -> NSTDAllocError {
-    #[cfg(not(any(unix, windows)))]
-    {
-        use crate::{core::ptr::raw::MAX_ALIGN, NSTD_NULL};
-        use alloc::alloc::Layout;
-        if let Ok(layout) = Layout::from_size_align(size, MAX_ALIGN) {
-            alloc::alloc::dealloc((*ptr).cast(), layout);
+    cfg_if! {
+        if #[cfg(any(
+            unix,
+            any(target_env = "wasi", target_os = "wasi"),
+            target_os = "fuchsia",
+            target_os = "solid_asp3",
+            target_os = "vxworks"
+        ))] {
+            use crate::NSTD_NULL;
+            libc::free(*ptr);
             *ptr = NSTD_NULL;
-            return NSTDAllocError::NSTD_ALLOC_ERROR_NONE;
+            NSTDAllocError::NSTD_ALLOC_ERROR_NONE
+        } else if #[cfg(windows)] {
+            nstd_os_windows_alloc_deallocate(ptr).into()
+        } else {
+            use crate::{core::ptr::raw::MAX_ALIGN, NSTD_NULL};
+            use alloc::alloc::Layout;
+            if let Ok(layout) = Layout::from_size_align(size, MAX_ALIGN) {
+                alloc::alloc::dealloc((*ptr).cast(), layout);
+                *ptr = NSTD_NULL;
+                return NSTDAllocError::NSTD_ALLOC_ERROR_NONE;
+            }
+            NSTDAllocError::NSTD_ALLOC_ERROR_INVALID_LAYOUT
         }
-        NSTDAllocError::NSTD_ALLOC_ERROR_INVALID_LAYOUT
     }
-    #[cfg(unix)]
-    {
-        nstd_os_unix_alloc_deallocate(ptr);
-        NSTDAllocError::NSTD_ALLOC_ERROR_NONE
-    }
-    #[cfg(windows)]
-    return nstd_os_windows_alloc_deallocate(ptr).into();
 }

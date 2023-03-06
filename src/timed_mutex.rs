@@ -1,5 +1,5 @@
 //! A mutual exclusion primitive with a timed locking mechanism.
-use crate::{heap_ptr::NSTDHeapPtr, time::NSTDDuration, NSTDAny, NSTDAnyMut, NSTDBool};
+use crate::{core::time::NSTDDuration, heap_ptr::NSTDHeapPtr, NSTDAny, NSTDAnyMut, NSTDBool};
 use cfg_if::cfg_if;
 
 cfg_if! {
@@ -15,12 +15,15 @@ cfg_if! {
         target_os = "solaris"
     ))] {
         use crate::os::unix::mutex::{
-            NSTDUnixMutex, NSTDUnixMutexGuard, NSTDUnixMutexLockResult,
+            NSTDUnixMutex, NSTDUnixMutexGuard, NSTDUnixMutexLockResult, NSTDUnixOptionalMutex,
             NSTDUnixOptionalMutexLockResult,
         };
 
         /// A mutual exclusion primitive with a timed locking mechanism.
         pub type NSTDTimedMutex = NSTDUnixMutex;
+
+        /// Represents an optional value of type `NSTDTimedMutex`.
+        pub type NSTDOptionalTimedMutex = NSTDUnixOptionalMutex;
 
         /// A handle to a timed mutex's data.
         pub type NSTDTimedMutexGuard<'a> = NSTDUnixMutexGuard<'a>;
@@ -34,7 +37,10 @@ cfg_if! {
         /// means that the function would block.
         pub type NSTDOptionalTimedMutexLockResult<'a> = NSTDUnixOptionalMutexLockResult<'a>;
     } else {
-        use crate::core::{optional::NSTDOptional, result::NSTDResult};
+        use crate::core::{
+            optional::{gen_optional, NSTDOptional},
+            result::NSTDResult,
+        };
         use core::{marker::PhantomData, mem::ManuallyDrop};
         use nstdapi::nstdapi;
 
@@ -68,6 +74,7 @@ cfg_if! {
         /// The data that the mutex is protecting must be able to be safely shared between threads.
         // SAFETY: The user guarantees that the data is thread-safe.
         unsafe impl Sync for NSTDTimedMutex {}
+        gen_optional!(NSTDOptionalTimedMutex, NSTDTimedMutex);
 
         /// A handle to a timed mutex's data.
         #[nstdapi]
@@ -112,12 +119,9 @@ extern "C" {
     ///
     /// # Returns
     ///
-    /// `NSTDTimedMutex mutex` - The new mutex protecting `data`.
-    ///
-    /// # Panics
-    ///
-    /// This operation will panic if creating the timed mutex fails.
-    pub fn nstd_timed_mutex_new(data: NSTDHeapPtr) -> NSTDTimedMutex;
+    /// `NSTDOptionalTimedMutex mutex` - The new mutex protecting `data` on success, or an
+    /// uninitialized "none" value if the OS failed to initialize the mutex.
+    pub fn nstd_timed_mutex_new(data: NSTDHeapPtr) -> NSTDOptionalTimedMutex;
 
     /// Determines whether or not a timed mutex's data is poisoned.
     ///
@@ -144,17 +148,13 @@ extern "C" {
     ///
     /// # Returns
     ///
-    /// `NSTDTimedMutexLockResult guard` - A handle to the mutex's protected data.
-    ///
-    /// # Panics
-    ///
-    /// This operation will panic if locking the mutex fails, this includes the situation where the
-    /// calling thread already owns the mutex lock.
+    /// `NSTDOptionalTimedMutexLockResult guard` - A handle to the mutex's protected data, or an
+    /// uninitialized "none" value if the OS fails to lock the mutex.
     ///
     /// # Safety
     ///
     /// The mutex lock must not already be owned by the calling thread.
-    pub fn nstd_timed_mutex_lock(mutex: &NSTDTimedMutex) -> NSTDTimedMutexLockResult;
+    pub fn nstd_timed_mutex_lock(mutex: &NSTDTimedMutex) -> NSTDOptionalTimedMutexLockResult;
 
     /// The non-blocking variant of `nstd_timed_mutex_lock` returning an uninitialized "none" result if
     /// the mutex is locked by another thread.

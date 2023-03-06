@@ -2,10 +2,10 @@
 #define NSTD_TIMED_MUTEX_H
 #include "core/optional.h"
 #include "core/result.h"
+#include "core/time.h"
 #include "heap_ptr.h"
 #include "nstd.h"
 #include "os/os.h"
-#include "time.h"
 
 #if defined(NSTD_OS_ANDROID) || defined(NSTD_OS_DRAGONFLY) || defined(NSTD_OS_FREEBSD) \
     || defined(NSTD_OS_HAIKU) || defined(NSTD_OS_LINUX) || defined(NSTD_OS_NETBSD)     \
@@ -31,6 +31,13 @@ typedef struct {
     /// Determines whether or not the mutex is currently locked.
     NSTDBool locked;
 } NSTDTimedMutex;
+#endif
+
+/// Represents an optional value of type `NSTDTimedMutex`.
+#ifdef NSTD_TIMED_MUTEX_OS_UNIX_IMPL
+typedef NSTDUnixOptionalMutex NSTDOptionalTimedMutex;
+#else
+NSTDOptional(NSTDTimedMutex) NSTDOptionalTimedMutex;
 #endif
 
 /// A handle to a timed mutex's data.
@@ -68,12 +75,9 @@ NSTDOptional(NSTDTimedMutexLockResult) NSTDOptionalTimedMutexLockResult;
 ///
 /// # Returns
 ///
-/// `NSTDTimedMutex mutex` - The new mutex protecting `data`.
-///
-/// # Panics
-///
-/// This operation will panic if creating the timed mutex fails.
-NSTDAPI NSTDTimedMutex nstd_timed_mutex_new(NSTDHeapPtr data);
+/// `NSTDOptionalTimedMutex mutex` - The new mutex protecting `data` on success, or an
+/// uninitialized "none" value if the OS failed to initialize the mutex.
+NSTDAPI NSTDOptionalTimedMutex nstd_timed_mutex_new(NSTDHeapPtr data);
 
 /// Determines whether or not a timed mutex's data is poisoned.
 ///
@@ -100,17 +104,13 @@ NSTDAPI NSTDBool nstd_timed_mutex_is_poisoned(const NSTDTimedMutex *mutex);
 ///
 /// # Returns
 ///
-/// `NSTDTimedMutexLockResult guard` - A handle to the mutex's protected data.
-///
-/// # Panics
-///
-/// This operation will panic if locking the mutex fails, this includes the situation where the
-/// calling thread already owns the mutex lock.
+/// `NSTDOptionalTimedMutexLockResult guard` - A handle to the mutex's protected data, or an
+/// uninitialized "none" value if the OS fails to lock the mutex.
 ///
 /// # Safety
 ///
 /// The mutex lock must not already be owned by the calling thread.
-NSTDAPI NSTDTimedMutexLockResult nstd_timed_mutex_lock(const NSTDTimedMutex *mutex);
+NSTDAPI NSTDOptionalTimedMutexLockResult nstd_timed_mutex_lock(const NSTDTimedMutex *mutex);
 
 /// The non-blocking variant of `nstd_timed_mutex_lock` returning an uninitialized "none" result if
 /// the mutex is locked by another thread.

@@ -1,11 +1,9 @@
-#include <nstd/core/core.h>
 #include <nstd/core/optional.h>
 #include <nstd/core/result.h>
-#include <nstd/core/str.h>
+#include <nstd/core/time.h>
 #include <nstd/heap_ptr.h>
 #include <nstd/nstd.h>
 #include <nstd/thread.h>
-#include <nstd/time.h>
 #include <nstd/timed_mutex.h>
 #include <chrono>
 #include <mutex>
@@ -22,24 +20,19 @@
 ///
 /// # Returns
 ///
-/// `NSTDTimedMutex mutex` - The new mutex protecting `data`.
-///
-/// # Panics
-///
-/// This operation will panic if creating the timed mutex fails.
-NSTDAPI NSTDTimedMutex nstd_timed_mutex_new(const NSTDHeapPtr data) {
+/// `NSTDOptionalTimedMutex mutex` - The new mutex protecting `data` on success, or an
+/// uninitialized "none" value if the OS failed to initialize the mutex.
+NSTDAPI NSTDOptionalTimedMutex nstd_timed_mutex_new(const NSTDHeapPtr data) {
 #ifdef NSTD_TIMED_MUTEX_OS_UNIX_IMPL
     return nstd_os_unix_mutex_new(data);
 #else
     try {
         const std::timed_mutex *const mutex{new std::timed_mutex{}};
-        return NSTDTimedMutex{(NSTDAnyMut)mutex, data, NSTD_FALSE, NSTD_FALSE};
+        const NSTDTimedMutex timed_mutex{(NSTDAnyMut)mutex, data, NSTD_FALSE, NSTD_FALSE};
+        return NSTDOptionalTimedMutex{NSTD_OPTIONAL_STATUS_SOME, {timed_mutex}};
     } catch (...) {
-        const NSTDOptionalStr msg{nstd_core_str_from_raw_cstr("failed to create a timed mutex")};
-        msg.status ? nstd_core_panic_with_msg(&msg.some) : nstd_core_panic();
+        return NSTDOptionalTimedMutex{NSTD_OPTIONAL_STATUS_NONE, {}};
     }
-    // Unreachable.
-    return NSTDTimedMutex{};
 #endif
 }
 
@@ -74,33 +67,29 @@ NSTDAPI NSTDBool nstd_timed_mutex_is_poisoned(const NSTDTimedMutex *const mutex)
 ///
 /// # Returns
 ///
-/// `NSTDTimedMutexLockResult guard` - A handle to the mutex's protected data.
-///
-/// # Panics
-///
-/// This operation will panic if locking the mutex fails, this includes the situation where the
-/// calling thread already owns the mutex lock.
+/// `NSTDOptionalTimedMutexLockResult guard` - A handle to the mutex's protected data, or an
+/// uninitialized "none" value if the OS fails to lock the mutex.
 ///
 /// # Safety
 ///
 /// The mutex lock must not already be owned by the calling thread.
-NSTDAPI NSTDTimedMutexLockResult nstd_timed_mutex_lock(const NSTDTimedMutex *const mutex) {
+NSTDAPI NSTDOptionalTimedMutexLockResult nstd_timed_mutex_lock(const NSTDTimedMutex *const mutex) {
 #ifdef NSTD_TIMED_MUTEX_OS_UNIX_IMPL
     return nstd_os_unix_mutex_lock(mutex);
 #else
     try {
         ((std::timed_mutex *)mutex->inner)->lock();
         const_cast<NSTDTimedMutex *>(mutex)->locked = NSTD_TRUE;
+        NSTDOptionalTimedMutexLockResult ret{NSTD_OPTIONAL_STATUS_SOME, {}};
+        const NSTDTimedMutexGuard guard{mutex};
         if (mutex->poisoned)
-            return NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_ERR, {NSTDTimedMutexGuard{mutex}}};
+            ret.some = NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_ERR, {guard}};
         else
-            return NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_OK, {NSTDTimedMutexGuard{mutex}}};
+            ret.some = NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_OK, {guard}};
+        return ret;
     } catch (...) {
-        const NSTDOptionalStr msg{nstd_core_str_from_raw_cstr("failed to lock a timed mutex")};
-        msg.status ? nstd_core_panic_with_msg(&msg.some) : nstd_core_panic();
+        return NSTDOptionalTimedMutexLockResult{NSTD_OPTIONAL_STATUS_NONE, {}};
     }
-    // Unreachable.
-    return NSTDTimedMutexLockResult{};
 #endif
 }
 
@@ -164,7 +153,7 @@ nstd_timed_mutex_timed_lock(const NSTDTimedMutex *const mutex, const NSTDDuratio
 #ifdef NSTD_TIMED_MUTEX_OS_UNIX_IMPL
     return nstd_os_unix_mutex_timed_lock(mutex, duration);
 #else
-    const std::chrono::duration<NSTDFloat64> dur{nstd_time_duration_get(duration)};
+    const std::chrono::duration<NSTDFloat64> dur{nstd_core_time_duration_get(duration)};
     if (((std::timed_mutex *)mutex->inner)->try_lock_for(dur)) {
         const_cast<NSTDTimedMutex *>(mutex)->locked = NSTD_TRUE;
         NSTDOptionalTimedMutexLockResult ret{NSTD_OPTIONAL_STATUS_SOME, {}};

@@ -17,6 +17,7 @@ pub mod result;
 pub mod slice;
 pub mod str;
 pub mod unichar;
+pub mod time;
 use self::str::NSTDStr;
 use nstdapi::nstdapi;
 

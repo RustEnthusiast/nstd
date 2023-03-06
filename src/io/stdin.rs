@@ -2,13 +2,13 @@
 use crate::{
     alloc::NSTDAllocError,
     core::{
+        result::NSTDResult,
         slice::{NSTDSlice, NSTDSliceMut},
         str::nstd_core_str_from_bytes_unchecked,
     },
     io::{NSTDIOError, NSTDIOResult},
     string::{nstd_string_push_str, NSTDString},
     vec::NSTDVec,
-    NSTDUInt,
 };
 use nstdapi::nstdapi;
 use std::io::{Stdin, StdinLock};
@@ -171,39 +171,30 @@ pub unsafe fn nstd_io_stdin_read_exact(
 ///
 /// - `NSTDString *buffer` - The string buffer to extend with a line from stdin.
 ///
-/// - `NSTDUInt *read` - Returns as the number of bytes read from stdin.
-///
 /// # Returns
 ///
-/// `NSTDIOError errc` - The I/O operation error code.
+/// `NSTDIOResult read` - The number of bytes read from `handle` on success, or the I/O operation
+/// error code on failure.
 ///
 /// # Panics
 ///
 /// This function will panic if `buffer`'s length in bytes exceeds `NSTDInt`'s max value.
 #[nstdapi]
-pub fn nstd_io_stdin_read_line(
-    handle: &mut NSTDStdin,
-    buffer: &mut NSTDString,
-    read: &mut NSTDUInt,
-) -> NSTDIOError {
+pub fn nstd_io_stdin_read_line(handle: &mut NSTDStdin, buffer: &mut NSTDString) -> NSTDIOResult {
     let mut buf = String::new();
     match handle.read_line(&mut buf) {
         Ok(r) => {
-            *read = r;
             let bytes = NSTDSlice::from_slice(buf.as_bytes());
             // SAFETY: `bytes` refers to `buf`'s data, which is still valid UTF-8 here.
             unsafe {
                 let str = nstd_core_str_from_bytes_unchecked(&bytes);
                 match nstd_string_push_str(buffer, &str) {
-                    NSTDAllocError::NSTD_ALLOC_ERROR_NONE => NSTDIOError::NSTD_IO_ERROR_NONE,
-                    _ => NSTDIOError::NSTD_IO_ERROR_OUT_OF_MEMORY,
+                    NSTDAllocError::NSTD_ALLOC_ERROR_NONE => NSTDResult::Ok(r),
+                    _ => NSTDResult::Err(NSTDIOError::NSTD_IO_ERROR_OUT_OF_MEMORY),
                 }
             }
         }
-        Err(err) => {
-            *read = 0;
-            NSTDIOError::from_err(err.kind())
-        }
+        Err(err) => NSTDResult::Err(NSTDIOError::from_err(err.kind())),
     }
 }
 

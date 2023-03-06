@@ -15,5 +15,6 @@
 #include "core/result.h"
 #include "core/slice.h"
 #include "core/str.h"
+#include "core/time.h"
 #include "core/unichar.h"
 #endif
