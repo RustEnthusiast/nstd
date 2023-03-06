@@ -1,5 +1,8 @@
 # TBD
+### `nstd`
+- Added the `panic_handler` crate feature.
 ### `nstd.core`
+- Added `nstd.core.time`.
 - `nstd.core.cty`'s functions now use `NSTDChar`.
 - Added `nstd_core_unichar_is_[ascii|alphabetic|numeric|alphanumeric|lowercase|uppercase|whitespace|control|digit]`.
 - Added `nstd_core_unichar_replacement`.
@@ -13,14 +16,13 @@
 ### `nstd.io`
 - Added `NSTDStd[in|out|err]Lock`.
 - `nstd_io_[stdout|stderr]_write` now returns `NSTDIOResult`.
-- `nstd_io_stdin_read[_all|_to_string]` now returns `NSTDIOResult`.
+- `nstd_io_stdin_read[_all|_to_string|_line]` now returns `NSTDIOResult`.
 - Added `NSTDIOResult`.
 ### `nstd.os`
+- Added `nstd.os.unix.time`.
 - Added `NSTD_OS_[IOS|ANDROID|DRAGONFLY|FREEBSD|NETBSD|OPENBSD|BSD|HAIKU|NTO|SOLARIS]`.
 - Added `NSTDUnixIOResult`.
 - Added `nstd.os.unix.mutex`.
-### `nstd.time`
-- Added `NSTD[Optional]Duration`.
 
 # 0.5.0
 ### `nstd`

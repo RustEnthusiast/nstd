@@ -2,9 +2,9 @@
 #define NSTD_OS_UNIX_MUTEX_H
 #include "../../core/optional.h"
 #include "../../core/result.h"
+#include "../../core/time.h"
 #include "../../heap_ptr.h"
 #include "../../nstd.h"
-#include "../../time.h"
 #include <pthread.h>
 
 /// A mutual exclusion primitive useful for protecting shared data.
@@ -16,6 +16,9 @@ typedef struct {
     /// Determines whether or not the mutex is poisoned.
     NSTDBool poisoned;
 } NSTDUnixMutex;
+
+/// Represents an optional value of type `NSTDUnixMutex`.
+NSTDOptional(NSTDUnixMutex) NSTDUnixOptionalMutex;
 
 /// A handle to a mutex's protected data.
 typedef struct {
@@ -41,12 +44,9 @@ NSTDOptional(NSTDUnixMutexLockResult) NSTDUnixOptionalMutexLockResult;
 ///
 /// # Returns
 ///
-/// `NSTDUnixMutex mutex` - The new initialized mutex.
-///
-/// # Panics
-///
-/// This operation will panic if creating the mutex fails.
-NSTDAPI NSTDUnixMutex nstd_os_unix_mutex_new(NSTDHeapPtr data);
+/// `NSTDUnixOptionalMutex mutex` - The new initialized mutex on success, or an uninitialized "none"
+/// value if the OS was unable to create and initialize the mutex.
+NSTDAPI NSTDUnixOptionalMutex nstd_os_unix_mutex_new(NSTDHeapPtr data);
 
 /// Returns a Unix mutex's native OS handle.
 ///
@@ -78,15 +78,16 @@ NSTDAPI NSTDBool nstd_os_unix_mutex_is_poisoned(const NSTDUnixMutex *mutex);
 ///
 /// # Returns
 ///
-/// `NSTDUnixMutexLockResult guard` - A handle to the mutex's protected data.
-///
-/// # Panics
-///
-/// This operation will panic if locking the mutex fails.
-NSTDAPI NSTDUnixMutexLockResult nstd_os_unix_mutex_lock(const NSTDUnixMutex *mutex);
+/// `NSTDUnixOptionalMutexLockResult guard` - A handle to the mutex's protected data on success, or
+/// an uninitialized "none" value if the OS failed to lock the mutex.
+NSTDAPI NSTDUnixOptionalMutexLockResult nstd_os_unix_mutex_lock(const NSTDUnixMutex *mutex);
 
 /// The non-blocking variant of `nstd_os_unix_mutex_lock`. This will return immediately with an
 /// uninitialized "none" value if the mutex is locked.
+///
+/// # Note
+///
+/// This operation may return a "none" value in the case that the OS fails to lock the mutex.
 ///
 /// # Parameters:
 ///
@@ -96,16 +97,14 @@ NSTDAPI NSTDUnixMutexLockResult nstd_os_unix_mutex_lock(const NSTDUnixMutex *mut
 ///
 /// `NSTDUnixOptionalMutexLockResult guard` - A handle to the mutex's data, or "none" if the mutex
 /// is locked.
-///
-/// # Panics
-///
-/// This operation will panic if locking the mutex fails.
 NSTDAPI NSTDUnixOptionalMutexLockResult nstd_os_unix_mutex_try_lock(const NSTDUnixMutex *mutex);
 
 /// The timed variant of `nstd_os_unix_mutex_lock`. This will return with an uninitialized "none"
 /// value if the mutex remains locked for the time span of `duration`.
 ///
-/// # Note
+/// # Notes
+///
+/// This operation may return a "none" value in the case that the OS fails to lock the mutex.
 ///
 /// This function will return immediately with a "none" value on unsupported platforms.
 /// Supported platforms include Android, DragonFly BSD, FreeBSD, NetBSD, OpenBSD, Haiku, illumos,
@@ -121,10 +120,6 @@ NSTDAPI NSTDUnixOptionalMutexLockResult nstd_os_unix_mutex_try_lock(const NSTDUn
 ///
 /// `NSTDUnixOptionalMutexLockResult guard` - A handle to the mutex's data, or "none" if the mutex
 /// remains locked for the time span of `duration`.
-///
-/// # Panics
-///
-/// This operation will panic if locking the mutex fails.
 NSTDAPI NSTDUnixOptionalMutexLockResult
 nstd_os_unix_mutex_timed_lock(const NSTDUnixMutex *mutex, const NSTDDuration *duration);
 
