@@ -48,6 +48,7 @@ int main() {
     - `env` - Process environment management.
     - `fs` - Provides access to the file system.
         - `file` - A handle to an opened file.
+    - `gl` - The low level graphics library.
     - `heap_ptr` - A pointer type for single value heap allocation.
     - `image` - Multi-format image processing.
     - `io` - Provides functionality for interacting with the standard I/O streams.

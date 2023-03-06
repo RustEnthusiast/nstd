@@ -22,6 +22,9 @@ pub mod env;
 #[cfg(feature = "nstd_fs")]
 #[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_fs")))]
 pub mod fs;
+#[cfg(feature = "nstd_gl")]
+#[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_gl")))]
+pub mod gl;
 #[cfg(feature = "nstd_heap_ptr")]
 #[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_heap_ptr")))]
 pub mod heap_ptr;

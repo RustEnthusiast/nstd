@@ -6,6 +6,7 @@
 #include "nstd/cstring.h"
 #include "nstd/env.h"
 #include "nstd/fs.h"
+#include "nstd/gl.h"
 #include "nstd/heap_ptr.h"
 #include "nstd/image.h"
 #include "nstd/io.h"
