@@ -1,6 +1,4 @@
 # TBD
-### `nstd`
-- Added the `panic_handler` crate feature.
 ### `nstd.core`
 - Added `nstd.core.time`.
 - `nstd.core.cty`'s functions now use `NSTDChar`.
