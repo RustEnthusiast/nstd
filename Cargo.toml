@@ -37,7 +37,7 @@ nstd_core = []
 nstd_cstring = ["nstd_alloc", "nstd_core", "nstd_vec"]
 nstd_env = ["nstd_core", "nstd_io", "nstd_string", "nstd_vec", "std"]
 nstd_fs = ["nstd_core", "nstd_io", "nstd_os_unix_io", "nstd_string", "nstd_time", "nstd_vec", "std"]
-nstd_gl = []
+nstd_gl = ["nstd_core", "nstd_window", "pollster", "std", "wgpu"]
 nstd_heap_ptr = ["nstd_alloc", "nstd_core"]
 nstd_image = ["image", "nstd_core", "std"]
 nstd_image_gif = ["image/gif", "nstd_image"]
@@ -77,6 +77,8 @@ gilrs = { version = "0.10", optional = true }
 image = { version = "0.24", optional = true, default-features = false }
 libc = { version = "0.2", optional = true, default-features = false }
 nstdapi = "0.1"
+pollster = { version = "0.3", optional = true }
+wgpu = { version = "0.14", optional = true }
 winit = { version = "0.27", optional = true }
 
 [target.'cfg(unix)'.dependencies]
