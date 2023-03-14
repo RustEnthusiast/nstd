@@ -12,7 +12,7 @@ typedef NSTDAnyMut NSTDStderr;
 /// # Returns
 ///
 /// `NSTDStderr handle` - A handle to the standard error stream.
-NSTDAPI NSTDStderr nstd_io_stderr();
+NSTDAPI NSTDStderr nstd_io_stderr(void);
 
 /// Writes some data to the standard error stream, returning how many bytes were written.
 ///
@@ -85,7 +85,7 @@ typedef NSTDAnyMut NSTDStderrLock;
 /// # Returns
 ///
 /// `NSTDStderrLock handle` - A locked handle to the standard error stream.
-NSTDAPI NSTDStderrLock nstd_io_stderr_lock();
+NSTDAPI NSTDStderrLock nstd_io_stderr_lock(void);
 
 /// Writes some data to the standard error stream, returning how many bytes were written.
 ///

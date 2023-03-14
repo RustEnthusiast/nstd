@@ -113,7 +113,7 @@ NSTDAPI NSTDIOError nstd_io_print_line(const NSTDStr *output);
 ///
 /// Panics if allocating the string fails or the input's length in bytes exceeds `NSTDInt`'s max
 /// value.
-NSTDAPI NSTDIOStringResult nstd_io_read();
+NSTDAPI NSTDIOStringResult nstd_io_read(void);
 
 /// Reads a line of UTF-8 input from stdin.
 ///
@@ -125,6 +125,6 @@ NSTDAPI NSTDIOStringResult nstd_io_read();
 /// # Panics
 ///
 /// Panics if allocating the string fails.
-NSTDAPI NSTDIOStringResult nstd_io_read_line();
+NSTDAPI NSTDIOStringResult nstd_io_read_line(void);
 
 #endif

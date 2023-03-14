@@ -16,7 +16,7 @@ typedef enum {
         union {                  \
             E err;               \
             T ok;                \
-        };                       \
+        } value;                 \
     }
 
 #endif
