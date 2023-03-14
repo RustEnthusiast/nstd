@@ -30,6 +30,7 @@ typedef enum {
 typedef struct {
     /// The source language variant.
     NSTDGLShaderSourceStatus status;
+    /// The shader source value union.
     union {
         /// WebGPU WGSL shader source.
         const NSTDStr *wgsl;
@@ -41,8 +42,8 @@ typedef struct {
             const NSTDStr *glsl;
             /// The shader's stage in the rendering pipeline.
             NSTDGLShaderStage stage;
-        };
-    };
+        } glsl;
+    } value;
 } NSTDGLShaderSource;
 
 /// A GPU shader module.
