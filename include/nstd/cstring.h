@@ -27,7 +27,7 @@ NSTDOptional(NSTDCString) NSTDOptionalCString;
 /// # Panics
 ///
 /// This function will panic if allocating for the null byte fails.
-NSTDAPI NSTDCString nstd_cstring_new();
+NSTDAPI NSTDCString nstd_cstring_new(void);
 
 /// Creates a new `NSTDCString` initialized with the given capacity.
 ///

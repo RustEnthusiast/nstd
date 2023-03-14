@@ -18,7 +18,7 @@ NSTDOptional(NSTDTime) NSTDOptionalTime;
 /// # Returns
 ///
 /// `NSTDTime time` - The current time.
-NSTDAPI NSTDTime nstd_time_now();
+NSTDAPI NSTDTime nstd_time_now(void);
 
 /// Returns the number of seconds stored in an `NSTDTime` object as an `NSTDFloat64`.
 ///

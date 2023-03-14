@@ -14,7 +14,7 @@ typedef NSTDAnyMut NSTDStdin;
 /// # Returns
 ///
 /// `NSTDStdin handle` - A handle to the standard input stream.
-NSTDAPI NSTDStdin nstd_io_stdin();
+NSTDAPI NSTDStdin nstd_io_stdin(void);
 
 /// Reads some data from stdin into a byte slice buffer.
 ///
@@ -140,7 +140,7 @@ typedef NSTDAnyMut NSTDStdinLock;
 /// # Returns
 ///
 /// `NSTDStdinLock handle` - A locked handle to the standard input stream.
-NSTDAPI NSTDStdinLock nstd_io_stdin_lock();
+NSTDAPI NSTDStdinLock nstd_io_stdin_lock(void);
 
 /// Reads some data from stdin into a byte slice buffer.
 ///

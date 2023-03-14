@@ -23,7 +23,7 @@ NSTDOptional(NSTDString) NSTDOptionalString;
 /// # Returns
 ///
 /// `NSTDString string` - The new string.
-NSTDAPI NSTDString nstd_string_new();
+NSTDAPI NSTDString nstd_string_new(void);
 
 /// Creates a new string initialized with the given capacity.
 ///

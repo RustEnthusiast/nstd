@@ -23,7 +23,7 @@ NSTDResult(NSTDWindowsHeap, NSTDWindowsAllocError) NSTDWindowsHeapResult;
 /// # Safety
 ///
 /// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-getprocessheap>.
-NSTDAPI NSTDWindowsHeapResult nstd_os_windows_alloc_heap_default();
+NSTDAPI NSTDWindowsHeapResult nstd_os_windows_alloc_heap_default(void);
 
 /// Creates a new private heap for the process.
 ///

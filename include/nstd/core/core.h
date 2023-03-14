@@ -10,7 +10,7 @@
 /// # Panics
 ///
 /// This function will always panic.
-NSTDAPI void nstd_core_panic();
+NSTDAPI void nstd_core_panic(void);
 
 /// Invokes the runtime's panic handler with a UTF-8 encoded payload.
 ///

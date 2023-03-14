@@ -19,7 +19,7 @@ NSTDOptional(NSTDUnixTime) NSTDUnixOptionalTime;
 ///
 /// `NSTDUnixOptionalTime time` - The current time on success, or an uninitialized "none" value on
 /// failure.
-NSTDAPI NSTDUnixOptionalTime nstd_os_unix_time_now();
+NSTDAPI NSTDUnixOptionalTime nstd_os_unix_time_now(void);
 
 /// Returns the number of seconds stored in an `NSTDUnixTime` object as an `NSTDFloat64`.
 ///
