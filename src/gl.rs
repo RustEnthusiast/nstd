@@ -1,11 +1,13 @@
 //! The low level graphics library.
+pub mod frame;
+pub mod render_pass;
+pub mod shader;
 use crate::{core::result::NSTDResult, window::NSTDWindow, NSTDUInt32};
 use nstdapi::nstdapi;
 use pollster::FutureExt;
 use wgpu::{
-    Backends, Color, CompositeAlphaMode, Device, DeviceDescriptor, Instance, LoadOp, Operations,
-    PowerPreference, PresentMode, Queue, RenderPassColorAttachment, RenderPassDescriptor,
-    RequestAdapterOptions, Surface, SurfaceConfiguration, TextureUsages,
+    Backends, CompositeAlphaMode, Device, DeviceDescriptor, Instance, PowerPreference, PresentMode,
+    Queue, RequestAdapterOptions, Surface, SurfaceConfiguration, TextureUsages,
 };
 
 /// Describes an error returned by an `nstd.gl` function.
@@ -298,39 +300,6 @@ pub fn nstd_gl_renderer_resize(
         renderer
             .surface
             .configure(&renderer.device, &renderer.surface_config);
-    }
-}
-
-/// Swaps a renderer's frame buffers.
-///
-/// # Parameters:
-///
-/// - `const NSTDGLRenderer *renderer` - The renderer.
-#[nstdapi]
-pub fn nstd_gl_renderer_draw(renderer: &NSTDGLRenderer) {
-    let renderer = &renderer.renderer;
-    // Get the swap chain's next texture.
-    if let Ok(output) = renderer.surface.get_current_texture() {
-        let view = output.texture.create_view(&Default::default());
-        // Create a GPU command encoder.
-        let mut encoder = renderer.device.create_command_encoder(&Default::default());
-        // Create a render pass.
-        let render_pass_desc = RenderPassDescriptor {
-            label: None,
-            color_attachments: &[Some(RenderPassColorAttachment {
-                view: &view,
-                ops: Operations {
-                    load: LoadOp::Clear(Color::BLACK),
-                    store: true,
-                },
-                resolve_target: None,
-            })],
-            depth_stencil_attachment: None,
-        };
-        encoder.begin_render_pass(&render_pass_desc);
-        // Submit the encoder's commands and output the next surface texture.
-        renderer.device_handle.submit(Some(encoder.finish()));
-        output.present();
     }
 }
 
