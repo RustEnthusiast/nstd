@@ -33,7 +33,7 @@ typedef struct {
 /// - This function was not called on the "main" thread.
 ///
 /// - Creating the gamepad input handler fails.
-NSTDAPI NSTDApp nstd_app_new();
+NSTDAPI NSTDApp nstd_app_new(void);
 
 /// Returns a handle to an `NSTDApp`'s event loop.
 ///
