@@ -83,9 +83,9 @@ NSTDAPI NSTDOptionalTimedMutexLockResult nstd_timed_mutex_lock(const NSTDTimedMu
         NSTDOptionalTimedMutexLockResult ret{NSTD_OPTIONAL_STATUS_SOME, {}};
         const NSTDTimedMutexGuard guard{mutex};
         if (mutex->poisoned)
-            ret.some = NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_ERR, {guard}};
+            ret.value.some = NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_ERR, {guard}};
         else
-            ret.some = NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_OK, {guard}};
+            ret.value.some = NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_OK, {guard}};
         return ret;
     } catch (...) {
         return NSTDOptionalTimedMutexLockResult{NSTD_OPTIONAL_STATUS_NONE, {}};
@@ -120,9 +120,9 @@ NSTDAPI NSTDOptionalTimedMutexLockResult nstd_timed_mutex_try_lock(const NSTDTim
         NSTDOptionalTimedMutexLockResult ret{NSTD_OPTIONAL_STATUS_SOME, {}};
         const NSTDTimedMutexGuard guard{mutex};
         if (mutex->poisoned)
-            ret.some = NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_ERR, {guard}};
+            ret.value.some = NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_ERR, {guard}};
         else
-            ret.some = NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_OK, {guard}};
+            ret.value.some = NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_OK, {guard}};
         return ret;
     } else
         return NSTDOptionalTimedMutexLockResult{NSTD_OPTIONAL_STATUS_NONE, {}};
@@ -159,9 +159,9 @@ nstd_timed_mutex_timed_lock(const NSTDTimedMutex *const mutex, const NSTDDuratio
         NSTDOptionalTimedMutexLockResult ret{NSTD_OPTIONAL_STATUS_SOME, {}};
         const NSTDTimedMutexGuard guard{mutex};
         if (mutex->poisoned)
-            ret.some = NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_ERR, {guard}};
+            ret.value.some = NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_ERR, {guard}};
         else
-            ret.some = NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_OK, {guard}};
+            ret.value.some = NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_OK, {guard}};
         return ret;
     } else
         return NSTDOptionalTimedMutexLockResult{NSTD_OPTIONAL_STATUS_NONE, {}};
