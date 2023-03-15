@@ -1,8 +1,20 @@
 #ifndef NSTD_GL_FRAME_H
 #define NSTD_GL_FRAME_H
-#include "../core/optional.h"
+#include "../core/result.h"
 #include "../nstd.h"
 #include "gl.h"
+
+/// Describes an error returned from `nstd_gl_frame_new`.
+typedef enum {
+    /// A timeout was encountered while trying to acquire the next frame.
+    NSTD_GL_FRAME_ERROR_TIMEOUT,
+    /// The underlying surface has changed, and therefore the swap chain must be updated.
+    NSTD_GL_FRAME_ERROR_OUTDATED,
+    /// The swap chain has been lost and needs to be recreated.
+    NSTD_GL_FRAME_ERROR_LOST,
+    /// There is no memory left to allocate a new frame.
+    NSTD_GL_FRAME_ERROR_OUT_OF_MEMORY
+} NSTDGLFrameError;
 
 /// An individual window surface texture.
 typedef struct {
@@ -10,8 +22,8 @@ typedef struct {
     NSTDAnyMut frame;
 } NSTDGLFrame;
 
-/// Represents an optional value of type `NSTDGLFrame`.
-NSTDOptional(NSTDGLFrame) NSTDGLOptionalFrame;
+/// A result type returned from `nstd_gl_frame_new`.
+NSTDResult(NSTDGLFrame, NSTDGLFrameError) NSTDGLFrameResult;
 
 /// Gets `renderer`'s swap chain's next frame.
 ///
@@ -21,12 +33,13 @@ NSTDOptional(NSTDGLFrame) NSTDGLOptionalFrame;
 ///
 /// # Returns
 ///
-/// `NSTDGLOptionalFrame frame` - Renderer's next frame.
+/// `NSTDGLFrameResult frame` - Renderer's next frame on success, or a value indicating an error on
+/// failure.
 ///
 /// # Panics
 ///
 /// This operation will panic if another frame is alive.
-NSTDAPI NSTDGLOptionalFrame nstd_gl_frame_new(const NSTDGLRenderer *renderer);
+NSTDAPI NSTDGLFrameResult nstd_gl_frame_new(const NSTDGLRenderer *renderer);
 
 /// Draws `frame` onto the display.
 ///
