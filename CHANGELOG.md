@@ -1,4 +1,6 @@
 # TBD
+### `nstd`
+Fixed some C99 header incompatibilities.
 ### `nstd.core`
 - Added `nstd.core.time`.
 - `nstd.core.cty`'s functions now use `NSTDChar`.
