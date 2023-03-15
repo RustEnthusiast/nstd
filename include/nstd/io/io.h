@@ -49,7 +49,7 @@ typedef enum {
     /// A reader unexpectedly reached the end of a file.
     NSTD_IO_ERROR_UNEXPECTED_EOF,
     /// An operation could not be completed, because it failed to allocate enough memory.
-    NSTD_IO_ERROR_OUT_OF_MEMORY,
+    NSTD_IO_ERROR_OUT_OF_MEMORY
 } NSTDIOError;
 
 /// A result type that yields an [NSTDUInt] representing the number of bytes read or written by an
