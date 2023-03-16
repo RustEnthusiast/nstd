@@ -9,10 +9,10 @@ struct CModule {
     name: &'static str,
     /// The module's source files.
     src: &'static [&'static str],
-    /// Set to true if this module contains C++.
-    cpp: bool,
     /// Flags to attempt to pass to the compiler.
     flags: &'static [&'static str],
+    /// Set to true if this module contains C++.
+    cpp: bool,
 }
 impl CModule {
     /// Compiles and links the C/C++ module.
@@ -45,13 +45,23 @@ impl CModule {
 fn main() {
     println!("cargo:rerun-if-changed=src/*");
     println!("cargo:rerun-if-changed=include/*");
+    #[cfg(feature = "nstd_os_unix_alloc")]
+    {
+        let nstd_os_unix_alloc = CModule {
+            name: "nstd_os_unix_alloc",
+            src: &["src/os/unix/alloc.c"],
+            flags: &["-std=c99", "/std:c99"],
+            ..Default::default()
+        };
+        nstd_os_unix_alloc.build();
+    }
     #[cfg(feature = "nstd_timed_mutex")]
     {
         let nstd_timed_mutex = CModule {
             name: "nstd_timed_mutex",
             src: &["src/timed_mutex.cpp"],
-            cpp: true,
             flags: &["-std=c++11", "/std:c++11"],
+            cpp: true,
             ..Default::default()
         };
         nstd_timed_mutex.build();
