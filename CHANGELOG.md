@@ -1,4 +1,4 @@
-# TBD
+# 0.6.0
 ### `nstd`
 Fixed some C99 header incompatibilities.
 ### `nstd.core`
