@@ -16,27 +16,26 @@ struct CModule {
 }
 impl CModule {
     /// Compiles and links the C/C++ module.
+    #[cfg(feature = "cc")]
     fn build(self) {
-        #[cfg(feature = "cc")]
-        {
-            use cc::Build;
-            if std::env::var("DOCS_RS").is_err() {
-                // Create the compiler.
-                let mut cc = Build::new();
-                // Add compiler flags.
-                for flag in self.flags {
-                    cc.flag_if_supported(flag);
-                }
-                // Compile.
-                cc.flag_if_supported("-pedantic-errors")
-                    .flag_if_supported("/permissive-")
-                    .include("include")
-                    .warnings(true)
-                    .extra_warnings(true)
-                    .cpp(self.cpp)
-                    .files(self.src)
-                    .compile(self.name);
+        use cc::Build;
+        if std::env::var("DOCS_RS").is_err() {
+            // Create the compiler.
+            let mut cc = Build::new();
+            // Add compiler flags.
+            for flag in self.flags {
+                cc.flag_if_supported(flag);
             }
+            // Disable compiler extensions.
+            cc.flag_if_supported("-pedantic-errors")
+                .flag_if_supported("/permissive-");
+            // Compile.
+            cc.include("include")
+                .warnings(true)
+                .extra_warnings(true)
+                .cpp(self.cpp)
+                .files(self.src)
+                .compile(self.name);
         }
     }
 }
@@ -47,20 +46,23 @@ fn main() {
     println!("cargo:rerun-if-changed=include/*");
     #[cfg(feature = "nstd_os_unix_alloc")]
     {
-        let nstd_os_unix_alloc = CModule {
-            name: "nstd_os_unix_alloc",
-            src: &["src/os/unix/alloc.c"],
-            flags: &["-std=c99", "/std:c99"],
-            ..Default::default()
-        };
-        nstd_os_unix_alloc.build();
+        use build_target::Family;
+        if build_target::target_family() == Ok(Family::Unix) {
+            let nstd_os_unix_alloc = CModule {
+                name: "nstd_os_unix_alloc",
+                src: &["src/os/unix/alloc.c"],
+                flags: &["-std=c99", "/std:c11"],
+                ..Default::default()
+            };
+            nstd_os_unix_alloc.build();
+        }
     }
     #[cfg(feature = "nstd_timed_mutex")]
     {
         let nstd_timed_mutex = CModule {
             name: "nstd_timed_mutex",
             src: &["src/timed_mutex.cpp"],
-            flags: &["-std=c++11", "/std:c++11"],
+            flags: &["-std=c++11", "/std:c++14"],
             cpp: true,
             ..Default::default()
         };

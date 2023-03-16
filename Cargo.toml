@@ -41,7 +41,7 @@ nstd_io = ["nstd_alloc", "nstd_core", "nstd_os_unix_io", "nstd_string", "nstd_ve
 nstd_math = ["std"]
 nstd_mutex = ["nstd_core", "nstd_heap_ptr", "std"]
 nstd_os = ["windows-sys"]
-nstd_os_unix_alloc = ["cc", "nstd_core", "nstd_os"]
+nstd_os_unix_alloc = ["build-target", "cc", "nstd_core", "nstd_os"]
 nstd_os_unix_io = ["errno", "libc", "nstd_alloc", "nstd_core", "nstd_os", "nstd_string", "nstd_vec"]
 nstd_os_unix_mutex = [
     "libc", "nstd_core", "nstd_heap_ptr", "nstd_os", "nstd_os_unix_time", "nstd_thread"
@@ -75,4 +75,5 @@ errno = { version = "0.3", optional = true, default-features = false }
 windows-sys = { version = "0.45", optional = true, features = ["Win32_Foundation"] }
 
 [build-dependencies]
+build-target = { version = "0.4", optional = true }
 cc = { version = "1.0", optional = true }
