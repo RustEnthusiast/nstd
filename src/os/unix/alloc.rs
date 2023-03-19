@@ -1,5 +1,9 @@
 //! Memory allocation for Unix-like systems.
 use crate::{core::def::NSTDErrorCode, NSTDAnyMut, NSTDUInt};
+#[cfg(all(feature = "asm", target_arch = "x86_64", not(target_os = "macos")))]
+core::arch::global_asm!(include_str!("alloc/x86_64/alloc.asm"));
+#[cfg(all(feature = "asm", target_arch = "x86_64", target_os = "macos"))]
+core::arch::global_asm!(include_str!("alloc/x86_64/macos/alloc.asm"));
 
 extern "C" {
     /// Allocates a block of memory on the heap, returning a pointer to it.

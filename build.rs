@@ -46,7 +46,7 @@ fn main() {
     println!("cargo:rerun-if-changed=include/*");
     #[cfg(feature = "nstd_os_unix_alloc")]
     {
-        use build_target::Family;
+        use build_target::{Arch, Family};
         if build_target::target_family() == Ok(Family::Unix) {
             let nstd_os_unix_alloc = CModule {
                 name: "nstd_os_unix_alloc",
@@ -54,7 +54,12 @@ fn main() {
                 flags: &["-std=c99", "/std:c11"],
                 ..Default::default()
             };
-            nstd_os_unix_alloc.build();
+            if build_target::target_arch() == Ok(Arch::X86_64) {
+                #[cfg(not(feature = "asm"))]
+                nstd_os_unix_alloc.build();
+            } else {
+                nstd_os_unix_alloc.build();
+            }
         }
     }
     #[cfg(feature = "nstd_timed_mutex")]
