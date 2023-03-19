@@ -12,8 +12,8 @@ nstd_os_unix_alloc_allocate_zeroed:
     mov esi, 1
     jmp calloc
 
-.globl nstd_os_unix_alloc_allocate
-nstd_os_unix_alloc_allocate:
+.globl nstd_os_unix_alloc_reallocate
+nstd_os_unix_alloc_reallocate:
     push rdi
     mov rdi, [rdi]
     call realloc
