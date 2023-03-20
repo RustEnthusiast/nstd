@@ -142,7 +142,7 @@ pub enum NSTDGLPresentationMode {
     ///
     /// Traditionally called "Fast VSync".
     ///
-    /// Supported on Direct 3D 11/12, Nvidia on Vulkan, and Wayland on Vulkan.
+    /// Supported on Direct3D 11/12, Nvidia on Vulkan, and Wayland on Vulkan.
     NSTD_GL_PRESENTATION_MODE_MAILBOX,
 }
 impl From<NSTDGLPresentationMode> for PresentMode {
