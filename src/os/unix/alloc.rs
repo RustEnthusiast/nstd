@@ -1,9 +1,20 @@
 //! Memory allocation for Unix-like systems.
-use crate::{core::def::NSTDErrorCode, NSTDAnyMut, NSTDUInt};
+use crate::{NSTDAnyMut, NSTDUInt};
 #[cfg(all(feature = "asm", target_arch = "x86_64", not(target_os = "macos")))]
 core::arch::global_asm!(include_str!("alloc/x86_64/alloc.asm"));
 #[cfg(all(feature = "asm", target_arch = "x86_64", target_os = "macos"))]
 core::arch::global_asm!(include_str!("alloc/x86_64/macos/alloc.asm"));
+
+/// Describes an error returned from an `nstd.os.unix.alloc` function.
+#[repr(C)]
+#[derive(Clone, Copy, PartialEq, Eq)]
+#[allow(non_camel_case_types)]
+pub enum NSTDUnixAllocError {
+    /// No error occurred.
+    NSTD_UNIX_ALLOC_ERROR_NONE,
+    /// Allocating or reallocating failed.
+    NSTD_UNIX_ALLOC_ERROR_OUT_OF_MEMORY,
+}
 
 extern "C" {
     /// Allocates a block of memory on the heap, returning a pointer to it.
@@ -75,7 +86,7 @@ extern "C" {
     ///
     /// # Returns
     ///
-    /// `NSTDErrorCode errc` - Nonzero if reallocating fails.
+    /// `NSTDUnixAllocError errc` - The allocation operation error code.
     ///
     /// # Safety
     ///
@@ -100,8 +111,10 @@ extern "C" {
     ///     nstd_os_unix_alloc_deallocate(&mut mem);
     /// }
     /// ```
-    pub fn nstd_os_unix_alloc_reallocate(ptr: &mut NSTDAnyMut, new_size: NSTDUInt)
-        -> NSTDErrorCode;
+    pub fn nstd_os_unix_alloc_reallocate(
+        ptr: &mut NSTDAnyMut,
+        new_size: NSTDUInt,
+    ) -> NSTDUnixAllocError;
 
     /// Deallocates a block of memory previously allocated by `nstd_os_unix_alloc_allocate[_zeroed]`.
     ///

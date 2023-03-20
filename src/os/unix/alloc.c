@@ -1,4 +1,3 @@
-#include <nstd/core/def.h>
 #include <nstd/nstd.h>
 #include <nstd/os/unix/alloc.h>
 #include <stdlib.h>
@@ -47,19 +46,19 @@ NSTDAPI NSTDAnyMut nstd_os_unix_alloc_allocate_zeroed(const NSTDUInt size) {
 ///
 /// # Returns
 ///
-/// `NSTDErrorCode errc` - Nonzero if reallocating fails.
+/// `NSTDUnixAllocError errc` - The allocation operation error code.
 ///
 /// # Safety
 ///
 /// See <https://man7.org/linux/man-pages/man3/realloc.3p.html>.
-NSTDAPI NSTDErrorCode
+NSTDAPI NSTDUnixAllocError
 nstd_os_unix_alloc_reallocate(NSTDAnyMut *const ptr, const NSTDUInt new_size) {
     const NSTDAnyMut new_mem = realloc(*ptr, new_size);
     if (new_mem) {
         *ptr = new_mem;
-        return 0;
+        return NSTD_UNIX_ALLOC_ERROR_NONE;
     }
-    return 1;
+    return NSTD_UNIX_ALLOC_ERROR_OUT_OF_MEMORY;
 }
 
 /// Deallocates a block of memory previously allocated by `nstd_os_unix_alloc_allocate[_zeroed]`.

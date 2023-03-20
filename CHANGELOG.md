@@ -1,4 +1,7 @@
 # TBD
+## Added
+### `nstd.os`
+- Added `NSTDUnixAllocError`.
 ## Changed
 ### `nstd.heap_ptr`
 - `nstd_heap_ptr_[new[_zeroed]|clone]` now returns `NSTDOptionalHeapPtr`.
