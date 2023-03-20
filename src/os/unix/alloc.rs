@@ -97,7 +97,7 @@ extern "C" {
     /// ```
     /// use nstd_sys::os::unix::alloc::{
     ///     nstd_os_unix_alloc_allocate_zeroed, nstd_os_unix_alloc_deallocate,
-    ///     nstd_os_unix_alloc_reallocate,
+    ///     nstd_os_unix_alloc_reallocate, NSTDUnixAllocError::NSTD_UNIX_ALLOC_ERROR_NONE,
     /// };
     ///
     /// const SIZE: usize = core::mem::size_of::<u64>();
@@ -106,7 +106,8 @@ extern "C" {
     /// unsafe {
     ///     let mut mem = nstd_os_unix_alloc_allocate_zeroed(SIZE);
     ///     assert!(!mem.is_null());
-    ///     assert!(nstd_os_unix_alloc_reallocate(&mut mem, NEW_SIZE) == 0);
+    ///     let errc = nstd_os_unix_alloc_reallocate(&mut mem, NEW_SIZE);
+    ///     assert!(errc == NSTD_UNIX_ALLOC_ERROR_NONE);
     ///     assert!(*mem.cast::<u32>() == 0);
     ///     nstd_os_unix_alloc_deallocate(&mut mem);
     /// }
