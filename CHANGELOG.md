@@ -1,3 +1,8 @@
+# TBD
+## Changed
+### `nstd.heap_ptr`
+- `nstd_heap_ptr_[new[_zeroed]|clone]` now returns `NSTDOptionalHeapPtr`.
+
 # 0.6.0
 ### `nstd`
 Fixed some C99 header incompatibilities.
