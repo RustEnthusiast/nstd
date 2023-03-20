@@ -2,6 +2,8 @@
 ## Changed
 ### `nstd.heap_ptr`
 - `nstd_heap_ptr_[new[_zeroed]|clone]` now returns `NSTDOptionalHeapPtr`.
+### `nstd.shared_ptr`
+- `nstd_shared_ptr_new[_zeroed]` now returns `NSTDOptionalSharedPtr`.
 
 # 0.6.0
 ### `nstd`
