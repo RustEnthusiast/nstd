@@ -3,6 +3,8 @@
 ### `nstd.os`
 - Added `NSTDUnixAllocError`.
 ## Changed
+### `nstd.core`
+- `nstd_core_slice_mut_copy` now panics.
 ### `nstd.heap_ptr`
 - `nstd_heap_ptr_[new[_zeroed]|clone]` now returns `NSTDOptionalHeapPtr`.
 ### `nstd.shared_ptr`

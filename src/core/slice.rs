@@ -1,7 +1,6 @@
 //! A view into a sequence of values in memory.
 use crate::{
     core::{
-        def::NSTDErrorCode,
         mem::nstd_core_mem_copy,
         optional::{gen_optional, NSTDOptional},
         ptr::{
@@ -829,15 +828,13 @@ pub const fn nstd_core_slice_mut_last_const(slice: &NSTDSliceMut) -> NSTDAny {
 ///
 /// - `const NSTDSlice *src` - The slice to copy data from.
 ///
-/// # Returns
+/// # Panics
 ///
-/// `NSTDErrorCode errc` - Nonzero on error.
+/// This operation will panic in the following situations:
 ///
-/// # Errors
+/// - The two buffer's lengths do not match.
 ///
-/// - `1` - The two buffer's lengths do not match.
-///
-/// - `2` - The two buffer's strides do not match.
+/// - The two buffer's strides do not match.
 ///
 /// # Safety
 ///
@@ -863,16 +860,10 @@ pub const fn nstd_core_slice_mut_last_const(slice: &NSTDSliceMut) -> NSTDAny {
 /// assert!(dest_arr == src_arr);
 /// ```
 #[nstdapi]
-pub unsafe fn nstd_core_slice_mut_copy(dest: &mut NSTDSliceMut, src: &NSTDSlice) -> NSTDErrorCode {
-    if dest.len != src.len {
-        1
-    } else if nstd_core_slice_mut_stride(dest) != nstd_core_slice_stride(src) {
-        2
-    } else {
-        let len = src.byte_len();
-        let dest = nstd_core_slice_mut_as_ptr(dest).cast();
-        let src = nstd_core_slice_as_ptr(src).cast();
-        nstd_core_mem_copy(dest, src, len);
-        0
-    }
+pub unsafe fn nstd_core_slice_mut_copy(dest: &mut NSTDSliceMut, src: &NSTDSlice) {
+    assert!(dest.len == src.len && nstd_core_slice_mut_stride(dest) == nstd_core_slice_stride(src));
+    let len = src.byte_len();
+    let dest = nstd_core_slice_mut_as_ptr(dest) as _;
+    let src = nstd_core_slice_as_ptr(src) as _;
+    nstd_core_mem_copy(dest, src, len);
 }
