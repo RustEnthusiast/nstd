@@ -65,16 +65,17 @@ NSTDAPI NSTDVec nstd_vec_new_with_cap(NSTDUInt element_size, NSTDUInt cap);
 ///
 /// # Returns
 ///
-/// `NSTDVec vec` - The new vector with a copy of `slice`'s contents.
+/// `NSTDOptionalVec vec` - The new vector with a copy of `slice`'s contents on success, or an
+/// uninitialized "none" variant if allocating fails.
 ///
 /// # Panics
 ///
-/// This operation will panic if the slice's stride is 0 or allocating fails.
+/// This operation will panic if the slice's stride is 0.
 ///
 /// # Safety
 ///
 /// The caller of this function must ensure that `slice`'s data is valid for reads.
-NSTDAPI NSTDVec nstd_vec_from_slice(const NSTDSlice *slice);
+NSTDAPI NSTDOptionalVec nstd_vec_from_slice(const NSTDSlice *slice);
 
 /// Creates a new deep copy of `vec`.
 ///

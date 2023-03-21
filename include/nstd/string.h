@@ -48,16 +48,13 @@ NSTDAPI NSTDString nstd_string_new_with_cap(NSTDUInt cap);
 ///
 /// # Returns
 ///
-/// `NSTDString string` The new owned version of `str`.
-///
-/// # Panics
-///
-/// This operation will panic if allocating fails.
+/// `NSTDOptionalString string` - The new owned version of `str` on success, or an uninitialized
+/// "none" variant if allocating fails.
 ///
 /// # Safety
 ///
 /// The caller of this function must ensure that `str`'s data is valid for reads.
-NSTDAPI NSTDString nstd_string_from_str(const NSTDStr *str);
+NSTDAPI NSTDOptionalString nstd_string_from_str(const NSTDStr *str);
 
 /// Creates a new string from owned UTF-8 data.
 ///
