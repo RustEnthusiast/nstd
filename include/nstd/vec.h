@@ -84,12 +84,9 @@ NSTDAPI NSTDVec nstd_vec_from_slice(const NSTDSlice *slice);
 ///
 /// # Returns
 ///
-/// `NSTDVec cloned` - The new deep copy of `vec`.
-///
-/// # Panics
-///
-/// This operation will panic if allocating for the new vector fails.
-NSTDAPI NSTDVec nstd_vec_clone(const NSTDVec *vec);
+/// `NSTDOptionalVec cloned` - The new deep copy of `vec` on success, or an uninitialized "none"
+/// variant if allocating fails.
+NSTDAPI NSTDOptionalVec nstd_vec_clone(const NSTDVec *vec);
 
 /// Returns the length of a vector.
 ///

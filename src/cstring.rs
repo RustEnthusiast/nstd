@@ -198,16 +198,14 @@ pub fn nstd_cstring_from_bytes(bytes: NSTDVec) -> NSTDCString {
 ///
 /// # Returns
 ///
-/// `NSTDCString cloned` - A new deep copy of `cstring`.
-///
-/// # Panics
-///
-/// This function will panic if allocating for the new C string fails.
+/// `NSTDOptionalCString cloned` - A new deep copy of `cstring` on success, or an uninitialized
+/// "none" variant if allocating fails.
 #[inline]
 #[nstdapi]
-pub fn nstd_cstring_clone(cstring: &NSTDCString) -> NSTDCString {
-    NSTDCString {
-        bytes: nstd_vec_clone(&cstring.bytes),
+pub fn nstd_cstring_clone(cstring: &NSTDCString) -> NSTDOptionalCString {
+    match nstd_vec_clone(&cstring.bytes) {
+        NSTDOptional::Some(bytes) => NSTDOptional::Some(NSTDCString { bytes }),
+        _ => NSTDOptional::None,
     }
 }
 

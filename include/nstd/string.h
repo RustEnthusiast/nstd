@@ -88,12 +88,9 @@ NSTDAPI NSTDString nstd_string_from_bytes(NSTDVec bytes);
 ///
 /// # Returns
 ///
-/// `NSTDString cloned` - A new deep copy of `string`.
-///
-/// # Panics
-///
-/// This function will panic if allocating for the new string fails.
-NSTDAPI NSTDString nstd_string_clone(const NSTDString *string);
+/// `NSTDOptionalString cloned` - A new deep copy of `string` on success, or an uninitialized
+/// "none" variant if allocating fails.
+NSTDAPI NSTDOptionalString nstd_string_clone(const NSTDString *string);
 
 /// Creates a string slice containing the contents of `string`.
 ///

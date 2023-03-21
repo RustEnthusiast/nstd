@@ -8,6 +8,8 @@
 - `nstd.core.time` functions now take `NSTDDuration` by value.
 - `nstd_core_str[_mut]_from_raw_cstr[_with_null]` no longer panics if `cstr` is null.
 - `nstd_core_slice_mut_copy` now panics.
+### `nstd.cstring`
+- `nstd_cstring_clone` now returns `NSTDOptionalCString`.
 ### `nstd.heap_ptr`
 - `nstd_heap_ptr_[new[_zeroed]|clone]` now returns `NSTDOptionalHeapPtr`.
 ### `nstd.os`
@@ -15,10 +17,14 @@
 - `nstd.os.unix.time` functions now take `NSTDUnixTime` & `NSTDDuration` by value.
 ### `nstd.shared_ptr`
 - `nstd_shared_ptr_new[_zeroed]` now returns `NSTDOptionalSharedPtr`.
+### `nstd.string`
+- `nstd_string_clone` now returns `NSTDOptionalString`.
 ### `nstd.time`
 - `nstd.time` functions now take `NSTDTime` & `NSTDDuration` by value.
 ### `nstd.timed_mutex`
 - `nstd_timed_mutex_timed_lock` now takes `NSTDDuration` by value.
+### `nstd.vec`
+- `nstd_vec_clone` now returns `NSTDOptionalVec`.
 
 # 0.6.0
 ### `nstd`

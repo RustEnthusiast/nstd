@@ -327,22 +327,21 @@ pub unsafe fn nstd_vec_from_slice(slice: &NSTDSlice) -> NSTDVec {
 ///
 /// # Returns
 ///
-/// `NSTDVec cloned` - The new deep copy of `vec`.
-///
-/// # Panics
-///
-/// This operation will panic if allocating for the new vector fails.
+/// `NSTDOptionalVec cloned` - The new deep copy of `vec` on success, or an uninitialized "none"
+/// variant if allocating fails.
 #[nstdapi]
-pub fn nstd_vec_clone(vec: &NSTDVec) -> NSTDVec {
+pub fn nstd_vec_clone(vec: &NSTDVec) -> NSTDOptionalVec {
     if vec.len > 0 {
         let mut cloned = nstd_vec_new_with_cap(vec.stride, vec.len);
-        assert!(!cloned.ptr.is_null());
+        if cloned.ptr.is_null() {
+            return NSTDOptional::None;
+        }
         // SAFETY: Both vectors are non-null.
         unsafe { nstd_core_mem_copy(cloned.ptr.cast(), vec.ptr.cast(), vec.byte_len()) };
         cloned.len = vec.len;
-        cloned
+        NSTDOptional::Some(cloned)
     } else {
-        nstd_vec_new(vec.stride)
+        NSTDOptional::Some(nstd_vec_new(vec.stride))
     }
 }
 

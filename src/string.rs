@@ -197,16 +197,14 @@ pub fn nstd_string_from_bytes(bytes: NSTDVec) -> NSTDString {
 ///
 /// # Returns
 ///
-/// `NSTDString cloned` - A new deep copy of `string`.
-///
-/// # Panics
-///
-/// This function will panic if allocating for the new string fails.
+/// `NSTDOptionalString cloned` - A new deep copy of `string` on success, or an uninitialized
+/// "none" variant if allocating fails.
 #[inline]
 #[nstdapi]
-pub fn nstd_string_clone(string: &NSTDString) -> NSTDString {
-    NSTDString {
-        bytes: nstd_vec_clone(&string.bytes),
+pub fn nstd_string_clone(string: &NSTDString) -> NSTDOptionalString {
+    match nstd_vec_clone(&string.bytes) {
+        NSTDOptional::Some(bytes) => NSTDOptional::Some(NSTDString { bytes }),
+        _ => NSTDOptional::None,
     }
 }
 

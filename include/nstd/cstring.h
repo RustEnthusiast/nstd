@@ -123,12 +123,9 @@ NSTDAPI NSTDCString nstd_cstring_from_bytes(NSTDVec bytes);
 ///
 /// # Returns
 ///
-/// `NSTDCString cloned` - A new deep copy of `cstring`.
-///
-/// # Panics
-///
-/// This function will panic if allocating for the new C string fails.
-NSTDAPI NSTDCString nstd_cstring_clone(const NSTDCString *cstring);
+/// `NSTDOptionalCString cloned` - A new deep copy of `cstring` on success, or an uninitialized
+/// "none" variant if allocating fails.
+NSTDAPI NSTDOptionalCString nstd_cstring_clone(const NSTDCString *cstring);
 
 /// Creates a C string slice containing the contents of `cstring`.
 ///
