@@ -204,11 +204,7 @@ pub const unsafe fn nstd_core_str_from_cstr_unchecked(cstr: &NSTDCStr) -> NSTDSt
 ///
 /// # Panics
 ///
-/// This function will panic in the following situations:
-///
-/// - `cstr` is null.
-///
-/// - `cstr`'s length is greater than `NSTDInt`'s max value.
+/// This function will panic if `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -228,15 +224,16 @@ pub const unsafe fn nstd_core_str_from_cstr_unchecked(cstr: &NSTDCStr) -> NSTDSt
 /// ```
 #[nstdapi]
 pub unsafe fn nstd_core_str_from_raw_cstr(cstr: *const NSTDChar) -> NSTDOptionalStr {
-    assert!(!cstr.is_null());
-    let ptr = cstr.cast();
-    let len = nstd_core_cstr_raw_len(cstr);
-    assert!(len <= isize::MAX as NSTDUInt);
-    let bytes = core::slice::from_raw_parts(ptr, len);
-    match core::str::from_utf8(bytes).is_ok() {
-        true => NSTDOptional::Some(NSTDStr { ptr, len }),
-        false => NSTDOptional::None,
+    if !cstr.is_null() {
+        let ptr = cstr.cast();
+        let len = nstd_core_cstr_raw_len(cstr);
+        assert!(len <= isize::MAX as NSTDUInt);
+        let bytes = core::slice::from_raw_parts(ptr, len);
+        if core::str::from_utf8(bytes).is_ok() {
+            return NSTDOptional::Some(NSTDStr { ptr, len });
+        }
     }
+    NSTDOptional::None
 }
 
 /// Creates a new `NSTDStr` from a raw C string, including the null byte.
@@ -252,11 +249,7 @@ pub unsafe fn nstd_core_str_from_raw_cstr(cstr: *const NSTDChar) -> NSTDOptional
 ///
 /// # Panics
 ///
-/// This function will panic in the following situations:
-///
-/// - `cstr` is null.
-///
-/// - `cstr`'s length is greater than `NSTDInt`'s max value.
+/// This function will panic if `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -276,15 +269,16 @@ pub unsafe fn nstd_core_str_from_raw_cstr(cstr: *const NSTDChar) -> NSTDOptional
 /// ```
 #[nstdapi]
 pub unsafe fn nstd_core_str_from_raw_cstr_with_null(cstr: *const NSTDChar) -> NSTDOptionalStr {
-    assert!(!cstr.is_null());
-    let ptr = cstr.cast();
-    let len = nstd_core_cstr_raw_len_with_null(cstr);
-    assert!(len <= isize::MAX as NSTDUInt);
-    let bytes = core::slice::from_raw_parts(ptr, len);
-    match core::str::from_utf8(bytes).is_ok() {
-        true => NSTDOptional::Some(NSTDStr { ptr, len }),
-        false => NSTDOptional::None,
+    if !cstr.is_null() {
+        let ptr = cstr.cast();
+        let len = nstd_core_cstr_raw_len_with_null(cstr);
+        assert!(len <= isize::MAX as NSTDUInt);
+        let bytes = core::slice::from_raw_parts(ptr, len);
+        if core::str::from_utf8(bytes).is_ok() {
+            return NSTDOptional::Some(NSTDStr { ptr, len });
+        }
     }
+    NSTDOptional::None
 }
 
 /// Creates a string slice from raw bytes.
@@ -999,11 +993,7 @@ pub unsafe fn nstd_core_str_mut_from_cstr_unchecked(cstr: &mut NSTDCStrMut) -> N
 ///
 /// # Panics
 ///
-/// This function will panic in the following situations:
-///
-/// - `cstr` is null.
-///
-/// - `cstr`'s length is greater than `NSTDInt`'s max value.
+/// This function will panic if `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -1023,15 +1013,16 @@ pub unsafe fn nstd_core_str_mut_from_cstr_unchecked(cstr: &mut NSTDCStrMut) -> N
 /// ```
 #[nstdapi]
 pub unsafe fn nstd_core_str_mut_from_raw_cstr(cstr: *mut NSTDChar) -> NSTDOptionalStrMut {
-    assert!(!cstr.is_null());
-    let ptr = cstr.cast();
-    let len = nstd_core_cstr_raw_len(cstr);
-    assert!(len <= isize::MAX as usize);
-    let bytes = core::slice::from_raw_parts(ptr, len);
-    match core::str::from_utf8(bytes).is_ok() {
-        true => NSTDOptional::Some(NSTDStrMut { ptr, len }),
-        false => NSTDOptional::None,
+    if !cstr.is_null() {
+        let ptr = cstr.cast();
+        let len = nstd_core_cstr_raw_len(cstr);
+        assert!(len <= isize::MAX as usize);
+        let bytes = core::slice::from_raw_parts(ptr, len);
+        if core::str::from_utf8(bytes).is_ok() {
+            return NSTDOptional::Some(NSTDStrMut { ptr, len });
+        }
     }
+    NSTDOptional::None
 }
 
 /// Creates a new `NSTDStrMut` from a raw C string, including the null byte.
@@ -1047,11 +1038,7 @@ pub unsafe fn nstd_core_str_mut_from_raw_cstr(cstr: *mut NSTDChar) -> NSTDOption
 ///
 /// # Panics
 ///
-/// This function will panic in the following situations:
-///
-/// - `cstr` is null.
-///
-/// - `cstr`'s length is greater than `NSTDInt`'s max value.
+/// This function will panic if `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -1073,15 +1060,16 @@ pub unsafe fn nstd_core_str_mut_from_raw_cstr(cstr: *mut NSTDChar) -> NSTDOption
 /// ```
 #[nstdapi]
 pub unsafe fn nstd_core_str_mut_from_raw_cstr_with_null(cstr: *mut NSTDChar) -> NSTDOptionalStrMut {
-    assert!(!cstr.is_null());
-    let ptr = cstr.cast();
-    let len = nstd_core_cstr_raw_len_with_null(cstr);
-    assert!(len <= isize::MAX as usize);
-    let bytes = core::slice::from_raw_parts(ptr, len);
-    match core::str::from_utf8(bytes).is_ok() {
-        true => NSTDOptional::Some(NSTDStrMut { ptr, len }),
-        false => NSTDOptional::None,
+    if !cstr.is_null() {
+        let ptr = cstr.cast();
+        let len = nstd_core_cstr_raw_len_with_null(cstr);
+        assert!(len <= isize::MAX as usize);
+        let bytes = core::slice::from_raw_parts(ptr, len);
+        if core::str::from_utf8(bytes).is_ok() {
+            return NSTDOptional::Some(NSTDStrMut { ptr, len });
+        }
     }
+    NSTDOptional::None
 }
 
 /// Creates a string slice from raw bytes.

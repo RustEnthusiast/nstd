@@ -4,6 +4,7 @@
 - Added `NSTDUnixAllocError`.
 ## Changed
 ### `nstd.core`
+- `nstd_core_str[_mut]_from_raw_cstr[_with_null]` no longer panics if `cstr` is null.
 - `nstd_core_slice_mut_copy` now panics.
 ### `nstd.heap_ptr`
 - `nstd_heap_ptr_[new[_zeroed]|clone]` now returns `NSTDOptionalHeapPtr`.
