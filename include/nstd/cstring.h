@@ -53,15 +53,11 @@ NSTDAPI NSTDCString nstd_cstring_new_with_cap(NSTDUInt cap);
 /// # Returns
 ///
 /// `NSTDOptionalCString cstring` - The new owned version of `cstr` on success, or an uninitialized
-/// "none" variant if allocating fails.
+/// "none" variant if `cstr` contains a null byte or allocating fails.
 ///
 /// # Panics
 ///
-/// This operation will panic in the following situations:
-///
-/// - `cstr` contains a null byte.
-///
-/// - `cstr`'s length is greater than `NSTDInt`'s max value.
+/// This operation will panic if `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -101,7 +97,8 @@ NSTDAPI NSTDOptionalCString nstd_cstring_from_cstr_unchecked(const NSTDCStr *cst
 ///
 /// # Returns
 ///
-/// `NSTDCString cstring` - The new C string with ownership of `bytes`.
+/// `NSTDOptionalCString cstring` - The new C string with ownership of `bytes` on success, or an
+/// uninitialized "none" variant if `bytes` does not end with a null (`\0`) byte.
 ///
 /// # Panics
 ///
@@ -109,10 +106,8 @@ NSTDAPI NSTDOptionalCString nstd_cstring_from_cstr_unchecked(const NSTDCStr *cst
 ///
 /// - `bytes`'s stride is not 1.
 ///
-/// - `bytes`'s data does not end with a 0 byte.
-///
 /// - `bytes`'s length is greater than `NSTDInt`'s max value.
-NSTDAPI NSTDCString nstd_cstring_from_bytes(NSTDVec bytes);
+NSTDAPI NSTDOptionalCString nstd_cstring_from_bytes(NSTDVec bytes);
 
 /// Creates a deep copy of an `NSTDCString`.
 ///
