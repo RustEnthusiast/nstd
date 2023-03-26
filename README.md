@@ -49,6 +49,9 @@ int main() {
     - `fs` - Provides access to the file system.
         - `file` - A handle to an opened file.
     - `gl` - The low level graphics library.
+        - `frame` - An individual window surface texture.
+        - `render_pass` - Represents a single render pass.
+        - `shader` - GPU shader programs.
     - `heap_ptr` - A pointer type for single value heap allocation.
     - `image` - Multi-format image processing.
     - `io` - Provides functionality for interacting with the standard I/O streams.
