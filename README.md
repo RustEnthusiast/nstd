@@ -49,6 +49,7 @@ int main() {
     - `fs` - Provides access to the file system.
         - `file` - A handle to an opened file.
     - `gl` - The low level graphics library.
+        - `buffer` - GPU memory buffers.
         - `frame` - An individual window surface texture.
         - `render_pass` - Represents a single render pass.
         - `shader` - GPU shader programs.
