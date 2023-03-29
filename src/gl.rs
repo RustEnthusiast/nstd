@@ -13,7 +13,7 @@ use wgpu::{
 
 /// Describes an error returned by an `nstd.gl` function.
 #[nstdapi]
-#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 #[allow(non_camel_case_types)]
 pub enum NSTDGLError {
     /// No error occurred.
@@ -26,7 +26,7 @@ pub enum NSTDGLError {
 
 /// Represents a rendering backend.
 #[nstdapi]
-#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 #[allow(non_camel_case_types)]
 pub enum NSTDGLBackend {
     /// Unknown backend.
@@ -78,7 +78,7 @@ impl From<NSTDGLBackend> for Backends {
 ///
 /// This type is used for querying drawing devices.
 #[nstdapi]
-#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 #[allow(non_camel_case_types)]
 pub enum NSTDGLPowerPreference {
     /// No power preference.
@@ -102,7 +102,7 @@ impl From<NSTDGLPowerPreference> for PowerPreference {
 
 /// Represents a surface's presentation mode.
 #[nstdapi]
-#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 #[allow(non_camel_case_types)]
 pub enum NSTDGLPresentationMode {
     /// Attempts to choose a non-VSync presentation mode automatically.
