@@ -55,7 +55,7 @@ pub fn nstd_os_unix_time_now() -> NSTDUnixOptionalTime {
 ///
 /// # Parameters:
 ///
-/// - `const NSTDUnixTime *time` - The time object.
+/// - `NSTDUnixTime time` - The time object.
 ///
 /// # Returns
 ///
@@ -63,55 +63,55 @@ pub fn nstd_os_unix_time_now() -> NSTDUnixOptionalTime {
 /// `NSTDFloat64`.
 #[inline]
 #[nstdapi]
-pub fn nstd_os_unix_time_get(time: &NSTDUnixTime) -> NSTDFloat64 {
-    nstd_core_time_duration_get(&time.duration)
+pub fn nstd_os_unix_time_get(time: NSTDUnixTime) -> NSTDFloat64 {
+    nstd_core_time_duration_get(time.duration)
 }
 
 /// Returns the number of seconds in an `NSTDUnixTime` object.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDUnixTime *time` - The time object.
+/// - `NSTDUnixTime time` - The time object.
 ///
 /// # Returns
 ///
 /// `NSTDInt64 seconds` - The number of seconds held in `time`.
 #[inline]
 #[nstdapi]
-pub fn nstd_os_unix_time_seconds(time: &NSTDUnixTime) -> NSTDInt64 {
-    nstd_core_time_duration_seconds(&time.duration)
+pub fn nstd_os_unix_time_seconds(time: NSTDUnixTime) -> NSTDInt64 {
+    nstd_core_time_duration_seconds(time.duration)
 }
 
 /// Returns the number of nanoseconds in an `NSTDUnixTime` object.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDUnixTime *time` - The time object.
+/// - `NSTDUnixTime time` - The time object.
 ///
 /// # Returns
 ///
 /// `NSTDUInt32 nanoseconds` - The number of nanoseconds held in `time`.
 #[inline]
 #[nstdapi]
-pub fn nstd_os_unix_time_nanoseconds(time: &NSTDUnixTime) -> NSTDUInt32 {
-    nstd_core_time_duration_nanoseconds(&time.duration)
+pub fn nstd_os_unix_time_nanoseconds(time: NSTDUnixTime) -> NSTDUInt32 {
+    nstd_core_time_duration_nanoseconds(time.duration)
 }
 
 /// Computes the addition of an `NSTDUnixTime` object and an `NSTDDuration`.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDUnixTime *time` - The time object
+/// - `NSTDUnixTime time` - The time object
 ///
-/// - `const NSTDDuration *duration` - The duration to add.
+/// - `NSTDDuration duration` - The duration to add.
 ///
 /// # Returns
 ///
 /// `NSTDUnixTime time` - The result of the addition.
 #[inline]
 #[nstdapi]
-pub fn nstd_os_unix_time_add(time: &NSTDUnixTime, duration: &NSTDDuration) -> NSTDUnixTime {
-    let secs = nstd_core_time_duration_get(&time.duration) + nstd_core_time_duration_get(duration);
+pub fn nstd_os_unix_time_add(time: NSTDUnixTime, duration: NSTDDuration) -> NSTDUnixTime {
+    let secs = nstd_core_time_duration_get(time.duration) + nstd_core_time_duration_get(duration);
     NSTDUnixTime {
         duration: nstd_core_time_duration_new(secs),
     }
@@ -121,17 +121,17 @@ pub fn nstd_os_unix_time_add(time: &NSTDUnixTime, duration: &NSTDDuration) -> NS
 ///
 /// # Parameters:
 ///
-/// - `const NSTDUnixTime *time` - The time object
+/// - `NSTDUnixTime time` - The time object
 ///
-/// - `const NSTDDuration *duration` - The duration to subtract.
+/// - `NSTDDuration duration` - The duration to subtract.
 ///
 /// # Returns
 ///
 /// `NSTDUnixTime time` - The result of the subtraction.
 #[inline]
 #[nstdapi]
-pub fn nstd_os_unix_time_sub(time: &NSTDUnixTime, duration: &NSTDDuration) -> NSTDUnixTime {
-    let secs = nstd_core_time_duration_get(&time.duration) - nstd_core_time_duration_get(duration);
+pub fn nstd_os_unix_time_sub(time: NSTDUnixTime, duration: NSTDDuration) -> NSTDUnixTime {
+    let secs = nstd_core_time_duration_get(time.duration) - nstd_core_time_duration_get(duration);
     NSTDUnixTime {
         duration: nstd_core_time_duration_new(secs),
     }

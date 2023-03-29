@@ -262,7 +262,7 @@ pub fn nstd_os_unix_mutex_try_lock(mutex: &NSTDUnixMutex) -> NSTDUnixOptionalMut
 ///
 /// - `const NSTDUnixMutex *mutex` - The mutex to lock.
 ///
-/// - `const NSTDDuration *duration` - The amount of time to block for.
+/// - `NSTDDuration duration` - The amount of time to block for.
 ///
 /// # Returns
 ///
@@ -272,7 +272,7 @@ pub fn nstd_os_unix_mutex_try_lock(mutex: &NSTDUnixMutex) -> NSTDUnixOptionalMut
 #[allow(unused_variables)]
 pub fn nstd_os_unix_mutex_timed_lock<'a>(
     mutex: &'a NSTDUnixMutex,
-    duration: &NSTDDuration,
+    duration: NSTDDuration,
 ) -> NSTDUnixOptionalMutexLockResult<'a> {
     #[cfg(any(
         target_os = "android",
@@ -293,10 +293,10 @@ pub fn nstd_os_unix_mutex_timed_lock<'a>(
         };
         use libc::{pthread_mutex_timedlock, timespec};
         if let NSTDOptional::Some(mut time) = nstd_os_unix_time_now() {
-            time = nstd_os_unix_time_add(&time, duration);
+            time = nstd_os_unix_time_add(time, duration);
             let duration = timespec {
-                tv_sec: nstd_os_unix_time_seconds(&time) as _,
-                tv_nsec: nstd_os_unix_time_nanoseconds(&time) as _,
+                tv_sec: nstd_os_unix_time_seconds(time) as _,
+                tv_nsec: nstd_os_unix_time_nanoseconds(time) as _,
             };
             // SAFETY: `mutex` is behind an initialized reference.
             if unsafe { pthread_mutex_timedlock(mutex.inner.0.get(), &duration) } == 0 {

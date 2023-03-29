@@ -95,13 +95,13 @@ NSTDAPI void nstd_proc_free(NSTDChildProcess handle);
 NSTDAPI NSTDInt32 nstd_proc_exit(NSTDInt32 exit_code);
 
 /// Terminates the program in an abnormal fashion.
-NSTDAPI void nstd_proc_abort();
+NSTDAPI void nstd_proc_abort(void);
 
 /// Returns the ID of the current process.
 ///
 /// # Returns
 ///
 /// `NSTDUInt32 ID` - The process ID.
-NSTDAPI NSTDUInt32 nstd_proc_id();
+NSTDAPI NSTDUInt32 nstd_proc_id(void);
 
 #endif

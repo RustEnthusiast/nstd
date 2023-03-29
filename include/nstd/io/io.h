@@ -49,7 +49,7 @@ typedef enum {
     /// A reader unexpectedly reached the end of a file.
     NSTD_IO_ERROR_UNEXPECTED_EOF,
     /// An operation could not be completed, because it failed to allocate enough memory.
-    NSTD_IO_ERROR_OUT_OF_MEMORY,
+    NSTD_IO_ERROR_OUT_OF_MEMORY
 } NSTDIOError;
 
 /// A result type that yields an [NSTDUInt] representing the number of bytes read or written by an
@@ -113,7 +113,7 @@ NSTDAPI NSTDIOError nstd_io_print_line(const NSTDStr *output);
 ///
 /// Panics if allocating the string fails or the input's length in bytes exceeds `NSTDInt`'s max
 /// value.
-NSTDAPI NSTDIOStringResult nstd_io_read();
+NSTDAPI NSTDIOStringResult nstd_io_read(void);
 
 /// Reads a line of UTF-8 input from stdin.
 ///
@@ -125,6 +125,6 @@ NSTDAPI NSTDIOStringResult nstd_io_read();
 /// # Panics
 ///
 /// Panics if allocating the string fails.
-NSTDAPI NSTDIOStringResult nstd_io_read_line();
+NSTDAPI NSTDIOStringResult nstd_io_read_line(void);
 
 #endif

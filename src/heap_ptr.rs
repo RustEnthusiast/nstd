@@ -60,11 +60,8 @@ gen_optional!(NSTDOptionalHeapPtr, NSTDHeapPtr);
 ///
 /// # Returns
 ///
-/// `NSTDHeapPtr hptr` - The new heap allocated object.
-///
-/// # Panics
-///
-/// This function will panic if allocation fails.
+/// `NSTDOptionalHeapPtr hptr` - The new heap allocated object, or an uninitialized "none" variant
+/// if allocating fails.
 ///
 /// # Safety
 ///
@@ -79,20 +76,22 @@ gen_optional!(NSTDOptionalHeapPtr, NSTDHeapPtr);
 /// const SIZE: usize = core::mem::size_of::<char>();
 ///
 /// let v = '🦀';
-/// let hptr = unsafe { nstd_heap_ptr_new(SIZE, addr_of!(v).cast()) };
+/// let hptr = unsafe { nstd_heap_ptr_new(SIZE, addr_of!(v).cast()).unwrap() };
 /// ```
 #[nstdapi]
-pub unsafe fn nstd_heap_ptr_new(element_size: NSTDUInt, init: NSTDAny) -> NSTDHeapPtr {
+pub unsafe fn nstd_heap_ptr_new(element_size: NSTDUInt, init: NSTDAny) -> NSTDOptionalHeapPtr {
     if element_size == 0 {
-        NSTDHeapPtr::zero_sized()
+        NSTDOptional::Some(NSTDHeapPtr::zero_sized())
     } else {
         let mem = nstd_alloc_allocate(element_size);
-        assert!(!mem.is_null());
+        if mem.is_null() {
+            return NSTDOptional::None;
+        }
         nstd_core_mem_copy(mem.cast(), init.cast(), element_size);
-        NSTDHeapPtr {
+        NSTDOptional::Some(NSTDHeapPtr {
             ptr: mem,
             size: element_size,
-        }
+        })
     }
 }
 
@@ -104,11 +103,8 @@ pub unsafe fn nstd_heap_ptr_new(element_size: NSTDUInt, init: NSTDAny) -> NSTDHe
 ///
 /// # Returns
 ///
-/// `NSTDHeapPtr hptr` - The new heap allocated object.
-///
-/// # Panics
-///
-/// This function will panic if allocation fails.
+/// `NSTDOptionalHeapPtr hptr` - The new heap allocated object, or an uninitialized "none" variant
+/// if allocating fails.
 ///
 /// # Safety
 ///
@@ -123,22 +119,24 @@ pub unsafe fn nstd_heap_ptr_new(element_size: NSTDUInt, init: NSTDAny) -> NSTDHe
 /// const SIZE: usize = core::mem::size_of::<u64>();
 ///
 /// unsafe {
-///     let hptr = nstd_heap_ptr_new_zeroed(SIZE);
+///     let hptr = nstd_heap_ptr_new_zeroed(SIZE).unwrap();
 ///     assert!(*nstd_heap_ptr_get(&hptr).cast::<u64>() == 0);
 /// }
 /// ```
 #[nstdapi]
-pub unsafe fn nstd_heap_ptr_new_zeroed(element_size: NSTDUInt) -> NSTDHeapPtr {
+pub unsafe fn nstd_heap_ptr_new_zeroed(element_size: NSTDUInt) -> NSTDOptionalHeapPtr {
     if element_size == 0 {
-        NSTDHeapPtr::zero_sized()
+        NSTDOptional::Some(NSTDHeapPtr::zero_sized())
     } else {
         // SAFETY: `element_size` is not 0.
         let mem = unsafe { nstd_alloc_allocate_zeroed(element_size) };
-        assert!(!mem.is_null());
-        NSTDHeapPtr {
+        if mem.is_null() {
+            return NSTDOptional::None;
+        }
+        NSTDOptional::Some(NSTDHeapPtr {
             ptr: mem,
             size: element_size,
-        }
+        })
     }
 }
 
@@ -150,23 +148,22 @@ pub unsafe fn nstd_heap_ptr_new_zeroed(element_size: NSTDUInt) -> NSTDHeapPtr {
 ///
 /// # Returns
 ///
-/// `NSTDHeapPtr cloned` - A new clone of the original heap object.
-///
-/// # Panics
-///
-/// This function will panic if allocation fails.
+/// `NSTDOptionalHeapPtr cloned` - A new clone of the original heap object, or an uninitialized
+/// "none" variant if allocating fails.
 #[nstdapi]
-pub fn nstd_heap_ptr_clone(hptr: &NSTDHeapPtr) -> NSTDHeapPtr {
+pub fn nstd_heap_ptr_clone(hptr: &NSTDHeapPtr) -> NSTDOptionalHeapPtr {
     let size = nstd_heap_ptr_size(hptr);
     if size == 0 {
-        NSTDHeapPtr::zero_sized()
+        NSTDOptional::Some(NSTDHeapPtr::zero_sized())
     } else {
         // SAFETY: `size` is not 0.
         let mem = unsafe { nstd_alloc_allocate(size) };
-        assert!(!mem.is_null());
+        if mem.is_null() {
+            return NSTDOptional::None;
+        }
         // SAFETY: Both pointers are non-null.
         unsafe { nstd_core_mem_copy(mem.cast(), hptr.ptr.cast(), size) };
-        NSTDHeapPtr { ptr: mem, size }
+        NSTDOptional::Some(NSTDHeapPtr { ptr: mem, size })
     }
 }
 
@@ -187,7 +184,7 @@ pub fn nstd_heap_ptr_clone(hptr: &NSTDHeapPtr) -> NSTDHeapPtr {
 ///
 /// const SIZE: usize = core::mem::size_of::<i32>();
 ///
-/// let hptr = unsafe { nstd_heap_ptr_new_zeroed(SIZE) };
+/// let hptr = unsafe { nstd_heap_ptr_new_zeroed(SIZE).unwrap() };
 /// assert!(nstd_heap_ptr_size(&hptr) == SIZE);
 /// ```
 #[inline]
@@ -220,7 +217,7 @@ pub fn nstd_heap_ptr_size(hptr: &NSTDHeapPtr) -> NSTDUInt {
 ///
 /// unsafe {
 ///     let v = -46923i128;
-///     let hptr = nstd_heap_ptr_new(SIZE, addr_of!(v).cast());
+///     let hptr = nstd_heap_ptr_new(SIZE, addr_of!(v).cast()).unwrap();
 ///     assert!(*nstd_heap_ptr_get(&hptr).cast::<i128>() == v);
 /// }
 /// ```
@@ -254,7 +251,7 @@ pub fn nstd_heap_ptr_get(hptr: &NSTDHeapPtr) -> NSTDAny {
 ///
 /// unsafe {
 ///     let v = 32964i128;
-///     let mut hptr = nstd_heap_ptr_new(SIZE, addr_of!(v).cast());
+///     let mut hptr = nstd_heap_ptr_new(SIZE, addr_of!(v).cast()).unwrap();
 ///     let hv = nstd_heap_ptr_get_mut(&mut hptr).cast::<i128>();
 ///     assert!(*hv == v);
 ///     *hv = -46923;

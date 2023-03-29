@@ -16,7 +16,7 @@ typedef enum {
         NSTDOptionalStatus status; \
         union {                    \
             T some;                \
-        };                         \
+        } value;                   \
     }
 
 /// Represents an optional value of type `NSTDBool`.

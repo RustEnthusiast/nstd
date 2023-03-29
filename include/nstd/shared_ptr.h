@@ -24,17 +24,17 @@ NSTDOptional(NSTDSharedPtr) NSTDOptionalSharedPtr;
 ///
 /// # Returns
 ///
-/// `NSTDSharedPtr shared_ptr` - The new shared pointer.
+/// `NSTDOptionalSharedPtr shared_ptr` - The new shared pointer, or an uninitialized "none" variant
+/// if allocating fails.
 ///
 /// # Panics
 ///
-/// This operation will panic if either `element_size` is greater than `NSTDInt`'s max value or
-/// allocating fails.
+/// This operation will panic if `element_size` is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
 /// `init` must be a pointer to a value that is valid for reads of `element_size` bytes.
-NSTDAPI NSTDSharedPtr nstd_shared_ptr_new(NSTDUInt element_size, NSTDAny init);
+NSTDAPI NSTDOptionalSharedPtr nstd_shared_ptr_new(NSTDUInt element_size, NSTDAny init);
 
 /// Creates a new zero-initialized instance of a shared pointer.
 ///
@@ -44,18 +44,18 @@ NSTDAPI NSTDSharedPtr nstd_shared_ptr_new(NSTDUInt element_size, NSTDAny init);
 ///
 /// # Returns
 ///
-/// `NSTDSharedPtr shared_ptr` - The yet to be shared pointer.
+/// `NSTDOptionalSharedPtr shared_ptr` - The yet to be shared pointer, or an uninitialized "none"
+/// variant if allocating fails.
 ///
 /// # Panics
 ///
-/// This operation will panic if either `element_size` is greater than `NSTDInt`'s max value or
-/// allocating fails.
+/// This operation will panic if `element_size` is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
 /// The data to be stored in the shared pointer must be safely representable by an all-zero byte
 /// pattern.
-NSTDAPI NSTDSharedPtr nstd_shared_ptr_new_zeroed(NSTDUInt element_size);
+NSTDAPI NSTDOptionalSharedPtr nstd_shared_ptr_new_zeroed(NSTDUInt element_size);
 
 /// Shares `shared_ptr`.
 ///

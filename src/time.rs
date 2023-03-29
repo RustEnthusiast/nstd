@@ -49,7 +49,7 @@ pub fn nstd_time_now() -> NSTDTime {
 ///
 /// # Parameters:
 ///
-/// - `const NSTDTime *time` - The time object.
+/// - `NSTDTime time` - The time object.
 ///
 /// # Returns
 ///
@@ -57,55 +57,55 @@ pub fn nstd_time_now() -> NSTDTime {
 /// `NSTDFloat64`.
 #[inline]
 #[nstdapi]
-pub fn nstd_time_get(time: &NSTDTime) -> NSTDFloat64 {
-    nstd_core_time_duration_get(&time.duration)
+pub fn nstd_time_get(time: NSTDTime) -> NSTDFloat64 {
+    nstd_core_time_duration_get(time.duration)
 }
 
 /// Returns the number of seconds in an `NSTDTime` object.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDTime *time` - The time object.
+/// - `NSTDTime time` - The time object.
 ///
 /// # Returns
 ///
 /// `NSTDInt64 seconds` - The number of seconds held in `time`.
 #[inline]
 #[nstdapi]
-pub fn nstd_time_seconds(time: &NSTDTime) -> NSTDInt64 {
-    nstd_core_time_duration_seconds(&time.duration)
+pub fn nstd_time_seconds(time: NSTDTime) -> NSTDInt64 {
+    nstd_core_time_duration_seconds(time.duration)
 }
 
 /// Returns the number of nanoseconds in an `NSTDTime` object.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDTime *time` - The time object.
+/// - `NSTDTime time` - The time object.
 ///
 /// # Returns
 ///
 /// `NSTDUInt32 nanoseconds` - The number of nanoseconds held in `time`.
 #[inline]
 #[nstdapi]
-pub fn nstd_time_nanoseconds(time: &NSTDTime) -> NSTDUInt32 {
-    nstd_core_time_duration_nanoseconds(&time.duration)
+pub fn nstd_time_nanoseconds(time: NSTDTime) -> NSTDUInt32 {
+    nstd_core_time_duration_nanoseconds(time.duration)
 }
 
 /// Computes the addition of an `NSTDTime` object and an `NSTDDuration`.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDTime *time` - The time object
+/// - `NSTDTime time` - The time object
 ///
-/// - `const NSTDDuration *duration` - The duration to add.
+/// - `NSTDDuration duration` - The duration to add.
 ///
 /// # Returns
 ///
 /// `NSTDTime time` - The result of the addition.
 #[inline]
 #[nstdapi]
-pub fn nstd_time_add(time: &NSTDTime, duration: &NSTDDuration) -> NSTDTime {
-    let secs = nstd_core_time_duration_get(&time.duration) + nstd_core_time_duration_get(duration);
+pub fn nstd_time_add(time: NSTDTime, duration: NSTDDuration) -> NSTDTime {
+    let secs = nstd_core_time_duration_get(time.duration) + nstd_core_time_duration_get(duration);
     NSTDTime {
         duration: nstd_core_time_duration_new(secs),
     }
@@ -115,17 +115,17 @@ pub fn nstd_time_add(time: &NSTDTime, duration: &NSTDDuration) -> NSTDTime {
 ///
 /// # Parameters:
 ///
-/// - `const NSTDTime *time` - The time object
+/// - `NSTDTime time` - The time object
 ///
-/// - `const NSTDDuration *duration` - The duration to subtract.
+/// - `NSTDDuration duration` - The duration to subtract.
 ///
 /// # Returns
 ///
 /// `NSTDTime time` - The result of the subtraction.
 #[inline]
 #[nstdapi]
-pub fn nstd_time_sub(time: &NSTDTime, duration: &NSTDDuration) -> NSTDTime {
-    let secs = nstd_core_time_duration_get(&time.duration) - nstd_core_time_duration_get(duration);
+pub fn nstd_time_sub(time: NSTDTime, duration: NSTDDuration) -> NSTDTime {
+    let secs = nstd_core_time_duration_get(time.duration) - nstd_core_time_duration_get(duration);
     NSTDTime {
         duration: nstd_core_time_duration_new(secs),
     }

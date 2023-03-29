@@ -61,8 +61,6 @@ pub type NSTDOptionalSharedLib = NSTDOptional<NSTDSharedLib>;
 ///
 /// - `path`'s length in bytes exceeds `NSTDInt`'s max value.
 ///
-/// - Allocating fails.
-///
 /// - Conversion from UTF-8 to UTF-16 fails on Windows.
 ///
 /// # Safety
@@ -78,8 +76,11 @@ pub unsafe fn nstd_shared_lib_load(path: &NSTDStr) -> NSTDOptionalSharedLib {
         let path = nstd_core_str_as_cstr(path);
         if nstd_core_cstr_get_null(&path).is_null() {
             // Allocate a null byte for `path`.
-            let path = nstd_cstring_from_cstr_unchecked(&path);
-            nstd_os_unix_shared_lib_load(nstd_cstring_as_ptr(&path))
+            if let NSTDOptional::Some(path) = nstd_cstring_from_cstr_unchecked(&path) {
+                nstd_os_unix_shared_lib_load(nstd_cstring_as_ptr(&path))
+            } else {
+                NSTDOptional::None
+            }
         } else {
             // Use the already null terminated `path`.
             nstd_os_unix_shared_lib_load(nstd_core_cstr_as_ptr(&path))

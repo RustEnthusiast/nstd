@@ -4,6 +4,7 @@ BreakBeforeBraces: Attach
 AlignAfterOpenBracket: BlockIndent
 IndentPPDirectives: AfterHash
 AlignEscapedNewlines: Left
+AllowShortFunctionsOnASingleLine: None
 SortIncludes: Never
 ColumnLimit: 100
 SpaceBeforeCpp11BracedList: false
