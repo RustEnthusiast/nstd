@@ -24,60 +24,60 @@ NSTDAPI NSTDTime nstd_time_now(void);
 ///
 /// # Parameters:
 ///
-/// - `const NSTDTime *time` - The time object.
+/// - `NSTDTime time` - The time object.
 ///
 /// # Returns
 ///
 /// `NSTDFloat64 seconds` - The number of seconds in a time object represented as an
 /// `NSTDFloat64`.
-NSTDAPI NSTDFloat64 nstd_time_get(const NSTDTime *time);
+NSTDAPI NSTDFloat64 nstd_time_get(NSTDTime time);
 
 /// Returns the number of seconds in an `NSTDTime` object.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDTime *time` - The time object.
+/// - `NSTDTime time` - The time object.
 ///
 /// # Returns
 ///
 /// `NSTDInt64 seconds` - The number of seconds held in `time`.
-NSTDAPI NSTDInt64 nstd_time_seconds(const NSTDTime *time);
+NSTDAPI NSTDInt64 nstd_time_seconds(NSTDTime time);
 
 /// Returns the number of nanoseconds in an `NSTDTime` object.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDTime *time` - The time object.
+/// - `NSTDTime time` - The time object.
 ///
 /// # Returns
 ///
 /// `NSTDUInt32 nanoseconds` - The number of nanoseconds held in `time`.
-NSTDAPI NSTDUInt32 nstd_time_nanoseconds(const NSTDTime *time);
+NSTDAPI NSTDUInt32 nstd_time_nanoseconds(NSTDTime time);
 
 /// Computes the addition of an `NSTDTime` object and an `NSTDDuration`.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDTime *time` - The time object
+/// - `NSTDTime time` - The time object
 ///
-/// - `const NSTDDuration *duration` - The duration to add.
+/// - `NSTDDuration duration` - The duration to add.
 ///
 /// # Returns
 ///
 /// `NSTDTime time` - The result of the addition.
-NSTDAPI NSTDTime nstd_time_add(const NSTDTime *time, const NSTDDuration *duration);
+NSTDAPI NSTDTime nstd_time_add(NSTDTime time, NSTDDuration duration);
 
 /// Computes the subtraction between an `NSTDTime` object and an `NSTDDuration`.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDTime *time` - The time object
+/// - `NSTDTime time` - The time object
 ///
-/// - `const NSTDDuration *duration` - The duration to subtract.
+/// - `NSTDDuration duration` - The duration to subtract.
 ///
 /// # Returns
 ///
 /// `NSTDTime time` - The result of the subtraction.
-NSTDAPI NSTDTime nstd_time_sub(const NSTDTime *time, const NSTDDuration *duration);
+NSTDAPI NSTDTime nstd_time_sub(NSTDTime time, NSTDDuration duration);
 
 #endif

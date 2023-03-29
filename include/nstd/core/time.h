@@ -27,60 +27,60 @@ NSTDAPI NSTDDuration nstd_core_time_duration_new(NSTDFloat64 seconds);
 ///
 /// # Parameters:
 ///
-/// - `const NSTDDuration *duration` - The duration object.
+/// - `NSTDDuration duration` - The duration object.
 ///
 /// # Returns
 ///
 /// `NSTDFloat64 seconds` - The number of seconds in a duration object represented as an
 /// `NSTDFloat64`.
-NSTDAPI NSTDFloat64 nstd_core_time_duration_get(const NSTDDuration *duration);
+NSTDAPI NSTDFloat64 nstd_core_time_duration_get(NSTDDuration duration);
 
 /// Returns the number of seconds in an `NSTDDuration` object.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDDuration *duration` - The duration object.
+/// - `NSTDDuration duration` - The duration object.
 ///
 /// # Returns
 ///
 /// `NSTDInt64 seconds` - The number of seconds held in `duration`.
-NSTDAPI NSTDInt64 nstd_core_time_duration_seconds(const NSTDDuration *duration);
+NSTDAPI NSTDInt64 nstd_core_time_duration_seconds(NSTDDuration duration);
 
 /// Returns the number of nanoseconds in an `NSTDDuration` object.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDDuration *duration` - The duration object.
+/// - `NSTDDuration duration` - The duration object.
 ///
 /// # Returns
 ///
 /// `NSTDUInt32 nanoseconds` - The number of nanoseconds held in `duration`.
-NSTDAPI NSTDUInt32 nstd_core_time_duration_nanoseconds(const NSTDDuration *duration);
+NSTDAPI NSTDUInt32 nstd_core_time_duration_nanoseconds(NSTDDuration duration);
 
 /// Computes the addition of two time spans.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDDuration *lhs` - The left-hand side operand.
+/// - `NSTDDuration lhs` - The left-hand side operand.
 ///
-/// - `const NSTDDuration *rhs` - The right-hand side operand.
+/// - `NSTDDuration rhs` - The right-hand side operand.
 ///
 /// # Returns
 ///
 /// `NSTDDuration duration` - The result of the time span addition.
-NSTDAPI NSTDDuration nstd_core_time_duration_add(const NSTDDuration *lhs, const NSTDDuration *rhs);
+NSTDAPI NSTDDuration nstd_core_time_duration_add(NSTDDuration lhs, NSTDDuration rhs);
 
 /// Computes the subtraction between two time spans.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDDuration *lhs` - The left-hand side operand.
+/// - `NSTDDuration lhs` - The left-hand side operand.
 ///
-/// - `const NSTDDuration *rhs` - The right-hand side operand.
+/// - `NSTDDuration rhs` - The right-hand side operand.
 ///
 /// # Returns
 ///
 /// `NSTDDuration duration` - The result of the time span subtraction.
-NSTDAPI NSTDDuration nstd_core_time_duration_sub(const NSTDDuration *lhs, const NSTDDuration *rhs);
+NSTDAPI NSTDDuration nstd_core_time_duration_sub(NSTDDuration lhs, NSTDDuration rhs);
 
 #endif

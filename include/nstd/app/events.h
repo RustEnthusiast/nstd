@@ -60,7 +60,7 @@ typedef enum {
     /// The right mouse button.
     NSTD_MOUSE_BUTTON_RIGHT,
     /// An extra mouse button.
-    NSTD_MOUSE_BUTTON_OTHER,
+    NSTD_MOUSE_BUTTON_OTHER
 } NSTDMouseButton;
 
 /// Represents some type of mouse button input.

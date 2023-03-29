@@ -52,22 +52,17 @@ NSTDAPI NSTDCString nstd_cstring_new_with_cap(NSTDUInt cap);
 ///
 /// # Returns
 ///
-/// `NSTDCString cstring` The new owned version of `cstr`.
+/// `NSTDOptionalCString cstring` - The new owned version of `cstr` on success, or an uninitialized
+/// "none" variant if `cstr` contains a null byte or allocating fails.
 ///
 /// # Panics
 ///
-/// This operation will panic in the following situations:
-///
-/// - `cstr` contains a null byte.
-///
-/// - `cstr`'s length is greater than `NSTDInt`'s max value.
-///
-/// - Allocating fails.
+/// This operation will panic if `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
 /// The caller of this function must ensure that `cstr`'s data is valid for reads.
-NSTDAPI NSTDCString nstd_cstring_from_cstr(const NSTDCStr *cstr);
+NSTDAPI NSTDOptionalCString nstd_cstring_from_cstr(const NSTDCStr *cstr);
 
 /// Creates an owned version of an unowned C string slice without checking if the slice contains
 /// any null bytes.
@@ -78,12 +73,12 @@ NSTDAPI NSTDCString nstd_cstring_from_cstr(const NSTDCStr *cstr);
 ///
 /// # Returns
 ///
-/// `NSTDCString cstring` The new owned version of `cstr`.
+/// `NSTDOptionalCString cstring` - The new owned version of `cstr` on success, or an uninitialized
+/// "none" variant if allocating fails.
 ///
 /// # Panics
 ///
-/// This operation will panic if `cstr`'s length is greater than `NSTDInt`'s max value or
-/// allocating fails.
+/// This operation will panic if `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -92,7 +87,7 @@ NSTDAPI NSTDCString nstd_cstring_from_cstr(const NSTDCStr *cstr);
 /// - `cstr`'s data is valid for reads.
 ///
 /// - `cstr` does not contain any null (`'\0'`) bytes.
-NSTDAPI NSTDCString nstd_cstring_from_cstr_unchecked(const NSTDCStr *cstr);
+NSTDAPI NSTDOptionalCString nstd_cstring_from_cstr_unchecked(const NSTDCStr *cstr);
 
 /// Creates a new C string from owned data.
 ///
@@ -102,7 +97,8 @@ NSTDAPI NSTDCString nstd_cstring_from_cstr_unchecked(const NSTDCStr *cstr);
 ///
 /// # Returns
 ///
-/// `NSTDCString cstring` - The new C string with ownership of `bytes`.
+/// `NSTDOptionalCString cstring` - The new C string with ownership of `bytes` on success, or an
+/// uninitialized "none" variant if `bytes` does not end with a null (`\0`) byte.
 ///
 /// # Panics
 ///
@@ -110,10 +106,8 @@ NSTDAPI NSTDCString nstd_cstring_from_cstr_unchecked(const NSTDCStr *cstr);
 ///
 /// - `bytes`'s stride is not 1.
 ///
-/// - `bytes`'s data does not end with a 0 byte.
-///
 /// - `bytes`'s length is greater than `NSTDInt`'s max value.
-NSTDAPI NSTDCString nstd_cstring_from_bytes(NSTDVec bytes);
+NSTDAPI NSTDOptionalCString nstd_cstring_from_bytes(NSTDVec bytes);
 
 /// Creates a deep copy of an `NSTDCString`.
 ///
@@ -123,12 +117,9 @@ NSTDAPI NSTDCString nstd_cstring_from_bytes(NSTDVec bytes);
 ///
 /// # Returns
 ///
-/// `NSTDCString cloned` - A new deep copy of `cstring`.
-///
-/// # Panics
-///
-/// This function will panic if allocating for the new C string fails.
-NSTDAPI NSTDCString nstd_cstring_clone(const NSTDCString *cstring);
+/// `NSTDOptionalCString cloned` - A new deep copy of `cstring` on success, or an uninitialized
+/// "none" variant if allocating fails.
+NSTDAPI NSTDOptionalCString nstd_cstring_clone(const NSTDCString *cstring);
 
 /// Creates a C string slice containing the contents of `cstring`.
 ///

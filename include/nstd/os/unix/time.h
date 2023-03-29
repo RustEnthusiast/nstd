@@ -25,60 +25,60 @@ NSTDAPI NSTDUnixOptionalTime nstd_os_unix_time_now(void);
 ///
 /// # Parameters:
 ///
-/// - `const NSTDUnixTime *time` - The time object.
+/// - `NSTDUnixTime time` - The time object.
 ///
 /// # Returns
 ///
 /// `NSTDFloat64 seconds` - The number of seconds in a time object represented as an
 /// `NSTDFloat64`.
-NSTDAPI NSTDFloat64 nstd_os_unix_time_get(const NSTDUnixTime *time);
+NSTDAPI NSTDFloat64 nstd_os_unix_time_get(NSTDUnixTime time);
 
 /// Returns the number of seconds in an `NSTDUnixTime` object.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDUnixTime *time` - The time object.
+/// - `NSTDUnixTime time` - The time object.
 ///
 /// # Returns
 ///
 /// `NSTDInt64 seconds` - The number of seconds held in `time`.
-NSTDAPI NSTDInt64 nstd_os_unix_time_seconds(const NSTDUnixTime *time);
+NSTDAPI NSTDInt64 nstd_os_unix_time_seconds(NSTDUnixTime time);
 
 /// Returns the number of nanoseconds in an `NSTDUnixTime` object.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDUnixTime *time` - The time object.
+/// - `NSTDUnixTime time` - The time object.
 ///
 /// # Returns
 ///
 /// `NSTDUInt32 nanoseconds` - The number of nanoseconds held in `time`.
-NSTDAPI NSTDUInt32 nstd_os_unix_time_nanoseconds(const NSTDUnixTime *time);
+NSTDAPI NSTDUInt32 nstd_os_unix_time_nanoseconds(NSTDUnixTime time);
 
 /// Computes the addition of an `NSTDUnixTime` object and an `NSTDDuration`.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDUnixTime *time` - The time object
+/// - `NSTDUnixTime time` - The time object
 ///
-/// - `const NSTDDuration *duration` - The duration to add.
+/// - `NSTDDuration duration` - The duration to add.
 ///
 /// # Returns
 ///
 /// `NSTDUnixTime time` - The result of the addition.
-NSTDAPI NSTDUnixTime nstd_os_unix_time_add(const NSTDUnixTime *time, const NSTDDuration *duration);
+NSTDAPI NSTDUnixTime nstd_os_unix_time_add(NSTDUnixTime time, NSTDDuration duration);
 
 /// Computes the subtraction between an `NSTDUnixTime` object and an `NSTDDuration`.
 ///
 /// # Parameters:
 ///
-/// - `const NSTDUnixTime *time` - The time object
+/// - `NSTDUnixTime time` - The time object
 ///
-/// - `const NSTDDuration *duration` - The duration to subtract.
+/// - `NSTDDuration duration` - The duration to subtract.
 ///
 /// # Returns
 ///
 /// `NSTDUnixTime time` - The result of the subtraction.
-NSTDAPI NSTDUnixTime nstd_os_unix_time_sub(const NSTDUnixTime *time, const NSTDDuration *duration);
+NSTDAPI NSTDUnixTime nstd_os_unix_time_sub(NSTDUnixTime time, NSTDDuration duration);
 
 #endif
