@@ -41,8 +41,6 @@ NSTDOptional(NSTDSharedLib) NSTDOptionalSharedLib;
 ///
 /// - `path`'s length in bytes exceeds `NSTDInt`'s max value.
 ///
-/// - Allocating fails.
-///
 /// - Conversion from UTF-8 to UTF-16 fails on Windows.
 ///
 /// # Safety

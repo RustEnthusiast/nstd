@@ -133,11 +133,8 @@ pub fn nstd_string_new_with_cap(cap: NSTDUInt) -> NSTDString {
 ///
 /// # Returns
 ///
-/// `NSTDString string` The new owned version of `str`.
-///
-/// # Panics
-///
-/// This operation will panic if allocating fails.
+/// `NSTDOptionalString string` - The new owned version of `str` on success, or an uninitialized
+/// "none" variant if allocating fails.
 ///
 /// # Safety
 ///
@@ -155,10 +152,11 @@ pub fn nstd_string_new_with_cap(cap: NSTDUInt) -> NSTDString {
 /// ```
 #[inline]
 #[nstdapi]
-pub unsafe fn nstd_string_from_str(str: &NSTDStr) -> NSTDString {
+pub unsafe fn nstd_string_from_str(str: &NSTDStr) -> NSTDOptionalString {
     let bytes = nstd_core_str_as_bytes(str);
-    NSTDString {
-        bytes: nstd_vec_from_slice(&bytes),
+    match nstd_vec_from_slice(&bytes) {
+        NSTDOptional::Some(bytes) => NSTDOptional::Some(NSTDString { bytes }),
+        _ => NSTDOptional::None,
     }
 }
 
@@ -197,16 +195,14 @@ pub fn nstd_string_from_bytes(bytes: NSTDVec) -> NSTDString {
 ///
 /// # Returns
 ///
-/// `NSTDString cloned` - A new deep copy of `string`.
-///
-/// # Panics
-///
-/// This function will panic if allocating for the new string fails.
+/// `NSTDOptionalString cloned` - A new deep copy of `string` on success, or an uninitialized
+/// "none" variant if allocating fails.
 #[inline]
 #[nstdapi]
-pub fn nstd_string_clone(string: &NSTDString) -> NSTDString {
-    NSTDString {
-        bytes: nstd_vec_clone(&string.bytes),
+pub fn nstd_string_clone(string: &NSTDString) -> NSTDOptionalString {
+    match nstd_vec_clone(&string.bytes) {
+        NSTDOptional::Some(bytes) => NSTDOptional::Some(NSTDString { bytes }),
+        _ => NSTDOptional::None,
     }
 }
 
@@ -447,7 +443,7 @@ pub unsafe fn nstd_string_push_str(string: &mut NSTDString, str: &NSTDStr) -> NS
 ///
 /// unsafe {
 ///     let str = nstd_core_str_from_raw_cstr_with_null("Hello, world!\0".as_ptr().cast()).unwrap();
-///     let mut string = nstd_string_from_str(&str);
+///     let mut string = nstd_string_from_str(&str).unwrap();
 ///     assert!(nstd_string_pop(&mut string) == NSTDOptional::Some('\0'.into()));
 /// }
 /// ```

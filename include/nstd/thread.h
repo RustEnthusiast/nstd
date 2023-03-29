@@ -98,7 +98,7 @@ NSTDAPI NSTDThread nstd_thread_spawn_with_desc(
 /// # Returns
 ///
 /// `NSTDThreadHandle handle` - A handle to the current thread.
-NSTDAPI NSTDThreadHandle nstd_thread_current();
+NSTDAPI NSTDThreadHandle nstd_thread_current(void);
 
 /// Retrieves a raw handle to a thread.
 ///
@@ -187,14 +187,14 @@ NSTDAPI void nstd_thread_sleep(NSTDFloat64 secs);
 ///
 /// `NSTDThreadCountResult threads` - The estimated default amount of parallelism a program should
 /// use on success, or the I/O error code on failure.
-NSTDAPI NSTDThreadCountResult nstd_thread_count();
+NSTDAPI NSTDThreadCountResult nstd_thread_count(void);
 
 /// Checks if the current thread is unwinding due to a panic.
 ///
 /// # Returns
 ///
 /// `NSTDBool is_panicking` - Determines whether or not the calling thread is panicking.
-NSTDAPI NSTDBool nstd_thread_is_panicking();
+NSTDAPI NSTDBool nstd_thread_is_panicking(void);
 
 /// Compares two thread identifiers.
 ///

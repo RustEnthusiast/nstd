@@ -185,7 +185,7 @@ extern "C" {
     ///
     /// - `const NSTDTimedMutex *mutex` - The mutex to lock.
     ///
-    /// - `const NSTDDuration *duration` - The amount of time to block for.
+    /// - `NSTDDuration duration` - The amount of time to block for.
     ///
     /// # Returns
     ///
@@ -196,7 +196,7 @@ extern "C" {
     /// The mutex lock must not already be owned by the calling thread.
     pub fn nstd_timed_mutex_timed_lock<'a>(
         mutex: &'a NSTDTimedMutex,
-        duration: &NSTDDuration,
+        duration: NSTDDuration,
     ) -> NSTDOptionalTimedMutexLockResult<'a>;
 
     /// Returns an immutable raw pointer to a timed mutex guard's protected data.

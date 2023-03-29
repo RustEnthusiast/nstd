@@ -1,7 +1,6 @@
 #ifndef NSTD_CORE_SLICE_H
 #define NSTD_CORE_SLICE_H
 #include "../nstd.h"
-#include "def.h"
 #include "optional.h"
 #include "ptr.h"
 
@@ -342,19 +341,17 @@ NSTDAPI NSTDAny nstd_core_slice_mut_last_const(const NSTDSliceMut *slice);
 ///
 /// - `const NSTDSlice *src` - The slice to copy data from.
 ///
-/// # Returns
+/// # Panics
 ///
-/// `NSTDErrorCode errc` - Nonzero on error.
+/// This operation will panic in the following situations:
 ///
-/// # Errors
+/// - The two buffer's lengths do not match.
 ///
-/// - `1` - The two buffer's lengths do not match.
-///
-/// - `2` - The two buffer's strides do not match.
+/// - The two buffer's strides do not match.
 ///
 /// # Safety
 ///
 /// This function can cause undefined behavior if either `dest` or `src`'s data is invalid.
-NSTDAPI NSTDErrorCode nstd_core_slice_mut_copy(NSTDSliceMut *dest, const NSTDSlice *src);
+NSTDAPI void nstd_core_slice_mut_copy(NSTDSliceMut *dest, const NSTDSlice *src);
 
 #endif
