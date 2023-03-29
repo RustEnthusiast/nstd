@@ -28,7 +28,7 @@ NSTDAPI NSTDOptionalUnichar nstd_core_unichar_new(NSTDChar32 value);
 /// # Returns
 ///
 /// `NSTDUnichar replacement_char` - The Unicode replacement character (�).
-NSTDAPI NSTDUnichar nstd_core_unichar_replacement();
+NSTDAPI NSTDUnichar nstd_core_unichar_replacement(void);
 
 /// Determines whether or not `chr` is an ASCII character.
 ///

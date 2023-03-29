@@ -95,7 +95,7 @@ impl From<ThreadData> for NSTDHeapPtr {
 ///     0
 /// }
 ///
-/// let data = unsafe { nstd_heap_ptr_new_zeroed(0) };
+/// let data = unsafe { nstd_heap_ptr_new_zeroed(0).unwrap() };
 /// if let Some(thread) = unsafe { nstd_thread_spawn(Some(thread_fn), data) } {
 ///     if let NSTDOptional::Some(errc) = nstd_thread_join(thread) {
 ///         assert!(errc == 0);

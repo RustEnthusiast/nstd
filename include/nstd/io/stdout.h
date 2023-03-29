@@ -12,7 +12,7 @@ typedef NSTDAnyMut NSTDStdout;
 /// # Returns
 ///
 /// `NSTDStdout handle` - A handle to the standard output stream.
-NSTDAPI NSTDStdout nstd_io_stdout();
+NSTDAPI NSTDStdout nstd_io_stdout(void);
 
 /// Writes some data to the standard output stream, returning how many bytes were written.
 ///
@@ -85,7 +85,7 @@ typedef NSTDAnyMut NSTDStdoutLock;
 /// # Returns
 ///
 /// `NSTDStdoutLock handle` - A locked handle to the standard output stream.
-NSTDAPI NSTDStdoutLock nstd_io_stdout_lock();
+NSTDAPI NSTDStdoutLock nstd_io_stdout_lock(void);
 
 /// Writes some data to the standard output stream.
 ///

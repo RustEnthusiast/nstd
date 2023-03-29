@@ -114,14 +114,14 @@ NSTDAPI NSTDUnixOptionalMutexLockResult nstd_os_unix_mutex_try_lock(const NSTDUn
 ///
 /// - `const NSTDUnixMutex *mutex` - The mutex to lock.
 ///
-/// - `const NSTDDuration *duration` - The amount of time to block for.
+/// - `NSTDDuration duration` - The amount of time to block for.
 ///
 /// # Returns
 ///
 /// `NSTDUnixOptionalMutexLockResult guard` - A handle to the mutex's data, or "none" if the mutex
 /// remains locked for the time span of `duration`.
 NSTDAPI NSTDUnixOptionalMutexLockResult
-nstd_os_unix_mutex_timed_lock(const NSTDUnixMutex *mutex, const NSTDDuration *duration);
+nstd_os_unix_mutex_timed_lock(const NSTDUnixMutex *mutex, NSTDDuration duration);
 
 /// Returns a pointer to a mutex's raw data.
 ///

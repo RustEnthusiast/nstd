@@ -73,11 +73,7 @@ NSTDAPI NSTDStr nstd_core_str_from_cstr_unchecked(const NSTDCStr *cstr);
 ///
 /// # Panics
 ///
-/// This function will panic in the following situations:
-///
-/// - `cstr` is null.
-///
-/// - `cstr`'s length is greater than `NSTDInt`'s max value.
+/// This function will panic if `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -98,11 +94,7 @@ NSTDAPI NSTDOptionalStr nstd_core_str_from_raw_cstr(const NSTDChar *cstr);
 ///
 /// # Panics
 ///
-/// This function will panic in the following situations:
-///
-/// - `cstr` is null.
-///
-/// - `cstr`'s length is greater than `NSTDInt`'s max value.
+/// This function will panic if `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -574,11 +566,7 @@ NSTDAPI NSTDStrMut nstd_core_str_mut_from_cstr_unchecked(NSTDCStrMut *cstr);
 ///
 /// # Panics
 ///
-/// This function will panic in the following situations:
-///
-/// - `cstr` is null.
-///
-/// - `cstr`'s length is greater than `NSTDInt`'s max value.
+/// This function will panic if `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -599,11 +587,7 @@ NSTDAPI NSTDOptionalStrMut nstd_core_str_mut_from_raw_cstr(NSTDChar *cstr);
 ///
 /// # Panics
 ///
-/// This function will panic in the following situations:
-///
-/// - `cstr` is null.
-///
-/// - `cstr`'s length is greater than `NSTDInt`'s max value.
+/// This function will panic if `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///

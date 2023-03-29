@@ -95,17 +95,12 @@ pub fn nstd_cstring_new_with_cap(cap: NSTDUInt) -> NSTDCString {
 ///
 /// # Returns
 ///
-/// `NSTDCString cstring` The new owned version of `cstr`.
+/// `NSTDOptionalCString cstring` - The new owned version of `cstr` on success, or an uninitialized
+/// "none" variant if `cstr` contains a null byte or allocating fails.
 ///
 /// # Panics
 ///
-/// This operation will panic in the following situations:
-///
-/// - `cstr` contains a null byte.
-///
-/// - `cstr`'s length is greater than `NSTDInt`'s max value.
-///
-/// - Allocating fails.
+/// This operation will panic if `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -121,10 +116,13 @@ pub fn nstd_cstring_new_with_cap(cap: NSTDUInt) -> NSTDCString {
 ///     let cstring = nstd_cstring_from_cstr(&cstr);
 /// }
 /// ```
+#[inline]
 #[nstdapi]
-pub unsafe fn nstd_cstring_from_cstr(cstr: &NSTDCStr) -> NSTDCString {
-    assert!(nstd_core_cstr_get_null(cstr).is_null());
-    nstd_cstring_from_cstr_unchecked(cstr)
+pub unsafe fn nstd_cstring_from_cstr(cstr: &NSTDCStr) -> NSTDOptionalCString {
+    match nstd_core_cstr_get_null(cstr).is_null() {
+        true => nstd_cstring_from_cstr_unchecked(cstr),
+        false => NSTDOptional::None,
+    }
 }
 
 /// Creates an owned version of an unowned C string slice without checking if the slice contains
@@ -136,12 +134,12 @@ pub unsafe fn nstd_cstring_from_cstr(cstr: &NSTDCStr) -> NSTDCString {
 ///
 /// # Returns
 ///
-/// `NSTDCString cstring` The new owned version of `cstr`.
+/// `NSTDOptionalCString cstring` - The new owned version of `cstr` on success, or an uninitialized
+/// "none" variant if allocating fails.
 ///
 /// # Panics
 ///
-/// This operation will panic if `cstr`'s length is greater than `NSTDInt`'s max value or
-/// allocating fails.
+/// This operation will panic if `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -151,13 +149,15 @@ pub unsafe fn nstd_cstring_from_cstr(cstr: &NSTDCStr) -> NSTDCString {
 ///
 /// - `cstr` does not contain any null (`'\0'`) bytes.
 #[nstdapi]
-pub unsafe fn nstd_cstring_from_cstr_unchecked(cstr: &NSTDCStr) -> NSTDCString {
+pub unsafe fn nstd_cstring_from_cstr_unchecked(cstr: &NSTDCStr) -> NSTDOptionalCString {
     let bytes = nstd_core_cstr_as_bytes(cstr);
-    let mut bytes = nstd_vec_from_slice(&bytes);
-    let null: NSTDChar = 0;
-    let null = addr_of!(null).cast();
-    assert!(nstd_vec_push(&mut bytes, null) == NSTDAllocError::NSTD_ALLOC_ERROR_NONE);
-    NSTDCString { bytes }
+    if let NSTDOptional::Some(mut bytes) = nstd_vec_from_slice(&bytes) {
+        let null: NSTDChar = 0;
+        let null = addr_of!(null).cast();
+        assert!(nstd_vec_push(&mut bytes, null) == NSTDAllocError::NSTD_ALLOC_ERROR_NONE);
+        return NSTDOptional::Some(NSTDCString { bytes });
+    }
+    NSTDOptional::None
 }
 
 /// Creates a new C string from owned data.
@@ -168,7 +168,8 @@ pub unsafe fn nstd_cstring_from_cstr_unchecked(cstr: &NSTDCStr) -> NSTDCString {
 ///
 /// # Returns
 ///
-/// `NSTDCString cstring` - The new C string with ownership of `bytes`.
+/// `NSTDOptionalCString cstring` - The new C string with ownership of `bytes` on success, or an
+/// uninitialized "none" variant if `bytes` does not end with a null (`\0`) byte.
 ///
 /// # Panics
 ///
@@ -176,18 +177,18 @@ pub unsafe fn nstd_cstring_from_cstr_unchecked(cstr: &NSTDCStr) -> NSTDCString {
 ///
 /// - `bytes`'s stride is not 1.
 ///
-/// - `bytes`'s data does not end with a 0 byte.
-///
 /// - `bytes`'s length is greater than `NSTDInt`'s max value.
 #[nstdapi]
-pub fn nstd_cstring_from_bytes(bytes: NSTDVec) -> NSTDCString {
+pub fn nstd_cstring_from_bytes(bytes: NSTDVec) -> NSTDOptionalCString {
     let ptr = nstd_vec_as_ptr(&bytes) as *const NSTDChar;
     assert!(!ptr.is_null() && nstd_vec_stride(&bytes) == 1);
     // SAFETY: `ptr` is non-null.
     let cstr = unsafe { nstd_core_cstr_new_unchecked(ptr, nstd_vec_len(&bytes)) };
     // SAFETY: `cstr`'s data is owned by `bytes`.
-    assert!(unsafe { nstd_core_cstr_is_null_terminated(&cstr) });
-    NSTDCString { bytes }
+    match unsafe { nstd_core_cstr_is_null_terminated(&cstr) } {
+        true => NSTDOptional::Some(NSTDCString { bytes }),
+        false => NSTDOptional::None,
+    }
 }
 
 /// Creates a deep copy of an `NSTDCString`.
@@ -198,16 +199,14 @@ pub fn nstd_cstring_from_bytes(bytes: NSTDVec) -> NSTDCString {
 ///
 /// # Returns
 ///
-/// `NSTDCString cloned` - A new deep copy of `cstring`.
-///
-/// # Panics
-///
-/// This function will panic if allocating for the new C string fails.
+/// `NSTDOptionalCString cloned` - A new deep copy of `cstring` on success, or an uninitialized
+/// "none" variant if allocating fails.
 #[inline]
 #[nstdapi]
-pub fn nstd_cstring_clone(cstring: &NSTDCString) -> NSTDCString {
-    NSTDCString {
-        bytes: nstd_vec_clone(&cstring.bytes),
+pub fn nstd_cstring_clone(cstring: &NSTDCString) -> NSTDOptionalCString {
+    match nstd_vec_clone(&cstring.bytes) {
+        NSTDOptional::Some(bytes) => NSTDOptional::Some(NSTDCString { bytes }),
+        _ => NSTDOptional::None,
     }
 }
 
@@ -446,7 +445,7 @@ pub unsafe fn nstd_cstring_push_cstr(cstring: &mut NSTDCString, cstr: &NSTDCStr)
 ///
 /// unsafe {
 ///     let cstr = nstd_core_cstr_from_raw("123\0".as_ptr().cast());
-///     let mut cstring = nstd_cstring_from_cstr(&cstr);
+///     let mut cstring = nstd_cstring_from_cstr(&cstr).unwrap();
 ///     assert!(nstd_cstring_pop(&mut cstring) == b'3' as NSTDChar);
 /// }
 /// ```

@@ -18,7 +18,7 @@
 /// # Panics
 ///
 /// This operation will panic if allocating the string fails.
-NSTDAPI NSTDIOStringResult nstd_env_current_dir();
+NSTDAPI NSTDIOStringResult nstd_env_current_dir(void);
 
 /// Returns a complete path to the process executable.
 ///
@@ -37,7 +37,7 @@ NSTDAPI NSTDIOStringResult nstd_env_current_dir();
 /// # Panics
 ///
 /// This operation will panic if allocating the string fails.
-NSTDAPI NSTDIOStringResult nstd_env_current_exe();
+NSTDAPI NSTDIOStringResult nstd_env_current_exe(void);
 
 /// Returns a complete path to a temporary directory.
 ///
@@ -50,7 +50,7 @@ NSTDAPI NSTDIOStringResult nstd_env_current_exe();
 /// # Panics
 ///
 /// This operation will panic if allocating the string fails.
-NSTDAPI NSTDString nstd_env_temp_dir();
+NSTDAPI NSTDString nstd_env_temp_dir(void);
 
 /// Sets the current working directory for the process.
 ///
@@ -152,7 +152,7 @@ NSTDAPI void nstd_env_remove_var(const NSTDStr *key);
 /// - Allocating for any of the arguments fails.
 ///
 /// - The total number of bytes required for the vector exceeds `NSTDInt`'s max value.
-NSTDAPI NSTDVec nstd_env_args();
+NSTDAPI NSTDVec nstd_env_args(void);
 
 /// Returns an `NSTDVec` of `NSTDString[2]` which each represent an environment variable from the
 /// current process.
@@ -170,6 +170,6 @@ NSTDAPI NSTDVec nstd_env_args();
 /// - Allocating for any of the keys/values fails.
 ///
 /// - The total number of bytes required for the vector exceeds `NSTDInt`'s max value.
-NSTDAPI NSTDVec nstd_env_vars();
+NSTDAPI NSTDVec nstd_env_vars(void);
 
 #endif

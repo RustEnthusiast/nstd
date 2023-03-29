@@ -83,9 +83,9 @@ NSTDAPI NSTDOptionalTimedMutexLockResult nstd_timed_mutex_lock(const NSTDTimedMu
         NSTDOptionalTimedMutexLockResult ret{NSTD_OPTIONAL_STATUS_SOME, {}};
         const NSTDTimedMutexGuard guard{mutex};
         if (mutex->poisoned)
-            ret.some = NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_ERR, {guard}};
+            ret.value.some = NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_ERR, {guard}};
         else
-            ret.some = NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_OK, {guard}};
+            ret.value.some = NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_OK, {guard}};
         return ret;
     } catch (...) {
         return NSTDOptionalTimedMutexLockResult{NSTD_OPTIONAL_STATUS_NONE, {}};
@@ -120,9 +120,9 @@ NSTDAPI NSTDOptionalTimedMutexLockResult nstd_timed_mutex_try_lock(const NSTDTim
         NSTDOptionalTimedMutexLockResult ret{NSTD_OPTIONAL_STATUS_SOME, {}};
         const NSTDTimedMutexGuard guard{mutex};
         if (mutex->poisoned)
-            ret.some = NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_ERR, {guard}};
+            ret.value.some = NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_ERR, {guard}};
         else
-            ret.some = NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_OK, {guard}};
+            ret.value.some = NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_OK, {guard}};
         return ret;
     } else
         return NSTDOptionalTimedMutexLockResult{NSTD_OPTIONAL_STATUS_NONE, {}};
@@ -139,7 +139,7 @@ NSTDAPI NSTDOptionalTimedMutexLockResult nstd_timed_mutex_try_lock(const NSTDTim
 ///
 /// - `const NSTDTimedMutex *mutex` - The mutex to lock.
 ///
-/// - `const NSTDDuration *duration` - The amount of time to block for.
+/// - `NSTDDuration duration` - The amount of time to block for.
 ///
 /// # Returns
 ///
@@ -149,7 +149,7 @@ NSTDAPI NSTDOptionalTimedMutexLockResult nstd_timed_mutex_try_lock(const NSTDTim
 ///
 /// The mutex lock must not already be owned by the calling thread.
 NSTDAPI NSTDOptionalTimedMutexLockResult
-nstd_timed_mutex_timed_lock(const NSTDTimedMutex *const mutex, const NSTDDuration *const duration) {
+nstd_timed_mutex_timed_lock(const NSTDTimedMutex *const mutex, const NSTDDuration duration) {
 #ifdef NSTD_TIMED_MUTEX_OS_UNIX_IMPL
     return nstd_os_unix_mutex_timed_lock(mutex, duration);
 #else
@@ -159,9 +159,9 @@ nstd_timed_mutex_timed_lock(const NSTDTimedMutex *const mutex, const NSTDDuratio
         NSTDOptionalTimedMutexLockResult ret{NSTD_OPTIONAL_STATUS_SOME, {}};
         const NSTDTimedMutexGuard guard{mutex};
         if (mutex->poisoned)
-            ret.some = NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_ERR, {guard}};
+            ret.value.some = NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_ERR, {guard}};
         else
-            ret.some = NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_OK, {guard}};
+            ret.value.some = NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_OK, {guard}};
         return ret;
     } else
         return NSTDOptionalTimedMutexLockResult{NSTD_OPTIONAL_STATUS_NONE, {}};

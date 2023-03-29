@@ -277,10 +277,6 @@ gen_deterministic!(
 ///
 /// `NSTDBool is_digit` - `NSTD_TRUE` if `chr` is a digit.
 ///
-/// # Panics
-///
-/// This function will panic if `radix` is greater than 36.
-///
 /// # Example
 ///
 /// ```
@@ -289,9 +285,13 @@ gen_deterministic!(
 /// assert!(nstd_core_unichar_is_digit('5'.into(), 16) != NSTD_FALSE);
 /// assert!(nstd_core_unichar_is_digit('E'.into(), 16) != NSTD_FALSE);
 /// assert!(nstd_core_unichar_is_digit('F'.into(), 10) == NSTD_FALSE);
+/// assert!(nstd_core_unichar_is_digit('0'.into(), 37) == NSTD_FALSE);
 /// ```
 #[inline]
 #[nstdapi]
 pub fn nstd_core_unichar_is_digit(chr: NSTDUnichar, radix: NSTDUInt32) -> NSTDBool {
-    char::from(chr).is_digit(radix)
+    match radix <= 36 {
+        true => char::from(chr).is_digit(radix),
+        false => false,
+    }
 }

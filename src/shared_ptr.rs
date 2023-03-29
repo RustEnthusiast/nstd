@@ -73,12 +73,12 @@ gen_optional!(NSTDOptionalSharedPtr, NSTDSharedPtr);
 ///
 /// # Returns
 ///
-/// `NSTDSharedPtr shared_ptr` - The new shared pointer.
+/// `NSTDOptionalSharedPtr shared_ptr` - The new shared pointer, or an uninitialized "none" variant
+/// if allocating fails.
 ///
 /// # Panics
 ///
-/// This operation will panic if either `element_size` is greater than `NSTDInt`'s max value or
-/// allocating fails.
+/// This operation will panic if `element_size` is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -94,27 +94,29 @@ gen_optional!(NSTDOptionalSharedPtr, NSTDSharedPtr);
 ///
 /// let v = i16::MIN;
 /// unsafe {
-///     let shared_ptr = nstd_shared_ptr_new(SIZE, addr_of!(v).cast());
+///     let shared_ptr = nstd_shared_ptr_new(SIZE, addr_of!(v).cast()).unwrap();
 ///     assert!(*nstd_shared_ptr_get(&shared_ptr).cast::<i16>() == v);
 /// }
 /// ```
 #[nstdapi]
-pub unsafe fn nstd_shared_ptr_new(element_size: NSTDUInt, init: NSTDAny) -> NSTDSharedPtr {
+pub unsafe fn nstd_shared_ptr_new(element_size: NSTDUInt, init: NSTDAny) -> NSTDOptionalSharedPtr {
     assert!(element_size <= isize::MAX as usize);
     // Allocate a region of memory for the object and the pointer count.
     let buffer_size = element_size + USIZE_SIZE;
     let raw = nstd_alloc_allocate(buffer_size);
-    assert!(!raw.is_null());
+    if raw.is_null() {
+        return NSTDOptional::None;
+    }
     // Initialize the shared object.
     nstd_core_mem_copy(raw.cast(), init.cast(), element_size);
     // Set the pointer count to one.
     let ptrs = raw.add(element_size).cast::<usize>();
     core::ptr::write_unaligned(ptrs, 1);
     // Construct the pointer.
-    NSTDSharedPtr {
+    NSTDOptional::Some(NSTDSharedPtr {
         ptr: raw,
         size: buffer_size,
-    }
+    })
 }
 
 /// Creates a new zero-initialized instance of a shared pointer.
@@ -125,12 +127,12 @@ pub unsafe fn nstd_shared_ptr_new(element_size: NSTDUInt, init: NSTDAny) -> NSTD
 ///
 /// # Returns
 ///
-/// `NSTDSharedPtr shared_ptr` - The yet to be shared pointer.
+/// `NSTDOptionalSharedPtr shared_ptr` - The yet to be shared pointer, or an uninitialized "none"
+/// variant if allocating fails.
 ///
 /// # Panics
 ///
-/// This operation will panic if either `element_size` is greater than `NSTDInt`'s max value or
-/// allocating fails.
+/// This operation will panic if `element_size` is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -145,27 +147,29 @@ pub unsafe fn nstd_shared_ptr_new(element_size: NSTDUInt, init: NSTDAny) -> NSTD
 /// const SIZE: usize = core::mem::size_of::<u128>();
 ///
 /// unsafe {
-///     let shared_ptr = nstd_shared_ptr_new_zeroed(SIZE);
+///     let shared_ptr = nstd_shared_ptr_new_zeroed(SIZE).unwrap();
 ///     assert!(*nstd_shared_ptr_get(&shared_ptr).cast::<u128>() == 0);
 /// }
 /// ```
 #[nstdapi]
-pub unsafe fn nstd_shared_ptr_new_zeroed(element_size: NSTDUInt) -> NSTDSharedPtr {
+pub unsafe fn nstd_shared_ptr_new_zeroed(element_size: NSTDUInt) -> NSTDOptionalSharedPtr {
     // SAFETY: The allocated memory is validated after allocation.
     unsafe {
         assert!(element_size <= isize::MAX as usize);
         // Allocate a region of memory for the object and the pointer count.
         let buffer_size = element_size + USIZE_SIZE;
         let raw = nstd_alloc_allocate_zeroed(buffer_size);
-        assert!(!raw.is_null());
+        if raw.is_null() {
+            return NSTDOptional::None;
+        }
         // Set the pointer count to one.
         let ptrs = raw.add(element_size).cast::<usize>();
         core::ptr::write_unaligned(ptrs, 1);
         // Construct the pointer.
-        NSTDSharedPtr {
+        NSTDOptional::Some(NSTDSharedPtr {
             ptr: raw,
             size: buffer_size,
-        }
+        })
     }
 }
 
@@ -191,7 +195,7 @@ pub unsafe fn nstd_shared_ptr_new_zeroed(element_size: NSTDUInt) -> NSTDSharedPt
 ///     let v = 39u64;
 ///     let share;
 ///     {
-///         let shared_ptr = nstd_shared_ptr_new(SIZE, addr_of!(v).cast());
+///         let shared_ptr = nstd_shared_ptr_new(SIZE, addr_of!(v).cast()).unwrap();
 ///         share = nstd_shared_ptr_share(&shared_ptr);
 ///     }
 ///     assert!(*nstd_shared_ptr_get(&share).cast::<u64>() == v);
@@ -237,7 +241,7 @@ pub fn nstd_shared_ptr_share(shared_ptr: &NSTDSharedPtr) -> NSTDSharedPtr {
 ///     let v = i128::MIN;
 ///     let share;
 ///     {
-///         let shared_ptr = nstd_shared_ptr_new(SIZE, addr_of!(v).cast());
+///         let shared_ptr = nstd_shared_ptr_new(SIZE, addr_of!(v).cast()).unwrap();
 ///         assert!(nstd_shared_ptr_owners(&shared_ptr) == 1);
 ///
 ///         share = nstd_shared_ptr_share(&shared_ptr);
@@ -273,7 +277,7 @@ pub fn nstd_shared_ptr_owners(shared_ptr: &NSTDSharedPtr) -> NSTDUInt {
 ///
 /// const SIZE: usize = core::mem::size_of::<f64>();
 ///
-/// let shared_ptr = unsafe { nstd_shared_ptr_new_zeroed(SIZE) };
+/// let shared_ptr = unsafe { nstd_shared_ptr_new_zeroed(SIZE).unwrap() };
 /// assert!(nstd_shared_ptr_size(&shared_ptr) == SIZE);
 /// ```
 #[inline]
@@ -302,7 +306,7 @@ pub fn nstd_shared_ptr_size(shared_ptr: &NSTDSharedPtr) -> NSTDUInt {
 ///
 /// let v = u128::MAX;
 /// unsafe {
-///     let shared_ptr = nstd_shared_ptr_new(SIZE, addr_of!(v).cast());
+///     let shared_ptr = nstd_shared_ptr_new(SIZE, addr_of!(v).cast()).unwrap();
 ///     assert!(*nstd_shared_ptr_get(&shared_ptr).cast::<u128>() == v);
 /// }
 /// ```

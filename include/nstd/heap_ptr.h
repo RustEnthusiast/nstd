@@ -24,16 +24,13 @@ NSTDOptional(NSTDHeapPtr) NSTDOptionalHeapPtr;
 ///
 /// # Returns
 ///
-/// `NSTDHeapPtr hptr` - The new heap allocated object.
-///
-/// # Panics
-///
-/// This function will panic if allocation fails.
+/// `NSTDOptionalHeapPtr hptr` - The new heap allocated object, or an uninitialized "none" variant
+/// if allocating fails.
 ///
 /// # Safety
 ///
 /// `init` must be a pointer to a value that is valid for reads of `element_size` bytes.
-NSTDAPI NSTDHeapPtr nstd_heap_ptr_new(NSTDUInt element_size, NSTDAny init);
+NSTDAPI NSTDOptionalHeapPtr nstd_heap_ptr_new(NSTDUInt element_size, NSTDAny init);
 
 /// Creates a new zero-initialized heap allocated object.
 ///
@@ -43,17 +40,14 @@ NSTDAPI NSTDHeapPtr nstd_heap_ptr_new(NSTDUInt element_size, NSTDAny init);
 ///
 /// # Returns
 ///
-/// `NSTDHeapPtr hptr` - The new heap allocated object.
-///
-/// # Panics
-///
-/// This function will panic if allocation fails.
+/// `NSTDOptionalHeapPtr hptr` - The new heap allocated object, or an uninitialized "none" variant
+/// if allocating fails.
 ///
 /// # Safety
 ///
 /// The data to be stored in the heap pointer must be safely representable by an all-zero byte
 /// pattern.
-NSTDAPI NSTDHeapPtr nstd_heap_ptr_new_zeroed(NSTDUInt element_size);
+NSTDAPI NSTDOptionalHeapPtr nstd_heap_ptr_new_zeroed(NSTDUInt element_size);
 
 /// Creates a clone of a heap allocated object.
 ///
@@ -63,12 +57,9 @@ NSTDAPI NSTDHeapPtr nstd_heap_ptr_new_zeroed(NSTDUInt element_size);
 ///
 /// # Returns
 ///
-/// `NSTDHeapPtr cloned` - A new clone of the original heap object.
-///
-/// # Panics
-///
-/// This function will panic if allocation fails.
-NSTDAPI NSTDHeapPtr nstd_heap_ptr_clone(const NSTDHeapPtr *hptr);
+/// `NSTDOptionalHeapPtr cloned` - A new clone of the original heap object, or an uninitialized
+/// "none" variant if allocating fails.
+NSTDAPI NSTDOptionalHeapPtr nstd_heap_ptr_clone(const NSTDHeapPtr *hptr);
 
 /// Returns the size of the heap allocated object.
 ///

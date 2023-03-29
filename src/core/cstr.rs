@@ -649,7 +649,7 @@ pub unsafe fn nstd_core_cstr_mut_from_raw_with_null(raw: *mut NSTDChar) -> NSTDC
 /// let mut str = String::from("Faded than a ho");
 /// let cstr = nstd_core_cstr_mut_new(str.as_mut_ptr().cast(), str.len()).unwrap();
 /// let cstr = nstd_core_cstr_mut_as_const(&cstr);
-/// let cstring = unsafe { nstd_cstring_from_cstr(&cstr) };
+/// let cstring = unsafe { nstd_cstring_from_cstr(&cstr).unwrap() };
 /// assert!(nstd_cstring_len(&cstring) == nstd_core_cstr_len(&cstr));
 /// ```
 #[inline]
