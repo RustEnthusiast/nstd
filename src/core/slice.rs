@@ -6,8 +6,9 @@ use crate::{
         ptr::{
             nstd_core_ptr_get, nstd_core_ptr_mut_get, nstd_core_ptr_mut_get_const,
             nstd_core_ptr_mut_new, nstd_core_ptr_mut_new_unchecked, nstd_core_ptr_mut_size,
-            nstd_core_ptr_new, nstd_core_ptr_new_unchecked, nstd_core_ptr_size, NSTDPtr,
-            NSTDPtrMut,
+            nstd_core_ptr_new, nstd_core_ptr_new_unchecked, nstd_core_ptr_size,
+            raw::{nstd_core_ptr_raw_dangling, nstd_core_ptr_raw_dangling_mut},
+            NSTDPtr, NSTDPtrMut,
         },
     },
     NSTDAny, NSTDAnyMut, NSTDUInt, NSTD_NULL,
@@ -125,6 +126,25 @@ pub const unsafe fn nstd_core_slice_new_unchecked(
     NSTDSlice {
         ptr: nstd_core_ptr_new_unchecked(ptr, element_size),
         len,
+    }
+}
+
+/// Creates a new empty slice with a given `element_size`.
+///
+/// # Parameters:
+///
+/// - `NSTDUInt element_size` - The number of bytes each element occupies.
+///
+/// # Returns
+///
+/// `NSTDSlice slice` - The new empty slice.
+#[inline]
+#[nstdapi]
+pub const fn nstd_core_slice_empty(element_size: NSTDUInt) -> NSTDSlice {
+    NSTDSlice {
+        // SAFETY: The slice is given a non-null pointer and a length of 0.
+        ptr: unsafe { nstd_core_ptr_new_unchecked(nstd_core_ptr_raw_dangling(), element_size) },
+        len: 0,
     }
 }
 
@@ -456,6 +476,27 @@ pub const unsafe fn nstd_core_slice_mut_new_unchecked(
     NSTDSliceMut {
         ptr: nstd_core_ptr_mut_new_unchecked(ptr, element_size),
         len,
+    }
+}
+
+/// Creates a new empty slice with a given `element_size`.
+///
+/// # Parameters:
+///
+/// - `NSTDUInt element_size` - The number of bytes each element occupies.
+///
+/// # Returns
+///
+/// `NSTDSliceMut slice` - The new empty slice.
+#[inline]
+#[nstdapi]
+pub const fn nstd_core_slice_mut_empty(element_size: NSTDUInt) -> NSTDSliceMut {
+    NSTDSliceMut {
+        // SAFETY: The slice is given a non-null pointer and a length of 0.
+        ptr: unsafe {
+            nstd_core_ptr_mut_new_unchecked(nstd_core_ptr_raw_dangling_mut(), element_size)
+        },
+        len: 0,
     }
 }
 
