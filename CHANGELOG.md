@@ -1,5 +1,7 @@
 # TBD
 ## Added
+### `nstd.core`
+- Added `nstd_core_slice[_mut]_empty`.
 ### `nstd.os`
 - Added `NSTDUnixAllocError`.
 ## Changed

@@ -54,6 +54,17 @@ NSTDAPI NSTDOptionalSlice nstd_core_slice_new(NSTDAny ptr, NSTDUInt element_size
 /// The user of this function must ensure that `ptr` is not null.
 NSTDAPI NSTDSlice nstd_core_slice_new_unchecked(NSTDAny ptr, NSTDUInt element_size, NSTDUInt len);
 
+/// Creates a new empty slice with a given `element_size`.
+///
+/// # Parameters:
+///
+/// - `NSTDUInt element_size` - The number of bytes each element occupies.
+///
+/// # Returns
+///
+/// `NSTDSlice slice` - The new empty slice.
+NSTDAPI NSTDSlice nstd_core_slice_empty(NSTDUInt element_size);
+
 /// Returns a raw pointer to the slice's memory.
 ///
 /// # Parameters:
@@ -185,6 +196,17 @@ nstd_core_slice_mut_new(NSTDAnyMut ptr, NSTDUInt element_size, NSTDUInt len);
 /// The user of this function must ensure that `ptr` is not null.
 NSTDAPI NSTDSliceMut
 nstd_core_slice_mut_new_unchecked(NSTDAnyMut ptr, NSTDUInt element_size, NSTDUInt len);
+
+/// Creates a new empty slice with a given `element_size`.
+///
+/// # Parameters:
+///
+/// - `NSTDUInt element_size` - The number of bytes each element occupies.
+///
+/// # Returns
+///
+/// `NSTDSliceMut slice` - The new empty slice.
+NSTDAPI NSTDSliceMut nstd_core_slice_mut_empty(NSTDUInt element_size);
 
 /// Creates an immutable version of a mutable slice.
 ///
