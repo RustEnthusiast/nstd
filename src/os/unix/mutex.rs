@@ -270,10 +270,10 @@ pub fn nstd_os_unix_mutex_try_lock(mutex: &NSTDUnixMutex) -> NSTDUnixOptionalMut
 /// remains locked for the time span of `duration`.
 #[nstdapi]
 #[allow(unused_variables)]
-pub fn nstd_os_unix_mutex_timed_lock<'a>(
-    mutex: &'a NSTDUnixMutex,
+pub fn nstd_os_unix_mutex_timed_lock(
+    mutex: &NSTDUnixMutex,
     duration: NSTDDuration,
-) -> NSTDUnixOptionalMutexLockResult<'a> {
+) -> NSTDUnixOptionalMutexLockResult {
     #[cfg(any(
         target_os = "android",
         target_os = "dragonfly",
