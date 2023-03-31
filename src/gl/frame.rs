@@ -76,13 +76,13 @@ pub fn nstd_gl_frame_new(renderer: &NSTDGLRenderer) -> NSTDGLFrameResult {
                 .device
                 .create_command_encoder(&Default::default());
             // Construct the new frame.
-            return NSTDResult::Ok(NSTDGLFrame {
+            NSTDResult::Ok(NSTDGLFrame {
                 frame: Box::new(Frame {
                     view,
                     encoder,
                     texture,
                 }),
-            });
+            })
         }
         Err(err) => NSTDResult::Err(err.into()),
     }

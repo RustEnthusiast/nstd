@@ -84,7 +84,7 @@ impl NSTDGLShaderSource<'_> {
     /// # Safety
     ///
     /// `wgsl`, `spirv`, and `glsl`'s data must be valid.
-    unsafe fn into_wgpu(&self) -> ShaderSource {
+    unsafe fn as_wgpu(&self) -> ShaderSource {
         match self {
             Self::WGSL(wgsl) => ShaderSource::Wgsl(wgsl.as_str().into()),
             Self::SPIRV(spirv) => ShaderSource::SpirV(spirv.as_slice().into()),
@@ -326,7 +326,7 @@ pub unsafe fn nstd_gl_shader_module_new(
 ) -> NSTDGLShaderModule {
     let module_desc = ShaderModuleDescriptor {
         label: None,
-        source: source.into_wgpu(),
+        source: source.as_wgpu(),
     };
     Box::new(renderer.renderer.device.create_shader_module(module_desc))
 }
@@ -406,18 +406,15 @@ pub unsafe fn nstd_gl_shader_new(
         label: None,
         layout: Some(&pipeline_layout),
         vertex: VertexState {
-            module: &desc.vertex,
+            module: desc.vertex,
             entry_point: "vertex",
             buffers: &buffers,
         },
-        fragment: match desc.fragment {
-            Some(fragment) => Some(FragmentState {
-                module: fragment,
-                entry_point: "fragment",
-                targets: &targets,
-            }),
-            _ => None,
-        },
+        fragment: desc.fragment.map(|fragment| FragmentState {
+            module: fragment,
+            entry_point: "fragment",
+            targets: &targets,
+        }),
         primitive: PrimitiveState {
             topology: PrimitiveTopology::TriangleList,
             front_face: FrontFace::Ccw,
