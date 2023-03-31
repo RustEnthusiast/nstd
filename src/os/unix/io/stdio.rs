@@ -1,4 +1,5 @@
 //! Provides common I/O operations for working with Unix file descriptors.
+#![allow(unused)]
 use super::{
     NSTDUnixFileDescriptor,
     NSTDUnixIOError::{self, *},
