@@ -5,6 +5,8 @@
 ### `nstd.os`
 - Added `NSTDUnixAllocError`.
 ## Changed
+### `nstd`
+- Updated `windows-sys` to version 0.48.
 ### `nstd.core`
 - `nstd_core_unichar_is_digit` no longer panics.
 - `nstd.core.time` functions now take `NSTDDuration` by value.

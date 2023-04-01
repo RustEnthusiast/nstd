@@ -72,7 +72,7 @@ nstdapi = "0.1"
 errno = { version = "0.3", optional = true, default-features = false }
 
 [target.'cfg(windows)'.dependencies]
-windows-sys = { version = "0.45", optional = true, features = ["Win32_Foundation"] }
+windows-sys = { version = "0.48", optional = true, features = ["Win32_Foundation"] }
 
 [build-dependencies]
 build-target = { version = "0.4", optional = true }
