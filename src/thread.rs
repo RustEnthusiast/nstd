@@ -6,16 +6,14 @@ use crate::{
         optional::NSTDOptional,
         result::NSTDResult,
         str::{nstd_core_str_as_cstr, NSTDOptionalStr, NSTDStr},
+        time::NSTDDuration,
     },
     heap_ptr::NSTDHeapPtr,
     io::NSTDIOError,
-    NSTDBool, NSTDFloat64, NSTDUInt,
+    NSTDBool, NSTDUInt,
 };
 use nstdapi::nstdapi;
-use std::{
-    thread::{Builder, JoinHandle, Thread, ThreadId},
-    time::Duration,
-};
+use std::thread::{Builder, JoinHandle, Thread, ThreadId};
 
 /// Represents a running thread.
 pub type NSTDThread = Box<JoinHandle<NSTDThreadResult>>;
@@ -289,19 +287,19 @@ pub fn nstd_thread_id(handle: &NSTDThreadHandle) -> NSTDThreadID {
 #[allow(unused_variables)]
 pub fn nstd_thread_handle_free(handle: NSTDThreadHandle) {}
 
-/// Puts the current thread to sleep for a specified number of seconds.
+/// Puts the current thread to sleep for a specified duration.
 ///
 /// # Parameters:
 ///
-/// - `NSTDFloat64 secs` - The number of seconds to put the thread to sleep for.
+/// - `NSTDDuration duration` - The duration to put the thread to sleep for.
 ///
 /// # Panics
 ///
-/// Panics if `secs` is negative, overflows Rust's `Duration` structure, or is non-finite.
+/// Panics if `duration` is negative, overflows Rust's `Duration` structure, or is non-finite.
 #[inline]
 #[nstdapi]
-pub fn nstd_thread_sleep(secs: NSTDFloat64) {
-    std::thread::sleep(Duration::from_secs_f64(secs));
+pub fn nstd_thread_sleep(duration: NSTDDuration) {
+    std::thread::sleep(duration.into_duration());
 }
 
 /// Returns the number of recommended threads that a program should use.

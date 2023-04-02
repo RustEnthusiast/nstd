@@ -3,6 +3,7 @@ use crate::{
     core::optional::{gen_optional, NSTDOptional},
     NSTDFloat64, NSTDInt64, NSTDUInt32,
 };
+use core::time::Duration;
 use nstdapi::nstdapi;
 
 /// Represents a span of time.
@@ -11,6 +12,17 @@ use nstdapi::nstdapi;
 pub struct NSTDDuration {
     /// The duration in seconds.
     seconds: NSTDFloat64,
+}
+impl NSTDDuration {
+    /// Converts an [NSTDDuration] into a [Duration].
+    ///
+    /// # Panics
+    ///
+    /// Panics if `duration` is negative, overflows Rust's `Duration` structure, or is non-finite.
+    #[inline]
+    pub(crate) fn into_duration(self) -> Duration {
+        Duration::from_secs_f64(self.seconds)
+    }
 }
 gen_optional!(NSTDOptionalDuration, NSTDDuration);
 

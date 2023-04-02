@@ -25,6 +25,8 @@
 ### `nstd.string`
 - `nstd_string_from_str` now returns `NSTDOptionalString`.
 - `nstd_string_clone` now returns `NSTDOptionalString`.
+### `nstd.thread`
+- `nstd_thread_sleep` now takes `NSTDDuration`.
 ### `nstd.time`
 - `nstd.time` functions now take `NSTDTime` & `NSTDDuration` by value.
 ### `nstd.timed_mutex`

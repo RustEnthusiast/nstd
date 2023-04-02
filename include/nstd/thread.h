@@ -4,6 +4,7 @@
 #include "core/optional.h"
 #include "core/result.h"
 #include "core/str.h"
+#include "core/time.h"
 #include "heap_ptr.h"
 #include "io/io.h"
 #include "nstd.h"
@@ -170,16 +171,16 @@ NSTDAPI NSTDThreadID nstd_thread_id(const NSTDThreadHandle *handle);
 /// - `NSTDThreadHandle handle` - The handle to free.
 NSTDAPI void nstd_thread_handle_free(NSTDThreadHandle handle);
 
-/// Puts the current thread to sleep for a specified number of seconds.
+/// Puts the current thread to sleep for a specified duration.
 ///
 /// # Parameters:
 ///
-/// - `NSTDFloat64 secs` - The number of seconds to put the thread to sleep for.
+/// - `NSTDDuration duration` - The duration to put the thread to sleep for.
 ///
 /// # Panics
 ///
-/// Panics if `secs` is negative, overflows Rust's `Duration` structure, or is non-finite.
-NSTDAPI void nstd_thread_sleep(NSTDFloat64 secs);
+/// Panics if `duration` is negative, overflows Rust's `Duration` structure, or is non-finite.
+NSTDAPI void nstd_thread_sleep(NSTDDuration duration);
 
 /// Returns the number of recommended threads that a program should use.
 ///
