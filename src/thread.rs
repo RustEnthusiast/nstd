@@ -50,18 +50,6 @@ pub type NSTDOptionalThreadResult = NSTDOptional<NSTDThreadResult>;
 /// success.
 pub type NSTDThreadCountResult = NSTDResult<NSTDUInt, NSTDIOError>;
 
-/// Data type that wraps [NSTDHeapPtr] and implements the [Send] trait.
-struct ThreadData(NSTDHeapPtr);
-// SAFETY: `nstd_thread_spawn` documents the safety of passing data between threads.
-unsafe impl Send for ThreadData {}
-impl From<ThreadData> for NSTDHeapPtr {
-    /// Consumes `data` returning the inner heap pointer.
-    #[inline]
-    fn from(data: ThreadData) -> Self {
-        data.0
-    }
-}
-
 /// Spawns a new thread and returns a handle to it.
 ///
 /// # Parameters:
@@ -106,8 +94,7 @@ pub unsafe fn nstd_thread_spawn(
     data: NSTDHeapPtr,
 ) -> Option<NSTDThread> {
     if let Some(thread_fn) = thread_fn {
-        let data = ThreadData(data);
-        if let Ok(thread) = Builder::new().spawn(move || thread_fn(data.into())) {
+        if let Ok(thread) = Builder::new().spawn(move || thread_fn(data)) {
             return Some(Box::new(thread));
         }
     }
@@ -166,8 +153,7 @@ pub unsafe fn nstd_thread_spawn_with_desc(
             builder = builder.stack_size(desc.stack_size);
         }
         // Spawn the new thread.
-        let data = ThreadData(data);
-        if let Ok(thread) = builder.spawn(move || thread_fn(data.into())) {
+        if let Ok(thread) = builder.spawn(move || thread_fn(data)) {
             return Some(Box::new(thread));
         }
     }
