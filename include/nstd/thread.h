@@ -46,9 +46,9 @@ NSTDResult(NSTDUInt, NSTDIOError) NSTDThreadCountResult;
 ///
 /// # Parameters:
 ///
-/// - `NSTDThreadResult (*thread_fn)(NSTDHeapPtr)` - The thread function.
+/// - `NSTDThreadResult (*thread_fn)(NSTDOptionalHeapPtr)` - The thread function.
 ///
-/// - `NSTDHeapPtr data` - Data to pass to the thread.
+/// - `NSTDOptionalHeapPtr data` - Data to send to the thread.
 ///
 /// # Returns
 ///
@@ -59,15 +59,16 @@ NSTDResult(NSTDUInt, NSTDIOError) NSTDThreadCountResult;
 /// - The caller of this function must guarantee that `thread_fn` is a valid function pointer.
 ///
 /// - The data type that `data` holds must be able to be safely sent between threads.
-NSTDAPI NSTDThread nstd_thread_spawn(NSTDThreadResult (*thread_fn)(NSTDHeapPtr), NSTDHeapPtr data);
+NSTDAPI NSTDThread
+nstd_thread_spawn(NSTDThreadResult (*thread_fn)(NSTDOptionalHeapPtr), NSTDOptionalHeapPtr data);
 
 /// Spawns a new thread configured with a descriptor.
 ///
 /// # Parameters:
 ///
-/// - `NSTDThreadResult (*thread_fn)(NSTDHeapPtr)` - The thread function.
+/// - `NSTDThreadResult (*thread_fn)(NSTDOptionalHeapPtr)` - The thread function.
 ///
-/// - `NSTDHeapPtr data` - Data to pass to the thread.
+/// - `NSTDOptionalHeapPtr data` - Data to send to the thread.
 ///
 /// - `const NSTDThreadDescriptor *desc` - The thread descriptor.
 ///
@@ -91,7 +92,8 @@ NSTDAPI NSTDThread nstd_thread_spawn(NSTDThreadResult (*thread_fn)(NSTDHeapPtr),
 ///
 /// - The data type that `data` holds must be able to be safely sent between threads.
 NSTDAPI NSTDThread nstd_thread_spawn_with_desc(
-    NSTDThreadResult (*thread_fn)(NSTDHeapPtr), NSTDHeapPtr data, const NSTDThreadDescriptor *desc
+    NSTDThreadResult (*thread_fn)(NSTDOptionalHeapPtr), NSTDOptionalHeapPtr data,
+    const NSTDThreadDescriptor *desc
 );
 
 /// Returns a handle to the calling thread.

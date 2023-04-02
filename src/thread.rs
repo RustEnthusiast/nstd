@@ -8,7 +8,7 @@ use crate::{
         str::{nstd_core_str_as_cstr, NSTDOptionalStr, NSTDStr},
         time::NSTDDuration,
     },
-    heap_ptr::NSTDHeapPtr,
+    heap_ptr::NSTDOptionalHeapPtr,
     io::NSTDIOError,
     NSTDBool, NSTDUInt,
 };
@@ -54,9 +54,9 @@ pub type NSTDThreadCountResult = NSTDResult<NSTDUInt, NSTDIOError>;
 ///
 /// # Parameters:
 ///
-/// - `NSTDThreadResult (*thread_fn)(NSTDHeapPtr)` - The thread function.
+/// - `NSTDThreadResult (*thread_fn)(NSTDOptionalHeapPtr)` - The thread function.
 ///
-/// - `NSTDHeapPtr data` - Data to pass to the thread.
+/// - `NSTDOptionalHeapPtr data` - Data to send to the thread.
 ///
 /// # Returns
 ///
@@ -73,16 +73,15 @@ pub type NSTDThreadCountResult = NSTDResult<NSTDUInt, NSTDIOError>;
 /// ```
 /// use nstd_sys::{
 ///     core::optional::NSTDOptional,
-///     heap_ptr::{nstd_heap_ptr_new_zeroed, NSTDHeapPtr},
+///     heap_ptr::NSTDOptionalHeapPtr,
 ///     thread::{nstd_thread_join, nstd_thread_spawn, NSTDThreadResult},
 /// };
 ///
-/// unsafe extern "C" fn thread_fn(data: NSTDHeapPtr) -> NSTDThreadResult {
+/// unsafe extern "C" fn thread_fn(data: NSTDOptionalHeapPtr) -> NSTDThreadResult {
 ///     0
 /// }
 ///
-/// let data = unsafe { nstd_heap_ptr_new_zeroed(0).unwrap() };
-/// if let Some(thread) = unsafe { nstd_thread_spawn(Some(thread_fn), data) } {
+/// if let Some(thread) = unsafe { nstd_thread_spawn(Some(thread_fn), NSTDOptional::None) } {
 ///     if let NSTDOptional::Some(errc) = nstd_thread_join(thread) {
 ///         assert!(errc == 0);
 ///     }
@@ -90,8 +89,8 @@ pub type NSTDThreadCountResult = NSTDResult<NSTDUInt, NSTDIOError>;
 /// ```
 #[nstdapi]
 pub unsafe fn nstd_thread_spawn(
-    thread_fn: Option<unsafe extern "C" fn(NSTDHeapPtr) -> NSTDThreadResult>,
-    data: NSTDHeapPtr,
+    thread_fn: Option<unsafe extern "C" fn(NSTDOptionalHeapPtr) -> NSTDThreadResult>,
+    data: NSTDOptionalHeapPtr,
 ) -> Option<NSTDThread> {
     if let Some(thread_fn) = thread_fn {
         if let Ok(thread) = Builder::new().spawn(move || thread_fn(data)) {
@@ -105,9 +104,9 @@ pub unsafe fn nstd_thread_spawn(
 ///
 /// # Parameters:
 ///
-/// - `NSTDThreadResult (*thread_fn)(NSTDHeapPtr)` - The thread function.
+/// - `NSTDThreadResult (*thread_fn)(NSTDOptionalHeapPtr)` - The thread function.
 ///
-/// - `NSTDHeapPtr data` - Data to pass to the thread.
+/// - `NSTDOptionalHeapPtr data` - Data to send to the thread.
 ///
 /// - `const NSTDThreadDescriptor *desc` - The thread descriptor.
 ///
@@ -132,8 +131,8 @@ pub unsafe fn nstd_thread_spawn(
 /// - The data type that `data` holds must be able to be safely sent between threads.
 #[nstdapi]
 pub unsafe fn nstd_thread_spawn_with_desc(
-    thread_fn: Option<unsafe extern "C" fn(NSTDHeapPtr) -> NSTDThreadResult>,
-    data: NSTDHeapPtr,
+    thread_fn: Option<unsafe extern "C" fn(NSTDOptionalHeapPtr) -> NSTDThreadResult>,
+    data: NSTDOptionalHeapPtr,
     desc: &NSTDThreadDescriptor,
 ) -> Option<NSTDThread> {
     if let Some(thread_fn) = thread_fn {
