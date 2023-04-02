@@ -29,6 +29,7 @@
 - `nstd_thread_spawn[_with_desc]` now takes `NSTDOptionalHeapPtr`.
 - `nstd_thread_sleep` now takes `NSTDDuration`.
 ### `nstd.time`
+- `nstd_time_now` now returns `NSTDOptionalTime`.
 - `nstd.time` functions now take `NSTDTime` & `NSTDDuration` by value.
 ### `nstd.timed_mutex`
 - `nstd_timed_mutex_timed_lock` now takes `NSTDDuration` by value.
