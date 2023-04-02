@@ -20,6 +20,7 @@ impl NSTDDuration {
     ///
     /// Panics if `duration` is negative, overflows Rust's `Duration` structure, or is non-finite.
     #[inline]
+    #[allow(dead_code)]
     pub(crate) fn into_duration(self) -> Duration {
         Duration::from_secs_f64(self.seconds)
     }
