@@ -8,6 +8,7 @@
 ### `nstd`
 - Updated `windows-sys` to version 0.48.
 ### `nstd.core`
+- `NSTDOptional` & `NSTDResult` now use `NSTDUInt8` as a discriminant.
 - `nstd_core_unichar_is_digit` no longer panics.
 - `nstd.core.time` functions now take `NSTDDuration` by value.
 - `nstd_core_str[_mut]_from_raw_cstr[_with_null]` no longer panics if `cstr` is null.

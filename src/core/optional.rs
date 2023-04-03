@@ -6,18 +6,14 @@ use crate::{
 };
 use nstdapi::nstdapi;
 
-/// Describes an `NSTDOptional` variant.
-#[nstdapi]
-#[allow(non_camel_case_types)]
-pub enum NSTDOptionalStatus {
-    /// No value.
-    NSTD_OPTIONAL_STATUS_NONE,
-    /// "Some" initialized value.
-    NSTD_OPTIONAL_STATUS_SOME,
-}
+/// Describes an `NSTDOptional` with no value.
+pub const NSTD_OPTIONAL_STATUS_NONE: NSTDUInt8 = 0;
+/// Describes an `NSTDOptional` with "some" initialized value.
+pub const NSTD_OPTIONAL_STATUS_SOME: NSTDUInt8 = 1;
 
 /// Represents an optional (possibly uninitialized) value.
 #[nstdapi]
+#[repr(u8)]
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
 pub enum NSTDOptional<T> {
     /// The uninitialized variant.
