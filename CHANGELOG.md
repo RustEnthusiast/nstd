@@ -2,8 +2,19 @@
 ## Added
 ### `nstd.core`
 - Added `nstd_core_slice[_mut]_empty`.
+### `nstd.heap_ptr`
+- Added `nstd_heap_ptr_drop`.
+### `nstd.mutex`
+- Added `nstd_mutex_drop`.
 ### `nstd.os`
+- Added `nstd_os_unix_mutex_drop`.
 - Added `NSTDUnixAllocError`.
+### `nstd.shared_ptr`
+- Added `nstd_shared_ptr_drop`.
+### `nstd.timed_mutex`
+- Added `nstd_timed_mutex_drop`.
+### `nstd.vec`
+- Added `nstd_vec_drop`.
 ## Changed
 ### `nstd`
 - Updated `windows-sys` to version 0.48.

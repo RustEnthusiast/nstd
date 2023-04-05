@@ -1,7 +1,7 @@
 //! A mutual exclusion primitive useful for protecting shared data.
 use crate::{
     core::{optional::NSTDOptional, result::NSTDResult},
-    heap_ptr::{nstd_heap_ptr_get, nstd_heap_ptr_get_mut, NSTDHeapPtr},
+    heap_ptr::{nstd_heap_ptr_drop, nstd_heap_ptr_get, nstd_heap_ptr_get_mut, NSTDHeapPtr},
     NSTDAny, NSTDAnyMut, NSTDBool,
 };
 use nstdapi::nstdapi;
@@ -152,3 +152,27 @@ pub fn nstd_mutex_unlock(guard: NSTDMutexGuard) {}
 #[nstdapi]
 #[allow(unused_variables)]
 pub fn nstd_mutex_free(mutex: NSTDMutex) {}
+
+/// Frees an instance of `NSTDMutex` after invoking `callback` with the mutex's data.
+///
+/// `callback` will not be called if the mutex is poisoned.
+///
+/// # Parameters:
+///
+/// - `NSTDMutex mutex` - The mutex to free.
+///
+/// - `void (*callback)(NSTDAnyMut)` - The mutex data's destructor.
+///
+/// # Safety
+///
+/// This operation makes a direct call on a C function pointer (`callback`).
+#[inline]
+#[nstdapi]
+pub unsafe fn nstd_mutex_drop(
+    mutex: NSTDMutex,
+    callback: Option<unsafe extern "C" fn(NSTDAnyMut)>,
+) {
+    if let Ok(data) = mutex.into_inner() {
+        nstd_heap_ptr_drop(data, callback);
+    }
+}

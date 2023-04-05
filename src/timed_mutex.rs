@@ -234,4 +234,22 @@ extern "C" {
     ///
     /// - `NSTDTimedMutex mutex` - The timed mutex to free.
     pub fn nstd_timed_mutex_free(mutex: NSTDTimedMutex);
+
+    /// Frees an instance of `NSTDTimedMutex` after invoking `callback` with the mutex's data.
+    ///
+    /// `callback` will not be called if the mutex is poisoned.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDTimedMutex mutex` - The timed mutex to free.
+    ///
+    /// - `void (*callback)(NSTDAnyMut)` - The mutex data's destructor.
+    ///
+    /// # Safety
+    ///
+    /// This operation makes a direct call on a C function pointer (`callback`).
+    pub fn nstd_timed_mutex_drop(
+        mutex: NSTDTimedMutex,
+        callback: Option<unsafe extern "C" fn(NSTDAnyMut)>,
+    );
 }

@@ -447,4 +447,21 @@ NSTDAPI void nstd_vec_clear(NSTDVec *vec);
 /// - `NSTDVec vec` - The vector to free.
 NSTDAPI void nstd_vec_free(NSTDVec vec);
 
+/// Frees an instance of `NSTDVec` after invoking `callback` with each of the vector's elements.
+///
+/// # Parameters:
+///
+/// - `NSTDVec vec` - The vector to free.
+///
+/// - `void (*callback)(NSTDAnyMut)` - The vector data's destructor.
+///
+/// # Panics
+///
+/// This operation will panic if `vec`'s length in bytes exceeds `NSTDInt`'s max value.
+///
+/// # Safety
+///
+/// This operation makes a direct call on a C function pointer (`callback`).
+NSTDAPI void nstd_vec_drop(NSTDVec vec, void (*callback)(NSTDAnyMut));
+
 #endif

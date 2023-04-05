@@ -5,7 +5,7 @@ use crate::{
         result::NSTDResult,
         time::NSTDDuration,
     },
-    heap_ptr::{nstd_heap_ptr_get, nstd_heap_ptr_get_mut, NSTDHeapPtr},
+    heap_ptr::{nstd_heap_ptr_drop, nstd_heap_ptr_get, nstd_heap_ptr_get_mut, NSTDHeapPtr},
     thread::nstd_thread_is_panicking,
     NSTDAny, NSTDAnyMut, NSTDBool, NSTD_FALSE, NSTD_TRUE,
 };
@@ -353,7 +353,7 @@ pub fn nstd_os_unix_mutex_get_mut(guard: &mut NSTDUnixMutexGuard) -> NSTDAnyMut 
 #[allow(unused_variables)]
 pub fn nstd_os_unix_mutex_unlock(guard: NSTDUnixMutexGuard) {}
 
-/// Frees a mutex and the data it is protecting.
+/// Frees an instance of `NSTDUnixMutex`.
 ///
 /// # Parameters:
 ///
@@ -362,3 +362,27 @@ pub fn nstd_os_unix_mutex_unlock(guard: NSTDUnixMutexGuard) {}
 #[nstdapi]
 #[allow(unused_variables)]
 pub fn nstd_os_unix_mutex_free(mutex: NSTDUnixMutex) {}
+
+/// Frees an instance of `NSTDUnixMutex` after invoking `callback` with the mutex's data.
+///
+/// `callback` will not be called if the mutex is poisoned.
+///
+/// # Parameters:
+///
+/// - `NSTDUnixMutex mutex` - The mutex to free.
+///
+/// - `void (*callback)(NSTDAnyMut)` - The mutex data's destructor.
+///
+/// # Safety
+///
+/// This operation makes a direct call on a C function pointer (`callback`).
+#[inline]
+#[nstdapi]
+pub unsafe fn nstd_os_unix_mutex_drop(
+    mutex: NSTDUnixMutex,
+    callback: Option<unsafe extern "C" fn(NSTDAnyMut)>,
+) {
+    if !mutex.poisoned.get() {
+        nstd_heap_ptr_drop(mutex.data.into_inner(), callback);
+    }
+}

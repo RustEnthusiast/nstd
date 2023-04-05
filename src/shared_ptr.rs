@@ -321,6 +321,29 @@ pub fn nstd_shared_ptr_get(shared_ptr: &NSTDSharedPtr) -> NSTDAny {
 /// # Parameters:
 ///
 /// - `NSTDSharedPtr shared_ptr` - The shared object to free.
+#[inline]
 #[nstdapi]
 #[allow(unused_variables)]
 pub fn nstd_shared_ptr_free(shared_ptr: NSTDSharedPtr) {}
+
+/// Frees an instance of `NSTDSharedPtr` after invoking `callback` with the shared object.
+///
+/// # Parameters:
+///
+/// - `NSTDSharedPtr shared_ptr` - The shared object to free.
+///
+/// - `void (*callback)(NSTDAnyMut)` - The shared object's destructor.
+///
+/// # Safety
+///
+/// This operation makes a direct call on a C function pointer (`callback`).
+#[inline]
+#[nstdapi]
+pub unsafe fn nstd_shared_ptr_drop(
+    shared_ptr: NSTDSharedPtr,
+    callback: Option<unsafe extern "C" fn(NSTDAnyMut)>,
+) {
+    if let Some(callback) = callback {
+        callback(shared_ptr.ptr);
+    }
+}

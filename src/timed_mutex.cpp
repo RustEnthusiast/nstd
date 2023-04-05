@@ -236,3 +236,32 @@ NSTDAPI void nstd_timed_mutex_free(const NSTDTimedMutex mutex) {
     nstd_heap_ptr_free(mutex.data);
 #endif
 }
+
+/// Frees an instance of `NSTDTimedMutex` after invoking `callback` with the mutex's data.
+///
+/// `callback` will not be called if the mutex is poisoned.
+///
+/// # Parameters:
+///
+/// - `NSTDTimedMutex mutex` - The timed mutex to free.
+///
+/// - `void (*callback)(NSTDAnyMut)` - The mutex data's destructor.
+///
+/// # Safety
+///
+/// This operation makes a direct call on a C function pointer (`callback`).
+NSTDAPI void nstd_timed_mutex_drop(const NSTDTimedMutex mutex, void (*const callback)(NSTDAnyMut)) {
+#ifdef NSTD_TIMED_MUTEX_OS_UNIX_IMPL
+    nstd_os_unix_mutex_drop(mutex, callback);
+#else
+    // Destroying a locked mutex results in undefined behavior, so here we check if the mutex is
+    // locked. If the mutex *is* locked then it's guard must have been leaked, in this case we will
+    // leak the raw mutex as well.
+    if (!mutex.locked)
+        delete (std::timed_mutex *)mutex.inner;
+    // Accessing the data through `callback` may result in undefined behavior if this mutex is
+    // poisoned.
+    if (!mutex.poisoned)
+        nstd_heap_ptr_drop(mutex.data, callback);
+#endif
+}

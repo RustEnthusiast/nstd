@@ -112,4 +112,19 @@ NSTDAPI void nstd_mutex_unlock(NSTDMutexGuard guard);
 /// - `NSTDMutex mutex` - The mutex to free.
 NSTDAPI void nstd_mutex_free(NSTDMutex mutex);
 
+/// Frees an instance of `NSTDMutex` after invoking `callback` with the mutex's data.
+///
+/// `callback` will not be called if the mutex is poisoned.
+///
+/// # Parameters:
+///
+/// - `NSTDMutex mutex` - The mutex to free.
+///
+/// - `void (*callback)(NSTDAnyMut)` - The mutex data's destructor.
+///
+/// # Safety
+///
+/// This operation makes a direct call on a C function pointer (`callback`).
+NSTDAPI void nstd_mutex_drop(NSTDMutex mutex, void (*callback)(NSTDAnyMut));
+
 #endif

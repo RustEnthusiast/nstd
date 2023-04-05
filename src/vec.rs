@@ -1115,3 +1115,30 @@ pub fn nstd_vec_clear(vec: &mut NSTDVec) {
 #[nstdapi]
 #[allow(unused_variables)]
 pub fn nstd_vec_free(vec: NSTDVec) {}
+
+/// Frees an instance of `NSTDVec` after invoking `callback` with each of the vector's elements.
+///
+/// # Parameters:
+///
+/// - `NSTDVec vec` - The vector to free.
+///
+/// - `void (*callback)(NSTDAnyMut)` - The vector data's destructor.
+///
+/// # Panics
+///
+/// This operation will panic if `vec`'s length in bytes exceeds `NSTDInt`'s max value.
+///
+/// # Safety
+///
+/// This operation makes a direct call on a C function pointer (`callback`).
+#[nstdapi]
+pub unsafe fn nstd_vec_drop(mut vec: NSTDVec, callback: Option<unsafe extern "C" fn(NSTDAnyMut)>) {
+    if let Some(callback) = callback {
+        let mut ptr = nstd_vec_as_ptr_mut(&mut vec);
+        let end = nstd_vec_end(&vec) as _;
+        while ptr < end {
+            callback(ptr);
+            ptr = ptr.add(vec.stride);
+        }
+    }
+}
