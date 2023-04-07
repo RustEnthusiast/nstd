@@ -214,7 +214,7 @@ NSTDAPI NSTDAnyMut nstd_timed_mutex_get_mut(NSTDTimedMutexGuard *const guard) {
 /// if the mutex was poisoned.
 NSTDAPI NSTDOptionalHeapPtr nstd_timed_mutex_into_inner(const NSTDTimedMutex mutex) {
 #ifdef NSTD_TIMED_MUTEX_OS_UNIX_IMPL
-    nstd_os_unix_mutex_into_inner(mutex);
+    return nstd_os_unix_mutex_into_inner(mutex);
 #else
     if (!nstd_timed_mutex_is_poisoned(&mutex)) {
         return NSTDOptionalHeapPtr{NSTD_OPTIONAL_STATUS_SOME, {mutex.data}};
