@@ -263,5 +263,7 @@ NSTDAPI void nstd_timed_mutex_drop(const NSTDTimedMutex mutex, void (*const call
     // poisoned.
     if (!mutex.poisoned)
         nstd_heap_ptr_drop(mutex.data, callback);
+    else
+        nstd_heap_ptr_free(mutex.data);
 #endif
 }
