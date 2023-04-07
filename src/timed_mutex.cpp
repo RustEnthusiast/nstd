@@ -202,6 +202,28 @@ NSTDAPI NSTDAnyMut nstd_timed_mutex_get_mut(NSTDTimedMutexGuard *const guard) {
 #endif
 }
 
+/// Consumes a timed mutex and returns the data it was protecting.
+///
+/// # Parameters:
+///
+/// - `NSTDTimedMutex mutex` - The mutex to take ownership of.
+///
+/// # Returns
+///
+/// `NSTDOptionalHeapPtr data` - Ownership of the mutex's data, or an uninitialized "none" variant
+/// if the mutex was poisoned.
+NSTDAPI NSTDOptionalHeapPtr nstd_timed_mutex_into_inner(const NSTDTimedMutex mutex) {
+#ifdef NSTD_TIMED_MUTEX_OS_UNIX_IMPL
+    nstd_os_unix_mutex_into_inner(mutex);
+#else
+    if (!nstd_timed_mutex_is_poisoned(&mutex)) {
+        return NSTDOptionalHeapPtr{NSTD_OPTIONAL_STATUS_SOME, {mutex.data}};
+    } else {
+        return NSTDOptionalHeapPtr{NSTD_OPTIONAL_STATUS_NONE, {}};
+    }
+#endif
+}
+
 /// Unlocks a timed mutex by consuming a mutex guard.
 ///
 /// # Parameters:

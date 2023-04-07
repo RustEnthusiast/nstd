@@ -1,5 +1,9 @@
 //! A mutual exclusion primitive with a timed locking mechanism.
-use crate::{core::time::NSTDDuration, heap_ptr::NSTDHeapPtr, NSTDAny, NSTDAnyMut, NSTDBool};
+use crate::{
+    core::time::NSTDDuration,
+    heap_ptr::{NSTDHeapPtr, NSTDOptionalHeapPtr},
+    NSTDAny, NSTDAnyMut, NSTDBool,
+};
 use cfg_if::cfg_if;
 
 cfg_if! {
@@ -220,6 +224,18 @@ extern "C" {
     ///
     /// `NSTDAnyMut data` - A pointer to the guard's protected data.
     pub fn nstd_timed_mutex_get_mut(guard: &mut NSTDTimedMutexGuard) -> NSTDAnyMut;
+
+    /// Consumes a timed mutex and returns the data it was protecting.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDTimedMutex mutex` - The mutex to take ownership of.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDOptionalHeapPtr data` - Ownership of the mutex's data, or an uninitialized "none"
+    /// variant if the mutex was poisoned.
+    pub fn nstd_timed_mutex_into_inner(mutex: NSTDTimedMutex) -> NSTDOptionalHeapPtr;
 
     /// Unlocks a timed mutex by consuming a mutex guard.
     ///

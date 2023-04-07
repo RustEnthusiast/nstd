@@ -5,7 +5,10 @@ use crate::{
         result::NSTDResult,
         time::NSTDDuration,
     },
-    heap_ptr::{nstd_heap_ptr_drop, nstd_heap_ptr_get, nstd_heap_ptr_get_mut, NSTDHeapPtr},
+    heap_ptr::{
+        nstd_heap_ptr_drop, nstd_heap_ptr_get, nstd_heap_ptr_get_mut, NSTDHeapPtr,
+        NSTDOptionalHeapPtr,
+    },
     thread::nstd_thread_is_panicking,
     NSTDAny, NSTDAnyMut, NSTDBool, NSTD_FALSE, NSTD_TRUE,
 };
@@ -341,6 +344,25 @@ pub fn nstd_os_unix_mutex_get(guard: &NSTDUnixMutexGuard) -> NSTDAny {
 pub fn nstd_os_unix_mutex_get_mut(guard: &mut NSTDUnixMutexGuard) -> NSTDAnyMut {
     // SAFETY: `mutex` is behind a valid reference.
     nstd_heap_ptr_get_mut(unsafe { &mut *guard.mutex.data.get() })
+}
+
+/// Consumes a mutex and returns the data it was protecting.
+///
+/// # Parameters:
+///
+/// - `NSTDUnixMutex mutex` - The mutex to take ownership of.
+///
+/// # Returns
+///
+/// `NSTDOptionalHeapPtr data` - Ownership of the mutex's data, or an uninitialized "none" variant
+/// if the mutex was poisoned.
+#[inline]
+#[nstdapi]
+pub fn nstd_os_unix_mutex_into_inner(mutex: NSTDUnixMutex) -> NSTDOptionalHeapPtr {
+    match nstd_os_unix_mutex_is_poisoned(&mutex) {
+        false => NSTDOptional::Some(mutex.data.into_inner()),
+        true => NSTDOptional::None,
+    }
 }
 
 /// Unlocks a mutex by consuming it's guard.

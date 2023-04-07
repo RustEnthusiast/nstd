@@ -145,6 +145,18 @@ NSTDAPI NSTDAny nstd_os_unix_mutex_get(const NSTDUnixMutexGuard *guard);
 /// `NSTDAnyMut data` - A pointer to the mutex's data.
 NSTDAPI NSTDAnyMut nstd_os_unix_mutex_get_mut(NSTDUnixMutexGuard *guard);
 
+/// Consumes a mutex and returns the data it was protecting.
+///
+/// # Parameters:
+///
+/// - `NSTDUnixMutex mutex` - The mutex to take ownership of.
+///
+/// # Returns
+///
+/// `NSTDOptionalHeapPtr data` - Ownership of the mutex's data, or an uninitialized "none" variant
+/// if the mutex was poisoned.
+NSTDAPI NSTDOptionalHeapPtr nstd_os_unix_mutex_into_inner(NSTDUnixMutex mutex);
+
 /// Unlocks a mutex by consuming it's guard.
 ///
 /// # Parameters:

@@ -1,7 +1,10 @@
 //! A mutual exclusion primitive useful for protecting shared data.
 use crate::{
     core::{optional::NSTDOptional, result::NSTDResult},
-    heap_ptr::{nstd_heap_ptr_drop, nstd_heap_ptr_get, nstd_heap_ptr_get_mut, NSTDHeapPtr},
+    heap_ptr::{
+        nstd_heap_ptr_drop, nstd_heap_ptr_get, nstd_heap_ptr_get_mut, NSTDHeapPtr,
+        NSTDOptionalHeapPtr,
+    },
     NSTDAny, NSTDAnyMut, NSTDBool,
 };
 use nstdapi::nstdapi;
@@ -131,6 +134,25 @@ pub fn nstd_mutex_get(guard: &NSTDMutexGuard) -> NSTDAny {
 #[nstdapi]
 pub fn nstd_mutex_get_mut(guard: &mut NSTDMutexGuard) -> NSTDAnyMut {
     nstd_heap_ptr_get_mut(guard)
+}
+
+/// Consumes a mutex and returns the data it was protecting.
+///
+/// # Parameters:
+///
+/// - `NSTDMutex mutex` - The mutex to take ownership of.
+///
+/// # Returns
+///
+/// `NSTDOptionalHeapPtr data` - Ownership of the mutex's data, or an uninitialized "none" variant
+/// if the mutex was poisoned.
+#[inline]
+#[nstdapi]
+pub fn nstd_mutex_into_inner(mutex: NSTDMutex) -> NSTDOptionalHeapPtr {
+    match mutex.into_inner() {
+        Ok(data) => NSTDOptional::Some(data),
+        _ => NSTDOptional::None,
+    }
 }
 
 /// Unlocks a mutex by consuming a mutex guard.
