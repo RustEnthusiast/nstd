@@ -216,9 +216,15 @@ NSTDAPI NSTDOptionalHeapPtr nstd_timed_mutex_into_inner(const NSTDTimedMutex mut
 #ifdef NSTD_TIMED_MUTEX_OS_UNIX_IMPL
     return nstd_os_unix_mutex_into_inner(mutex);
 #else
+    // Destroying a locked mutex results in undefined behavior, so here we check if the mutex is
+    // locked. If the mutex *is* locked then it's guard must have been leaked, in this case we will
+    // leak the raw mutex as well.
+    if (!mutex.locked)
+        delete (std::timed_mutex *)mutex.inner;
     if (!nstd_timed_mutex_is_poisoned(&mutex)) {
         return NSTDOptionalHeapPtr{NSTD_OPTIONAL_STATUS_SOME, {mutex.data}};
     } else {
+        nstd_heap_ptr_free(mutex.data);
         return NSTDOptionalHeapPtr{NSTD_OPTIONAL_STATUS_NONE, {}};
     }
 #endif
