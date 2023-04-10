@@ -221,9 +221,9 @@ NSTDAPI NSTDOptionalHeapPtr nstd_timed_mutex_into_inner(const NSTDTimedMutex mut
     // leak the raw mutex as well.
     if (!mutex.locked)
         delete (std::timed_mutex *)mutex.inner;
-    if (!nstd_timed_mutex_is_poisoned(&mutex)) {
+    if (!mutex.poisoned)
         return NSTDOptionalHeapPtr{NSTD_OPTIONAL_STATUS_SOME, {mutex.data}};
-    } else {
+    else {
         nstd_heap_ptr_free(mutex.data);
         return NSTDOptionalHeapPtr{NSTD_OPTIONAL_STATUS_NONE, {}};
     }
