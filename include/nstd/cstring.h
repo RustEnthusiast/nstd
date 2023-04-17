@@ -57,7 +57,7 @@ NSTDAPI NSTDCString nstd_cstring_new_with_cap(NSTDUInt cap);
 ///
 /// # Panics
 ///
-/// This operation will panic if `cstr`'s length is greater than `NSTDInt`'s max value.
+/// This operation will panic if allocating for the C string's null byte fails.
 ///
 /// # Safety
 ///
@@ -78,7 +78,7 @@ NSTDAPI NSTDOptionalCString nstd_cstring_from_cstr(const NSTDCStr *cstr);
 ///
 /// # Panics
 ///
-/// This operation will panic if `cstr`'s length is greater than `NSTDInt`'s max value.
+/// This operation will panic if allocating for the C string's null byte fails.
 ///
 /// # Safety
 ///
@@ -102,11 +102,7 @@ NSTDAPI NSTDOptionalCString nstd_cstring_from_cstr_unchecked(const NSTDCStr *cst
 ///
 /// # Panics
 ///
-/// This operation will panic in the following situations:
-///
-/// - `bytes`'s stride is not 1.
-///
-/// - `bytes`'s length is greater than `NSTDInt`'s max value.
+/// This operation will panic if `bytes`'s stride is not 1.
 NSTDAPI NSTDOptionalCString nstd_cstring_from_bytes(NSTDVec bytes);
 
 /// Creates a deep copy of an `NSTDCString`.
@@ -233,11 +229,7 @@ NSTDAPI void nstd_cstring_push(NSTDCString *cstring, NSTDChar chr);
 ///
 /// - `cstr` contains a null byte.
 ///
-/// - `cstr`'s length is greater than `NSTDInt`'s max value.
-///
 /// - Appending the new null byte to the end of the C string fails.
-///
-/// - The new length in bytes exceeds `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -253,10 +245,6 @@ NSTDAPI NSTDAllocError nstd_cstring_push_cstr(NSTDCString *cstring, const NSTDCS
 /// # Returns
 ///
 /// `NSTDChar chr` - The removed character, or null if the C string is empty.
-///
-/// # Panics
-///
-/// This function will panic if getting a pointer to the C string's last character fails.
 NSTDAPI NSTDChar nstd_cstring_pop(NSTDCString *cstring);
 
 /// Sets a C string's length to zero.

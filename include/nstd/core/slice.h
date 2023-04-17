@@ -32,7 +32,8 @@ NSTDOptional(NSTDSlice) NSTDOptionalSlice;
 ///
 /// # Returns
 ///
-/// `NSTDOptionalSlice slice` - The new slice on success, or a "none" variant if `ptr` is null.
+/// `NSTDOptionalSlice slice` - The new slice on success, or an uninitialized "none" variant if
+/// either `ptr` is null or the slice's length in bytes would exceed `NSTDInt`'s max value.
 NSTDAPI NSTDOptionalSlice nstd_core_slice_new(NSTDAny ptr, NSTDUInt element_size, NSTDUInt len);
 
 /// Creates a new slice from raw data without checking if `ptr` is null.
@@ -51,7 +52,9 @@ NSTDAPI NSTDOptionalSlice nstd_core_slice_new(NSTDAny ptr, NSTDUInt element_size
 ///
 /// # Safety
 ///
-/// The user of this function must ensure that `ptr` is not null.
+/// The user of this function must ensure that `ptr` is non-null, `element_size` does not exceed
+/// `NSTDInt`'s max value, and that the slice's total length in bytes will not exceed `NSTDInt`'s
+/// max value.
 NSTDAPI NSTDSlice nstd_core_slice_new_unchecked(NSTDAny ptr, NSTDUInt element_size, NSTDUInt len);
 
 /// Creates a new empty slice with a given `element_size`.
@@ -63,6 +66,10 @@ NSTDAPI NSTDSlice nstd_core_slice_new_unchecked(NSTDAny ptr, NSTDUInt element_si
 /// # Returns
 ///
 /// `NSTDSlice slice` - The new empty slice.
+///
+/// # Panics
+///
+/// This operation will panic if `element_size` is greater than `NSTDInt`'s max value.
 NSTDAPI NSTDSlice nstd_core_slice_empty(NSTDUInt element_size);
 
 /// Returns a raw pointer to the slice's memory.
@@ -110,10 +117,6 @@ NSTDAPI NSTDUInt nstd_core_slice_stride(const NSTDSlice *slice);
 ///
 /// `NSTDAny element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out
 /// of the slice's boundaries.
-///
-/// # Panics
-///
-/// Panics if the slice's current length in bytes exceeds `NSTDInt`'s max value.
 NSTDAPI NSTDAny nstd_core_slice_get(const NSTDSlice *slice, NSTDUInt pos);
 
 /// Returns an immutable pointer to the first element in the slice.
@@ -138,10 +141,6 @@ NSTDAPI NSTDAny nstd_core_slice_first(const NSTDSlice *slice);
 ///
 /// `NSTDAny element` - A pointer to the last element in `slice` or `NSTD_NULL` if the
 /// slice is empty.
-///
-/// # Panics
-///
-/// Panics if the slice's current length in bytes exceeds `NSTDInt`'s max value.
 NSTDAPI NSTDAny nstd_core_slice_last(const NSTDSlice *slice);
 
 /// A view into a sequence of values in memory.
@@ -173,7 +172,8 @@ NSTDOptional(NSTDSliceMut) NSTDOptionalSliceMut;
 ///
 /// # Returns
 ///
-/// `NSTDOptionalSliceMut slice` - The new slice on success, or a "none" variant if `ptr` is null.
+/// `NSTDOptionalSliceMut slice` - The new slice on success, or an uninitialized "none" variant if
+/// either `ptr` is null or the slice's length in bytes would exceed `NSTDInt`'s max value.
 NSTDAPI NSTDOptionalSliceMut
 nstd_core_slice_mut_new(NSTDAnyMut ptr, NSTDUInt element_size, NSTDUInt len);
 
@@ -193,7 +193,9 @@ nstd_core_slice_mut_new(NSTDAnyMut ptr, NSTDUInt element_size, NSTDUInt len);
 ///
 /// # Safety
 ///
-/// The user of this function must ensure that `ptr` is not null.
+/// The user of this function must ensure that `ptr` is non-null, `element_size` does not exceed
+/// `NSTDInt`'s max value, and that the slice's total length in bytes will not exceed `NSTDInt`'s
+/// max value.
 NSTDAPI NSTDSliceMut
 nstd_core_slice_mut_new_unchecked(NSTDAnyMut ptr, NSTDUInt element_size, NSTDUInt len);
 
@@ -206,6 +208,10 @@ nstd_core_slice_mut_new_unchecked(NSTDAnyMut ptr, NSTDUInt element_size, NSTDUIn
 /// # Returns
 ///
 /// `NSTDSliceMut slice` - The new empty slice.
+///
+/// # Panics
+///
+/// This operation will panic if `element_size` is greater than `NSTDInt`'s max value.
 NSTDAPI NSTDSliceMut nstd_core_slice_mut_empty(NSTDUInt element_size);
 
 /// Creates an immutable version of a mutable slice.
@@ -275,10 +281,6 @@ NSTDAPI NSTDUInt nstd_core_slice_mut_stride(const NSTDSliceMut *slice);
 ///
 /// `NSTDAnyMut element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out of
 /// the slice's boundaries.
-///
-/// # Panics
-///
-/// Panics if the slice's current length in bytes exceeds `NSTDInt`'s max value.
 NSTDAPI NSTDAnyMut nstd_core_slice_mut_get(NSTDSliceMut *slice, NSTDUInt pos);
 
 /// Returns an immutable pointer to the element at index `pos` in `slice`.
@@ -293,10 +295,6 @@ NSTDAPI NSTDAnyMut nstd_core_slice_mut_get(NSTDSliceMut *slice, NSTDUInt pos);
 ///
 /// `NSTDAny element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out
 /// of the slice's boundaries.
-///
-/// # Panics
-///
-/// Panics if the slice's current length in bytes exceeds `NSTDInt`'s max value.
 NSTDAPI NSTDAny nstd_core_slice_mut_get_const(const NSTDSliceMut *slice, NSTDUInt pos);
 
 /// Returns a pointer to the first element in the slice.
@@ -333,10 +331,6 @@ NSTDAPI NSTDAny nstd_core_slice_mut_first_const(const NSTDSliceMut *slice);
 ///
 /// `NSTDAnyMut element` - A pointer to the last element in `slice` or `NSTD_NULL` if the slice
 /// is empty.
-///
-/// # Panics
-///
-/// Panics if the slice's current length in bytes exceeds `NSTDInt`'s max value.
 NSTDAPI NSTDAnyMut nstd_core_slice_mut_last(NSTDSliceMut *slice);
 
 /// Returns an immutable pointer to the last element in the slice.
@@ -349,10 +343,6 @@ NSTDAPI NSTDAnyMut nstd_core_slice_mut_last(NSTDSliceMut *slice);
 ///
 /// `NSTDAny element` - A pointer to the last element in `slice` or `NSTD_NULL` if the
 /// slice is empty.
-///
-/// # Panics
-///
-/// Panics if the slice's current length in bytes exceeds `NSTDInt`'s max value.
 NSTDAPI NSTDAny nstd_core_slice_mut_last_const(const NSTDSliceMut *slice);
 
 /// Copies data into `dest` from `src`. The number of bytes copied is determined by `src`.

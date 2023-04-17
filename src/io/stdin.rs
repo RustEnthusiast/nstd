@@ -79,10 +79,6 @@ pub unsafe fn nstd_io_stdin_read(
 ///
 /// `NSTDIOResult read` - The number of bytes read from `handle` on success, or the I/O operation
 /// error code on failure.
-///
-/// # Panics
-///
-/// This function will panic if `buffer`'s length in bytes ends up exceeding `NSTDInt`'s max value.
 #[inline]
 #[nstdapi]
 pub fn nstd_io_stdin_read_all(handle: &mut NSTDStdin, buffer: &mut NSTDVec) -> NSTDIOResult {
@@ -112,10 +108,6 @@ pub fn nstd_io_stdin_read_all(handle: &mut NSTDStdin, buffer: &mut NSTDVec) -> N
 ///
 /// `NSTDIOResult read` - The number of bytes read from `handle` on success, or the I/O operation
 /// error code on failure.
-///
-/// # Panics
-///
-/// This function will panic if `buffer`'s length in bytes ends up exceeding `NSTDInt`'s max value.
 #[inline]
 #[nstdapi]
 pub fn nstd_io_stdin_read_to_string(
@@ -175,10 +167,6 @@ pub unsafe fn nstd_io_stdin_read_exact(
 ///
 /// `NSTDIOResult read` - The number of bytes read from `handle` on success, or the I/O operation
 /// error code on failure.
-///
-/// # Panics
-///
-/// This function will panic if `buffer`'s length in bytes exceeds `NSTDInt`'s max value.
 #[nstdapi]
 pub fn nstd_io_stdin_read_line(handle: &mut NSTDStdin, buffer: &mut NSTDString) -> NSTDIOResult {
     let mut buf = String::new();
@@ -272,10 +260,6 @@ pub unsafe fn nstd_io_stdin_lock_read(
 ///
 /// `NSTDIOResult read` - The number of bytes read from `handle` on success, or the I/O operation
 /// error code on failure.
-///
-/// # Panics
-///
-/// This function will panic if `buffer`'s length in bytes ends up exceeding `NSTDInt`'s max value.
 #[inline]
 #[nstdapi]
 pub fn nstd_io_stdin_lock_read_all(
@@ -308,10 +292,6 @@ pub fn nstd_io_stdin_lock_read_all(
 ///
 /// `NSTDIOResult read` - The number of bytes read from `handle` on success, or the I/O operation
 /// error code on failure.
-///
-/// # Panics
-///
-/// This function will panic if `buffer`'s length in bytes ends up exceeding `NSTDInt`'s max value.
 #[inline]
 #[nstdapi]
 pub fn nstd_io_stdin_lock_read_to_string(

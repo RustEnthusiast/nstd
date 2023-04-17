@@ -13,6 +13,7 @@ use crate::{
             nstd_core_slice_mut_empty, nstd_core_slice_mut_new_unchecked,
             nstd_core_slice_new_unchecked, nstd_core_slice_stride, NSTDSlice, NSTDSliceMut,
         },
+        NSTD_INT_MAX,
     },
     NSTDAny, NSTDAnyMut, NSTDUInt, NSTD_NULL,
 };
@@ -71,11 +72,7 @@ impl NSTDVec {
     ///
     /// # Panics
     ///
-    /// This operation will panic in the following situations:
-    ///
-    /// - `size_of::<T>()` does not match the vector's stride.
-    ///
-    /// - The total length of the vector's buffer exceeds `isize::MAX` bytes.
+    /// This operation will panic if `size_of::<T>()` does not match the vector's stride.
     ///
     /// # Safety
     ///
@@ -85,7 +82,7 @@ impl NSTDVec {
     #[inline]
     #[allow(dead_code)]
     pub(crate) unsafe fn as_slice<T>(&self) -> &[T] {
-        assert!(self.stride == core::mem::size_of::<T>() && self.byte_len() <= isize::MAX as usize);
+        assert!(self.stride == core::mem::size_of::<T>());
         match self.ptr.is_null() {
             false => core::slice::from_raw_parts(self.ptr.cast(), self.len),
             _ => core::slice::from_raw_parts(NonNull::dangling().as_ptr(), 0),
@@ -94,18 +91,12 @@ impl NSTDVec {
 
     /// Returns a pointer to one byte past the end of the vector.
     ///
-    /// # Panics
-    ///
-    /// Panics if the total length of the vector's buffer exceeds `isize::MAX` bytes.
-    ///
     /// # Safety
     ///
     /// The vector must have already allocated memory.
     #[inline]
     unsafe fn end(&mut self) -> NSTDAnyMut {
-        let len = self.byte_len();
-        assert!(len <= isize::MAX as usize);
-        self.ptr.add(len)
+        self.ptr.add(self.byte_len())
     }
 
     /// Attempts to reserve some memory for the vector if needed.
@@ -139,13 +130,14 @@ impl<A> FromIterator<A> for NSTDVec {
     ///
     /// # Panics
     ///
-    /// This operation will panic if `A`'s size in bytes is 0 or the iterator's length in bytes
-    /// exceeds `NSTDInt`'s max value.
+    /// This operation will panic if `A`'s size in bytes is 0 or allocating fails.
     fn from_iter<T: IntoIterator<Item = A>>(iter: T) -> Self {
         let mut s = nstd_vec_new(core::mem::size_of::<A>());
+        let mut errc;
         for v in iter {
             // SAFETY: `v` is stored on the stack.
-            unsafe { nstd_vec_push(&mut s, addr_of!(v).cast()) };
+            errc = unsafe { nstd_vec_push(&mut s, addr_of!(v).cast()) };
+            assert!(errc == NSTDAllocError::NSTD_ALLOC_ERROR_NONE);
             // Be sure to forget `v` so it doesn't get dropped.
             core::mem::forget(v);
         }
@@ -428,13 +420,19 @@ pub const fn nstd_vec_reserved(vec: &NSTDVec) -> NSTDUInt {
 /// # Returns
 ///
 /// `NSTDSlice slice` - An *immutable* view into the vector.
-#[inline]
+///
+/// # Panics
+///
+/// This operation will panic if `vec`'s stride is greater than `NSTDInt`'s max value.
 #[nstdapi]
 pub fn nstd_vec_as_slice(vec: &NSTDVec) -> NSTDSlice {
-    // SAFETY: `vec.ptr` is checked.
+    // SAFETY: `vec.ptr` is checked, vector lengths are never greater than `NSTDInt`'s max value.
     unsafe {
         match vec.ptr.is_null() {
-            false => nstd_core_slice_new_unchecked(vec.ptr, vec.stride, vec.len),
+            false => {
+                assert!(vec.stride <= NSTD_INT_MAX as _);
+                nstd_core_slice_new_unchecked(vec.ptr, vec.stride, vec.len)
+            }
             _ => nstd_core_slice_empty(vec.stride),
         }
     }
@@ -449,13 +447,19 @@ pub fn nstd_vec_as_slice(vec: &NSTDVec) -> NSTDSlice {
 /// # Returns
 ///
 /// `NSTDSliceMut slice` - A *mutable* view into the vector.
-#[inline]
+///
+/// # Panics
+///
+/// This operation will panic if `vec`'s stride is greater than `NSTDInt`'s max value.
 #[nstdapi]
 pub fn nstd_vec_as_slice_mut(vec: &mut NSTDVec) -> NSTDSliceMut {
-    // SAFETY: `vec.ptr` is checked.
+    // SAFETY: `vec.ptr` is checked, vector lengths are never greater than `NSTDInt`'s max value.
     unsafe {
         match vec.ptr.is_null() {
-            false => nstd_core_slice_mut_new_unchecked(vec.ptr, vec.stride, vec.len),
+            false => {
+                assert!(vec.stride <= NSTD_INT_MAX as _);
+                nstd_core_slice_mut_new_unchecked(vec.ptr, vec.stride, vec.len)
+            }
             _ => nstd_core_slice_mut_empty(vec.stride),
         }
     }
@@ -503,16 +507,11 @@ pub fn nstd_vec_as_ptr_mut(vec: &mut NSTDVec) -> NSTDAnyMut {
 /// # Returns
 ///
 /// `NSTDAny end` - A pointer to the end of the vector or null if the vector has yet to allocate.
-///
-/// # Panics
-///
-/// Panics if the total length of the vector's buffer exceeds `isize::MAX` bytes.
 #[inline]
 #[nstdapi]
 pub fn nstd_vec_end(vec: &NSTDVec) -> NSTDAny {
     if !vec.ptr.is_null() {
         let len = vec.byte_len();
-        assert!(len <= isize::MAX as usize);
         // SAFETY: `len` is within the bounds of the vector and does not overflow `isize`.
         return unsafe { vec.ptr.add(len) };
     }
@@ -531,16 +530,11 @@ pub fn nstd_vec_end(vec: &NSTDVec) -> NSTDAny {
 /// # Returns
 ///
 /// `NSTDAnyMut end` - A pointer to the end of the vector or null if the vector has yet to allocate.
-///
-/// # Panics
-///
-/// Panics if the total length of the vector's buffer exceeds `isize::MAX` bytes.
 #[inline]
 #[nstdapi]
 pub fn nstd_vec_end_mut(vec: &mut NSTDVec) -> NSTDAnyMut {
     if !vec.ptr.is_null() {
         let len = vec.byte_len();
-        assert!(len <= isize::MAX as usize);
         // SAFETY: `len` is within the bounds of the vector and does not overflow `isize`.
         return unsafe { vec.ptr.add(len) };
     }
@@ -564,10 +558,6 @@ pub fn nstd_vec_end_mut(vec: &mut NSTDVec) -> NSTDAnyMut {
 ///
 /// `NSTDAny element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out
 /// of the vector's boundaries.
-///
-/// # Panics
-///
-/// Panics if the vec's current length in bytes exceeds `NSTDInt`'s max value.
 ///
 /// # Example
 ///
@@ -596,7 +586,6 @@ pub fn nstd_vec_end_mut(vec: &mut NSTDVec) -> NSTDAnyMut {
 pub const fn nstd_vec_get(vec: &NSTDVec, mut pos: NSTDUInt) -> NSTDAny {
     if pos < vec.len {
         pos *= vec.stride;
-        assert!(pos <= isize::MAX as usize);
         // SAFETY: `pos` is a valid index.
         return unsafe { vec.ptr.add(pos) };
     }
@@ -620,10 +609,6 @@ pub const fn nstd_vec_get(vec: &NSTDVec, mut pos: NSTDUInt) -> NSTDAny {
 ///
 /// `NSTDAnyMut element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out of
 /// the vector's boundaries.
-///
-/// # Panics
-///
-/// Panics if the vec's current length in bytes exceeds `NSTDInt`'s max value.
 ///
 /// # Example
 ///
@@ -670,10 +655,6 @@ pub fn nstd_vec_get_mut(vec: &mut NSTDVec, pos: NSTDUInt) -> NSTDAnyMut {
 /// # Returns
 ///
 /// `NSTDAllocError errc` - The allocation operation error code.
-///
-/// # Panics
-///
-/// Panics if `vec`'s current length in bytes exceeds `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -722,10 +703,6 @@ pub unsafe fn nstd_vec_push(vec: &mut NSTDVec, value: NSTDAny) -> NSTDAllocError
 ///
 /// - `NSTDAny value` - A pointer to the value that was popped off the stack, or null if the
 /// vector is empty.
-///
-/// # Panics
-///
-/// Panics if `vec`'s new length (in bytes) exceeds `NSTDInt`'s max value.
 ///
 /// # Example
 ///
@@ -779,10 +756,6 @@ pub fn nstd_vec_pop(vec: &mut NSTDVec) -> NSTDAny {
 ///
 /// - `2` - Reserving space for the vector failed.
 ///
-/// # Panics
-///
-/// This function will panic if `index` multiplied by `vec`'s stride exceeds `NSTDInt`'s max value.
-///
 /// # Safety
 ///
 /// This operation is unsafe because undefined behavior can occur if the size of the value being
@@ -832,7 +805,6 @@ pub unsafe fn nstd_vec_insert(
         let stride = vec.stride;
         let bytes_to_copy = (vec.len - index) * stride;
         index *= stride;
-        assert!(index <= isize::MAX as usize);
         let idxptr = vec.ptr.add(index).cast::<NSTDByte>();
         let dest = idxptr.add(stride);
         nstd_core_mem_copy_overlapping(dest, idxptr, bytes_to_copy);
@@ -854,10 +826,6 @@ pub unsafe fn nstd_vec_insert(
 /// # Returns
 ///
 /// `NSTDErrorCode errc` - Nonzero if `index` is invalid.
-///
-/// # Panics
-///
-/// This operation will panic if `index` multiplied by `vec`'s stride exceeds `NSTDInt`'s max value.
 ///
 /// # Example
 ///
@@ -890,7 +858,6 @@ pub fn nstd_vec_remove(vec: &mut NSTDVec, mut index: NSTDUInt) -> NSTDErrorCode 
         let stride = vec.stride;
         let bytes_to_copy = (vec.len - index - 1) * stride;
         index *= stride;
-        assert!(index <= isize::MAX as usize);
         // SAFETY: The vector's data is valid for the shift.
         unsafe {
             let idxptr = vec.ptr.add(index).cast::<NSTDByte>();
@@ -919,11 +886,7 @@ pub fn nstd_vec_remove(vec: &mut NSTDVec, mut index: NSTDUInt) -> NSTDErrorCode 
 ///
 /// # Panics
 ///
-/// This operation will panic in the following situations:
-///
-/// - `vec` and `values` strides do not match.
-///
-/// - The current length in bytes exceeds `NSTDInt`'s max value.
+/// This operation will panic if `vec` and `values` strides do not match.
 ///
 /// # Safety
 ///
@@ -1123,10 +1086,6 @@ pub fn nstd_vec_free(vec: NSTDVec) {}
 /// - `NSTDVec vec` - The vector to free.
 ///
 /// - `void (*callback)(NSTDAnyMut)` - The vector data's destructor.
-///
-/// # Panics
-///
-/// This operation will panic if `vec`'s length in bytes exceeds `NSTDInt`'s max value.
 ///
 /// # Safety
 ///

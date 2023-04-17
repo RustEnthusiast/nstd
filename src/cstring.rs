@@ -100,7 +100,7 @@ pub fn nstd_cstring_new_with_cap(cap: NSTDUInt) -> NSTDCString {
 ///
 /// # Panics
 ///
-/// This operation will panic if `cstr`'s length is greater than `NSTDInt`'s max value.
+/// This operation will panic if allocating for the C string's null byte fails.
 ///
 /// # Safety
 ///
@@ -139,7 +139,7 @@ pub unsafe fn nstd_cstring_from_cstr(cstr: &NSTDCStr) -> NSTDOptionalCString {
 ///
 /// # Panics
 ///
-/// This operation will panic if `cstr`'s length is greater than `NSTDInt`'s max value.
+/// This operation will panic if allocating for the C string's null byte fails.
 ///
 /// # Safety
 ///
@@ -173,16 +173,12 @@ pub unsafe fn nstd_cstring_from_cstr_unchecked(cstr: &NSTDCStr) -> NSTDOptionalC
 ///
 /// # Panics
 ///
-/// This operation will panic in the following situations:
-///
-/// - `bytes`'s stride is not 1.
-///
-/// - `bytes`'s length is greater than `NSTDInt`'s max value.
+/// This operation will panic if `bytes`'s stride is not 1.
 #[nstdapi]
 pub fn nstd_cstring_from_bytes(bytes: NSTDVec) -> NSTDOptionalCString {
     let ptr = nstd_vec_as_ptr(&bytes) as *const NSTDChar;
     assert!(!ptr.is_null() && nstd_vec_stride(&bytes) == 1);
-    // SAFETY: `ptr` is non-null.
+    // SAFETY: `ptr` is non-null, vector length's can never be greater than `NSTDInt`'s max value.
     let cstr = unsafe { nstd_core_cstr_new_unchecked(ptr, nstd_vec_len(&bytes)) };
     // SAFETY: `cstr`'s data is owned by `bytes`.
     match unsafe { nstd_core_cstr_is_null_terminated(&cstr) } {
@@ -223,7 +219,7 @@ pub fn nstd_cstring_clone(cstring: &NSTDCString) -> NSTDOptionalCString {
 pub fn nstd_cstring_as_cstr(cstring: &NSTDCString) -> NSTDCStr {
     let ptr = nstd_vec_as_ptr(&cstring.bytes);
     let len = nstd_vec_len(&cstring.bytes);
-    // SAFETY: `ptr` is never null, owned C strings always have at least one byte allocated.
+    // SAFETY: `ptr` is never null, owned C strings can never be longer than `NSTDInt`'s max value.
     unsafe { nstd_core_cstr_new_unchecked(ptr as _, len) }
 }
 
@@ -379,11 +375,7 @@ pub fn nstd_cstring_push(cstring: &mut NSTDCString, chr: NSTDChar) {
 ///
 /// - `cstr` contains a null byte.
 ///
-/// - `cstr`'s length is greater than `NSTDInt`'s max value.
-///
 /// - Appending the new null byte to the end of the C string fails.
-///
-/// - The new length in bytes exceeds `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -429,10 +421,6 @@ pub unsafe fn nstd_cstring_push_cstr(cstring: &mut NSTDCString, cstr: &NSTDCStr)
 /// # Returns
 ///
 /// `NSTDChar chr` - The removed character, or null if the C string is empty.
-///
-/// # Panics
-///
-/// This function will panic if getting a pointer to the C string's last character fails.
 ///
 /// # Example
 ///

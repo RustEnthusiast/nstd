@@ -16,10 +16,14 @@ pub mod range;
 pub mod result;
 pub mod slice;
 pub mod str;
-pub mod unichar;
 pub mod time;
+pub mod unichar;
 use self::str::NSTDStr;
+use super::NSTDInt;
 use nstdapi::nstdapi;
+
+/// [NSTDInt]'s maximum value.
+pub(crate) const NSTD_INT_MAX: NSTDInt = NSTDInt::MAX;
 
 /// Invokes the runtime's panic handler.
 ///

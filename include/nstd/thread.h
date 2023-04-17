@@ -76,14 +76,6 @@ nstd_thread_spawn(NSTDThreadResult (*thread_fn)(NSTDOptionalHeapPtr), NSTDOption
 ///
 /// `NSTDThread thread` - A handle to the new thread, null on error.
 ///
-/// # Panics
-///
-/// This function will panic in the following situations:
-///
-/// - `desc.name` contains null bytes.
-///
-/// - `desc.name`'s length in bytes exceeds `NSTDInt`'s max value.
-///
 /// # Safety
 ///
 /// - The caller of this function must guarantee that `thread_fn` is a valid function pointer.

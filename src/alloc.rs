@@ -46,6 +46,7 @@ impl From<NSTDWindowsAllocError> for NSTDAllocError {
             NSTD_WINDOWS_ALLOC_ERROR_MEMORY_NOT_FOUND => Self::NSTD_ALLOC_ERROR_MEMORY_NOT_FOUND,
             NSTD_WINDOWS_ALLOC_ERROR_HEAP_NOT_FOUND => Self::NSTD_ALLOC_ERROR_HEAP_NOT_FOUND,
             NSTD_WINDOWS_ALLOC_ERROR_INVALID_HEAP => Self::NSTD_ALLOC_ERROR_INVALID_HEAP,
+            NSTD_WINDOWS_ALLOC_ERROR_INVALID_LAYOUT => Self::NSTD_ALLOC_ERROR_INVALID_LAYOUT,
         }
     }
 }
@@ -89,7 +90,11 @@ pub unsafe fn nstd_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
             target_os = "solid_asp3",
             target_os = "vxworks"
         ))] {
-            libc::malloc(size)
+            use crate::{core::NSTD_INT_MAX, NSTD_NULL};
+            match size <= NSTD_INT_MAX as _ {
+                true => libc::malloc(size),
+                false => NSTD_NULL,
+            }
         } else if #[cfg(windows)] {
             nstd_os_windows_alloc_allocate(size)
         } else {
@@ -143,7 +148,11 @@ pub unsafe fn nstd_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMut {
             target_os = "solid_asp3",
             target_os = "vxworks"
         ))] {
-            libc::calloc(size, 1)
+            use crate::{core::NSTD_INT_MAX, NSTD_NULL};
+            match size <= NSTD_INT_MAX as _ {
+                true => libc::calloc(size, 1),
+                false => NSTD_NULL,
+            }
         } else if #[cfg(windows)] {
             nstd_os_windows_alloc_allocate_zeroed(size)
         } else {
@@ -220,6 +229,10 @@ pub unsafe fn nstd_alloc_reallocate(
             target_os = "solid_asp3",
             target_os = "vxworks"
         ))] {
+            use crate::core::NSTD_INT_MAX;
+            if new_size > NSTD_INT_MAX as _ {
+                return NSTDAllocError::NSTD_ALLOC_ERROR_INVALID_LAYOUT;
+            }
             let new_mem = libc::realloc(*ptr, new_size);
             if new_mem.is_null() {
                 return NSTDAllocError::NSTD_ALLOC_ERROR_OUT_OF_MEMORY;

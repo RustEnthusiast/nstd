@@ -146,10 +146,6 @@ pub type NSTDIOStringResult = NSTDResult<NSTDString, NSTDIOError>;
 ///
 /// `NSTDIOError errc` - The I/O operation error code.
 ///
-/// # Panics
-///
-/// Panics if `output`'s length in bytes exceeds `NSTDInt`'s max value.
-///
 /// # Safety
 ///
 /// The provided string slice's data must be valid, else this function can cause garbage bytes to
@@ -174,10 +170,6 @@ pub unsafe fn nstd_io_print(output: &NSTDStr) -> NSTDIOError {
 /// # Returns
 ///
 /// `NSTDIOError errc` - The I/O operation error code.
-///
-/// # Panics
-///
-/// Panics if `output`'s length in bytes exceeds `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -205,8 +197,7 @@ pub unsafe fn nstd_io_print_line(output: &NSTDStr) -> NSTDIOError {
 ///
 /// # Panics
 ///
-/// Panics if allocating the string fails or the input's length in bytes exceeds `NSTDInt`'s max
-/// value.
+/// Panics if allocating the string fails.
 #[nstdapi]
 pub fn nstd_io_read() -> NSTDIOStringResult {
     let mut res = nstd_io_read_line();

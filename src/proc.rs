@@ -29,18 +29,9 @@ pub type NSTDChildProcess = Box<Child>;
 ///
 /// This operation will panic in any of the following situations:
 ///
-/// - `program`'s length in bytes exceeds `NSTDInt`'s max value.
-///
 /// - `args`'s stride is not equal to `sizeof(NSTDStr)`.
 ///
-/// - `args`'s length is greater than `NSTDInt`'s max value.
-///
 /// - `vars`'s stride is not equal to `sizeof(NSTDStr[2])`.
-///
-/// - `vars`'s length is greater than `NSTDInt`'s max value.
-///
-/// - Any of the arguments or environment variable keys/values length in bytes exceeds `NSTDInt`'s
-/// max value.
 ///
 /// # Safety
 ///

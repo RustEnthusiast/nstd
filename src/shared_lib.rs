@@ -59,7 +59,7 @@ pub type NSTDOptionalSharedLib = NSTDOptional<NSTDSharedLib>;
 ///
 /// This operation may panic in the following situations:
 ///
-/// - `path`'s length in bytes exceeds `NSTDInt`'s max value.
+/// - Allocating memory fails.
 ///
 /// - Conversion from UTF-8 to UTF-16 fails on Windows.
 ///

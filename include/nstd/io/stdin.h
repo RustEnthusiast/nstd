@@ -56,10 +56,6 @@ NSTDAPI NSTDIOResult nstd_io_stdin_read(NSTDStdin *handle, NSTDSliceMut *buffer)
 ///
 /// `NSTDIOResult read` - The number of bytes read from `handle` on success, or the I/O operation
 /// error code on failure.
-///
-/// # Panics
-///
-/// This function will panic if `buffer`'s length in bytes ends up exceeding `NSTDInt`'s max value.
 NSTDAPI NSTDIOResult nstd_io_stdin_read_all(NSTDStdin *handle, NSTDVec *buffer);
 
 /// Continuously reads UTF-8 data from stdin into a string buffer until EOF is reached.
@@ -79,10 +75,6 @@ NSTDAPI NSTDIOResult nstd_io_stdin_read_all(NSTDStdin *handle, NSTDVec *buffer);
 ///
 /// `NSTDIOResult read` - The number of bytes read from `handle` on success, or the I/O operation
 /// error code on failure.
-///
-/// # Panics
-///
-/// This function will panic if `buffer`'s length in bytes ends up exceeding `NSTDInt`'s max value.
 NSTDAPI NSTDIOResult nstd_io_stdin_read_to_string(NSTDStdin *handle, NSTDString *buffer);
 
 /// Reads enough data from stdin to fill the entirety of `buffer`.
@@ -119,10 +111,6 @@ NSTDAPI NSTDIOError nstd_io_stdin_read_exact(NSTDStdin *handle, NSTDSliceMut *bu
 ///
 /// `NSTDIOResult read` - The number of bytes read from `handle` on success, or the I/O operation
 /// error code on failure.
-///
-/// # Panics
-///
-/// This function will panic if `buffer`'s length in bytes exceeds `NSTDInt`'s max value.
 NSTDAPI NSTDIOResult nstd_io_stdin_read_line(NSTDStdin *handle, NSTDString *buffer);
 
 /// Frees an instance of `NSTDStdin`.
@@ -182,10 +170,6 @@ NSTDAPI NSTDIOResult nstd_io_stdin_lock_read(NSTDStdinLock *handle, NSTDSliceMut
 ///
 /// `NSTDIOResult read` - The number of bytes read from `handle` on success, or the I/O operation
 /// error code on failure.
-///
-/// # Panics
-///
-/// This function will panic if `buffer`'s length in bytes ends up exceeding `NSTDInt`'s max value.
 NSTDAPI NSTDIOResult nstd_io_stdin_lock_read_all(NSTDStdinLock *handle, NSTDVec *buffer);
 
 /// Continuously reads UTF-8 data from stdin into a string buffer until EOF is reached.
@@ -205,10 +189,6 @@ NSTDAPI NSTDIOResult nstd_io_stdin_lock_read_all(NSTDStdinLock *handle, NSTDVec 
 ///
 /// `NSTDIOResult read` - The number of bytes read from `handle` on success, or the I/O operation
 /// error code on failure.
-///
-/// # Panics
-///
-/// This function will panic if `buffer`'s length in bytes ends up exceeding `NSTDInt`'s max value.
 NSTDAPI NSTDIOResult nstd_io_stdin_lock_read_to_string(NSTDStdinLock *handle, NSTDString *buffer);
 
 /// Reads enough data from stdin to fill the entirety of `buffer`.

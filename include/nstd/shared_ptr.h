@@ -27,10 +27,6 @@ NSTDOptional(NSTDSharedPtr) NSTDOptionalSharedPtr;
 /// `NSTDOptionalSharedPtr shared_ptr` - The new shared pointer, or an uninitialized "none" variant
 /// if allocating fails.
 ///
-/// # Panics
-///
-/// This operation will panic if `element_size` is greater than `NSTDInt`'s max value.
-///
 /// # Safety
 ///
 /// `init` must be a pointer to a value that is valid for reads of `element_size` bytes.
@@ -46,10 +42,6 @@ NSTDAPI NSTDOptionalSharedPtr nstd_shared_ptr_new(NSTDUInt element_size, NSTDAny
 ///
 /// `NSTDOptionalSharedPtr shared_ptr` - The yet to be shared pointer, or an uninitialized "none"
 /// variant if allocating fails.
-///
-/// # Panics
-///
-/// This operation will panic if `element_size` is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///

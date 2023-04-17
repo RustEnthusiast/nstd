@@ -1,6 +1,7 @@
 //! Unowned C string slices.
 pub mod raw;
 use self::raw::{nstd_core_cstr_raw_len, nstd_core_cstr_raw_len_with_null};
+use super::NSTD_INT_MAX;
 use crate::{
     core::{
         mem::nstd_core_mem_search,
@@ -28,17 +29,12 @@ pub struct NSTDCStr {
 impl NSTDCStr {
     /// Interprets a C string slice as a byte slice.
     ///
-    /// # Panics
-    ///
-    /// This operation will panic if the C string slice's length is greater than `isize::MAX`.
-    ///
     /// # Safety
     ///
     /// This C string slice's data must remain valid and unmodified while the returned byte slice
     /// is in use.
     #[inline]
     pub(crate) const unsafe fn as_bytes(&self) -> &[u8] {
-        assert!(self.len <= isize::MAX as usize);
         core::slice::from_raw_parts(self.ptr.cast(), self.len)
     }
 }
@@ -54,8 +50,8 @@ gen_optional!(NSTDOptionalCStr, NSTDCStr);
 ///
 /// # Returns
 ///
-/// `NSTDOptionalCStr cstr` - The new C string slice referencing `raw`'s data on success, or a
-/// "none" variant if `raw` is null.
+/// `NSTDOptionalCStr cstr` - The new C string slice referencing `raw`'s data on success, or an
+/// uninitialized "none" variant if `raw` is null or `len` is greater than `NSTDInt`'s max value.
 ///
 /// # Example
 ///
@@ -69,9 +65,9 @@ gen_optional!(NSTDOptionalCStr, NSTDCStr);
 #[inline]
 #[nstdapi]
 pub fn nstd_core_cstr_new(raw: *const NSTDChar, len: NSTDUInt) -> NSTDOptionalCStr {
-    match raw.is_null() {
-        true => NSTDOptional::None,
-        false => NSTDOptional::Some(NSTDCStr { ptr: raw, len }),
+    match !raw.is_null() && len <= NSTD_INT_MAX as _ {
+        true => NSTDOptional::Some(NSTDCStr { ptr: raw, len }),
+        false => NSTDOptional::None,
     }
 }
 
@@ -89,7 +85,8 @@ pub fn nstd_core_cstr_new(raw: *const NSTDChar, len: NSTDUInt) -> NSTDOptionalCS
 ///
 /// # Safety
 ///
-/// The user of this function must ensure that `raw` is not null.
+/// The user of this function must ensure that `raw` is non-null and `len` is not greater than
+/// `NSTDInt`'s max value.
 ///
 /// # Example
 ///
@@ -120,8 +117,10 @@ pub const unsafe fn nstd_core_cstr_new_unchecked(raw: *const NSTDChar, len: NSTD
 ///
 /// # Safety
 ///
-/// `raw` must point to a character array that is valid for reads up until and including it's
+/// - `raw` must point to a character array that is valid for reads up until and including it's
 /// null-terminating byte.
+///
+/// - `raw`'s length must not be greater than `NSTDInt`'s max value.
 ///
 /// # Example
 ///
@@ -154,8 +153,10 @@ pub unsafe fn nstd_core_cstr_from_raw(raw: *const NSTDChar) -> NSTDCStr {
 ///
 /// # Safety
 ///
-/// `raw` must point to a character array that is valid for reads up until and including it's
+/// - `raw` must point to a character array that is valid for reads up until and including it's
 /// null-terminating byte.
+///
+/// - `raw`'s length must not be greater than `NSTDInt`'s max value.
 ///
 /// # Example
 ///
@@ -272,10 +273,6 @@ pub const fn nstd_core_cstr_len(cstr: &NSTDCStr) -> NSTDUInt {
 /// `NSTDBool is_null_terminated` - Returns true if the C string slice contains a single null byte
 /// at the end.
 ///
-/// # Panics
-///
-/// This function may panic if `cstr`'s length is greater than `NSTDInt`'s max value.
-///
 /// # Safety
 ///
 /// The caller must ensure that `cstr` is valid for reads.
@@ -320,10 +317,6 @@ pub unsafe fn nstd_core_cstr_is_null_terminated(cstr: &NSTDCStr) -> NSTDBool {
 /// `const NSTDChar *nul` - A pointer to the first null byte in `cstr`, or null if the C string
 /// slice doesn't contain a null byte.
 ///
-/// # Panics
-///
-/// This operation may panic if `cstr`'s length is greater than `NSTDInt`'s max value.
-///
 /// # Safety
 ///
 /// The caller must ensure that `cstr` is valid for reads.
@@ -357,10 +350,6 @@ pub unsafe fn nstd_core_cstr_get_null(cstr: &NSTDCStr) -> *const NSTDChar {
 
 /// Return a pointer to the character at index `pos` in `cstr`.
 ///
-/// # Note
-///
-/// This will return a null pointer if `pos` is greater than `NSTDInt`'s max value.
-///
 /// # Parameters:
 ///
 /// - `const NSTDCStr *cstr` - The C string.
@@ -389,7 +378,7 @@ pub unsafe fn nstd_core_cstr_get_null(cstr: &NSTDCStr) -> *const NSTDChar {
 #[inline]
 #[nstdapi]
 pub const fn nstd_core_cstr_get(cstr: &NSTDCStr, pos: NSTDUInt) -> *const NSTDChar {
-    if pos < cstr.len && pos <= isize::MAX as usize {
+    if pos < cstr.len {
         // SAFETY: We've checked `pos`.
         return unsafe { cstr.ptr.add(pos) };
     }
@@ -475,17 +464,12 @@ pub struct NSTDCStrMut {
 impl NSTDCStrMut {
     /// Interprets a C string slice as a byte slice.
     ///
-    /// # Panics
-    ///
-    /// This operation will panic if the C string slice's length is greater than `isize::MAX`.
-    ///
     /// # Safety
     ///
     /// This C string slice's data must remain valid and unmodified while the returned byte slice
     /// is in use.
     #[inline]
     pub(crate) const unsafe fn as_bytes(&self) -> &[u8] {
-        assert!(self.len <= isize::MAX as usize);
         core::slice::from_raw_parts(self.ptr.cast(), self.len)
     }
 }
@@ -501,8 +485,8 @@ gen_optional!(NSTDOptionalCStrMut, NSTDCStrMut);
 ///
 /// # Returns
 ///
-/// `NSTDOptionalCStrMut cstr` - The new C string slice referencing `raw`'s data on success, or a
-/// "none" variant if `raw` is null.
+/// `NSTDOptionalCStrMut cstr` - The new C string slice referencing `raw`'s data on success, or an
+/// uninitialized "none" variant if `raw` is null or `len` is greater than `NSTDInt`'s max value.
 ///
 /// # Example
 ///
@@ -516,9 +500,9 @@ gen_optional!(NSTDOptionalCStrMut, NSTDCStrMut);
 #[inline]
 #[nstdapi]
 pub fn nstd_core_cstr_mut_new(raw: *mut NSTDChar, len: NSTDUInt) -> NSTDOptionalCStrMut {
-    match raw.is_null() {
-        true => NSTDOptional::None,
-        false => NSTDOptional::Some(NSTDCStrMut { ptr: raw, len }),
+    match !raw.is_null() && len <= NSTD_INT_MAX as _ {
+        true => NSTDOptional::Some(NSTDCStrMut { ptr: raw, len }),
+        false => NSTDOptional::None,
     }
 }
 
@@ -536,7 +520,8 @@ pub fn nstd_core_cstr_mut_new(raw: *mut NSTDChar, len: NSTDUInt) -> NSTDOptional
 ///
 /// # Safety
 ///
-/// The user of this function must ensure that `raw` is not null.
+/// The user of this function must ensure that `raw` is non-null and `len` is not greater than
+/// `NSTDInt`'s max value.
 ///
 /// # Example
 ///
@@ -572,8 +557,10 @@ pub const unsafe fn nstd_core_cstr_mut_new_unchecked(
 ///
 /// # Safety
 ///
-/// `raw` must point to a character array that is valid for reads up until and including it's
+/// - `raw` must point to a character array that is valid for reads up until and including it's
 /// null-terminating byte.
+///
+/// - `raw`'s length must not be greater than `NSTDInt`'s max value.
 ///
 /// # Example
 ///
@@ -606,8 +593,10 @@ pub unsafe fn nstd_core_cstr_mut_from_raw(raw: *mut NSTDChar) -> NSTDCStrMut {
 ///
 /// # Safety
 ///
-/// `raw` must point to a character array that is valid for reads up until and including it's
+/// - `raw` must point to a character array that is valid for reads up until and including it's
 /// null-terminating byte.
+///
+/// - `raw`'s length must not be greater than `NSTDInt`'s max value.
 ///
 /// # Example
 ///
@@ -655,7 +644,8 @@ pub unsafe fn nstd_core_cstr_mut_from_raw_with_null(raw: *mut NSTDChar) -> NSTDC
 #[inline]
 #[nstdapi]
 pub const fn nstd_core_cstr_mut_as_const(cstr: &NSTDCStrMut) -> NSTDCStr {
-    // SAFETY: `cstr.ptr` is never null.
+    // SAFETY: `cstr.ptr` is never null, C string slices are never longer than `NSTDInt`'s max
+    // value.
     unsafe { nstd_core_cstr_new_unchecked(cstr.ptr, cstr.len) }
 }
 
@@ -780,10 +770,6 @@ pub const fn nstd_core_cstr_mut_len(cstr: &NSTDCStrMut) -> NSTDUInt {
 /// `NSTDBool is_null_terminated` - Returns true if the C string slice contains a single null byte
 /// at the end.
 ///
-/// # Panics
-///
-/// This function will panic if `cstr`'s length is greater than `NSTDInt`'s maximum value.
-///
 /// # Safety
 ///
 /// The caller must ensure that `cstr` is valid for reads.
@@ -829,10 +815,6 @@ pub unsafe fn nstd_core_cstr_mut_is_null_terminated(cstr: &NSTDCStrMut) -> NSTDB
 /// `NSTDChar *nul` - A pointer to the first null byte in `cstr`, or null if the C string
 /// slice doesn't contain a null byte.
 ///
-/// # Panics
-///
-/// This operation may panic if `cstr`'s length is greater than `NSTDInt`'s max value.
-///
 /// # Safety
 ///
 /// The caller must ensure that `cstr` is valid for reads.
@@ -875,10 +857,6 @@ pub unsafe fn nstd_core_cstr_mut_get_null(cstr: &mut NSTDCStrMut) -> *mut NSTDCh
 /// `const NSTDChar *nul` - A pointer to the first null byte in `cstr`, or null if the C string
 /// slice doesn't contain a null byte.
 ///
-/// # Panics
-///
-/// This operation may panic if `cstr`'s length is greater than `NSTDInt`'s max value.
-///
 /// # Safety
 ///
 /// The caller must ensure that `cstr` is valid for reads.
@@ -912,10 +890,6 @@ pub unsafe fn nstd_core_cstr_mut_get_null_const(cstr: &NSTDCStrMut) -> *const NS
 }
 
 /// Return a pointer to the character at index `pos` in `cstr`.
-///
-/// # Note
-///
-/// This will return a null pointer if `pos` is greater than `NSTDInt`'s max value.
 ///
 /// # Parameters:
 ///
@@ -954,10 +928,6 @@ pub fn nstd_core_cstr_mut_get(cstr: &mut NSTDCStrMut, pos: NSTDUInt) -> *mut NST
 
 /// Return an immutable pointer to the character at index `pos` in `cstr`.
 ///
-/// # Note
-///
-/// This will return a null pointer if `pos` is greater than `NSTDInt`'s max value.
-///
 /// # Parameters:
 ///
 /// - `const NSTDCStrMut *cstr` - The C string.
@@ -986,7 +956,7 @@ pub fn nstd_core_cstr_mut_get(cstr: &mut NSTDCStrMut, pos: NSTDUInt) -> *mut NST
 #[inline]
 #[nstdapi]
 pub const fn nstd_core_cstr_mut_get_const(cstr: &NSTDCStrMut, pos: NSTDUInt) -> *const NSTDChar {
-    if pos < cstr.len && pos <= isize::MAX as usize {
+    if pos < cstr.len {
         // SAFETY: We've checked `pos`.
         return unsafe { cstr.ptr.add(pos) };
     }

@@ -76,10 +76,6 @@ gen_optional!(NSTDOptionalSharedPtr, NSTDSharedPtr);
 /// `NSTDOptionalSharedPtr shared_ptr` - The new shared pointer, or an uninitialized "none" variant
 /// if allocating fails.
 ///
-/// # Panics
-///
-/// This operation will panic if `element_size` is greater than `NSTDInt`'s max value.
-///
 /// # Safety
 ///
 /// `init` must be a pointer to a value that is valid for reads of `element_size` bytes.
@@ -100,7 +96,6 @@ gen_optional!(NSTDOptionalSharedPtr, NSTDSharedPtr);
 /// ```
 #[nstdapi]
 pub unsafe fn nstd_shared_ptr_new(element_size: NSTDUInt, init: NSTDAny) -> NSTDOptionalSharedPtr {
-    assert!(element_size <= isize::MAX as usize);
     // Allocate a region of memory for the object and the pointer count.
     let buffer_size = element_size + USIZE_SIZE;
     let raw = nstd_alloc_allocate(buffer_size);
@@ -130,10 +125,6 @@ pub unsafe fn nstd_shared_ptr_new(element_size: NSTDUInt, init: NSTDAny) -> NSTD
 /// `NSTDOptionalSharedPtr shared_ptr` - The yet to be shared pointer, or an uninitialized "none"
 /// variant if allocating fails.
 ///
-/// # Panics
-///
-/// This operation will panic if `element_size` is greater than `NSTDInt`'s max value.
-///
 /// # Safety
 ///
 /// The data to be stored in the shared pointer must be safely representable by an all-zero byte
@@ -155,7 +146,6 @@ pub unsafe fn nstd_shared_ptr_new(element_size: NSTDUInt, init: NSTDAny) -> NSTD
 pub unsafe fn nstd_shared_ptr_new_zeroed(element_size: NSTDUInt) -> NSTDOptionalSharedPtr {
     // SAFETY: The allocated memory is validated after allocation.
     unsafe {
-        assert!(element_size <= isize::MAX as usize);
         // Allocate a region of memory for the object and the pointer count.
         let buffer_size = element_size + USIZE_SIZE;
         let raw = nstd_alloc_allocate_zeroed(buffer_size);

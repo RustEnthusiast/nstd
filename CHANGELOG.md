@@ -8,6 +8,7 @@
 - Added `nstd_mutex_into_inner`.
 - Added `nstd_mutex_drop`.
 ### `nstd.os`
+- Added `NSTD_UNIX_ALLOC_ERROR_INVALID_LAYOUT`.
 - Added `nstd_os_unix_mutex_into_inner`.
 - Added `nstd_os_unix_mutex_drop`.
 - Added `NSTDUnixAllocError`.
@@ -22,25 +23,39 @@
 ### `nstd`
 - Updated `windows-sys` to version 0.48.
 ### `nstd.core`
+- `nstd_core_str[_mut]_[from_cstr|from_raw_cstr[_with_null]|len|get|to_*]` no longer panics.
+- `nstd_core_cstr[_mut]_[is_null_terminated|get_null|get][_const]` no longer panics.
+- `nstd_core_slice[_mut]_[get|last][_const]` no longer panics.
+- `nstd_core_mem_compare` no longer panics.
 - `NSTDOptional` & `NSTDResult` now use `NSTDUInt8` as a discriminant.
 - `nstd_core_unichar_is_digit` no longer panics.
 - `nstd.core.time` functions now take `NSTDDuration` by value.
-- `nstd_core_str[_mut]_from_raw_cstr[_with_null]` no longer panics if `cstr` is null.
 - `nstd_core_slice_mut_copy` now panics.
 ### `nstd.cstring`
+- `nstd_cstring_pop` no longer panics.
 - `nstd_cstring_from_cstr[_unchecked]` now returns `NSTDOptionalCString`.
 - `nstd_cstring_clone` now returns `NSTDOptionalCString`.
+### `nstd.env`
+- `nstd_env_set_current_dir` no longer panics.
+### `nstd.fs`
+- `nstd_fs_[[create|remove]_[file|dir|dirs]|rename|copy|metadata]` no longer panics.
+- `nstd_fs_file_[open|read_all|read_to_string]` no longer panics.
 ### `nstd.heap_ptr`
 - `nstd_heap_ptr_[new[_zeroed]|clone]` now returns `NSTDOptionalHeapPtr`.
+### `nstd.io`
+- `nstd_io_print[_line]` no longer panics.
+- `nstd_io_stdin[_lock]_[read_all|read_to_string|read_line]` no longer panics.
 ### `nstd.os`
 - `nstd_os_unix_mutex_timed_lock` now takes `NSTDDuration` by value.
 - `nstd.os.unix.time` functions now take `NSTDUnixTime` & `NSTDDuration` by value.
 ### `nstd.shared_ptr`
 - `nstd_shared_ptr_new[_zeroed]` now returns `NSTDOptionalSharedPtr`.
 ### `nstd.string`
+- `nstd_string_[len|push[_str]|pop]` no longer panics.
 - `nstd_string_from_str` now returns `NSTDOptionalString`.
 - `nstd_string_clone` now returns `NSTDOptionalString`.
 ### `nstd.thread`
+- `nstd_thread_spawn_with_desc` no longer panics.
 - `nstd_thread_spawn[_with_desc]` now takes `NSTDOptionalHeapPtr`.
 - `nstd_thread_sleep` now takes `NSTDDuration`.
 ### `nstd.time`
@@ -49,6 +64,8 @@
 ### `nstd.timed_mutex`
 - `nstd_timed_mutex_timed_lock` now takes `NSTDDuration` by value.
 ### `nstd.vec`
+- `nstd_vec_[end|get|push|pop|insert|remove][_mut]` no longer panics.
+- `nstd_vec_as_slice[_mut]` now panics.
 - `nstd_vec_from_slice` now returns `NSTDOptionalVec`.
 - `nstd_vec_clone` now returns `NSTDOptionalVec`.
 

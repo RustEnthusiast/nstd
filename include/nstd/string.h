@@ -72,8 +72,6 @@ NSTDAPI NSTDOptionalString nstd_string_from_str(const NSTDStr *str);
 ///
 /// - `bytes`'s stride is not 1.
 ///
-/// - `bytes`'s length is greater than `NSTDInt`'s max value.
-///
 /// - `bytes`'s data is not valid UTF-8.
 NSTDAPI NSTDString nstd_string_from_bytes(NSTDVec bytes);
 
@@ -153,10 +151,6 @@ NSTDAPI NSTDVec nstd_string_into_bytes(NSTDString string);
 /// # Returns
 ///
 /// `NSTDUInt len` - The length of the string.
-///
-/// # Panics
-///
-/// This operation will panic if the string's length is greater than `NSTDInt`'s max value.
 NSTDAPI NSTDUInt nstd_string_len(const NSTDString *string);
 
 /// Returns the number of bytes a string contains.
@@ -194,10 +188,6 @@ NSTDAPI NSTDUInt nstd_string_cap(const NSTDString *string);
 /// # Returns
 ///
 /// `NSTDAllocError errc` - The allocation operation error code.
-///
-/// # Panics
-///
-/// Panics if the current length in bytes exceeds `NSTDInt`'s max value.
 NSTDAPI NSTDAllocError nstd_string_push(NSTDString *string, NSTDUnichar chr);
 
 /// Appends a string slice to the end of a string.
@@ -211,10 +201,6 @@ NSTDAPI NSTDAllocError nstd_string_push(NSTDString *string, NSTDUnichar chr);
 /// # Returns
 ///
 /// `NSTDAllocError errc` - The allocation operation error code.
-///
-/// # Panics
-///
-/// Panics if the current length in bytes exceeds `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -230,10 +216,6 @@ NSTDAPI NSTDAllocError nstd_string_push_str(NSTDString *string, const NSTDStr *s
 /// # Returns
 ///
 /// `NSTDOptionalUnichar chr` - The removed character on success.
-///
-/// # Panics
-///
-/// This operation will panic if the string's length in bytes exceeds `NSTDInt`'s max value.
 NSTDAPI NSTDOptionalUnichar nstd_string_pop(NSTDString *string);
 
 /// Sets a string's length to zero.

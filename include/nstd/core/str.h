@@ -35,10 +35,6 @@ NSTDOptional(NSTDStr) NSTDOptionalStr;
 /// `NSTDOptionalStr str` - The new `NSTDStr` instance on success, or a "none" variant if the
 /// result is not valid UTF-8.
 ///
-/// # Panics
-///
-/// This function will panic if `cstr`'s length is greater than `NSTDInt`'s max value.
-///
 /// # Safety
 ///
 /// `cstr`'s data must be valid for reads of at least `cstr.len` consecutive bytes.
@@ -68,17 +64,13 @@ NSTDAPI NSTDStr nstd_core_str_from_cstr_unchecked(const NSTDCStr *cstr);
 ///
 /// # Returns
 ///
-/// `NSTDOptionalStr str` - The new string slice on success, or a "none" variant if the
-/// result is not valid UTF-8.
-///
-/// # Panics
-///
-/// This function will panic if `cstr`'s length is greater than `NSTDInt`'s max value.
+/// `NSTDOptionalStr str` - The new string slice on success or an uninitialized "none" variant if
+/// `cstr` is null, `cstr`'s length exceeds `NSTDInt`'s max value, or `cstr` is not valid UTF-8.
 ///
 /// # Safety
 ///
-/// This function makes access to raw pointer data, which can cause undefined behavior in the event
-/// that `cstr`'s data is invalid.
+/// `cstr` must point to a character array that is valid for reads up until and including it's
+/// null-terminating byte.
 NSTDAPI NSTDOptionalStr nstd_core_str_from_raw_cstr(const NSTDChar *cstr);
 
 /// Creates a new `NSTDStr` from a raw C string, including the null byte.
@@ -89,17 +81,13 @@ NSTDAPI NSTDOptionalStr nstd_core_str_from_raw_cstr(const NSTDChar *cstr);
 ///
 /// # Returns
 ///
-/// `NSTDOptionalStr str` - The new string slice on success, or a "none" variant if the
-/// result is not valid UTF-8.
-///
-/// # Panics
-///
-/// This function will panic if `cstr`'s length is greater than `NSTDInt`'s max value.
+/// `NSTDOptionalStr str` - The new string slice on success or an uninitialized "none" variant if
+/// `cstr` is null, `cstr`'s length exceeds `NSTDInt`'s max value, or `cstr` is not valid UTF-8.
 ///
 /// # Safety
 ///
-/// This function makes access to raw pointer data, which can cause undefined behavior in the event
-/// that `cstr`'s data is invalid.
+/// `cstr` must point to a character array that is valid for reads up until and including it's
+/// null-terminating byte.
 NSTDAPI NSTDOptionalStr nstd_core_str_from_raw_cstr_with_null(const NSTDChar *cstr);
 
 /// Creates a string slice from raw bytes.
@@ -115,11 +103,7 @@ NSTDAPI NSTDOptionalStr nstd_core_str_from_raw_cstr_with_null(const NSTDChar *cs
 ///
 /// # Panics
 ///
-/// This operation will panic in the following situations:
-///
-/// - `bytes`'s stride is not 1.
-///
-/// - `bytes`'s length is greater than `NSTDInt`'s max value.
+/// This operation will panic if `bytes`'s stride is not 1.
 ///
 /// # Safety
 ///
@@ -194,11 +178,6 @@ NSTDAPI const NSTDByte *nstd_core_str_as_ptr(const NSTDStr *str);
 ///
 /// `NSTDUInt len` - The length of the string slice.
 ///
-/// # Panics
-///
-/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s max
-/// value.
-///
 /// # Safety
 ///
 /// This operation can cause undefined behavior in the event that `str`'s data is invalid.
@@ -231,11 +210,6 @@ NSTDAPI NSTDUInt nstd_core_str_byte_len(const NSTDStr *str);
 ///
 /// `NSTDOptionalUnichar chr` - The character at index `pos`, or none on error.
 ///
-/// # Panics
-///
-/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s max
-/// value.
-///
 /// # Safety
 ///
 /// This operation can cause undefined behavior in the event that `str`'s data is invalid.
@@ -258,13 +232,9 @@ NSTDAPI NSTDOptionalUnichar nstd_core_str_get(const NSTDStr *str, NSTDUInt pos);
 ///
 /// This operation can panic under the following circumstances:
 ///
-/// - `range.start` is greater than `NSTDInt`'s max value.
-///
 /// - `range.start` is greater than `range.end`.
 ///
 /// - `range.end` is greater than `str.len`.
-///
-/// - `range.end` - `range.start` is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -281,11 +251,6 @@ NSTDAPI NSTDOptionalStr nstd_core_str_substr(const NSTDStr *str, NSTDURange rang
 ///
 /// `NSTDOptionalFloat32 v` - The parsed value, or none on error.
 ///
-/// # Panics
-///
-/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s
-/// max value.
-///
 /// # Safety
 ///
 /// This operation can cause undefined behavior in the event that `str`'s data is invalid.
@@ -299,11 +264,6 @@ NSTDAPI NSTDOptionalFloat32 nstd_core_str_to_f32(const NSTDStr *str);
 /// # Returns
 ///
 /// `NSTDOptionalFloat64 v` - The parsed value, or none on error.
-///
-/// # Panics
-///
-/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s
-/// max value.
 ///
 /// # Safety
 ///
@@ -319,11 +279,6 @@ NSTDAPI NSTDOptionalFloat64 nstd_core_str_to_f64(const NSTDStr *str);
 ///
 /// `NSTDOptionalInt v` - The parsed value, or none on error.
 ///
-/// # Panics
-///
-/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s
-/// max value.
-///
 /// # Safety
 ///
 /// This operation can cause undefined behavior in the event that `str`'s data is invalid.
@@ -337,11 +292,6 @@ NSTDAPI NSTDOptionalInt nstd_core_str_to_int(const NSTDStr *str);
 /// # Returns
 ///
 /// `NSTDOptionalUInt v` - The parsed value, or none on error.
-///
-/// # Panics
-///
-/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s
-/// max value.
 ///
 /// # Safety
 ///
@@ -357,11 +307,6 @@ NSTDAPI NSTDOptionalUInt nstd_core_str_to_uint(const NSTDStr *str);
 ///
 /// `NSTDOptionalInt8 v` - The parsed value, or none on error.
 ///
-/// # Panics
-///
-/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s
-/// max value.
-///
 /// # Safety
 ///
 /// This operation can cause undefined behavior in the event that `str`'s data is invalid.
@@ -375,11 +320,6 @@ NSTDAPI NSTDOptionalInt8 nstd_core_str_to_i8(const NSTDStr *str);
 /// # Returns
 ///
 /// `NSTDOptionalUInt8 v` - The parsed value, or none on error.
-///
-/// # Panics
-///
-/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s
-/// max value.
 ///
 /// # Safety
 ///
@@ -395,11 +335,6 @@ NSTDAPI NSTDOptionalUInt8 nstd_core_str_to_u8(const NSTDStr *str);
 ///
 /// `NSTDOptionalInt16 v` - The parsed value, or none on error.
 ///
-/// # Panics
-///
-/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s
-/// max value.
-///
 /// # Safety
 ///
 /// This operation can cause undefined behavior in the event that `str`'s data is invalid.
@@ -413,11 +348,6 @@ NSTDAPI NSTDOptionalInt16 nstd_core_str_to_i16(const NSTDStr *str);
 /// # Returns
 ///
 /// `NSTDOptionalUInt16 v` - The parsed value, or none on error.
-///
-/// # Panics
-///
-/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s
-/// max value.
 ///
 /// # Safety
 ///
@@ -433,11 +363,6 @@ NSTDAPI NSTDOptionalUInt16 nstd_core_str_to_u16(const NSTDStr *str);
 ///
 /// `NSTDOptionalInt32 v` - The parsed value, or none on error.
 ///
-/// # Panics
-///
-/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s
-/// max value.
-///
 /// # Safety
 ///
 /// This operation can cause undefined behavior in the event that `str`'s data is invalid.
@@ -451,11 +376,6 @@ NSTDAPI NSTDOptionalInt32 nstd_core_str_to_i32(const NSTDStr *str);
 /// # Returns
 ///
 /// `NSTDOptionalUInt32 v` - The parsed value, or none on error.
-///
-/// # Panics
-///
-/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s
-/// max value.
 ///
 /// # Safety
 ///
@@ -471,11 +391,6 @@ NSTDAPI NSTDOptionalUInt32 nstd_core_str_to_u32(const NSTDStr *str);
 ///
 /// `NSTDOptionalInt64 v` - The parsed value, or none on error.
 ///
-/// # Panics
-///
-/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s
-/// max value.
-///
 /// # Safety
 ///
 /// This operation can cause undefined behavior in the event that `str`'s data is invalid.
@@ -489,11 +404,6 @@ NSTDAPI NSTDOptionalInt64 nstd_core_str_to_i64(const NSTDStr *str);
 /// # Returns
 ///
 /// `NSTDOptionalUInt64 v` - The parsed value, or none on error.
-///
-/// # Panics
-///
-/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s
-/// max value.
 ///
 /// # Safety
 ///
@@ -528,10 +438,6 @@ NSTDOptional(NSTDStrMut) NSTDOptionalStrMut;
 /// `NSTDOptionalStrMut str` - The new `NSTDStrMut` instance on success, or a "none" variant if the
 /// result is not valid UTF-8.
 ///
-/// # Panics
-///
-/// This function will panic if `cstr`'s length is greater than `NSTDInt`'s max value.
-///
 /// # Safety
 ///
 /// `cstr`'s data must be valid for reads of at least `cstr.len` consecutive bytes.
@@ -561,17 +467,13 @@ NSTDAPI NSTDStrMut nstd_core_str_mut_from_cstr_unchecked(NSTDCStrMut *cstr);
 ///
 /// # Returns
 ///
-/// `NSTDOptionalStrMut str` - The new string slice on success, or a "none" variant if the
-/// result is not valid UTF-8.
-///
-/// # Panics
-///
-/// This function will panic if `cstr`'s length is greater than `NSTDInt`'s max value.
+/// `NSTDOptionalStrMut str` - The new string slice on success or an uninitialized "none" variant
+/// if `cstr` is null, `cstr`'s length exceeds `NSTDInt`'s max value, or `cstr` is not valid UTF-8.
 ///
 /// # Safety
 ///
-/// This function makes access to raw pointer data, which can cause undefined behavior in the event
-/// that `cstr`'s data is invalid.
+/// `cstr` must point to a character array that is valid for reads up until and including it's
+/// null-terminating byte.
 NSTDAPI NSTDOptionalStrMut nstd_core_str_mut_from_raw_cstr(NSTDChar *cstr);
 
 /// Creates a new `NSTDStrMut` from a raw C string, including the null byte.
@@ -582,17 +484,13 @@ NSTDAPI NSTDOptionalStrMut nstd_core_str_mut_from_raw_cstr(NSTDChar *cstr);
 ///
 /// # Returns
 ///
-/// `NSTDOptionalStrMut str` - The new string slice on success, or a "none" variant if the
-/// result is not valid UTF-8.
-///
-/// # Panics
-///
-/// This function will panic if `cstr`'s length is greater than `NSTDInt`'s max value.
+/// `NSTDOptionalStrMut str` - The new string slice on success or an uninitialized "none" variant
+/// if `cstr` is null, `cstr`'s length exceeds `NSTDInt`'s max value, or `cstr` is not valid UTF-8.
 ///
 /// # Safety
 ///
-/// This function makes access to raw pointer data, which can cause undefined behavior in the event
-/// that `cstr`'s data is invalid.
+/// `cstr` must point to a character array that is valid for reads up until and including it's
+/// null-terminating byte.
 NSTDAPI NSTDOptionalStrMut nstd_core_str_mut_from_raw_cstr_with_null(NSTDChar *cstr);
 
 /// Creates a string slice from raw bytes.
@@ -608,11 +506,7 @@ NSTDAPI NSTDOptionalStrMut nstd_core_str_mut_from_raw_cstr_with_null(NSTDChar *c
 ///
 /// # Panics
 ///
-/// This operation will panic in the following situations:
-///
-/// - `bytes`'s stride is not 1.
-///
-/// - `bytes`'s length is greater than `NSTDInt`'s max value.
+/// This operation will panic if `bytes`'s stride is not 1.
 ///
 /// # Safety
 ///
@@ -698,11 +592,6 @@ NSTDAPI const NSTDByte *nstd_core_str_mut_as_ptr(const NSTDStrMut *str);
 ///
 /// `NSTDUInt len` - The length of the string slice.
 ///
-/// # Panics
-///
-/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s max
-/// value.
-///
 /// # Safety
 ///
 /// This operation can cause undefined behavior in the event that `str`'s data is invalid.
@@ -735,11 +624,6 @@ NSTDAPI NSTDUInt nstd_core_str_mut_byte_len(const NSTDStrMut *str);
 ///
 /// `NSTDOptionalUnichar chr` - The character at index `pos`, or none on error.
 ///
-/// # Panics
-///
-/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s max
-/// value.
-///
 /// # Safety
 ///
 /// This operation can cause undefined behavior in the event that `str`'s data is invalid.
@@ -762,13 +646,9 @@ NSTDAPI NSTDOptionalUnichar nstd_core_str_mut_get(const NSTDStrMut *str, NSTDUIn
 ///
 /// This operation can panic under the following circumstances:
 ///
-/// - `range.start` is greater than `NSTDInt`'s max value.
-///
 /// - `range.start` is greater than `range.end`.
 ///
 /// - `range.end` is greater than `str.len`.
-///
-/// - `range.end` - `range.start` is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -785,11 +665,6 @@ NSTDAPI NSTDOptionalStrMut nstd_core_str_mut_substr(NSTDStrMut *str, NSTDURange 
 ///
 /// `NSTDOptionalFloat32 v` - The parsed value, or none on error.
 ///
-/// # Panics
-///
-/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s
-/// max value.
-///
 /// # Safety
 ///
 /// This operation can cause undefined behavior in the event that `str`'s data is invalid.
@@ -803,11 +678,6 @@ NSTDAPI NSTDOptionalFloat32 nstd_core_str_mut_to_f32(const NSTDStrMut *str);
 /// # Returns
 ///
 /// `NSTDOptionalFloat64 v` - The parsed value, or none on error.
-///
-/// # Panics
-///
-/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s
-/// max value.
 ///
 /// # Safety
 ///
@@ -823,11 +693,6 @@ NSTDAPI NSTDOptionalFloat64 nstd_core_str_mut_to_f64(const NSTDStrMut *str);
 ///
 /// `NSTDOptionalInt v` - The parsed value, or none on error.
 ///
-/// # Panics
-///
-/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s
-/// max value.
-///
 /// # Safety
 ///
 /// This operation can cause undefined behavior in the event that `str`'s data is invalid.
@@ -841,11 +706,6 @@ NSTDAPI NSTDOptionalInt nstd_core_str_mut_to_int(const NSTDStrMut *str);
 /// # Returns
 ///
 /// `NSTDOptionalUInt v` - The parsed value, or none on error.
-///
-/// # Panics
-///
-/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s
-/// max value.
 ///
 /// # Safety
 ///
@@ -861,11 +721,6 @@ NSTDAPI NSTDOptionalUInt nstd_core_str_mut_to_uint(const NSTDStrMut *str);
 ///
 /// `NSTDOptionalInt8 v` - The parsed value, or none on error.
 ///
-/// # Panics
-///
-/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s
-/// max value.
-///
 /// # Safety
 ///
 /// This operation can cause undefined behavior in the event that `str`'s data is invalid.
@@ -879,11 +734,6 @@ NSTDAPI NSTDOptionalInt8 nstd_core_str_mut_to_i8(const NSTDStrMut *str);
 /// # Returns
 ///
 /// `NSTDOptionalUInt8 v` - The parsed value, or none on error.
-///
-/// # Panics
-///
-/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s
-/// max value.
 ///
 /// # Safety
 ///
@@ -899,11 +749,6 @@ NSTDAPI NSTDOptionalUInt8 nstd_core_str_mut_to_u8(const NSTDStrMut *str);
 ///
 /// `NSTDOptionalInt16 v` - The parsed value, or none on error.
 ///
-/// # Panics
-///
-/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s
-/// max value.
-///
 /// # Safety
 ///
 /// This operation can cause undefined behavior in the event that `str`'s data is invalid.
@@ -917,11 +762,6 @@ NSTDAPI NSTDOptionalInt16 nstd_core_str_mut_to_i16(const NSTDStrMut *str);
 /// # Returns
 ///
 /// `NSTDOptionalUInt16 v` - The parsed value, or none on error.
-///
-/// # Panics
-///
-/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s
-/// max value.
 ///
 /// # Safety
 ///
@@ -937,11 +777,6 @@ NSTDAPI NSTDOptionalUInt16 nstd_core_str_mut_to_u16(const NSTDStrMut *str);
 ///
 /// `NSTDOptionalInt32 v` - The parsed value, or none on error.
 ///
-/// # Panics
-///
-/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s
-/// max value.
-///
 /// # Safety
 ///
 /// This operation can cause undefined behavior in the event that `str`'s data is invalid.
@@ -955,11 +790,6 @@ NSTDAPI NSTDOptionalInt32 nstd_core_str_mut_to_i32(const NSTDStrMut *str);
 /// # Returns
 ///
 /// `NSTDOptionalUInt32 v` - The parsed value, or none on error.
-///
-/// # Panics
-///
-/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s
-/// max value.
 ///
 /// # Safety
 ///
@@ -975,11 +805,6 @@ NSTDAPI NSTDOptionalUInt32 nstd_core_str_mut_to_u32(const NSTDStrMut *str);
 ///
 /// `NSTDOptionalInt64 v` - The parsed value, or none on error.
 ///
-/// # Panics
-///
-/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s
-/// max value.
-///
 /// # Safety
 ///
 /// This operation can cause undefined behavior in the event that `str`'s data is invalid.
@@ -993,11 +818,6 @@ NSTDAPI NSTDOptionalInt64 nstd_core_str_mut_to_i64(const NSTDStrMut *str);
 /// # Returns
 ///
 /// `NSTDOptionalUInt64 v` - The parsed value, or none on error.
-///
-/// # Panics
-///
-/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s
-/// max value.
 ///
 /// # Safety
 ///
