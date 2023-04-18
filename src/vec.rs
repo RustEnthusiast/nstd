@@ -13,7 +13,6 @@ use crate::{
             nstd_core_slice_mut_empty, nstd_core_slice_mut_new_unchecked,
             nstd_core_slice_new_unchecked, nstd_core_slice_stride, NSTDSlice, NSTDSliceMut,
         },
-        NSTD_INT_MAX,
     },
     NSTDAny, NSTDAnyMut, NSTDUInt, NSTD_NULL,
 };
@@ -160,7 +159,7 @@ gen_optional!(NSTDOptionalVec, NSTDVec);
 ///
 /// # Parameters:
 ///
-/// - `NSTDUInt element_size` - The size in bytes of each value in the vector.
+/// - `NSTDUInt stride` - The size in bytes of each value in the vector.
 ///
 /// # Returns
 ///
@@ -168,7 +167,7 @@ gen_optional!(NSTDOptionalVec, NSTDVec);
 ///
 /// # Panics
 ///
-/// This function will panic if `element_size` is zero.
+/// This function will panic if `stride` is zero.
 ///
 /// # Example
 ///
@@ -181,11 +180,11 @@ gen_optional!(NSTDOptionalVec, NSTDVec);
 /// ```
 #[inline]
 #[nstdapi]
-pub const fn nstd_vec_new(element_size: NSTDUInt) -> NSTDVec {
-    assert!(element_size != 0);
+pub const fn nstd_vec_new(stride: NSTDUInt) -> NSTDVec {
+    assert!(stride != 0);
     NSTDVec {
         ptr: NSTD_NULL,
-        stride: element_size,
+        stride,
         cap: 0,
         len: 0,
     }
@@ -199,7 +198,7 @@ pub const fn nstd_vec_new(element_size: NSTDUInt) -> NSTDVec {
 ///
 /// # Parameters:
 ///
-/// - `NSTDUInt element_size` - The size in bytes of each value in the vector.
+/// - `NSTDUInt stride` - The size in bytes of each value in the vector.
 ///
 /// - `NSTDUInt cap` - The initial capacity for the vector.
 ///
@@ -209,7 +208,7 @@ pub const fn nstd_vec_new(element_size: NSTDUInt) -> NSTDVec {
 ///
 /// # Panics
 ///
-/// This function will panic if either `element_size` or `cap` are zero.
+/// This function will panic if either `stride` or `cap` are zero.
 ///
 /// # Example
 ///
@@ -236,19 +235,19 @@ pub const fn nstd_vec_new(element_size: NSTDUInt) -> NSTDVec {
 /// }
 /// ```
 #[nstdapi]
-pub fn nstd_vec_new_with_cap(element_size: NSTDUInt, mut cap: NSTDUInt) -> NSTDVec {
-    // Ensure that neither `element_size` or `cap` are zero.
-    assert!(element_size != 0 && cap != 0);
+pub fn nstd_vec_new_with_cap(stride: NSTDUInt, mut cap: NSTDUInt) -> NSTDVec {
+    // Ensure that neither `stride` or `cap` are zero.
+    assert!(stride != 0 && cap != 0);
     // Attempt to allocate the memory buffer.
-    // SAFETY: Both `element_size` & `cap` are above 0.
-    let mem = unsafe { nstd_alloc_allocate(cap * element_size) };
-    if mem.is_null() {
+    // SAFETY: Both `stride` & `cap` are above 0.
+    let ptr = unsafe { nstd_alloc_allocate(cap * stride) };
+    if ptr.is_null() {
         cap = 0;
     }
     // Construct the vector.
     NSTDVec {
-        ptr: mem,
-        stride: element_size,
+        ptr,
+        stride,
         cap,
         len: 0,
     }
@@ -420,20 +419,13 @@ pub const fn nstd_vec_reserved(vec: &NSTDVec) -> NSTDUInt {
 /// # Returns
 ///
 /// `NSTDSlice slice` - An *immutable* view into the vector.
-///
-/// # Panics
-///
-/// This operation will panic if `vec`'s stride is greater than `NSTDInt`'s max value.
 #[nstdapi]
 pub fn nstd_vec_as_slice(vec: &NSTDVec) -> NSTDSlice {
     // SAFETY: `vec.ptr` is checked, vector lengths are never greater than `NSTDInt`'s max value.
     unsafe {
         match vec.ptr.is_null() {
-            false => {
-                assert!(vec.stride <= NSTD_INT_MAX as _);
-                nstd_core_slice_new_unchecked(vec.ptr, vec.stride, vec.len)
-            }
-            _ => nstd_core_slice_empty(vec.stride),
+            false => nstd_core_slice_new_unchecked(vec.ptr, vec.stride, vec.len),
+            true => nstd_core_slice_empty(vec.stride),
         }
     }
 }
@@ -447,20 +439,13 @@ pub fn nstd_vec_as_slice(vec: &NSTDVec) -> NSTDSlice {
 /// # Returns
 ///
 /// `NSTDSliceMut slice` - A *mutable* view into the vector.
-///
-/// # Panics
-///
-/// This operation will panic if `vec`'s stride is greater than `NSTDInt`'s max value.
 #[nstdapi]
 pub fn nstd_vec_as_slice_mut(vec: &mut NSTDVec) -> NSTDSliceMut {
     // SAFETY: `vec.ptr` is checked, vector lengths are never greater than `NSTDInt`'s max value.
     unsafe {
         match vec.ptr.is_null() {
-            false => {
-                assert!(vec.stride <= NSTD_INT_MAX as _);
-                nstd_core_slice_mut_new_unchecked(vec.ptr, vec.stride, vec.len)
-            }
-            _ => nstd_core_slice_mut_empty(vec.stride),
+            false => nstd_core_slice_mut_new_unchecked(vec.ptr, vec.stride, vec.len),
+            true => nstd_core_slice_mut_empty(vec.stride),
         }
     }
 }

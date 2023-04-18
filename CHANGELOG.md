@@ -65,7 +65,6 @@
 - `nstd_timed_mutex_timed_lock` now takes `NSTDDuration` by value.
 ### `nstd.vec`
 - `nstd_vec_[end|get|push|pop|insert|remove][_mut]` no longer panics.
-- `nstd_vec_as_slice[_mut]` now panics.
 - `nstd_vec_from_slice` now returns `NSTDOptionalVec`.
 - `nstd_vec_clone` now returns `NSTDOptionalVec`.
 

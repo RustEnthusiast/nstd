@@ -25,7 +25,7 @@ NSTDOptional(NSTDVec) NSTDOptionalVec;
 ///
 /// # Parameters:
 ///
-/// - `NSTDUInt element_size` - The size in bytes of each value in the vector.
+/// - `NSTDUInt stride` - The size in bytes of each value in the vector.
 ///
 /// # Returns
 ///
@@ -33,8 +33,8 @@ NSTDOptional(NSTDVec) NSTDOptionalVec;
 ///
 /// # Panics
 ///
-/// This function will panic if `element_size` is zero.
-NSTDAPI NSTDVec nstd_vec_new(NSTDUInt element_size);
+/// This function will panic if `stride` is zero.
+NSTDAPI NSTDVec nstd_vec_new(NSTDUInt stride);
 
 /// Creates a new vector initialized with the given capacity.
 ///
@@ -44,7 +44,7 @@ NSTDAPI NSTDVec nstd_vec_new(NSTDUInt element_size);
 ///
 /// # Parameters:
 ///
-/// - `NSTDUInt element_size` - The size in bytes of each value in the vector.
+/// - `NSTDUInt stride` - The size in bytes of each value in the vector.
 ///
 /// - `NSTDUInt cap` - The initial capacity for the vector.
 ///
@@ -54,8 +54,8 @@ NSTDAPI NSTDVec nstd_vec_new(NSTDUInt element_size);
 ///
 /// # Panics
 ///
-/// This function will panic if either `element_size` or `cap` are zero.
-NSTDAPI NSTDVec nstd_vec_new_with_cap(NSTDUInt element_size, NSTDUInt cap);
+/// This function will panic if either `stride` or `cap` are zero.
+NSTDAPI NSTDVec nstd_vec_new_with_cap(NSTDUInt stride, NSTDUInt cap);
 
 /// Creates a new vector from a slice.
 ///
@@ -144,10 +144,6 @@ NSTDAPI NSTDUInt nstd_vec_reserved(const NSTDVec *vec);
 /// # Returns
 ///
 /// `NSTDSlice slice` - An *immutable* view into the vector.
-///
-/// # Panics
-///
-/// This operation will panic if `vec`'s stride is greater than `NSTDInt`'s max value.
 NSTDAPI NSTDSlice nstd_vec_as_slice(const NSTDVec *vec);
 
 /// Returns a slice containing all of a vector's active elements.
@@ -159,10 +155,6 @@ NSTDAPI NSTDSlice nstd_vec_as_slice(const NSTDVec *vec);
 /// # Returns
 ///
 /// `NSTDSliceMut slice` - A *mutable* view into the vector.
-///
-/// # Panics
-///
-/// This operation will panic if `vec`'s stride is greater than `NSTDInt`'s max value.
 NSTDAPI NSTDSliceMut nstd_vec_as_slice_mut(NSTDVec *vec);
 
 /// Returns a pointer to a vector's raw data.
