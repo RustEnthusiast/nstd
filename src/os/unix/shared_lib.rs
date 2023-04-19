@@ -1,9 +1,8 @@
 //! Provides shared library access for Unix like systems.
 use crate::{core::optional::NSTDOptional, NSTDAny, NSTDAnyMut, NSTDChar};
-use nstdapi::nstdapi;
 
 /// Represents an owned handle to a dynamically loaded library.
-#[nstdapi]
+#[repr(C)]
 pub struct NSTDUnixSharedLib {
     /// A raw handle to the shared library.
     handle: NSTDAnyMut,
