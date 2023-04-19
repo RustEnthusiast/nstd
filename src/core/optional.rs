@@ -7,9 +7,9 @@ use crate::{
 use nstdapi::nstdapi;
 
 /// Describes an `NSTDOptional` with no value.
-pub const NSTD_OPTIONAL_STATUS_NONE: NSTDUInt8 = 0;
+pub const NSTD_OPTIONAL_NONE: NSTDUInt8 = 0;
 /// Describes an `NSTDOptional` with "some" initialized value.
-pub const NSTD_OPTIONAL_STATUS_SOME: NSTDUInt8 = 1;
+pub const NSTD_OPTIONAL_SOME: NSTDUInt8 = 1;
 
 /// Represents an optional (possibly uninitialized) value.
 #[nstdapi]

@@ -3,9 +3,9 @@
 #include "../nstd.h"
 
 /// Describes an `NSTDOptional` with no value.
-#define NSTD_OPTIONAL_STATUS_NONE 0
+#define NSTD_OPTIONAL_NONE 0
 /// Describes an `NSTDOptional` with "some" initialized value.
-#define NSTD_OPTIONAL_STATUS_SOME 1
+#define NSTD_OPTIONAL_SOME 1
 
 /// Represents an optional (possibly uninitialized) value.
 #define NSTDOptional(T)   \

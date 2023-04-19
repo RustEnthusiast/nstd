@@ -3,9 +3,9 @@ use crate::NSTDUInt8;
 use nstdapi::nstdapi;
 
 /// Describes an erroneous `NSTDResult` value.
-pub const NSTD_RESULT_STATUS_ERR: NSTDUInt8 = 0;
+pub const NSTD_RESULT_ERR: NSTDUInt8 = 0;
 /// Describes a successful `NSTDResult` value.
-pub const NSTD_RESULT_STATUS_OK: NSTDUInt8 = 1;
+pub const NSTD_RESULT_OK: NSTDUInt8 = 1;
 
 /// Defines a "result" type with success and error variants.
 #[nstdapi]

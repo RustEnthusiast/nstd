@@ -3,9 +3,9 @@
 #include "../nstd.h"
 
 /// Describes an erroneous `NSTDResult` value.
-#define NSTD_RESULT_STATUS_ERR 0
+#define NSTD_RESULT_ERR 0
 /// Describes a successful `NSTDResult` value.
-#define NSTD_RESULT_STATUS_OK 1
+#define NSTD_RESULT_OK 1
 
 /// Defines a "result" type with success and error variants.
 #define NSTDResult(T, E)  \

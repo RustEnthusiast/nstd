@@ -29,9 +29,9 @@ NSTDAPI NSTDOptionalTimedMutex nstd_timed_mutex_new(const NSTDHeapPtr data) {
     try {
         const std::timed_mutex *const mutex{new std::timed_mutex{}};
         const NSTDTimedMutex timed_mutex{(NSTDAnyMut)mutex, data, NSTD_FALSE, NSTD_FALSE};
-        return NSTDOptionalTimedMutex{NSTD_OPTIONAL_STATUS_SOME, {timed_mutex}};
+        return NSTDOptionalTimedMutex{NSTD_OPTIONAL_SOME, {timed_mutex}};
     } catch (...) {
-        return NSTDOptionalTimedMutex{NSTD_OPTIONAL_STATUS_NONE, {}};
+        return NSTDOptionalTimedMutex{NSTD_OPTIONAL_NONE, {}};
     }
 #endif
 }
@@ -80,15 +80,15 @@ NSTDAPI NSTDOptionalTimedMutexLockResult nstd_timed_mutex_lock(const NSTDTimedMu
     try {
         ((std::timed_mutex *)mutex->inner)->lock();
         const_cast<NSTDTimedMutex *>(mutex)->locked = NSTD_TRUE;
-        NSTDOptionalTimedMutexLockResult ret{NSTD_OPTIONAL_STATUS_SOME, {}};
+        NSTDOptionalTimedMutexLockResult ret{NSTD_OPTIONAL_SOME, {}};
         const NSTDTimedMutexGuard guard{mutex};
         if (mutex->poisoned)
-            ret.value.some = NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_ERR, {guard}};
+            ret.value.some = NSTDTimedMutexLockResult{NSTD_RESULT_ERR, {guard}};
         else
-            ret.value.some = NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_OK, {guard}};
+            ret.value.some = NSTDTimedMutexLockResult{NSTD_RESULT_OK, {guard}};
         return ret;
     } catch (...) {
-        return NSTDOptionalTimedMutexLockResult{NSTD_OPTIONAL_STATUS_NONE, {}};
+        return NSTDOptionalTimedMutexLockResult{NSTD_OPTIONAL_NONE, {}};
     }
 #endif
 }
@@ -117,15 +117,15 @@ NSTDAPI NSTDOptionalTimedMutexLockResult nstd_timed_mutex_try_lock(const NSTDTim
 #else
     if (((std::timed_mutex *)mutex->inner)->try_lock()) {
         const_cast<NSTDTimedMutex *>(mutex)->locked = NSTD_TRUE;
-        NSTDOptionalTimedMutexLockResult ret{NSTD_OPTIONAL_STATUS_SOME, {}};
+        NSTDOptionalTimedMutexLockResult ret{NSTD_OPTIONAL_SOME, {}};
         const NSTDTimedMutexGuard guard{mutex};
         if (mutex->poisoned)
-            ret.value.some = NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_ERR, {guard}};
+            ret.value.some = NSTDTimedMutexLockResult{NSTD_RESULT_ERR, {guard}};
         else
-            ret.value.some = NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_OK, {guard}};
+            ret.value.some = NSTDTimedMutexLockResult{NSTD_RESULT_OK, {guard}};
         return ret;
     } else
-        return NSTDOptionalTimedMutexLockResult{NSTD_OPTIONAL_STATUS_NONE, {}};
+        return NSTDOptionalTimedMutexLockResult{NSTD_OPTIONAL_NONE, {}};
 #endif
 }
 
@@ -156,15 +156,15 @@ nstd_timed_mutex_timed_lock(const NSTDTimedMutex *const mutex, const NSTDDuratio
     const std::chrono::duration<NSTDFloat64> dur{nstd_core_time_duration_get(duration)};
     if (((std::timed_mutex *)mutex->inner)->try_lock_for(dur)) {
         const_cast<NSTDTimedMutex *>(mutex)->locked = NSTD_TRUE;
-        NSTDOptionalTimedMutexLockResult ret{NSTD_OPTIONAL_STATUS_SOME, {}};
+        NSTDOptionalTimedMutexLockResult ret{NSTD_OPTIONAL_SOME, {}};
         const NSTDTimedMutexGuard guard{mutex};
         if (mutex->poisoned)
-            ret.value.some = NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_ERR, {guard}};
+            ret.value.some = NSTDTimedMutexLockResult{NSTD_RESULT_ERR, {guard}};
         else
-            ret.value.some = NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_OK, {guard}};
+            ret.value.some = NSTDTimedMutexLockResult{NSTD_RESULT_OK, {guard}};
         return ret;
     } else
-        return NSTDOptionalTimedMutexLockResult{NSTD_OPTIONAL_STATUS_NONE, {}};
+        return NSTDOptionalTimedMutexLockResult{NSTD_OPTIONAL_NONE, {}};
 #endif
 }
 
@@ -222,10 +222,10 @@ NSTDAPI NSTDOptionalHeapPtr nstd_timed_mutex_into_inner(const NSTDTimedMutex mut
     if (!mutex.locked)
         delete (std::timed_mutex *)mutex.inner;
     if (!mutex.poisoned)
-        return NSTDOptionalHeapPtr{NSTD_OPTIONAL_STATUS_SOME, {mutex.data}};
+        return NSTDOptionalHeapPtr{NSTD_OPTIONAL_SOME, {mutex.data}};
     else {
         nstd_heap_ptr_free(mutex.data);
-        return NSTDOptionalHeapPtr{NSTD_OPTIONAL_STATUS_NONE, {}};
+        return NSTDOptionalHeapPtr{NSTD_OPTIONAL_NONE, {}};
     }
 #endif
 }

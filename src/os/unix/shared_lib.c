@@ -19,10 +19,10 @@
 NSTDAPI NSTDUnixOptionalSharedLib nstd_os_unix_shared_lib_load(const NSTDChar *const path) {
     const NSTDAnyMut handle = dlopen(path, RTLD_LAZY | RTLD_LOCAL);
     if (handle) {
-        const NSTDUnixOptionalSharedLib lib = {NSTD_OPTIONAL_STATUS_SOME, {{handle}}};
+        const NSTDUnixOptionalSharedLib lib = {NSTD_OPTIONAL_SOME, {{handle}}};
         return lib;
     } else {
-        const NSTDUnixOptionalSharedLib lib = {NSTD_OPTIONAL_STATUS_NONE};
+        const NSTDUnixOptionalSharedLib lib = {NSTD_OPTIONAL_NONE};
         return lib;
     }
 }
