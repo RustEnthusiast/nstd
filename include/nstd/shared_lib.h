@@ -4,16 +4,16 @@
 #include "core/str.h"
 #include "nstd.h"
 #include "os/os.h"
-#ifdef NSTD_OS_UNIX
-#    include "os/unix/shared_lib.h"
-#endif
 #ifdef NSTD_OS_WINDOWS
 #    include "os/windows/shared_lib.h"
 #endif
 
 /// A handle to a dynamically loaded library.
 #if defined(NSTD_OS_UNIX)
-typedef NSTDUnixSharedLib NSTDSharedLib;
+typedef struct {
+    /// A raw handle to the shared library.
+    NSTDAnyMut handle;
+} NSTDSharedLib;
 #elif defined(NSTD_OS_WINDOWS)
 typedef NSTDWindowsSharedLib NSTDSharedLib;
 #else
