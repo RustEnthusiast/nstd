@@ -53,10 +53,6 @@ NSTDAPI NSTDOptionalCString nstd_cstring_new_with_cap(NSTDUInt cap);
 /// `NSTDOptionalCString cstring` - The new owned version of `cstr` on success, or an uninitialized
 /// "none" variant if `cstr` contains a null byte or allocating fails.
 ///
-/// # Panics
-///
-/// This operation will panic if allocating for the C string's null byte fails.
-///
 /// # Safety
 ///
 /// The caller of this function must ensure that `cstr`'s data is valid for reads.
@@ -73,10 +69,6 @@ NSTDAPI NSTDOptionalCString nstd_cstring_from_cstr(const NSTDCStr *cstr);
 ///
 /// `NSTDOptionalCString cstring` - The new owned version of `cstr` on success, or an uninitialized
 /// "none" variant if allocating fails.
-///
-/// # Panics
-///
-/// This operation will panic if allocating for the C string's null byte fails.
 ///
 /// # Safety
 ///

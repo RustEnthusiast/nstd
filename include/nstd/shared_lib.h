@@ -37,11 +37,7 @@ NSTDOptional(NSTDSharedLib) NSTDOptionalSharedLib;
 ///
 /// # Panics
 ///
-/// This operation may panic in the following situations:
-///
-/// - Allocating memory fails.
-///
-/// - Conversion from UTF-8 to UTF-16 fails on Windows.
+/// This operation will panic if conversion from UTF-8 to UTF-16 fails on Windows.
 ///
 /// # Safety
 ///

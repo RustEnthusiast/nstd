@@ -95,10 +95,6 @@ pub fn nstd_cstring_new_with_cap(cap: NSTDUInt) -> NSTDOptionalCString {
 /// `NSTDOptionalCString cstring` - The new owned version of `cstr` on success, or an uninitialized
 /// "none" variant if `cstr` contains a null byte or allocating fails.
 ///
-/// # Panics
-///
-/// This operation will panic if allocating for the C string's null byte fails.
-///
 /// # Safety
 ///
 /// The caller of this function must ensure that `cstr`'s data is valid for reads.
@@ -134,10 +130,6 @@ pub unsafe fn nstd_cstring_from_cstr(cstr: &NSTDCStr) -> NSTDOptionalCString {
 /// `NSTDOptionalCString cstring` - The new owned version of `cstr` on success, or an uninitialized
 /// "none" variant if allocating fails.
 ///
-/// # Panics
-///
-/// This operation will panic if allocating for the C string's null byte fails.
-///
 /// # Safety
 ///
 /// The caller of this function must ensure the following preconditions:
@@ -150,9 +142,10 @@ pub unsafe fn nstd_cstring_from_cstr_unchecked(cstr: &NSTDCStr) -> NSTDOptionalC
     let bytes = nstd_core_cstr_as_bytes(cstr);
     if let NSTDOptional::Some(mut bytes) = nstd_vec_from_slice(&bytes) {
         let null: NSTDChar = 0;
-        let null = addr_of!(null).cast();
-        assert!(nstd_vec_push(&mut bytes, null) == NSTDAllocError::NSTD_ALLOC_ERROR_NONE);
-        return NSTDOptional::Some(NSTDCString { bytes });
+        let null = addr_of!(null) as _;
+        if nstd_vec_push(&mut bytes, null) == NSTDAllocError::NSTD_ALLOC_ERROR_NONE {
+            return NSTDOptional::Some(NSTDCString { bytes });
+        }
     }
     NSTDOptional::None
 }
