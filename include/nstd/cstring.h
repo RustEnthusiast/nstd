@@ -22,12 +22,9 @@ NSTDOptional(NSTDCString) NSTDOptionalCString;
 ///
 /// # Returns
 ///
-/// `NSTDCString cstring` - The new C string.
-///
-/// # Panics
-///
-/// This function will panic if allocating for the null byte fails.
-NSTDAPI NSTDCString nstd_cstring_new(void);
+/// `NSTDOptionalCString cstring` - The new C string on success, or an uninitialized "none" variant
+/// if allocating for the C string's null terminator fails.
+NSTDAPI NSTDOptionalCString nstd_cstring_new(void);
 
 /// Creates a new `NSTDCString` initialized with the given capacity.
 ///
@@ -37,12 +34,13 @@ NSTDAPI NSTDCString nstd_cstring_new(void);
 ///
 /// # Returns
 ///
-/// `NSTDCString cstring` - The new C string.
+/// `NSTDOptionalCString cstring` - The new C string on success, or an uninitialized "none" variant
+/// if allocating fails.
 ///
 /// # Panics
 ///
-/// This function will panic if either `cap` is zero or allocating fails.
-NSTDAPI NSTDCString nstd_cstring_new_with_cap(NSTDUInt cap);
+/// This function will panic if `cap` is zero.
+NSTDAPI NSTDOptionalCString nstd_cstring_new_with_cap(NSTDUInt cap);
 
 /// Creates an owned version of an unowned C string slice.
 ///

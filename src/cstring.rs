@@ -34,11 +34,8 @@ gen_optional!(NSTDOptionalCString, NSTDCString);
 ///
 /// # Returns
 ///
-/// `NSTDCString cstring` - The new C string.
-///
-/// # Panics
-///
-/// This function will panic if allocating for the null byte fails.
+/// `NSTDOptionalCString cstring` - The new C string on success, or an uninitialized "none" variant
+/// if allocating for the C string's null terminator fails.
 ///
 /// # Example
 ///
@@ -49,7 +46,7 @@ gen_optional!(NSTDOptionalCString, NSTDCString);
 /// ```
 #[inline]
 #[nstdapi]
-pub fn nstd_cstring_new() -> NSTDCString {
+pub fn nstd_cstring_new() -> NSTDOptionalCString {
     nstd_cstring_new_with_cap(1)
 }
 
@@ -61,11 +58,12 @@ pub fn nstd_cstring_new() -> NSTDCString {
 ///
 /// # Returns
 ///
-/// `NSTDCString cstring` - The new C string.
+/// `NSTDOptionalCString cstring` - The new C string on success, or an uninitialized "none" variant
+/// if allocating fails.
 ///
 /// # Panics
 ///
-/// This function will panic if either `cap` is zero or allocating fails.
+/// This function will panic if `cap` is zero.
 ///
 /// # Example
 ///
@@ -76,15 +74,14 @@ pub fn nstd_cstring_new() -> NSTDCString {
 /// ```
 #[inline]
 #[nstdapi]
-pub fn nstd_cstring_new_with_cap(cap: NSTDUInt) -> NSTDCString {
+pub fn nstd_cstring_new_with_cap(cap: NSTDUInt) -> NSTDOptionalCString {
     let mut bytes = nstd_vec_new_with_cap(1, cap);
     let nul: NSTDChar = 0;
     // SAFETY: `nul` is stored on the stack.
-    unsafe {
-        let errc = nstd_vec_push(&mut bytes, addr_of!(nul).cast());
-        assert!(errc == NSTDAllocError::NSTD_ALLOC_ERROR_NONE);
+    match unsafe { nstd_vec_push(&mut bytes, addr_of!(nul) as _) } {
+        NSTDAllocError::NSTD_ALLOC_ERROR_NONE => NSTDOptional::Some(NSTDCString { bytes }),
+        _ => NSTDOptional::None,
     }
-    NSTDCString { bytes }
 }
 
 /// Creates an owned version of an unowned C string slice.
