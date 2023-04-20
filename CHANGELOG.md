@@ -32,7 +32,9 @@
 - `nstd.core.time` functions now take `NSTDDuration` by value.
 - `nstd_core_slice_mut_copy` now panics.
 ### `nstd.cstring`
-- `nstd_cstring_[new|from_cstr[_unchecked]|pop]` no longer panics.
+- `nstd_cstring_new[_with_cap]` now returns `NSTDOptionalCString`.
+- `nstd_cstring_push` now returns `NSTDAllocError`.
+- `nstd_cstring_[new|from_cstr[_unchecked]|push|pop]` no longer panics.
 - `nstd_cstring_from_cstr[_unchecked]` now returns `NSTDOptionalCString`.
 - `nstd_cstring_clone` now returns `NSTDOptionalCString`.
 ### `nstd.env`

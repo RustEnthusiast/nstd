@@ -196,10 +196,10 @@ NSTDAPI NSTDUInt nstd_cstring_cap(const NSTDCString *cstring);
 ///
 /// - `NSTDChar chr` - The C char to append to the C string.
 ///
-/// # Panics
+/// # Returns
 ///
-/// This operation panics if `chr` cannot be appended to the C string.
-NSTDAPI void nstd_cstring_push(NSTDCString *cstring, NSTDChar chr);
+/// `NSTDAllocError errc` - The allocation operation error code.
+NSTDAPI NSTDAllocError nstd_cstring_push(NSTDCString *cstring, NSTDChar chr);
 
 /// Appends a C string slice to the end of a C string.
 ///

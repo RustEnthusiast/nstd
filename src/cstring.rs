@@ -315,9 +315,9 @@ pub fn nstd_cstring_cap(cstring: &NSTDCString) -> NSTDUInt {
 ///
 /// - `NSTDChar chr` - The C char to append to the C string.
 ///
-/// # Panics
+/// # Returns
 ///
-/// This operation panics if `chr` cannot be appended to the C string.
+/// `NSTDAllocError errc` - The allocation operation error code.
 ///
 /// # Example
 ///
@@ -331,20 +331,23 @@ pub fn nstd_cstring_cap(cstring: &NSTDCString) -> NSTDUInt {
 /// nstd_cstring_push(&mut cstring, b'!' as NSTDChar);
 /// ```
 #[nstdapi]
-pub fn nstd_cstring_push(cstring: &mut NSTDCString, chr: NSTDChar) {
-    // SAFETY: C strings always contain an exclusive null byte at the end.
-    unsafe {
-        if chr != 0 {
+pub fn nstd_cstring_push(cstring: &mut NSTDCString, chr: NSTDChar) -> NSTDAllocError {
+    if chr != 0 {
+        // SAFETY: C strings always contain an exclusive null byte at the end.
+        unsafe {
             // Push a new null byte onto the end of the C string.
-            let nulpos = nstd_vec_len(&cstring.bytes) - 1;
-            let mut nul = nstd_vec_get_mut(&mut cstring.bytes, nulpos).cast::<NSTDChar>();
-            let errc = nstd_vec_push(&mut cstring.bytes, nul.cast());
-            assert!(errc == NSTDAllocError::NSTD_ALLOC_ERROR_NONE);
+            let nul: NSTDChar = 0;
+            let errc = nstd_vec_push(&mut cstring.bytes, addr_of!(nul) as _);
+            if errc != NSTDAllocError::NSTD_ALLOC_ERROR_NONE {
+                return errc;
+            }
             // Write `chr` over the old null byte.
-            nul = nstd_vec_get_mut(&mut cstring.bytes, nulpos).cast();
+            let nulpos = nstd_vec_len(&cstring.bytes) - 2;
+            let nul = nstd_vec_get_mut(&mut cstring.bytes, nulpos).cast();
             *nul = chr;
         }
     }
+    NSTDAllocError::NSTD_ALLOC_ERROR_NONE
 }
 
 /// Appends a C string slice to the end of a C string.
