@@ -64,16 +64,13 @@ NSTDAPI NSTDOptionalString nstd_string_from_str(const NSTDStr *str);
 ///
 /// # Returns
 ///
-/// `NSTDString string` - The new UTF-8 encoded string with ownership of `bytes`.
+/// `NSTDOptionalString string` - The new UTF-8 encoded string with ownership of `bytes` on success
+/// or an uninitialized "none" variant if `bytes` contains invalid UTF-8.
 ///
 /// # Panics
 ///
-/// This operation will panic in the following situations:
-///
-/// - `bytes`'s stride is not 1.
-///
-/// - `bytes`'s data is not valid UTF-8.
-NSTDAPI NSTDString nstd_string_from_bytes(NSTDVec bytes);
+/// This operation will panic if `bytes`'s stride is not 1.
+NSTDAPI NSTDOptionalString nstd_string_from_bytes(NSTDVec bytes);
 
 /// Creates a deep copy of a string.
 ///

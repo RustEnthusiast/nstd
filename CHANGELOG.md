@@ -54,7 +54,7 @@
 - `nstd_shared_ptr_new[_zeroed]` now returns `NSTDOptionalSharedPtr`.
 ### `nstd.string`
 - `nstd_string_[len|push[_str]|pop]` no longer panics.
-- `nstd_string_from_str` now returns `NSTDOptionalString`.
+- `nstd_string_from_[str|bytes]` now returns `NSTDOptionalString`.
 - `nstd_string_clone` now returns `NSTDOptionalString`.
 ### `nstd.thread`
 - `nstd_thread_spawn_with_desc` no longer panics.
