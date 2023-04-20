@@ -327,7 +327,7 @@ pub fn nstd_cstring_cap(cstring: &NSTDCString) -> NSTDUInt {
 ///     NSTDChar,
 /// };
 ///
-/// let mut cstring = nstd_cstring_new();
+/// let mut cstring = nstd_cstring_new().unwrap();
 /// nstd_cstring_push(&mut cstring, b'!' as NSTDChar);
 /// ```
 #[nstdapi]
@@ -384,7 +384,7 @@ pub fn nstd_cstring_push(cstring: &mut NSTDCString, chr: NSTDChar) -> NSTDAllocE
 ///     NSTDChar,
 /// };
 ///
-/// let mut cstring = nstd_cstring_new();
+/// let mut cstring = nstd_cstring_new().unwrap();
 /// unsafe {
 ///     let cstr = nstd_core_cstr_from_raw("baNaNa\0".as_ptr().cast());
 ///     assert!(nstd_cstring_push_cstr(&mut cstring, &cstr) == NSTD_ALLOC_ERROR_NONE);
