@@ -1,8 +1,8 @@
 //! Represents an optional (possibly uninitialized) value.
 use crate::{
-    NSTDBool, NSTDChar, NSTDChar16, NSTDChar32, NSTDChar8, NSTDFloat32, NSTDFloat64, NSTDInt,
-    NSTDInt16, NSTDInt32, NSTDInt64, NSTDInt8, NSTDUInt, NSTDUInt16, NSTDUInt32, NSTDUInt64,
-    NSTDUInt8,
+    NSTDAny, NSTDAnyMut, NSTDBool, NSTDChar, NSTDChar16, NSTDChar32, NSTDChar8, NSTDFloat32,
+    NSTDFloat64, NSTDInt, NSTDInt16, NSTDInt32, NSTDInt64, NSTDInt8, NSTDUInt, NSTDUInt16,
+    NSTDUInt32, NSTDUInt64, NSTDUInt8,
 };
 use nstdapi::nstdapi;
 
@@ -74,6 +74,8 @@ macro_rules! gen_optional {
     };
 }
 pub(crate) use gen_optional;
+gen_optional!(NSTDOptionalAny, NSTDAny);
+gen_optional!(NSTDOptionalAnyMut, NSTDAnyMut);
 gen_optional!(NSTDOptionalBool, NSTDBool);
 gen_optional!(NSTDOptionalChar, NSTDChar);
 gen_optional!(NSTDOptionalChar8, NSTDChar8);

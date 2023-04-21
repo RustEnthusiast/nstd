@@ -16,6 +16,10 @@
         } value;          \
     }
 
+/// Represents an optional value of type `NSTDAny`.
+NSTDOptional(NSTDAny) NSTDOptionalAny;
+/// Represents an optional value of type `NSTDAnyMut`.
+NSTDOptional(NSTDAnyMut) NSTDOptionalAnyMut;
 /// Represents an optional value of type `NSTDBool`.
 NSTDOptional(NSTDBool) NSTDOptionalBool;
 /// Represents an optional value of type `NSTDChar`.
