@@ -81,7 +81,7 @@ pub type NSTDThreadCountResult = NSTDResult<NSTDUInt, NSTDIOError>;
 ///     0
 /// }
 ///
-/// if let Some(thread) = unsafe { nstd_thread_spawn(Some(thread_fn), NSTDOptional::None) } {
+/// if let Some(thread) = unsafe { nstd_thread_spawn(thread_fn, NSTDOptional::None) } {
 ///     if let NSTDOptional::Some(errc) = nstd_thread_join(thread) {
 ///         assert!(errc == 0);
 ///     }
@@ -89,13 +89,11 @@ pub type NSTDThreadCountResult = NSTDResult<NSTDUInt, NSTDIOError>;
 /// ```
 #[nstdapi]
 pub unsafe fn nstd_thread_spawn(
-    thread_fn: Option<unsafe extern "C" fn(NSTDOptionalHeapPtr) -> NSTDThreadResult>,
+    thread_fn: unsafe extern "C" fn(NSTDOptionalHeapPtr) -> NSTDThreadResult,
     data: NSTDOptionalHeapPtr,
 ) -> Option<NSTDThread> {
-    if let Some(thread_fn) = thread_fn {
-        if let Ok(thread) = Builder::new().spawn(move || thread_fn(data)) {
-            return Some(Box::new(thread));
-        }
+    if let Ok(thread) = Builder::new().spawn(move || thread_fn(data)) {
+        return Some(Box::new(thread));
     }
     None
 }
@@ -123,30 +121,28 @@ pub unsafe fn nstd_thread_spawn(
 /// - The data type that `data` holds must be able to be safely sent between threads.
 #[nstdapi]
 pub unsafe fn nstd_thread_spawn_with_desc(
-    thread_fn: Option<unsafe extern "C" fn(NSTDOptionalHeapPtr) -> NSTDThreadResult>,
+    thread_fn: unsafe extern "C" fn(NSTDOptionalHeapPtr) -> NSTDThreadResult,
     data: NSTDOptionalHeapPtr,
     desc: &NSTDThreadDescriptor,
 ) -> Option<NSTDThread> {
-    if let Some(thread_fn) = thread_fn {
-        // Create the thread builder.
-        let mut builder = Builder::new();
-        // Set the thread name.
-        if let NSTDOptional::Some(name) = &desc.name {
-            // Make sure `name` doesn't contain any null bytes.
-            let c_name = nstd_core_str_as_cstr(name);
-            if !nstd_core_cstr_get_null(&c_name).is_null() {
-                return None;
-            }
-            builder = builder.name(name.as_str().to_string());
+    // Create the thread builder.
+    let mut builder = Builder::new();
+    // Set the thread name.
+    if let NSTDOptional::Some(name) = &desc.name {
+        // Make sure `name` doesn't contain any null bytes.
+        let c_name = nstd_core_str_as_cstr(name);
+        if !nstd_core_cstr_get_null(&c_name).is_null() {
+            return None;
         }
-        // Set the thread stack size.
-        if desc.stack_size != 0 {
-            builder = builder.stack_size(desc.stack_size);
-        }
-        // Spawn the new thread.
-        if let Ok(thread) = builder.spawn(move || thread_fn(data)) {
-            return Some(Box::new(thread));
-        }
+        builder = builder.name(name.as_str().to_string());
+    }
+    // Set the thread stack size.
+    if desc.stack_size != 0 {
+        builder = builder.stack_size(desc.stack_size);
+    }
+    // Spawn the new thread.
+    if let Ok(thread) = builder.spawn(move || thread_fn(data)) {
+        return Some(Box::new(thread));
     }
     None
 }

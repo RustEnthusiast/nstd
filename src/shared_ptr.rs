@@ -331,9 +331,7 @@ pub fn nstd_shared_ptr_free(shared_ptr: NSTDSharedPtr) {}
 #[nstdapi]
 pub unsafe fn nstd_shared_ptr_drop(
     shared_ptr: NSTDSharedPtr,
-    callback: Option<unsafe extern "C" fn(NSTDAnyMut)>,
+    callback: unsafe extern "C" fn(NSTDAnyMut),
 ) {
-    if let Some(callback) = callback {
-        callback(shared_ptr.ptr);
-    }
+    callback(shared_ptr.ptr);
 }

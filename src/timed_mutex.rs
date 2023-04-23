@@ -264,8 +264,5 @@ extern "C" {
     /// # Safety
     ///
     /// This operation makes a direct call on a C function pointer (`callback`).
-    pub fn nstd_timed_mutex_drop(
-        mutex: NSTDTimedMutex,
-        callback: Option<unsafe extern "C" fn(NSTDAnyMut)>,
-    );
+    pub fn nstd_timed_mutex_drop(mutex: NSTDTimedMutex, callback: unsafe extern "C" fn(NSTDAnyMut));
 }

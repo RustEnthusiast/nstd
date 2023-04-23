@@ -402,7 +402,7 @@ pub fn nstd_os_unix_mutex_free(mutex: NSTDUnixMutex) {}
 #[nstdapi]
 pub unsafe fn nstd_os_unix_mutex_drop(
     mutex: NSTDUnixMutex,
-    callback: Option<unsafe extern "C" fn(NSTDAnyMut)>,
+    callback: unsafe extern "C" fn(NSTDAnyMut),
 ) {
     if !mutex.poisoned.get() {
         nstd_heap_ptr_drop(mutex.data.into_inner(), callback);

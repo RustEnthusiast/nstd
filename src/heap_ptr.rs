@@ -287,11 +287,6 @@ pub fn nstd_heap_ptr_free(hptr: NSTDHeapPtr) {}
 /// This operation makes a direct call on a C function pointer (`callback`).
 #[inline]
 #[nstdapi]
-pub unsafe fn nstd_heap_ptr_drop(
-    hptr: NSTDHeapPtr,
-    callback: Option<unsafe extern "C" fn(NSTDAnyMut)>,
-) {
-    if let Some(callback) = callback {
-        callback(hptr.ptr);
-    }
+pub unsafe fn nstd_heap_ptr_drop(hptr: NSTDHeapPtr, callback: unsafe extern "C" fn(NSTDAnyMut)) {
+    callback(hptr.ptr);
 }

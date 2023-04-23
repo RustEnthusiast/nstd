@@ -103,6 +103,8 @@ or return valid references.
 
 - Input reference data is assumed to remain unaltered by other code/threads.
 
+- C function pointers are assumed to be non-null unless wrapped in an `Option`.
+
 - Private (non-`pub`) structure members must not be directly accessed by the user.
 
 - Structured enum variants must be checked before they're accessed (eg. `NSTDOptional` or

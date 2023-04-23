@@ -1076,13 +1076,11 @@ pub fn nstd_vec_free(vec: NSTDVec) {}
 ///
 /// This operation makes a direct call on a C function pointer (`callback`).
 #[nstdapi]
-pub unsafe fn nstd_vec_drop(mut vec: NSTDVec, callback: Option<unsafe extern "C" fn(NSTDAnyMut)>) {
-    if let Some(callback) = callback {
-        let mut ptr = nstd_vec_as_ptr_mut(&mut vec);
-        let end = nstd_vec_end(&vec) as _;
-        while ptr < end {
-            callback(ptr);
-            ptr = ptr.add(vec.stride);
-        }
+pub unsafe fn nstd_vec_drop(mut vec: NSTDVec, callback: unsafe extern "C" fn(NSTDAnyMut)) {
+    let mut ptr = nstd_vec_as_ptr_mut(&mut vec);
+    let end = nstd_vec_end(&vec) as _;
+    while ptr < end {
+        callback(ptr);
+        ptr = ptr.add(vec.stride);
     }
 }

@@ -190,10 +190,7 @@ pub fn nstd_mutex_free(mutex: NSTDMutex) {}
 /// This operation makes a direct call on a C function pointer (`callback`).
 #[inline]
 #[nstdapi]
-pub unsafe fn nstd_mutex_drop(
-    mutex: NSTDMutex,
-    callback: Option<unsafe extern "C" fn(NSTDAnyMut)>,
-) {
+pub unsafe fn nstd_mutex_drop(mutex: NSTDMutex, callback: unsafe extern "C" fn(NSTDAnyMut)) {
     if let Ok(data) = mutex.into_inner() {
         nstd_heap_ptr_drop(data, callback);
     }
