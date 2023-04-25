@@ -1,6 +1,7 @@
 # TBD
 ## Added
 ### `nstd.core`
+- Added `nstd_core_abort[_with_msg]`.
 - Added `NSTDOptionalAny[Mut]`.
 - Added `nstd_core_slice[_mut]_empty`.
 ### `nstd.heap_ptr`
