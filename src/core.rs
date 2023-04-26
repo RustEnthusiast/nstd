@@ -29,9 +29,10 @@ pub(crate) const NSTD_INT_MAX: NSTDInt = NSTDInt::MAX;
 /// from a panic, resulting in program abortion.
 struct Abort;
 impl Drop for Abort {
-    /// Panics.
+    /// Panics if Rust's panic strategy is set to unwind.
     #[inline]
     fn drop(&mut self) {
+        #[cfg(panic = "unwind")]
         panic!();
     }
 }
