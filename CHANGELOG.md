@@ -1,4 +1,4 @@
-# TBD
+# 0.7.0
 ## Added
 ### `nstd.core`
 - Added `nstd_core_abort[_with_msg]`.
