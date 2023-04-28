@@ -5,15 +5,12 @@
 #include "gl.h"
 #include "render_pass.h"
 
-/// Describes the type of a GPU buffer.
-typedef enum {
-    /// Represents a vertex buffer.
-    NSTD_GL_BUFFER_TYPE_VERTEX,
-    /// Represents a index buffer.
-    NSTD_GL_BUFFER_TYPE_INDEX,
-    /// Represents a uniform buffer.
-    NSTD_GL_BUFFER_TYPE_UNIFORM
-} NSTDGLBufferType;
+/// Create a vertex buffer.
+#define NSTD_GL_BUFFER_TYPE_VERTEX 1
+/// Create a index buffer.
+#define NSTD_GL_BUFFER_TYPE_INDEX (1 << 1)
+/// Create a uniform buffer.
+#define NSTD_GL_BUFFER_TYPE_UNIFORM (1 << 2)
 
 /// GPU memory buffers.
 typedef NSTDAnyMut NSTDGLBuffer;
@@ -26,7 +23,7 @@ typedef NSTDAnyMut NSTDGLBuffer;
 ///
 /// - `const NSTDSlice *data` - The data to send to the GPU.
 ///
-/// - `NSTDGLBufferType buffer_type` - The type of buffer to create.
+/// - `NSTDUInt8 buffer_type` - A bit mask describing what type of buffer to create.
 ///
 /// # Panics
 ///
@@ -35,9 +32,8 @@ typedef NSTDAnyMut NSTDGLBuffer;
 /// # Safety
 ///
 /// `data` must be valid for reads.
-NSTDAPI NSTDGLBuffer nstd_gl_buffer_new(
-    const NSTDGLRenderer *renderer, const NSTDSlice *data, NSTDGLBufferType buffer_type
-);
+NSTDAPI NSTDGLBuffer
+nstd_gl_buffer_new(const NSTDGLRenderer *renderer, const NSTDSlice *data, NSTDUInt8 buffer_type);
 
 /// Makes `buffer` active for `render_pass` at `index`.
 ///

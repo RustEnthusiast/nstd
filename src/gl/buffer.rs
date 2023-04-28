@@ -1,35 +1,18 @@
 //! GPU memory buffers.
 use super::{render_pass::NSTDGLRenderPass, NSTDGLRenderer};
-use crate::{core::slice::NSTDSlice, NSTDUInt32};
+use crate::{core::slice::NSTDSlice, NSTDUInt32, NSTDUInt8};
 use nstdapi::nstdapi;
 use wgpu::{
     util::{BufferInitDescriptor, DeviceExt},
     Buffer, BufferUsages,
 };
 
-/// Describes the type of a GPU buffer.
-#[nstdapi]
-#[derive(Clone, Copy, PartialEq, Eq)]
-#[allow(non_camel_case_types)]
-pub enum NSTDGLBufferType {
-    /// Represents a vertex buffer.
-    NSTD_GL_BUFFER_TYPE_VERTEX,
-    /// Represents a index buffer.
-    NSTD_GL_BUFFER_TYPE_INDEX,
-    /// Represents a uniform buffer.
-    NSTD_GL_BUFFER_TYPE_UNIFORM,
-}
-impl From<NSTDGLBufferType> for BufferUsages {
-    /// Converts an [NSTDGLBufferType] into [BufferUsages].
-    #[inline]
-    fn from(value: NSTDGLBufferType) -> Self {
-        match value {
-            NSTDGLBufferType::NSTD_GL_BUFFER_TYPE_VERTEX => Self::VERTEX,
-            NSTDGLBufferType::NSTD_GL_BUFFER_TYPE_INDEX => Self::INDEX,
-            NSTDGLBufferType::NSTD_GL_BUFFER_TYPE_UNIFORM => Self::UNIFORM,
-        }
-    }
-}
+/// Create a vertex buffer.
+pub const NSTD_GL_BUFFER_TYPE_VERTEX: NSTDUInt8 = 1;
+/// Create a index buffer.
+pub const NSTD_GL_BUFFER_TYPE_INDEX: NSTDUInt8 = 1 << 1;
+/// Create a uniform buffer.
+pub const NSTD_GL_BUFFER_TYPE_UNIFORM: NSTDUInt8 = 1 << 2;
 
 /// GPU memory buffers.
 pub type NSTDGLBuffer = Box<Buffer>;
@@ -42,7 +25,7 @@ pub type NSTDGLBuffer = Box<Buffer>;
 ///
 /// - `const NSTDSlice *data` - The data to send to the GPU.
 ///
-/// - `NSTDGLBufferType buffer_type` - The type of buffer to create.
+/// - `NSTDUInt8 buffer_type` - A bit mask describing what type of buffer to create.
 ///
 /// # Panics
 ///
@@ -55,12 +38,16 @@ pub type NSTDGLBuffer = Box<Buffer>;
 pub unsafe fn nstd_gl_buffer_new(
     renderer: &NSTDGLRenderer,
     data: &NSTDSlice,
-    buffer_type: NSTDGLBufferType,
+    buffer_type: NSTDUInt8,
 ) -> NSTDGLBuffer {
+    let mut usage = BufferUsages::empty();
+    (buffer_type & NSTD_GL_BUFFER_TYPE_VERTEX != 0).then(|| usage |= BufferUsages::VERTEX);
+    (buffer_type & NSTD_GL_BUFFER_TYPE_INDEX != 0).then(|| usage |= BufferUsages::INDEX);
+    (buffer_type & NSTD_GL_BUFFER_TYPE_UNIFORM != 0).then(|| usage |= BufferUsages::UNIFORM);
     let buffer_desc = BufferInitDescriptor {
         label: None,
         contents: data.as_slice(),
-        usage: buffer_type.into(),
+        usage,
     };
     Box::new(renderer.renderer.device.create_buffer_init(&buffer_desc))
 }
