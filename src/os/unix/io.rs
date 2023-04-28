@@ -49,6 +49,7 @@ pub enum NSTDUnixIOError {
 }
 impl NSTDUnixIOError {
     /// Retrieves the last system error and turns it into an `NSTDUnixIOError`.
+    #[allow(unused)]
     fn last() -> Self {
         #[allow(unreachable_patterns)]
         match errno::errno().0 as c_int {

@@ -4,41 +4,58 @@
 //!
 //! This module is only functional on Windows and Unix systems.
 #![cfg(any(unix, windows))]
-#[cfg(unix)]
-use crate::{
-    core::{
-        cstr::{nstd_core_cstr_as_ptr, nstd_core_cstr_get_null},
-        str::nstd_core_str_as_cstr,
-    },
-    cstring::{nstd_cstring_as_ptr, nstd_cstring_from_cstr_unchecked},
-    os::unix::shared_lib::{
-        nstd_os_unix_shared_lib_get, nstd_os_unix_shared_lib_get_mut, nstd_os_unix_shared_lib_load,
-        NSTDUnixSharedLib,
-    },
-};
 use crate::{
     core::{optional::NSTDOptional, str::NSTDStr},
     NSTDAny, NSTDAnyMut, NSTDChar,
 };
-#[cfg(windows)]
-use crate::{
-    os::windows::{
-        shared_lib::{
-            nstd_os_windows_shared_lib_get, nstd_os_windows_shared_lib_get_mut,
-            nstd_os_windows_shared_lib_load, NSTDWindowsSharedLib,
-        },
-        str::nstd_os_windows_str_to_utf16,
-    },
-    vec::nstd_vec_as_ptr,
-};
+use cfg_if::cfg_if;
 use nstdapi::nstdapi;
 
-/// A handle to a dynamically loaded library.
-#[cfg(unix)]
-pub type NSTDSharedLib = NSTDUnixSharedLib;
-/// A handle to a dynamically loaded library.
-#[cfg(windows)]
-pub type NSTDSharedLib = NSTDWindowsSharedLib;
+cfg_if! {
+    if #[cfg(unix)] {
+        use crate::{
+            core::{
+                cstr::{nstd_core_cstr_as_ptr, nstd_core_cstr_get_null},
+                str::nstd_core_str_as_cstr,
+            },
+            cstring::{nstd_cstring_as_ptr, nstd_cstring_from_cstr_unchecked},
+        };
+        use libc::{dlclose, dlopen, dlsym, RTLD_LAZY, RTLD_LOCAL};
+
+        /// A handle to a dynamically loaded library.
+        #[nstdapi]
+        pub struct NSTDSharedLib {
+            /// A raw handle to the shared library.
+            handle: NSTDAnyMut,
+        }
+        impl Drop for NSTDSharedLib {
+            /// [NSTDSharedLib]s destructor.
+            #[inline]
+            fn drop(&mut self) {
+                // SAFETY: `self.handle` is valid.
+                unsafe { dlclose(self.handle) };
+            }
+        }
+        // SAFETY: `NSTDSharedLib` owns a handle to the dynamically loaded library.
+        unsafe impl Send for NSTDSharedLib {}
+        // SAFETY: `NSTDSharedLib` does not undergo interior mutability.
+        unsafe impl Sync for NSTDSharedLib {}
+    } else if #[cfg(windows)] {
+        use crate::{
+            os::windows::{
+                shared_lib::{
+                    nstd_os_windows_shared_lib_get, nstd_os_windows_shared_lib_get_mut,
+                    nstd_os_windows_shared_lib_load, NSTDWindowsSharedLib,
+                },
+                str::nstd_os_windows_str_to_utf16,
+            },
+            vec::nstd_vec_as_ptr,
+        };
+
+        /// A handle to a dynamically loaded library.
+        pub type NSTDSharedLib = NSTDWindowsSharedLib;
+    }
+}
 
 /// An optional handle to a shared library.
 ///
@@ -57,11 +74,7 @@ pub type NSTDOptionalSharedLib = NSTDOptional<NSTDSharedLib>;
 ///
 /// # Panics
 ///
-/// This operation may panic in the following situations:
-///
-/// - `path`'s length in bytes exceeds `NSTDInt`'s max value.
-///
-/// - Conversion from UTF-8 to UTF-16 fails on Windows.
+/// This operation will panic if conversion from UTF-8 to UTF-16 fails on Windows.
 ///
 /// # Safety
 ///
@@ -77,13 +90,19 @@ pub unsafe fn nstd_shared_lib_load(path: &NSTDStr) -> NSTDOptionalSharedLib {
         if nstd_core_cstr_get_null(&path).is_null() {
             // Allocate a null byte for `path`.
             if let NSTDOptional::Some(path) = nstd_cstring_from_cstr_unchecked(&path) {
-                nstd_os_unix_shared_lib_load(nstd_cstring_as_ptr(&path))
-            } else {
-                NSTDOptional::None
+                let handle = dlopen(nstd_cstring_as_ptr(&path), RTLD_LAZY | RTLD_LOCAL);
+                if !handle.is_null() {
+                    return NSTDOptional::Some(NSTDSharedLib { handle });
+                }
             }
+            NSTDOptional::None
         } else {
             // Use the already null terminated `path`.
-            nstd_os_unix_shared_lib_load(nstd_core_cstr_as_ptr(&path))
+            let handle = dlopen(nstd_core_cstr_as_ptr(&path), RTLD_LAZY | RTLD_LOCAL);
+            match !handle.is_null() {
+                true => NSTDOptional::Some(NSTDSharedLib { handle }),
+                false => NSTDOptional::None,
+            }
         }
     }
     #[cfg(windows)]
@@ -112,7 +131,7 @@ pub unsafe fn nstd_shared_lib_load(path: &NSTDStr) -> NSTDOptionalSharedLib {
 #[nstdapi]
 pub unsafe fn nstd_shared_lib_get(lib: &NSTDSharedLib, symbol: *const NSTDChar) -> NSTDAny {
     #[cfg(unix)]
-    return nstd_os_unix_shared_lib_get(lib, symbol);
+    return dlsym(lib.handle, symbol);
     #[cfg(windows)]
     return nstd_os_windows_shared_lib_get(lib, symbol);
 }
@@ -140,7 +159,7 @@ pub unsafe fn nstd_shared_lib_get_mut(
     symbol: *const NSTDChar,
 ) -> NSTDAnyMut {
     #[cfg(unix)]
-    return nstd_os_unix_shared_lib_get_mut(lib, symbol);
+    return dlsym(lib.handle, symbol);
     #[cfg(windows)]
     return nstd_os_windows_shared_lib_get_mut(lib, symbol);
 }

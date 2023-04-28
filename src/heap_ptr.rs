@@ -273,3 +273,20 @@ pub fn nstd_heap_ptr_get_mut(hptr: &mut NSTDHeapPtr) -> NSTDAnyMut {
 #[nstdapi]
 #[allow(unused_variables)]
 pub fn nstd_heap_ptr_free(hptr: NSTDHeapPtr) {}
+
+/// Frees an instance of `NSTDHeapPtr` after invoking `callback` with the heap object's data.
+///
+/// # Parameters:
+///
+/// - `NSTDHeapPtr hptr` - A pointer to the heap object.
+///
+/// - `void (*callback)(NSTDAnyMut)` - The heap object's destructor.
+///
+/// # Safety
+///
+/// This operation makes a direct call on a C function pointer (`callback`).
+#[inline]
+#[nstdapi]
+pub unsafe fn nstd_heap_ptr_drop(hptr: NSTDHeapPtr, callback: unsafe extern "C" fn(NSTDAnyMut)) {
+    callback(hptr.ptr);
+}

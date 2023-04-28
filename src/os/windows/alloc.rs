@@ -1,6 +1,6 @@
 //! Low level memory allocation for Windows.
 pub mod heap;
-use crate::{NSTDAnyMut, NSTDUInt, NSTD_NULL};
+use crate::{core::NSTD_INT_MAX, NSTDAnyMut, NSTDUInt, NSTD_NULL};
 use nstdapi::nstdapi;
 use windows_sys::Win32::System::Memory::{
     GetProcessHeap, HeapAlloc, HeapFree, HeapReAlloc, HEAP_ZERO_MEMORY,
@@ -21,6 +21,8 @@ pub enum NSTDWindowsAllocError {
     NSTD_WINDOWS_ALLOC_ERROR_HEAP_NOT_FOUND,
     /// A heap is invalid.
     NSTD_WINDOWS_ALLOC_ERROR_INVALID_HEAP,
+    /// An allocation function received input parameters that resulted in an invalid memory layout.
+    NSTD_WINDOWS_ALLOC_ERROR_INVALID_LAYOUT,
 }
 
 /// Allocates a new block of memory on the current process' heap.
@@ -63,10 +65,13 @@ pub enum NSTDWindowsAllocError {
 #[inline]
 #[nstdapi]
 pub unsafe fn nstd_os_windows_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
-    match GetProcessHeap() {
-        0 => NSTD_NULL,
-        heap => HeapAlloc(heap, 0, size),
+    if size <= NSTD_INT_MAX as _ {
+        let heap = GetProcessHeap();
+        if heap != 0 {
+            return HeapAlloc(heap, 0, size);
+        }
     }
+    NSTD_NULL
 }
 
 /// Allocates a new block of zero-initialized memory on the current process' heap.
@@ -103,10 +108,13 @@ pub unsafe fn nstd_os_windows_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
 #[inline]
 #[nstdapi]
 pub unsafe fn nstd_os_windows_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMut {
-    match GetProcessHeap() {
-        0 => NSTD_NULL,
-        heap => HeapAlloc(heap, HEAP_ZERO_MEMORY, size),
+    if size <= NSTD_INT_MAX as _ {
+        let heap = GetProcessHeap();
+        if heap != 0 {
+            return HeapAlloc(heap, HEAP_ZERO_MEMORY, size);
+        }
     }
+    NSTD_NULL
 }
 
 /// Reallocates a block of memory previously allocated by
@@ -158,6 +166,9 @@ pub unsafe fn nstd_os_windows_alloc_reallocate(
     ptr: &mut NSTDAnyMut,
     new_size: NSTDUInt,
 ) -> NSTDWindowsAllocError {
+    if new_size > NSTD_INT_MAX as _ {
+        return NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_INVALID_LAYOUT;
+    }
     match GetProcessHeap() {
         0 => NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_HEAP_NOT_FOUND,
         heap => match HeapReAlloc(heap, 0, *ptr, new_size) {

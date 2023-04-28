@@ -29,9 +29,9 @@ NSTDAPI NSTDOptionalTimedMutex nstd_timed_mutex_new(const NSTDHeapPtr data) {
     try {
         const std::timed_mutex *const mutex{new std::timed_mutex{}};
         const NSTDTimedMutex timed_mutex{(NSTDAnyMut)mutex, data, NSTD_FALSE, NSTD_FALSE};
-        return NSTDOptionalTimedMutex{NSTD_OPTIONAL_STATUS_SOME, {timed_mutex}};
+        return NSTDOptionalTimedMutex{NSTD_OPTIONAL_SOME, {timed_mutex}};
     } catch (...) {
-        return NSTDOptionalTimedMutex{NSTD_OPTIONAL_STATUS_NONE, {}};
+        return NSTDOptionalTimedMutex{NSTD_OPTIONAL_NONE, {}};
     }
 #endif
 }
@@ -80,15 +80,15 @@ NSTDAPI NSTDOptionalTimedMutexLockResult nstd_timed_mutex_lock(const NSTDTimedMu
     try {
         ((std::timed_mutex *)mutex->inner)->lock();
         const_cast<NSTDTimedMutex *>(mutex)->locked = NSTD_TRUE;
-        NSTDOptionalTimedMutexLockResult ret{NSTD_OPTIONAL_STATUS_SOME, {}};
+        NSTDOptionalTimedMutexLockResult ret{NSTD_OPTIONAL_SOME, {}};
         const NSTDTimedMutexGuard guard{mutex};
         if (mutex->poisoned)
-            ret.value.some = NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_ERR, {guard}};
+            ret.value.some = NSTDTimedMutexLockResult{NSTD_RESULT_ERR, {guard}};
         else
-            ret.value.some = NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_OK, {guard}};
+            ret.value.some = NSTDTimedMutexLockResult{NSTD_RESULT_OK, {guard}};
         return ret;
     } catch (...) {
-        return NSTDOptionalTimedMutexLockResult{NSTD_OPTIONAL_STATUS_NONE, {}};
+        return NSTDOptionalTimedMutexLockResult{NSTD_OPTIONAL_NONE, {}};
     }
 #endif
 }
@@ -117,15 +117,15 @@ NSTDAPI NSTDOptionalTimedMutexLockResult nstd_timed_mutex_try_lock(const NSTDTim
 #else
     if (((std::timed_mutex *)mutex->inner)->try_lock()) {
         const_cast<NSTDTimedMutex *>(mutex)->locked = NSTD_TRUE;
-        NSTDOptionalTimedMutexLockResult ret{NSTD_OPTIONAL_STATUS_SOME, {}};
+        NSTDOptionalTimedMutexLockResult ret{NSTD_OPTIONAL_SOME, {}};
         const NSTDTimedMutexGuard guard{mutex};
         if (mutex->poisoned)
-            ret.value.some = NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_ERR, {guard}};
+            ret.value.some = NSTDTimedMutexLockResult{NSTD_RESULT_ERR, {guard}};
         else
-            ret.value.some = NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_OK, {guard}};
+            ret.value.some = NSTDTimedMutexLockResult{NSTD_RESULT_OK, {guard}};
         return ret;
     } else
-        return NSTDOptionalTimedMutexLockResult{NSTD_OPTIONAL_STATUS_NONE, {}};
+        return NSTDOptionalTimedMutexLockResult{NSTD_OPTIONAL_NONE, {}};
 #endif
 }
 
@@ -156,15 +156,15 @@ nstd_timed_mutex_timed_lock(const NSTDTimedMutex *const mutex, const NSTDDuratio
     const std::chrono::duration<NSTDFloat64> dur{nstd_core_time_duration_get(duration)};
     if (((std::timed_mutex *)mutex->inner)->try_lock_for(dur)) {
         const_cast<NSTDTimedMutex *>(mutex)->locked = NSTD_TRUE;
-        NSTDOptionalTimedMutexLockResult ret{NSTD_OPTIONAL_STATUS_SOME, {}};
+        NSTDOptionalTimedMutexLockResult ret{NSTD_OPTIONAL_SOME, {}};
         const NSTDTimedMutexGuard guard{mutex};
         if (mutex->poisoned)
-            ret.value.some = NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_ERR, {guard}};
+            ret.value.some = NSTDTimedMutexLockResult{NSTD_RESULT_ERR, {guard}};
         else
-            ret.value.some = NSTDTimedMutexLockResult{NSTD_RESULT_STATUS_OK, {guard}};
+            ret.value.some = NSTDTimedMutexLockResult{NSTD_RESULT_OK, {guard}};
         return ret;
     } else
-        return NSTDOptionalTimedMutexLockResult{NSTD_OPTIONAL_STATUS_NONE, {}};
+        return NSTDOptionalTimedMutexLockResult{NSTD_OPTIONAL_NONE, {}};
 #endif
 }
 
@@ -202,6 +202,34 @@ NSTDAPI NSTDAnyMut nstd_timed_mutex_get_mut(NSTDTimedMutexGuard *const guard) {
 #endif
 }
 
+/// Consumes a timed mutex and returns the data it was protecting.
+///
+/// # Parameters:
+///
+/// - `NSTDTimedMutex mutex` - The mutex to take ownership of.
+///
+/// # Returns
+///
+/// `NSTDOptionalHeapPtr data` - Ownership of the mutex's data, or an uninitialized "none" variant
+/// if the mutex was poisoned.
+NSTDAPI NSTDOptionalHeapPtr nstd_timed_mutex_into_inner(const NSTDTimedMutex mutex) {
+#ifdef NSTD_TIMED_MUTEX_OS_UNIX_IMPL
+    return nstd_os_unix_mutex_into_inner(mutex);
+#else
+    // Destroying a locked mutex results in undefined behavior, so here we check if the mutex is
+    // locked. If the mutex *is* locked then it's guard must have been leaked, in this case we will
+    // leak the raw mutex as well.
+    if (!mutex.locked)
+        delete (std::timed_mutex *)mutex.inner;
+    if (!mutex.poisoned)
+        return NSTDOptionalHeapPtr{NSTD_OPTIONAL_SOME, {mutex.data}};
+    else {
+        nstd_heap_ptr_free(mutex.data);
+        return NSTDOptionalHeapPtr{NSTD_OPTIONAL_NONE, {}};
+    }
+#endif
+}
+
 /// Unlocks a timed mutex by consuming a mutex guard.
 ///
 /// # Parameters:
@@ -234,5 +262,36 @@ NSTDAPI void nstd_timed_mutex_free(const NSTDTimedMutex mutex) {
     if (!mutex.locked)
         delete (std::timed_mutex *)mutex.inner;
     nstd_heap_ptr_free(mutex.data);
+#endif
+}
+
+/// Frees an instance of `NSTDTimedMutex` after invoking `callback` with the mutex's data.
+///
+/// `callback` will not be called if the mutex is poisoned.
+///
+/// # Parameters:
+///
+/// - `NSTDTimedMutex mutex` - The timed mutex to free.
+///
+/// - `void (*callback)(NSTDAnyMut)` - The mutex data's destructor.
+///
+/// # Safety
+///
+/// This operation makes a direct call on a C function pointer (`callback`).
+NSTDAPI void nstd_timed_mutex_drop(const NSTDTimedMutex mutex, void (*const callback)(NSTDAnyMut)) {
+#ifdef NSTD_TIMED_MUTEX_OS_UNIX_IMPL
+    nstd_os_unix_mutex_drop(mutex, callback);
+#else
+    // Destroying a locked mutex results in undefined behavior, so here we check if the mutex is
+    // locked. If the mutex *is* locked then it's guard must have been leaked, in this case we will
+    // leak the raw mutex as well.
+    if (!mutex.locked)
+        delete (std::timed_mutex *)mutex.inner;
+    // Accessing the data through `callback` may result in undefined behavior if this mutex is
+    // poisoned.
+    if (!mutex.poisoned)
+        nstd_heap_ptr_drop(mutex.data, callback);
+    else
+        nstd_heap_ptr_free(mutex.data);
 #endif
 }

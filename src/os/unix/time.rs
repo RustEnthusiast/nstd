@@ -20,6 +20,14 @@ pub struct NSTDUnixTime {
     /// The time span since January 1st 1970.
     duration: NSTDDuration,
 }
+impl NSTDUnixTime {
+    /// Creates a new [NSTDUnixTime] object from an [NSTDDuration].
+    #[inline]
+    #[allow(dead_code)]
+    pub(crate) fn from_duration(duration: NSTDDuration) -> Self {
+        Self { duration }
+    }
+}
 impl From<timespec> for NSTDUnixTime {
     /// Converts a [timespec] into an [NSTDUnixTime] object.
     fn from(value: timespec) -> Self {

@@ -1,5 +1,6 @@
 //! A sized pointer to some arbitrary type.
 pub mod raw;
+use super::NSTD_INT_MAX;
 use crate::{
     core::{
         mem::nstd_core_mem_copy,
@@ -36,13 +37,14 @@ gen_optional!(NSTDOptionalPtr, NSTDPtr);
 /// # Returns
 ///
 /// `NSTDOptionalPtr ptr` - A new instance of `NSTDPtr` that points to `obj` on success, or
-/// a "none" variant if `obj` is null.
+/// an uninitialized "none" variant if either `obj` is null or `size` is greater than `NSTDInt`'s
+/// max value.
 #[inline]
 #[nstdapi]
 pub fn nstd_core_ptr_new(obj: NSTDAny, size: NSTDUInt) -> NSTDOptionalPtr {
-    match obj.is_null() {
-        true => NSTDOptional::None,
-        false => NSTDOptional::Some(NSTDPtr { raw: obj, size }),
+    match !obj.is_null() && size <= NSTD_INT_MAX as _ {
+        true => NSTDOptional::Some(NSTDPtr { raw: obj, size }),
+        false => NSTDOptional::None,
     }
 }
 
@@ -60,7 +62,8 @@ pub fn nstd_core_ptr_new(obj: NSTDAny, size: NSTDUInt) -> NSTDOptionalPtr {
 ///
 /// # Safety
 ///
-/// The user of this function must ensure that `obj` is not null.
+/// The user of this function must ensure that `obj` is non-null and `size` is not greater than
+/// `NSTDInt`'s max value.
 #[inline]
 #[nstdapi]
 pub const unsafe fn nstd_core_ptr_new_unchecked(obj: NSTDAny, size: NSTDUInt) -> NSTDPtr {
@@ -151,13 +154,14 @@ gen_optional!(NSTDOptionalPtrMut, NSTDPtrMut);
 /// # Returns
 ///
 /// `NSTDOptionalPtrMut ptr` - A new instance of `NSTDPtrMut` that points to `obj` on success, or
-/// a "none" variant if `obj` is null.
+/// an uninitialized "none" variant if either `obj` is null or `size` is greater than `NSTDInt`'s
+/// max value.
 #[inline]
 #[nstdapi]
 pub fn nstd_core_ptr_mut_new(obj: NSTDAnyMut, size: NSTDUInt) -> NSTDOptionalPtrMut {
-    match obj.is_null() {
-        true => NSTDOptional::None,
-        false => NSTDOptional::Some(NSTDPtrMut { raw: obj, size }),
+    match !obj.is_null() && size <= NSTD_INT_MAX as _ {
+        true => NSTDOptional::Some(NSTDPtrMut { raw: obj, size }),
+        false => NSTDOptional::None,
     }
 }
 
@@ -175,7 +179,8 @@ pub fn nstd_core_ptr_mut_new(obj: NSTDAnyMut, size: NSTDUInt) -> NSTDOptionalPtr
 ///
 /// # Safety
 ///
-/// The user of this function must ensure that `obj` is not null.
+/// The user of this function must ensure that `obj` is non-null and `size` is not greater than
+/// `NSTDInt`'s max value.
 #[inline]
 #[nstdapi]
 pub const unsafe fn nstd_core_ptr_mut_new_unchecked(obj: NSTDAnyMut, size: NSTDUInt) -> NSTDPtrMut {
@@ -194,7 +199,7 @@ pub const unsafe fn nstd_core_ptr_mut_new_unchecked(obj: NSTDAnyMut, size: NSTDU
 #[inline]
 #[nstdapi]
 pub const fn nstd_core_ptr_mut_as_const(ptr: &NSTDPtrMut) -> NSTDPtr {
-    // SAFETY: `ptr.raw` is never null.
+    // SAFETY: `ptr.raw` is never null, `ptr.size` is never greater than `NSTDInt`'s max value.
     unsafe { nstd_core_ptr_new_unchecked(ptr.raw, ptr.size) }
 }
 
