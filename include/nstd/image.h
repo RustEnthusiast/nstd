@@ -18,11 +18,7 @@ typedef NSTDAnyMut NSTDImage;
 ///
 /// # Panics
 ///
-/// This operation will panic in the following events:
-///
-/// - `buffer`'s stride is not 1.
-///
-/// - `buffer`'s length is greater than `NSTDInt`'s max value.
+/// This operation will panic if `buffer`'s stride is not 1.
 ///
 /// # Safety
 ///
