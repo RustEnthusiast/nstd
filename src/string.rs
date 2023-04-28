@@ -168,23 +168,20 @@ pub unsafe fn nstd_string_from_str(str: &NSTDStr) -> NSTDOptionalString {
 ///
 /// # Returns
 ///
-/// `NSTDString string` - The new UTF-8 encoded string with ownership of `bytes`.
+/// `NSTDOptionalString string` - The new UTF-8 encoded string with ownership of `bytes` on success
+/// or an uninitialized "none" variant if `bytes` contains invalid UTF-8.
 ///
 /// # Panics
 ///
-/// This operation will panic in the following situations:
-///
-/// - `bytes`'s stride is not 1.
-///
-/// - `bytes`'s length is greater than `NSTDInt`'s max value.
-///
-/// - `bytes`'s data is not valid UTF-8.
+/// This operation will panic if `bytes`'s stride is not 1.
 #[inline]
 #[nstdapi]
-pub fn nstd_string_from_bytes(bytes: NSTDVec) -> NSTDString {
+pub fn nstd_string_from_bytes(bytes: NSTDVec) -> NSTDOptionalString {
     // SAFETY: We're ensuring that the vector is properly encoded as UTF-8.
-    assert!(core::str::from_utf8(unsafe { bytes.as_slice() }).is_ok());
-    NSTDString { bytes }
+    match core::str::from_utf8(unsafe { bytes.as_slice() }).is_ok() {
+        true => NSTDOptional::Some(NSTDString { bytes }),
+        false => NSTDOptional::None,
+    }
 }
 
 /// Creates a deep copy of a string.
@@ -294,10 +291,6 @@ pub fn nstd_string_into_bytes(string: NSTDString) -> NSTDVec {
 /// # Returns
 ///
 /// `NSTDUInt len` - The length of the string.
-///
-/// # Panics
-///
-/// This operation will panic if the string's length is greater than `NSTDInt`'s max value.
 #[inline]
 #[nstdapi]
 pub fn nstd_string_len(string: &NSTDString) -> NSTDUInt {
@@ -350,10 +343,6 @@ pub const fn nstd_string_cap(string: &NSTDString) -> NSTDUInt {
 ///
 /// `NSTDAllocError errc` - The allocation operation error code.
 ///
-/// # Panics
-///
-/// Panics if the current length in bytes exceeds `NSTDInt`'s max value.
-///
 /// # Example
 ///
 /// ```
@@ -370,7 +359,8 @@ pub fn nstd_string_push(string: &mut NSTDString, chr: NSTDUnichar) -> NSTDAllocE
     let chr = char::from(chr);
     let mut buf = [0; 4];
     chr.encode_utf8(&mut buf);
-    // SAFETY: `buf`'s data is stored on the stack.
+    // SAFETY: `buf`'s data is stored on the stack, UTF-8 characters never occupy more than 4
+    // bytes.
     unsafe {
         let buf = nstd_core_slice_new_unchecked(buf.as_ptr() as _, 1, chr.len_utf8());
         nstd_vec_extend(&mut string.bytes, &buf)
@@ -388,10 +378,6 @@ pub fn nstd_string_push(string: &mut NSTDString, chr: NSTDUnichar) -> NSTDAllocE
 /// # Returns
 ///
 /// `NSTDAllocError errc` - The allocation operation error code.
-///
-/// # Panics
-///
-/// Panics if the current length in bytes exceeds `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -428,10 +414,6 @@ pub unsafe fn nstd_string_push_str(string: &mut NSTDString, str: &NSTDStr) -> NS
 /// # Returns
 ///
 /// `NSTDOptionalUnichar chr` - The removed character on success.
-///
-/// # Panics
-///
-/// This operation will panic if the string's length in bytes exceeds `NSTDInt`'s max value.
 ///
 /// # Example
 ///

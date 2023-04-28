@@ -5,10 +5,6 @@ use nstdapi::nstdapi;
 
 /// Compares two memory buffers of `num` bytes.
 ///
-/// # Note
-///
-/// This will always return false if `num` is greater than `NSTDInt`'s max value.
-///
 /// # Parameters:
 ///
 /// - `const NSTDByte *buf1` - A pointer to the first memory buffer.
@@ -20,6 +16,10 @@ use nstdapi::nstdapi;
 /// # Returns
 ///
 /// `NSTDBool is_eq` - `NSTD_TRUE` if the memory buffers carry the same data.
+///
+/// # Panics
+///
+/// This operation may panic if `num` is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -69,15 +69,13 @@ pub unsafe fn nstd_core_mem_compare(
         ))] {
             libc::memcmp(buf1 as _, buf2 as _, num) == 0
         } else {
-            use crate::{NSTD_FALSE, NSTD_TRUE};
+            use crate::{core::NSTD_INT_MAX, NSTD_TRUE};
             // If the two pointers point to the same buffer, or `num` is 0, return true.
             if buf1 == buf2 || num == 0 {
                 return NSTD_TRUE;
             }
             // Check if `num` exceeds `isize::MAX`.
-            if num > isize::MAX as usize {
-                return NSTD_FALSE;
-            }
+            assert!(num <= NSTD_INT_MAX as _);
             // Otherwise compare them manually.
             let buf1 = core::slice::from_raw_parts(buf1, num);
             let buf2 = core::slice::from_raw_parts(buf2, num);
@@ -143,8 +141,9 @@ pub unsafe fn nstd_core_mem_search(
         ))] {
             libc::memchr(buf as _, delim as _, size) as _
         } else {
+            use crate::core::NSTD_INT_MAX;
             // Check if `size` is greater than `NSTDInt`'s max value.
-            assert!(size <= isize::MAX as usize);
+            assert!(size <= NSTD_INT_MAX as _);
             // Search the buffer for `delim`.
             cfg_if! {
                 if #[cfg(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64")))] {
@@ -235,7 +234,8 @@ pub unsafe fn nstd_core_mem_zero(buf: *mut NSTDByte, size: NSTDUInt) {
         ))] {
             libc::memset(buf as _, 0, size);
         } else {
-            assert!(size <= isize::MAX as usize);
+            use crate::core::NSTD_INT_MAX;
+            assert!(size <= NSTD_INT_MAX as _);
             cfg_if! {
                 if #[cfg(all(
                     feature = "asm",
@@ -347,7 +347,8 @@ pub unsafe fn nstd_core_mem_fill(buf: *mut NSTDByte, size: NSTDUInt, fill: NSTDB
         ))] {
             libc::memset(buf as _, fill as _, size);
         } else {
-            assert!(size <= isize::MAX as usize);
+            use crate::core::NSTD_INT_MAX;
+            assert!(size <= NSTD_INT_MAX as _);
             cfg_if! {
                 if #[cfg(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64")))] {
                     core::arch::asm!(

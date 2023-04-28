@@ -1,23 +1,19 @@
 //! Represents an optional (possibly uninitialized) value.
 use crate::{
-    NSTDBool, NSTDChar, NSTDChar16, NSTDChar32, NSTDChar8, NSTDFloat32, NSTDFloat64, NSTDInt,
-    NSTDInt16, NSTDInt32, NSTDInt64, NSTDInt8, NSTDUInt, NSTDUInt16, NSTDUInt32, NSTDUInt64,
-    NSTDUInt8,
+    NSTDAny, NSTDAnyMut, NSTDBool, NSTDChar, NSTDChar16, NSTDChar32, NSTDChar8, NSTDFloat32,
+    NSTDFloat64, NSTDInt, NSTDInt16, NSTDInt32, NSTDInt64, NSTDInt8, NSTDUInt, NSTDUInt16,
+    NSTDUInt32, NSTDUInt64, NSTDUInt8,
 };
 use nstdapi::nstdapi;
 
-/// Describes an `NSTDOptional` variant.
-#[nstdapi]
-#[allow(non_camel_case_types)]
-pub enum NSTDOptionalStatus {
-    /// No value.
-    NSTD_OPTIONAL_STATUS_NONE,
-    /// "Some" initialized value.
-    NSTD_OPTIONAL_STATUS_SOME,
-}
+/// Describes an `NSTDOptional` with no value.
+pub const NSTD_OPTIONAL_NONE: NSTDUInt8 = 0;
+/// Describes an `NSTDOptional` with "some" initialized value.
+pub const NSTD_OPTIONAL_SOME: NSTDUInt8 = 1;
 
 /// Represents an optional (possibly uninitialized) value.
 #[nstdapi]
+#[repr(u8)]
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
 pub enum NSTDOptional<T> {
     /// The uninitialized variant.
@@ -78,6 +74,8 @@ macro_rules! gen_optional {
     };
 }
 pub(crate) use gen_optional;
+gen_optional!(NSTDOptionalAny, NSTDAny);
+gen_optional!(NSTDOptionalAnyMut, NSTDAnyMut);
 gen_optional!(NSTDOptionalBool, NSTDBool);
 gen_optional!(NSTDOptionalChar, NSTDChar);
 gen_optional!(NSTDOptionalChar8, NSTDChar8);

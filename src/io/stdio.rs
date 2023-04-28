@@ -4,20 +4,14 @@ use crate::{
     alloc::NSTDAllocError,
     core::{
         result::NSTDResult,
-        slice::{
-            nstd_core_slice_len, nstd_core_slice_mut_len, nstd_core_slice_mut_stride,
-            nstd_core_slice_stride, NSTDSlice, NSTDSliceMut,
-        },
+        slice::{nstd_core_slice_mut_stride, nstd_core_slice_stride, NSTDSlice, NSTDSliceMut},
         str::nstd_core_str_from_bytes_unchecked,
     },
     io::{NSTDIOError, NSTDIOResult},
     string::{nstd_string_push_str, NSTDString},
-    vec::{nstd_vec_extend, nstd_vec_len, nstd_vec_stride, NSTDVec},
+    vec::{nstd_vec_extend, nstd_vec_stride, NSTDVec},
 };
 use std::io::{Read, Write};
-
-/// `isize::MAX` as a [usize].
-const ISIZE_MAX: usize = isize::MAX as usize;
 
 /// Writes some `nstd` bytes to a [Write] stream.
 ///
@@ -26,7 +20,7 @@ const ISIZE_MAX: usize = isize::MAX as usize;
 /// This function can cause undefined behavior if `bytes`'s data is invalid.
 pub(crate) unsafe fn write<W: Write>(stream: &mut W, bytes: &NSTDSlice) -> NSTDIOResult {
     // Make sure the slice's element size is 1.
-    if nstd_core_slice_stride(bytes) != 1 || nstd_core_slice_len(bytes) > ISIZE_MAX {
+    if nstd_core_slice_stride(bytes) != 1 {
         return NSTDResult::Err(NSTDIOError::NSTD_IO_ERROR_INVALID_INPUT);
     }
     // Attempt to write the bytes to stdout.
@@ -43,7 +37,7 @@ pub(crate) unsafe fn write<W: Write>(stream: &mut W, bytes: &NSTDSlice) -> NSTDI
 /// This function can cause undefined behavior if `bytes`'s data is invalid.
 pub(crate) unsafe fn write_all<W: Write>(stream: &mut W, bytes: &NSTDSlice) -> NSTDIOError {
     // Make sure the slice's element size is 1.
-    if nstd_core_slice_stride(bytes) != 1 || nstd_core_slice_len(bytes) > ISIZE_MAX {
+    if nstd_core_slice_stride(bytes) != 1 {
         return NSTDIOError::NSTD_IO_ERROR_INVALID_INPUT;
     }
     // Attempt to write the bytes to stdout.
@@ -69,7 +63,7 @@ pub(crate) fn flush<W: Write>(stream: &mut W) -> NSTDIOError {
 /// `buffer`'s data must be valid for writes.
 pub(crate) unsafe fn read<R: Read>(stream: &mut R, buffer: &mut NSTDSliceMut) -> NSTDIOResult {
     // Make sure the buffer's element size is 1.
-    if nstd_core_slice_mut_stride(buffer) != 1 || nstd_core_slice_mut_len(buffer) > ISIZE_MAX {
+    if nstd_core_slice_mut_stride(buffer) != 1 {
         return NSTDResult::Err(NSTDIOError::NSTD_IO_ERROR_INVALID_INPUT);
     }
     // Attempt to read bytes into the buffer.
@@ -87,7 +81,7 @@ pub(crate) unsafe fn read<R: Read>(stream: &mut R, buffer: &mut NSTDSliceMut) ->
 /// This does not mean there were no bytes read from `stream` in this case.
 pub(crate) fn read_all<R: Read>(stream: &mut R, buffer: &mut NSTDVec) -> NSTDIOResult {
     // Make sure the buffer's element size is 1.
-    if nstd_vec_stride(buffer) != 1 || nstd_vec_len(buffer) > ISIZE_MAX {
+    if nstd_vec_stride(buffer) != 1 {
         return NSTDResult::Err(NSTDIOError::NSTD_IO_ERROR_INVALID_INPUT);
     }
     // Attempt to read data into `buffer`.
@@ -111,10 +105,6 @@ pub(crate) fn read_all<R: Read>(stream: &mut R, buffer: &mut NSTDVec) -> NSTDIOR
 ///
 /// If extending the buffer fails, an error code of `NSTD_IO_ERROR_OUT_OF_MEMORY` will be returned.
 /// This does not mean there were no bytes read from `stream` in this case.
-///
-/// # Panics
-///
-/// This function will panic if `buffer`'s length in bytes exceeds `NSTDInt`'s max value.
 pub(crate) fn read_to_string<R: Read>(stream: &mut R, buffer: &mut NSTDString) -> NSTDIOResult {
     // Attempt to read data into `buffer`.
     let mut buf = String::new();
@@ -141,7 +131,7 @@ pub(crate) fn read_to_string<R: Read>(stream: &mut R, buffer: &mut NSTDString) -
 /// `buffer`'s data must be valid for writes.
 pub(crate) unsafe fn read_exact<R: Read>(stream: &mut R, buffer: &mut NSTDSliceMut) -> NSTDIOError {
     // Make sure the buffer's element size is 1.
-    if nstd_core_slice_mut_stride(buffer) != 1 || nstd_core_slice_mut_len(buffer) > ISIZE_MAX {
+    if nstd_core_slice_mut_stride(buffer) != 1 {
         return NSTDIOError::NSTD_IO_ERROR_INVALID_INPUT;
     }
     // Attempt to fill the buffer with data from stdin.

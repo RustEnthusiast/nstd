@@ -1,6 +1,9 @@
 #ifndef NSTD_NSTD_H
 #define NSTD_NSTD_H
 #include "os/os.h"
+#if __STDC_VERSION__ < 202311L
+#    include <stdbool.h>
+#endif
 #include <stddef.h>
 #include <stdint.h>
 #ifdef __cplusplus
@@ -28,9 +31,9 @@
 #endif
 
 /// Boolean value false (0).
-#define NSTD_FALSE 0
+#define NSTD_FALSE false
 /// Boolean value true (1).
-#define NSTD_TRUE 1
+#define NSTD_TRUE true
 
 /// An integral type who's size matches the target architecture's pointer size.
 typedef ptrdiff_t NSTDInt;
@@ -84,6 +87,6 @@ typedef const void *NSTDAny;
 typedef void *NSTDAnyMut;
 
 /// A boolean type, can either be `NSTD_TRUE` (1) or `NSTD_FALSE` (0).
-typedef NSTDUInt8 NSTDBool;
+typedef bool NSTDBool;
 
 #endif

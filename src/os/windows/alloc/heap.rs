@@ -1,6 +1,6 @@
 //! Process heap management for Windows.
 use crate::{
-    core::result::NSTDResult,
+    core::{result::NSTDResult, NSTD_INT_MAX},
     os::windows::{alloc::NSTDWindowsAllocError, NSTDWindowsHandle},
     NSTDAny, NSTDAnyMut, NSTDUInt, NSTD_NULL,
 };
@@ -306,7 +306,10 @@ pub unsafe fn nstd_os_windows_alloc_heap_allocate(
     heap: &NSTDWindowsHeap,
     size: NSTDUInt,
 ) -> NSTDAnyMut {
-    HeapAlloc(heap.handle, 0, size)
+    match size <= NSTD_INT_MAX as _ {
+        true => HeapAlloc(heap.handle, 0, size),
+        false => NSTD_NULL,
+    }
 }
 
 /// Allocates a zero-initialized block of memory on a heap.
@@ -358,7 +361,10 @@ pub unsafe fn nstd_os_windows_alloc_heap_allocate_zeroed(
     heap: &NSTDWindowsHeap,
     size: NSTDUInt,
 ) -> NSTDAnyMut {
-    HeapAlloc(heap.handle, HEAP_ZERO_MEMORY, size)
+    match size <= NSTD_INT_MAX as _ {
+        true => HeapAlloc(heap.handle, HEAP_ZERO_MEMORY, size),
+        false => NSTD_NULL,
+    }
 }
 
 /// Reallocates a block of memory on a heap.
@@ -413,6 +419,9 @@ pub unsafe fn nstd_os_windows_alloc_heap_reallocate(
     ptr: &mut NSTDAnyMut,
     size: NSTDUInt,
 ) -> NSTDWindowsAllocError {
+    if size > NSTD_INT_MAX as _ {
+        return NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_INVALID_LAYOUT;
+    }
     match HeapReAlloc(heap.handle, 0, *ptr, size) {
         NSTD_NULL => NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_OUT_OF_MEMORY,
         new_mem => {

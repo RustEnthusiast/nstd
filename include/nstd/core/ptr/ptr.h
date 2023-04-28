@@ -30,7 +30,8 @@ NSTDOptional(NSTDPtr) NSTDOptionalPtr;
 /// # Returns
 ///
 /// `NSTDOptionalPtr ptr` - A new instance of `NSTDPtr` that points to `obj` on success, or
-/// a "none" variant if `obj` is null.
+/// an uninitialized "none" variant if either `obj` is null or `size` is greater than `NSTDInt`'s
+/// max value.
 NSTDAPI NSTDOptionalPtr nstd_core_ptr_new(NSTDAny obj, NSTDUInt size);
 
 /// Creates a new instance of `NSTDPtr` without checking if `obj` is null.
@@ -47,7 +48,8 @@ NSTDAPI NSTDOptionalPtr nstd_core_ptr_new(NSTDAny obj, NSTDUInt size);
 ///
 /// # Safety
 ///
-/// The user of this function must ensure that `obj` is not null.
+/// The user of this function must ensure that `obj` is non-null and `size` is not greater than
+/// `NSTDInt`'s max value.
 NSTDAPI NSTDPtr nstd_core_ptr_new_unchecked(NSTDAny obj, NSTDUInt size);
 
 /// Returns the size of the object being pointed to.
@@ -100,7 +102,8 @@ NSTDOptional(NSTDPtrMut) NSTDOptionalPtrMut;
 /// # Returns
 ///
 /// `NSTDOptionalPtrMut ptr` - A new instance of `NSTDPtrMut` that points to `obj` on success, or
-/// a "none" variant if `obj` is null.
+/// an uninitialized "none" variant if either `obj` is null or `size` is greater than `NSTDInt`'s
+/// max value.
 NSTDAPI NSTDOptionalPtrMut nstd_core_ptr_mut_new(NSTDAnyMut obj, NSTDUInt size);
 
 /// Creates a new instance of `NSTDPtrMut` without checking if `obj` is null.
@@ -117,7 +120,8 @@ NSTDAPI NSTDOptionalPtrMut nstd_core_ptr_mut_new(NSTDAnyMut obj, NSTDUInt size);
 ///
 /// # Safety
 ///
-/// The user of this function must ensure that `obj` is not null.
+/// The user of this function must ensure that `obj` is non-null and `size` is not greater than
+/// `NSTDInt`'s max value.
 NSTDAPI NSTDPtrMut nstd_core_ptr_mut_new_unchecked(NSTDAnyMut obj, NSTDUInt size);
 
 /// Creates an immutable version of a mutable pointer.

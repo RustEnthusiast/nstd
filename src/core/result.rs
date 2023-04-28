@@ -1,18 +1,15 @@
 //! Defines a "result" type with success and error variants.
+use crate::NSTDUInt8;
 use nstdapi::nstdapi;
 
-/// Describes an `NSTDResult` variant.
-#[nstdapi]
-#[allow(non_camel_case_types)]
-pub enum NSTDResultStatus {
-    /// An error variant.
-    NSTD_RESULT_STATUS_ERR,
-    /// A successful variant.
-    NSTD_RESULT_STATUS_OK,
-}
+/// Describes an erroneous `NSTDResult` value.
+pub const NSTD_RESULT_ERR: NSTDUInt8 = 0;
+/// Describes a successful `NSTDResult` value.
+pub const NSTD_RESULT_OK: NSTDUInt8 = 1;
 
 /// Defines a "result" type with success and error variants.
 #[nstdapi]
+#[repr(u8)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum NSTDResult<T, E> {
     /// The error variant.

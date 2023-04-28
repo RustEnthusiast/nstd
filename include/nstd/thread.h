@@ -4,6 +4,7 @@
 #include "core/optional.h"
 #include "core/result.h"
 #include "core/str.h"
+#include "core/time.h"
 #include "heap_ptr.h"
 #include "io/io.h"
 #include "nstd.h"
@@ -45,9 +46,9 @@ NSTDResult(NSTDUInt, NSTDIOError) NSTDThreadCountResult;
 ///
 /// # Parameters:
 ///
-/// - `NSTDThreadResult (*thread_fn)(NSTDHeapPtr)` - The thread function.
+/// - `NSTDThreadResult (*thread_fn)(NSTDOptionalHeapPtr)` - The thread function.
 ///
-/// - `NSTDHeapPtr data` - Data to pass to the thread.
+/// - `NSTDOptionalHeapPtr data` - Data to send to the thread.
 ///
 /// # Returns
 ///
@@ -58,29 +59,22 @@ NSTDResult(NSTDUInt, NSTDIOError) NSTDThreadCountResult;
 /// - The caller of this function must guarantee that `thread_fn` is a valid function pointer.
 ///
 /// - The data type that `data` holds must be able to be safely sent between threads.
-NSTDAPI NSTDThread nstd_thread_spawn(NSTDThreadResult (*thread_fn)(NSTDHeapPtr), NSTDHeapPtr data);
+NSTDAPI NSTDThread
+nstd_thread_spawn(NSTDThreadResult (*thread_fn)(NSTDOptionalHeapPtr), NSTDOptionalHeapPtr data);
 
 /// Spawns a new thread configured with a descriptor.
 ///
 /// # Parameters:
 ///
-/// - `NSTDThreadResult (*thread_fn)(NSTDHeapPtr)` - The thread function.
+/// - `NSTDThreadResult (*thread_fn)(NSTDOptionalHeapPtr)` - The thread function.
 ///
-/// - `NSTDHeapPtr data` - Data to pass to the thread.
+/// - `NSTDOptionalHeapPtr data` - Data to send to the thread.
 ///
 /// - `const NSTDThreadDescriptor *desc` - The thread descriptor.
 ///
 /// # Returns
 ///
 /// `NSTDThread thread` - A handle to the new thread, null on error.
-///
-/// # Panics
-///
-/// This function will panic in the following situations:
-///
-/// - `desc.name` contains null bytes.
-///
-/// - `desc.name`'s length in bytes exceeds `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -90,7 +84,8 @@ NSTDAPI NSTDThread nstd_thread_spawn(NSTDThreadResult (*thread_fn)(NSTDHeapPtr),
 ///
 /// - The data type that `data` holds must be able to be safely sent between threads.
 NSTDAPI NSTDThread nstd_thread_spawn_with_desc(
-    NSTDThreadResult (*thread_fn)(NSTDHeapPtr), NSTDHeapPtr data, const NSTDThreadDescriptor *desc
+    NSTDThreadResult (*thread_fn)(NSTDOptionalHeapPtr), NSTDOptionalHeapPtr data,
+    const NSTDThreadDescriptor *desc
 );
 
 /// Returns a handle to the calling thread.
@@ -170,16 +165,16 @@ NSTDAPI NSTDThreadID nstd_thread_id(const NSTDThreadHandle *handle);
 /// - `NSTDThreadHandle handle` - The handle to free.
 NSTDAPI void nstd_thread_handle_free(NSTDThreadHandle handle);
 
-/// Puts the current thread to sleep for a specified number of seconds.
+/// Puts the current thread to sleep for a specified duration.
 ///
 /// # Parameters:
 ///
-/// - `NSTDFloat64 secs` - The number of seconds to put the thread to sleep for.
+/// - `NSTDDuration duration` - The duration to put the thread to sleep for.
 ///
 /// # Panics
 ///
-/// Panics if `secs` is negative, overflows Rust's `Duration` structure, or is non-finite.
-NSTDAPI void nstd_thread_sleep(NSTDFloat64 secs);
+/// Panics if `duration` is negative, overflows Rust's `Duration` structure, or is non-finite.
+NSTDAPI void nstd_thread_sleep(NSTDDuration duration);
 
 /// Returns the number of recommended threads that a program should use.
 ///

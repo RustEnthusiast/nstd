@@ -7,7 +7,9 @@ typedef enum {
     /// No error occurred.
     NSTD_UNIX_ALLOC_ERROR_NONE,
     /// Allocating or reallocating failed.
-    NSTD_UNIX_ALLOC_ERROR_OUT_OF_MEMORY
+    NSTD_UNIX_ALLOC_ERROR_OUT_OF_MEMORY,
+    /// An allocation function received input parameters that resulted in an invalid memory layout.
+    NSTD_UNIX_ALLOC_ERROR_INVALID_LAYOUT
 } NSTDUnixAllocError;
 
 /// Allocates a block of memory on the heap, returning a pointer to it.

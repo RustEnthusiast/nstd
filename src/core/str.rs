@@ -1,4 +1,5 @@
 //! An unowned view into a UTF-8 encoded byte string.
+use super::NSTD_INT_MAX;
 use crate::{
     core::{
         cstr::{
@@ -41,11 +42,6 @@ macro_rules! gen_to_primitive {
         /// # Returns
         ///
         #[doc = concat!("`", stringify!($RetT), " v` - The parsed value, or none on error.")]
-        ///
-        /// # Panics
-        ///
-        /// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s
-        /// max value.
         ///
         /// # Safety
         ///
@@ -90,17 +86,12 @@ impl NSTDStr {
 
     /// Creates a Rust string slice from this [NSTDStr].
     ///
-    /// # Panics
-    ///
-    /// This method will panic if the string slice's length is greater than `isize::MAX`.
-    ///
     /// # Safety
     ///
     /// This string slice's data must remain valid UTF-8 and left unmodified while the returned
     /// string slice is in use.
     #[inline]
     pub(crate) const unsafe fn as_str(&self) -> &str {
-        assert!(self.len <= isize::MAX as usize);
         let bytes = core::slice::from_raw_parts(self.ptr, self.len);
         core::str::from_utf8_unchecked(bytes)
     }
@@ -117,10 +108,6 @@ gen_optional!(NSTDOptionalStr, NSTDStr);
 ///
 /// `NSTDOptionalStr str` - The new `NSTDStr` instance on success, or a "none" variant if the
 /// result is not valid UTF-8.
-///
-/// # Panics
-///
-/// This function will panic if `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -199,17 +186,13 @@ pub const unsafe fn nstd_core_str_from_cstr_unchecked(cstr: &NSTDCStr) -> NSTDSt
 ///
 /// # Returns
 ///
-/// `NSTDOptionalStr str` - The new string slice on success, or a "none" variant if the
-/// result is not valid UTF-8.
-///
-/// # Panics
-///
-/// This function will panic if `cstr`'s length is greater than `NSTDInt`'s max value.
+/// `NSTDOptionalStr str` - The new string slice on success or an uninitialized "none" variant if
+/// `cstr` is null, `cstr`'s length exceeds `NSTDInt`'s max value, or `cstr` is not valid UTF-8.
 ///
 /// # Safety
 ///
-/// This function makes access to raw pointer data, which can cause undefined behavior in the event
-/// that `cstr`'s data is invalid.
+/// `cstr` must point to a character array that is valid for reads up until and including it's
+/// null-terminating byte.
 ///
 /// # Example
 ///
@@ -225,12 +208,13 @@ pub const unsafe fn nstd_core_str_from_cstr_unchecked(cstr: &NSTDCStr) -> NSTDSt
 #[nstdapi]
 pub unsafe fn nstd_core_str_from_raw_cstr(cstr: *const NSTDChar) -> NSTDOptionalStr {
     if !cstr.is_null() {
-        let ptr = cstr.cast();
         let len = nstd_core_cstr_raw_len(cstr);
-        assert!(len <= isize::MAX as NSTDUInt);
-        let bytes = core::slice::from_raw_parts(ptr, len);
-        if core::str::from_utf8(bytes).is_ok() {
-            return NSTDOptional::Some(NSTDStr { ptr, len });
+        if len <= NSTD_INT_MAX as _ {
+            let ptr = cstr.cast();
+            let bytes = core::slice::from_raw_parts(ptr, len);
+            if core::str::from_utf8(bytes).is_ok() {
+                return NSTDOptional::Some(NSTDStr { ptr, len });
+            }
         }
     }
     NSTDOptional::None
@@ -244,17 +228,13 @@ pub unsafe fn nstd_core_str_from_raw_cstr(cstr: *const NSTDChar) -> NSTDOptional
 ///
 /// # Returns
 ///
-/// `NSTDOptionalStr str` - The new string slice on success, or a "none" variant if the
-/// result is not valid UTF-8.
-///
-/// # Panics
-///
-/// This function will panic if `cstr`'s length is greater than `NSTDInt`'s max value.
+/// `NSTDOptionalStr str` - The new string slice on success or an uninitialized "none" variant if
+/// `cstr` is null, `cstr`'s length exceeds `NSTDInt`'s max value, or `cstr` is not valid UTF-8.
 ///
 /// # Safety
 ///
-/// This function makes access to raw pointer data, which can cause undefined behavior in the event
-/// that `cstr`'s data is invalid.
+/// `cstr` must point to a character array that is valid for reads up until and including it's
+/// null-terminating byte.
 ///
 /// # Example
 ///
@@ -270,12 +250,13 @@ pub unsafe fn nstd_core_str_from_raw_cstr(cstr: *const NSTDChar) -> NSTDOptional
 #[nstdapi]
 pub unsafe fn nstd_core_str_from_raw_cstr_with_null(cstr: *const NSTDChar) -> NSTDOptionalStr {
     if !cstr.is_null() {
-        let ptr = cstr.cast();
         let len = nstd_core_cstr_raw_len_with_null(cstr);
-        assert!(len <= isize::MAX as NSTDUInt);
-        let bytes = core::slice::from_raw_parts(ptr, len);
-        if core::str::from_utf8(bytes).is_ok() {
-            return NSTDOptional::Some(NSTDStr { ptr, len });
+        if len <= NSTD_INT_MAX as _ {
+            let ptr = cstr.cast();
+            let bytes = core::slice::from_raw_parts(ptr, len);
+            if core::str::from_utf8(bytes).is_ok() {
+                return NSTDOptional::Some(NSTDStr { ptr, len });
+            }
         }
     }
     NSTDOptional::None
@@ -294,11 +275,7 @@ pub unsafe fn nstd_core_str_from_raw_cstr_with_null(cstr: *const NSTDChar) -> NS
 ///
 /// # Panics
 ///
-/// This operation will panic in the following situations:
-///
-/// - `bytes`'s stride is not 1.
-///
-/// - `bytes`'s length is greater than `NSTDInt`'s max value.
+/// This operation will panic if `bytes`'s stride is not 1.
 ///
 /// # Safety
 ///
@@ -391,7 +368,7 @@ pub const unsafe fn nstd_core_str_from_bytes_unchecked(bytes: &NSTDSlice) -> NST
 #[inline]
 #[nstdapi]
 pub const fn nstd_core_str_as_cstr(str: &NSTDStr) -> NSTDCStr {
-    // SAFETY: `str.ptr` is never null.
+    // SAFETY: `str.ptr` is never null, string slices are never longer than `NSTDInt`'s max value.
     unsafe { nstd_core_cstr_new_unchecked(str.ptr.cast(), str.len) }
 }
 
@@ -423,7 +400,8 @@ pub const fn nstd_core_str_as_cstr(str: &NSTDStr) -> NSTDCStr {
 #[inline]
 #[nstdapi]
 pub const fn nstd_core_str_as_bytes(str: &NSTDStr) -> NSTDSlice {
-    // SAFETY: `str.ptr` is never null.
+    // SAFETY: `str.ptr` is never null, string slice lengths are never greater than `NSTDInt`'s max
+    // value.
     unsafe { nstd_core_slice_new_unchecked(str.ptr.cast(), 1, str.len) }
 }
 
@@ -451,11 +429,6 @@ pub const fn nstd_core_str_as_ptr(str: &NSTDStr) -> *const NSTDByte {
 /// # Returns
 ///
 /// `NSTDUInt len` - The length of the string slice.
-///
-/// # Panics
-///
-/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s max
-/// value.
 ///
 /// # Safety
 ///
@@ -521,11 +494,6 @@ pub const fn nstd_core_str_byte_len(str: &NSTDStr) -> NSTDUInt {
 ///
 /// `NSTDOptionalUnichar chr` - The character at index `pos`, or none on error.
 ///
-/// # Panics
-///
-/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s max
-/// value.
-///
 /// # Safety
 ///
 /// This operation can cause undefined behavior in the event that `str`'s data is invalid.
@@ -567,13 +535,9 @@ pub unsafe fn nstd_core_str_get(str: &NSTDStr, pos: NSTDUInt) -> NSTDOptionalUni
 ///
 /// This operation can panic under the following circumstances:
 ///
-/// - `range.start` is greater than `NSTDInt`'s max value.
-///
 /// - `range.start` is greater than `range.end`.
 ///
 /// - `range.end` is greater than `str.len`.
-///
-/// - `range.end` - `range.start` is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -601,7 +565,7 @@ pub unsafe fn nstd_core_str_get(str: &NSTDStr, pos: NSTDUInt) -> NSTDOptionalUni
 #[nstdapi]
 pub const unsafe fn nstd_core_str_substr(str: &NSTDStr, range: NSTDURange) -> NSTDOptionalStr {
     // Make sure the range is valid for the bounds of `str`.
-    assert!(range.start <= isize::MAX as usize && range.start <= range.end && range.end <= str.len);
+    assert!(range.start <= range.end && range.end <= str.len);
     // Create the byte slice with `range` and use it to create the new string slice.
     let start = str.ptr.add(range.start).cast();
     let bytes = nstd_core_slice_new_unchecked(start, 1, range.end - range.start);
@@ -879,17 +843,12 @@ pub struct NSTDStrMut {
 impl NSTDStrMut {
     /// Creates a Rust string slice from this [NSTDStrMut].
     ///
-    /// # Panics
-    ///
-    /// This method will panic if the string slice's length is greater than `isize::MAX`.
-    ///
     /// # Safety
     ///
     /// This string slice's data must remain valid UTF-8 and left unmodified while the returned
     /// string slice is in use.
     #[inline]
     const unsafe fn as_str(&self) -> &str {
-        assert!(self.len <= isize::MAX as usize);
         let bytes = core::slice::from_raw_parts(self.ptr, self.len);
         core::str::from_utf8_unchecked(bytes)
     }
@@ -906,10 +865,6 @@ gen_optional!(NSTDOptionalStrMut, NSTDStrMut);
 ///
 /// `NSTDOptionalStrMut str` - The new `NSTDStrMut` instance on success, or a "none" variant if the
 /// result is not valid UTF-8.
-///
-/// # Panics
-///
-/// This function will panic if `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -988,17 +943,13 @@ pub unsafe fn nstd_core_str_mut_from_cstr_unchecked(cstr: &mut NSTDCStrMut) -> N
 ///
 /// # Returns
 ///
-/// `NSTDOptionalStrMut str` - The new string slice on success, or a "none" variant if the
-/// result is not valid UTF-8.
-///
-/// # Panics
-///
-/// This function will panic if `cstr`'s length is greater than `NSTDInt`'s max value.
+/// `NSTDOptionalStrMut str` - The new string slice on success or an uninitialized "none" variant
+/// if `cstr` is null, `cstr`'s length exceeds `NSTDInt`'s max value, or `cstr` is not valid UTF-8.
 ///
 /// # Safety
 ///
-/// This function makes access to raw pointer data, which can cause undefined behavior in the event
-/// that `cstr`'s data is invalid.
+/// `cstr` must point to a character array that is valid for reads up until and including it's
+/// null-terminating byte.
 ///
 /// # Example
 ///
@@ -1014,12 +965,13 @@ pub unsafe fn nstd_core_str_mut_from_cstr_unchecked(cstr: &mut NSTDCStrMut) -> N
 #[nstdapi]
 pub unsafe fn nstd_core_str_mut_from_raw_cstr(cstr: *mut NSTDChar) -> NSTDOptionalStrMut {
     if !cstr.is_null() {
-        let ptr = cstr.cast();
         let len = nstd_core_cstr_raw_len(cstr);
-        assert!(len <= isize::MAX as usize);
-        let bytes = core::slice::from_raw_parts(ptr, len);
-        if core::str::from_utf8(bytes).is_ok() {
-            return NSTDOptional::Some(NSTDStrMut { ptr, len });
+        if len <= NSTD_INT_MAX as _ {
+            let ptr = cstr.cast();
+            let bytes = core::slice::from_raw_parts(ptr, len);
+            if core::str::from_utf8(bytes).is_ok() {
+                return NSTDOptional::Some(NSTDStrMut { ptr, len });
+            }
         }
     }
     NSTDOptional::None
@@ -1033,17 +985,13 @@ pub unsafe fn nstd_core_str_mut_from_raw_cstr(cstr: *mut NSTDChar) -> NSTDOption
 ///
 /// # Returns
 ///
-/// `NSTDOptionalStrMut str` - The new string slice on success, or a "none" variant if the
-/// result is not valid UTF-8.
-///
-/// # Panics
-///
-/// This function will panic if `cstr`'s length is greater than `NSTDInt`'s max value.
+/// `NSTDOptionalStrMut str` - The new string slice on success or an uninitialized "none" variant
+/// if `cstr` is null, `cstr`'s length exceeds `NSTDInt`'s max value, or `cstr` is not valid UTF-8.
 ///
 /// # Safety
 ///
-/// This function makes access to raw pointer data, which can cause undefined behavior in the event
-/// that `cstr`'s data is invalid.
+/// `cstr` must point to a character array that is valid for reads up until and including it's
+/// null-terminating byte.
 ///
 /// # Example
 ///
@@ -1061,12 +1009,13 @@ pub unsafe fn nstd_core_str_mut_from_raw_cstr(cstr: *mut NSTDChar) -> NSTDOption
 #[nstdapi]
 pub unsafe fn nstd_core_str_mut_from_raw_cstr_with_null(cstr: *mut NSTDChar) -> NSTDOptionalStrMut {
     if !cstr.is_null() {
-        let ptr = cstr.cast();
         let len = nstd_core_cstr_raw_len_with_null(cstr);
-        assert!(len <= isize::MAX as usize);
-        let bytes = core::slice::from_raw_parts(ptr, len);
-        if core::str::from_utf8(bytes).is_ok() {
-            return NSTDOptional::Some(NSTDStrMut { ptr, len });
+        if len <= NSTD_INT_MAX as _ {
+            let ptr = cstr.cast();
+            let bytes = core::slice::from_raw_parts(ptr, len);
+            if core::str::from_utf8(bytes).is_ok() {
+                return NSTDOptional::Some(NSTDStrMut { ptr, len });
+            }
         }
     }
     NSTDOptional::None
@@ -1085,11 +1034,7 @@ pub unsafe fn nstd_core_str_mut_from_raw_cstr_with_null(cstr: *mut NSTDChar) -> 
 ///
 /// # Panics
 ///
-/// This operation will panic in the following situations:
-///
-/// - `bytes`'s stride is not 1.
-///
-/// - `bytes`'s length is greater than `NSTDInt`'s max value.
+/// This operation will panic if `bytes`'s stride is not 1.
 ///
 /// # Safety
 ///
@@ -1199,7 +1144,7 @@ pub const fn nstd_core_str_mut_as_const(str: &NSTDStrMut) -> NSTDStr {
 #[inline]
 #[nstdapi]
 pub const fn nstd_core_str_mut_as_cstr(str: &NSTDStrMut) -> NSTDCStr {
-    // SAFETY: `str.ptr` is never null.
+    // SAFETY: `str.ptr` is never null, string slices are never longer than `NSTDInt`'s max value.
     unsafe { nstd_core_cstr_new_unchecked(str.ptr.cast(), str.len) }
 }
 
@@ -1233,7 +1178,8 @@ pub const fn nstd_core_str_mut_as_cstr(str: &NSTDStrMut) -> NSTDCStr {
 #[inline]
 #[nstdapi]
 pub const fn nstd_core_str_mut_as_bytes(str: &NSTDStrMut) -> NSTDSlice {
-    // SAFETY: `str.ptr` is never null.
+    // SAFETY: `str.ptr` is never null, string slice lengths are never greater than `NSTDInt`'s max
+    // value.
     unsafe { nstd_core_slice_new_unchecked(str.ptr.cast(), 1, str.len) }
 }
 
@@ -1261,11 +1207,6 @@ pub const fn nstd_core_str_mut_as_ptr(str: &NSTDStrMut) -> *const NSTDByte {
 /// # Returns
 ///
 /// `NSTDUInt len` - The length of the string slice.
-///
-/// # Panics
-///
-/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s max
-/// value.
 ///
 /// # Safety
 ///
@@ -1333,11 +1274,6 @@ pub const fn nstd_core_str_mut_byte_len(str: &NSTDStrMut) -> NSTDUInt {
 ///
 /// `NSTDOptionalUnichar chr` - The character at index `pos`, or none on error.
 ///
-/// # Panics
-///
-/// This operation may panic in the event that `str`'s length is greater than `NSTDInt`'s max
-/// value.
-///
 /// # Safety
 ///
 /// This operation can cause undefined behavior in the event that `str`'s data is invalid.
@@ -1379,13 +1315,9 @@ pub unsafe fn nstd_core_str_mut_get(str: &NSTDStrMut, pos: NSTDUInt) -> NSTDOpti
 ///
 /// This operation can panic under the following circumstances:
 ///
-/// - `range.start` is greater than `NSTDInt`'s max value.
-///
 /// - `range.start` is greater than `range.end`.
 ///
 /// - `range.end` is greater than `str.len`.
-///
-/// - `range.end` - `range.start` is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -1418,7 +1350,7 @@ pub unsafe fn nstd_core_str_mut_substr(
     range: NSTDURange,
 ) -> NSTDOptionalStrMut {
     // Make sure the range is valid for the bounds of `str`.
-    assert!(range.start <= isize::MAX as usize && range.start <= range.end && range.end <= str.len);
+    assert!(range.start <= range.end && range.end <= str.len);
     // Create the byte slice with `range` and use it to create the new string slice.
     let start = str.ptr.add(range.start).cast();
     let mut bytes = nstd_core_slice_mut_new_unchecked(start, 1, range.end - range.start);

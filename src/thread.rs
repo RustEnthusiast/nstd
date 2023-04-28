@@ -6,16 +6,14 @@ use crate::{
         optional::NSTDOptional,
         result::NSTDResult,
         str::{nstd_core_str_as_cstr, NSTDOptionalStr, NSTDStr},
+        time::NSTDDuration,
     },
-    heap_ptr::NSTDHeapPtr,
+    heap_ptr::NSTDOptionalHeapPtr,
     io::NSTDIOError,
-    NSTDBool, NSTDFloat64, NSTDUInt,
+    NSTDBool, NSTDUInt,
 };
 use nstdapi::nstdapi;
-use std::{
-    thread::{Builder, JoinHandle, Thread, ThreadId},
-    time::Duration,
-};
+use std::thread::{Builder, JoinHandle, Thread, ThreadId};
 
 /// Represents a running thread.
 pub type NSTDThread = Box<JoinHandle<NSTDThreadResult>>;
@@ -52,25 +50,13 @@ pub type NSTDOptionalThreadResult = NSTDOptional<NSTDThreadResult>;
 /// success.
 pub type NSTDThreadCountResult = NSTDResult<NSTDUInt, NSTDIOError>;
 
-/// Data type that wraps [NSTDHeapPtr] and implements the [Send] trait.
-struct ThreadData(NSTDHeapPtr);
-// SAFETY: `nstd_thread_spawn` documents the safety of passing data between threads.
-unsafe impl Send for ThreadData {}
-impl From<ThreadData> for NSTDHeapPtr {
-    /// Consumes `data` returning the inner heap pointer.
-    #[inline]
-    fn from(data: ThreadData) -> Self {
-        data.0
-    }
-}
-
 /// Spawns a new thread and returns a handle to it.
 ///
 /// # Parameters:
 ///
-/// - `NSTDThreadResult (*thread_fn)(NSTDHeapPtr)` - The thread function.
+/// - `NSTDThreadResult (*thread_fn)(NSTDOptionalHeapPtr)` - The thread function.
 ///
-/// - `NSTDHeapPtr data` - Data to pass to the thread.
+/// - `NSTDOptionalHeapPtr data` - Data to send to the thread.
 ///
 /// # Returns
 ///
@@ -87,16 +73,15 @@ impl From<ThreadData> for NSTDHeapPtr {
 /// ```
 /// use nstd_sys::{
 ///     core::optional::NSTDOptional,
-///     heap_ptr::{nstd_heap_ptr_new_zeroed, NSTDHeapPtr},
+///     heap_ptr::NSTDOptionalHeapPtr,
 ///     thread::{nstd_thread_join, nstd_thread_spawn, NSTDThreadResult},
 /// };
 ///
-/// unsafe extern "C" fn thread_fn(data: NSTDHeapPtr) -> NSTDThreadResult {
+/// unsafe extern "C" fn thread_fn(data: NSTDOptionalHeapPtr) -> NSTDThreadResult {
 ///     0
 /// }
 ///
-/// let data = unsafe { nstd_heap_ptr_new_zeroed(0).unwrap() };
-/// if let Some(thread) = unsafe { nstd_thread_spawn(Some(thread_fn), data) } {
+/// if let Some(thread) = unsafe { nstd_thread_spawn(thread_fn, NSTDOptional::None) } {
 ///     if let NSTDOptional::Some(errc) = nstd_thread_join(thread) {
 ///         assert!(errc == 0);
 ///     }
@@ -104,14 +89,11 @@ impl From<ThreadData> for NSTDHeapPtr {
 /// ```
 #[nstdapi]
 pub unsafe fn nstd_thread_spawn(
-    thread_fn: Option<unsafe extern "C" fn(NSTDHeapPtr) -> NSTDThreadResult>,
-    data: NSTDHeapPtr,
+    thread_fn: unsafe extern "C" fn(NSTDOptionalHeapPtr) -> NSTDThreadResult,
+    data: NSTDOptionalHeapPtr,
 ) -> Option<NSTDThread> {
-    if let Some(thread_fn) = thread_fn {
-        let data = ThreadData(data);
-        if let Ok(thread) = Builder::new().spawn(move || thread_fn(data.into())) {
-            return Some(Box::new(thread));
-        }
+    if let Ok(thread) = Builder::new().spawn(move || thread_fn(data)) {
+        return Some(Box::new(thread));
     }
     None
 }
@@ -120,23 +102,15 @@ pub unsafe fn nstd_thread_spawn(
 ///
 /// # Parameters:
 ///
-/// - `NSTDThreadResult (*thread_fn)(NSTDHeapPtr)` - The thread function.
+/// - `NSTDThreadResult (*thread_fn)(NSTDOptionalHeapPtr)` - The thread function.
 ///
-/// - `NSTDHeapPtr data` - Data to pass to the thread.
+/// - `NSTDOptionalHeapPtr data` - Data to send to the thread.
 ///
 /// - `const NSTDThreadDescriptor *desc` - The thread descriptor.
 ///
 /// # Returns
 ///
 /// `NSTDThread thread` - A handle to the new thread, null on error.
-///
-/// # Panics
-///
-/// This function will panic in the following situations:
-///
-/// - `desc.name` contains null bytes.
-///
-/// - `desc.name`'s length in bytes exceeds `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -147,31 +121,28 @@ pub unsafe fn nstd_thread_spawn(
 /// - The data type that `data` holds must be able to be safely sent between threads.
 #[nstdapi]
 pub unsafe fn nstd_thread_spawn_with_desc(
-    thread_fn: Option<unsafe extern "C" fn(NSTDHeapPtr) -> NSTDThreadResult>,
-    data: NSTDHeapPtr,
+    thread_fn: unsafe extern "C" fn(NSTDOptionalHeapPtr) -> NSTDThreadResult,
+    data: NSTDOptionalHeapPtr,
     desc: &NSTDThreadDescriptor,
 ) -> Option<NSTDThread> {
-    if let Some(thread_fn) = thread_fn {
-        // Create the thread builder.
-        let mut builder = Builder::new();
-        // Set the thread name.
-        if let NSTDOptional::Some(name) = &desc.name {
-            // Make sure `name` doesn't contain any null bytes.
-            let c_name = nstd_core_str_as_cstr(name);
-            if !nstd_core_cstr_get_null(&c_name).is_null() {
-                return None;
-            }
-            builder = builder.name(name.as_str().to_string());
+    // Create the thread builder.
+    let mut builder = Builder::new();
+    // Set the thread name.
+    if let NSTDOptional::Some(name) = &desc.name {
+        // Make sure `name` doesn't contain any null bytes.
+        let c_name = nstd_core_str_as_cstr(name);
+        if !nstd_core_cstr_get_null(&c_name).is_null() {
+            return None;
         }
-        // Set the thread stack size.
-        if desc.stack_size != 0 {
-            builder = builder.stack_size(desc.stack_size);
-        }
-        // Spawn the new thread.
-        let data = ThreadData(data);
-        if let Ok(thread) = builder.spawn(move || thread_fn(data.into())) {
-            return Some(Box::new(thread));
-        }
+        builder = builder.name(name.as_str().to_string());
+    }
+    // Set the thread stack size.
+    if desc.stack_size != 0 {
+        builder = builder.stack_size(desc.stack_size);
+    }
+    // Spawn the new thread.
+    if let Ok(thread) = builder.spawn(move || thread_fn(data)) {
+        return Some(Box::new(thread));
     }
     None
 }
@@ -289,19 +260,19 @@ pub fn nstd_thread_id(handle: &NSTDThreadHandle) -> NSTDThreadID {
 #[allow(unused_variables)]
 pub fn nstd_thread_handle_free(handle: NSTDThreadHandle) {}
 
-/// Puts the current thread to sleep for a specified number of seconds.
+/// Puts the current thread to sleep for a specified duration.
 ///
 /// # Parameters:
 ///
-/// - `NSTDFloat64 secs` - The number of seconds to put the thread to sleep for.
+/// - `NSTDDuration duration` - The duration to put the thread to sleep for.
 ///
 /// # Panics
 ///
-/// Panics if `secs` is negative, overflows Rust's `Duration` structure, or is non-finite.
+/// Panics if `duration` is negative, overflows Rust's `Duration` structure, or is non-finite.
 #[inline]
 #[nstdapi]
-pub fn nstd_thread_sleep(secs: NSTDFloat64) {
-    std::thread::sleep(Duration::from_secs_f64(secs));
+pub fn nstd_thread_sleep(duration: NSTDDuration) {
+    std::thread::sleep(duration.into_duration());
 }
 
 /// Returns the number of recommended threads that a program should use.

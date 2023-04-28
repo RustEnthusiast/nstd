@@ -27,10 +27,6 @@ NSTDOptional(NSTDSharedPtr) NSTDOptionalSharedPtr;
 /// `NSTDOptionalSharedPtr shared_ptr` - The new shared pointer, or an uninitialized "none" variant
 /// if allocating fails.
 ///
-/// # Panics
-///
-/// This operation will panic if `element_size` is greater than `NSTDInt`'s max value.
-///
 /// # Safety
 ///
 /// `init` must be a pointer to a value that is valid for reads of `element_size` bytes.
@@ -46,10 +42,6 @@ NSTDAPI NSTDOptionalSharedPtr nstd_shared_ptr_new(NSTDUInt element_size, NSTDAny
 ///
 /// `NSTDOptionalSharedPtr shared_ptr` - The yet to be shared pointer, or an uninitialized "none"
 /// variant if allocating fails.
-///
-/// # Panics
-///
-/// This operation will panic if `element_size` is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -107,5 +99,18 @@ NSTDAPI NSTDAny nstd_shared_ptr_get(const NSTDSharedPtr *shared_ptr);
 ///
 /// - `NSTDSharedPtr shared_ptr` - The shared object to free.
 NSTDAPI void nstd_shared_ptr_free(NSTDSharedPtr shared_ptr);
+
+/// Frees an instance of `NSTDSharedPtr` after invoking `callback` with the shared object.
+///
+/// # Parameters:
+///
+/// - `NSTDSharedPtr shared_ptr` - The shared object to free.
+///
+/// - `void (*callback)(NSTDAnyMut)` - The shared object's destructor.
+///
+/// # Safety
+///
+/// This operation makes a direct call on a C function pointer (`callback`).
+NSTDAPI void nstd_shared_ptr_drop(NSTDSharedPtr shared_ptr, void (*callback)(NSTDAnyMut));
 
 #endif

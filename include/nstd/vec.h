@@ -25,7 +25,7 @@ NSTDOptional(NSTDVec) NSTDOptionalVec;
 ///
 /// # Parameters:
 ///
-/// - `NSTDUInt element_size` - The size in bytes of each value in the vector.
+/// - `NSTDUInt stride` - The size in bytes of each value in the vector.
 ///
 /// # Returns
 ///
@@ -33,8 +33,8 @@ NSTDOptional(NSTDVec) NSTDOptionalVec;
 ///
 /// # Panics
 ///
-/// This function will panic if `element_size` is zero.
-NSTDAPI NSTDVec nstd_vec_new(NSTDUInt element_size);
+/// This function will panic if `stride` is zero.
+NSTDAPI NSTDVec nstd_vec_new(NSTDUInt stride);
 
 /// Creates a new vector initialized with the given capacity.
 ///
@@ -44,7 +44,7 @@ NSTDAPI NSTDVec nstd_vec_new(NSTDUInt element_size);
 ///
 /// # Parameters:
 ///
-/// - `NSTDUInt element_size` - The size in bytes of each value in the vector.
+/// - `NSTDUInt stride` - The size in bytes of each value in the vector.
 ///
 /// - `NSTDUInt cap` - The initial capacity for the vector.
 ///
@@ -54,8 +54,8 @@ NSTDAPI NSTDVec nstd_vec_new(NSTDUInt element_size);
 ///
 /// # Panics
 ///
-/// This function will panic if either `element_size` or `cap` are zero.
-NSTDAPI NSTDVec nstd_vec_new_with_cap(NSTDUInt element_size, NSTDUInt cap);
+/// This function will panic if either `stride` or `cap` are zero.
+NSTDAPI NSTDVec nstd_vec_new_with_cap(NSTDUInt stride, NSTDUInt cap);
 
 /// Creates a new vector from a slice.
 ///
@@ -191,10 +191,6 @@ NSTDAPI NSTDAnyMut nstd_vec_as_ptr_mut(NSTDVec *vec);
 /// # Returns
 ///
 /// `NSTDAny end` - A pointer to the end of the vector or null if the vector has yet to allocate.
-///
-/// # Panics
-///
-/// Panics if the total length of the vector's buffer exceeds `isize::MAX` bytes.
 NSTDAPI NSTDAny nstd_vec_end(const NSTDVec *vec);
 
 /// Returns a mutable pointer to the end of a vector.
@@ -209,10 +205,6 @@ NSTDAPI NSTDAny nstd_vec_end(const NSTDVec *vec);
 /// # Returns
 ///
 /// `NSTDAnyMut end` - A pointer to the end of the vector or null if the vector has yet to allocate.
-///
-/// # Panics
-///
-/// Panics if the total length of the vector's buffer exceeds `isize::MAX` bytes.
 NSTDAPI NSTDAnyMut nstd_vec_end_mut(NSTDVec *vec);
 
 /// Returns an immutable pointer to the element at index `pos` in `vec`.
@@ -232,10 +224,6 @@ NSTDAPI NSTDAnyMut nstd_vec_end_mut(NSTDVec *vec);
 ///
 /// `NSTDAny element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out
 /// of the vector's boundaries.
-///
-/// # Panics
-///
-/// Panics if the vec's current length in bytes exceeds `NSTDInt`'s max value.
 NSTDAPI NSTDAny nstd_vec_get(const NSTDVec *vec, NSTDUInt pos);
 
 /// Returns a pointer to the element at index `pos` in `vec`.
@@ -255,10 +243,6 @@ NSTDAPI NSTDAny nstd_vec_get(const NSTDVec *vec, NSTDUInt pos);
 ///
 /// `NSTDAnyMut element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out of
 /// the vector's boundaries.
-///
-/// # Panics
-///
-/// Panics if the vec's current length in bytes exceeds `NSTDInt`'s max value.
 NSTDAPI NSTDAnyMut nstd_vec_get_mut(NSTDVec *vec, NSTDUInt pos);
 
 /// Pushes a value onto a vector by copying bytes to the end of the vector's buffer. The number of
@@ -273,10 +257,6 @@ NSTDAPI NSTDAnyMut nstd_vec_get_mut(NSTDVec *vec, NSTDUInt pos);
 /// # Returns
 ///
 /// `NSTDAllocError errc` - The allocation operation error code.
-///
-/// # Panics
-///
-/// Panics if `vec`'s current length in bytes exceeds `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -299,10 +279,6 @@ NSTDAPI NSTDAllocError nstd_vec_push(NSTDVec *vec, NSTDAny value);
 ///
 /// - `NSTDAny value` - A pointer to the value that was popped off the stack, or null if the
 /// vector is empty.
-///
-/// # Panics
-///
-/// Panics if `vec`'s new length (in bytes) exceeds `NSTDInt`'s max value.
 NSTDAPI NSTDAny nstd_vec_pop(NSTDVec *vec);
 
 /// Attempts to insert a value into a vector at `index`.
@@ -325,10 +301,6 @@ NSTDAPI NSTDAny nstd_vec_pop(NSTDVec *vec);
 ///
 /// - `2` - Reserving space for the vector failed.
 ///
-/// # Panics
-///
-/// This function will panic if `index` multiplied by `vec`'s stride exceeds `NSTDInt`'s max value.
-///
 /// # Safety
 ///
 /// This operation is unsafe because undefined behavior can occur if the size of the value being
@@ -346,10 +318,6 @@ NSTDAPI NSTDErrorCode nstd_vec_insert(NSTDVec *vec, NSTDAny value, NSTDUInt inde
 /// # Returns
 ///
 /// `NSTDErrorCode errc` - Nonzero if `index` is invalid.
-///
-/// # Panics
-///
-/// This operation will panic if `index` multiplied by `vec`'s stride exceeds `NSTDInt`'s max value.
 NSTDAPI NSTDErrorCode nstd_vec_remove(NSTDVec *vec, NSTDUInt index);
 
 /// Pushes a series of values onto a vector.
@@ -366,11 +334,7 @@ NSTDAPI NSTDErrorCode nstd_vec_remove(NSTDVec *vec, NSTDUInt index);
 ///
 /// # Panics
 ///
-/// This operation will panic in the following situations:
-///
-/// - `vec` and `values` strides do not match.
-///
-/// - The current length in bytes exceeds `NSTDInt`'s max value.
+/// This operation will panic if `vec` and `values` strides do not match.
 ///
 /// # Safety
 ///
@@ -446,5 +410,18 @@ NSTDAPI void nstd_vec_clear(NSTDVec *vec);
 ///
 /// - `NSTDVec vec` - The vector to free.
 NSTDAPI void nstd_vec_free(NSTDVec vec);
+
+/// Frees an instance of `NSTDVec` after invoking `callback` with each of the vector's elements.
+///
+/// # Parameters:
+///
+/// - `NSTDVec vec` - The vector to free.
+///
+/// - `void (*callback)(NSTDAnyMut)` - The vector data's destructor.
+///
+/// # Safety
+///
+/// This operation makes a direct call on a C function pointer (`callback`).
+NSTDAPI void nstd_vec_drop(NSTDVec vec, void (*callback)(NSTDAnyMut));
 
 #endif
