@@ -34,11 +34,8 @@ gen_optional!(NSTDOptionalCString, NSTDCString);
 ///
 /// # Returns
 ///
-/// `NSTDCString cstring` - The new C string.
-///
-/// # Panics
-///
-/// This function will panic if allocating for the null byte fails.
+/// `NSTDOptionalCString cstring` - The new C string on success, or an uninitialized "none" variant
+/// if allocating for the C string's null terminator fails.
 ///
 /// # Example
 ///
@@ -49,7 +46,7 @@ gen_optional!(NSTDOptionalCString, NSTDCString);
 /// ```
 #[inline]
 #[nstdapi]
-pub fn nstd_cstring_new() -> NSTDCString {
+pub fn nstd_cstring_new() -> NSTDOptionalCString {
     nstd_cstring_new_with_cap(1)
 }
 
@@ -61,11 +58,12 @@ pub fn nstd_cstring_new() -> NSTDCString {
 ///
 /// # Returns
 ///
-/// `NSTDCString cstring` - The new C string.
+/// `NSTDOptionalCString cstring` - The new C string on success, or an uninitialized "none" variant
+/// if allocating fails.
 ///
 /// # Panics
 ///
-/// This function will panic if either `cap` is zero or allocating fails.
+/// This function will panic if `cap` is zero.
 ///
 /// # Example
 ///
@@ -76,15 +74,14 @@ pub fn nstd_cstring_new() -> NSTDCString {
 /// ```
 #[inline]
 #[nstdapi]
-pub fn nstd_cstring_new_with_cap(cap: NSTDUInt) -> NSTDCString {
+pub fn nstd_cstring_new_with_cap(cap: NSTDUInt) -> NSTDOptionalCString {
     let mut bytes = nstd_vec_new_with_cap(1, cap);
     let nul: NSTDChar = 0;
     // SAFETY: `nul` is stored on the stack.
-    unsafe {
-        let errc = nstd_vec_push(&mut bytes, addr_of!(nul).cast());
-        assert!(errc == NSTDAllocError::NSTD_ALLOC_ERROR_NONE);
+    match unsafe { nstd_vec_push(&mut bytes, addr_of!(nul) as _) } {
+        NSTDAllocError::NSTD_ALLOC_ERROR_NONE => NSTDOptional::Some(NSTDCString { bytes }),
+        _ => NSTDOptional::None,
     }
-    NSTDCString { bytes }
 }
 
 /// Creates an owned version of an unowned C string slice.
@@ -97,10 +94,6 @@ pub fn nstd_cstring_new_with_cap(cap: NSTDUInt) -> NSTDCString {
 ///
 /// `NSTDOptionalCString cstring` - The new owned version of `cstr` on success, or an uninitialized
 /// "none" variant if `cstr` contains a null byte or allocating fails.
-///
-/// # Panics
-///
-/// This operation will panic if `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -137,10 +130,6 @@ pub unsafe fn nstd_cstring_from_cstr(cstr: &NSTDCStr) -> NSTDOptionalCString {
 /// `NSTDOptionalCString cstring` - The new owned version of `cstr` on success, or an uninitialized
 /// "none" variant if allocating fails.
 ///
-/// # Panics
-///
-/// This operation will panic if `cstr`'s length is greater than `NSTDInt`'s max value.
-///
 /// # Safety
 ///
 /// The caller of this function must ensure the following preconditions:
@@ -153,9 +142,10 @@ pub unsafe fn nstd_cstring_from_cstr_unchecked(cstr: &NSTDCStr) -> NSTDOptionalC
     let bytes = nstd_core_cstr_as_bytes(cstr);
     if let NSTDOptional::Some(mut bytes) = nstd_vec_from_slice(&bytes) {
         let null: NSTDChar = 0;
-        let null = addr_of!(null).cast();
-        assert!(nstd_vec_push(&mut bytes, null) == NSTDAllocError::NSTD_ALLOC_ERROR_NONE);
-        return NSTDOptional::Some(NSTDCString { bytes });
+        let null = addr_of!(null) as _;
+        if nstd_vec_push(&mut bytes, null) == NSTDAllocError::NSTD_ALLOC_ERROR_NONE {
+            return NSTDOptional::Some(NSTDCString { bytes });
+        }
     }
     NSTDOptional::None
 }
@@ -173,16 +163,12 @@ pub unsafe fn nstd_cstring_from_cstr_unchecked(cstr: &NSTDCStr) -> NSTDOptionalC
 ///
 /// # Panics
 ///
-/// This operation will panic in the following situations:
-///
-/// - `bytes`'s stride is not 1.
-///
-/// - `bytes`'s length is greater than `NSTDInt`'s max value.
+/// This operation will panic if `bytes`'s stride is not 1.
 #[nstdapi]
 pub fn nstd_cstring_from_bytes(bytes: NSTDVec) -> NSTDOptionalCString {
     let ptr = nstd_vec_as_ptr(&bytes) as *const NSTDChar;
     assert!(!ptr.is_null() && nstd_vec_stride(&bytes) == 1);
-    // SAFETY: `ptr` is non-null.
+    // SAFETY: `ptr` is non-null, vector length's can never be greater than `NSTDInt`'s max value.
     let cstr = unsafe { nstd_core_cstr_new_unchecked(ptr, nstd_vec_len(&bytes)) };
     // SAFETY: `cstr`'s data is owned by `bytes`.
     match unsafe { nstd_core_cstr_is_null_terminated(&cstr) } {
@@ -223,7 +209,7 @@ pub fn nstd_cstring_clone(cstring: &NSTDCString) -> NSTDOptionalCString {
 pub fn nstd_cstring_as_cstr(cstring: &NSTDCString) -> NSTDCStr {
     let ptr = nstd_vec_as_ptr(&cstring.bytes);
     let len = nstd_vec_len(&cstring.bytes);
-    // SAFETY: `ptr` is never null, owned C strings always have at least one byte allocated.
+    // SAFETY: `ptr` is never null, owned C strings can never be longer than `NSTDInt`'s max value.
     unsafe { nstd_core_cstr_new_unchecked(ptr as _, len) }
 }
 
@@ -329,9 +315,9 @@ pub fn nstd_cstring_cap(cstring: &NSTDCString) -> NSTDUInt {
 ///
 /// - `NSTDChar chr` - The C char to append to the C string.
 ///
-/// # Panics
+/// # Returns
 ///
-/// This operation panics if `chr` cannot be appended to the C string.
+/// `NSTDAllocError errc` - The allocation operation error code.
 ///
 /// # Example
 ///
@@ -341,24 +327,27 @@ pub fn nstd_cstring_cap(cstring: &NSTDCString) -> NSTDUInt {
 ///     NSTDChar,
 /// };
 ///
-/// let mut cstring = nstd_cstring_new();
+/// let mut cstring = nstd_cstring_new().unwrap();
 /// nstd_cstring_push(&mut cstring, b'!' as NSTDChar);
 /// ```
 #[nstdapi]
-pub fn nstd_cstring_push(cstring: &mut NSTDCString, chr: NSTDChar) {
-    // SAFETY: C strings always contain an exclusive null byte at the end.
-    unsafe {
-        if chr != 0 {
+pub fn nstd_cstring_push(cstring: &mut NSTDCString, chr: NSTDChar) -> NSTDAllocError {
+    if chr != 0 {
+        // SAFETY: C strings always contain an exclusive null byte at the end.
+        unsafe {
             // Push a new null byte onto the end of the C string.
-            let nulpos = nstd_vec_len(&cstring.bytes) - 1;
-            let mut nul = nstd_vec_get_mut(&mut cstring.bytes, nulpos).cast::<NSTDChar>();
-            let errc = nstd_vec_push(&mut cstring.bytes, nul.cast());
-            assert!(errc == NSTDAllocError::NSTD_ALLOC_ERROR_NONE);
+            let nul: NSTDChar = 0;
+            let errc = nstd_vec_push(&mut cstring.bytes, addr_of!(nul) as _);
+            if errc != NSTDAllocError::NSTD_ALLOC_ERROR_NONE {
+                return errc;
+            }
             // Write `chr` over the old null byte.
-            nul = nstd_vec_get_mut(&mut cstring.bytes, nulpos).cast();
+            let nulpos = nstd_vec_len(&cstring.bytes) - 2;
+            let nul = nstd_vec_get_mut(&mut cstring.bytes, nulpos).cast();
             *nul = chr;
         }
     }
+    NSTDAllocError::NSTD_ALLOC_ERROR_NONE
 }
 
 /// Appends a C string slice to the end of a C string.
@@ -379,11 +368,7 @@ pub fn nstd_cstring_push(cstring: &mut NSTDCString, chr: NSTDChar) {
 ///
 /// - `cstr` contains a null byte.
 ///
-/// - `cstr`'s length is greater than `NSTDInt`'s max value.
-///
 /// - Appending the new null byte to the end of the C string fails.
-///
-/// - The new length in bytes exceeds `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -399,7 +384,7 @@ pub fn nstd_cstring_push(cstring: &mut NSTDCString, chr: NSTDChar) {
 ///     NSTDChar,
 /// };
 ///
-/// let mut cstring = nstd_cstring_new();
+/// let mut cstring = nstd_cstring_new().unwrap();
 /// unsafe {
 ///     let cstr = nstd_core_cstr_from_raw("baNaNa\0".as_ptr().cast());
 ///     assert!(nstd_cstring_push_cstr(&mut cstring, &cstr) == NSTD_ALLOC_ERROR_NONE);
@@ -429,10 +414,6 @@ pub unsafe fn nstd_cstring_push_cstr(cstring: &mut NSTDCString, cstr: &NSTDCStr)
 /// # Returns
 ///
 /// `NSTDChar chr` - The removed character, or null if the C string is empty.
-///
-/// # Panics
-///
-/// This function will panic if getting a pointer to the C string's last character fails.
 ///
 /// # Example
 ///

@@ -20,6 +20,10 @@ impl Drop for NSTDWindowsSharedLib {
         unsafe { FreeLibrary(self.handle) };
     }
 }
+// SAFETY: `NSTDWindowsSharedLib` owns a handle to the dynamically loaded library.
+unsafe impl Send for NSTDWindowsSharedLib {}
+// SAFETY: `NSTDWindowsSharedLib` does not undergo interior mutability.
+unsafe impl Sync for NSTDWindowsSharedLib {}
 
 /// An optional (possibly null) shared Windows library handle.
 pub type NSTDWindowsOptionalSharedLib = NSTDOptional<NSTDWindowsSharedLib>;

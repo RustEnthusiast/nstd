@@ -1,15 +1,10 @@
 //! A view into a sequence of values in memory.
+use super::NSTD_INT_MAX;
 use crate::{
     core::{
         mem::nstd_core_mem_copy,
         optional::{gen_optional, NSTDOptional},
-        ptr::{
-            nstd_core_ptr_get, nstd_core_ptr_mut_get, nstd_core_ptr_mut_get_const,
-            nstd_core_ptr_mut_new, nstd_core_ptr_mut_new_unchecked, nstd_core_ptr_mut_size,
-            nstd_core_ptr_new, nstd_core_ptr_new_unchecked, nstd_core_ptr_size,
-            raw::{nstd_core_ptr_raw_dangling, nstd_core_ptr_raw_dangling_mut},
-            NSTDPtr, NSTDPtrMut,
-        },
+        ptr::raw::{nstd_core_ptr_raw_dangling, nstd_core_ptr_raw_dangling_mut},
     },
     NSTDAny, NSTDAnyMut, NSTDUInt, NSTD_NULL,
 };
@@ -25,37 +20,35 @@ use nstdapi::nstdapi;
 #[derive(Clone, Copy, Debug)]
 pub struct NSTDSlice {
     /// A pointer to the first element in the slice.
-    ptr: NSTDPtr,
+    ptr: NSTDAny,
     /// The number of elements in the slice.
     len: NSTDUInt,
+    /// The slice's stride.
+    stride: NSTDUInt,
 }
 impl NSTDSlice {
     /// Creates a new [NSTDSlice] from a Rust slice.
     #[inline]
     #[allow(dead_code)]
     pub(crate) const fn from_slice<T>(s: &[T]) -> Self {
-        // SAFETY: Rust references are never null.
-        unsafe {
-            let ptr = nstd_core_ptr_new_unchecked(s.as_ptr() as _, core::mem::size_of::<T>());
-            Self { ptr, len: s.len() }
+        Self {
+            ptr: s.as_ptr() as _,
+            len: s.len(),
+            stride: core::mem::size_of::<T>(),
         }
     }
 
     /// Returns the number of bytes that this slice covers.
     #[inline]
     pub(crate) const fn byte_len(&self) -> usize {
-        self.len * nstd_core_slice_stride(self)
+        self.len * self.stride
     }
 
     /// Creates a Rust byte slice from this `NSTDSlice`.
     ///
     /// # Panics
     ///
-    /// This operation will panic in the following situations:
-    ///
-    /// - `size_of::<T>()` does not match the slice's stride.
-    ///
-    /// - The number of bytes the slice contains is greater than `NSTDInt`'s maximum value.
+    /// This operation will panic if `size_of::<T>()` does not match the slice's stride.
     ///
     /// # Safety
     ///
@@ -65,10 +58,8 @@ impl NSTDSlice {
     /// - The slice's data must be properly aligned.
     #[inline]
     pub(crate) const unsafe fn as_slice<T>(&self) -> &[T] {
-        assert!(nstd_core_slice_stride(self) == core::mem::size_of::<T>());
-        assert!(self.byte_len() <= isize::MAX as usize);
-        let ptr = nstd_core_slice_as_ptr(self).cast();
-        core::slice::from_raw_parts(ptr, self.len)
+        assert!(self.stride == core::mem::size_of::<T>());
+        core::slice::from_raw_parts(self.ptr as _, self.len)
     }
 }
 gen_optional!(NSTDOptionalSlice, NSTDSlice);
@@ -79,23 +70,20 @@ gen_optional!(NSTDOptionalSlice, NSTDSlice);
 ///
 /// - `NSTDAny ptr` - A pointer to the first element in the sequence.
 ///
-/// - `NSTDUInt element_size` - The number of bytes each element occupies.
+/// - `NSTDUInt stride` - The number of bytes each element occupies.
 ///
 /// - `NSTDUInt len` - The number of elements in the sequence.
 ///
 /// # Returns
 ///
-/// `NSTDOptionalSlice slice` - The new slice on success, or a "none" variant if `ptr` is null.
+/// `NSTDOptionalSlice slice` - The new slice on success, or an uninitialized "none" variant if
+/// either `ptr` is null or the slice's length in bytes would exceed `NSTDInt`'s max value.
 #[inline]
 #[nstdapi]
-pub fn nstd_core_slice_new(
-    ptr: NSTDAny,
-    element_size: NSTDUInt,
-    len: NSTDUInt,
-) -> NSTDOptionalSlice {
-    match nstd_core_ptr_new(ptr, element_size) {
-        NSTDOptional::Some(ptr) => NSTDOptional::Some(NSTDSlice { ptr, len }),
-        _ => NSTDOptional::None,
+pub fn nstd_core_slice_new(ptr: NSTDAny, stride: NSTDUInt, len: NSTDUInt) -> NSTDOptionalSlice {
+    match !ptr.is_null() && len * stride <= NSTD_INT_MAX as _ {
+        true => NSTDOptional::Some(NSTDSlice { ptr, len, stride }),
+        false => NSTDOptional::None,
     }
 }
 
@@ -105,7 +93,7 @@ pub fn nstd_core_slice_new(
 ///
 /// - `NSTDAny ptr` - A pointer to the first element in the sequence.
 ///
-/// - `NSTDUInt element_size` - The number of bytes each element occupies.
+/// - `NSTDUInt stride` - The number of bytes each element occupies.
 ///
 /// - `NSTDUInt len` - The number of elements in the sequence.
 ///
@@ -115,36 +103,34 @@ pub fn nstd_core_slice_new(
 ///
 /// # Safety
 ///
-/// The user of this function must ensure that `ptr` is not null.
+/// The user of this function must ensure that `ptr` is non-null, and that the slice's total length
+/// in bytes will not exceed `NSTDInt`'s max value.
 #[inline]
 #[nstdapi]
 pub const unsafe fn nstd_core_slice_new_unchecked(
     ptr: NSTDAny,
-    element_size: NSTDUInt,
+    stride: NSTDUInt,
     len: NSTDUInt,
 ) -> NSTDSlice {
-    NSTDSlice {
-        ptr: nstd_core_ptr_new_unchecked(ptr, element_size),
-        len,
-    }
+    NSTDSlice { ptr, len, stride }
 }
 
-/// Creates a new empty slice with a given `element_size`.
+/// Creates a new empty slice with a given `stride`.
 ///
 /// # Parameters:
 ///
-/// - `NSTDUInt element_size` - The number of bytes each element occupies.
+/// - `NSTDUInt stride` - The number of bytes each element occupies.
 ///
 /// # Returns
 ///
 /// `NSTDSlice slice` - The new empty slice.
 #[inline]
 #[nstdapi]
-pub const fn nstd_core_slice_empty(element_size: NSTDUInt) -> NSTDSlice {
+pub const fn nstd_core_slice_empty(stride: NSTDUInt) -> NSTDSlice {
     NSTDSlice {
-        // SAFETY: The slice is given a non-null pointer and a length of 0.
-        ptr: unsafe { nstd_core_ptr_new_unchecked(nstd_core_ptr_raw_dangling(), element_size) },
+        ptr: nstd_core_ptr_raw_dangling(),
         len: 0,
+        stride,
     }
 }
 
@@ -171,7 +157,7 @@ pub const fn nstd_core_slice_empty(element_size: NSTDUInt) -> NSTDSlice {
 #[inline]
 #[nstdapi]
 pub const fn nstd_core_slice_as_ptr(slice: &NSTDSlice) -> NSTDAny {
-    nstd_core_ptr_get(&slice.ptr)
+    slice.ptr
 }
 
 /// Returns the number of elements in an immutable slice.
@@ -222,7 +208,7 @@ pub const fn nstd_core_slice_len(slice: &NSTDSlice) -> NSTDUInt {
 #[inline]
 #[nstdapi]
 pub const fn nstd_core_slice_stride(slice: &NSTDSlice) -> NSTDUInt {
-    nstd_core_ptr_size(&slice.ptr)
+    slice.stride
 }
 
 /// Returns an immutable pointer to the element at index `pos` in `slice`.
@@ -237,10 +223,6 @@ pub const fn nstd_core_slice_stride(slice: &NSTDSlice) -> NSTDUInt {
 ///
 /// `NSTDAny element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out
 /// of the slice's boundaries.
-///
-/// # Panics
-///
-/// Panics if the slice's current length in bytes exceeds `NSTDInt`'s max value.
 ///
 /// # Example
 ///
@@ -263,10 +245,9 @@ pub const fn nstd_core_slice_stride(slice: &NSTDSlice) -> NSTDUInt {
 #[nstdapi]
 pub const fn nstd_core_slice_get(slice: &NSTDSlice, mut pos: NSTDUInt) -> NSTDAny {
     if pos < slice.len {
-        pos *= nstd_core_slice_stride(slice);
-        assert!(pos <= isize::MAX as usize);
+        pos *= slice.stride;
         // SAFETY: We've checked `pos`.
-        return unsafe { nstd_core_slice_as_ptr(slice).add(pos) };
+        return unsafe { slice.ptr.add(pos) };
     }
     NSTD_NULL
 }
@@ -304,7 +285,7 @@ pub const fn nstd_core_slice_get(slice: &NSTDSlice, mut pos: NSTDUInt) -> NSTDAn
 #[nstdapi]
 pub const fn nstd_core_slice_first(slice: &NSTDSlice) -> NSTDAny {
     match slice.len > 0 {
-        true => nstd_core_slice_as_ptr(slice),
+        true => slice.ptr,
         false => NSTD_NULL,
     }
 }
@@ -319,10 +300,6 @@ pub const fn nstd_core_slice_first(slice: &NSTDSlice) -> NSTDAny {
 ///
 /// `NSTDAny element` - A pointer to the last element in `slice` or `NSTD_NULL` if the
 /// slice is empty.
-///
-/// # Panics
-///
-/// Panics if the slice's current length in bytes exceeds `NSTDInt`'s max value.
 ///
 /// # Example
 ///
@@ -361,26 +338,18 @@ pub const fn nstd_core_slice_last(slice: &NSTDSlice) -> NSTDAny {
 #[derive(Debug)]
 pub struct NSTDSliceMut {
     /// A pointer to the first element in the slice.
-    ptr: NSTDPtrMut,
+    ptr: NSTDAnyMut,
     /// The number of elements in the slice.
     len: NSTDUInt,
+    /// The slice's stride.
+    stride: NSTDUInt,
 }
 impl NSTDSliceMut {
-    /// Returns the number of bytes that this slice covers.
-    #[inline]
-    pub(crate) const fn byte_len(&self) -> usize {
-        self.len * nstd_core_slice_mut_stride(self)
-    }
-
     /// Creates a Rust byte slice from this `NSTDSliceMut`.
     ///
     /// # Panics
     ///
-    /// This operation will panic in the following situations:
-    ///
-    /// - `size_of::<T>()` does not match the slice's stride.
-    ///
-    /// - The number of bytes the slice contains is greater than `NSTDInt`'s maximum value.
+    /// This operation will panic if `size_of::<T>()` does not match the slice's stride.
     ///
     /// # Safety
     ///
@@ -391,7 +360,6 @@ impl NSTDSliceMut {
     #[inline]
     pub(crate) const unsafe fn as_slice<T>(&self) -> &[T] {
         assert!(nstd_core_slice_mut_stride(self) == core::mem::size_of::<T>());
-        assert!(self.byte_len() <= isize::MAX as usize);
         let ptr = nstd_core_slice_mut_as_ptr_const(self).cast();
         core::slice::from_raw_parts(ptr, self.len)
     }
@@ -400,11 +368,7 @@ impl NSTDSliceMut {
     ///
     /// # Panics
     ///
-    /// This operation will panic in the following situations:
-    ///
-    /// - `size_of::<T>()` does not match the slice's stride.
-    ///
-    /// - The number of bytes the slice contains is greater than `NSTDInt`'s maximum value.
+    /// This operation will panic if `size_of::<T>()` does not match the slice's stride.
     ///
     /// # Safety
     ///
@@ -416,7 +380,6 @@ impl NSTDSliceMut {
     #[allow(dead_code)]
     pub(crate) unsafe fn as_slice_mut<T>(&mut self) -> &mut [T] {
         assert!(nstd_core_slice_mut_stride(self) == core::mem::size_of::<T>());
-        assert!(self.byte_len() <= isize::MAX as usize);
         let ptr = nstd_core_slice_mut_as_ptr(self).cast();
         core::slice::from_raw_parts_mut(ptr, self.len)
     }
@@ -429,23 +392,23 @@ gen_optional!(NSTDOptionalSliceMut, NSTDSliceMut);
 ///
 /// - `NSTDAnyMut ptr` - A pointer to the first element in the sequence.
 ///
-/// - `NSTDUInt element_size` - The number of bytes each element occupies.
+/// - `NSTDUInt stride` - The number of bytes each element occupies.
 ///
 /// - `NSTDUInt len` - The number of elements in the sequence.
 ///
 /// # Returns
 ///
-/// `NSTDOptionalSliceMut slice` - The new slice on success, or a "none" variant if `ptr` is null.
-#[inline]
+/// `NSTDOptionalSliceMut slice` - The new slice on success, or an uninitialized "none" variant if
+/// either `ptr` is null or the slice's length in bytes would exceed `NSTDInt`'s max value.
 #[nstdapi]
 pub fn nstd_core_slice_mut_new(
     ptr: NSTDAnyMut,
-    element_size: NSTDUInt,
+    stride: NSTDUInt,
     len: NSTDUInt,
 ) -> NSTDOptionalSliceMut {
-    match nstd_core_ptr_mut_new(ptr, element_size) {
-        NSTDOptional::Some(ptr) => NSTDOptional::Some(NSTDSliceMut { ptr, len }),
-        _ => NSTDOptional::None,
+    match !ptr.is_null() && len * stride <= NSTD_INT_MAX as _ {
+        true => NSTDOptional::Some(NSTDSliceMut { ptr, len, stride }),
+        false => NSTDOptional::None,
     }
 }
 
@@ -455,7 +418,7 @@ pub fn nstd_core_slice_mut_new(
 ///
 /// - `NSTDAnyMut ptr` - A pointer to the first element in the sequence.
 ///
-/// - `NSTDUInt element_size` - The number of bytes each element occupies.
+/// - `NSTDUInt stride` - The number of bytes each element occupies.
 ///
 /// - `NSTDUInt len` - The number of elements in the sequence.
 ///
@@ -465,38 +428,34 @@ pub fn nstd_core_slice_mut_new(
 ///
 /// # Safety
 ///
-/// The user of this function must ensure that `ptr` is not null.
+/// The user of this function must ensure that `ptr` is non-null, and that the slice's total length
+/// in bytes will not exceed `NSTDInt`'s max value.
 #[inline]
 #[nstdapi]
 pub const unsafe fn nstd_core_slice_mut_new_unchecked(
     ptr: NSTDAnyMut,
-    element_size: NSTDUInt,
+    stride: NSTDUInt,
     len: NSTDUInt,
 ) -> NSTDSliceMut {
-    NSTDSliceMut {
-        ptr: nstd_core_ptr_mut_new_unchecked(ptr, element_size),
-        len,
-    }
+    NSTDSliceMut { ptr, len, stride }
 }
 
-/// Creates a new empty slice with a given `element_size`.
+/// Creates a new empty slice with a given `stride`.
 ///
 /// # Parameters:
 ///
-/// - `NSTDUInt element_size` - The number of bytes each element occupies.
+/// - `NSTDUInt stride` - The number of bytes each element occupies.
 ///
 /// # Returns
 ///
 /// `NSTDSliceMut slice` - The new empty slice.
 #[inline]
 #[nstdapi]
-pub const fn nstd_core_slice_mut_empty(element_size: NSTDUInt) -> NSTDSliceMut {
+pub const fn nstd_core_slice_mut_empty(stride: NSTDUInt) -> NSTDSliceMut {
     NSTDSliceMut {
-        // SAFETY: The slice is given a non-null pointer and a length of 0.
-        ptr: unsafe {
-            nstd_core_ptr_mut_new_unchecked(nstd_core_ptr_raw_dangling_mut(), element_size)
-        },
+        ptr: nstd_core_ptr_raw_dangling_mut(),
         len: 0,
+        stride,
     }
 }
 
@@ -548,7 +507,7 @@ pub const fn nstd_core_slice_mut_as_const(slice: &NSTDSliceMut) -> NSTDSlice {
 #[inline]
 #[nstdapi]
 pub fn nstd_core_slice_mut_as_ptr(slice: &mut NSTDSliceMut) -> NSTDAnyMut {
-    nstd_core_ptr_mut_get(&mut slice.ptr)
+    slice.ptr
 }
 
 /// Returns an immutable raw pointer to the slice's memory.
@@ -574,7 +533,7 @@ pub fn nstd_core_slice_mut_as_ptr(slice: &mut NSTDSliceMut) -> NSTDAnyMut {
 #[inline]
 #[nstdapi]
 pub const fn nstd_core_slice_mut_as_ptr_const(slice: &NSTDSliceMut) -> NSTDAny {
-    nstd_core_ptr_mut_get_const(&slice.ptr)
+    slice.ptr
 }
 
 /// Returns the number of elements in a slice.
@@ -625,7 +584,7 @@ pub const fn nstd_core_slice_mut_len(slice: &NSTDSliceMut) -> NSTDUInt {
 #[inline]
 #[nstdapi]
 pub const fn nstd_core_slice_mut_stride(slice: &NSTDSliceMut) -> NSTDUInt {
-    nstd_core_ptr_mut_size(&slice.ptr)
+    slice.stride
 }
 
 /// Returns a pointer to the element at index `pos` in `slice`.
@@ -640,10 +599,6 @@ pub const fn nstd_core_slice_mut_stride(slice: &NSTDSliceMut) -> NSTDUInt {
 ///
 /// `NSTDAnyMut element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out of
 /// the slice's boundaries.
-///
-/// # Panics
-///
-/// Panics if the slice's current length in bytes exceeds `NSTDInt`'s max value.
 ///
 /// # Example
 ///
@@ -682,10 +637,6 @@ pub fn nstd_core_slice_mut_get(slice: &mut NSTDSliceMut, pos: NSTDUInt) -> NSTDA
 /// `NSTDAny element` - A pointer to the element at `pos` or `NSTD_NULL` if `pos` is out
 /// of the slice's boundaries.
 ///
-/// # Panics
-///
-/// Panics if the slice's current length in bytes exceeds `NSTDInt`'s max value.
-///
 /// # Example
 ///
 /// ```
@@ -709,7 +660,6 @@ pub fn nstd_core_slice_mut_get(slice: &mut NSTDSliceMut, pos: NSTDUInt) -> NSTDA
 pub const fn nstd_core_slice_mut_get_const(slice: &NSTDSliceMut, mut pos: NSTDUInt) -> NSTDAny {
     if pos < slice.len {
         pos *= nstd_core_slice_mut_stride(slice);
-        assert!(pos <= isize::MAX as usize);
         // SAFETY: We've checked `pos`.
         return unsafe { nstd_core_slice_mut_as_ptr_const(slice).add(pos) };
     }
@@ -796,10 +746,6 @@ pub const fn nstd_core_slice_mut_first_const(slice: &NSTDSliceMut) -> NSTDAny {
 /// `NSTDAnyMut element` - A pointer to the last element in `slice` or `NSTD_NULL` if the slice
 /// is empty.
 ///
-/// # Panics
-///
-/// Panics if the slice's current length in bytes exceeds `NSTDInt`'s max value.
-///
 /// # Example
 ///
 /// ```
@@ -830,10 +776,6 @@ pub fn nstd_core_slice_mut_last(slice: &mut NSTDSliceMut) -> NSTDAnyMut {
 ///
 /// `NSTDAny element` - A pointer to the last element in `slice` or `NSTD_NULL` if the
 /// slice is empty.
-///
-/// # Panics
-///
-/// Panics if the slice's current length in bytes exceeds `NSTDInt`'s max value.
 ///
 /// # Example
 ///

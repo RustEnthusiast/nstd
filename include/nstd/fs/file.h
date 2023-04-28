@@ -44,10 +44,6 @@ NSTDResult(NSTDFile, NSTDIOError) NSTDFileResult;
 ///
 /// `NSTDFileResult file` - A handle to the opened file, or the IO error on failure.
 ///
-/// # Panics
-///
-/// Panics if `name`'s length in bytes exceeds `NSTDInt`'s max value.
-///
 /// # Safety
 ///
 /// This operation can cause undefined behavior if `name`'s data is invalid.
@@ -134,10 +130,6 @@ NSTDAPI NSTDIOResult nstd_fs_file_read(NSTDFile *file, NSTDSliceMut *buffer);
 ///
 /// `NSTDIOResult read` - The number of bytes read from `handle` on success, or the I/O operation
 /// error code on failure.
-///
-/// # Panics
-///
-/// This function will panic if `buffer`'s length in bytes ends up exceeding `NSTDInt`'s max value.
 NSTDAPI NSTDIOResult nstd_fs_file_read_all(NSTDFile *file, NSTDVec *buffer);
 
 /// Continuously reads UTF-8 data from `file` into a string buffer until EOF is reached.
@@ -157,10 +149,6 @@ NSTDAPI NSTDIOResult nstd_fs_file_read_all(NSTDFile *file, NSTDVec *buffer);
 ///
 /// `NSTDIOResult read` - The number of bytes read from `handle` on success, or the I/O operation
 /// error code on failure.
-///
-/// # Panics
-///
-/// This function will panic if `buffer`'s length in bytes ends up exceeding `NSTDInt`'s max value.
 NSTDAPI NSTDIOResult nstd_fs_file_read_to_string(NSTDFile *file, NSTDString *buffer);
 
 /// Reads enough data from `file` to fill the entirety of `buffer`.

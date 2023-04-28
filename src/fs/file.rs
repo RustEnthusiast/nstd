@@ -51,10 +51,6 @@ pub type NSTDFileResult = NSTDResult<NSTDFile, NSTDIOError>;
 ///
 /// `NSTDFileResult file` - A handle to the opened file, or the IO error on failure.
 ///
-/// # Panics
-///
-/// Panics if `name`'s length in bytes exceeds `NSTDInt`'s max value.
-///
 /// # Safety
 ///
 /// This operation can cause undefined behavior if `name`'s data is invalid.
@@ -180,10 +176,6 @@ pub unsafe fn nstd_fs_file_read(file: &mut NSTDFile, buffer: &mut NSTDSliceMut) 
 ///
 /// `NSTDIOResult read` - The number of bytes read from `handle` on success, or the I/O operation
 /// error code on failure.
-///
-/// # Panics
-///
-/// This function will panic if `buffer`'s length in bytes ends up exceeding `NSTDInt`'s max value.
 #[inline]
 #[nstdapi]
 pub fn nstd_fs_file_read_all(file: &mut NSTDFile, buffer: &mut NSTDVec) -> NSTDIOResult {
@@ -211,10 +203,6 @@ pub fn nstd_fs_file_read_all(file: &mut NSTDFile, buffer: &mut NSTDVec) -> NSTDI
 ///
 /// `NSTDIOResult read` - The number of bytes read from `handle` on success, or the I/O operation
 /// error code on failure.
-///
-/// # Panics
-///
-/// This function will panic if `buffer`'s length in bytes ends up exceeding `NSTDInt`'s max value.
 #[inline]
 #[nstdapi]
 pub fn nstd_fs_file_read_to_string(file: &mut NSTDFile, buffer: &mut NSTDString) -> NSTDIOResult {

@@ -2,23 +2,24 @@
 #define NSTD_CORE_OPTIONAL_H
 #include "../nstd.h"
 
-/// Describes an `NSTDOptional` variant.
-typedef enum {
-    /// No value.
-    NSTD_OPTIONAL_STATUS_NONE,
-    /// "Some" initialized value.
-    NSTD_OPTIONAL_STATUS_SOME
-} NSTDOptionalStatus;
+/// Describes an `NSTDOptional` with no value.
+#define NSTD_OPTIONAL_NONE 0
+/// Describes an `NSTDOptional` with "some" initialized value.
+#define NSTD_OPTIONAL_SOME 1
 
 /// Represents an optional (possibly uninitialized) value.
-#define NSTDOptional(T)            \
-    typedef struct {               \
-        NSTDOptionalStatus status; \
-        union {                    \
-            T some;                \
-        } value;                   \
+#define NSTDOptional(T)   \
+    typedef struct {      \
+        NSTDUInt8 status; \
+        union {           \
+            T some;       \
+        } value;          \
     }
 
+/// Represents an optional value of type `NSTDAny`.
+NSTDOptional(NSTDAny) NSTDOptionalAny;
+/// Represents an optional value of type `NSTDAnyMut`.
+NSTDOptional(NSTDAnyMut) NSTDOptionalAnyMut;
 /// Represents an optional value of type `NSTDBool`.
 NSTDOptional(NSTDBool) NSTDOptionalBool;
 /// Represents an optional value of type `NSTDChar`.

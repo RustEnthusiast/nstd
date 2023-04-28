@@ -16,14 +16,72 @@ pub mod range;
 pub mod result;
 pub mod slice;
 pub mod str;
-pub mod unichar;
 pub mod time;
+pub mod unichar;
 use self::str::NSTDStr;
+use super::NSTDInt;
 use nstdapi::nstdapi;
+
+/// [NSTDInt]'s maximum value.
+pub(crate) const NSTD_INT_MAX: NSTDInt = NSTDInt::MAX;
+
+/// Takes advantage of Rust's unwinding behavior by panicking while a thread is already unwinding
+/// from a panic, resulting in program abortion.
+struct Abort;
+impl Drop for Abort {
+    /// Panics if Rust's panic strategy is set to unwind.
+    #[inline]
+    fn drop(&mut self) {
+        #[cfg(panic = "unwind")]
+        panic!();
+    }
+}
+
+/// Terminates the program immediately in an abnormal fashion.
+///
+/// This operation will never return.
+///
+/// # Panics
+///
+/// This operation will always panic.
+#[inline]
+#[nstdapi]
+pub const fn nstd_core_abort() -> ! {
+    #[allow(unused_variables)]
+    let abort = Abort;
+    panic!();
+}
+
+/// Terminates the program immediately in an abnormal fashion with a UTF-8 encoded payload.
+///
+/// This operation will never return.
+///
+/// # Parameters:
+///
+/// - `const NSTDStr *msg` - The message to abort with.
+///
+/// # Panics
+///
+/// This function will always panic.
+///
+/// # Safety
+///
+/// `msg`'s data must be valid for reads.
+#[inline]
+#[nstdapi]
+pub const unsafe fn nstd_core_abort_with_msg(msg: &NSTDStr) -> ! {
+    #[allow(unused_variables)]
+    let abort = Abort;
+    panic!("{}", msg.as_str());
+}
 
 /// Invokes the runtime's panic handler.
 ///
 /// This operation will never return.
+///
+/// In contrast to `nstd_core_abort`, which will terminate the program immediately, this method of
+/// abortion will begin unwinding the stack (when panic = "unwind"). This can be useful for Rust
+/// programs that don't unwind through call frames from foreign languages.
 ///
 /// # Panics
 ///
@@ -37,6 +95,10 @@ pub const fn nstd_core_panic() -> ! {
 /// Invokes the runtime's panic handler with a UTF-8 encoded payload.
 ///
 /// This operation will never return.
+///
+/// In contrast to `nstd_core_abort_with_msg`, which will terminate the program immediately, this
+/// method of abortion will begin unwinding the stack (when panic = "unwind"). This can be useful
+/// for Rust programs that don't unwind through call frames from foreign languages.
 ///
 /// # Parameters:
 ///

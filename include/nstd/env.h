@@ -62,10 +62,6 @@ NSTDAPI NSTDString nstd_env_temp_dir(void);
 ///
 /// `NSTDIOError errc` - The I/O operation error code.
 ///
-/// # Panics
-///
-/// This operation will panic if `path`'s length in bytes exceeds `NSTDInt`'s max value.
-///
 /// # Safety
 ///
 /// The user of this function must ensure that `path` is valid for reads.
@@ -85,8 +81,7 @@ NSTDAPI NSTDIOError nstd_env_set_current_dir(const NSTDStr *path);
 ///
 /// # Panics
 ///
-/// This operation will panic if `key`'s length in bytes exceeds `NSTDInt`'s max value, or
-/// allocating the string fails.
+/// This operation will panic if allocating for the string fails.
 ///
 /// # Safety
 ///
@@ -109,8 +104,6 @@ NSTDAPI NSTDIOStringResult nstd_env_var(const NSTDStr *key);
 ///
 /// - `value` contains the ASCII null character `'\0'`.
 ///
-/// - Either `key` or `value`'s length in bytes exceeds `NSTDInt`'s max value.
-///
 /// # Safety
 ///
 /// The user of this function must ensure that both `key` and `value` are valid for reads.
@@ -128,8 +121,6 @@ NSTDAPI void nstd_env_set_var(const NSTDStr *key, const NSTDStr *value);
 ///
 /// - `key` is empty or contains either of the following ASCII characters: `'='` or `'\0'`.
 ///
-/// - `key`'s size in bytes exceeds `NSTDInt`'s max value.
-///
 /// - The environment variable's value contains the ASCII null character `'\0'`.
 ///
 /// # Safety
@@ -145,13 +136,7 @@ NSTDAPI void nstd_env_remove_var(const NSTDStr *key);
 ///
 /// # Panics
 ///
-/// This operation may panic in the following situations:
-///
-/// - Any arguments are invalid Unicode.
-///
-/// - Allocating for any of the arguments fails.
-///
-/// - The total number of bytes required for the vector exceeds `NSTDInt`'s max value.
+/// This operation will panic if any arguments contain invalid Unicode or allocating fails.
 NSTDAPI NSTDVec nstd_env_args(void);
 
 /// Returns an `NSTDVec` of `NSTDString[2]` which each represent an environment variable from the
@@ -163,13 +148,8 @@ NSTDAPI NSTDVec nstd_env_args(void);
 ///
 /// # Panics
 ///
-/// This operation may panic in the following situations:
-///
-/// - Any of the environment variable's keys or values are invalid Unicode.
-///
-/// - Allocating for any of the keys/values fails.
-///
-/// - The total number of bytes required for the vector exceeds `NSTDInt`'s max value.
+/// This operation will panic if any environment variables contain invalid Unicode or allocating
+/// fails.
 NSTDAPI NSTDVec nstd_env_vars(void);
 
 #endif

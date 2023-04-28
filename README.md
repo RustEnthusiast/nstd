@@ -8,12 +8,15 @@ Rust syntax).
 # Example using C
 ```c
 // Build nstd with features set to "capi nstd_core nstd_io".
+#include <assert.h>
 #include <nstd.h>
 
 /// Main entry point of the program.
-int main() {
-    const NSTDStr output = nstd_core_str_from_raw_cstr("Hello, 🌎!");
-    nstd_io_print_line(&output);
+int main(void) {
+    const NSTDOptionalStr output_opt = nstd_core_str_from_raw_cstr("Hello, 🌎!");
+    assert(output_opt.status);
+    const NSTDStr output = output_opt.value.some;
+    assert(nstd_io_print_line(&output) == NSTD_IO_ERROR_NONE);
     return 0;
 }
 ```
@@ -100,6 +103,8 @@ Users can refer to the [docs](https://docs.rs/nstd-sys/latest/nstd_sys/) to see 
 or return valid references.
 
 - Input reference data is assumed to remain unaltered by other code/threads.
+
+- C function pointers are assumed to be non-null unless wrapped in an `Option`.
 
 - Private (non-`pub`) structure members must not be directly accessed by the user.
 

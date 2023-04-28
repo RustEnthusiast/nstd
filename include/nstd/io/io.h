@@ -72,10 +72,6 @@ NSTDResult(NSTDString, NSTDIOError) NSTDIOStringResult;
 ///
 /// `NSTDIOError errc` - The I/O operation error code.
 ///
-/// # Panics
-///
-/// Panics if `output`'s length in bytes exceeds `NSTDInt`'s max value.
-///
 /// # Safety
 ///
 /// The provided string slice's data must be valid, else this function can cause garbage bytes to
@@ -92,10 +88,6 @@ NSTDAPI NSTDIOError nstd_io_print(const NSTDStr *output);
 ///
 /// `NSTDIOError errc` - The I/O operation error code.
 ///
-/// # Panics
-///
-/// Panics if `output`'s length in bytes exceeds `NSTDInt`'s max value.
-///
 /// # Safety
 ///
 /// The provided string slice's data must be valid, else this function can cause garbage bytes to
@@ -111,8 +103,7 @@ NSTDAPI NSTDIOError nstd_io_print_line(const NSTDStr *output);
 ///
 /// # Panics
 ///
-/// Panics if allocating the string fails or the input's length in bytes exceeds `NSTDInt`'s max
-/// value.
+/// Panics if allocating the string fails.
 NSTDAPI NSTDIOStringResult nstd_io_read(void);
 
 /// Reads a line of UTF-8 input from stdin.

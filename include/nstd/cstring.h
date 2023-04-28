@@ -22,12 +22,9 @@ NSTDOptional(NSTDCString) NSTDOptionalCString;
 ///
 /// # Returns
 ///
-/// `NSTDCString cstring` - The new C string.
-///
-/// # Panics
-///
-/// This function will panic if allocating for the null byte fails.
-NSTDAPI NSTDCString nstd_cstring_new(void);
+/// `NSTDOptionalCString cstring` - The new C string on success, or an uninitialized "none" variant
+/// if allocating for the C string's null terminator fails.
+NSTDAPI NSTDOptionalCString nstd_cstring_new(void);
 
 /// Creates a new `NSTDCString` initialized with the given capacity.
 ///
@@ -37,12 +34,13 @@ NSTDAPI NSTDCString nstd_cstring_new(void);
 ///
 /// # Returns
 ///
-/// `NSTDCString cstring` - The new C string.
+/// `NSTDOptionalCString cstring` - The new C string on success, or an uninitialized "none" variant
+/// if allocating fails.
 ///
 /// # Panics
 ///
-/// This function will panic if either `cap` is zero or allocating fails.
-NSTDAPI NSTDCString nstd_cstring_new_with_cap(NSTDUInt cap);
+/// This function will panic if `cap` is zero.
+NSTDAPI NSTDOptionalCString nstd_cstring_new_with_cap(NSTDUInt cap);
 
 /// Creates an owned version of an unowned C string slice.
 ///
@@ -54,10 +52,6 @@ NSTDAPI NSTDCString nstd_cstring_new_with_cap(NSTDUInt cap);
 ///
 /// `NSTDOptionalCString cstring` - The new owned version of `cstr` on success, or an uninitialized
 /// "none" variant if `cstr` contains a null byte or allocating fails.
-///
-/// # Panics
-///
-/// This operation will panic if `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -75,10 +69,6 @@ NSTDAPI NSTDOptionalCString nstd_cstring_from_cstr(const NSTDCStr *cstr);
 ///
 /// `NSTDOptionalCString cstring` - The new owned version of `cstr` on success, or an uninitialized
 /// "none" variant if allocating fails.
-///
-/// # Panics
-///
-/// This operation will panic if `cstr`'s length is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -102,11 +92,7 @@ NSTDAPI NSTDOptionalCString nstd_cstring_from_cstr_unchecked(const NSTDCStr *cst
 ///
 /// # Panics
 ///
-/// This operation will panic in the following situations:
-///
-/// - `bytes`'s stride is not 1.
-///
-/// - `bytes`'s length is greater than `NSTDInt`'s max value.
+/// This operation will panic if `bytes`'s stride is not 1.
 NSTDAPI NSTDOptionalCString nstd_cstring_from_bytes(NSTDVec bytes);
 
 /// Creates a deep copy of an `NSTDCString`.
@@ -210,10 +196,10 @@ NSTDAPI NSTDUInt nstd_cstring_cap(const NSTDCString *cstring);
 ///
 /// - `NSTDChar chr` - The C char to append to the C string.
 ///
-/// # Panics
+/// # Returns
 ///
-/// This operation panics if `chr` cannot be appended to the C string.
-NSTDAPI void nstd_cstring_push(NSTDCString *cstring, NSTDChar chr);
+/// `NSTDAllocError errc` - The allocation operation error code.
+NSTDAPI NSTDAllocError nstd_cstring_push(NSTDCString *cstring, NSTDChar chr);
 
 /// Appends a C string slice to the end of a C string.
 ///
@@ -233,11 +219,7 @@ NSTDAPI void nstd_cstring_push(NSTDCString *cstring, NSTDChar chr);
 ///
 /// - `cstr` contains a null byte.
 ///
-/// - `cstr`'s length is greater than `NSTDInt`'s max value.
-///
 /// - Appending the new null byte to the end of the C string fails.
-///
-/// - The new length in bytes exceeds `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -253,10 +235,6 @@ NSTDAPI NSTDAllocError nstd_cstring_push_cstr(NSTDCString *cstring, const NSTDCS
 /// # Returns
 ///
 /// `NSTDChar chr` - The removed character, or null if the C string is empty.
-///
-/// # Panics
-///
-/// This function will panic if getting a pointer to the C string's last character fails.
 NSTDAPI NSTDChar nstd_cstring_pop(NSTDCString *cstring);
 
 /// Sets a C string's length to zero.
