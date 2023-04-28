@@ -71,15 +71,7 @@ impl NSTDGLShaderSource<'_> {
     ///
     /// # Panics
     ///
-    /// This operation will panic in the following situations:
-    ///
-    /// - `wgsl`'s source length in bytes exceeds `NSTDInt`'s max value.
-    ///
-    /// - `spirv`'s stride is not 4.
-    ///
-    /// - `spirv`'s length in bytes exceeds `NSTDInt`'s max value.
-    ///
-    /// - `glsl`'s source length in bytes exceeds `NSTDInt`'s max value.
+    /// This operation will panic if `spirv`'s stride is not 4.
     ///
     /// # Safety
     ///
@@ -305,15 +297,7 @@ pub type NSTDGLShader = Box<RenderPipeline>;
 ///
 /// # Panics
 ///
-/// This operation will panic in the following situations:
-///
-/// - `source.wgsl`'s source length in bytes exceeds `NSTDInt`'s max value.
-///
-/// - `source.spirv`'s stride is not 4.
-///
-/// - `source.spirv`'s length in bytes exceeds `NSTDInt`'s max value.
-///
-/// - `source.glsl`'s source length in bytes exceeds `NSTDInt`'s max value.
+/// This operation will panic if `source.spirv`'s stride is not 4.
 ///
 /// # Safety
 ///
@@ -359,11 +343,7 @@ pub fn nstd_gl_shader_module_free(module: NSTDGLShaderModule) {}
 ///
 /// - `desc.buffers`'s stride does not match `NSTDGLVertexBufferLayout`'s size in bytes.
 ///
-/// - `desc.buffers`'s length in bytes exceeds `NSTDInt`'s max value.
-///
 /// - `desc.buffers.attributes`'s stride does not match `NSTDGLVertexAttribute`'s size in bytes.
-///
-/// - `desc.buffers.attributes`'s length in bytes exceeds `NSTDInt`'s max value.
 ///
 /// # Safety
 ///

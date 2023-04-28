@@ -46,11 +46,7 @@ pub type NSTDGLBuffer = Box<Buffer>;
 ///
 /// # Panics
 ///
-/// This operation will panic in the following situations:
-///
-/// - `data`'s stride is not 1.
-///
-/// - `data`'s length exceeds `NSTDInt`'s max value.
+/// This operation will panic if `data`'s stride is not 1.
 ///
 /// # Safety
 ///
