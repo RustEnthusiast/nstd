@@ -3,7 +3,18 @@
 #include "core/optional.h"
 #include "core/time.h"
 #include "nstd.h"
+#include "os/os.h"
+#ifdef NSTD_OS_UNIX
+#    include "os/unix/time.h"
+#endif
 
+#ifdef NSTD_OS_UNIX
+/// A structure representing system time since January 1st 1970.
+typedef NSTDUnixTime NSTDTime;
+
+/// Represents an optional value of type `NSTDTime`.
+typedef NSTDUnixOptionalTime NSTDOptionalTime;
+#else
 /// A structure representing system time since January 1st 1970.
 typedef struct {
     /// The time span since January 1st 1970.
@@ -12,13 +23,15 @@ typedef struct {
 
 /// Represents an optional value of type `NSTDTime`.
 NSTDOptional(NSTDTime) NSTDOptionalTime;
+#endif
 
 /// Returns the current system time as an `NSTDTime` object.
 ///
 /// # Returns
 ///
-/// `NSTDTime time` - The current time.
-NSTDAPI NSTDTime nstd_time_now(void);
+/// `NSTDOptionalTime time` - The current time on success, or an uninitialized "none" variant on
+/// failure.
+NSTDAPI NSTDOptionalTime nstd_time_now(void);
 
 /// Returns the number of seconds stored in an `NSTDTime` object as an `NSTDFloat64`.
 ///

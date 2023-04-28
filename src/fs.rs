@@ -60,10 +60,6 @@ pub type NSTDFileMetadataResult = NSTDResult<NSTDFileMetadata, NSTDIOError>;
 ///
 /// `NSTDIOError errc` - The I/O operation error code.
 ///
-/// # Panics
-///
-/// Panics if `name`'s length in bytes exceeds `NSTDInt`'s max value.
-///
 /// # Safety
 ///
 /// This operation can cause undefined behavior if `name`'s data is invalid.
@@ -85,10 +81,6 @@ pub unsafe fn nstd_fs_create_file(name: &NSTDStr) -> NSTDIOError {
 /// # Returns
 ///
 /// `NSTDIOError errc` - The I/O operation error code.
-///
-/// # Panics
-///
-/// Panics if `name`'s length in bytes exceeds `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -112,10 +104,6 @@ pub unsafe fn nstd_fs_create_dir(name: &NSTDStr) -> NSTDIOError {
 ///
 /// `NSTDIOError errc` - The I/O operation error code.
 ///
-/// # Panics
-///
-/// Panics if `name`'s length in bytes exceeds `NSTDInt`'s max value.
-///
 /// # Safety
 ///
 /// This operation can cause undefined behavior if `name`'s data is invalid.
@@ -137,10 +125,6 @@ pub unsafe fn nstd_fs_create_dirs(name: &NSTDStr) -> NSTDIOError {
 /// # Returns
 ///
 /// `NSTDIOError errc` - The I/O operation error code.
-///
-/// # Panics
-///
-/// Panics if `name`'s length in bytes exceeds `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -164,10 +148,6 @@ pub unsafe fn nstd_fs_remove_file(name: &NSTDStr) -> NSTDIOError {
 ///
 /// `NSTDIOError errc` - The I/O operation error code.
 ///
-/// # Panics
-///
-/// Panics if `name`'s length in bytes exceeds `NSTDInt`'s max value.
-///
 /// # Safety
 ///
 /// This operation can cause undefined behavior if `name`'s data is invalid.
@@ -189,10 +169,6 @@ pub unsafe fn nstd_fs_remove_dir(name: &NSTDStr) -> NSTDIOError {
 /// # Returns
 ///
 /// `NSTDIOError errc` - The I/O operation error code.
-///
-/// # Panics
-///
-/// Panics if `name`'s length in bytes exceeds `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -218,8 +194,7 @@ pub unsafe fn nstd_fs_remove_dirs(name: &NSTDStr) -> NSTDIOError {
 ///
 /// # Panics
 ///
-/// This operation will panic if `path`'s length in bytes exceeds `NSTDInt`'s max value or
-/// allocating fails.
+/// This operation will panic if allocating fails.
 ///
 /// # Safety
 ///
@@ -244,8 +219,7 @@ pub unsafe fn nstd_fs_read(path: &NSTDStr) -> NSTDIOBufferResult {
 ///
 /// # Panics
 ///
-/// This operation will panic if `path`'s length in bytes exceeds `NSTDInt`'s max value or
-/// allocating fails.
+/// This operation will panic if allocating fails.
 ///
 /// # Safety
 ///
@@ -272,13 +246,7 @@ pub unsafe fn nstd_fs_read_to_string(path: &NSTDStr) -> NSTDIOStringResult {
 ///
 /// # Panics
 ///
-/// This operation will panic in the following situations:
-///
-/// - `path`'s length in bytes is greater than `NSTDInt`'s max value.
-///
-/// - `content`'s stride is not 1.
-///
-/// - `content`'s length is greater than `NSTDInt`'s max value.
+/// This operation will panic if `content`'s stride is not 1.
 ///
 /// # Safety
 ///
@@ -304,14 +272,6 @@ pub unsafe fn nstd_fs_write(path: &NSTDStr, content: &NSTDSlice) -> NSTDIOError 
 ///
 /// `NSTDIOError errc` - The I/O operation error code.
 ///
-/// # Panics
-///
-/// This operation will panic in the following situations:
-///
-/// - `from`'s length in bytes is greater than `NSTDInt`'s max value.
-///
-/// - `to`'s length in bytes is greater than `NSTDInt`'s max value.
-///
 /// # Safety
 ///
 /// This operation can cause undefined behavior if either `to` or `from`'s data is invalid.
@@ -335,14 +295,6 @@ pub unsafe fn nstd_fs_rename(from: &NSTDStr, to: &NSTDStr) -> NSTDIOError {
 /// # Returns
 ///
 /// `NSTDIOError errc` - The I/O operation error code.
-///
-/// # Panics
-///
-/// This operation will panic in the following situations:
-///
-/// - `from`'s length in bytes is greater than `NSTDInt`'s max value.
-///
-/// - `to`'s length in bytes is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -369,8 +321,7 @@ pub unsafe fn nstd_fs_copy(from: &NSTDStr, to: &NSTDStr) -> NSTDIOError {
 ///
 /// # Panics
 ///
-/// This operation will panic if `path`'s length in bytes exceeds `NSTDInt`'s max value or
-/// allocating fails.
+/// This operation will panic if allocating fails.
 ///
 /// # Safety
 ///
@@ -395,10 +346,6 @@ pub unsafe fn nstd_fs_absolute(path: &NSTDStr) -> NSTDIOStringResult {
 /// # Returns
 ///
 /// `NSTDFileMetadataResult metadata` - Metadata describing the file.
-///
-/// # Panics
-///
-/// This operation will panic if `path`'s length in bytes exceeds `NSTDInt`'s max value.
 ///
 /// # Safety
 ///

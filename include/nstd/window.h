@@ -59,10 +59,6 @@ NSTDAPI NSTDWindowID nstd_window_id(const NSTDWindow *window);
 ///
 /// - `const NSTDStr *title` - The new title of the window.
 ///
-/// # Panics
-///
-/// Panics if `title`'s length in bytes is greater than `NSTDInt`'s max value.
-///
 /// # Safety
 ///
 /// This function can cause undefined behavior if `title`'s data is invalid.
@@ -75,10 +71,6 @@ NSTDAPI void nstd_window_set_title(const NSTDWindow *window, const NSTDStr *titl
 /// - `const NSTDWindow *window` - The window.
 ///
 /// - `const NSTDImage *icon` - The image to set as the window icon.
-///
-/// # Panics
-///
-/// Panics if the image's length in bytes exceeds `NSTDInt`'s max value.
 NSTDAPI void nstd_window_set_icon(const NSTDWindow *window, const NSTDImage *icon);
 
 /// Sets the position of a window.

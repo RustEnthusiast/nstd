@@ -109,4 +109,17 @@ NSTDAPI NSTDAnyMut nstd_heap_ptr_get_mut(NSTDHeapPtr *hptr);
 /// - `NSTDHeapPtr hptr` - A pointer to the heap object.
 NSTDAPI void nstd_heap_ptr_free(NSTDHeapPtr hptr);
 
+/// Frees an instance of `NSTDHeapPtr` after invoking `callback` with the heap object's data.
+///
+/// # Parameters:
+///
+/// - `NSTDHeapPtr hptr` - A pointer to the heap object.
+///
+/// - `void (*callback)(NSTDAnyMut)` - The heap object's destructor.
+///
+/// # Safety
+///
+/// This operation makes a direct call on a C function pointer (`callback`).
+NSTDAPI void nstd_heap_ptr_drop(NSTDHeapPtr hptr, void (*callback)(NSTDAnyMut));
+
 #endif

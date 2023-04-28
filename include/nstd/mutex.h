@@ -98,6 +98,18 @@ NSTDAPI NSTDAnyMut nstd_mutex_get_mut(NSTDMutexGuard *guard);
 /// `NSTDOptionalMutexLockResult guard` - A handle to the mutex's protected data.
 NSTDAPI NSTDOptionalMutexLockResult nstd_mutex_try_lock(const NSTDMutex *mutex);
 
+/// Consumes a mutex and returns the data it was protecting.
+///
+/// # Parameters:
+///
+/// - `NSTDMutex mutex` - The mutex to take ownership of.
+///
+/// # Returns
+///
+/// `NSTDOptionalHeapPtr data` - Ownership of the mutex's data, or an uninitialized "none" variant
+/// if the mutex was poisoned.
+NSTDAPI NSTDOptionalHeapPtr nstd_mutex_into_inner(NSTDMutex mutex);
+
 /// Unlocks a mutex by consuming a mutex guard.
 ///
 /// # Parameters:
@@ -111,5 +123,20 @@ NSTDAPI void nstd_mutex_unlock(NSTDMutexGuard guard);
 ///
 /// - `NSTDMutex mutex` - The mutex to free.
 NSTDAPI void nstd_mutex_free(NSTDMutex mutex);
+
+/// Frees an instance of `NSTDMutex` after invoking `callback` with the mutex's data.
+///
+/// `callback` will not be called if the mutex is poisoned.
+///
+/// # Parameters:
+///
+/// - `NSTDMutex mutex` - The mutex to free.
+///
+/// - `void (*callback)(NSTDAnyMut)` - The mutex data's destructor.
+///
+/// # Safety
+///
+/// This operation makes a direct call on a C function pointer (`callback`).
+NSTDAPI void nstd_mutex_drop(NSTDMutex mutex, void (*callback)(NSTDAnyMut));
 
 #endif

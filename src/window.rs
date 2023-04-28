@@ -80,10 +80,6 @@ pub fn nstd_window_id(window: &NSTDWindow) -> NSTDWindowID {
 ///
 /// - `const NSTDStr *title` - The new title of the window.
 ///
-/// # Panics
-///
-/// Panics if `title`'s length in bytes is greater than `NSTDInt`'s max value.
-///
 /// # Safety
 ///
 /// This function can cause undefined behavior if `title`'s data is invalid.
@@ -100,10 +96,6 @@ pub unsafe fn nstd_window_set_title(window: &NSTDWindow, title: &NSTDStr) {
 /// - `const NSTDWindow *window` - The window.
 ///
 /// - `const NSTDImage *icon` - The image to set as the window icon.
-///
-/// # Panics
-///
-/// Panics if the image's length in bytes exceeds `NSTDInt`'s max value.
 #[nstdapi]
 pub fn nstd_window_set_icon(window: &NSTDWindow, icon: &NSTDImage) {
     let width = nstd_image_width(icon);

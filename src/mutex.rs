@@ -1,7 +1,10 @@
 //! A mutual exclusion primitive useful for protecting shared data.
 use crate::{
     core::{optional::NSTDOptional, result::NSTDResult},
-    heap_ptr::{nstd_heap_ptr_get, nstd_heap_ptr_get_mut, NSTDHeapPtr},
+    heap_ptr::{
+        nstd_heap_ptr_drop, nstd_heap_ptr_get, nstd_heap_ptr_get_mut, NSTDHeapPtr,
+        NSTDOptionalHeapPtr,
+    },
     NSTDAny, NSTDAnyMut, NSTDBool,
 };
 use nstdapi::nstdapi;
@@ -133,6 +136,25 @@ pub fn nstd_mutex_get_mut(guard: &mut NSTDMutexGuard) -> NSTDAnyMut {
     nstd_heap_ptr_get_mut(guard)
 }
 
+/// Consumes a mutex and returns the data it was protecting.
+///
+/// # Parameters:
+///
+/// - `NSTDMutex mutex` - The mutex to take ownership of.
+///
+/// # Returns
+///
+/// `NSTDOptionalHeapPtr data` - Ownership of the mutex's data, or an uninitialized "none" variant
+/// if the mutex was poisoned.
+#[inline]
+#[nstdapi]
+pub fn nstd_mutex_into_inner(mutex: NSTDMutex) -> NSTDOptionalHeapPtr {
+    match mutex.into_inner() {
+        Ok(data) => NSTDOptional::Some(data),
+        _ => NSTDOptional::None,
+    }
+}
+
 /// Unlocks a mutex by consuming a mutex guard.
 ///
 /// # Parameters:
@@ -152,3 +174,24 @@ pub fn nstd_mutex_unlock(guard: NSTDMutexGuard) {}
 #[nstdapi]
 #[allow(unused_variables)]
 pub fn nstd_mutex_free(mutex: NSTDMutex) {}
+
+/// Frees an instance of `NSTDMutex` after invoking `callback` with the mutex's data.
+///
+/// `callback` will not be called if the mutex is poisoned.
+///
+/// # Parameters:
+///
+/// - `NSTDMutex mutex` - The mutex to free.
+///
+/// - `void (*callback)(NSTDAnyMut)` - The mutex data's destructor.
+///
+/// # Safety
+///
+/// This operation makes a direct call on a C function pointer (`callback`).
+#[inline]
+#[nstdapi]
+pub unsafe fn nstd_mutex_drop(mutex: NSTDMutex, callback: unsafe extern "C" fn(NSTDAnyMut)) {
+    if let Ok(data) = mutex.into_inner() {
+        nstd_heap_ptr_drop(data, callback);
+    }
+}
