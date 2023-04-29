@@ -83,7 +83,7 @@ naga = { version = "0.10", optional = true }
 nstdapi = "0.1"
 pollster = { version = "0.3", optional = true }
 wgpu = { version = "0.14", features = ["glsl", "spirv"], optional = true }
-winit = { version = "0.27", optional = true }
+winit = { version = "0.28", optional = true }
 
 [target.'cfg(unix)'.dependencies]
 errno = { version = "0.3", optional = true, default-features = false }
