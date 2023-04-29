@@ -37,7 +37,10 @@ nstd_core = []
 nstd_cstring = ["nstd_alloc", "nstd_core", "nstd_vec"]
 nstd_env = ["nstd_core", "nstd_io", "nstd_string", "nstd_vec", "std"]
 nstd_fs = ["nstd_core", "nstd_io", "nstd_os_unix_io", "nstd_string", "nstd_time", "nstd_vec", "std"]
-nstd_gl = ["naga", "nstd_core", "nstd_window", "pollster", "std", "wgpu"]
+nstd_gl = [
+    "naga", "nstd_core", "nstd_window", "pollster", "std", "web-sys/Document", "web-sys/Element",
+    "web-sys/Window", "wgpu"
+]
 nstd_heap_ptr = ["nstd_alloc", "nstd_core"]
 nstd_image = ["image", "nstd_core", "std"]
 nstd_image_gif = ["image/gif", "nstd_image"]
@@ -89,6 +92,7 @@ errno = { version = "0.3", optional = true, default-features = false }
 windows-sys = { version = "0.48", optional = true, features = ["Win32_Foundation"] }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
+web-sys = { version = "0.3", optional = true }
 wgpu = { version = "0.14", features = ["webgl"], optional = true }
 
 [build-dependencies]

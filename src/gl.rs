@@ -18,6 +18,8 @@ use wgpu::{
 pub enum NSTDGLError {
     /// No error occurred.
     NSTD_GL_ERROR_NONE,
+    /// A canvas could not be created for a web window.
+    NSTD_GL_ERROR_CANVAS_NOT_CREATED,
     /// A GPU device adapter could not be acquired.
     NSTD_GL_ERROR_ADAPTER_NOT_FOUND,
     /// A GPU device handle could not be acquired.
@@ -230,6 +232,22 @@ pub type NSTDGLRendererResult = NSTDResult<NSTDGLRenderer, NSTDGLError>;
 /// `desc.window` must remain alive while the returned object is alive.
 #[nstdapi]
 pub unsafe fn nstd_gl_renderer_new(desc: &NSTDGLRendererDescriptor) -> NSTDGLRendererResult {
+    #[cfg(target_arch = "wasm32")]
+    {
+        use web_sys::Element;
+        use winit::platform::web::WindowExtWebSys;
+        // Create a rendering canvas on the web window's body.
+        if web_sys::window()
+            .and_then(|w| {
+                let body = w.document()?.body()?;
+                let canvas = Element::from(desc.window.canvas());
+                body.append_child(&canvas).ok()
+            })
+            .is_none()
+        {
+            return NSTDResult::Err(NSTDGLError::NSTD_GL_ERROR_CANVAS_NOT_CREATED);
+        }
+    }
     // Create an instance of the rendering backend.
     let instance = Instance::new(desc.backend.into());
     // Create the rendering surface.
