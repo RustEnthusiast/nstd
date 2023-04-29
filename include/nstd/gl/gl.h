@@ -8,6 +8,10 @@
 typedef enum {
     /// No error occurred.
     NSTD_GL_ERROR_NONE,
+    /// A canvas could not be created for a web window.
+    NSTD_GL_ERROR_CANVAS_NOT_CREATED,
+    /// A rendering surface could not be created.
+    NSTD_GL_ERROR_SURFACE_NOT_CREATED,
     /// A GPU device adapter could not be acquired.
     NSTD_GL_ERROR_ADAPTER_NOT_FOUND,
     /// A GPU device handle could not be acquired.

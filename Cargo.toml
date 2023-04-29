@@ -79,10 +79,10 @@ cfg-if = "1.0"
 gilrs = { version = "0.10", optional = true }
 image = { version = "0.24", optional = true, default-features = false }
 libc = { version = "0.2", optional = true, default-features = false }
-naga = { version = "0.10", optional = true }
+naga = { version = "0.12", optional = true }
 nstdapi = "0.1"
 pollster = { version = "0.3", optional = true }
-wgpu = { version = "0.14", features = ["glsl", "spirv"], optional = true }
+wgpu = { version = "0.16", features = ["glsl", "spirv"], optional = true }
 winit = { version = "0.28", optional = true }
 
 [target.'cfg(unix)'.dependencies]
@@ -93,7 +93,7 @@ windows-sys = { version = "0.48", optional = true, features = ["Win32_Foundation
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 web-sys = { version = "0.3", optional = true }
-wgpu = { version = "0.14", features = ["webgl"], optional = true }
+wgpu = { version = "0.16", features = ["webgl"], optional = true }
 
 [build-dependencies]
 build-target = { version = "0.4", optional = true }

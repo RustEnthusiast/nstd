@@ -7,8 +7,9 @@ use crate::{core::result::NSTDResult, window::NSTDWindow, NSTDUInt32};
 use nstdapi::nstdapi;
 use pollster::FutureExt;
 use wgpu::{
-    Backends, CompositeAlphaMode, Device, DeviceDescriptor, Instance, PowerPreference, PresentMode,
-    Queue, RequestAdapterOptions, Surface, SurfaceConfiguration, TextureUsages,
+    Backends, CompositeAlphaMode, Device, DeviceDescriptor, Instance, InstanceDescriptor,
+    PowerPreference, PresentMode, Queue, RequestAdapterOptions, Surface, SurfaceConfiguration,
+    TextureUsages,
 };
 
 /// Describes an error returned by an `nstd.gl` function.
@@ -20,6 +21,8 @@ pub enum NSTDGLError {
     NSTD_GL_ERROR_NONE,
     /// A canvas could not be created for a web window.
     NSTD_GL_ERROR_CANVAS_NOT_CREATED,
+    /// A rendering surface could not be created.
+    NSTD_GL_ERROR_SURFACE_NOT_CREATED,
     /// A GPU device adapter could not be acquired.
     NSTD_GL_ERROR_ADAPTER_NOT_FOUND,
     /// A GPU device handle could not be acquired.
@@ -249,9 +252,16 @@ pub unsafe fn nstd_gl_renderer_new(desc: &NSTDGLRendererDescriptor) -> NSTDGLRen
         }
     }
     // Create an instance of the rendering backend.
-    let instance = Instance::new(desc.backend.into());
+    let instance_desc = InstanceDescriptor {
+        backends: desc.backend.into(),
+        ..Default::default()
+    };
+    let instance = Instance::new(instance_desc);
     // Create the rendering surface.
-    let surface = instance.create_surface(desc.window.as_ref());
+    let surface = match instance.create_surface(desc.window.as_ref()) {
+        Ok(surface) => surface,
+        _ => return NSTDResult::Err(NSTDGLError::NSTD_GL_ERROR_SURFACE_NOT_CREATED),
+    };
     // Create the GPU device adapter.
     let adapter_desc = RequestAdapterOptions {
         compatible_surface: Some(&surface),
@@ -274,13 +284,16 @@ pub unsafe fn nstd_gl_renderer_new(desc: &NSTDGLRendererDescriptor) -> NSTDGLRen
     };
     // Configure the surface.
     let window_size = desc.window.inner_size();
+    let formats = surface.get_capabilities(&adapter).formats;
+    let format = *formats.iter().find(|c| c.is_srgb()).unwrap_or(&formats[0]);
     let surface_config = SurfaceConfiguration {
         width: window_size.width,
         height: window_size.height,
         present_mode: desc.presentation_mode.into(),
-        format: surface.get_supported_formats(&adapter)[0],
+        format,
         usage: TextureUsages::RENDER_ATTACHMENT,
         alpha_mode: CompositeAlphaMode::Auto,
+        view_formats: Vec::new(),
     };
     surface.configure(&device, &surface_config);
     // Construct the renderer.
