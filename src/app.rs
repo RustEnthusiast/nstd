@@ -11,7 +11,11 @@ use self::{
     },
 };
 use crate::{
-    core::{def::NSTDErrorCode, str::NSTDStr},
+    core::{
+        def::NSTDErrorCode,
+        optional::{gen_optional, NSTDOptional},
+        str::NSTDStr,
+    },
     heap_ptr::NSTDOptionalHeapPtr,
     NSTDAnyMut, NSTDBool,
 };
@@ -30,17 +34,17 @@ pub struct NSTDApp {
     /// Private app data.
     inner: Box<AppData>,
 }
+gen_optional!(NSTDOptionalApp, NSTDApp);
 
 /// Creates a new `nstd` application.
-///
-/// # Note
 ///
 /// An `NSTDApp` can only be created once on the "main" thread. Attempting to recreate an `NSTDApp`
 /// after one has already been created will result in a panic.
 ///
 /// # Returns
 ///
-/// `NSTDApp app` - The new `NSTDApp`.
+/// `NSTDOptionalApp app` - The new `NSTDApp` or an uninitialized "none" variant if creating the
+/// `nstd` application fails.
 ///
 /// # Panics
 ///
@@ -48,22 +52,23 @@ pub struct NSTDApp {
 ///
 /// - This function was not called on the "main" thread.
 ///
-/// - Creating the gamepad input handler fails.
+/// - An `NSTDApp` has already been created.
 #[nstdapi]
-pub fn nstd_app_new() -> NSTDApp {
+pub fn nstd_app_new() -> NSTDOptionalApp {
+    // Create the event loop.
     let event_loop = EventLoop::new();
     event_loop.set_device_event_filter(DeviceEventFilter::Never);
-    NSTDApp {
+    // Initialize the gamepad input handler.
+    let gil = match Gilrs::new() {
+        Ok(gil) => gil,
+        Err(NotImplemented(gil)) => gil,
+        _ => return NSTDOptional::None,
+    };
+    // Construct the `nstd` application.
+    NSTDOptional::Some(NSTDApp {
         events: NSTDAppEvents::default(),
-        inner: Box::new(AppData {
-            event_loop,
-            gil: match Gilrs::new() {
-                Ok(gil) => gil,
-                Err(NotImplemented(gil)) => gil,
-                _ => panic!("failed to create gamepad event listener"),
-            },
-        }),
-    }
+        inner: Box::new(AppData { event_loop, gil }),
+    })
 }
 
 /// Returns a handle to an `NSTDApp`'s event loop.

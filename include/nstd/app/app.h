@@ -1,6 +1,7 @@
 #ifndef NSTD_APP_APP_H
 #define NSTD_APP_APP_H
 #include "../core/def.h"
+#include "../core/optional.h"
 #include "../heap_ptr.h"
 #include "../nstd.h"
 #include "data.h"
@@ -15,16 +16,18 @@ typedef struct {
     NSTDAnyMut inner;
 } NSTDApp;
 
+/// Represents an optional value of type `NSTDApp`.
+NSTDOptional(NSTDApp) NSTDOptionalApp;
+
 /// Creates a new `nstd` application.
-///
-/// # Note
 ///
 /// An `NSTDApp` can only be created once on the "main" thread. Attempting to recreate an `NSTDApp`
 /// after one has already been created will result in a panic.
 ///
 /// # Returns
 ///
-/// `NSTDApp app` - The new `NSTDApp`.
+/// `NSTDOptionalApp app` - The new `NSTDApp` or an uninitialized "none" variant if creating the
+/// `nstd` application fails.
 ///
 /// # Panics
 ///
@@ -32,8 +35,8 @@ typedef struct {
 ///
 /// - This function was not called on the "main" thread.
 ///
-/// - Creating the gamepad input handler fails.
-NSTDAPI NSTDApp nstd_app_new(void);
+/// - An `NSTDApp` has already been created.
+NSTDAPI NSTDOptionalApp nstd_app_new(void);
 
 /// Returns a handle to an `NSTDApp`'s event loop.
 ///
