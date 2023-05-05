@@ -1,8 +1,11 @@
 //! An individual window surface texture.
-use super::NSTDGLRenderer;
+use super::{render_pass::NSTDGLRenderPass, NSTDGLRenderer};
 use crate::core::result::NSTDResult;
 use nstdapi::nstdapi;
-use wgpu::{CommandEncoder, SurfaceError, SurfaceTexture, TextureView};
+use wgpu::{
+    Color, CommandEncoder, LoadOp, Operations, RenderPassColorAttachment, RenderPassDescriptor,
+    SurfaceError, SurfaceTexture, TextureView,
+};
 
 /// Describes an error returned from `nstd_gl_frame_new`.
 #[nstdapi]
@@ -31,20 +34,20 @@ impl From<SurfaceError> for NSTDGLFrameError {
 }
 
 /// The frame.
-pub(super) struct Frame {
-    /// `texture`'s view.
-    pub(super) view: TextureView,
-    /// The GPU command encoder.
-    pub(super) encoder: CommandEncoder,
+struct Frame {
     /// The surface's texture.
     texture: SurfaceTexture,
+    /// `texture`'s view.
+    view: TextureView,
+    /// The GPU command encoder.
+    encoder: CommandEncoder,
 }
 
 /// An individual window surface texture.
 #[nstdapi]
 pub struct NSTDGLFrame {
     /// The inner frame.
-    pub(super) frame: Box<Frame>,
+    frame: Box<Frame>,
 }
 
 /// A result type returned from `nstd_gl_frame_new`.
@@ -78,14 +81,40 @@ pub fn nstd_gl_frame_new(renderer: &NSTDGLRenderer) -> NSTDGLFrameResult {
             // Construct the new frame.
             NSTDResult::Ok(NSTDGLFrame {
                 frame: Box::new(Frame {
+                    texture,
                     view,
                     encoder,
-                    texture,
                 }),
             })
         }
         Err(err) => NSTDResult::Err(err.into()),
     }
+}
+
+/// Creates a new render pass that may be used for drawing onto a frame.
+///
+/// # Parameters:
+///
+/// - `NSTDGLFrame *frame` - The frame to create a render pass for.
+///
+/// # Returns
+///
+/// `NSTDGLRenderPass render_pass` - The new render pass.
+#[nstdapi]
+pub fn nstd_gl_frame_render(frame: &mut NSTDGLFrame) -> NSTDGLRenderPass {
+    let render_pass_desc = RenderPassDescriptor {
+        label: None,
+        color_attachments: &[Some(RenderPassColorAttachment {
+            view: &frame.frame.view,
+            ops: Operations {
+                load: LoadOp::Clear(Color::BLACK),
+                store: true,
+            },
+            resolve_target: None,
+        })],
+        depth_stencil_attachment: None,
+    };
+    Box::new(frame.frame.encoder.begin_render_pass(&render_pass_desc))
 }
 
 /// Draws `frame` onto the display.

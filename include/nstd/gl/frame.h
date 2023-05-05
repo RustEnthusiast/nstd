@@ -3,6 +3,7 @@
 #include "../core/result.h"
 #include "../nstd.h"
 #include "gl.h"
+#include "render_pass.h"
 
 /// Describes an error returned from `nstd_gl_frame_new`.
 typedef enum {
@@ -40,6 +41,17 @@ NSTDResult(NSTDGLFrame, NSTDGLFrameError) NSTDGLFrameResult;
 ///
 /// This operation will panic if another frame is alive.
 NSTDAPI NSTDGLFrameResult nstd_gl_frame_new(const NSTDGLRenderer *renderer);
+
+/// Creates a new render pass that may be used for drawing onto a frame.
+///
+/// # Parameters:
+///
+/// - `NSTDGLFrame *frame` - The frame to create a render pass for.
+///
+/// # Returns
+///
+/// `NSTDGLRenderPass render_pass` - The new render pass.
+NSTDAPI NSTDGLRenderPass nstd_gl_frame_render(NSTDGLFrame *frame);
 
 /// Draws `frame` onto the display.
 ///
