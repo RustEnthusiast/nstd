@@ -2,7 +2,7 @@
 use crate::heap_ptr::NSTDOptionalHeapPtr;
 use gilrs::{Event as GamepadEvent, Gilrs};
 use nstdapi::nstdapi;
-use winit::event_loop::{ControlFlow, EventLoop, EventLoopWindowTarget};
+use winit::event_loop::{ControlFlow, EventLoopWindowTarget};
 
 /// A handle to the application event loop.
 pub type NSTDAppHandle<'a> = &'a EventLoopWindowTarget<()>;
@@ -47,12 +47,4 @@ impl<'a> NSTDAppData<'a> {
     pub(crate) fn next_gamepad_event(&mut self) -> Option<GamepadEvent> {
         self.gil.next_event()
     }
-}
-
-/// Private application data.
-pub(super) struct AppData {
-    /// The [winit] event loop.
-    pub(super) event_loop: EventLoop<()>,
-    /// The gamepad input handler.
-    pub(super) gil: Gilrs,
 }
