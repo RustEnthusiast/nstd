@@ -3,7 +3,7 @@ pub mod data;
 pub mod display;
 pub mod events;
 use self::{
-    data::{AppData, NSTDAppData, NSTDAppHandle},
+    data::{NSTDAppData, NSTDAppHandle},
     display::{NSTDDisplay, NSTDDisplayHandle},
     events::{
         NSTDAppEvents, NSTDDeviceEventFilter, NSTDDeviceID, NSTDGamepadAxis, NSTDGamepadButton,
@@ -25,6 +25,14 @@ use winit::{
     event::{DeviceEvent, ElementState, Event, StartCause, WindowEvent},
     event_loop::{ControlFlow, DeviceEventFilter, EventLoop},
 };
+
+/// Private application data.
+struct AppData {
+    /// The [winit] event loop.
+    event_loop: EventLoop<()>,
+    /// The gamepad input handler.
+    gil: Gilrs,
+}
 
 /// An application event loop.
 #[nstdapi]

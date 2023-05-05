@@ -69,7 +69,7 @@ cfg-if = "1.0"
 gilrs = { version = "0.10", optional = true }
 libc = { version = "0.2", optional = true, default-features = false }
 nstdapi = "0.1"
-winit = { version = "0.27", optional = true }
+winit = { version = "0.28", optional = true }
 
 [target.'cfg(unix)'.dependencies]
 errno = { version = "0.3", optional = true, default-features = false }
