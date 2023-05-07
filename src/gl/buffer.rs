@@ -4,7 +4,7 @@ use crate::{core::slice::NSTDSlice, NSTDUInt32, NSTDUInt8};
 use nstdapi::nstdapi;
 use wgpu::{
     util::{BufferInitDescriptor, DeviceExt},
-    Buffer, BufferUsages,
+    Buffer, BufferUsages, IndexFormat,
 };
 
 /// Create a vertex buffer.
@@ -52,7 +52,7 @@ pub unsafe fn nstd_gl_buffer_new(
     Box::new(renderer.renderer.device.create_buffer_init(&buffer_desc))
 }
 
-/// Makes `buffer` active for `render_pass` at `index`.
+/// Makes `buffer` an active vertex buffer for `render_pass` at `index`.
 ///
 /// # Parameters:
 ///
@@ -69,6 +69,22 @@ pub fn nstd_gl_buffer_bind_vertex<'a: 'b, 'b>(
     render_pass: &mut NSTDGLRenderPass<'b>,
 ) {
     render_pass.set_vertex_buffer(index, buffer.slice(..));
+}
+
+/// Makes `buffer` an active index buffer for `render_pass`.
+///
+/// # Parameters:
+///
+/// - `const NSTDGLBuffer *buffer` - The buffer to bind.
+///
+/// - `NSTDGLRenderPass *render_pass` - The render pass in use.
+#[inline]
+#[nstdapi]
+pub fn nstd_gl_buffer_bind_index<'a: 'b, 'b>(
+    buffer: &'a NSTDGLBuffer,
+    render_pass: &mut NSTDGLRenderPass<'b>,
+) {
+    render_pass.set_index_buffer(buffer.slice(..), IndexFormat::Uint32);
 }
 
 /// Frees a GPU buffer.

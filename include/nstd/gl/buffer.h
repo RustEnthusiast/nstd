@@ -35,7 +35,7 @@ typedef NSTDAnyMut NSTDGLBuffer;
 NSTDAPI NSTDGLBuffer
 nstd_gl_buffer_new(const NSTDGLRenderer *renderer, const NSTDSlice *data, NSTDUInt8 buffer_type);
 
-/// Makes `buffer` active for `render_pass` at `index`.
+/// Makes `buffer` an active vertex buffer for `render_pass` at `index`.
 ///
 /// # Parameters:
 ///
@@ -47,6 +47,15 @@ nstd_gl_buffer_new(const NSTDGLRenderer *renderer, const NSTDSlice *data, NSTDUI
 NSTDAPI void nstd_gl_buffer_bind_vertex(
     const NSTDGLBuffer *buffer, NSTDUInt32 index, NSTDGLRenderPass *render_pass
 );
+
+/// Makes `buffer` an active index buffer for `render_pass`.
+///
+/// # Parameters:
+///
+/// - `const NSTDGLBuffer *buffer` - The buffer to bind.
+///
+/// - `NSTDGLRenderPass *render_pass` - The render pass in use.
+NSTDAPI void nstd_gl_buffer_bind_index(const NSTDGLBuffer *buffer, NSTDGLRenderPass *render_pass);
 
 /// Frees a GPU buffer.
 ///
