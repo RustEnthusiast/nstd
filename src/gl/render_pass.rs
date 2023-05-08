@@ -1,5 +1,5 @@
 //! Represents a single render pass.
-use crate::core::range::NSTDRangeU32;
+use crate::{core::range::NSTDRangeU32, NSTDInt32};
 use nstdapi::nstdapi;
 use wgpu::RenderPass;
 
@@ -23,6 +23,32 @@ pub fn nstd_gl_render_pass_draw(
     instances: NSTDRangeU32,
 ) {
     render_pass.draw(vertices.start..vertices.end, instances.start..instances.end);
+}
+
+/// Draws indexed primitives from active vertex and index buffers.
+///
+/// # Parameters:
+///
+/// - `NSTDGLRenderPass *render_pass` - The render pass.
+///
+/// - `NSTDRangeU32 indices` - The range of indices to draw.
+///
+/// - `NSTDInt32 base` - The index of the first vertex to draw.
+///
+/// - `NSTDRangeU32 instances` - The range of instances to draw.
+#[inline]
+#[nstdapi]
+pub fn nstd_gl_render_pass_draw_indexed(
+    render_pass: &mut NSTDGLRenderPass,
+    indices: NSTDRangeU32,
+    base: NSTDInt32,
+    instances: NSTDRangeU32,
+) {
+    render_pass.draw_indexed(
+        indices.start..indices.end,
+        base,
+        instances.start..instances.end,
+    );
 }
 
 /// Frees an instance of `NSTDGLRenderPass`.
