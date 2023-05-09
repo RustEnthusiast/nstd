@@ -3,13 +3,39 @@ pub mod buffer;
 pub mod frame;
 pub mod render_pass;
 pub mod shader;
-use crate::{core::result::NSTDResult, window::NSTDWindow, NSTDUInt32};
+use crate::{core::result::NSTDResult, window::NSTDWindow, NSTDFloat64, NSTDUInt32};
 use nstdapi::nstdapi;
 use pollster::FutureExt;
 use wgpu::{
-    Backends, Device, DeviceDescriptor, Instance, InstanceDescriptor, PowerPreference, PresentMode,
-    Queue, RequestAdapterOptions, Surface, SurfaceConfiguration, TextureUsages,
+    Backends, Color, Device, DeviceDescriptor, Instance, InstanceDescriptor, PowerPreference,
+    PresentMode, Queue, RequestAdapterOptions, Surface, SurfaceConfiguration, TextureUsages,
 };
+
+/// Represents an RGBA color value.
+#[nstdapi]
+#[derive(Clone, Copy, PartialEq)]
+pub struct NSTDGLColor {
+    /// The red color value.
+    pub r: NSTDFloat64,
+    /// The green color value.
+    pub g: NSTDFloat64,
+    /// The blue color value.
+    pub b: NSTDFloat64,
+    /// The alpha color value.
+    pub a: NSTDFloat64,
+}
+impl NSTDGLColor {
+    /// Converts an [NSTDGLColor] into a `wgpu` [Color].
+    #[inline]
+    const fn as_wgpu(&self) -> Color {
+        Color {
+            r: self.r,
+            g: self.g,
+            b: self.b,
+            a: self.a,
+        }
+    }
+}
 
 /// Describes an error returned by an `nstd.gl` function.
 #[nstdapi]

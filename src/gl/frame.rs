@@ -1,5 +1,5 @@
 //! An individual window surface texture.
-use super::{render_pass::NSTDGLRenderPass, NSTDGLRenderer};
+use super::{render_pass::NSTDGLRenderPass, NSTDGLColor, NSTDGLRenderer};
 use crate::core::result::NSTDResult;
 use nstdapi::nstdapi;
 use wgpu::{
@@ -97,17 +97,25 @@ pub fn nstd_gl_frame_new(renderer: &NSTDGLRenderer) -> NSTDGLFrameResult {
 ///
 /// - `NSTDGLFrame *frame` - The frame to create a render pass for.
 ///
+/// - `const NSTDGLColor *clear_color` - The render pass clear color. This value is optional.
+///
 /// # Returns
 ///
 /// `NSTDGLRenderPass render_pass` - The new render pass.
 #[nstdapi]
-pub fn nstd_gl_frame_render(frame: &mut NSTDGLFrame) -> NSTDGLRenderPass {
+pub fn nstd_gl_frame_render<'a>(
+    frame: &'a mut NSTDGLFrame,
+    clear_color: Option<&NSTDGLColor>,
+) -> NSTDGLRenderPass<'a> {
     let render_pass_desc = RenderPassDescriptor {
         label: None,
         color_attachments: &[Some(RenderPassColorAttachment {
             view: &frame.frame.view,
             ops: Operations {
-                load: LoadOp::Clear(Color::BLACK),
+                load: LoadOp::Clear(match clear_color {
+                    Some(clear_color) => clear_color.as_wgpu(),
+                    _ => Color::BLACK,
+                }),
                 store: true,
             },
             resolve_target: None,

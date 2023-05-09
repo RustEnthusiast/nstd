@@ -4,6 +4,18 @@
 #include "../nstd.h"
 #include "../window.h"
 
+/// Represents an RGBA color value.
+typedef struct {
+    /// The red color value.
+    NSTDFloat64 r;
+    /// The green color value.
+    NSTDFloat64 g;
+    /// The blue color value.
+    NSTDFloat64 b;
+    /// The alpha color value.
+    NSTDFloat64 a;
+} NSTDGLColor;
+
 /// Describes an error returned by an `nstd.gl` function.
 typedef enum {
     /// No error occurred.
