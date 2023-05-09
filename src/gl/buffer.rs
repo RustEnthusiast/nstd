@@ -7,12 +7,12 @@ use wgpu::{
     Buffer, BufferUsages, IndexFormat,
 };
 
-/// Create a vertex buffer.
-pub const NSTD_GL_BUFFER_TYPE_VERTEX: NSTDUInt8 = 1;
-/// Create a index buffer.
-pub const NSTD_GL_BUFFER_TYPE_INDEX: NSTDUInt8 = 1 << 1;
-/// Create a uniform buffer.
-pub const NSTD_GL_BUFFER_TYPE_UNIFORM: NSTDUInt8 = 1 << 2;
+/// A bit flag that instructs [nstd_gl_buffer_new] to create a vertex buffer.
+pub const NSTD_GL_VERTEX_BUFFER: NSTDUInt8 = 1;
+/// A bit flag that instructs [nstd_gl_buffer_new] to create an index buffer.
+pub const NSTD_GL_INDEX_BUFFER: NSTDUInt8 = 1 << 1;
+/// A bit flag that instructs [nstd_gl_buffer_new] to create a uniform buffer.
+pub const NSTD_GL_UNIFORM_BUFFER: NSTDUInt8 = 1 << 2;
 
 /// GPU memory buffers.
 pub type NSTDGLBuffer = Box<Buffer>;
@@ -41,9 +41,9 @@ pub unsafe fn nstd_gl_buffer_new(
     buffer_type: NSTDUInt8,
 ) -> NSTDGLBuffer {
     let mut usage = BufferUsages::empty();
-    (buffer_type & NSTD_GL_BUFFER_TYPE_VERTEX != 0).then(|| usage |= BufferUsages::VERTEX);
-    (buffer_type & NSTD_GL_BUFFER_TYPE_INDEX != 0).then(|| usage |= BufferUsages::INDEX);
-    (buffer_type & NSTD_GL_BUFFER_TYPE_UNIFORM != 0).then(|| usage |= BufferUsages::UNIFORM);
+    (buffer_type & NSTD_GL_VERTEX_BUFFER != 0).then(|| usage |= BufferUsages::VERTEX);
+    (buffer_type & NSTD_GL_INDEX_BUFFER != 0).then(|| usage |= BufferUsages::INDEX);
+    (buffer_type & NSTD_GL_UNIFORM_BUFFER != 0).then(|| usage |= BufferUsages::UNIFORM);
     let buffer_desc = BufferInitDescriptor {
         label: None,
         contents: data.as_slice(),

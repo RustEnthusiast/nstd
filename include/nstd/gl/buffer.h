@@ -5,12 +5,12 @@
 #include "gl.h"
 #include "render_pass.h"
 
-/// Create a vertex buffer.
-#define NSTD_GL_BUFFER_TYPE_VERTEX 1
-/// Create a index buffer.
-#define NSTD_GL_BUFFER_TYPE_INDEX (1 << 1)
-/// Create a uniform buffer.
-#define NSTD_GL_BUFFER_TYPE_UNIFORM (1 << 2)
+/// A bit flag that instructs [nstd_gl_buffer_new] to create a vertex buffer.
+#define NSTD_GL_VERTEX_BUFFER 1
+/// A bit flag that instructs [nstd_gl_buffer_new] to create an index buffer.
+#define NSTD_GL_INDEX_BUFFER (1 << 1)
+/// A bit flag that instructs [nstd_gl_buffer_new] to create a uniform buffer.
+#define NSTD_GL_UNIFORM_BUFFER (1 << 2)
 
 /// GPU memory buffers.
 typedef NSTDAnyMut NSTDGLBuffer;
