@@ -8,12 +8,12 @@
 
 /// An enumeration of each programmable stage of the rendering pipeline.
 typedef enum {
-    /// The vertex shader.
-    NSTD_GL_SHADER_STAGE_VERTEX,
-    /// The fragment shader.
-    NSTD_GL_SHADER_STAGE_FRAGMENT,
-    /// The compute shader.
-    NSTD_GL_SHADER_STAGE_COMPUTE
+    /// Describes a vertex shader.
+    NSTD_GL_SHADER_STAGE_VERTEX = 1,
+    /// Describes a fragment shader.
+    NSTD_GL_SHADER_STAGE_FRAGMENT = 1 << 1,
+    /// Describes a compute shader.
+    NSTD_GL_SHADER_STAGE_COMPUTE = 1 << 2
 } NSTDGLShaderStage;
 
 /// Describes an `NSTDGLShaderSource` variant.
@@ -161,6 +161,10 @@ typedef struct {
     ///
     /// A slice of [NSTDGLVertexBufferLayout].
     const NSTDSlice *buffers;
+    /// The shader's bind groups.
+    ///
+    /// A slice of [NSTDGLBindGroup].
+    const NSTDSlice *bind_groups;
 } NSTDGLShaderDescriptor;
 
 /// A GPU shader program.

@@ -1,5 +1,5 @@
 //! GPU shader programs.
-use super::{render_pass::NSTDGLRenderPass, NSTDGLRenderer};
+use super::{bind_group::NSTDGLBindGroup, render_pass::NSTDGLRenderPass, NSTDGLRenderer};
 use crate::{
     core::{slice::NSTDSlice, str::NSTDStr},
     NSTDUInt32, NSTDUInt64,
@@ -8,9 +8,9 @@ use naga::ShaderStage;
 use nstdapi::nstdapi;
 use wgpu::{
     BlendState, ColorTargetState, ColorWrites, Face, FragmentState, FrontFace, MultisampleState,
-    PolygonMode, PrimitiveState, PrimitiveTopology, RenderPipeline, RenderPipelineDescriptor,
-    ShaderModule, ShaderModuleDescriptor, ShaderSource, VertexAttribute, VertexBufferLayout,
-    VertexFormat, VertexState, VertexStepMode,
+    PipelineLayoutDescriptor, PolygonMode, PrimitiveState, PrimitiveTopology, RenderPipeline,
+    RenderPipelineDescriptor, ShaderModule, ShaderModuleDescriptor, ShaderSource, VertexAttribute,
+    VertexBufferLayout, VertexFormat, VertexState, VertexStepMode,
 };
 
 /// An enumeration of each programmable stage of the rendering pipeline.
@@ -18,18 +18,18 @@ use wgpu::{
 #[derive(Clone, Copy, PartialEq, Eq)]
 #[allow(non_camel_case_types)]
 pub enum NSTDGLShaderStage {
-    /// The vertex shader.
-    NSTD_GL_SHADER_STAGE_VERTEX,
-    /// The fragment shader.
-    NSTD_GL_SHADER_STAGE_FRAGMENT,
-    /// The compute shader.
-    NSTD_GL_SHADER_STAGE_COMPUTE,
+    /// Describes a vertex shader.
+    NSTD_GL_SHADER_STAGE_VERTEX = 1,
+    /// Describes a fragment shader.
+    NSTD_GL_SHADER_STAGE_FRAGMENT = 1 << 1,
+    /// Describes a compute shader.
+    NSTD_GL_SHADER_STAGE_COMPUTE = 1 << 2,
 }
 impl From<&NSTDGLShaderStage> for ShaderStage {
     /// Converts an [NSTDGLShaderStage] into a [ShaderStage].
     #[inline]
     fn from(value: &NSTDGLShaderStage) -> Self {
-        match *value {
+        match value {
             NSTDGLShaderStage::NSTD_GL_SHADER_STAGE_VERTEX => Self::Vertex,
             NSTDGLShaderStage::NSTD_GL_SHADER_STAGE_FRAGMENT => Self::Fragment,
             NSTDGLShaderStage::NSTD_GL_SHADER_STAGE_COMPUTE => Self::Compute,
@@ -278,6 +278,10 @@ pub struct NSTDGLShaderDescriptor<'a> {
     ///
     /// A slice of [NSTDGLVertexBufferLayout].
     pub buffers: &'a NSTDSlice,
+    /// The shader's bind groups.
+    ///
+    /// A slice of [NSTDGLBindGroup].
+    pub bind_groups: &'a NSTDSlice,
 }
 
 /// A GPU shader program.
@@ -374,8 +378,21 @@ pub unsafe fn nstd_gl_shader_new(
             attributes: &attributes[i],
         });
     }
+    // Create the vector of bind group layouts.
+    let bind_group_layouts = desc
+        .bind_groups
+        .as_slice::<NSTDGLBindGroup>()
+        .iter()
+        .map(|bg| bg.layout())
+        .collect::<Vec<_>>();
     // Create the pipeline layout.
-    let pipeline_layout = renderer.device.create_pipeline_layout(&Default::default());
+    let pipeline_layout_desc = PipelineLayoutDescriptor {
+        bind_group_layouts: &bind_group_layouts,
+        ..Default::default()
+    };
+    let pipeline_layout = renderer
+        .device
+        .create_pipeline_layout(&pipeline_layout_desc);
     // Create the render pipeline.
     let targets = [Some(ColorTargetState {
         format: renderer.surface_config.format,

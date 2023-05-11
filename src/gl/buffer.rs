@@ -58,15 +58,15 @@ pub unsafe fn nstd_gl_buffer_new(
 ///
 /// - `const NSTDGLBuffer *buffer` - The buffer to bind.
 ///
-/// - `NSTDUInt32 index` - The index (or slot) to bind the buffer to.
-///
 /// - `NSTDGLRenderPass *render_pass` - The render pass in use.
+///
+/// - `NSTDUInt32 index` - The index (or slot) to bind the buffer to.
 #[inline]
 #[nstdapi]
 pub fn nstd_gl_buffer_bind_vertex<'a: 'b, 'b>(
     buffer: &'a NSTDGLBuffer,
-    index: NSTDUInt32,
     render_pass: &mut NSTDGLRenderPass<'b>,
+    index: NSTDUInt32,
 ) {
     render_pass.set_vertex_buffer(index, buffer.slice(..));
 }

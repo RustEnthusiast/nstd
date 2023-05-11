@@ -41,11 +41,11 @@ nstd_gl_buffer_new(const NSTDGLRenderer *renderer, const NSTDSlice *data, NSTDUI
 ///
 /// - `const NSTDGLBuffer *buffer` - The buffer to bind.
 ///
-/// - `NSTDUInt32 index` - The index (or slot) to bind the buffer to.
-///
 /// - `NSTDGLRenderPass *render_pass` - The render pass in use.
+///
+/// - `NSTDUInt32 index` - The index (or slot) to bind the buffer to.
 NSTDAPI void nstd_gl_buffer_bind_vertex(
-    const NSTDGLBuffer *buffer, NSTDUInt32 index, NSTDGLRenderPass *render_pass
+    const NSTDGLBuffer *buffer, NSTDGLRenderPass *render_pass, NSTDUInt32 index
 );
 
 /// Makes `buffer` an active index buffer for `render_pass`.

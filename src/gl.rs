@@ -1,4 +1,5 @@
 //! The low level graphics library.
+pub mod bind_group;
 pub mod buffer;
 pub mod frame;
 pub mod render_pass;
