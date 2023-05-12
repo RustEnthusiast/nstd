@@ -30,13 +30,9 @@ macro_rules! gen_from_primitive {
         $name: ident, $FromT: ty
     ) => {
         $(#[$meta])*
-        ///
-        /// # Panics
-        ///
-        /// Panics if allocating fails.
         #[inline]
         #[nstdapi]
-        pub fn $name(v: $FromT) -> NSTDString {
+        pub fn $name(v: $FromT) -> NSTDOptionalString {
             NSTDString::from_str(&v.to_string())
         }
     };
@@ -51,14 +47,11 @@ pub struct NSTDString {
 }
 impl NSTDString {
     /// Creates a new [NSTDString] from a Rust &[str].
-    ///
-    /// # Panics
-    ///
-    /// Panics if allocating fails.
     #[inline]
-    pub(crate) fn from_str(str: &str) -> Self {
-        NSTDString {
-            bytes: NSTDVec::from_slice(str.as_bytes()),
+    pub(crate) fn from_str(str: &str) -> NSTDOptionalString {
+        match NSTDVec::from_slice(str.as_bytes()) {
+            NSTDOptional::Some(bytes) => NSTDOptional::Some(NSTDString { bytes }),
+            _ => NSTDOptional::None,
         }
     }
 
@@ -461,7 +454,7 @@ gen_from_primitive!(
     ///
     /// # Returns
     ///
-    /// `NSTDString string` - The 32-bit floating-point value as a string.
+    /// `NSTDOptionalString string` - The 32-bit floating-point value as a string.
     nstd_string_from_f32,
     NSTDFloat32
 );
@@ -474,7 +467,7 @@ gen_from_primitive!(
     ///
     /// # Returns
     ///
-    /// `NSTDString string` - The 64-bit floating-point value as a string.
+    /// `NSTDOptionalString string` - The 64-bit floating-point value as a string.
     nstd_string_from_f64,
     NSTDFloat64
 );
@@ -487,7 +480,7 @@ gen_from_primitive!(
     ///
     /// # Returns
     ///
-    /// `NSTDString string` - The arch-bit signed integer value as a string.
+    /// `NSTDOptionalString string` - The arch-bit signed integer value as a string.
     nstd_string_from_int,
     NSTDInt
 );
@@ -500,7 +493,7 @@ gen_from_primitive!(
     ///
     /// # Returns
     ///
-    /// `NSTDString string` - The arch-bit unsigned integer value as a string.
+    /// `NSTDOptionalString string` - The arch-bit unsigned integer value as a string.
     nstd_string_from_uint,
     NSTDUInt
 );
@@ -513,7 +506,7 @@ gen_from_primitive!(
     ///
     /// # Returns
     ///
-    /// `NSTDString string` - The 8-bit signed integer value as a string.
+    /// `NSTDOptionalString string` - The 8-bit signed integer value as a string.
     nstd_string_from_i8,
     NSTDInt8
 );
@@ -526,7 +519,7 @@ gen_from_primitive!(
     ///
     /// # Returns
     ///
-    /// `NSTDString string` - The 8-bit unsigned integer value as a string.
+    /// `NSTDOptionalString string` - The 8-bit unsigned integer value as a string.
     nstd_string_from_u8,
     NSTDUInt8
 );
@@ -539,7 +532,7 @@ gen_from_primitive!(
     ///
     /// # Returns
     ///
-    /// `NSTDString string` - The 16-bit signed integer value as a string.
+    /// `NSTDOptionalString string` - The 16-bit signed integer value as a string.
     nstd_string_from_i16,
     NSTDInt16
 );
@@ -552,7 +545,7 @@ gen_from_primitive!(
     ///
     /// # Returns
     ///
-    /// `NSTDString string` - The 16-bit unsigned integer value as a string.
+    /// `NSTDOptionalString string` - The 16-bit unsigned integer value as a string.
     nstd_string_from_u16,
     NSTDUInt16
 );
@@ -565,7 +558,7 @@ gen_from_primitive!(
     ///
     /// # Returns
     ///
-    /// `NSTDString string` - The 32-bit signed integer value as a string.
+    /// `NSTDOptionalString string` - The 32-bit signed integer value as a string.
     nstd_string_from_i32,
     NSTDInt32
 );
@@ -578,7 +571,7 @@ gen_from_primitive!(
     ///
     /// # Returns
     ///
-    /// `NSTDString string` - The 32-bit unsigned integer value as a string.
+    /// `NSTDOptionalString string` - The 32-bit unsigned integer value as a string.
     nstd_string_from_u32,
     NSTDUInt32
 );
@@ -591,7 +584,7 @@ gen_from_primitive!(
     ///
     /// # Returns
     ///
-    /// `NSTDString string` - The 64-bit signed integer value as a string.
+    /// `NSTDOptionalString string` - The 64-bit signed integer value as a string.
     nstd_string_from_i64,
     NSTDInt64
 );
@@ -604,7 +597,7 @@ gen_from_primitive!(
     ///
     /// # Returns
     ///
-    /// `NSTDString string` - The 64-bit unsigned integer value as a string.
+    /// `NSTDOptionalString string` - The 64-bit unsigned integer value as a string.
     nstd_string_from_u64,
     NSTDUInt64
 );

@@ -1,3 +1,17 @@
+# TBD
+## Changed
+### `nstd.env`
+- `nstd_env_var` no longer panics.
+- `nstd_env_temp_dir` now returns `NSTDOptionalString`.
+- `nstd_env_current_[dir|exe]` functions no longer panic.
+### `nstd.fs`
+- `nstd_fs_absolute` no longer panics.
+- `nstd_fs_read[_to_string]` functions no longer panic.
+### `nstd.io`
+- `nstd_io_read[_line]` functions no longer panic.
+### `nstd.string`
+- `nstd_string_from_*` functions now return `NSTDOptionalString`.
+
 # 0.7.0
 ## Added
 ### `nstd.core`

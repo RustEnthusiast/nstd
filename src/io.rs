@@ -9,7 +9,7 @@ use crate::os::unix::io::{
     NSTDUnixIOResult,
 };
 use crate::{
-    core::{result::NSTDResult, str::NSTDStr},
+    core::{optional::NSTDOptional, result::NSTDResult, str::NSTDStr},
     string::{nstd_string_pop, NSTDString},
     vec::NSTDVec,
     NSTDUInt,
@@ -194,10 +194,6 @@ pub unsafe fn nstd_io_print_line(output: &NSTDStr) -> NSTDIOError {
 ///
 /// `NSTDIOStringResult input` - The UTF-8 input from stdin on success and the I/O operation error
 /// code on failure.
-///
-/// # Panics
-///
-/// Panics if allocating the string fails.
 #[nstdapi]
 pub fn nstd_io_read() -> NSTDIOStringResult {
     let mut res = nstd_io_read_line();
@@ -213,10 +209,6 @@ pub fn nstd_io_read() -> NSTDIOStringResult {
 ///
 /// `NSTDIOStringResult input` - The UTF-8 input from stdin on success and the I/O operation error
 /// code on failure.
-///
-/// # Panics
-///
-/// Panics if allocating the string fails.
 #[nstdapi]
 pub fn nstd_io_read_line() -> NSTDIOStringResult {
     // Attempt to read a line from stdin.
@@ -224,5 +216,8 @@ pub fn nstd_io_read_line() -> NSTDIOStringResult {
     if let Err(err) = std::io::stdin().read_line(&mut input) {
         return NSTDResult::Err(NSTDIOError::from_err(err.kind()));
     }
-    NSTDResult::Ok(NSTDString::from_str(&input))
+    match NSTDString::from_str(&input) {
+        NSTDOptional::Some(input) => NSTDResult::Ok(input),
+        _ => NSTDResult::Err(NSTDIOError::NSTD_IO_ERROR_OUT_OF_MEMORY),
+    }
 }

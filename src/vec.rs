@@ -37,21 +37,23 @@ impl NSTDVec {
     ///
     /// # Panics
     ///
-    /// This operation will panic if either `size_of::<T>()` is 0 or allocating fails.
+    /// This operation will panic if `size_of::<T>()` is 0.
     #[allow(dead_code)]
-    pub(crate) fn from_slice<T: Copy>(slice: &[T]) -> Self {
+    pub(crate) fn from_slice<T: Copy>(slice: &[T]) -> NSTDOptionalVec {
         let stride = core::mem::size_of::<T>();
         let len = slice.len();
         if len > 0 {
             // Allocate the new vector.
             let mut vec = nstd_vec_new_with_cap(stride, len);
-            assert!(!vec.ptr.is_null());
+            if vec.ptr.is_null() {
+                return NSTDOptional::None;
+            }
             // SAFETY: `vec`'s memory buffer has just been allocated and validated.
             unsafe { nstd_core_mem_copy(vec.ptr.cast(), slice.as_ptr().cast(), len * stride) };
             vec.len = len;
-            vec
+            NSTDOptional::Some(vec)
         } else {
-            nstd_vec_new(stride)
+            NSTDOptional::Some(nstd_vec_new(stride))
         }
     }
 

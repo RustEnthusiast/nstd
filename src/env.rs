@@ -1,12 +1,13 @@
 //! Process environment management.
 use crate::{
-    core::{result::NSTDResult, str::NSTDStr},
+    alloc::NSTDAllocError::NSTD_ALLOC_ERROR_NONE,
+    core::{optional::NSTDOptional, result::NSTDResult, str::NSTDStr},
     io::{NSTDIOError, NSTDIOStringResult},
-    string::NSTDString,
-    vec::NSTDVec,
+    string::{NSTDOptionalString, NSTDString},
+    vec::{nstd_vec_new, nstd_vec_push, NSTDVec},
 };
 use nstdapi::nstdapi;
-use std::env::VarError;
+use std::{env::VarError, ptr::addr_of};
 
 /// Returns a complete path to the process's current working directory.
 ///
@@ -16,14 +17,13 @@ use std::env::VarError;
 ///
 /// `NSTDIOStringResult working_dir` - A path to the current working directory on success, or the
 /// I/O operation error code on failure.
-///
-/// # Panics
-///
-/// This operation will panic if allocating the string fails.
 #[nstdapi]
 pub fn nstd_env_current_dir() -> NSTDIOStringResult {
     match std::env::current_dir() {
-        Ok(dir) => NSTDResult::Ok(NSTDString::from_str(&dir.to_string_lossy())),
+        Ok(dir) => match NSTDString::from_str(&dir.to_string_lossy()) {
+            NSTDOptional::Some(dir) => NSTDResult::Ok(dir),
+            _ => NSTDResult::Err(NSTDIOError::NSTD_IO_ERROR_OUT_OF_MEMORY),
+        },
         Err(err) => NSTDResult::Err(NSTDIOError::from_err(err.kind())),
     }
 }
@@ -41,14 +41,13 @@ pub fn nstd_env_current_dir() -> NSTDIOStringResult {
 ///
 /// `NSTDIOStringResult exe` - A complete path to process executable on success, or the I/O
 /// operation error code on failure.
-///
-/// # Panics
-///
-/// This operation will panic if allocating the string fails.
 #[nstdapi]
 pub fn nstd_env_current_exe() -> NSTDIOStringResult {
     match std::env::current_exe() {
-        Ok(exe) => NSTDResult::Ok(NSTDString::from_str(&exe.to_string_lossy())),
+        Ok(exe) => match NSTDString::from_str(&exe.to_string_lossy()) {
+            NSTDOptional::Some(exe) => NSTDResult::Ok(exe),
+            _ => NSTDResult::Err(NSTDIOError::NSTD_IO_ERROR_OUT_OF_MEMORY),
+        },
         Err(err) => NSTDResult::Err(NSTDIOError::from_err(err.kind())),
     }
 }
@@ -59,14 +58,10 @@ pub fn nstd_env_current_exe() -> NSTDIOStringResult {
 ///
 /// # Returns
 ///
-/// `NSTDString temp` - A path to the temporary directory.
-///
-/// # Panics
-///
-/// This operation will panic if allocating the string fails.
+/// `NSTDOptionalString temp` - A path to the temporary directory.
 #[inline]
 #[nstdapi]
-pub fn nstd_env_temp_dir() -> NSTDString {
+pub fn nstd_env_temp_dir() -> NSTDOptionalString {
     NSTDString::from_str(&std::env::temp_dir().to_string_lossy())
 }
 
@@ -103,17 +98,16 @@ pub unsafe fn nstd_env_set_current_dir(path: &NSTDStr) -> NSTDIOError {
 /// code on failure. This will return as `NSTD_IO_ERROR_NOT_FOUND` if they variable cannot be found,
 /// and `NSTD_IO_ERROR_INVALID_DATA` if the variable isn't valid Unicode.
 ///
-/// # Panics
-///
-/// This operation will panic if allocating for the string fails.
-///
 /// # Safety
 ///
 /// The user of this function must ensure that `key` is valid for reads.
 #[nstdapi]
 pub unsafe fn nstd_env_var(key: &NSTDStr) -> NSTDIOStringResult {
     match std::env::var(key.as_str()) {
-        Ok(var) => NSTDResult::Ok(NSTDString::from_str(&var)),
+        Ok(var) => match NSTDString::from_str(&var) {
+            NSTDOptional::Some(var) => NSTDResult::Ok(var),
+            _ => NSTDResult::Err(NSTDIOError::NSTD_IO_ERROR_OUT_OF_MEMORY),
+        },
         Err(VarError::NotPresent) => NSTDResult::Err(NSTDIOError::NSTD_IO_ERROR_NOT_FOUND),
         Err(VarError::NotUnicode(_)) => NSTDResult::Err(NSTDIOError::NSTD_IO_ERROR_INVALID_DATA),
     }
@@ -175,11 +169,20 @@ pub unsafe fn nstd_env_remove_var(key: &NSTDStr) {
 ///
 /// # Panics
 ///
-/// This operation will panic if any arguments contain invalid Unicode or allocating fails.
+/// This operation will panic if any program arguments contain invalid Unicode.
 #[nstdapi]
 pub fn nstd_env_args() -> NSTDVec {
-    let args = std::env::args();
-    NSTDVec::from_iter(args.map(|arg| NSTDString::from_str(&arg)))
+    let mut args = nstd_vec_new(std::mem::size_of::<NSTDString>());
+    for arg in std::env::args() {
+        if let NSTDOptional::Some(arg) = NSTDString::from_str(&arg) {
+            // SAFETY: `arg` is stored on the stack.
+            let errc = unsafe { nstd_vec_push(&mut args, addr_of!(arg) as _) };
+            if errc == NSTD_ALLOC_ERROR_NONE {
+                std::mem::forget(arg);
+            }
+        }
+    }
+    args
 }
 
 /// Returns an `NSTDVec` of `NSTDString[2]` which each represent an environment variable from the
@@ -191,10 +194,21 @@ pub fn nstd_env_args() -> NSTDVec {
 ///
 /// # Panics
 ///
-/// This operation will panic if any environment variables contain invalid Unicode or allocating
-/// fails.
+/// This operation will panic if any environment variables contain invalid Unicode.
 #[nstdapi]
 pub fn nstd_env_vars() -> NSTDVec {
-    let vars = std::env::vars();
-    NSTDVec::from_iter(vars.map(|(k, v)| [NSTDString::from_str(&k), NSTDString::from_str(&v)]))
+    let mut vars = nstd_vec_new(std::mem::size_of::<[NSTDString; 2]>());
+    for (k, v) in std::env::vars() {
+        if let NSTDOptional::Some(k) = NSTDString::from_str(&k) {
+            if let NSTDOptional::Some(v) = NSTDString::from_str(&v) {
+                let var = [k, v];
+                // SAFETY: `var` is stored on the stack.
+                let errc = unsafe { nstd_vec_push(&mut vars, addr_of!(var) as _) };
+                if errc == NSTD_ALLOC_ERROR_NONE {
+                    std::mem::forget(var);
+                }
+            }
+        }
+    }
+    vars
 }
