@@ -950,24 +950,16 @@ pub fn nstd_vec_truncate(vec: &mut NSTDVec, len: NSTDUInt) {
 ///
 /// - `NSTDUInt len` - The new length for the vector.
 ///
-/// # Returns
-///
-/// `NSTDErrorCode errc` - Nonzero if `len` is greater than `cap`.
-///
 /// # Safety
 ///
-/// If `len` is greater than the vector's current length, care must be taken to ensure that the new
-/// elements are properly initialized.
+/// - If `len` is greater than the vector's current length, care must be taken to ensure that the
+/// new elements are properly initialized.
+///
+/// - `len`'s value must not be greater than the vector's capacity.
 #[inline]
 #[nstdapi]
-pub unsafe fn nstd_vec_set_len(vec: &mut NSTDVec, len: NSTDUInt) -> NSTDErrorCode {
-    match len <= vec.cap {
-        true => {
-            vec.len = len;
-            0
-        }
-        _ => 1,
-    }
+pub unsafe fn nstd_vec_set_len(vec: &mut NSTDVec, len: NSTDUInt) {
+    vec.len = len;
 }
 
 /// Reserves some space on the heap for at least `size` more elements to be pushed onto a vector
