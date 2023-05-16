@@ -34,10 +34,6 @@ NSTDAPI NSTDString nstd_string_new(void);
 /// # Returns
 ///
 /// `NSTDString string` - The new string.
-///
-/// # Panics
-///
-/// This function will panic if `cap` is zero.
 NSTDAPI NSTDString nstd_string_new_with_cap(NSTDUInt cap);
 
 /// Creates an owned version of an unowned string slice.

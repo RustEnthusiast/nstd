@@ -99,10 +99,6 @@ pub const fn nstd_string_new() -> NSTDString {
 ///
 /// `NSTDString string` - The new string.
 ///
-/// # Panics
-///
-/// This function will panic if `cap` is zero.
-///
 /// # Example
 ///
 /// ```

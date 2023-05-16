@@ -36,10 +36,6 @@ NSTDAPI NSTDOptionalCString nstd_cstring_new(void);
 ///
 /// `NSTDOptionalCString cstring` - The new C string on success, or an uninitialized "none" variant
 /// if allocating fails.
-///
-/// # Panics
-///
-/// This function will panic if `cap` is zero.
 NSTDAPI NSTDOptionalCString nstd_cstring_new_with_cap(NSTDUInt cap);
 
 /// Creates an owned version of an unowned C string slice.

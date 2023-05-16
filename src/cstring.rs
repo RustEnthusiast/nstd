@@ -61,10 +61,6 @@ pub fn nstd_cstring_new() -> NSTDOptionalCString {
 /// `NSTDOptionalCString cstring` - The new C string on success, or an uninitialized "none" variant
 /// if allocating fails.
 ///
-/// # Panics
-///
-/// This function will panic if `cap` is zero.
-///
 /// # Example
 ///
 /// ```
@@ -166,8 +162,8 @@ pub unsafe fn nstd_cstring_from_cstr_unchecked(cstr: &NSTDCStr) -> NSTDOptionalC
 /// This operation will panic if `bytes`'s stride is not 1.
 #[nstdapi]
 pub fn nstd_cstring_from_bytes(bytes: NSTDVec) -> NSTDOptionalCString {
+    assert!(nstd_vec_stride(&bytes) == 1);
     let ptr = nstd_vec_as_ptr(&bytes) as *const NSTDChar;
-    assert!(!ptr.is_null() && nstd_vec_stride(&bytes) == 1);
     // SAFETY: `ptr` is non-null, vector length's can never be greater than `NSTDInt`'s max value.
     let cstr = unsafe { nstd_core_cstr_new_unchecked(ptr, nstd_vec_len(&bytes)) };
     // SAFETY: `cstr`'s data is owned by `bytes`.

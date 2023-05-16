@@ -1,5 +1,7 @@
 # TBD
 ## Changed
+### `nstd.cstring`
+- `nstd_cstring_new_with_cap` no longer panics.
 ### `nstd.env`
 - `nstd_env_var` no longer panics.
 - `nstd_env_temp_dir` now returns `NSTDOptionalString`.
@@ -10,8 +12,11 @@
 ### `nstd.io`
 - `nstd_io_read[_line]` functions no longer panic.
 ### `nstd.string`
+- `nstd_string_new_with_cap` no longer panics.
 - `nstd_string_from_*` functions now return `NSTDOptionalString`.
 ### `nstd.vec`
+- `nstd_vec_new[_with_cap]` functions no longer panic.
+- `nstd_vec_from_slice` no longer panics.
 - `nstd_vec_set_len` no longer returns `NSTDErrorCode`.
 
 # 0.7.0

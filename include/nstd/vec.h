@@ -30,17 +30,11 @@ NSTDOptional(NSTDVec) NSTDOptionalVec;
 /// # Returns
 ///
 /// `NSTDVec vec` - The new vector.
-///
-/// # Panics
-///
-/// This function will panic if `stride` is zero.
 NSTDAPI NSTDVec nstd_vec_new(NSTDUInt stride);
 
 /// Creates a new vector initialized with the given capacity.
 ///
-/// # Note
-///
-/// This will return a "null vector" (a vector that has not allocated yet) on error.
+/// If allocation fails, a vector with a capacity of 0 will be returned.
 ///
 /// # Parameters:
 ///
@@ -51,10 +45,6 @@ NSTDAPI NSTDVec nstd_vec_new(NSTDUInt stride);
 /// # Returns
 ///
 /// `NSTDVec vec` - The new vector.
-///
-/// # Panics
-///
-/// This function will panic if either `stride` or `cap` are zero.
 NSTDAPI NSTDVec nstd_vec_new_with_cap(NSTDUInt stride, NSTDUInt cap);
 
 /// Creates a new vector from a slice.
@@ -67,10 +57,6 @@ NSTDAPI NSTDVec nstd_vec_new_with_cap(NSTDUInt stride, NSTDUInt cap);
 ///
 /// `NSTDOptionalVec vec` - The new vector with a copy of `slice`'s contents on success, or an
 /// uninitialized "none" variant if allocating fails.
-///
-/// # Panics
-///
-/// This operation will panic if the slice's stride is 0.
 ///
 /// # Safety
 ///
@@ -190,7 +176,7 @@ NSTDAPI NSTDAnyMut nstd_vec_as_ptr_mut(NSTDVec *vec);
 ///
 /// # Returns
 ///
-/// `NSTDAny end` - A pointer to the end of the vector or null if the vector has yet to allocate.
+/// `NSTDAny end` - A pointer to the end of the vector.
 NSTDAPI NSTDAny nstd_vec_end(const NSTDVec *vec);
 
 /// Returns a mutable pointer to the end of a vector.
@@ -204,7 +190,7 @@ NSTDAPI NSTDAny nstd_vec_end(const NSTDVec *vec);
 ///
 /// # Returns
 ///
-/// `NSTDAnyMut end` - A pointer to the end of the vector or null if the vector has yet to allocate.
+/// `NSTDAnyMut end` - A mutable pointer to the end of the vector.
 NSTDAPI NSTDAnyMut nstd_vec_end_mut(NSTDVec *vec);
 
 /// Returns an immutable pointer to the element at index `pos` in `vec`.
