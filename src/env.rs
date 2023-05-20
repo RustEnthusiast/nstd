@@ -1,6 +1,6 @@
 //! Process environment management.
 use crate::{
-    alloc::NSTDAllocError::NSTD_ALLOC_ERROR_NONE,
+    alloc::{NSTDAllocError::NSTD_ALLOC_ERROR_NONE, NSTD_ALLOCATOR},
     core::{optional::NSTDOptional, result::NSTDResult, str::NSTDStr},
     io::{NSTDIOError, NSTDIOStringResult},
     string::{NSTDOptionalString, NSTDString},
@@ -18,9 +18,9 @@ use std::{env::VarError, ptr::addr_of};
 /// `NSTDIOStringResult working_dir` - A path to the current working directory on success, or the
 /// I/O operation error code on failure.
 #[nstdapi]
-pub fn nstd_env_current_dir() -> NSTDIOStringResult {
+pub fn nstd_env_current_dir() -> NSTDIOStringResult<'static> {
     match std::env::current_dir() {
-        Ok(dir) => match NSTDString::from_str(&dir.to_string_lossy()) {
+        Ok(dir) => match NSTDString::from_str(&NSTD_ALLOCATOR, &dir.to_string_lossy()) {
             NSTDOptional::Some(dir) => NSTDResult::Ok(dir),
             _ => NSTDResult::Err(NSTDIOError::NSTD_IO_ERROR_OUT_OF_MEMORY),
         },
@@ -42,9 +42,9 @@ pub fn nstd_env_current_dir() -> NSTDIOStringResult {
 /// `NSTDIOStringResult exe` - A complete path to process executable on success, or the I/O
 /// operation error code on failure.
 #[nstdapi]
-pub fn nstd_env_current_exe() -> NSTDIOStringResult {
+pub fn nstd_env_current_exe() -> NSTDIOStringResult<'static> {
     match std::env::current_exe() {
-        Ok(exe) => match NSTDString::from_str(&exe.to_string_lossy()) {
+        Ok(exe) => match NSTDString::from_str(&NSTD_ALLOCATOR, &exe.to_string_lossy()) {
             NSTDOptional::Some(exe) => NSTDResult::Ok(exe),
             _ => NSTDResult::Err(NSTDIOError::NSTD_IO_ERROR_OUT_OF_MEMORY),
         },
@@ -61,8 +61,8 @@ pub fn nstd_env_current_exe() -> NSTDIOStringResult {
 /// `NSTDOptionalString temp` - A path to the temporary directory.
 #[inline]
 #[nstdapi]
-pub fn nstd_env_temp_dir() -> NSTDOptionalString {
-    NSTDString::from_str(&std::env::temp_dir().to_string_lossy())
+pub fn nstd_env_temp_dir() -> NSTDOptionalString<'static> {
+    NSTDString::from_str(&NSTD_ALLOCATOR, &std::env::temp_dir().to_string_lossy())
 }
 
 /// Sets the current working directory for the process.
@@ -104,7 +104,7 @@ pub unsafe fn nstd_env_set_current_dir(path: &NSTDStr) -> NSTDIOError {
 #[nstdapi]
 pub unsafe fn nstd_env_var(key: &NSTDStr) -> NSTDIOStringResult {
     match std::env::var(key.as_str()) {
-        Ok(var) => match NSTDString::from_str(&var) {
+        Ok(var) => match NSTDString::from_str(&NSTD_ALLOCATOR, &var) {
             NSTDOptional::Some(var) => NSTDResult::Ok(var),
             _ => NSTDResult::Err(NSTDIOError::NSTD_IO_ERROR_OUT_OF_MEMORY),
         },
@@ -171,10 +171,10 @@ pub unsafe fn nstd_env_remove_var(key: &NSTDStr) {
 ///
 /// This operation will panic if any program arguments contain invalid Unicode.
 #[nstdapi]
-pub fn nstd_env_args() -> NSTDVec {
-    let mut args = nstd_vec_new(std::mem::size_of::<NSTDString>());
+pub fn nstd_env_args() -> NSTDVec<'static> {
+    let mut args = nstd_vec_new(&NSTD_ALLOCATOR, std::mem::size_of::<NSTDString>());
     for arg in std::env::args() {
-        if let NSTDOptional::Some(arg) = NSTDString::from_str(&arg) {
+        if let NSTDOptional::Some(arg) = NSTDString::from_str(&NSTD_ALLOCATOR, &arg) {
             // SAFETY: `arg` is stored on the stack.
             let errc = unsafe { nstd_vec_push(&mut args, addr_of!(arg) as _) };
             if errc == NSTD_ALLOC_ERROR_NONE {
@@ -196,11 +196,11 @@ pub fn nstd_env_args() -> NSTDVec {
 ///
 /// This operation will panic if any environment variables contain invalid Unicode.
 #[nstdapi]
-pub fn nstd_env_vars() -> NSTDVec {
-    let mut vars = nstd_vec_new(std::mem::size_of::<[NSTDString; 2]>());
+pub fn nstd_env_vars() -> NSTDVec<'static> {
+    let mut vars = nstd_vec_new(&NSTD_ALLOCATOR, std::mem::size_of::<[NSTDString; 2]>());
     for (k, v) in std::env::vars() {
-        if let NSTDOptional::Some(k) = NSTDString::from_str(&k) {
-            if let NSTDOptional::Some(v) = NSTDString::from_str(&v) {
+        if let NSTDOptional::Some(k) = NSTDString::from_str(&NSTD_ALLOCATOR, &k) {
+            if let NSTDOptional::Some(v) = NSTDString::from_str(&NSTD_ALLOCATOR, &v) {
                 let var = [k, v];
                 // SAFETY: `var` is stored on the stack.
                 let errc = unsafe { nstd_vec_push(&mut vars, addr_of!(var) as _) };

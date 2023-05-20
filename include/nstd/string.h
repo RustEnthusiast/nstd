@@ -20,25 +20,33 @@ NSTDOptional(NSTDString) NSTDOptionalString;
 
 /// Creates a new instance of `NSTDString`.
 ///
+/// # Parameters:
+///
+/// - `const NSTDAllocator *allocator` - The memory allocator.
+///
 /// # Returns
 ///
 /// `NSTDString string` - The new string.
-NSTDAPI NSTDString nstd_string_new(void);
+NSTDAPI NSTDString nstd_string_new(const NSTDAllocator *allocator);
 
 /// Creates a new string initialized with the given capacity.
 ///
 /// # Parameters:
+///
+/// - `const NSTDAllocator *allocator` - The memory allocator.
 ///
 /// - `NSTDUInt cap` - The number of bytes to allocate ahead of time.
 ///
 /// # Returns
 ///
 /// `NSTDString string` - The new string.
-NSTDAPI NSTDString nstd_string_new_with_cap(NSTDUInt cap);
+NSTDAPI NSTDString nstd_string_new_with_cap(const NSTDAllocator *allocator, NSTDUInt cap);
 
 /// Creates an owned version of an unowned string slice.
 ///
 /// # Parameters:
+///
+/// - `const NSTDAllocator *allocator` - The memory allocator.
 ///
 /// - `const NSTDStr *str` - The unowned string slice.
 ///
@@ -50,7 +58,7 @@ NSTDAPI NSTDString nstd_string_new_with_cap(NSTDUInt cap);
 /// # Safety
 ///
 /// The caller of this function must ensure that `str`'s data is valid for reads.
-NSTDAPI NSTDOptionalString nstd_string_from_str(const NSTDStr *str);
+NSTDAPI NSTDOptionalString nstd_string_from_str(const NSTDAllocator *allocator, const NSTDStr *str);
 
 /// Creates a new string from owned UTF-8 data.
 ///

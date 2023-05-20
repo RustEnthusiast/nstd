@@ -24,22 +24,22 @@ cfg_if! {
         };
 
         /// A mutual exclusion primitive with a timed locking mechanism.
-        pub type NSTDTimedMutex = NSTDUnixMutex;
+        pub type NSTDTimedMutex<'a> = NSTDUnixMutex<'a>;
 
         /// Represents an optional value of type `NSTDTimedMutex`.
-        pub type NSTDOptionalTimedMutex = NSTDUnixOptionalMutex;
+        pub type NSTDOptionalTimedMutex<'a> = NSTDUnixOptionalMutex<'a>;
 
         /// A handle to a timed mutex's data.
-        pub type NSTDTimedMutexGuard<'a> = NSTDUnixMutexGuard<'a>;
+        pub type NSTDTimedMutexGuard<'m, 'a> = NSTDUnixMutexGuard<'m, 'a>;
 
         /// A result type containing a timed mutex lock whether or not the mutex is poisoned.
-        pub type NSTDTimedMutexLockResult<'a> = NSTDUnixMutexLockResult<'a>;
+        pub type NSTDTimedMutexLockResult<'m, 'a> = NSTDUnixMutexLockResult<'m, 'a>;
 
         /// An optional value of type `NSTDTimedMutexLockResult`.
         ///
         /// This type is returned from `nstd_timed_mutex_try_lock` where the uninitialized variant
         /// means that the function would block.
-        pub type NSTDOptionalTimedMutexLockResult<'a> = NSTDUnixOptionalMutexLockResult<'a>;
+        pub type NSTDOptionalTimedMutexLockResult<'m, 'a> = NSTDUnixOptionalMutexLockResult<'m, 'a>;
     } else {
         use crate::core::{
             optional::{gen_optional, NSTDOptional},
@@ -158,7 +158,9 @@ extern "C" {
     /// # Safety
     ///
     /// The mutex lock must not already be owned by the calling thread.
-    pub fn nstd_timed_mutex_lock(mutex: &NSTDTimedMutex) -> NSTDOptionalTimedMutexLockResult;
+    pub fn nstd_timed_mutex_lock<'m, 'a>(
+        mutex: &'m NSTDTimedMutex<'a>,
+    ) -> NSTDOptionalTimedMutexLockResult<'m, 'a>;
 
     /// The non-blocking variant of `nstd_timed_mutex_lock` returning an uninitialized "none" result if
     /// the mutex is locked by another thread.
@@ -177,7 +179,9 @@ extern "C" {
     /// # Safety
     ///
     /// The mutex lock must not already be owned by the calling thread.
-    pub fn nstd_timed_mutex_try_lock(mutex: &NSTDTimedMutex) -> NSTDOptionalTimedMutexLockResult;
+    pub fn nstd_timed_mutex_try_lock<'m, 'a>(
+        mutex: &'m NSTDTimedMutex<'a>,
+    ) -> NSTDOptionalTimedMutexLockResult<'m, 'a>;
 
     /// The timed variant of `nstd_timed_mutex_lock` returning an uninitialized "none" result if
     /// the mutex lock could not be acquired after a specified number of `seconds`.
@@ -198,10 +202,10 @@ extern "C" {
     /// # Safety
     ///
     /// The mutex lock must not already be owned by the calling thread.
-    pub fn nstd_timed_mutex_timed_lock<'a>(
-        mutex: &'a NSTDTimedMutex,
+    pub fn nstd_timed_mutex_timed_lock<'m, 'a>(
+        mutex: &'m NSTDTimedMutex<'a>,
         duration: NSTDDuration,
-    ) -> NSTDOptionalTimedMutexLockResult<'a>;
+    ) -> NSTDOptionalTimedMutexLockResult<'m, 'a>;
 
     /// Returns an immutable raw pointer to a timed mutex guard's protected data.
     ///

@@ -14,6 +14,7 @@ use nstdapi::nstdapi;
 cfg_if! {
     if #[cfg(unix)] {
         use crate::{
+            alloc::NSTD_ALLOCATOR,
             core::{
                 cstr::{nstd_core_cstr_as_ptr, nstd_core_cstr_get_null},
                 str::nstd_core_str_as_cstr,
@@ -89,7 +90,9 @@ pub unsafe fn nstd_shared_lib_load(path: &NSTDStr) -> NSTDOptionalSharedLib {
         let path = nstd_core_str_as_cstr(path);
         if nstd_core_cstr_get_null(&path).is_null() {
             // Allocate a null byte for `path`.
-            if let NSTDOptional::Some(path) = nstd_cstring_from_cstr_unchecked(&path) {
+            if let NSTDOptional::Some(path) =
+                nstd_cstring_from_cstr_unchecked(&NSTD_ALLOCATOR, &path)
+            {
                 let handle = dlopen(nstd_cstring_as_ptr(&path), RTLD_LAZY | RTLD_LOCAL);
                 if !handle.is_null() {
                     return NSTDOptional::Some(NSTDSharedLib { handle });

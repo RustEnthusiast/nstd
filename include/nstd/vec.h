@@ -8,6 +8,8 @@
 
 /// A dynamically sized contiguous sequence of values.
 typedef struct {
+    /// The memory allocator.
+    const NSTDAllocator *allocator;
     /// A raw pointer to the vector's memory buffer.
     NSTDAnyMut ptr;
     /// The number of bytes each value in the vector takes up.
@@ -25,18 +27,22 @@ NSTDOptional(NSTDVec) NSTDOptionalVec;
 ///
 /// # Parameters:
 ///
+/// - `const NSTDAllocator *allocator` - The memory allocator.
+///
 /// - `NSTDUInt stride` - The size in bytes of each value in the vector.
 ///
 /// # Returns
 ///
 /// `NSTDVec vec` - The new vector.
-NSTDAPI NSTDVec nstd_vec_new(NSTDUInt stride);
+NSTDAPI NSTDVec nstd_vec_new(const NSTDAllocator *allocator, NSTDUInt stride);
 
 /// Creates a new vector initialized with the given capacity.
 ///
 /// If allocation fails, a vector with a capacity of 0 will be returned.
 ///
 /// # Parameters:
+///
+/// - `const NSTDAllocator *allocator` - The memory allocator.
 ///
 /// - `NSTDUInt stride` - The size in bytes of each value in the vector.
 ///
@@ -45,11 +51,14 @@ NSTDAPI NSTDVec nstd_vec_new(NSTDUInt stride);
 /// # Returns
 ///
 /// `NSTDVec vec` - The new vector.
-NSTDAPI NSTDVec nstd_vec_new_with_cap(NSTDUInt stride, NSTDUInt cap);
+NSTDAPI NSTDVec
+nstd_vec_new_with_cap(const NSTDAllocator *allocator, NSTDUInt stride, NSTDUInt cap);
 
 /// Creates a new vector from a slice.
 ///
 /// # Parameters:
+///
+/// - `const NSTDAllocator *allocator` - The memory allocator.
 ///
 /// - `const NSTDSlice *slice` - The slice to copy data from.
 ///
@@ -61,7 +70,7 @@ NSTDAPI NSTDVec nstd_vec_new_with_cap(NSTDUInt stride, NSTDUInt cap);
 /// # Safety
 ///
 /// The caller of this function must ensure that `slice`'s data is valid for reads.
-NSTDAPI NSTDOptionalVec nstd_vec_from_slice(const NSTDSlice *slice);
+NSTDAPI NSTDOptionalVec nstd_vec_from_slice(const NSTDAllocator *allocator, const NSTDSlice *slice);
 
 /// Creates a new deep copy of `vec`.
 ///

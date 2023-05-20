@@ -9,6 +9,7 @@ use crate::os::unix::io::{
     NSTDUnixIOResult,
 };
 use crate::{
+    alloc::NSTD_ALLOCATOR,
     core::{optional::NSTDOptional, result::NSTDResult, str::NSTDStr},
     string::{nstd_string_pop, NSTDString},
     vec::NSTDVec,
@@ -131,10 +132,10 @@ impl From<NSTDUnixIOResult> for NSTDIOResult {
 }
 
 /// A result type that yields an [NSTDVec] on success and an I/O operation error code on failure.
-pub type NSTDIOBufferResult = NSTDResult<NSTDVec, NSTDIOError>;
+pub type NSTDIOBufferResult<'a> = NSTDResult<NSTDVec<'a>, NSTDIOError>;
 
 /// A result type that yields a UTF-8 string on success and an I/O operation error code on failure.
-pub type NSTDIOStringResult = NSTDResult<NSTDString, NSTDIOError>;
+pub type NSTDIOStringResult<'a> = NSTDResult<NSTDString<'a>, NSTDIOError>;
 
 /// Writes a string slice to stdout.
 ///
@@ -195,7 +196,7 @@ pub unsafe fn nstd_io_print_line(output: &NSTDStr) -> NSTDIOError {
 /// `NSTDIOStringResult input` - The UTF-8 input from stdin on success and the I/O operation error
 /// code on failure.
 #[nstdapi]
-pub fn nstd_io_read() -> NSTDIOStringResult {
+pub fn nstd_io_read() -> NSTDIOStringResult<'static> {
     let mut res = nstd_io_read_line();
     if let NSTDResult::Ok(input) = &mut res {
         nstd_string_pop(input);
@@ -210,13 +211,13 @@ pub fn nstd_io_read() -> NSTDIOStringResult {
 /// `NSTDIOStringResult input` - The UTF-8 input from stdin on success and the I/O operation error
 /// code on failure.
 #[nstdapi]
-pub fn nstd_io_read_line() -> NSTDIOStringResult {
+pub fn nstd_io_read_line() -> NSTDIOStringResult<'static> {
     // Attempt to read a line from stdin.
     let mut input = String::new();
     if let Err(err) = std::io::stdin().read_line(&mut input) {
         return NSTDResult::Err(NSTDIOError::from_err(err.kind()));
     }
-    match NSTDString::from_str(&input) {
+    match NSTDString::from_str(&NSTD_ALLOCATOR, &input) {
         NSTDOptional::Some(input) => NSTDResult::Ok(input),
         _ => NSTDResult::Err(NSTDIOError::NSTD_IO_ERROR_OUT_OF_MEMORY),
     }

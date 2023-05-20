@@ -1,12 +1,12 @@
 //! A dynamically sized, null terminated, C string.
 use crate::{
-    alloc::NSTDAllocError,
+    alloc::{NSTDAllocError, NSTDAllocator},
     core::{
         cstr::{
             nstd_core_cstr_as_bytes, nstd_core_cstr_get_null, nstd_core_cstr_is_null_terminated,
             nstd_core_cstr_new_unchecked, NSTDCStr,
         },
-        optional::{gen_optional, NSTDOptional},
+        optional::NSTDOptional,
         slice::NSTDSlice,
     },
     vec::{
@@ -23,14 +23,19 @@ use nstdapi::nstdapi;
 ///
 /// Managed C strings (`NSTDCString`) will always contain a null byte until freed.
 #[nstdapi]
-#[derive(Debug)]
-pub struct NSTDCString {
+pub struct NSTDCString<'a> {
     /// The underlying vector of `NSTDChar`s.
-    bytes: NSTDVec,
+    bytes: NSTDVec<'a>,
 }
-gen_optional!(NSTDOptionalCString, NSTDCString);
+
+/// Represents an optional value of type `NSTDCString`.
+pub type NSTDOptionalCString<'a> = NSTDOptional<NSTDCString<'a>>;
 
 /// Creates a new empty `NSTDCString`.
+///
+/// # Parameters:
+///
+/// - `const NSTDAllocator *allocator` - The memory allocator.
 ///
 /// # Returns
 ///
@@ -40,19 +45,21 @@ gen_optional!(NSTDOptionalCString, NSTDCString);
 /// # Example
 ///
 /// ```
-/// use nstd_sys::cstring::nstd_cstring_new;
+/// use nstd_sys::{alloc::NSTD_ALLOCATOR, cstring::nstd_cstring_new};
 ///
-/// let cstring = nstd_cstring_new();
+/// let cstring = nstd_cstring_new(&NSTD_ALLOCATOR);
 /// ```
 #[inline]
 #[nstdapi]
-pub fn nstd_cstring_new() -> NSTDOptionalCString {
-    nstd_cstring_new_with_cap(1)
+pub fn nstd_cstring_new(allocator: &NSTDAllocator) -> NSTDOptionalCString {
+    nstd_cstring_new_with_cap(allocator, 1)
 }
 
 /// Creates a new `NSTDCString` initialized with the given capacity.
 ///
 /// # Parameters:
+///
+/// - `const NSTDAllocator *allocator` - The memory allocator.
 ///
 /// - `NSTDUInt cap` - The number of bytes to allocate ahead of time.
 ///
@@ -64,14 +71,14 @@ pub fn nstd_cstring_new() -> NSTDOptionalCString {
 /// # Example
 ///
 /// ```
-/// use nstd_sys::cstring::nstd_cstring_new_with_cap;
+/// use nstd_sys::{alloc::NSTD_ALLOCATOR, cstring::nstd_cstring_new_with_cap};
 ///
-/// let cstring = nstd_cstring_new_with_cap(10);
+/// let cstring = nstd_cstring_new_with_cap(&NSTD_ALLOCATOR, 10);
 /// ```
 #[inline]
 #[nstdapi]
-pub fn nstd_cstring_new_with_cap(cap: NSTDUInt) -> NSTDOptionalCString {
-    let mut bytes = nstd_vec_new_with_cap(1, cap);
+pub fn nstd_cstring_new_with_cap(allocator: &NSTDAllocator, cap: NSTDUInt) -> NSTDOptionalCString {
+    let mut bytes = nstd_vec_new_with_cap(allocator, 1, cap);
     let nul: NSTDChar = 0;
     // SAFETY: `nul` is stored on the stack.
     match unsafe { nstd_vec_push(&mut bytes, addr_of!(nul) as _) } {
@@ -83,6 +90,8 @@ pub fn nstd_cstring_new_with_cap(cap: NSTDUInt) -> NSTDOptionalCString {
 /// Creates an owned version of an unowned C string slice.
 ///
 /// # Parameters:
+///
+/// - `const NSTDAllocator *allocator` - The memory allocator.
 ///
 /// - `const NSTDCStr *cstr` - The unowned C string slice.
 ///
@@ -98,18 +107,23 @@ pub fn nstd_cstring_new_with_cap(cap: NSTDUInt) -> NSTDOptionalCString {
 /// # Example
 ///
 /// ```
-/// use nstd_sys::{core::cstr::nstd_core_cstr_from_raw, cstring::nstd_cstring_from_cstr};
+/// use nstd_sys::{
+///     alloc::NSTD_ALLOCATOR, core::cstr::nstd_core_cstr_from_raw, cstring::nstd_cstring_from_cstr,
+/// };
 ///
 /// unsafe {
 ///     let cstr = nstd_core_cstr_from_raw("C string\0".as_ptr().cast());
-///     let cstring = nstd_cstring_from_cstr(&cstr);
+///     let cstring = nstd_cstring_from_cstr(&NSTD_ALLOCATOR, &cstr);
 /// }
 /// ```
 #[inline]
 #[nstdapi]
-pub unsafe fn nstd_cstring_from_cstr(cstr: &NSTDCStr) -> NSTDOptionalCString {
+pub unsafe fn nstd_cstring_from_cstr<'a>(
+    allocator: &'a NSTDAllocator,
+    cstr: &NSTDCStr,
+) -> NSTDOptionalCString<'a> {
     match nstd_core_cstr_get_null(cstr).is_null() {
-        true => nstd_cstring_from_cstr_unchecked(cstr),
+        true => nstd_cstring_from_cstr_unchecked(allocator, cstr),
         false => NSTDOptional::None,
     }
 }
@@ -118,6 +132,8 @@ pub unsafe fn nstd_cstring_from_cstr(cstr: &NSTDCStr) -> NSTDOptionalCString {
 /// any null bytes.
 ///
 /// # Parameters:
+///
+/// - `const NSTDAllocator *allocator` - The memory allocator.
 ///
 /// - `const NSTDCStr *cstr` - The unowned C string slice.
 ///
@@ -134,9 +150,12 @@ pub unsafe fn nstd_cstring_from_cstr(cstr: &NSTDCStr) -> NSTDOptionalCString {
 ///
 /// - `cstr` does not contain any null (`'\0'`) bytes.
 #[nstdapi]
-pub unsafe fn nstd_cstring_from_cstr_unchecked(cstr: &NSTDCStr) -> NSTDOptionalCString {
+pub unsafe fn nstd_cstring_from_cstr_unchecked<'a>(
+    allocator: &'a NSTDAllocator,
+    cstr: &NSTDCStr,
+) -> NSTDOptionalCString<'a> {
     let bytes = nstd_core_cstr_as_bytes(cstr);
-    if let NSTDOptional::Some(mut bytes) = nstd_vec_from_slice(&bytes) {
+    if let NSTDOptional::Some(mut bytes) = nstd_vec_from_slice(allocator, &bytes) {
         let null: NSTDChar = 0;
         let null = addr_of!(null) as _;
         if nstd_vec_push(&mut bytes, null) == NSTDAllocError::NSTD_ALLOC_ERROR_NONE {
@@ -185,7 +204,7 @@ pub fn nstd_cstring_from_bytes(bytes: NSTDVec) -> NSTDOptionalCString {
 /// "none" variant if allocating fails.
 #[inline]
 #[nstdapi]
-pub fn nstd_cstring_clone(cstring: &NSTDCString) -> NSTDOptionalCString {
+pub fn nstd_cstring_clone<'a>(cstring: &NSTDCString<'a>) -> NSTDOptionalCString<'a> {
     match nstd_vec_clone(&cstring.bytes) {
         NSTDOptional::Some(bytes) => NSTDOptional::Some(NSTDCString { bytes }),
         _ => NSTDOptional::None,
@@ -319,11 +338,12 @@ pub fn nstd_cstring_cap(cstring: &NSTDCString) -> NSTDUInt {
 ///
 /// ```
 /// use nstd_sys::{
+///     alloc::NSTD_ALLOCATOR,
 ///     cstring::{nstd_cstring_new, nstd_cstring_push},
 ///     NSTDChar,
 /// };
 ///
-/// let mut cstring = nstd_cstring_new().unwrap();
+/// let mut cstring = nstd_cstring_new(&NSTD_ALLOCATOR).unwrap();
 /// nstd_cstring_push(&mut cstring, b'!' as NSTDChar);
 /// ```
 #[nstdapi]
@@ -374,13 +394,13 @@ pub fn nstd_cstring_push(cstring: &mut NSTDCString, chr: NSTDChar) -> NSTDAllocE
 ///
 /// ```
 /// use nstd_sys::{
-///     alloc::NSTDAllocError::NSTD_ALLOC_ERROR_NONE,
+///     alloc::{NSTDAllocError::NSTD_ALLOC_ERROR_NONE, NSTD_ALLOCATOR},
 ///     core::cstr::nstd_core_cstr_from_raw,
 ///     cstring::{nstd_cstring_new, nstd_cstring_push_cstr},
 ///     NSTDChar,
 /// };
 ///
-/// let mut cstring = nstd_cstring_new().unwrap();
+/// let mut cstring = nstd_cstring_new(&NSTD_ALLOCATOR).unwrap();
 /// unsafe {
 ///     let cstr = nstd_core_cstr_from_raw("baNaNa\0".as_ptr().cast());
 ///     assert!(nstd_cstring_push_cstr(&mut cstring, &cstr) == NSTD_ALLOC_ERROR_NONE);
@@ -415,6 +435,7 @@ pub unsafe fn nstd_cstring_push_cstr(cstring: &mut NSTDCString, cstr: &NSTDCStr)
 ///
 /// ```
 /// use nstd_sys::{
+///     alloc::NSTD_ALLOCATOR,
 ///     core::cstr::nstd_core_cstr_from_raw,
 ///     cstring::{nstd_cstring_from_cstr, nstd_cstring_pop},
 ///     NSTDChar,
@@ -422,7 +443,7 @@ pub unsafe fn nstd_cstring_push_cstr(cstring: &mut NSTDCString, cstr: &NSTDCStr)
 ///
 /// unsafe {
 ///     let cstr = nstd_core_cstr_from_raw("123\0".as_ptr().cast());
-///     let mut cstring = nstd_cstring_from_cstr(&cstr).unwrap();
+///     let mut cstring = nstd_cstring_from_cstr(&NSTD_ALLOCATOR, &cstr).unwrap();
 ///     assert!(nstd_cstring_pop(&mut cstring) == b'3' as NSTDChar);
 /// }
 /// ```
