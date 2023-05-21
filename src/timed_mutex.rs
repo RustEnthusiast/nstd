@@ -41,26 +41,23 @@ cfg_if! {
         /// means that the function would block.
         pub type NSTDOptionalTimedMutexLockResult<'m, 'a> = NSTDUnixOptionalMutexLockResult<'m, 'a>;
     } else {
-        use crate::core::{
-            optional::{gen_optional, NSTDOptional},
-            result::NSTDResult,
-        };
+        use crate::core::{optional::NSTDOptional, result::NSTDResult};
         use core::{marker::PhantomData, mem::ManuallyDrop};
         use nstdapi::nstdapi;
 
         /// A mutual exclusion primitive with a timed locking mechanism.
         #[nstdapi]
-        pub struct NSTDTimedMutex {
+        pub struct NSTDTimedMutex<'a> {
             /// The underlying mutex.
             inner: NSTDAnyMut,
             /// The data to protect.
-            data: ManuallyDrop<NSTDHeapPtr>,
+            data: ManuallyDrop<NSTDHeapPtr<'a>>,
             /// Determines whether or not the mutex is poisoned.
             poisoned: NSTDBool,
             /// Determines whether or not the mutex is currently locked.
             locked: NSTDBool,
         }
-        impl Drop for NSTDTimedMutex {
+        impl Drop for NSTDTimedMutex<'_> {
             /// [NSTDTimedMutex]'s destructor.
             #[inline]
             fn drop(&mut self) {
@@ -72,23 +69,25 @@ cfg_if! {
         ///
         /// The data that the mutex is protecting must be able to be safely sent between threads.
         // SAFETY: The user guarantees that the data is thread-safe.
-        unsafe impl Send for NSTDTimedMutex {}
+        unsafe impl Send for NSTDTimedMutex<'_> {}
         /// # Safety
         ///
         /// The data that the mutex is protecting must be able to be safely shared between threads.
         // SAFETY: The user guarantees that the data is thread-safe.
-        unsafe impl Sync for NSTDTimedMutex {}
-        gen_optional!(NSTDOptionalTimedMutex, NSTDTimedMutex);
+        unsafe impl Sync for NSTDTimedMutex<'_> {}
+
+        /// Represents an optional value of type `NSTDTimedMutex`.
+        pub type NSTDOptionalTimedMutex<'a> = NSTDOptional<NSTDTimedMutex<'a>>;
 
         /// A handle to a timed mutex's data.
         #[nstdapi]
-        pub struct NSTDTimedMutexGuard<'a> {
+        pub struct NSTDTimedMutexGuard<'m, 'a> {
             /// A reference to the mutex.
-            mutex: &'a NSTDTimedMutex,
+            mutex: &'m NSTDTimedMutex<'a>,
             /// Ensures that the guard is not [Send].
             pd: PhantomData<*const ()>,
         }
-        impl Drop for NSTDTimedMutexGuard<'_> {
+        impl Drop for NSTDTimedMutexGuard<'_, '_> {
             /// [NSTDTimedMutexGuard]'s destructor.
             #[inline]
             fn drop(&mut self) {
@@ -100,17 +99,18 @@ cfg_if! {
         ///
         /// The data that the guard is protecting must be able to be safely shared between threads.
         // SAFETY: The user guarantees that the data is thread-safe.
-        unsafe impl Sync for NSTDTimedMutexGuard<'_> {}
+        unsafe impl Sync for NSTDTimedMutexGuard<'_, '_> {}
 
         /// A result type containing a timed mutex lock whether or not the mutex is poisoned.
-        pub type NSTDTimedMutexLockResult<'a> =
-            NSTDResult<NSTDTimedMutexGuard<'a>, NSTDTimedMutexGuard<'a>>;
+        pub type NSTDTimedMutexLockResult<'m, 'a> =
+            NSTDResult<NSTDTimedMutexGuard<'m, 'a>, NSTDTimedMutexGuard<'m, 'a>>;
 
         /// An optional value of type `NSTDTimedMutexLockResult`.
         ///
         /// This type is returned from `nstd_timed_mutex_try_lock` where the uninitialized variant
         /// means that the function would block.
-        pub type NSTDOptionalTimedMutexLockResult<'a> = NSTDOptional<NSTDTimedMutexLockResult<'a>>;
+        pub type NSTDOptionalTimedMutexLockResult<'m, 'a> =
+            NSTDOptional<NSTDTimedMutexLockResult<'m, 'a>>;
     }
 }
 
