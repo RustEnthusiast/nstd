@@ -95,7 +95,7 @@ cfg_if! {
                 unsafe { nstd_timed_mutex_unlock(core::ptr::read(self)) };
             }
         }
-        // # Safety
+        /// # Safety
         ///
         /// The data that the guard is protecting must be able to be safely shared between threads.
         // SAFETY: The user guarantees that the data is thread-safe.
