@@ -118,7 +118,7 @@ impl Drop for NSTDVec<'_> {
         let buffer_len = self.buffer_byte_len();
         if buffer_len > 0 {
             // SAFETY: The vector has allocated.
-            unsafe { (self.allocator.deallocate)(&mut self.ptr, buffer_len) };
+            unsafe { (self.allocator.deallocate)(self.allocator.state, &mut self.ptr, buffer_len) };
         }
     }
 }
@@ -251,7 +251,7 @@ pub fn nstd_vec_new_with_cap(
     }
     // Attempt to allocate the memory buffer.
     // SAFETY: Both `stride` & `cap` are above 0.
-    let mut ptr = unsafe { (allocator.allocate)(cap * stride) };
+    let mut ptr = unsafe { (allocator.allocate)(allocator.state, cap * stride) };
     if ptr.is_null() {
         ptr = nstd_core_ptr_raw_dangling_mut();
         cap = 0;
@@ -996,7 +996,7 @@ pub fn nstd_vec_reserve(vec: &mut NSTDVec, size: NSTDUInt) -> NSTDAllocError {
     // Checking if the vector is null and needs to make it's first allocation.
     if !vec.has_allocated() {
         // SAFETY: `bytes_to_alloc` is above 0.
-        let mem = unsafe { (vec.allocator.allocate)(bytes_to_alloc) };
+        let mem = unsafe { (vec.allocator.allocate)(vec.allocator.state, bytes_to_alloc) };
         if !mem.is_null() {
             vec.ptr = mem;
             vec.cap = size;
@@ -1012,7 +1012,9 @@ pub fn nstd_vec_reserve(vec: &mut NSTDVec, size: NSTDUInt) -> NSTDAllocError {
         let byte_len = vec.buffer_byte_len();
         let new_byte_len = byte_len + bytes_to_alloc;
         // SAFETY: The vector is non-null & the lengths are above 0.
-        let errc = unsafe { (vec.allocator.reallocate)(&mut vec.ptr, byte_len, new_byte_len) };
+        let errc = unsafe {
+            (vec.allocator.reallocate)(vec.allocator.state, &mut vec.ptr, byte_len, new_byte_len)
+        };
         // On success increase the buffer length.
         if errc == NSTD_ALLOC_ERROR_NONE {
             vec.cap += size;
@@ -1040,7 +1042,9 @@ pub fn nstd_vec_shrink(vec: &mut NSTDVec) -> NSTDAllocError {
             // Make sure to allocate at least one element to avoid undefined behavior.
             let new_len = vec.byte_len().max(vec.stride);
             // SAFETY: The vector is non-null & the lengths are above 0.
-            let errc = unsafe { (vec.allocator.reallocate)(&mut vec.ptr, current_len, new_len) };
+            let errc = unsafe {
+                (vec.allocator.reallocate)(vec.allocator.state, &mut vec.ptr, current_len, new_len)
+            };
             if errc == NSTD_ALLOC_ERROR_NONE {
                 // The buffer's new length is at least 1.
                 vec.cap = vec.len.max(1);

@@ -20,6 +20,8 @@ typedef enum {
 
 /// A structure of function pointers making up an allocator VTable.
 typedef struct {
+    /// An opaque pointer to the allocator's state.
+    NSTDAny state;
     /// Allocates a contiguous sequence of `size` bytes in memory.
     ///
     /// If allocation fails, a null pointer is returned.
@@ -39,7 +41,7 @@ typedef struct {
     /// - Behavior is undefined if `size` is zero.
     ///
     /// - The new memory buffer should be considered uninitialized.
-    NSTDAnyMut (*allocate)(NSTDUInt);
+    NSTDAnyMut (*allocate)(NSTDAny, NSTDUInt);
     /// Allocates a contiguous sequence of `size` bytes in memory.
     ///
     /// The initialized memory is zero-initialized.
@@ -61,7 +63,7 @@ typedef struct {
     /// - Behavior is undefined if `size` is zero.
     ///
     /// - The new memory buffer should be considered uninitialized.
-    NSTDAnyMut (*allocate_zeroed)(NSTDUInt);
+    NSTDAnyMut (*allocate_zeroed)(NSTDAny, NSTDUInt);
     /// Reallocates memory that was previously allocated by this allocator.
     ///
     /// Reallocation will fail if `new_size` is greater than `NSTDInt`'s max value.
@@ -89,7 +91,7 @@ typedef struct {
     /// - Behavior is undefined if `ptr` is not a value returned by this allocator.
     ///
     /// - `size` must be the same value that was used to allocate the memory buffer.
-    NSTDAllocError (*reallocate)(NSTDAnyMut *, NSTDUInt, NSTDUInt);
+    NSTDAllocError (*reallocate)(NSTDAny, NSTDAnyMut *, NSTDUInt, NSTDUInt);
     /// Deallocates memory that was previously allocated by this allocator.
     ///
     /// On successful deallocation, `ptr` will be set to null and `NSTD_ALLOC_ERROR_NONE` will be
@@ -112,7 +114,7 @@ typedef struct {
     /// - Behavior is undefined if `ptr` is not a value returned by this allocator.
     ///
     /// - `size` must be the same value that was used to allocate the memory buffer.
-    NSTDAllocError (*deallocate)(NSTDAnyMut *, NSTDUInt);
+    NSTDAllocError (*deallocate)(NSTDAny, NSTDAnyMut *, NSTDUInt);
 } NSTDAllocator;
 
 /// `nstd`'s default allocator.

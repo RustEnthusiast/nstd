@@ -14,7 +14,7 @@ use crate::os::windows::alloc::{
     nstd_os_windows_alloc_deallocate, nstd_os_windows_alloc_reallocate,
     NSTDWindowsAllocError::{self, *},
 };
-use crate::{NSTDAnyMut, NSTDUInt};
+use crate::{NSTDAny, NSTDAnyMut, NSTDUInt, NSTD_NULL};
 use cfg_if::cfg_if;
 use nstdapi::nstdapi;
 
@@ -55,6 +55,8 @@ impl From<NSTDWindowsAllocError> for NSTDAllocError {
 #[nstdapi]
 #[derive(Clone, Copy)]
 pub struct NSTDAllocator {
+    /// An opaque pointer to the allocator's state.
+    pub state: NSTDAny,
     /// Allocates a contiguous sequence of `size` bytes in memory.
     ///
     /// If allocation fails, a null pointer is returned.
@@ -74,7 +76,7 @@ pub struct NSTDAllocator {
     /// - Behavior is undefined if `size` is zero.
     ///
     /// - The new memory buffer should be considered uninitialized.
-    pub allocate: unsafe extern "C" fn(NSTDUInt) -> NSTDAnyMut,
+    pub allocate: unsafe extern "C" fn(NSTDAny, NSTDUInt) -> NSTDAnyMut,
     /// Allocates a contiguous sequence of `size` bytes in memory.
     ///
     /// The initialized memory is zero-initialized.
@@ -96,7 +98,7 @@ pub struct NSTDAllocator {
     /// - Behavior is undefined if `size` is zero.
     ///
     /// - The new memory buffer should be considered uninitialized.
-    pub allocate_zeroed: unsafe extern "C" fn(NSTDUInt) -> NSTDAnyMut,
+    pub allocate_zeroed: unsafe extern "C" fn(NSTDAny, NSTDUInt) -> NSTDAnyMut,
     /// Reallocates memory that was previously allocated by this allocator.
     ///
     /// Reallocation will fail if `new_size` is greater than `NSTDInt`'s max value.
@@ -124,7 +126,8 @@ pub struct NSTDAllocator {
     /// - Behavior is undefined if `ptr` is not a value returned by this allocator.
     ///
     /// - `size` must be the same value that was used to allocate the memory buffer.
-    pub reallocate: unsafe extern "C" fn(&mut NSTDAnyMut, NSTDUInt, NSTDUInt) -> NSTDAllocError,
+    pub reallocate:
+        unsafe extern "C" fn(NSTDAny, &mut NSTDAnyMut, NSTDUInt, NSTDUInt) -> NSTDAllocError,
     /// Deallocates memory that was previously allocated by this allocator.
     ///
     /// On successful deallocation, `ptr` will be set to null and `NSTD_ALLOC_ERROR_NONE` will be
@@ -147,16 +150,60 @@ pub struct NSTDAllocator {
     /// - Behavior is undefined if `ptr` is not a value returned by this allocator.
     ///
     /// - `size` must be the same value that was used to allocate the memory buffer.
-    pub deallocate: unsafe extern "C" fn(&mut NSTDAnyMut, NSTDUInt) -> NSTDAllocError,
+    pub deallocate: unsafe extern "C" fn(NSTDAny, &mut NSTDAnyMut, NSTDUInt) -> NSTDAllocError,
+}
+/// # Safety
+///
+/// The allocator's state must be able to be safely *shared* between threads.
+// SAFETY: The user guarantees that the state is thread-safe.
+unsafe impl Send for NSTDAllocator {}
+/// # Safety
+///
+/// The allocator's state must be able to be safely shared between threads.
+// SAFETY: The user guarantees that the state is thread-safe.
+unsafe impl Sync for NSTDAllocator {}
+
+/// Forwards an `NSTD_ALLOCATOR`'s `allocate` call to `nstd_alloc_allocate`.
+#[inline]
+unsafe extern "C" fn allocate(_: NSTDAny, size: NSTDUInt) -> NSTDAnyMut {
+    nstd_alloc_allocate(size)
+}
+
+/// Forwards an `NSTD_ALLOCATOR`'s `allocate_zeroed` call to `nstd_alloc_allocate_zeroed`.
+#[inline]
+unsafe extern "C" fn allocate_zeroed(_: NSTDAny, size: NSTDUInt) -> NSTDAnyMut {
+    nstd_alloc_allocate_zeroed(size)
+}
+
+/// Forwards an `NSTD_ALLOCATOR`'s `reallocate` call to `nstd_alloc_reallocate`.
+#[inline]
+unsafe extern "C" fn reallocate(
+    _: NSTDAny,
+    ptr: &mut NSTDAnyMut,
+    size: NSTDUInt,
+    new_size: NSTDUInt,
+) -> NSTDAllocError {
+    nstd_alloc_reallocate(ptr, size, new_size)
+}
+
+/// Forwards an `NSTD_ALLOCATOR`'s `deallocate` call to `nstd_alloc_deallocate`.
+#[inline]
+unsafe extern "C" fn deallocate(
+    _: NSTDAny,
+    ptr: &mut NSTDAnyMut,
+    size: NSTDUInt,
+) -> NSTDAllocError {
+    nstd_alloc_deallocate(ptr, size)
 }
 
 /// `nstd`'s default allocator.
 #[nstdapi]
 pub static NSTD_ALLOCATOR: NSTDAllocator = NSTDAllocator {
-    allocate: nstd_alloc_allocate,
-    allocate_zeroed: nstd_alloc_allocate_zeroed,
-    reallocate: nstd_alloc_reallocate,
-    deallocate: nstd_alloc_deallocate,
+    state: NSTD_NULL,
+    allocate,
+    allocate_zeroed,
+    reallocate,
+    deallocate,
 };
 
 /// Allocates a block of memory on the heap.
@@ -189,7 +236,7 @@ pub static NSTD_ALLOCATOR: NSTDAllocator = NSTDAllocator {
 /// ```
 #[inline]
 #[nstdapi]
-pub unsafe extern "C" fn nstd_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
+pub unsafe fn nstd_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
     cfg_if! {
         if #[cfg(any(
             unix,
@@ -247,7 +294,7 @@ pub unsafe extern "C" fn nstd_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
 /// ```
 #[inline]
 #[nstdapi]
-pub unsafe extern "C" fn nstd_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMut {
+pub unsafe fn nstd_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMut {
     cfg_if! {
         if #[cfg(any(
             unix,
@@ -324,7 +371,7 @@ pub unsafe extern "C" fn nstd_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMu
 #[nstdapi]
 #[cfg_attr(windows, inline)]
 #[allow(unused_variables)]
-pub unsafe extern "C" fn nstd_alloc_reallocate(
+pub unsafe fn nstd_alloc_reallocate(
     ptr: &mut NSTDAnyMut,
     size: NSTDUInt,
     new_size: NSTDUInt,
@@ -397,10 +444,7 @@ pub unsafe extern "C" fn nstd_alloc_reallocate(
 #[inline]
 #[nstdapi]
 #[allow(unused_variables)]
-pub unsafe extern "C" fn nstd_alloc_deallocate(
-    ptr: &mut NSTDAnyMut,
-    size: NSTDUInt,
-) -> NSTDAllocError {
+pub unsafe fn nstd_alloc_deallocate(ptr: &mut NSTDAnyMut, size: NSTDUInt) -> NSTDAllocError {
     cfg_if! {
         if #[cfg(any(
             unix,

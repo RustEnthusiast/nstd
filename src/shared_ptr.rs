@@ -54,7 +54,7 @@ impl Drop for NSTDSharedPtr<'_> {
             core::ptr::write_unaligned(ptrs, new_size);
             // If the pointer count is zero, free the data.
             if new_size == 0 {
-                (self.allocator.deallocate)(&mut self.ptr, self.size);
+                (self.allocator.deallocate)(self.allocator.state, &mut self.ptr, self.size);
             }
         }
     }
@@ -107,7 +107,7 @@ pub unsafe fn nstd_shared_ptr_new(
 ) -> NSTDOptionalSharedPtr {
     // Allocate a region of memory for the object and the pointer count.
     let buffer_size = element_size + USIZE_SIZE;
-    let raw = (allocator.allocate)(buffer_size);
+    let raw = (allocator.allocate)(allocator.state, buffer_size);
     if raw.is_null() {
         return NSTDOptional::None;
     }
@@ -166,7 +166,7 @@ pub unsafe fn nstd_shared_ptr_new_zeroed(
     unsafe {
         // Allocate a region of memory for the object and the pointer count.
         let buffer_size = element_size + USIZE_SIZE;
-        let raw = (allocator.allocate_zeroed)(buffer_size);
+        let raw = (allocator.allocate_zeroed)(allocator.state, buffer_size);
         if raw.is_null() {
             return NSTDOptional::None;
         }

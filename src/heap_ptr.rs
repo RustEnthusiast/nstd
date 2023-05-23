@@ -33,7 +33,7 @@ impl Drop for NSTDHeapPtr<'_> {
     fn drop(&mut self) {
         if self.size > 0 {
             // SAFETY: The heap object's size is non-zero.
-            unsafe { (self.allocator.deallocate)(&mut self.ptr, self.size) };
+            unsafe { (self.allocator.deallocate)(self.allocator.state, &mut self.ptr, self.size) };
         }
     }
 }
@@ -90,7 +90,7 @@ pub unsafe fn nstd_heap_ptr_new(
     if element_size == 0 {
         NSTDOptional::Some(NSTDHeapPtr::zero_sized(allocator))
     } else {
-        let mem = (allocator.allocate)(element_size);
+        let mem = (allocator.allocate)(allocator.state, element_size);
         if mem.is_null() {
             return NSTDOptional::None;
         }
@@ -145,7 +145,7 @@ pub unsafe fn nstd_heap_ptr_new_zeroed(
         NSTDOptional::Some(NSTDHeapPtr::zero_sized(allocator))
     } else {
         // SAFETY: `element_size` is not 0.
-        let mem = unsafe { (allocator.allocate_zeroed)(element_size) };
+        let mem = unsafe { (allocator.allocate_zeroed)(allocator.state, element_size) };
         if mem.is_null() {
             return NSTDOptional::None;
         }
@@ -174,7 +174,7 @@ pub fn nstd_heap_ptr_clone<'a>(hptr: &NSTDHeapPtr<'a>) -> NSTDOptionalHeapPtr<'a
         NSTDOptional::Some(NSTDHeapPtr::zero_sized(hptr.allocator))
     } else {
         // SAFETY: `size` is not 0.
-        let mem = unsafe { (hptr.allocator.allocate)(size) };
+        let mem = unsafe { (hptr.allocator.allocate)(hptr.allocator.state, size) };
         if mem.is_null() {
             return NSTDOptional::None;
         }
