@@ -26,6 +26,11 @@ typedef struct {
     ///
     /// If allocation fails, a null pointer is returned.
     ///
+    /// If allocation succeeds, this returns a pointer that is suitably aligned for any type with
+    /// [fundamental alignment](https://en.cppreference.com/w/c/language/object#Alignment), i.e.,
+    /// the returned pointer will be suitably aligned for
+    /// [max_align_t](https://en.cppreference.com/w/c/types/max_align_t).
+    ///
     /// Allocation will fail if `size` is greater than `NSTDInt`'s max value.
     ///
     /// # Parameters:
@@ -47,6 +52,11 @@ typedef struct {
     /// The initialized memory is zero-initialized.
     ///
     /// If allocation fails, a null pointer is returned.
+    ///
+    /// If allocation succeeds, this returns a pointer that is suitably aligned for any type with
+    /// [fundamental alignment](https://en.cppreference.com/w/c/language/object#Alignment), i.e.,
+    /// the returned pointer will be suitably aligned for
+    /// [max_align_t](https://en.cppreference.com/w/c/types/max_align_t).
     ///
     /// Allocation will fail if `size` is greater than `NSTDInt`'s max value.
     ///
