@@ -58,6 +58,30 @@ impl<'a> NSTDVec<'a> {
         }
     }
 
+    /// Creates a new [NSTDVec] from a Rust [Vec].
+    ///
+    /// When using the `unstable` feature, this method will return a vector using Rust's global
+    /// allocator so no extra allocations will occur.
+    #[allow(dead_code)]
+    pub(crate) fn from_vec<T: Copy>(vec: Vec<T>) -> NSTDOptionalVec<'a> {
+        #[cfg(feature = "unstable")]
+        {
+            use crate::alloc::GLOBAL_ALLOCATOR;
+            let cap = vec.capacity();
+            let data = vec.leak();
+            let v = NSTDVec {
+                allocator: &GLOBAL_ALLOCATOR,
+                ptr: data.as_ptr() as _,
+                stride: core::mem::size_of::<T>(),
+                len: data.len(),
+                cap,
+            };
+            NSTDOptional::Some(v)
+        }
+        #[cfg(not(feature = "unstable"))]
+        return Self::from_slice(&NSTD_ALLOCATOR, &vec);
+    }
+
     /// Checks if the vector's capacity is greater than 0.
     #[inline]
     fn has_allocated(&self) -> NSTDBool {

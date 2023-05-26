@@ -1,7 +1,6 @@
 //! Provides access to the file system.
 pub mod file;
 use crate::{
-    alloc::NSTD_ALLOCATOR,
     core::{optional::NSTDOptional, result::NSTDResult, slice::NSTDSlice, str::NSTDStr},
     io::{NSTDIOBufferResult, NSTDIOError, NSTDIOStringResult},
     string::NSTDString,
@@ -199,7 +198,7 @@ pub unsafe fn nstd_fs_remove_dirs(name: &NSTDStr) -> NSTDIOError {
 #[nstdapi]
 pub unsafe fn nstd_fs_read(path: &NSTDStr) -> NSTDIOBufferResult {
     match std::fs::read(path.as_str()) {
-        Ok(contents) => match NSTDVec::from_slice(&NSTD_ALLOCATOR, &contents) {
+        Ok(contents) => match NSTDVec::from_vec(contents) {
             NSTDOptional::Some(contents) => NSTDResult::Ok(contents),
             _ => NSTDResult::Err(NSTDIOError::NSTD_IO_ERROR_OUT_OF_MEMORY),
         },
@@ -223,7 +222,7 @@ pub unsafe fn nstd_fs_read(path: &NSTDStr) -> NSTDIOBufferResult {
 #[nstdapi]
 pub unsafe fn nstd_fs_read_to_string(path: &NSTDStr) -> NSTDIOStringResult {
     match std::fs::read_to_string(path.as_str()) {
-        Ok(contents) => match NSTDString::from_str(&NSTD_ALLOCATOR, &contents) {
+        Ok(contents) => match NSTDString::from_string(contents) {
             NSTDOptional::Some(contents) => NSTDResult::Ok(contents),
             _ => NSTDResult::Err(NSTDIOError::NSTD_IO_ERROR_OUT_OF_MEMORY),
         },
@@ -325,7 +324,7 @@ pub unsafe fn nstd_fs_copy(from: &NSTDStr, to: &NSTDStr) -> NSTDIOError {
 pub unsafe fn nstd_fs_absolute(path: &NSTDStr) -> NSTDIOStringResult {
     match std::fs::canonicalize(path.as_str()) {
         Ok(path) => match path.into_os_string().into_string() {
-            Ok(path) => match NSTDString::from_str(&NSTD_ALLOCATOR, &path) {
+            Ok(path) => match NSTDString::from_string(path) {
                 NSTDOptional::Some(path) => NSTDResult::Ok(path),
                 _ => NSTDResult::Err(NSTDIOError::NSTD_IO_ERROR_OUT_OF_MEMORY),
             },

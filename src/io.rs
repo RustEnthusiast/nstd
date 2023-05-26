@@ -9,7 +9,6 @@ use crate::os::unix::io::{
     NSTDUnixIOResult,
 };
 use crate::{
-    alloc::NSTD_ALLOCATOR,
     core::{optional::NSTDOptional, result::NSTDResult, str::NSTDStr},
     string::{nstd_string_pop, NSTDString},
     vec::NSTDVec,
@@ -217,7 +216,7 @@ pub fn nstd_io_read_line() -> NSTDIOStringResult<'static> {
     if let Err(err) = std::io::stdin().read_line(&mut input) {
         return NSTDResult::Err(NSTDIOError::from_err(err.kind()));
     }
-    match NSTDString::from_str(&NSTD_ALLOCATOR, &input) {
+    match NSTDString::from_string(input) {
         NSTDOptional::Some(input) => NSTDResult::Ok(input),
         _ => NSTDResult::Err(NSTDIOError::NSTD_IO_ERROR_OUT_OF_MEMORY),
     }

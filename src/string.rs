@@ -1,7 +1,7 @@
 //! Dynamically sized UTF-8 encoded byte string.
 extern crate alloc;
 use crate::{
-    alloc::{NSTDAllocError, NSTDAllocator, NSTD_ALLOCATOR},
+    alloc::{NSTDAllocError, NSTDAllocator},
     core::{
         def::NSTDByte,
         optional::NSTDOptional,
@@ -33,7 +33,7 @@ macro_rules! gen_from_primitive {
         #[inline]
         #[nstdapi]
         pub fn $name(v: $FromT) -> NSTDOptionalString<'static> {
-            NSTDString::from_str(&NSTD_ALLOCATOR, &v.to_string())
+            NSTDString::from_string(v.to_string())
         }
     };
 }
@@ -45,10 +45,13 @@ pub struct NSTDString<'a> {
     bytes: NSTDVec<'a>,
 }
 impl<'a> NSTDString<'a> {
-    /// Creates a new [NSTDString] from a Rust &[str].
+    /// Creates a new [NSTDString] from a Rust [String].
+    ///
+    /// When using the `unstable` feature, this method will return a string using Rust's global
+    /// allocator so no extra allocations will occur.
     #[inline]
-    pub(crate) fn from_str(allocator: &'a NSTDAllocator, str: &str) -> NSTDOptionalString<'a> {
-        match NSTDVec::from_slice(allocator, str.as_bytes()) {
+    pub(crate) fn from_string(string: String) -> NSTDOptionalString<'a> {
+        match NSTDVec::from_vec(string.into_bytes()) {
             NSTDOptional::Some(bytes) => NSTDOptional::Some(NSTDString { bytes }),
             _ => NSTDOptional::None,
         }

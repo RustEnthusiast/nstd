@@ -1,12 +1,15 @@
 //! Low level memory allocation.
-#[cfg(not(any(
-    unix,
-    windows,
-    any(target_env = "wasi", target_os = "wasi"),
-    target_os = "fuchsia",
-    target_os = "solid_asp3",
-    target_os = "vxworks"
-)))]
+#[cfg(any(
+    feature = "unstable",
+    not(any(
+        unix,
+        windows,
+        any(target_env = "wasi", target_os = "wasi"),
+        target_os = "fuchsia",
+        target_os = "solid_asp3",
+        target_os = "vxworks"
+    ))
+))]
 extern crate alloc;
 #[cfg(windows)]
 use crate::os::windows::alloc::{
@@ -205,6 +208,134 @@ pub static NSTD_ALLOCATOR: NSTDAllocator = NSTDAllocator {
     reallocate,
     deallocate,
 };
+
+cfg_if! {
+    if #[cfg(feature = "unstable")] {
+        use crate::core::ptr::raw::{nstd_core_ptr_raw_dangling_mut, MAX_ALIGN};
+        use alloc::alloc::{Allocator, Global, Layout};
+        use core::ptr::NonNull;
+
+        /// A trait that may be implemented on types that can be used as an allocator for `nstd`.
+        trait IsNSTDAllocator {
+            /// Returns the `NSTDAllocator`.
+            fn allocator(&self) -> NSTDAllocator {
+                NSTDAllocator {
+                    state: self as *const Self as _,
+                    allocate: Self::nstd_allocate,
+                    allocate_zeroed: Self::nstd_allocate_zeroed,
+                    reallocate: Self::nstd_reallocate,
+                    deallocate: Self::nstd_deallocate,
+                }
+            }
+
+            /// The `NSTDAllocator`'s `allocate` function.
+            unsafe extern "C" fn nstd_allocate(state: NSTDAny, size: NSTDUInt) -> NSTDAnyMut;
+
+            /// The `NSTDAllocator`'s `allocate_zeroed` function.
+            unsafe extern "C" fn nstd_allocate_zeroed(state: NSTDAny, size: NSTDUInt) -> NSTDAnyMut;
+
+            /// The `NSTDAllocator`'s `reallocate` function.
+            unsafe extern "C" fn nstd_reallocate(
+                state: NSTDAny,
+                ptr: &mut NSTDAnyMut,
+                size: NSTDUInt,
+                new_size: NSTDUInt,
+            ) -> NSTDAllocError;
+
+            /// The `NSTDAllocator`'s `deallocate` function.
+            unsafe extern "C" fn nstd_deallocate(
+                state: NSTDAny,
+                ptr: &mut NSTDAnyMut,
+                size: NSTDUInt,
+            ) -> NSTDAllocError;
+        }
+        impl<A: Allocator> IsNSTDAllocator for A {
+            /// The `NSTDAllocator`'s `allocate` function.
+            unsafe extern "C" fn nstd_allocate(state: NSTDAny, size: NSTDUInt) -> NSTDAnyMut {
+                let state = &*(state as *const Self);
+                if let Ok(layout) = Layout::from_size_align(size, MAX_ALIGN) {
+                    if let Ok(mem) = state.allocate(layout) {
+                        return mem.as_ptr() as _;
+                    }
+                }
+                NSTD_NULL
+            }
+
+            /// The `NSTDAllocator`'s `allocate_zeroed` function.
+            unsafe extern "C" fn nstd_allocate_zeroed(
+                state: NSTDAny,
+                size: NSTDUInt,
+            ) -> NSTDAnyMut {
+                let state = &*(state as *const Self);
+                if let Ok(layout) = Layout::from_size_align(size, MAX_ALIGN) {
+                    if let Ok(mem) = state.allocate_zeroed(layout) {
+                        return mem.as_ptr() as _;
+                    }
+                }
+                NSTD_NULL
+            }
+
+            /// The `NSTDAllocator`'s `reallocate` function.
+            unsafe extern "C" fn nstd_reallocate(
+                state: NSTDAny,
+                ptr: &mut NSTDAnyMut,
+                size: NSTDUInt,
+                new_size: NSTDUInt,
+            ) -> NSTDAllocError {
+                let state = &*(state as *const Self);
+                if let Some(mem) = NonNull::new((*ptr) as _) {
+                    if let Ok(old_layout) = Layout::from_size_align(size, MAX_ALIGN) {
+                        if let Ok(layout) = Layout::from_size_align(new_size, MAX_ALIGN) {
+                            let res = match new_size > size {
+                                true => state.grow(mem, old_layout, layout),
+                                false => state.shrink(mem, old_layout, layout),
+                            };
+                            match res {
+                                Ok(mem) => {
+                                    *ptr = mem.as_ptr() as _;
+                                    return NSTDAllocError::NSTD_ALLOC_ERROR_NONE;
+                                }
+                                _ => return NSTDAllocError::NSTD_ALLOC_ERROR_OUT_OF_MEMORY,
+                            }
+                        }
+                    }
+                    return NSTDAllocError::NSTD_ALLOC_ERROR_INVALID_LAYOUT;
+                }
+                NSTDAllocError::NSTD_ALLOC_ERROR_MEMORY_NOT_FOUND
+            }
+
+            /// The `NSTDAllocator`'s `deallocate` function.
+            unsafe extern "C" fn nstd_deallocate(
+                state: NSTDAny,
+                ptr: &mut NSTDAnyMut,
+                size: NSTDUInt,
+            ) -> NSTDAllocError {
+                let state = &*(state as *const Self);
+                match NonNull::new((*ptr) as _) {
+                    Some(mem) => match Layout::from_size_align(size, MAX_ALIGN) {
+                        Ok(layout) => {
+                            state.deallocate(mem, layout);
+                            *ptr = NSTD_NULL;
+                            NSTDAllocError::NSTD_ALLOC_ERROR_NONE
+                        }
+                        _ => NSTDAllocError::NSTD_ALLOC_ERROR_INVALID_LAYOUT,
+                    },
+                    _ => NSTDAllocError::NSTD_ALLOC_ERROR_MEMORY_NOT_FOUND,
+                }
+            }
+        }
+
+        /// Rust's [Global] [NSTDAllocator].
+        #[allow(dead_code)]
+        pub(crate) static GLOBAL_ALLOCATOR: NSTDAllocator = NSTDAllocator {
+            state: nstd_core_ptr_raw_dangling_mut(),
+            allocate: Global::nstd_allocate,
+            allocate_zeroed: Global::nstd_allocate_zeroed,
+            reallocate: Global::nstd_reallocate,
+            deallocate: Global::nstd_deallocate,
+        };
+    }
+}
 
 /// Allocates a block of memory on the heap.
 /// The number of bytes to be allocated is specified by `size`.
