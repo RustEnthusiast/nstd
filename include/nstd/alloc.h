@@ -18,6 +18,118 @@ typedef enum {
     NSTD_ALLOC_ERROR_INVALID_LAYOUT
 } NSTDAllocError;
 
+/// A structure of function pointers making up an allocator VTable.
+typedef struct {
+    /// An opaque pointer to the allocator's state.
+    NSTDAny state;
+    /// Allocates a contiguous sequence of `size` bytes in memory.
+    ///
+    /// If allocation fails, a null pointer is returned.
+    ///
+    /// If allocation succeeds, this returns a pointer that is suitably aligned for any type with
+    /// [fundamental alignment](https://en.cppreference.com/w/c/language/object#Alignment), i.e.,
+    /// the returned pointer will be suitably aligned for
+    /// [max_align_t](https://en.cppreference.com/w/c/types/max_align_t).
+    ///
+    /// Allocation will fail if `size` is greater than `NSTDInt`'s max value.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDUInt size` - The number of bytes to allocate.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDAnyMut ptr` - A pointer to the allocated memory, null on error.
+    ///
+    /// # Safety
+    ///
+    /// - Behavior is undefined if `size` is zero.
+    ///
+    /// - The new memory buffer should be considered uninitialized.
+    NSTDAnyMut (*allocate)(NSTDAny, NSTDUInt);
+    /// Allocates a contiguous sequence of `size` bytes in memory.
+    ///
+    /// The initialized memory is zero-initialized.
+    ///
+    /// If allocation fails, a null pointer is returned.
+    ///
+    /// If allocation succeeds, this returns a pointer that is suitably aligned for any type with
+    /// [fundamental alignment](https://en.cppreference.com/w/c/language/object#Alignment), i.e.,
+    /// the returned pointer will be suitably aligned for
+    /// [max_align_t](https://en.cppreference.com/w/c/types/max_align_t).
+    ///
+    /// Allocation will fail if `size` is greater than `NSTDInt`'s max value.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDUInt size` - The number of bytes to allocate.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDAnyMut ptr` - A pointer to the allocated memory, null on error.
+    ///
+    /// # Safety
+    ///
+    /// - Behavior is undefined if `size` is zero.
+    ///
+    /// - The new memory buffer should be considered uninitialized.
+    NSTDAnyMut (*allocate_zeroed)(NSTDAny, NSTDUInt);
+    /// Reallocates memory that was previously allocated by this allocator.
+    ///
+    /// Reallocation will fail if `new_size` is greater than `NSTDInt`'s max value.
+    ///
+    /// On successful reallocation, `ptr` will point to the new memory location and
+    /// `NSTD_ALLOC_ERROR_NONE` will be returned. If this is not the case and reallocation fails,
+    /// the pointer will remain untouched and the appropriate error is returned.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDAnyMut *ptr` - A pointer to the allocated memory.
+    ///
+    /// - `NSTDUInt size` - The number of bytes currently allocated.
+    ///
+    /// - `NSTDUInt new_size` - The number of bytes to reallocate.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDAllocError errc` - The allocation operation error code.
+    ///
+    /// # Safety
+    ///
+    /// - Behavior is undefined if `new_size` is zero.
+    ///
+    /// - Behavior is undefined if `ptr` is not a value returned by this allocator.
+    ///
+    /// - `size` must be the same value that was used to allocate the memory buffer.
+    NSTDAllocError (*reallocate)(NSTDAny, NSTDAnyMut *, NSTDUInt, NSTDUInt);
+    /// Deallocates memory that was previously allocated by this allocator.
+    ///
+    /// On successful deallocation, `ptr` will be set to null and `NSTD_ALLOC_ERROR_NONE` will be
+    /// returned. If this is not the case and deallocation fails, the pointer will remain untouched
+    /// and the appropriate error is returned.
+    ///
+    /// # Parameters:
+    ///
+    /// - `NSTDAnyMut *ptr` - A pointer to the allocated memory, once freed the pointer is set to
+    /// null.
+    ///
+    /// - `NSTDUInt size` - The number of bytes currently allocated.
+    ///
+    /// # Returns
+    ///
+    /// `NSTDAllocError errc` - The allocation operation error code.
+    ///
+    /// # Safety
+    ///
+    /// - Behavior is undefined if `ptr` is not a value returned by this allocator.
+    ///
+    /// - `size` must be the same value that was used to allocate the memory buffer.
+    NSTDAllocError (*deallocate)(NSTDAny, NSTDAnyMut *, NSTDUInt);
+} NSTDAllocator;
+
+/// `nstd`'s default allocator.
+NSTDAPI NSTDAllocator NSTD_ALLOCATOR;
+
 /// Allocates a block of memory on the heap.
 /// The number of bytes to be allocated is specified by `size`.
 ///

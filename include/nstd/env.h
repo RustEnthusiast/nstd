@@ -14,10 +14,6 @@
 ///
 /// `NSTDIOStringResult working_dir` - A path to the current working directory on success, or the
 /// I/O operation error code on failure.
-///
-/// # Panics
-///
-/// This operation will panic if allocating the string fails.
 NSTDAPI NSTDIOStringResult nstd_env_current_dir(void);
 
 /// Returns a complete path to the process executable.
@@ -33,10 +29,6 @@ NSTDAPI NSTDIOStringResult nstd_env_current_dir(void);
 ///
 /// `NSTDIOStringResult exe` - A complete path to process executable on success, or the I/O
 /// operation error code on failure.
-///
-/// # Panics
-///
-/// This operation will panic if allocating the string fails.
 NSTDAPI NSTDIOStringResult nstd_env_current_exe(void);
 
 /// Returns a complete path to a temporary directory.
@@ -45,12 +37,8 @@ NSTDAPI NSTDIOStringResult nstd_env_current_exe(void);
 ///
 /// # Returns
 ///
-/// `NSTDString temp` - A path to the temporary directory.
-///
-/// # Panics
-///
-/// This operation will panic if allocating the string fails.
-NSTDAPI NSTDString nstd_env_temp_dir(void);
+/// `NSTDOptionalString temp` - A path to the temporary directory.
+NSTDAPI NSTDOptionalString nstd_env_temp_dir(void);
 
 /// Sets the current working directory for the process.
 ///
@@ -78,10 +66,6 @@ NSTDAPI NSTDIOError nstd_env_set_current_dir(const NSTDStr *path);
 /// `NSTDIOStringResult var` - The value of the environment variable, or the I/O operation error
 /// code on failure. This will return as `NSTD_IO_ERROR_NOT_FOUND` if they variable cannot be found,
 /// and `NSTD_IO_ERROR_INVALID_DATA` if the variable isn't valid Unicode.
-///
-/// # Panics
-///
-/// This operation will panic if allocating for the string fails.
 ///
 /// # Safety
 ///
@@ -136,7 +120,7 @@ NSTDAPI void nstd_env_remove_var(const NSTDStr *key);
 ///
 /// # Panics
 ///
-/// This operation will panic if any arguments contain invalid Unicode or allocating fails.
+/// This operation will panic if any program arguments contain invalid Unicode.
 NSTDAPI NSTDVec nstd_env_args(void);
 
 /// Returns an `NSTDVec` of `NSTDString[2]` which each represent an environment variable from the
@@ -148,8 +132,7 @@ NSTDAPI NSTDVec nstd_env_args(void);
 ///
 /// # Panics
 ///
-/// This operation will panic if any environment variables contain invalid Unicode or allocating
-/// fails.
+/// This operation will panic if any environment variables contain invalid Unicode.
 NSTDAPI NSTDVec nstd_env_vars(void);
 
 #endif

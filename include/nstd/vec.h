@@ -8,6 +8,8 @@
 
 /// A dynamically sized contiguous sequence of values.
 typedef struct {
+    /// The memory allocator.
+    const NSTDAllocator *allocator;
     /// A raw pointer to the vector's memory buffer.
     NSTDAnyMut ptr;
     /// The number of bytes each value in the vector takes up.
@@ -25,24 +27,22 @@ NSTDOptional(NSTDVec) NSTDOptionalVec;
 ///
 /// # Parameters:
 ///
+/// - `const NSTDAllocator *allocator` - The memory allocator.
+///
 /// - `NSTDUInt stride` - The size in bytes of each value in the vector.
 ///
 /// # Returns
 ///
 /// `NSTDVec vec` - The new vector.
-///
-/// # Panics
-///
-/// This function will panic if `stride` is zero.
-NSTDAPI NSTDVec nstd_vec_new(NSTDUInt stride);
+NSTDAPI NSTDVec nstd_vec_new(const NSTDAllocator *allocator, NSTDUInt stride);
 
 /// Creates a new vector initialized with the given capacity.
 ///
-/// # Note
-///
-/// This will return a "null vector" (a vector that has not allocated yet) on error.
+/// If allocation fails, a vector with a capacity of 0 will be returned.
 ///
 /// # Parameters:
+///
+/// - `const NSTDAllocator *allocator` - The memory allocator.
 ///
 /// - `NSTDUInt stride` - The size in bytes of each value in the vector.
 ///
@@ -51,15 +51,14 @@ NSTDAPI NSTDVec nstd_vec_new(NSTDUInt stride);
 /// # Returns
 ///
 /// `NSTDVec vec` - The new vector.
-///
-/// # Panics
-///
-/// This function will panic if either `stride` or `cap` are zero.
-NSTDAPI NSTDVec nstd_vec_new_with_cap(NSTDUInt stride, NSTDUInt cap);
+NSTDAPI NSTDVec
+nstd_vec_new_with_cap(const NSTDAllocator *allocator, NSTDUInt stride, NSTDUInt cap);
 
 /// Creates a new vector from a slice.
 ///
 /// # Parameters:
+///
+/// - `const NSTDAllocator *allocator` - The memory allocator.
 ///
 /// - `const NSTDSlice *slice` - The slice to copy data from.
 ///
@@ -68,14 +67,10 @@ NSTDAPI NSTDVec nstd_vec_new_with_cap(NSTDUInt stride, NSTDUInt cap);
 /// `NSTDOptionalVec vec` - The new vector with a copy of `slice`'s contents on success, or an
 /// uninitialized "none" variant if allocating fails.
 ///
-/// # Panics
-///
-/// This operation will panic if the slice's stride is 0.
-///
 /// # Safety
 ///
 /// The caller of this function must ensure that `slice`'s data is valid for reads.
-NSTDAPI NSTDOptionalVec nstd_vec_from_slice(const NSTDSlice *slice);
+NSTDAPI NSTDOptionalVec nstd_vec_from_slice(const NSTDAllocator *allocator, const NSTDSlice *slice);
 
 /// Creates a new deep copy of `vec`.
 ///
@@ -190,7 +185,7 @@ NSTDAPI NSTDAnyMut nstd_vec_as_ptr_mut(NSTDVec *vec);
 ///
 /// # Returns
 ///
-/// `NSTDAny end` - A pointer to the end of the vector or null if the vector has yet to allocate.
+/// `NSTDAny end` - A pointer to the end of the vector.
 NSTDAPI NSTDAny nstd_vec_end(const NSTDVec *vec);
 
 /// Returns a mutable pointer to the end of a vector.
@@ -204,7 +199,7 @@ NSTDAPI NSTDAny nstd_vec_end(const NSTDVec *vec);
 ///
 /// # Returns
 ///
-/// `NSTDAnyMut end` - A pointer to the end of the vector or null if the vector has yet to allocate.
+/// `NSTDAnyMut end` - A mutable pointer to the end of the vector.
 NSTDAPI NSTDAnyMut nstd_vec_end_mut(NSTDVec *vec);
 
 /// Returns an immutable pointer to the element at index `pos` in `vec`.
@@ -362,15 +357,13 @@ NSTDAPI void nstd_vec_truncate(NSTDVec *vec, NSTDUInt len);
 ///
 /// - `NSTDUInt len` - The new length for the vector.
 ///
-/// # Returns
-///
-/// `NSTDErrorCode errc` - Nonzero if `len` is greater than `cap`.
-///
 /// # Safety
 ///
-/// If `len` is greater than the vector's current length, care must be taken to ensure that the new
-/// elements are properly initialized.
-NSTDAPI NSTDErrorCode nstd_vec_set_len(NSTDVec *vec, NSTDUInt len);
+/// - If `len` is greater than the vector's current length, care must be taken to ensure that the
+/// new elements are properly initialized.
+///
+/// - `len`'s value must not be greater than the vector's capacity.
+NSTDAPI void nstd_vec_set_len(NSTDVec *vec, NSTDUInt len);
 
 /// Reserves some space on the heap for at least `size` more elements to be pushed onto a vector
 /// without making more allocations.

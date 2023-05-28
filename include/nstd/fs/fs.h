@@ -141,10 +141,6 @@ NSTDAPI NSTDIOError nstd_fs_remove_dirs(const NSTDStr *name);
 ///
 /// `NSTDIOBufferResult contents` - The file's contents, or the I/O operation error code on failure.
 ///
-/// # Panics
-///
-/// This operation will panic if allocating fails.
-///
 /// # Safety
 ///
 /// This operation can cause undefined behavior if `path`'s data is invalid.
@@ -159,10 +155,6 @@ NSTDAPI NSTDIOBufferResult nstd_fs_read(const NSTDStr *path);
 /// # Returns
 ///
 /// `NSTDIOStringResult contents` - The file's contents, or the I/O operation error code on failure.
-///
-/// # Panics
-///
-/// This operation will panic if allocating fails.
 ///
 /// # Safety
 ///
@@ -234,10 +226,6 @@ NSTDAPI NSTDIOError nstd_fs_copy(const NSTDStr *from, const NSTDStr *to);
 ///
 /// `NSTDIOStringResult contents` - The absolute version of `path`, or the I/O operation error code
 /// on failure.
-///
-/// # Panics
-///
-/// This operation will panic if allocating fails.
 ///
 /// # Safety
 ///
