@@ -20,8 +20,8 @@ This will allow users of the framework to disable compilation of our module if t
 require it.
 
 To do this, open the `Cargo.toml` file and head to the `[features]` section. The module features
-are listed in alphabetical order following the `default`, `std`, `capi`, and `asm` features. Place
-the new feature where it is appropriate.
+are listed in alphabetical order following the `default`, `std`, `capi`, `asm`, and `unstable`
+features. Place the new feature where it is appropriate.
 
 The naming convention for a module feature is as follows: `nstd_{module_name}`.
 

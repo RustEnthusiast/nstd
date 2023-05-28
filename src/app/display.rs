@@ -82,7 +82,7 @@ pub fn nstd_app_display_handle(display: &NSTDDisplay) -> NSTDDisplayHandle {
 #[nstdapi]
 pub fn nstd_app_display_name(display: NSTDDisplayHandle) -> NSTDOptionalString {
     match display.name() {
-        Some(name) => NSTDOptional::Some(NSTDString::from_str(&name)),
+        Some(name) => NSTDString::from_string(name),
         _ => NSTDOptional::None,
     }
 }

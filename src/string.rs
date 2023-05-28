@@ -1,10 +1,10 @@
 //! Dynamically sized UTF-8 encoded byte string.
 extern crate alloc;
 use crate::{
-    alloc::NSTDAllocError,
+    alloc::{NSTDAllocError, NSTDAllocator},
     core::{
         def::NSTDByte,
-        optional::{gen_optional, NSTDOptional},
+        optional::NSTDOptional,
         slice::{nstd_core_slice_new_unchecked, NSTDSlice},
         str::{
             nstd_core_str_as_bytes, nstd_core_str_from_bytes_unchecked, nstd_core_str_len,
@@ -30,35 +30,30 @@ macro_rules! gen_from_primitive {
         $name: ident, $FromT: ty
     ) => {
         $(#[$meta])*
-        ///
-        /// # Panics
-        ///
-        /// Panics if allocating fails.
         #[inline]
         #[nstdapi]
-        pub fn $name(v: $FromT) -> NSTDString {
-            NSTDString::from_str(&v.to_string())
+        pub fn $name(v: $FromT) -> NSTDOptionalString<'static> {
+            NSTDString::from_string(v.to_string())
         }
     };
 }
 
 /// Dynamically sized UTF-8 encoded byte string.
 #[nstdapi]
-#[derive(Debug)]
-pub struct NSTDString {
+pub struct NSTDString<'a> {
     /// The underlying UTF-8 encoded byte buffer.
-    bytes: NSTDVec,
+    bytes: NSTDVec<'a>,
 }
-impl NSTDString {
-    /// Creates a new [NSTDString] from a Rust &[str].
+impl<'a> NSTDString<'a> {
+    /// Creates a new [NSTDString] from a Rust [String].
     ///
-    /// # Panics
-    ///
-    /// Panics if allocating fails.
+    /// When using the `unstable` feature, this method will return a string using Rust's global
+    /// allocator so no extra allocations will occur.
     #[inline]
-    pub(crate) fn from_str(str: &str) -> Self {
-        NSTDString {
-            bytes: NSTDVec::from_slice(str.as_bytes()),
+    pub(crate) fn from_string(string: String) -> NSTDOptionalString<'a> {
+        match NSTDVec::from_vec(string.into_bytes()) {
+            NSTDOptional::Some(bytes) => NSTDOptional::Some(NSTDString { bytes }),
+            _ => NSTDOptional::None,
         }
     }
 
@@ -69,13 +64,19 @@ impl NSTDString {
     /// When mutating the returned buffer, the buffer's data must remain valid UTF-8.
     #[inline]
     #[allow(dead_code)]
-    pub(crate) unsafe fn as_mut_vec(&mut self) -> &mut NSTDVec {
+    pub(crate) unsafe fn as_mut_vec(&mut self) -> &mut NSTDVec<'a> {
         &mut self.bytes
     }
 }
-gen_optional!(NSTDOptionalString, NSTDString);
+
+/// Represents an optional value of type `NSTDString`.
+pub type NSTDOptionalString<'a> = NSTDOptional<NSTDString<'a>>;
 
 /// Creates a new instance of `NSTDString`.
+///
+/// # Parameters:
+///
+/// - `const NSTDAllocator *allocator` - The memory allocator.
 ///
 /// # Returns
 ///
@@ -84,15 +85,15 @@ gen_optional!(NSTDOptionalString, NSTDString);
 /// # Example
 ///
 /// ```
-/// use nstd_sys::string::nstd_string_new;
+/// use nstd_sys::{alloc::NSTD_ALLOCATOR, string::nstd_string_new};
 ///
-/// let string = nstd_string_new();
+/// let string = nstd_string_new(&NSTD_ALLOCATOR);
 /// ```
 #[inline]
 #[nstdapi]
-pub const fn nstd_string_new() -> NSTDString {
+pub const fn nstd_string_new(allocator: &NSTDAllocator) -> NSTDString {
     NSTDString {
-        bytes: nstd_vec_new(1),
+        bytes: nstd_vec_new(allocator, 1),
     }
 }
 
@@ -100,34 +101,34 @@ pub const fn nstd_string_new() -> NSTDString {
 ///
 /// # Parameters:
 ///
+/// - `const NSTDAllocator *allocator` - The memory allocator.
+///
 /// - `NSTDUInt cap` - The number of bytes to allocate ahead of time.
 ///
 /// # Returns
 ///
 /// `NSTDString string` - The new string.
 ///
-/// # Panics
-///
-/// This function will panic if `cap` is zero.
-///
 /// # Example
 ///
 /// ```
-/// use nstd_sys::string::nstd_string_new_with_cap;
+/// use nstd_sys::{alloc::NSTD_ALLOCATOR, string::nstd_string_new_with_cap};
 ///
-/// let string = nstd_string_new_with_cap(20);
+/// let string = nstd_string_new_with_cap(&NSTD_ALLOCATOR, 20);
 /// ```
 #[inline]
 #[nstdapi]
-pub fn nstd_string_new_with_cap(cap: NSTDUInt) -> NSTDString {
+pub fn nstd_string_new_with_cap(allocator: &NSTDAllocator, cap: NSTDUInt) -> NSTDString {
     NSTDString {
-        bytes: nstd_vec_new_with_cap(1, cap),
+        bytes: nstd_vec_new_with_cap(allocator, 1, cap),
     }
 }
 
 /// Creates an owned version of an unowned string slice.
 ///
 /// # Parameters:
+///
+/// - `const NSTDAllocator *allocator` - The memory allocator.
 ///
 /// - `const NSTDStr *str` - The unowned string slice.
 ///
@@ -143,18 +144,23 @@ pub fn nstd_string_new_with_cap(cap: NSTDUInt) -> NSTDString {
 /// # Example
 ///
 /// ```
-/// use nstd_sys::{core::str::nstd_core_str_from_raw_cstr, string::nstd_string_from_str};
+/// use nstd_sys::{
+///     alloc::NSTD_ALLOCATOR, core::str::nstd_core_str_from_raw_cstr, string::nstd_string_from_str,
+/// };
 ///
 /// unsafe {
 ///     let str = nstd_core_str_from_raw_cstr("Hello, world!\0".as_ptr().cast()).unwrap();
-///     let string = nstd_string_from_str(&str);
+///     let string = nstd_string_from_str(&NSTD_ALLOCATOR, &str);
 /// }
 /// ```
 #[inline]
 #[nstdapi]
-pub unsafe fn nstd_string_from_str(str: &NSTDStr) -> NSTDOptionalString {
+pub unsafe fn nstd_string_from_str<'a>(
+    allocator: &'a NSTDAllocator,
+    str: &NSTDStr,
+) -> NSTDOptionalString<'a> {
     let bytes = nstd_core_str_as_bytes(str);
-    match nstd_vec_from_slice(&bytes) {
+    match nstd_vec_from_slice(allocator, &bytes) {
         NSTDOptional::Some(bytes) => NSTDOptional::Some(NSTDString { bytes }),
         _ => NSTDOptional::None,
     }
@@ -196,7 +202,7 @@ pub fn nstd_string_from_bytes(bytes: NSTDVec) -> NSTDOptionalString {
 /// "none" variant if allocating fails.
 #[inline]
 #[nstdapi]
-pub fn nstd_string_clone(string: &NSTDString) -> NSTDOptionalString {
+pub fn nstd_string_clone<'a>(string: &NSTDString<'a>) -> NSTDOptionalString<'a> {
     match nstd_vec_clone(&string.bytes) {
         NSTDOptional::Some(bytes) => NSTDOptional::Some(NSTDString { bytes }),
         _ => NSTDOptional::None,
@@ -347,11 +353,11 @@ pub const fn nstd_string_cap(string: &NSTDString) -> NSTDUInt {
 ///
 /// ```
 /// use nstd_sys::{
-///     alloc::NSTDAllocError::NSTD_ALLOC_ERROR_NONE,
+///     alloc::{NSTDAllocError::NSTD_ALLOC_ERROR_NONE, NSTD_ALLOCATOR},
 ///     string::{nstd_string_new, nstd_string_push},
 /// };
 ///
-/// let mut string = nstd_string_new();
+/// let mut string = nstd_string_new(&NSTD_ALLOCATOR);
 /// assert!(nstd_string_push(&mut string, '🦀'.into()) == NSTD_ALLOC_ERROR_NONE);
 /// ```
 #[nstdapi]
@@ -387,14 +393,14 @@ pub fn nstd_string_push(string: &mut NSTDString, chr: NSTDUnichar) -> NSTDAllocE
 ///
 /// ```
 /// use nstd_sys::{
-///     alloc::NSTDAllocError::NSTD_ALLOC_ERROR_NONE,
+///     alloc::{NSTDAllocError::NSTD_ALLOC_ERROR_NONE, NSTD_ALLOCATOR},
 ///     core::str::nstd_core_str_from_raw_cstr,
 ///     string::{nstd_string_new, nstd_string_push_str},
 /// };
 ///
 /// unsafe {
 ///     let str = nstd_core_str_from_raw_cstr("Hello, 🌎!\0".as_ptr().cast()).unwrap();
-///     let mut string = nstd_string_new();
+///     let mut string = nstd_string_new(&NSTD_ALLOCATOR);
 ///     assert!(nstd_string_push_str(&mut string, &str) == NSTD_ALLOC_ERROR_NONE);
 /// }
 /// ```
@@ -419,13 +425,14 @@ pub unsafe fn nstd_string_push_str(string: &mut NSTDString, str: &NSTDStr) -> NS
 ///
 /// ```
 /// use nstd_sys::{
+///     alloc::NSTD_ALLOCATOR,
 ///     core::{optional::NSTDOptional, str::nstd_core_str_from_raw_cstr_with_null},
 ///     string::{nstd_string_from_str, nstd_string_pop},
 /// };
 ///
 /// unsafe {
 ///     let str = nstd_core_str_from_raw_cstr_with_null("Hello, world!\0".as_ptr().cast()).unwrap();
-///     let mut string = nstd_string_from_str(&str).unwrap();
+///     let mut string = nstd_string_from_str(&NSTD_ALLOCATOR, &str).unwrap();
 ///     assert!(nstd_string_pop(&mut string) == NSTDOptional::Some('\0'.into()));
 /// }
 /// ```
@@ -461,7 +468,7 @@ gen_from_primitive!(
     ///
     /// # Returns
     ///
-    /// `NSTDString string` - The 32-bit floating-point value as a string.
+    /// `NSTDOptionalString string` - The 32-bit floating-point value as a string.
     nstd_string_from_f32,
     NSTDFloat32
 );
@@ -474,7 +481,7 @@ gen_from_primitive!(
     ///
     /// # Returns
     ///
-    /// `NSTDString string` - The 64-bit floating-point value as a string.
+    /// `NSTDOptionalString string` - The 64-bit floating-point value as a string.
     nstd_string_from_f64,
     NSTDFloat64
 );
@@ -487,7 +494,7 @@ gen_from_primitive!(
     ///
     /// # Returns
     ///
-    /// `NSTDString string` - The arch-bit signed integer value as a string.
+    /// `NSTDOptionalString string` - The arch-bit signed integer value as a string.
     nstd_string_from_int,
     NSTDInt
 );
@@ -500,7 +507,7 @@ gen_from_primitive!(
     ///
     /// # Returns
     ///
-    /// `NSTDString string` - The arch-bit unsigned integer value as a string.
+    /// `NSTDOptionalString string` - The arch-bit unsigned integer value as a string.
     nstd_string_from_uint,
     NSTDUInt
 );
@@ -513,7 +520,7 @@ gen_from_primitive!(
     ///
     /// # Returns
     ///
-    /// `NSTDString string` - The 8-bit signed integer value as a string.
+    /// `NSTDOptionalString string` - The 8-bit signed integer value as a string.
     nstd_string_from_i8,
     NSTDInt8
 );
@@ -526,7 +533,7 @@ gen_from_primitive!(
     ///
     /// # Returns
     ///
-    /// `NSTDString string` - The 8-bit unsigned integer value as a string.
+    /// `NSTDOptionalString string` - The 8-bit unsigned integer value as a string.
     nstd_string_from_u8,
     NSTDUInt8
 );
@@ -539,7 +546,7 @@ gen_from_primitive!(
     ///
     /// # Returns
     ///
-    /// `NSTDString string` - The 16-bit signed integer value as a string.
+    /// `NSTDOptionalString string` - The 16-bit signed integer value as a string.
     nstd_string_from_i16,
     NSTDInt16
 );
@@ -552,7 +559,7 @@ gen_from_primitive!(
     ///
     /// # Returns
     ///
-    /// `NSTDString string` - The 16-bit unsigned integer value as a string.
+    /// `NSTDOptionalString string` - The 16-bit unsigned integer value as a string.
     nstd_string_from_u16,
     NSTDUInt16
 );
@@ -565,7 +572,7 @@ gen_from_primitive!(
     ///
     /// # Returns
     ///
-    /// `NSTDString string` - The 32-bit signed integer value as a string.
+    /// `NSTDOptionalString string` - The 32-bit signed integer value as a string.
     nstd_string_from_i32,
     NSTDInt32
 );
@@ -578,7 +585,7 @@ gen_from_primitive!(
     ///
     /// # Returns
     ///
-    /// `NSTDString string` - The 32-bit unsigned integer value as a string.
+    /// `NSTDOptionalString string` - The 32-bit unsigned integer value as a string.
     nstd_string_from_u32,
     NSTDUInt32
 );
@@ -591,7 +598,7 @@ gen_from_primitive!(
     ///
     /// # Returns
     ///
-    /// `NSTDString string` - The 64-bit signed integer value as a string.
+    /// `NSTDOptionalString string` - The 64-bit signed integer value as a string.
     nstd_string_from_i64,
     NSTDInt64
 );
@@ -604,7 +611,7 @@ gen_from_primitive!(
     ///
     /// # Returns
     ///
-    /// `NSTDString string` - The 64-bit unsigned integer value as a string.
+    /// `NSTDOptionalString string` - The 64-bit unsigned integer value as a string.
     nstd_string_from_u64,
     NSTDUInt64
 );

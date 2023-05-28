@@ -44,7 +44,7 @@ impl NSTDSlice {
         self.len * self.stride
     }
 
-    /// Creates a Rust byte slice from this `NSTDSlice`.
+    /// Creates a Rust slice from this `NSTDSlice`.
     ///
     /// # Panics
     ///
@@ -345,7 +345,7 @@ pub struct NSTDSliceMut {
     stride: NSTDUInt,
 }
 impl NSTDSliceMut {
-    /// Creates a Rust byte slice from this `NSTDSliceMut`.
+    /// Creates a Rust slice from this `NSTDSliceMut`.
     ///
     /// # Panics
     ///
@@ -364,7 +364,7 @@ impl NSTDSliceMut {
         core::slice::from_raw_parts(ptr, self.len)
     }
 
-    /// Creates a mutable Rust byte slice from this `NSTDSliceMut`.
+    /// Creates a mutable Rust slice from this `NSTDSliceMut`.
     ///
     /// # Panics
     ///
