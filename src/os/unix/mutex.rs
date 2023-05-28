@@ -1,10 +1,6 @@
 //! A mutual exclusion primitive useful for protecting shared data.
 use crate::{
-    core::{
-        optional::{gen_optional, NSTDOptional},
-        result::NSTDResult,
-        time::NSTDDuration,
-    },
+    core::{optional::NSTDOptional, result::NSTDResult, time::NSTDDuration},
     heap_ptr::{
         nstd_heap_ptr_drop, nstd_heap_ptr_get, nstd_heap_ptr_get_mut, NSTDHeapPtr,
         NSTDOptionalHeapPtr,
@@ -76,11 +72,11 @@ impl Drop for MutexAttrs {
 
 /// A mutual exclusion primitive useful for protecting shared data.
 #[nstdapi]
-pub struct NSTDUnixMutex {
+pub struct NSTDUnixMutex<'a> {
     /// The underlying mutex.
     inner: RawMutex,
     /// The protected data.
-    data: UnsafeCell<NSTDHeapPtr>,
+    data: UnsafeCell<NSTDHeapPtr<'a>>,
     /// Determines whether or not the mutex is poisoned.
     poisoned: Cell<NSTDBool>,
 }
@@ -88,33 +84,35 @@ pub struct NSTDUnixMutex {
 ///
 /// The data that the mutex is protecting must be able to be safely sent between threads.
 // SAFETY: The user guarantees that the data is thread-safe.
-unsafe impl Send for NSTDUnixMutex {}
+unsafe impl Send for NSTDUnixMutex<'_> {}
 /// # Safety
 ///
 /// The data that the mutex is protecting must be able to be safely shared between threads.
 // SAFETY: The user guarantees that the data is thread-safe.
-unsafe impl Sync for NSTDUnixMutex {}
-gen_optional!(NSTDUnixOptionalMutex, NSTDUnixMutex);
+unsafe impl Sync for NSTDUnixMutex<'_> {}
+
+/// Represents an optional value of type `NSTDUnixMutex`.
+pub type NSTDUnixOptionalMutex<'a> = NSTDOptional<NSTDUnixMutex<'a>>;
 
 /// A handle to a mutex's protected data.
 #[nstdapi]
-pub struct NSTDUnixMutexGuard<'a> {
+pub struct NSTDUnixMutexGuard<'m, 'a> {
     /// A reference to the mutex.
-    mutex: &'a NSTDUnixMutex,
+    mutex: &'m NSTDUnixMutex<'a>,
     /// Ensures that the guard is not [Send].
     pd: PhantomData<*const ()>,
 }
-impl<'a> NSTDUnixMutexGuard<'a> {
+impl<'m, 'a> NSTDUnixMutexGuard<'m, 'a> {
     /// Constructs a new mutex guard.
     #[inline]
-    fn new(mutex: &'a NSTDUnixMutex) -> Self {
+    fn new(mutex: &'m NSTDUnixMutex<'a>) -> Self {
         Self {
             mutex,
             pd: Default::default(),
         }
     }
 }
-impl Drop for NSTDUnixMutexGuard<'_> {
+impl Drop for NSTDUnixMutexGuard<'_, '_> {
     /// Drops the guard, releasing the lock for the mutex.
     fn drop(&mut self) {
         if nstd_thread_is_panicking() {
@@ -130,17 +128,18 @@ impl Drop for NSTDUnixMutexGuard<'_> {
 ///
 /// The data that the guard is protecting must be able to be safely shared between threads.
 // SAFETY: The user guarantees that the data is thread-safe.
-unsafe impl Sync for NSTDUnixMutexGuard<'_> {}
+unsafe impl Sync for NSTDUnixMutexGuard<'_, '_> {}
 
 /// A result type returned from `nstd_os_unix_mutex_lock` containing the mutex guard whether or not
 /// the data is poisoned.
-pub type NSTDUnixMutexLockResult<'a> = NSTDResult<NSTDUnixMutexGuard<'a>, NSTDUnixMutexGuard<'a>>;
+pub type NSTDUnixMutexLockResult<'m, 'a> =
+    NSTDResult<NSTDUnixMutexGuard<'m, 'a>, NSTDUnixMutexGuard<'m, 'a>>;
 
 /// An optional value of type `NSTDUnixMutexLockResult`.
 ///
 /// This type is returned from the `nstd_os_unix_mutex_try_lock` where the uninitialized variant
 /// means that the function would block.
-pub type NSTDUnixOptionalMutexLockResult<'a> = NSTDOptional<NSTDUnixMutexLockResult<'a>>;
+pub type NSTDUnixOptionalMutexLockResult<'m, 'a> = NSTDOptional<NSTDUnixMutexLockResult<'m, 'a>>;
 
 /// Creates a new mutex in an unlocked state.
 ///
@@ -210,7 +209,9 @@ pub fn nstd_os_unix_mutex_is_poisoned(mutex: &NSTDUnixMutex) -> NSTDBool {
 /// `NSTDUnixOptionalMutexLockResult guard` - A handle to the mutex's protected data on success, or
 /// an uninitialized "none" value if the OS failed to lock the mutex.
 #[nstdapi]
-pub fn nstd_os_unix_mutex_lock(mutex: &NSTDUnixMutex) -> NSTDUnixOptionalMutexLockResult {
+pub fn nstd_os_unix_mutex_lock<'m, 'a>(
+    mutex: &'m NSTDUnixMutex<'a>,
+) -> NSTDUnixOptionalMutexLockResult<'m, 'a> {
     // SAFETY: `mutex` is behind an initialized reference.
     if unsafe { pthread_mutex_lock(mutex.inner.0.get()) } == 0 {
         let guard = NSTDUnixMutexGuard::new(mutex);
@@ -238,7 +239,9 @@ pub fn nstd_os_unix_mutex_lock(mutex: &NSTDUnixMutex) -> NSTDUnixOptionalMutexLo
 /// `NSTDUnixOptionalMutexLockResult guard` - A handle to the mutex's data, or "none" if the mutex
 /// is locked.
 #[nstdapi]
-pub fn nstd_os_unix_mutex_try_lock(mutex: &NSTDUnixMutex) -> NSTDUnixOptionalMutexLockResult {
+pub fn nstd_os_unix_mutex_try_lock<'m, 'a>(
+    mutex: &'m NSTDUnixMutex<'a>,
+) -> NSTDUnixOptionalMutexLockResult<'m, 'a> {
     // SAFETY: `mutex` is behind an initialized reference.
     if unsafe { pthread_mutex_trylock(mutex.inner.0.get()) } == 0 {
         let guard = NSTDUnixMutexGuard::new(mutex);
@@ -273,10 +276,10 @@ pub fn nstd_os_unix_mutex_try_lock(mutex: &NSTDUnixMutex) -> NSTDUnixOptionalMut
 /// remains locked for the time span of `duration`.
 #[nstdapi]
 #[allow(unused_variables)]
-pub fn nstd_os_unix_mutex_timed_lock(
-    mutex: &NSTDUnixMutex,
+pub fn nstd_os_unix_mutex_timed_lock<'m, 'a>(
+    mutex: &'m NSTDUnixMutex<'a>,
     duration: NSTDDuration,
-) -> NSTDUnixOptionalMutexLockResult {
+) -> NSTDUnixOptionalMutexLockResult<'m, 'a> {
     #[cfg(any(
         target_os = "android",
         target_os = "dragonfly",

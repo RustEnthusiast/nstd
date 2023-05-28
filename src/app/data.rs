@@ -13,7 +13,7 @@ pub struct NSTDAppData<'a> {
     /// A handle to the `nstd` app.
     pub handle: NSTDAppHandle<'a>,
     /// Custom user data.
-    pub data: &'a mut NSTDOptionalHeapPtr,
+    pub data: &'a mut NSTDOptionalHeapPtr<'static>,
     /// The gamepad input manager.
     gil: &'a mut Gilrs,
     /// The application's control flow.
@@ -25,7 +25,7 @@ impl<'a> NSTDAppData<'a> {
     pub(crate) fn new(
         handle: NSTDAppHandle<'a>,
         control_flow: &'a mut ControlFlow,
-        data: &'a mut NSTDOptionalHeapPtr,
+        data: &'a mut NSTDOptionalHeapPtr<'static>,
         gil: &'a mut Gilrs,
     ) -> Self {
         Self {

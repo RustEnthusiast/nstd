@@ -1,10 +1,13 @@
 #ifndef NSTD_HEAP_PTR_H
 #define NSTD_HEAP_PTR_H
+#include "alloc.h"
 #include "core/optional.h"
 #include "nstd.h"
 
 /// A pointer type for single value heap allocation.
 typedef struct {
+    /// The memory allocator.
+    const NSTDAllocator *allocator;
     /// A raw pointer to the value on the heap.
     NSTDAnyMut ptr;
     /// The size of the object in bytes.
@@ -18,6 +21,8 @@ NSTDOptional(NSTDHeapPtr) NSTDOptionalHeapPtr;
 ///
 /// # Parameters:
 ///
+/// - `const NSTDAllocator *allocator` - The memory allocator.
+///
 /// - `NSTDUInt element_size` - The size (in bytes) of the heap object.
 ///
 /// - `NSTDAny init` - A pointer to the object to initialize the heap object with.
@@ -30,11 +35,14 @@ NSTDOptional(NSTDHeapPtr) NSTDOptionalHeapPtr;
 /// # Safety
 ///
 /// `init` must be a pointer to a value that is valid for reads of `element_size` bytes.
-NSTDAPI NSTDOptionalHeapPtr nstd_heap_ptr_new(NSTDUInt element_size, NSTDAny init);
+NSTDAPI NSTDOptionalHeapPtr
+nstd_heap_ptr_new(const NSTDAllocator *allocator, NSTDUInt element_size, NSTDAny init);
 
 /// Creates a new zero-initialized heap allocated object.
 ///
 /// # Parameters:
+///
+/// - `const NSTDAllocator *allocator` - The memory allocator.
 ///
 /// - `NSTDUInt element_size` - The size (in bytes) of the heap object.
 ///
@@ -47,7 +55,8 @@ NSTDAPI NSTDOptionalHeapPtr nstd_heap_ptr_new(NSTDUInt element_size, NSTDAny ini
 ///
 /// The data to be stored in the heap pointer must be safely representable by an all-zero byte
 /// pattern.
-NSTDAPI NSTDOptionalHeapPtr nstd_heap_ptr_new_zeroed(NSTDUInt element_size);
+NSTDAPI NSTDOptionalHeapPtr
+nstd_heap_ptr_new_zeroed(const NSTDAllocator *allocator, NSTDUInt element_size);
 
 /// Creates a clone of a heap allocated object.
 ///

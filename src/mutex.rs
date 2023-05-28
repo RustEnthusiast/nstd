@@ -11,20 +11,20 @@ use nstdapi::nstdapi;
 use std::sync::{Mutex, MutexGuard, TryLockError};
 
 /// A mutual exclusion primitive useful for protecting shared data.
-pub type NSTDMutex = Box<Mutex<NSTDHeapPtr>>;
+pub type NSTDMutex<'a> = Box<Mutex<NSTDHeapPtr<'a>>>;
 
 /// A guard providing access to a mutex's protected data.
-pub type NSTDMutexGuard<'a> = Box<MutexGuard<'a, NSTDHeapPtr>>;
+pub type NSTDMutexGuard<'m, 'a> = Box<MutexGuard<'m, NSTDHeapPtr<'a>>>;
 
 /// A lock result returned from `nstd_mutex_lock` containing the mutex guard whether or not the
 /// data is poisoned.
-pub type NSTDMutexLockResult<'a> = NSTDResult<NSTDMutexGuard<'a>, NSTDMutexGuard<'a>>;
+pub type NSTDMutexLockResult<'m, 'a> = NSTDResult<NSTDMutexGuard<'m, 'a>, NSTDMutexGuard<'m, 'a>>;
 
 /// An optional value of type `NSTDMutexLockResult`.
 ///
 /// This type is returned from `nstd_mutex_try_lock` where the uninitialized variant means that the
 /// function would block.
-pub type NSTDOptionalMutexLockResult<'a> = NSTDOptional<NSTDMutexLockResult<'a>>;
+pub type NSTDOptionalMutexLockResult<'m, 'a> = NSTDOptional<NSTDMutexLockResult<'m, 'a>>;
 
 /// Creates a new mutual exclusion primitive.
 ///
@@ -76,7 +76,7 @@ pub fn nstd_mutex_is_poisoned(mutex: &NSTDMutex) -> NSTDBool {
 ///
 /// This operation may panic if the lock is already held by the current thread.
 #[nstdapi]
-pub fn nstd_mutex_lock(mutex: &NSTDMutex) -> NSTDMutexLockResult {
+pub fn nstd_mutex_lock<'m, 'a>(mutex: &'m NSTDMutex<'a>) -> NSTDMutexLockResult<'m, 'a> {
     match mutex.lock() {
         Ok(guard) => NSTDResult::Ok(Box::new(guard)),
         Err(err) => NSTDResult::Err(Box::new(err.into_inner())),
@@ -94,7 +94,9 @@ pub fn nstd_mutex_lock(mutex: &NSTDMutex) -> NSTDMutexLockResult {
 ///
 /// `NSTDOptionalMutexLockResult guard` - A handle to the mutex's protected data.
 #[nstdapi]
-pub fn nstd_mutex_try_lock(mutex: &NSTDMutex) -> NSTDOptionalMutexLockResult {
+pub fn nstd_mutex_try_lock<'m, 'a>(
+    mutex: &'m NSTDMutex<'a>,
+) -> NSTDOptionalMutexLockResult<'m, 'a> {
     match mutex.try_lock() {
         Ok(guard) => NSTDOptional::Some(NSTDResult::Ok(Box::new(guard))),
         Err(err) => match err {

@@ -100,10 +100,6 @@ NSTDAPI NSTDIOError nstd_io_print_line(const NSTDStr *output);
 ///
 /// `NSTDIOStringResult input` - The UTF-8 input from stdin on success and the I/O operation error
 /// code on failure.
-///
-/// # Panics
-///
-/// Panics if allocating the string fails.
 NSTDAPI NSTDIOStringResult nstd_io_read(void);
 
 /// Reads a line of UTF-8 input from stdin.
@@ -112,10 +108,6 @@ NSTDAPI NSTDIOStringResult nstd_io_read(void);
 ///
 /// `NSTDIOStringResult input` - The UTF-8 input from stdin on success and the I/O operation error
 /// code on failure.
-///
-/// # Panics
-///
-/// Panics if allocating the string fails.
 NSTDAPI NSTDIOStringResult nstd_io_read_line(void);
 
 #endif
