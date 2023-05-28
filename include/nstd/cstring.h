@@ -20,15 +20,21 @@ NSTDOptional(NSTDCString) NSTDOptionalCString;
 
 /// Creates a new empty `NSTDCString`.
 ///
+/// # Parameters:
+///
+/// - `const NSTDAllocator *allocator` - The memory allocator.
+///
 /// # Returns
 ///
 /// `NSTDOptionalCString cstring` - The new C string on success, or an uninitialized "none" variant
 /// if allocating for the C string's null terminator fails.
-NSTDAPI NSTDOptionalCString nstd_cstring_new(void);
+NSTDAPI NSTDOptionalCString nstd_cstring_new(const NSTDAllocator *allocator);
 
 /// Creates a new `NSTDCString` initialized with the given capacity.
 ///
 /// # Parameters:
+///
+/// - `const NSTDAllocator *allocator` - The memory allocator.
 ///
 /// - `NSTDUInt cap` - The number of bytes to allocate ahead of time.
 ///
@@ -36,15 +42,13 @@ NSTDAPI NSTDOptionalCString nstd_cstring_new(void);
 ///
 /// `NSTDOptionalCString cstring` - The new C string on success, or an uninitialized "none" variant
 /// if allocating fails.
-///
-/// # Panics
-///
-/// This function will panic if `cap` is zero.
-NSTDAPI NSTDOptionalCString nstd_cstring_new_with_cap(NSTDUInt cap);
+NSTDAPI NSTDOptionalCString nstd_cstring_new_with_cap(const NSTDAllocator *allocator, NSTDUInt cap);
 
 /// Creates an owned version of an unowned C string slice.
 ///
 /// # Parameters:
+///
+/// - `const NSTDAllocator *allocator` - The memory allocator.
 ///
 /// - `const NSTDCStr *cstr` - The unowned C string slice.
 ///
@@ -56,12 +60,15 @@ NSTDAPI NSTDOptionalCString nstd_cstring_new_with_cap(NSTDUInt cap);
 /// # Safety
 ///
 /// The caller of this function must ensure that `cstr`'s data is valid for reads.
-NSTDAPI NSTDOptionalCString nstd_cstring_from_cstr(const NSTDCStr *cstr);
+NSTDAPI NSTDOptionalCString
+nstd_cstring_from_cstr(const NSTDAllocator *allocator, const NSTDCStr *cstr);
 
 /// Creates an owned version of an unowned C string slice without checking if the slice contains
 /// any null bytes.
 ///
 /// # Parameters:
+///
+/// - `const NSTDAllocator *allocator` - The memory allocator.
 ///
 /// - `const NSTDCStr *cstr` - The unowned C string slice.
 ///
@@ -77,7 +84,8 @@ NSTDAPI NSTDOptionalCString nstd_cstring_from_cstr(const NSTDCStr *cstr);
 /// - `cstr`'s data is valid for reads.
 ///
 /// - `cstr` does not contain any null (`'\0'`) bytes.
-NSTDAPI NSTDOptionalCString nstd_cstring_from_cstr_unchecked(const NSTDCStr *cstr);
+NSTDAPI NSTDOptionalCString
+nstd_cstring_from_cstr_unchecked(const NSTDAllocator *allocator, const NSTDCStr *cstr);
 
 /// Creates a new C string from owned data.
 ///

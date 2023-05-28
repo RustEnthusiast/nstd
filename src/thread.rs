@@ -90,7 +90,7 @@ pub type NSTDThreadCountResult = NSTDResult<NSTDUInt, NSTDIOError>;
 #[nstdapi]
 pub unsafe fn nstd_thread_spawn(
     thread_fn: unsafe extern "C" fn(NSTDOptionalHeapPtr) -> NSTDThreadResult,
-    data: NSTDOptionalHeapPtr,
+    data: NSTDOptionalHeapPtr<'static>,
 ) -> Option<NSTDThread> {
     if let Ok(thread) = Builder::new().spawn(move || thread_fn(data)) {
         return Some(Box::new(thread));
@@ -122,7 +122,7 @@ pub unsafe fn nstd_thread_spawn(
 #[nstdapi]
 pub unsafe fn nstd_thread_spawn_with_desc(
     thread_fn: unsafe extern "C" fn(NSTDOptionalHeapPtr) -> NSTDThreadResult,
-    data: NSTDOptionalHeapPtr,
+    data: NSTDOptionalHeapPtr<'static>,
     desc: &NSTDThreadDescriptor,
 ) -> Option<NSTDThread> {
     // Create the thread builder.

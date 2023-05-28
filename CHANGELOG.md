@@ -1,3 +1,37 @@
+# TBD
+## Added
+### `nstd.alloc`
+- Added `NSTDAllocator` & `NSTD_ALLOCATOR`.
+## Changed
+### `nstd.cstring`
+- `nstd_cstring_from_cstr[_unchecked]` functions now take an `NSTDAllocator`.
+- `nstd_cstring_new[_with_cap]` functions now take an `NSTDAllocator`.
+- `nstd_cstring_new_with_cap` no longer panics.
+### `nstd.env`
+- `nstd_env_var` no longer panics.
+- `nstd_env_temp_dir` now returns `NSTDOptionalString`.
+- `nstd_env_current_[dir|exe]` functions no longer panic.
+### `nstd.fs`
+- `nstd_fs_absolute` no longer panics.
+- `nstd_fs_read[_to_string]` functions no longer panic.
+### `nstd.heap_ptr`
+- `nstd_heap_ptr_new[_zeroed]` functions now take an `NSTDAllocator`.
+### `nstd.io`
+- `nstd_io_read[_line]` functions no longer panic.
+### `nstd.shared_ptr`
+- `nstd_shared_ptr_new[_zeroed]` functions now take an `NSTDAllocator`.
+### `nstd.string`
+- `nstd_string_from_str` now takes an `NSTDAllocator`.
+- `nstd_string_new[_with_cap]` functions now take an `NSTDAllocator`.
+- `nstd_string_new_with_cap` no longer panics.
+- `nstd_string_from_*` functions now return `NSTDOptionalString`.
+### `nstd.vec`
+- `nstd_vec_from_slice` now takes an `NSTDAllocator`.
+- `nstd_vec_new[_with_cap]` functions now take an `NSTDAllocator`.
+- `nstd_vec_new[_with_cap]` functions no longer panic.
+- `nstd_vec_from_slice` no longer panics.
+- `nstd_vec_set_len` no longer returns `NSTDErrorCode`.
+
 # 0.7.0
 ## Added
 ### `nstd.core`

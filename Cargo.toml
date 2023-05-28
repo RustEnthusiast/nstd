@@ -31,11 +31,12 @@ default = ["std", "nstd_core"]
 std = []
 capi = ["nstdapi/capi"]
 asm = []
+unstable = []
 nstd_alloc = ["libc", "nstd_core", "nstd_os_windows_alloc"]
 nstd_app = ["gilrs", "nstd_core", "nstd_heap_ptr", "nstd_string", "std", "winit"]
 nstd_core = []
 nstd_cstring = ["nstd_alloc", "nstd_core", "nstd_vec"]
-nstd_env = ["nstd_core", "nstd_io", "nstd_string", "nstd_vec", "std"]
+nstd_env = ["nstd_alloc", "nstd_core", "nstd_io", "nstd_string", "nstd_vec", "std"]
 nstd_fs = ["nstd_core", "nstd_io", "nstd_os_unix_io", "nstd_string", "nstd_time", "nstd_vec", "std"]
 nstd_heap_ptr = ["nstd_alloc", "nstd_core"]
 nstd_image = ["image", "nstd_core", "std"]
@@ -56,11 +57,13 @@ nstd_os_unix_shared_lib = ["build-target", "cc", "nstd_core", "nstd_os"]
 nstd_os_unix_time = ["libc", "nstd_core", "nstd_os"]
 nstd_os_windows_alloc = ["nstd_core", "nstd_os", "windows-sys/Win32_System_Memory"]
 nstd_os_windows_shared_lib = ["nstd_core", "nstd_os", "windows-sys/Win32_System_LibraryLoader"]
-nstd_os_windows_str = ["nstd_core", "nstd_os", "nstd_vec", "windows-sys/Win32_Globalization"]
+nstd_os_windows_str = [
+    "nstd_alloc", "nstd_core", "nstd_os", "nstd_vec", "windows-sys/Win32_Globalization"
+]
 nstd_proc = ["nstd_core", "nstd_io", "std"]
 nstd_shared_lib = [
-    "libc", "nstd_core", "nstd_cstring", "nstd_os_windows_shared_lib", "nstd_os_windows_str",
-    "nstd_vec"
+    "libc", "nstd_alloc", "nstd_core", "nstd_cstring", "nstd_os_windows_shared_lib",
+    "nstd_os_windows_str", "nstd_vec"
 ]
 nstd_shared_ptr = ["nstd_alloc", "nstd_core"]
 nstd_string = ["nstd_alloc", "nstd_core", "nstd_vec"]
