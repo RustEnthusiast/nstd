@@ -110,7 +110,7 @@ pub fn nstd_app_handle(app: &NSTDApp) -> NSTDAppHandle {
 ///
 /// This function's caller must guarantee validity of the `app`'s event callbacks.
 #[nstdapi]
-pub unsafe fn nstd_app_run(app: NSTDApp, mut data: NSTDOptionalHeapPtr) -> ! {
+pub unsafe fn nstd_app_run(app: NSTDApp, mut data: NSTDOptionalHeapPtr<'static>) -> ! {
     let AppData {
         event_loop,
         mut gil,
