@@ -52,6 +52,7 @@ int main(void) {
     - `fs` - Provides access to the file system.
         - `file` - A handle to an opened file.
     - `gl` - The low level graphics library.
+        - `bind_group` - Represents group of bindings for a shader.
         - `buffer` - GPU memory buffers.
         - `frame` - An individual window surface texture.
         - `render_pass` - Represents a single render pass.
