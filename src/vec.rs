@@ -69,14 +69,13 @@ impl<'a> NSTDVec<'a> {
             use crate::alloc::GLOBAL_ALLOCATOR;
             let cap = vec.capacity();
             let data = vec.leak();
-            let v = NSTDVec {
+            NSTDOptional::Some(NSTDVec {
                 allocator: &GLOBAL_ALLOCATOR,
                 ptr: data.as_ptr() as _,
                 stride: core::mem::size_of::<T>(),
                 len: data.len(),
                 cap,
-            };
-            NSTDOptional::Some(v)
+            })
         }
         #[cfg(not(feature = "unstable"))]
         return Self::from_slice(&NSTD_ALLOCATOR, &vec);
@@ -376,6 +375,21 @@ pub fn nstd_vec_clone<'a>(vec: &NSTDVec<'a>) -> NSTDOptionalVec<'a> {
     } else {
         NSTDOptional::Some(nstd_vec_new(vec.allocator, vec.stride))
     }
+}
+
+/// Returns an immutable reference to a vector's allocator.
+///
+/// # Parameters:
+///
+/// - `const NSTDVec *vec` - The vector.
+///
+/// # Returns
+///
+/// `const NSTDAllocator *allocator` - The vector's allocator.
+#[inline]
+#[nstdapi]
+pub const fn nstd_vec_allocator<'a>(vec: &NSTDVec<'a>) -> &'a NSTDAllocator {
+    vec.allocator
 }
 
 /// Returns the length of a vector.

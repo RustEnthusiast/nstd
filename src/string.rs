@@ -13,9 +13,9 @@ use crate::{
         unichar::{NSTDOptionalUnichar, NSTDUnichar},
     },
     vec::{
-        nstd_vec_as_ptr, nstd_vec_as_slice, nstd_vec_as_slice_mut, nstd_vec_cap, nstd_vec_clear,
-        nstd_vec_clone, nstd_vec_extend, nstd_vec_from_slice, nstd_vec_len, nstd_vec_new,
-        nstd_vec_new_with_cap, nstd_vec_truncate, NSTDVec,
+        nstd_vec_allocator, nstd_vec_as_ptr, nstd_vec_as_slice, nstd_vec_as_slice_mut,
+        nstd_vec_cap, nstd_vec_clear, nstd_vec_clone, nstd_vec_extend, nstd_vec_from_slice,
+        nstd_vec_len, nstd_vec_new, nstd_vec_new_with_cap, nstd_vec_truncate, NSTDVec,
     },
     NSTDFloat32, NSTDFloat64, NSTDInt, NSTDInt16, NSTDInt32, NSTDInt64, NSTDInt8, NSTDUInt,
     NSTDUInt16, NSTDUInt32, NSTDUInt64, NSTDUInt8,
@@ -207,6 +207,21 @@ pub fn nstd_string_clone<'a>(string: &NSTDString<'a>) -> NSTDOptionalString<'a> 
         NSTDOptional::Some(bytes) => NSTDOptional::Some(NSTDString { bytes }),
         _ => NSTDOptional::None,
     }
+}
+
+/// Returns an immutable reference to a string's allocator.
+///
+/// # Parameters:
+///
+/// - `const NSTDString *string` - The string.
+///
+/// # Returns
+///
+/// `const NSTDAllocator *allocator` - The string's allocator.
+#[inline]
+#[nstdapi]
+pub fn nstd_string_allocator<'a>(string: &NSTDString<'a>) -> &'a NSTDAllocator {
+    nstd_vec_allocator(&string.bytes)
 }
 
 /// Creates a string slice containing the contents of `string`.
