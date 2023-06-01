@@ -349,11 +349,15 @@ pub fn nstd_gl_shader_module_free(module: NSTDGLShaderModule) {}
 ///
 /// - `desc.buffers.attributes`'s stride does not match `NSTDGLVertexAttribute`'s size in bytes.
 ///
+/// - `desc.bind_groups`'s stride does not match `NSTDGLBindGroup`'s size in bytes.
+///
 /// # Safety
 ///
 /// - `desc.buffers`'s data must be properly aligned and valid for reads.
 ///
 /// - `desc.buffers.attributes`'s data must be properly aligned and valid for reads.
+///
+/// - `desc.bind_groups`'s data must be properly aligned and valid for reads.
 #[nstdapi]
 pub unsafe fn nstd_gl_shader_new(
     renderer: &NSTDGLRenderer,
