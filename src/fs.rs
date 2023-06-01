@@ -198,10 +198,7 @@ pub unsafe fn nstd_fs_remove_dirs(name: &NSTDStr) -> NSTDIOError {
 #[nstdapi]
 pub unsafe fn nstd_fs_read(path: &NSTDStr) -> NSTDIOBufferResult {
     match std::fs::read(path.as_str()) {
-        Ok(contents) => match NSTDVec::from_vec(contents) {
-            NSTDOptional::Some(contents) => NSTDResult::Ok(contents),
-            _ => NSTDResult::Err(NSTDIOError::NSTD_IO_ERROR_OUT_OF_MEMORY),
-        },
+        Ok(contents) => NSTDResult::Ok(NSTDVec::from_vec(contents)),
         Err(err) => NSTDResult::Err(NSTDIOError::from_err(err.kind())),
     }
 }
@@ -222,10 +219,7 @@ pub unsafe fn nstd_fs_read(path: &NSTDStr) -> NSTDIOBufferResult {
 #[nstdapi]
 pub unsafe fn nstd_fs_read_to_string(path: &NSTDStr) -> NSTDIOStringResult {
     match std::fs::read_to_string(path.as_str()) {
-        Ok(contents) => match NSTDString::from_string(contents) {
-            NSTDOptional::Some(contents) => NSTDResult::Ok(contents),
-            _ => NSTDResult::Err(NSTDIOError::NSTD_IO_ERROR_OUT_OF_MEMORY),
-        },
+        Ok(contents) => NSTDResult::Ok(NSTDString::from_string(contents)),
         Err(err) => NSTDResult::Err(NSTDIOError::from_err(err.kind())),
     }
 }
@@ -324,10 +318,7 @@ pub unsafe fn nstd_fs_copy(from: &NSTDStr, to: &NSTDStr) -> NSTDIOError {
 pub unsafe fn nstd_fs_absolute(path: &NSTDStr) -> NSTDIOStringResult {
     match std::fs::canonicalize(path.as_str()) {
         Ok(path) => match path.into_os_string().into_string() {
-            Ok(path) => match NSTDString::from_string(path) {
-                NSTDOptional::Some(path) => NSTDResult::Ok(path),
-                _ => NSTDResult::Err(NSTDIOError::NSTD_IO_ERROR_OUT_OF_MEMORY),
-            },
+            Ok(path) => NSTDResult::Ok(NSTDString::from_string(path)),
             _ => NSTDResult::Err(NSTDIOError::NSTD_IO_ERROR_INVALID_DATA),
         },
         Err(err) => NSTDResult::Err(NSTDIOError::from_err(err.kind())),
