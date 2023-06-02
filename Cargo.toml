@@ -39,8 +39,8 @@ nstd_cstring = ["nstd_alloc", "nstd_core", "nstd_vec"]
 nstd_env = ["nstd_alloc", "nstd_core", "nstd_io", "nstd_string", "nstd_vec", "std"]
 nstd_fs = ["nstd_core", "nstd_io", "nstd_os_unix_io", "nstd_string", "nstd_time", "nstd_vec", "std"]
 nstd_gl = [
-    "naga", "nstd_core", "nstd_window", "pollster", "std", "web-sys/Document", "web-sys/Element",
-    "web-sys/Window", "wgpu"
+    "image", "naga", "nstd_core", "nstd_image", "nstd_window", "pollster", "std",
+    "web-sys/Document", "web-sys/Element", "web-sys/Window", "wgpu"
 ]
 nstd_heap_ptr = ["nstd_alloc", "nstd_core"]
 nstd_image = ["image", "nstd_core", "std"]

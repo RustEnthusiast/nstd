@@ -56,7 +56,9 @@ int main(void) {
         - `buffer` - GPU memory buffers.
         - `frame` - An individual window surface texture.
         - `render_pass` - Represents a single render pass.
+        - `sampler` - A shader's texture sampler..
         - `shader` - GPU shader programs.
+        - `texture` - A shader's texture..
     - `heap_ptr` - A pointer type for single value heap allocation.
     - `image` - Multi-format image processing.
     - `io` - Provides functionality for interacting with the standard I/O streams.

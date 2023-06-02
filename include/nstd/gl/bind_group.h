@@ -5,6 +5,8 @@
 #include "buffer.h"
 #include "gl.h"
 #include "render_pass.h"
+#include "sampler.h"
+#include "texture.h"
 
 /// Describes a read/write uniform buffer.
 #define NSTD_GL_BUFFER_BINDING_TYPE_UNIFORM 0
@@ -20,8 +22,36 @@ typedef struct {
     } value;
 } NSTDGLBufferBindingType;
 
+/// Describes a sampler's binding type.
+typedef enum {
+    /// The sampling result is based on a single color value from a texture.
+    NSTD_GL_SAMPLER_BINDING_TYPE_UNFILTERED,
+    /// The sampling result is based on more than a single color value from a texture.
+    NSTD_GL_SAMPLER_BINDING_TYPE_FILTERING
+} NSTDGLSamplerBindingType;
+
+/// Sampling returns floats.
+#define NSTD_GL_TEXTURE_SAMPLER_TYPE_FLOAT 0
+/// Sampling returns signed integers.
+#define NSTD_GL_TEXTURE_SAMPLER_TYPE_INT 1
+/// Sampling returns unsigned integers.
+#define NSTD_GL_TEXTURE_SAMPLER_TYPE_UINT 2
+
+/// Describes a texture sampling type.
+typedef struct {
+    NSTDUInt8 status;
+    union {
+        /// Determines whether or not the texture is filterable.
+        NSTDBool filterable;
+    } value;
+} NSTDGLTextureSamplerType;
+
 /// Describes a binding for a GPU memory buffer.
 #define NSTD_GL_BINDING_TYPE_BUFFER 0
+/// Describes a binding for a texture sampler.
+#define NSTD_GL_BINDING_TYPE_SAMPLER 1
+/// Describes a binding for a texture.
+#define NSTD_GL_BINDING_TYPE_TEXTURE 2
 
 /// Describes a bind group entry's type.
 typedef struct {
@@ -29,6 +59,10 @@ typedef struct {
     union {
         /// The buffer's binding type.
         NSTDGLBufferBindingType buffer_binding_type;
+        /// The sampler's binding type.
+        NSTDGLSamplerBindingType sampler_binding_type;
+        /// The texture sampler return type.
+        NSTDGLTextureSamplerType sample_type;
     } value;
 } NSTDGLBindingType;
 
@@ -36,11 +70,19 @@ typedef struct {
 typedef struct {
     enum {
         /// Represents a GPU memory buffer binding.
-        NSTD_GL_BINDING_RESOURCE_BUFFER
+        NSTD_GL_BINDING_RESOURCE_BUFFER,
+        /// Represents a texture sampler binding.
+        NSTD_GL_BINDING_RESOURCE_SAMPLER,
+        /// Represents a texture binding.
+        NSTD_GL_BINDING_RESOURCE_TEXTURE
     } status;
     union {
         /// A reference to the buffer to use as a binding resource.
         const NSTDGLBuffer *buffer;
+        /// A reference to the texture sampler.
+        const NSTDGLSampler *sampler;
+        /// A reference to the texture.
+        const NSTDGLTexture *texture;
     } value;
 } NSTDGLBindingResource;
 

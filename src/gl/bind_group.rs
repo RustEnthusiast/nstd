@@ -1,14 +1,14 @@
 //! Represents group of bindings for a shader.
 use super::{
-    buffer::NSTDGLBuffer, render_pass::NSTDGLRenderPass, shader::NSTDGLShaderStage::*,
-    NSTDGLRenderer,
+    buffer::NSTDGLBuffer, render_pass::NSTDGLRenderPass, sampler::NSTDGLSampler,
+    shader::NSTDGLShaderStage::*, texture::NSTDGLTexture, NSTDGLRenderer,
 };
 use crate::{core::slice::NSTDSlice, NSTDBool, NSTDUInt32, NSTDUInt8};
 use nstdapi::nstdapi;
 use wgpu::{
     BindGroup as WgpuBindGroup, BindGroupDescriptor, BindGroupEntry, BindGroupLayout,
     BindGroupLayoutDescriptor, BindGroupLayoutEntry, BindingResource, BindingType,
-    BufferBindingType, ShaderStages,
+    BufferBindingType, SamplerBindingType, ShaderStages, TextureSampleType, TextureViewDimension,
 };
 
 /// Describes a buffer's binding type.
@@ -35,6 +35,53 @@ impl From<NSTDGLBufferBindingType> for BufferBindingType {
     }
 }
 
+/// Describes a sampler's binding type.
+#[nstdapi]
+#[derive(Clone, Copy)]
+#[allow(non_camel_case_types)]
+pub enum NSTDGLSamplerBindingType {
+    /// The sampling result is based on a single color value from a texture.
+    NSTD_GL_SAMPLER_BINDING_TYPE_UNFILTERED,
+    /// The sampling result is based on more than a single color value from a texture.
+    NSTD_GL_SAMPLER_BINDING_TYPE_FILTERING,
+}
+impl From<NSTDGLSamplerBindingType> for SamplerBindingType {
+    /// Converts an [NSTDGLSamplerBindingType] into a `wgpu` [SamplerBindingType].
+    #[inline]
+    fn from(value: NSTDGLSamplerBindingType) -> Self {
+        match value {
+            NSTDGLSamplerBindingType::NSTD_GL_SAMPLER_BINDING_TYPE_UNFILTERED => Self::NonFiltering,
+            NSTDGLSamplerBindingType::NSTD_GL_SAMPLER_BINDING_TYPE_FILTERING => Self::Filtering,
+        }
+    }
+}
+
+/// Describes a texture sampling type.
+#[nstdapi]
+#[repr(u8)]
+#[derive(Clone, Copy)]
+pub enum NSTDGLTextureSamplerType {
+    /// Sampling returns floats.
+    Float {
+        /// Determines whether or not the texture is filterable.
+        filterable: NSTDBool,
+    },
+    /// Sampling returns signed integers.
+    Int,
+    /// Sampling returns unsigned integers.
+    UInt,
+}
+impl From<NSTDGLTextureSamplerType> for TextureSampleType {
+    /// Converts an [NSTDGLTextureSampleType] into a [TextureSampleType].
+    fn from(value: NSTDGLTextureSamplerType) -> Self {
+        match value {
+            NSTDGLTextureSamplerType::Float { filterable } => Self::Float { filterable },
+            NSTDGLTextureSamplerType::Int => Self::Sint,
+            NSTDGLTextureSamplerType::UInt => Self::Uint,
+        }
+    }
+}
+
 /// Describes a bind group entry's type.
 #[nstdapi]
 #[repr(u8)]
@@ -44,6 +91,16 @@ pub enum NSTDGLBindingType {
     Buffer {
         /// The buffer's binding type.
         buffer_binding_type: NSTDGLBufferBindingType,
+    },
+    /// Describes a binding for a texture sampler.
+    Sampler {
+        /// The sampler's binding type.
+        sampler_binding_type: NSTDGLSamplerBindingType,
+    },
+    /// Describes a binding for a texture.
+    Texture {
+        /// The texture sampler return type.
+        sample_type: NSTDGLTextureSamplerType,
     },
 }
 impl From<NSTDGLBindingType> for BindingType {
@@ -56,6 +113,14 @@ impl From<NSTDGLBindingType> for BindingType {
                 ty: buffer_binding_type.into(),
                 has_dynamic_offset: false,
                 min_binding_size: None,
+            },
+            NSTDGLBindingType::Sampler {
+                sampler_binding_type,
+            } => Self::Sampler(sampler_binding_type.into()),
+            NSTDGLBindingType::Texture { sample_type } => Self::Texture {
+                sample_type: sample_type.into(),
+                view_dimension: TextureViewDimension::D2,
+                multisampled: false,
             },
         }
     }
@@ -70,6 +135,16 @@ pub enum NSTDGLBindingResource<'a> {
         /// A reference to the buffer to use as a binding resource.
         buffer: &'a NSTDGLBuffer,
     },
+    /// Represents a texture sampler binding.
+    Sampler {
+        /// A reference to the texture sampler.
+        sampler: &'a NSTDGLSampler,
+    },
+    /// Represents a texture binding.
+    Texture {
+        /// A reference to the texture.
+        texture: &'a NSTDGLTexture,
+    },
 }
 impl<'a> From<NSTDGLBindingResource<'a>> for BindingResource<'a> {
     /// Converts an [NSTDGLBindingResource] into a `wgpu` [BindingResource].
@@ -78,6 +153,8 @@ impl<'a> From<NSTDGLBindingResource<'a>> for BindingResource<'a> {
             NSTDGLBindingResource::Buffer { buffer } => {
                 Self::Buffer(buffer.as_entire_buffer_binding())
             }
+            NSTDGLBindingResource::Sampler { sampler } => Self::Sampler(sampler),
+            NSTDGLBindingResource::Texture { texture } => Self::TextureView(texture.view()),
         }
     }
 }
