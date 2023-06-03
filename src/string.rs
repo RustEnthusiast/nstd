@@ -13,14 +13,14 @@ use crate::{
         unichar::{NSTDOptionalUnichar, NSTDUnichar},
     },
     vec::{
-        nstd_vec_as_ptr, nstd_vec_as_slice, nstd_vec_as_slice_mut, nstd_vec_cap, nstd_vec_clear,
-        nstd_vec_clone, nstd_vec_extend, nstd_vec_from_slice, nstd_vec_len, nstd_vec_new,
-        nstd_vec_new_with_cap, nstd_vec_truncate, NSTDVec,
+        nstd_vec_allocator, nstd_vec_as_ptr, nstd_vec_as_slice, nstd_vec_as_slice_mut,
+        nstd_vec_cap, nstd_vec_clear, nstd_vec_clone, nstd_vec_extend, nstd_vec_from_slice,
+        nstd_vec_len, nstd_vec_new, nstd_vec_new_with_cap, nstd_vec_truncate, NSTDVec,
     },
     NSTDFloat32, NSTDFloat64, NSTDInt, NSTDInt16, NSTDInt32, NSTDInt64, NSTDInt8, NSTDUInt,
     NSTDUInt16, NSTDUInt32, NSTDUInt64, NSTDUInt8,
 };
-use alloc::string::ToString;
+use alloc::string::{String, ToString};
 use nstdapi::nstdapi;
 
 /// Generates the `nstd_string_from_[i|u|f]*` functions.
@@ -32,7 +32,7 @@ macro_rules! gen_from_primitive {
         $(#[$meta])*
         #[inline]
         #[nstdapi]
-        pub fn $name(v: $FromT) -> NSTDOptionalString<'static> {
+        pub fn $name(v: $FromT) -> NSTDString<'static> {
             NSTDString::from_string(v.to_string())
         }
     };
@@ -46,14 +46,10 @@ pub struct NSTDString<'a> {
 }
 impl<'a> NSTDString<'a> {
     /// Creates a new [NSTDString] from a Rust [String].
-    ///
-    /// When using the `unstable` feature, this method will return a string using Rust's global
-    /// allocator so no extra allocations will occur.
     #[inline]
-    pub(crate) fn from_string(string: String) -> NSTDOptionalString<'a> {
-        match NSTDVec::from_vec(string.into_bytes()) {
-            NSTDOptional::Some(bytes) => NSTDOptional::Some(NSTDString { bytes }),
-            _ => NSTDOptional::None,
+    pub(crate) fn from_string(string: String) -> NSTDString<'a> {
+        NSTDString {
+            bytes: NSTDVec::from_vec(string.into_bytes()),
         }
     }
 
@@ -207,6 +203,21 @@ pub fn nstd_string_clone<'a>(string: &NSTDString<'a>) -> NSTDOptionalString<'a> 
         NSTDOptional::Some(bytes) => NSTDOptional::Some(NSTDString { bytes }),
         _ => NSTDOptional::None,
     }
+}
+
+/// Returns an immutable reference to a string's allocator.
+///
+/// # Parameters:
+///
+/// - `const NSTDString *string` - The string.
+///
+/// # Returns
+///
+/// `const NSTDAllocator *allocator` - The string's allocator.
+#[inline]
+#[nstdapi]
+pub fn nstd_string_allocator<'a>(string: &NSTDString<'a>) -> &'a NSTDAllocator {
+    nstd_vec_allocator(&string.bytes)
 }
 
 /// Creates a string slice containing the contents of `string`.

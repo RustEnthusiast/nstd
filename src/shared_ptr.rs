@@ -231,6 +231,21 @@ pub fn nstd_shared_ptr_share<'a>(shared_ptr: &NSTDSharedPtr<'a>) -> NSTDSharedPt
     }
 }
 
+/// Returns an immutable reference to a shared object's allocator.
+///
+/// # Parameters:
+///
+/// - `const NSTDSharedPtr *shared_ptr` - The shared object.
+///
+/// # Returns
+///
+/// `const NSTDAllocator *allocator` - The shared object's allocator.
+#[inline]
+#[nstdapi]
+pub fn nstd_shared_ptr_allocator<'a>(shared_ptr: &NSTDSharedPtr<'a>) -> &'a NSTDAllocator {
+    shared_ptr.allocator
+}
+
 /// Returns the number of pointers that share `shared_ptr`'s data.
 ///
 /// # Parameters:
