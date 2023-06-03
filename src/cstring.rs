@@ -10,8 +10,8 @@ use crate::{
         slice::NSTDSlice,
     },
     vec::{
-        nstd_vec_as_ptr, nstd_vec_as_slice, nstd_vec_cap, nstd_vec_clear, nstd_vec_clone,
-        nstd_vec_extend, nstd_vec_from_slice, nstd_vec_get_mut, nstd_vec_len,
+        nstd_vec_allocator, nstd_vec_as_ptr, nstd_vec_as_slice, nstd_vec_cap, nstd_vec_clear,
+        nstd_vec_clone, nstd_vec_extend, nstd_vec_from_slice, nstd_vec_get_mut, nstd_vec_len,
         nstd_vec_new_with_cap, nstd_vec_pop, nstd_vec_push, nstd_vec_stride, NSTDVec,
     },
     NSTDChar, NSTDUInt,
@@ -209,6 +209,21 @@ pub fn nstd_cstring_clone<'a>(cstring: &NSTDCString<'a>) -> NSTDOptionalCString<
         NSTDOptional::Some(bytes) => NSTDOptional::Some(NSTDCString { bytes }),
         _ => NSTDOptional::None,
     }
+}
+
+/// Returns an immutable reference to a C string's allocator.
+///
+/// # Parameters:
+///
+/// - `const NSTDCString *cstring` - The C string.
+///
+/// # Returns
+///
+/// `const NSTDAllocator *allocator` - The C string's allocator.
+#[inline]
+#[nstdapi]
+pub fn nstd_cstring_allocator<'a>(cstring: &NSTDCString<'a>) -> &'a NSTDAllocator {
+    nstd_vec_allocator(&cstring.bytes)
 }
 
 /// Creates a C string slice containing the contents of `cstring`.

@@ -115,6 +115,17 @@ NSTDAPI NSTDOptionalCString nstd_cstring_from_bytes(NSTDVec bytes);
 /// "none" variant if allocating fails.
 NSTDAPI NSTDOptionalCString nstd_cstring_clone(const NSTDCString *cstring);
 
+/// Returns an immutable reference to a C string's allocator.
+///
+/// # Parameters:
+///
+/// - `const NSTDCString *cstring` - The C string.
+///
+/// # Returns
+///
+/// `const NSTDAllocator *allocator` - The C string's allocator.
+NSTDAPI const NSTDAllocator *nstd_cstring_allocator(const NSTDCString *cstring);
+
 /// Creates a C string slice containing the contents of `cstring`.
 ///
 /// # Parameters:

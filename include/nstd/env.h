@@ -37,8 +37,8 @@ NSTDAPI NSTDIOStringResult nstd_env_current_exe(void);
 ///
 /// # Returns
 ///
-/// `NSTDOptionalString temp` - A path to the temporary directory.
-NSTDAPI NSTDOptionalString nstd_env_temp_dir(void);
+/// `NSTDString temp` - A path to the temporary directory.
+NSTDAPI NSTDString nstd_env_temp_dir(void);
 
 /// Sets the current working directory for the process.
 ///
