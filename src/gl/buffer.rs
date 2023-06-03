@@ -1,6 +1,6 @@
 //! GPU memory buffers.
 use super::{render_pass::NSTDGLRenderPass, NSTDGLRenderer};
-use crate::{core::slice::NSTDSlice, NSTDUInt32, NSTDUInt8};
+use crate::{core::slice::NSTDSlice, NSTDUInt32, NSTDUInt64, NSTDUInt8};
 use nstdapi::nstdapi;
 use wgpu::{
     util::{BufferInitDescriptor, DeviceExt},
@@ -13,6 +13,10 @@ pub const NSTD_GL_VERTEX_BUFFER: NSTDUInt8 = 1;
 pub const NSTD_GL_INDEX_BUFFER: NSTDUInt8 = 1 << 1;
 /// A bit flag that instructs [nstd_gl_buffer_new] to create a uniform buffer.
 pub const NSTD_GL_UNIFORM_BUFFER: NSTDUInt8 = 1 << 2;
+/// A bit flag that instructs [nstd_gl_buffer_new] to create a readable buffer.
+pub const NSTD_GL_SRC_BUFFER: NSTDUInt8 = 1 << 3;
+/// A bit flag that instructs [nstd_gl_buffer_new] to create a writable buffer.
+pub const NSTD_GL_DEST_BUFFER: NSTDUInt8 = 1 << 4;
 
 /// GPU memory buffers.
 pub type NSTDGLBuffer = Box<Buffer>;
@@ -25,7 +29,7 @@ pub type NSTDGLBuffer = Box<Buffer>;
 ///
 /// - `const NSTDSlice *data` - The data to send to the GPU.
 ///
-/// - `NSTDUInt8 buffer_type` - A bit mask describing what type of buffer to create.
+/// - `NSTDUInt8 usages` - A bit mask describing what type of buffer to create.
 ///
 /// # Panics
 ///
@@ -38,12 +42,14 @@ pub type NSTDGLBuffer = Box<Buffer>;
 pub unsafe fn nstd_gl_buffer_new(
     renderer: &NSTDGLRenderer,
     data: &NSTDSlice,
-    buffer_type: NSTDUInt8,
+    usages: NSTDUInt8,
 ) -> NSTDGLBuffer {
     let mut usage = BufferUsages::empty();
-    (buffer_type & NSTD_GL_VERTEX_BUFFER != 0).then(|| usage |= BufferUsages::VERTEX);
-    (buffer_type & NSTD_GL_INDEX_BUFFER != 0).then(|| usage |= BufferUsages::INDEX);
-    (buffer_type & NSTD_GL_UNIFORM_BUFFER != 0).then(|| usage |= BufferUsages::UNIFORM);
+    (usages & NSTD_GL_VERTEX_BUFFER != 0).then(|| usage |= BufferUsages::VERTEX);
+    (usages & NSTD_GL_INDEX_BUFFER != 0).then(|| usage |= BufferUsages::INDEX);
+    (usages & NSTD_GL_UNIFORM_BUFFER != 0).then(|| usage |= BufferUsages::UNIFORM);
+    (usages & NSTD_GL_SRC_BUFFER != 0).then(|| usage |= BufferUsages::COPY_SRC);
+    (usages & NSTD_GL_DEST_BUFFER != 0).then(|| usage |= BufferUsages::COPY_DST);
     let buffer_desc = BufferInitDescriptor {
         label: None,
         contents: data.as_slice(),
@@ -85,6 +91,39 @@ pub fn nstd_gl_buffer_bind_index<'a: 'b, 'b>(
     render_pass: &mut NSTDGLRenderPass<'b>,
 ) {
     render_pass.set_index_buffer(buffer.slice(..), IndexFormat::Uint32);
+}
+
+/// Writes data into a GPU buffer.
+///
+/// # Parameters:
+///
+/// - `const NSTDGLBuffer *buffer` - The buffer to write to.
+///
+/// - `const NSTDGLRenderer *renderer` - The renderer.
+///
+/// - `const NSTDSlice *data` - The data to write to the buffer.
+///
+/// - `NSTDUInt64 offset` - The offset to use for the write operation.
+///
+/// # Panics
+///
+/// This operation will panic if `data`'s stride is not 1.
+///
+/// # Safety
+///
+/// `data` must be valid for reads.
+#[inline]
+#[nstdapi]
+pub unsafe fn nstd_gl_buffer_write(
+    buffer: &NSTDGLBuffer,
+    renderer: &NSTDGLRenderer,
+    data: &NSTDSlice,
+    offset: NSTDUInt64,
+) {
+    renderer
+        .renderer
+        .device_handle
+        .write_buffer(buffer, offset as _, data.as_slice());
 }
 
 /// Frees a GPU buffer.
