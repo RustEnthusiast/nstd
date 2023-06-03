@@ -23,11 +23,11 @@ typedef NSTDUInt32 NSTDButtonID;
 
 /// An enumeration of device event filtering modes.
 typedef enum {
-    /// Always dispatch device events.
+    /// Never dispatch device events.
     NSTD_DEVICE_EVENT_FILTER_NONE,
     /// Only dispatch device events when an application window is focused.
     NSTD_DEVICE_EVENT_FILTER_UNFOCUSED,
-    /// Never dispatch device events.
+    /// Always dispatch device events.
     NSTD_DEVICE_EVENT_FILTER_ALL
 } NSTDDeviceEventFilter;
 
