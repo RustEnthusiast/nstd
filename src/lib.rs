@@ -4,7 +4,6 @@
 #![warn(clippy::undocumented_unsafe_blocks)]
 #![cfg_attr(not(any(test, feature = "std")), no_std)]
 #![cfg_attr(doc_cfg, feature(doc_cfg))]
-#![cfg_attr(feature = "unstable", feature(allocator_api, core_intrinsics))]
 #[cfg(feature = "nstd_alloc")]
 #[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_alloc")))]
 pub mod alloc;
