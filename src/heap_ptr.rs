@@ -188,6 +188,21 @@ pub fn nstd_heap_ptr_clone<'a>(hptr: &NSTDHeapPtr<'a>) -> NSTDOptionalHeapPtr<'a
     }
 }
 
+/// Returns an immutable reference to a heap object's allocator.
+///
+/// # Parameters:
+///
+/// - `const NSTDHeapPtr *hptr` - The heap object.
+///
+/// # Returns
+///
+/// `const NSTDAllocator *allocator` - The heap object's allocator.
+#[inline]
+#[nstdapi]
+pub fn nstd_heap_ptr_allocator<'a>(hptr: &NSTDHeapPtr<'a>) -> &'a NSTDAllocator {
+    hptr.allocator
+}
+
 /// Returns the size of the heap allocated object.
 ///
 /// # Parameters:

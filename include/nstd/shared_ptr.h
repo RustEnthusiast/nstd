@@ -69,6 +69,17 @@ nstd_shared_ptr_new_zeroed(const NSTDAllocator *allocator, NSTDUInt element_size
 /// `NSTDSharedPtr shared` - A new pointer pointing to the shared data.
 NSTDAPI NSTDSharedPtr nstd_shared_ptr_share(const NSTDSharedPtr *shared_ptr);
 
+/// Returns an immutable reference to a shared object's allocator.
+///
+/// # Parameters:
+///
+/// - `const NSTDSharedPtr *shared_ptr` - The shared object.
+///
+/// # Returns
+///
+/// `const NSTDAllocator *allocator` - The shared object's allocator.
+NSTDAPI const NSTDAllocator *nstd_shared_ptr_allocator(const NSTDSharedPtr *shared_ptr);
+
 /// Returns the number of pointers that share `shared_ptr`'s data.
 ///
 /// # Parameters:

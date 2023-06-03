@@ -84,6 +84,17 @@ NSTDAPI NSTDOptionalVec nstd_vec_from_slice(const NSTDAllocator *allocator, cons
 /// variant if allocating fails.
 NSTDAPI NSTDOptionalVec nstd_vec_clone(const NSTDVec *vec);
 
+/// Returns an immutable reference to a vector's allocator.
+///
+/// # Parameters:
+///
+/// - `const NSTDVec *vec` - The vector.
+///
+/// # Returns
+///
+/// `const NSTDAllocator *allocator` - The vector's allocator.
+NSTDAPI const NSTDAllocator *nstd_vec_allocator(const NSTDVec *vec);
+
 /// Returns the length of a vector.
 ///
 /// # Parameters:
