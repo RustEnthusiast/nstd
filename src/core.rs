@@ -47,14 +47,9 @@ impl Drop for Abort {
 #[inline]
 #[nstdapi]
 pub fn nstd_core_abort() -> ! {
-    #[cfg(feature = "unstable")]
-    core::intrinsics::abort();
-    #[cfg(not(feature = "unstable"))]
-    {
-        #[allow(unused_variables)]
-        let abort = Abort;
-        panic!();
-    }
+    #[allow(unused_variables)]
+    let abort = Abort;
+    panic!();
 }
 
 /// Terminates the program immediately in an abnormal fashion with a UTF-8 encoded payload.

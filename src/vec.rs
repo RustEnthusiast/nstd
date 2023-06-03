@@ -1,8 +1,9 @@
 //! A dynamically sized contiguous sequence of values.
+extern crate alloc;
 use crate::{
     alloc::{
         NSTDAllocError::{self, NSTD_ALLOC_ERROR_NONE},
-        NSTDAllocator, NSTD_ALLOCATOR,
+        NSTDAllocator, GLOBAL_ALLOCATOR, NSTD_ALLOCATOR,
     },
     core::{
         def::{NSTDByte, NSTDErrorCode},
@@ -16,6 +17,7 @@ use crate::{
     },
     NSTDAny, NSTDAnyMut, NSTDBool, NSTDUInt, NSTD_NULL,
 };
+use alloc::vec::Vec;
 use core::ptr::addr_of;
 use nstdapi::nstdapi;
 
@@ -34,52 +36,18 @@ pub struct NSTDVec<'a> {
     cap: NSTDUInt,
 }
 impl<'a> NSTDVec<'a> {
-    /// Creates a new [NSTDVec] from a Rust slice.
-    #[allow(dead_code)]
-    pub(crate) fn from_slice<T: Copy>(
-        allocator: &'a NSTDAllocator,
-        slice: &[T],
-    ) -> NSTDOptionalVec<'a> {
-        let stride = core::mem::size_of::<T>();
-        let len = slice.len();
-        if len > 0 {
-            // Allocate the new vector.
-            let mut vec = nstd_vec_new_with_cap(allocator, stride, len);
-            if !vec.has_allocated() {
-                return NSTDOptional::None;
-            }
-            let byte_len = core::mem::size_of_val(slice);
-            // SAFETY: `vec`'s memory buffer has just been allocated and validated.
-            unsafe { nstd_core_mem_copy(vec.ptr.cast(), slice.as_ptr().cast(), byte_len) };
-            vec.len = len;
-            NSTDOptional::Some(vec)
-        } else {
-            NSTDOptional::Some(nstd_vec_new(allocator, stride))
-        }
-    }
-
     /// Creates a new [NSTDVec] from a Rust [Vec].
-    ///
-    /// When using the `unstable` feature, this method will return a vector using Rust's global
-    /// allocator so no extra allocations will occur.
     #[allow(dead_code)]
-    pub(crate) fn from_vec<T: Copy>(vec: Vec<T>) -> NSTDOptionalVec<'a> {
-        #[cfg(feature = "unstable")]
-        {
-            use crate::alloc::GLOBAL_ALLOCATOR;
-            let cap = vec.capacity();
-            let data = vec.leak();
-            let v = NSTDVec {
-                allocator: &GLOBAL_ALLOCATOR,
-                ptr: data.as_ptr() as _,
-                stride: core::mem::size_of::<T>(),
-                len: data.len(),
-                cap,
-            };
-            NSTDOptional::Some(v)
+    pub(crate) fn from_vec<T>(vec: Vec<T>) -> NSTDVec<'a> {
+        let cap = vec.capacity();
+        let data = vec.leak();
+        NSTDVec {
+            allocator: &GLOBAL_ALLOCATOR,
+            ptr: data.as_ptr() as _,
+            stride: core::mem::size_of::<T>(),
+            len: data.len(),
+            cap,
         }
-        #[cfg(not(feature = "unstable"))]
-        return Self::from_slice(&NSTD_ALLOCATOR, &vec);
     }
 
     /// Checks if the vector's capacity is greater than 0.
@@ -376,6 +344,21 @@ pub fn nstd_vec_clone<'a>(vec: &NSTDVec<'a>) -> NSTDOptionalVec<'a> {
     } else {
         NSTDOptional::Some(nstd_vec_new(vec.allocator, vec.stride))
     }
+}
+
+/// Returns an immutable reference to a vector's allocator.
+///
+/// # Parameters:
+///
+/// - `const NSTDVec *vec` - The vector.
+///
+/// # Returns
+///
+/// `const NSTDAllocator *allocator` - The vector's allocator.
+#[inline]
+#[nstdapi]
+pub const fn nstd_vec_allocator<'a>(vec: &NSTDVec<'a>) -> &'a NSTDAllocator {
+    vec.allocator
 }
 
 /// Returns the length of a vector.

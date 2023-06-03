@@ -128,7 +128,7 @@ typedef struct {
 } NSTDAllocator;
 
 /// `nstd`'s default allocator.
-NSTDAPI NSTDAllocator NSTD_ALLOCATOR;
+NSTDAPI const NSTDAllocator NSTD_ALLOCATOR;
 
 /// Allocates a block of memory on the heap.
 /// The number of bytes to be allocated is specified by `size`.

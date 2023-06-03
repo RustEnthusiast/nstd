@@ -70,6 +70,17 @@ nstd_heap_ptr_new_zeroed(const NSTDAllocator *allocator, NSTDUInt element_size);
 /// "none" variant if allocating fails.
 NSTDAPI NSTDOptionalHeapPtr nstd_heap_ptr_clone(const NSTDHeapPtr *hptr);
 
+/// Returns an immutable reference to a heap object's allocator.
+///
+/// # Parameters:
+///
+/// - `const NSTDHeapPtr *hptr` - The heap object.
+///
+/// # Returns
+///
+/// `const NSTDAllocator *allocator` - The heap object's allocator.
+NSTDAPI const NSTDAllocator *nstd_heap_ptr_allocator(const NSTDHeapPtr *hptr);
+
 /// Returns the size of the heap allocated object.
 ///
 /// # Parameters:

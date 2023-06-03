@@ -2,6 +2,16 @@
 ## Added
 ### `nstd.alloc`
 - Added `NSTDAllocator` & `NSTD_ALLOCATOR`.
+### `nstd.cstring`
+- Added `nstd_cstring_allocator`.
+### `nstd.heap_ptr`
+- Added `nstd_heap_ptr_allocator`.
+### `nstd.shared_ptr`
+- Added `nstd_shared_ptr_allocator`.
+### `nstd.string`
+- Added `nstd_string_allocator`.
+### `nstd.vec`
+- Added `nstd_vec_allocator`.
 ## Changed
 ### `nstd.cstring`
 - `nstd_cstring_from_cstr[_unchecked]` functions now take an `NSTDAllocator`.
