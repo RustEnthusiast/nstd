@@ -36,11 +36,11 @@ pub type NSTDButtonID = NSTDUInt32;
 #[derive(Clone, Copy, PartialEq, Eq)]
 #[allow(non_camel_case_types)]
 pub enum NSTDDeviceEventFilter {
-    /// Always dispatch device events.
+    /// Never dispatch device events.
     NSTD_DEVICE_EVENT_FILTER_NONE,
     /// Only dispatch device events when an application window is focused.
     NSTD_DEVICE_EVENT_FILTER_UNFOCUSED,
-    /// Never dispatch device events.
+    /// Always dispatch device events.
     NSTD_DEVICE_EVENT_FILTER_ALL,
 }
 impl From<NSTDDeviceEventFilter> for DeviceEventFilter {
