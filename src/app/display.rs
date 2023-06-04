@@ -197,6 +197,21 @@ pub fn nstd_app_display_mode_refresh_rate(mode: &NSTDDisplayMode) -> NSTDUInt32 
     mode.refresh_rate_millihertz()
 }
 
+/// Returns a handle to a display mode's display.
+///
+/// # Parameters:
+///
+/// - `const NSTDDisplayMode *mode` - The display mode.
+///
+/// # Returns
+///
+/// `NSTDDisplay display` - A handle to the display that `mode` is valid for.
+#[inline]
+#[nstdapi]
+pub fn nstd_app_display_mode_handle(mode: &NSTDDisplayMode) -> NSTDDisplay {
+    Box::new(mode.monitor())
+}
+
 /// Frees an instance of `NSTDDisplayMode`.
 ///
 /// # Parameters:

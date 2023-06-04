@@ -132,6 +132,17 @@ NSTDAPI NSTDUInt16 nstd_app_display_mode_bit_depth(const NSTDDisplayMode *mode);
 /// `NSTDUInt32 refresh_rate` - The display's refresh rate.
 NSTDAPI NSTDUInt32 nstd_app_display_mode_refresh_rate(const NSTDDisplayMode *mode);
 
+/// Returns a handle to a display mode's display.
+///
+/// # Parameters:
+///
+/// - `const NSTDDisplayMode *mode` - The display mode.
+///
+/// # Returns
+///
+/// `NSTDDisplay display` - A handle to the display that `mode` is valid for.
+NSTDAPI NSTDDisplay nstd_app_display_mode_handle(const NSTDDisplayMode *mode);
+
 /// Frees an instance of `NSTDDisplayMode`.
 ///
 /// # Parameters:
