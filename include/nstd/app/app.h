@@ -4,6 +4,7 @@
 #include "../core/optional.h"
 #include "../heap_ptr.h"
 #include "../nstd.h"
+#include "../vec.h"
 #include "data.h"
 #include "display.h"
 #include "events.h"
@@ -74,21 +75,16 @@ NSTDAPI void nstd_app_run(NSTDApp app, NSTDOptionalHeapPtr data);
 /// - `NSTDApp app` - The `nstd` application.
 NSTDAPI void nstd_app_free(NSTDApp app);
 
-/// Invokes a callback function for each display detected by an `nstd` app.
+/// Returns a vector of display handles detected by an `nstd` application.
 ///
 /// # Parameters:
 ///
 /// - `NSTDAppHandle app` - A handle to the `nstd` application.
 ///
-/// - `void (*callback)(NSTDDisplayHandle, NSTDAnyMut)` - The callback function.
+/// # Returns
 ///
-/// - `NSTDAnyMut data` - Data to pass to `callback`.
-///
-/// # Safety
-///
-/// The user of this function must guarantee that `callback` is a valid C function pointer.
-NSTDAPI void nstd_app_displays(NSTDAppHandle app, void (*callback)(NSTDDisplayHandle, NSTDAnyMut),
-NSTDAnyMut data);
+/// `NSTDVec displays` - A vector of `NSTDDisplay` handles.
+NSTDAPI NSTDVec nstd_app_displays(NSTDAppHandle app);
 
 /// Returns a handle to the primary display.
 ///

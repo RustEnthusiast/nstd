@@ -4,7 +4,7 @@ pub mod display;
 pub mod events;
 use self::{
     data::{NSTDAppData, NSTDAppHandle},
-    display::{NSTDDisplay, NSTDDisplayHandle},
+    display::NSTDDisplay,
     events::{
         NSTDAppEvents, NSTDDeviceEventFilter, NSTDDeviceID, NSTDGamepadAxis, NSTDGamepadButton,
         NSTDGamepadID, NSTDKey, NSTDMouseInput, NSTDScrollDelta, NSTDTouchState, NSTDWindowID,
@@ -17,7 +17,8 @@ use crate::{
         str::NSTDStr,
     },
     heap_ptr::NSTDOptionalHeapPtr,
-    NSTDAnyMut, NSTDBool,
+    vec::NSTDVec,
+    NSTDBool,
 };
 use gilrs::{Error::NotImplemented, EventType as GamepadEvent, Gilrs};
 use nstdapi::nstdapi;
@@ -402,31 +403,22 @@ pub unsafe fn nstd_app_run(app: NSTDApp, mut data: NSTDOptionalHeapPtr<'static>)
 #[allow(unused_variables)]
 pub fn nstd_app_free(app: NSTDApp) {}
 
-/// Invokes a callback function for each display detected by an `nstd` app.
+/// Returns a vector of display handles detected by an `nstd` application.
 ///
 /// # Parameters:
 ///
 /// - `NSTDAppHandle app` - A handle to the `nstd` application.
 ///
-/// - `void (*callback)(NSTDDisplayHandle, NSTDAnyMut)` - The callback function.
+/// # Returns
 ///
-/// - `NSTDAnyMut data` - Data to pass to `callback`.
-///
-/// # Safety
-///
-/// The user of this function must guarantee that `callback` is a valid C function pointer.
+/// `NSTDVec displays` - A vector of `NSTDDisplay` handles.
 #[inline]
 #[nstdapi]
-pub unsafe fn nstd_app_displays(
-    app: NSTDAppHandle,
-    callback: Option<unsafe extern "C" fn(NSTDDisplayHandle, NSTDAnyMut)>,
-    data: NSTDAnyMut,
-) {
-    if let Some(callback) = callback {
-        for handle in app.available_monitors() {
-            callback(&handle, data);
-        }
-    }
+pub unsafe fn nstd_app_displays(app: NSTDAppHandle) -> NSTDVec {
+    app.available_monitors()
+        .into_iter()
+        .map(|m| Box::new(m))
+        .collect()
 }
 
 /// Returns a handle to the primary display.
