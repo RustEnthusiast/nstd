@@ -3,8 +3,8 @@
 #include "../core/optional.h"
 #include "../core/str.h"
 #include "../core/unichar.h"
+#include "../heap_ptr.h"
 #include "../nstd.h"
-#include "data.h"
 
 /// A window's unique identifier.
 typedef NSTDAnyMut NSTDWindowID;
@@ -294,6 +294,21 @@ typedef enum {
     /// An unknown axis.
     NSTD_GAMEPAD_AXIS_UNKNOWN
 } NSTDGamepadAxis;
+
+/// A handle to the application event loop.
+typedef NSTDAny NSTDAppHandle;
+
+/// Application data passed to each event.
+typedef struct {
+    /// A handle to the `nstd` app.
+    NSTDAppHandle handle;
+    /// Custom user data.
+    NSTDOptionalHeapPtr *data;
+    /// The gamepad input manager.
+    NSTDAnyMut gil;
+    /// The application's control flow.
+    NSTDAnyMut control_flow;
+} NSTDAppData;
 
 /// Contains callback based events through function pointers.
 typedef struct {

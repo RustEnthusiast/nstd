@@ -1,14 +1,13 @@
 //! An application event loop.
-pub mod data;
 pub mod display;
 pub mod events;
 pub mod gamepad;
 use self::{
-    data::{NSTDAppData, NSTDAppHandle},
     display::NSTDDisplay,
     events::{
-        NSTDAppEvents, NSTDDeviceEventFilter, NSTDDeviceID, NSTDGamepadAxis, NSTDGamepadButton,
-        NSTDGamepadID, NSTDKey, NSTDMouseInput, NSTDScrollDelta, NSTDTouchState, NSTDWindowID,
+        NSTDAppData, NSTDAppEvents, NSTDAppHandle, NSTDDeviceEventFilter, NSTDDeviceID,
+        NSTDGamepadAxis, NSTDGamepadButton, NSTDGamepadID, NSTDKey, NSTDMouseInput,
+        NSTDScrollDelta, NSTDTouchState, NSTDWindowID,
     },
     gamepad::NSTDGamepad,
 };

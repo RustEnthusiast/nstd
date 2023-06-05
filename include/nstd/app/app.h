@@ -5,7 +5,6 @@
 #include "../heap_ptr.h"
 #include "../nstd.h"
 #include "../vec.h"
-#include "data.h"
 #include "display.h"
 #include "events.h"
 #include "gamepad.h"

@@ -25,7 +25,6 @@ int main(void) {
 - `nstd` - A cross-platform, fast, and safe general purpose C library written in Rust.
     - `alloc` - Low level memory allocation.
     - `app` - An application event loop.
-        - `data` - Application data passed to each event.
         - `display` - Provides access to physical displays.
         - `events` - Contains callback based events through function pointers.
         - `gamepad` - Gamepad access.
