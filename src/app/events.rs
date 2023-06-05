@@ -465,6 +465,29 @@ impl NSTDGamepadButton {
             _ => Self::NSTD_GAMEPAD_BUTTON_UNKNOWN,
         }
     }
+
+    /// Converts an [NSTDGamepadButton] into a [gilrs] [Button].
+    pub(crate) fn into_winit(self) -> Button {
+        match self {
+            Self::NSTD_GAMEPAD_BUTTON_NORTH => Button::North,
+            Self::NSTD_GAMEPAD_BUTTON_SOUTH => Button::South,
+            Self::NSTD_GAMEPAD_BUTTON_EAST => Button::East,
+            Self::NSTD_GAMEPAD_BUTTON_WEST => Button::West,
+            Self::NSTD_GAMEPAD_BUTTON_RIGHT_BUMPER => Button::RightTrigger,
+            Self::NSTD_GAMEPAD_BUTTON_LEFT_BUMPER => Button::LeftTrigger,
+            Self::NSTD_GAMEPAD_BUTTON_RIGHT_TRIGGER => Button::RightTrigger2,
+            Self::NSTD_GAMEPAD_BUTTON_LEFT_TRIGGER => Button::LeftTrigger2,
+            Self::NSTD_GAMEPAD_BUTTON_START => Button::Start,
+            Self::NSTD_GAMEPAD_BUTTON_SELECT => Button::Select,
+            Self::NSTD_GAMEPAD_BUTTON_RIGHT_THUMB => Button::RightThumb,
+            Self::NSTD_GAMEPAD_BUTTON_LEFT_THUMB => Button::LeftThumb,
+            Self::NSTD_GAMEPAD_BUTTON_DPAD_UP => Button::DPadUp,
+            Self::NSTD_GAMEPAD_BUTTON_DPAD_DOWN => Button::DPadDown,
+            Self::NSTD_GAMEPAD_BUTTON_DPAD_LEFT => Button::DPadLeft,
+            Self::NSTD_GAMEPAD_BUTTON_DPAD_RIGHT => Button::DPadRight,
+            Self::NSTD_GAMEPAD_BUTTON_UNKNOWN => Button::Unknown,
+        }
+    }
 }
 
 /// Represents a gamepad axis.
@@ -504,6 +527,21 @@ impl NSTDGamepadAxis {
             Axis::DPadX => Self::NSTD_GAMEPAD_AXIS_DPAD_X,
             Axis::DPadY => Self::NSTD_GAMEPAD_AXIS_DPAD_Y,
             _ => Self::NSTD_GAMEPAD_AXIS_UNKNOWN,
+        }
+    }
+
+    /// Converts an [NSTDGamepadAxis] into a [gilrs] [Axis].
+    pub(crate) fn into_winit(self) -> Axis {
+        match self {
+            Self::NSTD_GAMEPAD_AXIS_LEFT_X => Axis::LeftStickX,
+            Self::NSTD_GAMEPAD_AXIS_LEFT_Y => Axis::LeftStickY,
+            Self::NSTD_GAMEPAD_AXIS_LEFT_Z => Axis::LeftZ,
+            Self::NSTD_GAMEPAD_AXIS_RIGHT_X => Axis::RightStickX,
+            Self::NSTD_GAMEPAD_AXIS_RIGHT_Y => Axis::RightStickY,
+            Self::NSTD_GAMEPAD_AXIS_RIGHT_Z => Axis::RightZ,
+            Self::NSTD_GAMEPAD_AXIS_DPAD_X => Axis::DPadX,
+            Self::NSTD_GAMEPAD_AXIS_DPAD_Y => Axis::DPadY,
+            Self::NSTD_GAMEPAD_AXIS_UNKNOWN => Axis::Unknown,
         }
     }
 }

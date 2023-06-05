@@ -4,4 +4,5 @@
 #include "app/data.h"
 #include "app/display.h"
 #include "app/events.h"
+#include "app/gamepad.h"
 #endif

@@ -2,6 +2,7 @@
 pub mod data;
 pub mod display;
 pub mod events;
+pub mod gamepad;
 use self::{
     data::{NSTDAppData, NSTDAppHandle},
     display::NSTDDisplay,
@@ -9,6 +10,7 @@ use self::{
         NSTDAppEvents, NSTDDeviceEventFilter, NSTDDeviceID, NSTDGamepadAxis, NSTDGamepadButton,
         NSTDGamepadID, NSTDKey, NSTDMouseInput, NSTDScrollDelta, NSTDTouchState, NSTDWindowID,
     },
+    gamepad::NSTDGamepad,
 };
 use crate::{
     core::{
@@ -447,6 +449,38 @@ pub fn nstd_app_primary_display(app: NSTDAppHandle) -> Option<NSTDDisplay> {
 #[nstdapi]
 pub fn nstd_app_set_device_event_filter(app: NSTDAppHandle, filter: NSTDDeviceEventFilter) {
     app.set_device_event_filter(filter.into());
+}
+
+/// Returns a handle to a gamepad that matches `id`.
+///
+/// # Parameters:
+///
+/// - `const NSTDAppData *app` - The app.
+///
+/// - `const NSTDGamepadID *id` - The gamepad ID.
+///
+/// # Returns
+///
+/// `NSTDGamepad gamepad` - A handle to the gamepad with ID `id`.
+#[inline]
+#[nstdapi]
+pub fn nstd_app_gamepad<'a>(app: &'a NSTDAppData<'a>, id: &NSTDGamepadID) -> NSTDGamepad<'a> {
+    Box::new(app.gil.gamepad(**id))
+}
+
+/// Returns a vector of all connected gamepad handles detected by `app`.
+///
+/// # Parameters:
+///
+/// - `const NSTDAppData *app` - The app.
+///
+/// # Returns
+///
+/// `NSTDVec gamepads` - A vector of `NSTDGamepad` handles.
+#[inline]
+#[nstdapi]
+pub fn nstd_app_gamepads(app: &NSTDAppData) -> NSTDVec<'static> {
+    app.gil.gamepads().map(|g| Box::new(g.1)).collect()
 }
 
 /// Signals an `NSTDApp`'s event loop to exit.

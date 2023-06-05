@@ -28,6 +28,7 @@ int main(void) {
         - `data` - Application data passed to each event.
         - `display` - Provides access to physical displays.
         - `events` - Contains callback based events through function pointers.
+        - `gamepad` - Gamepad access.
     - `core` - Provides core functionality for `nstd`.
         - `cstr` - Unowned C string slices.
             - `raw` - Raw C string processing.

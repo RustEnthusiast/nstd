@@ -8,6 +8,7 @@
 #include "data.h"
 #include "display.h"
 #include "events.h"
+#include "gamepad.h"
 
 /// An application event loop.
 typedef struct {
@@ -105,6 +106,30 @@ NSTDAPI NSTDDisplay nstd_app_primary_display(NSTDAppHandle app);
 ///
 /// - `NSTDDeviceEventFilter filter` - The device event filtering mode to use.
 NSTDAPI void nstd_app_set_device_event_filter(NSTDAppHandle app, NSTDDeviceEventFilter filter);
+
+/// Returns a handle to a gamepad that matches `id`.
+///
+/// # Parameters:
+///
+/// - `const NSTDAppData *app` - The app.
+///
+/// - `const NSTDGamepadID *id` - The gamepad ID.
+///
+/// # Returns
+///
+/// `NSTDGamepad gamepad` - A handle to the gamepad with ID `id`.
+NSTDAPI NSTDGamepad nstd_app_gamepad(const NSTDAppData *app, const NSTDGamepadID *id);
+
+/// Returns a vector of all connected gamepad handles detected by `app`.
+///
+/// # Parameters:
+///
+/// - `const NSTDAppData *app` - The app.
+///
+/// # Returns
+///
+/// `NSTDVec gamepads` - A vector of `NSTDGamepad` handles.
+NSTDAPI NSTDVec nstd_app_gamepads(const NSTDAppData *app);
 
 /// Signals an `NSTDApp`'s event loop to exit.
 ///

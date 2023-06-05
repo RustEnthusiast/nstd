@@ -15,7 +15,7 @@ pub struct NSTDAppData<'a> {
     /// Custom user data.
     pub data: &'a mut NSTDOptionalHeapPtr<'static>,
     /// The gamepad input manager.
-    gil: &'a mut Gilrs,
+    pub(crate) gil: &'a mut Gilrs,
     /// The application's control flow.
     control_flow: &'a mut ControlFlow,
 }
