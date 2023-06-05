@@ -415,7 +415,7 @@ pub fn nstd_app_free(app: NSTDApp) {}
 /// `NSTDVec displays` - A vector of `NSTDDisplay` handles.
 #[inline]
 #[nstdapi]
-pub unsafe fn nstd_app_displays(app: NSTDAppHandle) -> NSTDVec {
+pub fn nstd_app_displays(app: NSTDAppHandle) -> NSTDVec {
     app.available_monitors()
         .into_iter()
         .map(|m| Box::new(m))
