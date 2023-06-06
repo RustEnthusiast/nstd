@@ -26,6 +26,7 @@ pub struct NSTDWindowPosition {
     /// The position of the window from the top of the screen.
     pub y: NSTDInt32,
 }
+gen_optional!(NSTDOptionalWindowPosition, NSTDWindowPosition);
 
 /// Describes the size of a window.
 #[nstdapi]
@@ -121,7 +122,7 @@ pub fn nstd_window_set_outer_position(window: &NSTDWindow, pos: NSTDWindowPositi
 
 /// Gets the position of a window.
 ///
-/// This always returns an x and y value of 0 on unsupported platforms.
+/// Returns an uninitialized "none" variant on unsupported platforms.
 ///
 /// # Parameters:
 ///
@@ -129,19 +130,19 @@ pub fn nstd_window_set_outer_position(window: &NSTDWindow, pos: NSTDWindowPositi
 ///
 /// # Returns
 ///
-/// `NSTDWindowPosition pos` - The position of the window.
+/// `NSTDOptionalWindowPosition pos` - The position of the window.
 #[inline]
 #[nstdapi]
-pub fn nstd_window_get_outer_position(window: &NSTDWindow) -> NSTDWindowPosition {
-    if let Ok(pos) = window.outer_position() {
-        return NSTDWindowPosition { x: pos.x, y: pos.y };
+pub fn nstd_window_get_outer_position(window: &NSTDWindow) -> NSTDOptionalWindowPosition {
+    match window.outer_position() {
+        Ok(pos) => NSTDOptional::Some(NSTDWindowPosition { x: pos.x, y: pos.y }),
+        _ => NSTDOptional::None,
     }
-    NSTDWindowPosition { x: 0, y: 0 }
 }
 
 /// Gets the position of a window's client area on the display.
 ///
-/// This always returns an x and y value of 0 on unsupported platforms.
+/// Returns an uninitialized "none" variant on unsupported platforms.
 ///
 /// # Parameters:
 ///
@@ -149,14 +150,14 @@ pub fn nstd_window_get_outer_position(window: &NSTDWindow) -> NSTDWindowPosition
 ///
 /// # Returns
 ///
-/// `NSTDWindowPosition pos` - The position of the window's client area.
+/// `NSTDOptionalWindowPosition pos` - The position of the window's client area.
 #[inline]
 #[nstdapi]
-pub fn nstd_window_get_inner_position(window: &NSTDWindow) -> NSTDWindowPosition {
-    if let Ok(pos) = window.inner_position() {
-        return NSTDWindowPosition { x: pos.x, y: pos.y };
+pub fn nstd_window_get_inner_position(window: &NSTDWindow) -> NSTDOptionalWindowPosition {
+    match window.inner_position() {
+        Ok(pos) => NSTDOptional::Some(NSTDWindowPosition { x: pos.x, y: pos.y }),
+        _ => NSTDOptional::None,
     }
-    NSTDWindowPosition { x: 0, y: 0 }
 }
 
 /// Sets the size of a window's client area.

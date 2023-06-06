@@ -18,6 +18,9 @@ typedef struct {
     NSTDInt32 y;
 } NSTDWindowPosition;
 
+/// Represents an optional value of type `NSTDWindowPosition`.
+NSTDOptional(NSTDWindowPosition) NSTDOptionalWindowPosition;
+
 /// Describes the size of a window.
 typedef struct {
     /// The width of the window.
@@ -84,7 +87,7 @@ NSTDAPI void nstd_window_set_outer_position(const NSTDWindow *window, NSTDWindow
 
 /// Gets the position of a window.
 ///
-/// This always returns an x and y value of 0 on unsupported platforms.
+/// Returns an uninitialized "none" variant on unsupported platforms.
 ///
 /// # Parameters:
 ///
@@ -92,12 +95,12 @@ NSTDAPI void nstd_window_set_outer_position(const NSTDWindow *window, NSTDWindow
 ///
 /// # Returns
 ///
-/// `NSTDWindowPosition pos` - The position of the window.
-NSTDAPI NSTDWindowPosition nstd_window_get_outer_position(const NSTDWindow *window);
+/// `NSTDOptionalWindowPosition pos` - The position of the window.
+NSTDAPI NSTDOptionalWindowPosition nstd_window_get_outer_position(const NSTDWindow *window);
 
 /// Gets the position of a window's client area on the display.
 ///
-/// This always returns an x and y value of 0 on unsupported platforms.
+/// Returns an uninitialized "none" variant on unsupported platforms.
 ///
 /// # Parameters:
 ///
@@ -105,8 +108,8 @@ NSTDAPI NSTDWindowPosition nstd_window_get_outer_position(const NSTDWindow *wind
 ///
 /// # Returns
 ///
-/// `NSTDWindowPosition pos` - The position of the window's client area.
-NSTDAPI NSTDWindowPosition nstd_window_get_inner_position(const NSTDWindow *window);
+/// `NSTDOptionalWindowPosition pos` - The position of the window's client area.
+NSTDAPI NSTDOptionalWindowPosition nstd_window_get_inner_position(const NSTDWindow *window);
 
 /// Sets the size of a window's client area.
 ///
