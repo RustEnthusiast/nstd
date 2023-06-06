@@ -18,13 +18,8 @@
 /// See <https://man7.org/linux/man-pages/man3/dlopen.3.html>.
 NSTDAPI NSTDUnixOptionalSharedLib nstd_os_unix_shared_lib_load(const NSTDChar *const path) {
     const NSTDAnyMut handle = dlopen(path, RTLD_LAZY | RTLD_LOCAL);
-    if (handle) {
-        const NSTDUnixOptionalSharedLib lib = {NSTD_OPTIONAL_SOME, {{handle}}};
-        return lib;
-    } else {
-        const NSTDUnixOptionalSharedLib lib = {NSTD_OPTIONAL_NONE};
-        return lib;
-    }
+    return handle ? (NSTDUnixOptionalSharedLib){NSTD_OPTIONAL_SOME, {{handle}}}
+                  : (NSTDUnixOptionalSharedLib){NSTD_OPTIONAL_NONE};
 }
 
 /// Returns a raw handle to a dynamically loaded library.
