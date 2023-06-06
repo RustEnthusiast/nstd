@@ -2,6 +2,7 @@
 #define NSTD_WINDOW_H
 #include "app/data.h"
 #include "app/events.h"
+#include "core/def.h"
 #include "core/optional.h"
 #include "core/str.h"
 #include "image.h"
@@ -31,6 +32,16 @@ typedef struct {
 
 /// Represents an optional value of type `NSTDWindowSize`.
 NSTDOptional(NSTDWindowSize) NSTDOptionalWindowSize;
+
+/// Describes the behavior of cursor grabbing.
+typedef enum {
+    /// The cursor should not be locked or confined.
+    NSTD_CURSOR_GRAB_MODE_NONE,
+    /// The cursor will be confined to the window area.
+    NSTD_CURSOR_GRAB_MODE_CONFINED,
+    /// The cursor will be locked to a certain position inside the window area.
+    NSTD_CURSOR_GRAB_MODE_LOCKED
+} NSTDCursorGrabMode;
 
 /// Creates a new window attached to `app`'s event loop.
 ///
@@ -190,6 +201,35 @@ NSTDAPI void nstd_window_set_resizable(const NSTDWindow *window, NSTDBool resiza
 ///
 /// `NSTDBool is_resizable` - Returns true if the window is resizable.
 NSTDAPI NSTDBool nstd_window_is_resizable(const NSTDWindow *window);
+
+/// Sets the grabbing mode of the system cursor.
+///
+/// # Parameters:
+///
+/// - `const NSTDWindow *window` - The window.
+///
+/// - `NSTDCursorGrabMode mode` - The cursor grabbing mode.
+///
+/// # Returns
+///
+/// `NSTDErrorCode errc` - Nonzero on error.
+///
+/// # Errors
+///
+/// - `1` - The operating system is not currently supported.
+///
+/// - `2` - An operating system library function failed.
+NSTDAPI NSTDErrorCode
+nstd_window_set_cursor_grab_mode(const NSTDWindow *window, NSTDCursorGrabMode mode);
+
+/// Sets whether or not the system cursor is visible.
+///
+/// # Parameters:
+///
+/// - `const NSTDWindow *window` - The window.
+///
+/// - `NSTDBool visible` - Determines whether or not the cursor should be visible.
+NSTDAPI void nstd_window_set_cursor_visible(const NSTDWindow *window, NSTDBool visible);
 
 /// Permanently closes & frees a window and it's data.
 ///

@@ -2,6 +2,7 @@
 use crate::{
     app::{data::NSTDAppHandle, events::NSTDWindowID},
     core::{
+        def::NSTDErrorCode,
         optional::{gen_optional, NSTDOptional},
         str::NSTDStr,
     },
@@ -11,7 +12,8 @@ use crate::{
 use nstdapi::nstdapi;
 use winit::{
     dpi::{PhysicalPosition, PhysicalSize},
-    window::{Icon, Window},
+    error::ExternalError,
+    window::{CursorGrabMode, Icon, Window},
 };
 
 /// An `nstd` application window.
@@ -38,6 +40,30 @@ pub struct NSTDWindowSize {
     pub height: NSTDUInt32,
 }
 gen_optional!(NSTDOptionalWindowSize, NSTDWindowSize);
+
+/// Describes the behavior of cursor grabbing.
+#[nstdapi]
+#[derive(Clone, Copy, PartialEq, Eq)]
+#[allow(non_camel_case_types)]
+pub enum NSTDCursorGrabMode {
+    /// The cursor should not be locked or confined.
+    NSTD_CURSOR_GRAB_MODE_NONE,
+    /// The cursor will be confined to the window area.
+    NSTD_CURSOR_GRAB_MODE_CONFINED,
+    /// The cursor will be locked to a certain position inside the window area.
+    NSTD_CURSOR_GRAB_MODE_LOCKED,
+}
+impl From<NSTDCursorGrabMode> for CursorGrabMode {
+    /// Converts an [NSTDCursorGrabMode] into a [winit] [CursorGrabMode].
+    #[inline]
+    fn from(value: NSTDCursorGrabMode) -> Self {
+        match value {
+            NSTDCursorGrabMode::NSTD_CURSOR_GRAB_MODE_NONE => Self::None,
+            NSTDCursorGrabMode::NSTD_CURSOR_GRAB_MODE_CONFINED => Self::Confined,
+            NSTDCursorGrabMode::NSTD_CURSOR_GRAB_MODE_LOCKED => Self::Locked,
+        }
+    }
+}
 
 /// Creates a new window attached to `app`'s event loop.
 ///
@@ -286,6 +312,48 @@ pub fn nstd_window_set_resizable(window: &NSTDWindow, resizable: NSTDBool) {
 #[nstdapi]
 pub fn nstd_window_is_resizable(window: &NSTDWindow) -> NSTDBool {
     window.is_resizable()
+}
+
+/// Sets the grabbing mode of the system cursor.
+///
+/// # Parameters:
+///
+/// - `const NSTDWindow *window` - The window.
+///
+/// - `NSTDCursorGrabMode mode` - The cursor grabbing mode.
+///
+/// # Returns
+///
+/// `NSTDErrorCode errc` - Nonzero on error.
+///
+/// # Errors
+///
+/// - `1` - The operating system is not currently supported.
+///
+/// - `2` - An operating system library function failed.
+#[nstdapi]
+pub fn nstd_window_set_cursor_grab_mode(
+    window: &NSTDWindow,
+    mode: NSTDCursorGrabMode,
+) -> NSTDErrorCode {
+    match window.set_cursor_grab(mode.into()) {
+        Ok(_) => 0,
+        Err(ExternalError::NotSupported(_)) => 1,
+        Err(ExternalError::Os(_)) => 2,
+    }
+}
+
+/// Sets whether or not the system cursor is visible.
+///
+/// # Parameters:
+///
+/// - `const NSTDWindow *window` - The window.
+///
+/// - `NSTDBool visible` - Determines whether or not the cursor should be visible.
+#[inline]
+#[nstdapi]
+pub fn nstd_window_set_cursor_visible(window: &NSTDWindow, visible: NSTDBool) {
+    window.set_cursor_visible(visible);
 }
 
 /// Permanently closes & frees a window and it's data.
