@@ -115,7 +115,7 @@ pub fn nstd_window_set_icon(window: &NSTDWindow, icon: &NSTDImage) {
 /// - `NSTDWindowPosition pos` - The position of the window.
 #[inline]
 #[nstdapi]
-pub fn nstd_window_set_position(window: &NSTDWindow, pos: NSTDWindowPosition) {
+pub fn nstd_window_set_outer_position(window: &NSTDWindow, pos: NSTDWindowPosition) {
     window.set_outer_position(PhysicalPosition::new(pos.x, pos.y));
 }
 
@@ -132,7 +132,7 @@ pub fn nstd_window_set_position(window: &NSTDWindow, pos: NSTDWindowPosition) {
 /// `NSTDWindowPosition pos` - The position of the window.
 #[inline]
 #[nstdapi]
-pub fn nstd_window_get_position(window: &NSTDWindow) -> NSTDWindowPosition {
+pub fn nstd_window_get_outer_position(window: &NSTDWindow) -> NSTDWindowPosition {
     if let Ok(pos) = window.outer_position() {
         return NSTDWindowPosition { x: pos.x, y: pos.y };
     }
@@ -168,7 +168,7 @@ pub fn nstd_window_get_inner_position(window: &NSTDWindow) -> NSTDWindowPosition
 /// - `NSTDWindowSize size` - The new size of the window.
 #[inline]
 #[nstdapi]
-pub fn nstd_window_set_size(window: &NSTDWindow, size: NSTDWindowSize) {
+pub fn nstd_window_set_inner_size(window: &NSTDWindow, size: NSTDWindowSize) {
     window.set_inner_size(PhysicalSize::new(size.width, size.height));
 }
 
@@ -183,7 +183,7 @@ pub fn nstd_window_set_size(window: &NSTDWindow, size: NSTDWindowSize) {
 /// `NSTDWindowSize size` - The size of the window.
 #[inline]
 #[nstdapi]
-pub fn nstd_window_get_size(window: &NSTDWindow) -> NSTDWindowSize {
+pub fn nstd_window_get_inner_size(window: &NSTDWindow) -> NSTDWindowSize {
     let size = window.inner_size();
     NSTDWindowSize {
         width: size.width,
