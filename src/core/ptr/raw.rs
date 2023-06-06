@@ -27,7 +27,7 @@ const fn is_power_of_two(align: NSTDUInt) -> NSTDBool {
 /// ```
 /// use nstd_sys::core::{ptr::raw::nstd_core_ptr_raw_dangling, slice::nstd_core_slice_new};
 ///
-/// let slice = nstd_core_slice_new(nstd_core_ptr_raw_dangling(), 1, 0);
+/// let slice = nstd_core_slice_new(nstd_core_ptr_raw_dangling(), 1, 0).unwrap();
 /// ```
 #[inline]
 #[nstdapi]
@@ -46,7 +46,7 @@ pub const fn nstd_core_ptr_raw_dangling() -> NSTDAny {
 /// ```
 /// use nstd_sys::core::{ptr::raw::nstd_core_ptr_raw_dangling_mut, slice::nstd_core_slice_mut_new};
 ///
-/// let slice = nstd_core_slice_mut_new(nstd_core_ptr_raw_dangling_mut(), 1, 0);
+/// let slice = nstd_core_slice_mut_new(nstd_core_ptr_raw_dangling_mut(), 1, 0).unwrap();
 /// ```
 #[inline]
 #[nstdapi]
@@ -74,6 +74,18 @@ pub const fn nstd_core_ptr_raw_dangling_mut() -> NSTDAnyMut {
 ///
 /// Both `ptr` and the resulting pointer must be either in bounds or one byte past the end of the
 /// same allocated object.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::ptr::raw::{nstd_core_ptr_raw_align, nstd_core_ptr_raw_is_aligned};
+///
+/// unsafe {
+///     let ptr = 2 as _;
+///     let aligned = nstd_core_ptr_raw_align(ptr, 16);
+///     assert!(nstd_core_ptr_raw_is_aligned(aligned, 16));
+/// }
+/// ```
 #[nstdapi]
 pub unsafe fn nstd_core_ptr_raw_align(ptr: NSTDAny, align: NSTDUInt) -> NSTDAny {
     assert!(is_power_of_two(align));
@@ -103,6 +115,18 @@ pub unsafe fn nstd_core_ptr_raw_align(ptr: NSTDAny, align: NSTDUInt) -> NSTDAny 
 ///
 /// Both `ptr` and the resulting pointer must be either in bounds or one byte past the end of the
 /// same allocated object.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::ptr::raw::{nstd_core_ptr_raw_align_mut, nstd_core_ptr_raw_is_aligned};
+///
+/// unsafe {
+///     let ptr = 2 as _;
+///     let aligned = nstd_core_ptr_raw_align_mut(ptr, 16);
+///     assert!(nstd_core_ptr_raw_is_aligned(aligned, 16));
+/// }
+/// ```
 #[inline]
 #[nstdapi]
 pub unsafe fn nstd_core_ptr_raw_align_mut(ptr: NSTDAnyMut, align: NSTDUInt) -> NSTDAnyMut {

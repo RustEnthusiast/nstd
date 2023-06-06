@@ -129,13 +129,10 @@ pub fn nstd_app_display_scale_factor(display: &NSTDDisplay) -> NSTDFloat64 {
 /// # Returns
 ///
 /// `NSTDVec modes` - A vector of `display`'s `NSTDDisplayMode`s.
+#[inline]
 #[nstdapi]
 pub unsafe fn nstd_app_display_modes(display: &NSTDDisplay) -> NSTDVec {
-    display
-        .video_modes()
-        .into_iter()
-        .map(|m| Box::new(m))
-        .collect()
+    display.video_modes().map(Box::new).collect()
 }
 
 /// Frees an instance of `NSTDDisplay`.

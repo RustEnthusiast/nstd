@@ -416,10 +416,7 @@ pub fn nstd_app_free(app: NSTDApp) {}
 #[inline]
 #[nstdapi]
 pub fn nstd_app_displays(app: NSTDAppHandle) -> NSTDVec {
-    app.available_monitors()
-        .into_iter()
-        .map(|m| Box::new(m))
-        .collect()
+    app.available_monitors().map(Box::new).collect()
 }
 
 /// Returns a handle to the primary display.
