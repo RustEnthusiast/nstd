@@ -1,18 +1,18 @@
 //! Contains callback based events through function pointers.
 use crate::{
-    app::data::NSTDAppData,
     core::{
         optional::{NSTDOptional, NSTDOptionalUInt16},
         str::NSTDStr,
         unichar::NSTDUnichar,
     },
+    heap_ptr::NSTDOptionalHeapPtr,
     NSTDBool, NSTDFloat32, NSTDFloat64, NSTDInt32, NSTDUInt32,
 };
-use gilrs::{Axis, Button, GamepadId};
+use gilrs::{Axis, Button, Event as GamepadEvent, GamepadId, Gilrs};
 use nstdapi::nstdapi;
 use winit::{
     event::{DeviceId, MouseButton, MouseScrollDelta, TouchPhase, VirtualKeyCode},
-    event_loop::DeviceEventFilter,
+    event_loop::{ControlFlow, DeviceEventFilter, EventLoopWindowTarget},
     window::WindowId,
 };
 
@@ -465,6 +465,29 @@ impl NSTDGamepadButton {
             _ => Self::NSTD_GAMEPAD_BUTTON_UNKNOWN,
         }
     }
+
+    /// Converts an [NSTDGamepadButton] into a [gilrs] [Button].
+    pub(crate) fn into_winit(self) -> Button {
+        match self {
+            Self::NSTD_GAMEPAD_BUTTON_NORTH => Button::North,
+            Self::NSTD_GAMEPAD_BUTTON_SOUTH => Button::South,
+            Self::NSTD_GAMEPAD_BUTTON_EAST => Button::East,
+            Self::NSTD_GAMEPAD_BUTTON_WEST => Button::West,
+            Self::NSTD_GAMEPAD_BUTTON_RIGHT_BUMPER => Button::RightTrigger,
+            Self::NSTD_GAMEPAD_BUTTON_LEFT_BUMPER => Button::LeftTrigger,
+            Self::NSTD_GAMEPAD_BUTTON_RIGHT_TRIGGER => Button::RightTrigger2,
+            Self::NSTD_GAMEPAD_BUTTON_LEFT_TRIGGER => Button::LeftTrigger2,
+            Self::NSTD_GAMEPAD_BUTTON_START => Button::Start,
+            Self::NSTD_GAMEPAD_BUTTON_SELECT => Button::Select,
+            Self::NSTD_GAMEPAD_BUTTON_RIGHT_THUMB => Button::RightThumb,
+            Self::NSTD_GAMEPAD_BUTTON_LEFT_THUMB => Button::LeftThumb,
+            Self::NSTD_GAMEPAD_BUTTON_DPAD_UP => Button::DPadUp,
+            Self::NSTD_GAMEPAD_BUTTON_DPAD_DOWN => Button::DPadDown,
+            Self::NSTD_GAMEPAD_BUTTON_DPAD_LEFT => Button::DPadLeft,
+            Self::NSTD_GAMEPAD_BUTTON_DPAD_RIGHT => Button::DPadRight,
+            Self::NSTD_GAMEPAD_BUTTON_UNKNOWN => Button::Unknown,
+        }
+    }
 }
 
 /// Represents a gamepad axis.
@@ -505,6 +528,66 @@ impl NSTDGamepadAxis {
             Axis::DPadY => Self::NSTD_GAMEPAD_AXIS_DPAD_Y,
             _ => Self::NSTD_GAMEPAD_AXIS_UNKNOWN,
         }
+    }
+
+    /// Converts an [NSTDGamepadAxis] into a [gilrs] [Axis].
+    pub(crate) fn into_winit(self) -> Axis {
+        match self {
+            Self::NSTD_GAMEPAD_AXIS_LEFT_X => Axis::LeftStickX,
+            Self::NSTD_GAMEPAD_AXIS_LEFT_Y => Axis::LeftStickY,
+            Self::NSTD_GAMEPAD_AXIS_LEFT_Z => Axis::LeftZ,
+            Self::NSTD_GAMEPAD_AXIS_RIGHT_X => Axis::RightStickX,
+            Self::NSTD_GAMEPAD_AXIS_RIGHT_Y => Axis::RightStickY,
+            Self::NSTD_GAMEPAD_AXIS_RIGHT_Z => Axis::RightZ,
+            Self::NSTD_GAMEPAD_AXIS_DPAD_X => Axis::DPadX,
+            Self::NSTD_GAMEPAD_AXIS_DPAD_Y => Axis::DPadY,
+            Self::NSTD_GAMEPAD_AXIS_UNKNOWN => Axis::Unknown,
+        }
+    }
+}
+
+/// A handle to the application event loop.
+pub type NSTDAppHandle<'a> = &'a EventLoopWindowTarget<()>;
+
+/// Application data passed to each event.
+#[nstdapi]
+pub struct NSTDAppData<'a> {
+    /// A handle to the `nstd` app.
+    pub handle: NSTDAppHandle<'a>,
+    /// Custom user data.
+    pub data: &'a mut NSTDOptionalHeapPtr<'static>,
+    /// The gamepad input manager.
+    pub(crate) gil: &'a mut Gilrs,
+    /// The application's control flow.
+    control_flow: &'a mut ControlFlow,
+}
+impl<'a> NSTDAppData<'a> {
+    /// Creates a new instance of [NSTDAppData].
+    #[inline]
+    pub(crate) fn new(
+        handle: NSTDAppHandle<'a>,
+        control_flow: &'a mut ControlFlow,
+        data: &'a mut NSTDOptionalHeapPtr<'static>,
+        gil: &'a mut Gilrs,
+    ) -> Self {
+        Self {
+            handle,
+            control_flow,
+            data,
+            gil,
+        }
+    }
+
+    /// Returns a reference to the control flow cell.
+    #[inline]
+    pub(crate) fn control_flow(&mut self) -> &mut ControlFlow {
+        self.control_flow
+    }
+
+    /// Returns the next gamepad event if there is one.
+    #[inline]
+    pub(crate) fn next_gamepad_event(&mut self) -> Option<GamepadEvent> {
+        self.gil.next_event()
     }
 }
 

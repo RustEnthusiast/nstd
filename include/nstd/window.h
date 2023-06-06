@@ -1,6 +1,5 @@
 #ifndef NSTD_WINDOW_H
 #define NSTD_WINDOW_H
-#include "app/data.h"
 #include "app/events.h"
 #include "core/def.h"
 #include "core/optional.h"

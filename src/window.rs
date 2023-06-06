@@ -1,6 +1,6 @@
 //! An `nstd` application window.
 use crate::{
-    app::{data::NSTDAppHandle, events::NSTDWindowID},
+    app::events::{NSTDAppHandle, NSTDWindowID},
     core::{
         def::NSTDErrorCode,
         optional::{gen_optional, NSTDOptional},
