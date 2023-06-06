@@ -1,14 +1,15 @@
 //! An application event loop.
-pub mod data;
 pub mod display;
 pub mod events;
+pub mod gamepad;
 use self::{
-    data::{NSTDAppData, NSTDAppHandle},
-    display::{NSTDDisplay, NSTDDisplayHandle},
+    display::NSTDDisplay,
     events::{
-        NSTDAppEvents, NSTDDeviceEventFilter, NSTDDeviceID, NSTDGamepadAxis, NSTDGamepadButton,
-        NSTDGamepadID, NSTDKey, NSTDMouseInput, NSTDScrollDelta, NSTDTouchState, NSTDWindowID,
+        NSTDAppData, NSTDAppEvents, NSTDAppHandle, NSTDDeviceEventFilter, NSTDDeviceID,
+        NSTDGamepadAxis, NSTDGamepadButton, NSTDGamepadID, NSTDKey, NSTDMouseInput,
+        NSTDScrollDelta, NSTDTouchState, NSTDWindowID,
     },
+    gamepad::NSTDGamepad,
 };
 use crate::{
     core::{
@@ -17,7 +18,8 @@ use crate::{
         str::NSTDStr,
     },
     heap_ptr::NSTDOptionalHeapPtr,
-    NSTDAnyMut, NSTDBool,
+    vec::NSTDVec,
+    NSTDBool,
 };
 use gilrs::{Error::NotImplemented, EventType as GamepadEvent, Gilrs};
 use nstdapi::nstdapi;
@@ -402,31 +404,22 @@ pub unsafe fn nstd_app_run(app: NSTDApp, mut data: NSTDOptionalHeapPtr<'static>)
 #[allow(unused_variables)]
 pub fn nstd_app_free(app: NSTDApp) {}
 
-/// Invokes a callback function for each display detected by an `nstd` app.
+/// Returns a vector of display handles detected by an `nstd` application.
 ///
 /// # Parameters:
 ///
 /// - `NSTDAppHandle app` - A handle to the `nstd` application.
 ///
-/// - `void (*callback)(NSTDDisplayHandle, NSTDAnyMut)` - The callback function.
+/// # Returns
 ///
-/// - `NSTDAnyMut data` - Data to pass to `callback`.
-///
-/// # Safety
-///
-/// The user of this function must guarantee that `callback` is a valid C function pointer.
+/// `NSTDVec displays` - A vector of `NSTDDisplay` handles.
 #[inline]
 #[nstdapi]
-pub unsafe fn nstd_app_displays(
-    app: NSTDAppHandle,
-    callback: Option<unsafe extern "C" fn(NSTDDisplayHandle, NSTDAnyMut)>,
-    data: NSTDAnyMut,
-) {
-    if let Some(callback) = callback {
-        for handle in app.available_monitors() {
-            callback(&handle, data);
-        }
-    }
+pub fn nstd_app_displays(app: NSTDAppHandle) -> NSTDVec {
+    app.available_monitors()
+        .into_iter()
+        .map(|m| Box::new(m))
+        .collect()
 }
 
 /// Returns a handle to the primary display.
@@ -455,6 +448,38 @@ pub fn nstd_app_primary_display(app: NSTDAppHandle) -> Option<NSTDDisplay> {
 #[nstdapi]
 pub fn nstd_app_set_device_event_filter(app: NSTDAppHandle, filter: NSTDDeviceEventFilter) {
     app.set_device_event_filter(filter.into());
+}
+
+/// Returns a handle to a gamepad that matches `id`.
+///
+/// # Parameters:
+///
+/// - `const NSTDAppData *app` - The app.
+///
+/// - `const NSTDGamepadID *id` - The gamepad ID.
+///
+/// # Returns
+///
+/// `NSTDGamepad gamepad` - A handle to the gamepad with ID `id`.
+#[inline]
+#[nstdapi]
+pub fn nstd_app_gamepad<'a>(app: &'a NSTDAppData<'a>, id: &NSTDGamepadID) -> NSTDGamepad<'a> {
+    Box::new(app.gil.gamepad(**id))
+}
+
+/// Returns a vector of all connected gamepad handles detected by `app`.
+///
+/// # Parameters:
+///
+/// - `const NSTDAppData *app` - The app.
+///
+/// # Returns
+///
+/// `NSTDVec gamepads` - A vector of `NSTDGamepad` handles.
+#[inline]
+#[nstdapi]
+pub fn nstd_app_gamepads(app: &NSTDAppData) -> NSTDVec<'static> {
+    app.gil.gamepads().map(|g| Box::new(g.1)).collect()
 }
 
 /// Signals an `NSTDApp`'s event loop to exit.

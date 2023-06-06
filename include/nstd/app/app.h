@@ -4,9 +4,10 @@
 #include "../core/optional.h"
 #include "../heap_ptr.h"
 #include "../nstd.h"
-#include "data.h"
+#include "../vec.h"
 #include "display.h"
 #include "events.h"
+#include "gamepad.h"
 
 /// An application event loop.
 typedef struct {
@@ -74,21 +75,16 @@ NSTDAPI void nstd_app_run(NSTDApp app, NSTDOptionalHeapPtr data);
 /// - `NSTDApp app` - The `nstd` application.
 NSTDAPI void nstd_app_free(NSTDApp app);
 
-/// Invokes a callback function for each display detected by an `nstd` app.
+/// Returns a vector of display handles detected by an `nstd` application.
 ///
 /// # Parameters:
 ///
 /// - `NSTDAppHandle app` - A handle to the `nstd` application.
 ///
-/// - `void (*callback)(NSTDDisplayHandle, NSTDAnyMut)` - The callback function.
+/// # Returns
 ///
-/// - `NSTDAnyMut data` - Data to pass to `callback`.
-///
-/// # Safety
-///
-/// The user of this function must guarantee that `callback` is a valid C function pointer.
-NSTDAPI void nstd_app_displays(NSTDAppHandle app, void (*callback)(NSTDDisplayHandle, NSTDAnyMut),
-NSTDAnyMut data);
+/// `NSTDVec displays` - A vector of `NSTDDisplay` handles.
+NSTDAPI NSTDVec nstd_app_displays(NSTDAppHandle app);
 
 /// Returns a handle to the primary display.
 ///
@@ -109,6 +105,30 @@ NSTDAPI NSTDDisplay nstd_app_primary_display(NSTDAppHandle app);
 ///
 /// - `NSTDDeviceEventFilter filter` - The device event filtering mode to use.
 NSTDAPI void nstd_app_set_device_event_filter(NSTDAppHandle app, NSTDDeviceEventFilter filter);
+
+/// Returns a handle to a gamepad that matches `id`.
+///
+/// # Parameters:
+///
+/// - `const NSTDAppData *app` - The app.
+///
+/// - `const NSTDGamepadID *id` - The gamepad ID.
+///
+/// # Returns
+///
+/// `NSTDGamepad gamepad` - A handle to the gamepad with ID `id`.
+NSTDAPI NSTDGamepad nstd_app_gamepad(const NSTDAppData *app, const NSTDGamepadID *id);
+
+/// Returns a vector of all connected gamepad handles detected by `app`.
+///
+/// # Parameters:
+///
+/// - `const NSTDAppData *app` - The app.
+///
+/// # Returns
+///
+/// `NSTDVec gamepads` - A vector of `NSTDGamepad` handles.
+NSTDAPI NSTDVec nstd_app_gamepads(const NSTDAppData *app);
 
 /// Signals an `NSTDApp`'s event loop to exit.
 ///
