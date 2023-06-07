@@ -11,11 +11,6 @@ use crate::{
 use nstdapi::nstdapi;
 
 /// An immutable view into a sequence of values in memory.
-///
-/// # Safety
-///
-/// The user of this structure must ensure that the pointed-to data remains valid and unmodified
-/// while an instance of this structure is in use.
 #[nstdapi]
 #[derive(Clone, Copy, Debug)]
 pub struct NSTDSlice {
@@ -328,12 +323,6 @@ pub const fn nstd_core_slice_last(slice: &NSTDSlice) -> NSTDAny {
 }
 
 /// A view into a sequence of values in memory.
-///
-/// # Safety
-///
-/// The user of this structure must ensure that the pointed-to data remains valid, unmodified, and
-/// unreferenced in any other code while an instance of this structure is in use, else data races
-/// may occur.
 #[nstdapi]
 #[derive(Debug)]
 pub struct NSTDSliceMut {
