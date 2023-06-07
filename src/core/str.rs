@@ -61,7 +61,7 @@ macro_rules! gen_to_primitive {
 
 /// An immutable unowned view into a UTF-8 encoded byte string.
 #[nstdapi]
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy)]
 pub struct NSTDStr {
     /// A raw pointer to the string's data.
     ptr: *const NSTDByte,
@@ -822,7 +822,6 @@ gen_to_primitive!(
 
 /// An unowned view into a UTF-8 encoded byte string.
 #[nstdapi]
-#[derive(Debug)]
 pub struct NSTDStrMut {
     /// A raw pointer to the string's data.
     ptr: *mut NSTDByte,

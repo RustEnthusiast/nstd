@@ -12,7 +12,7 @@ use nstdapi::nstdapi;
 
 /// A sized immutable pointer to some arbitrary type.
 #[nstdapi]
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy)]
 pub struct NSTDPtr {
     /// A raw pointer to the data.
     raw: NSTDAny,
@@ -123,7 +123,6 @@ pub const fn nstd_core_ptr_get(ptr: &NSTDPtr) -> NSTDAny {
 
 /// A sized pointer to some arbitrary type.
 #[nstdapi]
-#[derive(Debug)]
 pub struct NSTDPtrMut {
     /// A raw pointer to the data.
     raw: NSTDAnyMut,

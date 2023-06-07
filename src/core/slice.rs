@@ -12,7 +12,7 @@ use nstdapi::nstdapi;
 
 /// An immutable view into a sequence of values in memory.
 #[nstdapi]
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy)]
 pub struct NSTDSlice {
     /// A pointer to the first element in the slice.
     ptr: NSTDAny,
@@ -324,7 +324,6 @@ pub const fn nstd_core_slice_last(slice: &NSTDSlice) -> NSTDAny {
 
 /// A view into a sequence of values in memory.
 #[nstdapi]
-#[derive(Debug)]
 pub struct NSTDSliceMut {
     /// A pointer to the first element in the slice.
     ptr: NSTDAnyMut,

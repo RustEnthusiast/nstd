@@ -28,7 +28,7 @@ pub type NSTDThreadID = Box<ThreadId>;
 ///
 /// This type is passed to the `nstd_thread_spawn_with_desc` function.
 #[nstdapi]
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy)]
 pub struct NSTDThreadDescriptor {
     /// The name of the thread.
     ///

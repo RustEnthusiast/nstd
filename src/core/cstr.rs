@@ -14,7 +14,7 @@ use nstdapi::nstdapi;
 
 /// An immutable slice of a C string.
 #[nstdapi]
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy)]
 pub struct NSTDCStr {
     /// A pointer to the first character in the C string.
     ptr: *const NSTDChar,
@@ -443,7 +443,6 @@ pub const fn nstd_core_cstr_last(cstr: &NSTDCStr) -> *const NSTDChar {
 
 /// A mutable slice of a C string.
 #[nstdapi]
-#[derive(Debug)]
 pub struct NSTDCStrMut {
     /// A pointer to the first character in the C string.
     ptr: *mut NSTDChar,

@@ -13,7 +13,7 @@ use nstdapi::nstdapi;
 
 /// Describes an error returned from allocation functions.
 #[repr(C)]
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 #[allow(non_camel_case_types)]
 pub enum NSTDAllocError {
     /// No error occurred.
