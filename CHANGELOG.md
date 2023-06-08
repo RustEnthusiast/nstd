@@ -1,4 +1,4 @@
-# TBD
+# 0.8.0
 ## Added
 ### `nstd.alloc`
 - Added `NSTDAllocator` & `NSTD_ALLOCATOR`.
