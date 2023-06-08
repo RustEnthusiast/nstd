@@ -46,7 +46,7 @@ impl Drop for Abort {
 /// This operation will always panic.
 #[inline]
 #[nstdapi]
-pub fn nstd_core_abort() -> ! {
+pub const fn nstd_core_abort() -> ! {
     #[allow(unused_variables)]
     let abort = Abort;
     panic!();
