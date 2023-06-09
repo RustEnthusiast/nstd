@@ -618,17 +618,14 @@ pub unsafe fn nstd_core_cstr_mut_from_raw_with_null(raw: *mut NSTDChar) -> NSTDC
 /// # Example
 ///
 /// ```
-/// use nstd_sys::{
-///     alloc::NSTD_ALLOCATOR,
-///     core::cstr::{nstd_core_cstr_len, nstd_core_cstr_mut_as_const, nstd_core_cstr_mut_new},
-///     cstring::{nstd_cstring_from_cstr, nstd_cstring_len},
+/// use nstd_sys::core::cstr::{
+///     nstd_core_cstr_len, nstd_core_cstr_mut_as_const, nstd_core_cstr_mut_new,
 /// };
 ///
 /// let mut str = String::from("Faded than a ho");
-/// let cstr = nstd_core_cstr_mut_new(str.as_mut_ptr().cast(), str.len()).unwrap();
-/// let cstr = nstd_core_cstr_mut_as_const(&cstr);
-/// let cstring = unsafe { nstd_cstring_from_cstr(&NSTD_ALLOCATOR, &cstr).unwrap() };
-/// assert!(nstd_cstring_len(&cstring) == nstd_core_cstr_len(&cstr));
+/// let cstr_mut = nstd_core_cstr_mut_new(str.as_mut_ptr().cast(), str.len()).unwrap();
+/// let cstr = nstd_core_cstr_mut_as_const(&cstr_mut);
+/// assert!(nstd_core_cstr_len(&cstr) == str.len());
 /// ```
 #[inline]
 #[nstdapi]
