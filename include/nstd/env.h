@@ -8,8 +8,6 @@
 
 /// Returns a complete path to the process's current working directory.
 ///
-/// Any non-Unicode sequences are replaced with the Unicode replacement character.
-///
 /// # Returns
 ///
 /// `NSTDIOStringResult working_dir` - A path to the current working directory on success, or the
@@ -17,8 +15,6 @@
 NSTDAPI NSTDIOStringResult nstd_env_current_dir(void);
 
 /// Returns a complete path to the process executable.
-///
-/// Any non-Unicode sequences are replaced with the Unicode replacement character.
 ///
 /// # Note
 ///
@@ -33,12 +29,10 @@ NSTDAPI NSTDIOStringResult nstd_env_current_exe(void);
 
 /// Returns a complete path to a temporary directory.
 ///
-/// Any non-Unicode sequences are replaced with the Unicode replacement character.
-///
 /// # Returns
 ///
-/// `NSTDString temp` - A path to the temporary directory.
-NSTDAPI NSTDString nstd_env_temp_dir(void);
+/// `NSTDOptionalString temp` - A path to the temporary directory.
+NSTDAPI NSTDOptionalString nstd_env_temp_dir(void);
 
 /// Sets the current working directory for the process.
 ///
