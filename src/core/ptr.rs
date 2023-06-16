@@ -1,12 +1,11 @@
 //! A sized pointer to some arbitrary type.
 pub mod raw;
-use super::NSTD_INT_MAX;
 use crate::{
     core::{
         mem::nstd_core_mem_copy,
         optional::{gen_optional, NSTDOptional},
     },
-    NSTDAny, NSTDAnyMut, NSTDUInt,
+    NSTDAny, NSTDAnyMut, NSTDUInt, NSTD_INT_MAX,
 };
 use nstdapi::nstdapi;
 

@@ -1,12 +1,11 @@
 //! A view into a sequence of values in memory.
-use super::NSTD_INT_MAX;
 use crate::{
     core::{
         mem::nstd_core_mem_copy,
         optional::{gen_optional, NSTDOptional},
         ptr::raw::{nstd_core_ptr_raw_dangling, nstd_core_ptr_raw_dangling_mut},
     },
-    NSTDAny, NSTDAnyMut, NSTDUInt, NSTD_NULL,
+    NSTDAny, NSTDAnyMut, NSTDUInt, NSTD_INT_MAX, NSTD_NULL,
 };
 use nstdapi::nstdapi;
 

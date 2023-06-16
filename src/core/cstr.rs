@@ -1,14 +1,13 @@
 //! Unowned C string slices.
 pub mod raw;
 use self::raw::{nstd_core_cstr_raw_len, nstd_core_cstr_raw_len_with_null};
-use super::NSTD_INT_MAX;
 use crate::{
     core::{
         mem::nstd_core_mem_search,
         optional::{gen_optional, NSTDOptional},
         slice::{nstd_core_slice_new_unchecked, NSTDSlice},
     },
-    NSTDBool, NSTDChar, NSTDUInt,
+    NSTDBool, NSTDChar, NSTDUInt, NSTD_INT_MAX,
 };
 use nstdapi::nstdapi;
 

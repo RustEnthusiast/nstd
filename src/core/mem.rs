@@ -69,7 +69,7 @@ pub unsafe fn nstd_core_mem_compare(
         ))] {
             libc::memcmp(buf1 as _, buf2 as _, num) == 0
         } else {
-            use crate::{core::NSTD_INT_MAX, NSTD_TRUE};
+            use crate::{NSTD_INT_MAX, NSTD_TRUE};
             // If the two pointers point to the same buffer, or `num` is 0, return true.
             if buf1 == buf2 || num == 0 {
                 return NSTD_TRUE;
@@ -141,7 +141,7 @@ pub unsafe fn nstd_core_mem_search(
         ))] {
             libc::memchr(buf as _, delim as _, size) as _
         } else {
-            use crate::core::NSTD_INT_MAX;
+            use crate::NSTD_INT_MAX;
             // Check if `size` is greater than `NSTDInt`'s max value.
             assert!(size <= NSTD_INT_MAX as _);
             // Search the buffer for `delim`.
@@ -234,7 +234,7 @@ pub unsafe fn nstd_core_mem_zero(buf: *mut NSTDByte, size: NSTDUInt) {
         ))] {
             libc::memset(buf as _, 0, size);
         } else {
-            use crate::core::NSTD_INT_MAX;
+            use crate::NSTD_INT_MAX;
             assert!(size <= NSTD_INT_MAX as _);
             cfg_if! {
                 if #[cfg(all(
@@ -347,7 +347,7 @@ pub unsafe fn nstd_core_mem_fill(buf: *mut NSTDByte, size: NSTDUInt, fill: NSTDB
         ))] {
             libc::memset(buf as _, fill as _, size);
         } else {
-            use crate::core::NSTD_INT_MAX;
+            use crate::NSTD_INT_MAX;
             assert!(size <= NSTD_INT_MAX as _);
             cfg_if! {
                 if #[cfg(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64")))] {

@@ -1,8 +1,8 @@
 //! Process heap management for Windows.
 use crate::{
-    core::{result::NSTDResult, NSTD_INT_MAX},
+    core::result::NSTDResult,
     os::windows::{alloc::NSTDWindowsAllocError, NSTDWindowsHandle},
-    NSTDAny, NSTDAnyMut, NSTDUInt, NSTD_NULL,
+    NSTDAny, NSTDAnyMut, NSTDUInt, NSTD_INT_MAX, NSTD_NULL,
 };
 use nstdapi::nstdapi;
 use windows_sys::Win32::System::Memory::{

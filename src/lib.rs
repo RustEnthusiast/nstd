@@ -62,6 +62,9 @@ pub mod timed_mutex;
 pub mod vec;
 use ::core::ffi::{c_char, c_void};
 
+/// [NSTDInt]'s maximum value.
+pub(crate) const NSTD_INT_MAX: NSTDInt = NSTDInt::MAX;
+
 /// A null pointer value constant.
 pub const NSTD_NULL: NSTDAnyMut = ::core::ptr::null_mut();
 

@@ -1,5 +1,4 @@
 //! An unowned view into a UTF-8 encoded byte string.
-use super::NSTD_INT_MAX;
 use crate::{
     core::{
         cstr::{
@@ -23,7 +22,7 @@ use crate::{
         },
         unichar::NSTDOptionalUnichar,
     },
-    NSTDChar, NSTDUInt,
+    NSTDChar, NSTDUInt, NSTD_INT_MAX,
 };
 use nstdapi::nstdapi;
 
