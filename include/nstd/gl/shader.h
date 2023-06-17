@@ -151,6 +151,24 @@ typedef struct {
     const NSTDSlice *attributes;
 } NSTDGLVertexBufferLayout;
 
+/// Describes which polygons are considered front-facing by a shader.
+typedef enum {
+    /// Polygons with vertices in counter clockwise order are considered the front face.
+    NSTD_GL_FRONT_FACE_CCW,
+    /// Polygons with vertices in clockwise order are considered the front face.
+    NSTD_GL_FRONT_FACE_CW
+} NSTDGLFrontFace;
+
+/// Describes which polygons should be discarded by a shader.
+typedef enum {
+    /// No polygons shall be discarded.
+    NSTD_GL_CULL_NONE,
+    /// Front-facing polygons should be discarded.
+    NSTD_GL_CULL_FRONT,
+    /// Back-facing polygons should be discarded.
+    NSTD_GL_CULL_BACK
+} NSTDGLCull;
+
 /// Describes the creation of a GPU shader program.
 typedef struct {
     /// The vertex shader module.
@@ -165,6 +183,10 @@ typedef struct {
     ///
     /// A slice of [NSTDGLBindGroup].
     const NSTDSlice *bind_groups;
+    /// Describes which polygons are considered front-facing by the shader.
+    NSTDGLFrontFace front_face;
+    /// Describes which polygons are discarded by the shader.
+    NSTDGLCull cull_mode;
 } NSTDGLShaderDescriptor;
 
 /// A GPU shader program.

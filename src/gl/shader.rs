@@ -266,6 +266,50 @@ pub struct NSTDGLVertexBufferLayout<'a> {
     pub attributes: &'a NSTDSlice,
 }
 
+/// Describes which polygons are considered front-facing by a shader.
+#[nstdapi]
+#[derive(Clone, Copy, PartialEq, Eq)]
+#[allow(non_camel_case_types)]
+pub enum NSTDGLFrontFace {
+    /// Polygons with vertices in counter clockwise order are considered the front face.
+    NSTD_GL_FRONT_FACE_CCW,
+    /// Polygons with vertices in clockwise order are considered the front face.
+    NSTD_GL_FRONT_FACE_CW,
+}
+impl From<NSTDGLFrontFace> for FrontFace {
+    /// Converts an [NSTDGLFrontFace] into a [FrontFace].
+    #[inline]
+    fn from(value: NSTDGLFrontFace) -> Self {
+        match value {
+            NSTDGLFrontFace::NSTD_GL_FRONT_FACE_CCW => Self::Ccw,
+            NSTDGLFrontFace::NSTD_GL_FRONT_FACE_CW => Self::Cw,
+        }
+    }
+}
+
+/// Describes which polygons should be discarded by a shader.
+#[nstdapi]
+#[derive(Clone, Copy, PartialEq, Eq)]
+#[allow(non_camel_case_types)]
+pub enum NSTDGLCull {
+    /// No polygons shall be discarded.
+    NSTD_GL_CULL_NONE,
+    /// Front-facing polygons should be discarded.
+    NSTD_GL_CULL_FRONT,
+    /// Back-facing polygons should be discarded.
+    NSTD_GL_CULL_BACK,
+}
+impl From<NSTDGLCull> for Option<Face> {
+    /// Converts an [NSTDGLCull] into an optional [Face].
+    fn from(value: NSTDGLCull) -> Self {
+        match value {
+            NSTDGLCull::NSTD_GL_CULL_NONE => None,
+            NSTDGLCull::NSTD_GL_CULL_FRONT => Some(Face::Front),
+            NSTDGLCull::NSTD_GL_CULL_BACK => Some(Face::Back),
+        }
+    }
+}
+
 /// Describes the creation of a GPU shader program.
 #[nstdapi]
 #[derive(Clone, Copy)]
@@ -282,6 +326,10 @@ pub struct NSTDGLShaderDescriptor<'a> {
     ///
     /// A slice of [NSTDGLBindGroup].
     pub bind_groups: &'a NSTDSlice,
+    /// Describes which polygons are considered front-facing by the shader.
+    pub front_face: NSTDGLFrontFace,
+    /// Describes which polygons are discarded by the shader.
+    pub cull_mode: NSTDGLCull,
 }
 
 /// A GPU shader program.
@@ -418,8 +466,8 @@ pub unsafe fn nstd_gl_shader_new(
         }),
         primitive: PrimitiveState {
             topology: PrimitiveTopology::TriangleList,
-            front_face: FrontFace::Ccw,
-            cull_mode: Some(Face::Back),
+            front_face: desc.front_face.into(),
+            cull_mode: desc.cull_mode.into(),
             polygon_mode: PolygonMode::Fill,
             strip_index_format: None,
             unclipped_depth: false,
