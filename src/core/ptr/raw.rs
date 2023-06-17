@@ -16,7 +16,8 @@ const fn is_power_of_two(align: NSTDUInt) -> NSTDBool {
     (align != 0) && ((align & (align - 1)) == 0)
 }
 
-/// Creates a new dangling immutable pointer with valid alignment for any scalar type.
+/// Creates a new dangling pointer to some immutable memory. The pointer is guaranteed to have valid
+/// alignment for any scalar type.
 ///
 /// # Returns
 ///
@@ -35,7 +36,8 @@ pub const fn nstd_core_ptr_raw_dangling() -> NSTDAny {
     MAX_ALIGN as NSTDAny
 }
 
-/// Creates a new dangling mutable pointer with valid alignment for any scalar type.
+/// Creates a new dangling pointer to some mutable memory. The pointer is guaranteed to have valid
+/// alignment for any scalar type.
 ///
 /// # Returns
 ///

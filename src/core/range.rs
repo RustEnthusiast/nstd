@@ -13,7 +13,7 @@ macro_rules! gen_range_struct {
     ) => {
         $(#[$meta])*
         #[nstdapi]
-        #[derive(Clone, Copy, Debug, Default)]
+        #[derive(Clone, Copy)]
         pub struct $name {
             /// The lower bound of the range.
             pub start: $T,

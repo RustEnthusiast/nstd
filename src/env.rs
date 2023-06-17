@@ -1,17 +1,15 @@
 //! Process environment management.
 use crate::{
     alloc::{NSTDAllocError::NSTD_ALLOC_ERROR_NONE, NSTD_ALLOCATOR},
-    core::{result::NSTDResult, str::NSTDStr},
+    core::{optional::NSTDOptional, result::NSTDResult, str::NSTDStr},
     io::{NSTDIOError, NSTDIOStringResult},
-    string::NSTDString,
+    string::{NSTDOptionalString, NSTDString},
     vec::{nstd_vec_new, nstd_vec_push, NSTDVec},
 };
 use nstdapi::nstdapi;
 use std::{env::VarError, ptr::addr_of};
 
 /// Returns a complete path to the process's current working directory.
-///
-/// Any non-Unicode sequences are replaced with the Unicode replacement character.
 ///
 /// # Returns
 ///
@@ -20,14 +18,15 @@ use std::{env::VarError, ptr::addr_of};
 #[nstdapi]
 pub fn nstd_env_current_dir() -> NSTDIOStringResult<'static> {
     match std::env::current_dir() {
-        Ok(dir) => NSTDResult::Ok(NSTDString::from_string(dir.to_string_lossy().into_owned())),
+        Ok(dir) => match dir.to_str() {
+            Some(dir) => NSTDResult::Ok(NSTDString::from_string(dir.into())),
+            _ => NSTDResult::Err(NSTDIOError::NSTD_IO_ERROR_INVALID_DATA),
+        },
         Err(err) => NSTDResult::Err(NSTDIOError::from_err(err.kind())),
     }
 }
 
 /// Returns a complete path to the process executable.
-///
-/// Any non-Unicode sequences are replaced with the Unicode replacement character.
 ///
 /// # Note
 ///
@@ -41,22 +40,25 @@ pub fn nstd_env_current_dir() -> NSTDIOStringResult<'static> {
 #[nstdapi]
 pub fn nstd_env_current_exe() -> NSTDIOStringResult<'static> {
     match std::env::current_exe() {
-        Ok(exe) => NSTDResult::Ok(NSTDString::from_string(exe.to_string_lossy().into_owned())),
+        Ok(exe) => match exe.to_str() {
+            Some(exe) => NSTDResult::Ok(NSTDString::from_string(exe.into())),
+            _ => NSTDResult::Err(NSTDIOError::NSTD_IO_ERROR_INVALID_DATA),
+        },
         Err(err) => NSTDResult::Err(NSTDIOError::from_err(err.kind())),
     }
 }
 
 /// Returns a complete path to a temporary directory.
 ///
-/// Any non-Unicode sequences are replaced with the Unicode replacement character.
-///
 /// # Returns
 ///
-/// `NSTDString temp` - A path to the temporary directory.
-#[inline]
+/// `NSTDOptionalString temp` - A path to the temporary directory.
 #[nstdapi]
-pub fn nstd_env_temp_dir() -> NSTDString<'static> {
-    NSTDString::from_string(std::env::temp_dir().to_string_lossy().into_owned())
+pub fn nstd_env_temp_dir() -> NSTDOptionalString<'static> {
+    match std::env::temp_dir().to_str() {
+        Some(temp) => NSTDOptional::Some(NSTDString::from_string(temp.into())),
+        _ => NSTDOptional::None,
+    }
 }
 
 /// Sets the current working directory for the process.

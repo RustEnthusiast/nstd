@@ -1,4 +1,4 @@
-    xor {len}, {len}
+    xor {len:e}, {len:e}
 2:
     cmp byte ptr [{cstr}], 0
     je 3f

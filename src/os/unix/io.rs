@@ -10,7 +10,7 @@ use nstdapi::nstdapi;
 
 /// An error type for Unix I/O operations.
 #[nstdapi]
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 #[allow(non_camel_case_types)]
 pub enum NSTDUnixIOError {
     /// No error occurred.

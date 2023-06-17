@@ -14,7 +14,6 @@ use crate::{
             nstd_core_slice_mut_len, nstd_core_slice_mut_stride, nstd_core_slice_stride, NSTDSlice,
             NSTDSliceMut,
         },
-        NSTD_INT_MAX,
     },
     string::NSTDString,
     vec::{
@@ -24,6 +23,15 @@ use crate::{
     NSTDUInt,
 };
 use libc::{lseek, SEEK_CUR, SEEK_END, SEEK_SET};
+
+/// `libc`'s `read/write` limit.
+#[cfg(not(target_os = "macos"))]
+const IO_LIMIT: NSTDUInt = libc::ssize_t::MAX as NSTDUInt;
+/// `libc`'s `read/write` limit.
+///
+/// macOS's read implementation rejects any read with a size larger than or equal to `INT_MAX`.
+#[cfg(target_os = "macos")]
+const IO_LIMIT: NSTDUInt = libc::c_int::MAX as NSTDUInt - 1;
 
 /// Writes some `nstd` bytes to a Unix file.
 ///
@@ -37,11 +45,11 @@ use libc::{lseek, SEEK_CUR, SEEK_END, SEEK_SET};
 /// - `bytes` must be valid for reads.
 pub(crate) unsafe fn write(fd: NSTDUnixFileDescriptor, bytes: &NSTDSlice) -> NSTDUnixIOResult {
     // Make sure the slice's element size is 1.
-    if nstd_core_slice_stride(bytes) != 1 {
+    let len = nstd_core_slice_len(bytes);
+    if nstd_core_slice_stride(bytes) != 1 || len > IO_LIMIT {
         return NSTDResult::Err(NSTD_UNIX_IO_ERROR_INVALID_INPUT);
     }
     // Check if `len` is 0.
-    let len = nstd_core_slice_len(bytes);
     if len == 0 {
         return NSTDResult::Ok(0);
     }
@@ -64,11 +72,11 @@ pub(crate) unsafe fn write(fd: NSTDUnixFileDescriptor, bytes: &NSTDSlice) -> NST
 /// - `bytes` must be valid for reads.
 pub(crate) unsafe fn write_all(fd: NSTDUnixFileDescriptor, bytes: &NSTDSlice) -> NSTDUnixIOError {
     // Make sure the slice's element size is 1.
-    if nstd_core_slice_stride(bytes) != 1 {
+    let len = nstd_core_slice_len(bytes);
+    if nstd_core_slice_stride(bytes) != 1 || len > IO_LIMIT {
         return NSTD_UNIX_IO_ERROR_INVALID_INPUT;
     }
     // Write the data.
-    let len = nstd_core_slice_len(bytes);
     let mut written = 0;
     let mut pos = nstd_core_slice_as_ptr(bytes);
     while written < len {
@@ -101,11 +109,11 @@ pub(crate) unsafe fn read(
     buffer: &mut NSTDSliceMut,
 ) -> NSTDUnixIOResult {
     // Make sure the buffer's element size is 1.
-    if nstd_core_slice_mut_stride(buffer) != 1 {
+    let len = nstd_core_slice_mut_len(buffer);
+    if nstd_core_slice_mut_stride(buffer) != 1 || len > IO_LIMIT {
         return NSTDResult::Err(NSTD_UNIX_IO_ERROR_INVALID_INPUT);
     }
     // Read data into `buffer`.
-    let len = nstd_core_slice_mut_len(buffer);
     match libc::read(fd, nstd_core_slice_mut_as_ptr(buffer), len) {
         -1 => NSTDResult::Err(NSTDUnixIOError::last()),
         r => NSTDResult::Ok(r as _),
@@ -152,7 +160,7 @@ pub(crate) unsafe fn read_all(
         },
     };
     // Check `buf_size`.
-    if buf_size > NSTD_INT_MAX as _ {
+    if buf_size > IO_LIMIT {
         return NSTDResult::Err(NSTD_UNIX_IO_ERROR_INVALID_INPUT);
     }
     // Read data into the vector.
@@ -240,11 +248,11 @@ pub(crate) unsafe fn read_exact(
     buffer: &mut NSTDSliceMut,
 ) -> NSTDUnixIOError {
     // Make sure the buffer's element size is 1.
-    if nstd_core_slice_mut_stride(buffer) != 1 {
+    let len = nstd_core_slice_mut_len(buffer);
+    if nstd_core_slice_mut_stride(buffer) != 1 || len > IO_LIMIT {
         return NSTD_UNIX_IO_ERROR_INVALID_INPUT;
     }
     // Attempt to fill `buffer`.
-    let len = nstd_core_slice_mut_len(buffer);
     let mut read = 0;
     let mut pos = nstd_core_slice_mut_as_ptr(buffer);
     while read < len {

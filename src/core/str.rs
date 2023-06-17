@@ -1,5 +1,4 @@
 //! An unowned view into a UTF-8 encoded byte string.
-use super::NSTD_INT_MAX;
 use crate::{
     core::{
         cstr::{
@@ -23,7 +22,7 @@ use crate::{
         },
         unichar::NSTDOptionalUnichar,
     },
-    NSTDChar, NSTDUInt,
+    NSTDChar, NSTDUInt, NSTD_INT_MAX,
 };
 use nstdapi::nstdapi;
 
@@ -60,13 +59,8 @@ macro_rules! gen_to_primitive {
 }
 
 /// An immutable unowned view into a UTF-8 encoded byte string.
-///
-/// # Safety
-///
-/// The user of this structure must ensure that the pointed-to data remains valid UTF-8, and
-/// unmodified while an instance of this structure is in use.
 #[nstdapi]
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy)]
 pub struct NSTDStr {
     /// A raw pointer to the string's data.
     ptr: *const NSTDByte,
@@ -826,14 +820,7 @@ gen_to_primitive!(
 );
 
 /// An unowned view into a UTF-8 encoded byte string.
-///
-/// # Safety
-///
-/// The user of this structure must ensure that the pointed-to data remains valid UTF-8, unmodified,
-/// and unreferenced in any other code while an instance of this structure is in use, else data
-/// races may occur.
 #[nstdapi]
-#[derive(Debug)]
 pub struct NSTDStrMut {
     /// A raw pointer to the string's data.
     ptr: *mut NSTDByte,

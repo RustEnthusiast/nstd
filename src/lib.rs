@@ -65,6 +65,9 @@ pub mod timed_mutex;
 pub mod vec;
 use ::core::ffi::{c_char, c_void};
 
+/// [NSTDInt]'s maximum value.
+pub(crate) const NSTD_INT_MAX: NSTDInt = NSTDInt::MAX;
+
 /// A null pointer value constant.
 pub const NSTD_NULL: NSTDAnyMut = ::core::ptr::null_mut();
 
@@ -110,18 +113,8 @@ pub type NSTDChar16 = NSTDUInt16;
 pub type NSTDChar32 = NSTDUInt32;
 
 /// An opaque pointer to some immutable data.
-///
-/// # Safety
-///
-/// Accessing any data through this pointer type is unsafe. Raw pointers have no way of knowing if
-/// the data being pointed to is or isn't valid.
 pub type NSTDAny = *const c_void;
 /// An opaque pointer to some mutable data.
-///
-/// # Safety
-///
-/// Accessing or mutating any data through this pointer type is unsafe. Raw pointers have no way of
-/// knowing if the data being pointed to is or isn't valid.
 pub type NSTDAnyMut = *mut c_void;
 
 /// A boolean type, can either be `NSTD_TRUE` (1) or `NSTD_FALSE` (0).

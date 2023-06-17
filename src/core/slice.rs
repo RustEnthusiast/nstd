@@ -1,23 +1,17 @@
 //! A view into a sequence of values in memory.
-use super::NSTD_INT_MAX;
 use crate::{
     core::{
         mem::nstd_core_mem_copy,
         optional::{gen_optional, NSTDOptional},
         ptr::raw::{nstd_core_ptr_raw_dangling, nstd_core_ptr_raw_dangling_mut},
     },
-    NSTDAny, NSTDAnyMut, NSTDUInt, NSTD_NULL,
+    NSTDAny, NSTDAnyMut, NSTDUInt, NSTD_INT_MAX, NSTD_NULL,
 };
 use nstdapi::nstdapi;
 
 /// An immutable view into a sequence of values in memory.
-///
-/// # Safety
-///
-/// The user of this structure must ensure that the pointed-to data remains valid and unmodified
-/// while an instance of this structure is in use.
 #[nstdapi]
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy)]
 pub struct NSTDSlice {
     /// A pointer to the first element in the slice.
     ptr: NSTDAny,
@@ -328,14 +322,7 @@ pub const fn nstd_core_slice_last(slice: &NSTDSlice) -> NSTDAny {
 }
 
 /// A view into a sequence of values in memory.
-///
-/// # Safety
-///
-/// The user of this structure must ensure that the pointed-to data remains valid, unmodified, and
-/// unreferenced in any other code while an instance of this structure is in use, else data races
-/// may occur.
 #[nstdapi]
-#[derive(Debug)]
 pub struct NSTDSliceMut {
     /// A pointer to the first element in the slice.
     ptr: NSTDAnyMut,
