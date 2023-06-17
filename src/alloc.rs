@@ -13,7 +13,7 @@ use nstdapi::nstdapi;
 
 /// Describes an error returned from allocation functions.
 #[repr(C)]
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 #[allow(non_camel_case_types)]
 pub enum NSTDAllocError {
     /// No error occurred.
@@ -308,7 +308,7 @@ pub unsafe fn nstd_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
             target_os = "solid_asp3",
             target_os = "vxworks"
         ))] {
-            use crate::core::NSTD_INT_MAX;
+            use crate::NSTD_INT_MAX;
             match size <= NSTD_INT_MAX as _ {
                 true => libc::malloc(size),
                 false => NSTD_NULL,
@@ -364,7 +364,7 @@ pub unsafe fn nstd_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMut {
             target_os = "solid_asp3",
             target_os = "vxworks"
         ))] {
-            use crate::core::NSTD_INT_MAX;
+            use crate::NSTD_INT_MAX;
             match size <= NSTD_INT_MAX as _ {
                 true => libc::calloc(size, 1),
                 false => NSTD_NULL,
@@ -443,7 +443,7 @@ pub unsafe fn nstd_alloc_reallocate(
             target_os = "solid_asp3",
             target_os = "vxworks"
         ))] {
-            use crate::core::NSTD_INT_MAX;
+            use crate::NSTD_INT_MAX;
             if new_size > NSTD_INT_MAX as _ {
                 return NSTDAllocError::NSTD_ALLOC_ERROR_INVALID_LAYOUT;
             }

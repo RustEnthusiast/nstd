@@ -5,11 +5,6 @@
 #include "../slice.h"
 
 /// An immutable slice of a C string.
-///
-/// # Safety
-///
-/// The user of this structure must ensure that the pointed-to data remains valid and unmodified
-/// while an instance of this structure is in use.
 typedef struct {
     /// A pointer to the first character in the C string.
     const NSTDChar *ptr;
@@ -191,12 +186,6 @@ NSTDAPI const NSTDChar *nstd_core_cstr_first(const NSTDCStr *cstr);
 NSTDAPI const NSTDChar *nstd_core_cstr_last(const NSTDCStr *cstr);
 
 /// A mutable slice of a C string.
-///
-/// # Safety
-///
-/// The user of this structure must ensure that the pointed-to data remains valid, unmodified, and
-/// unreferenced in any other code while an instance of this structure is in use, else data races
-/// may occur.
 typedef struct {
     /// A pointer to the first character in the C string.
     NSTDChar *ptr;

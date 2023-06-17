@@ -1,4 +1,9 @@
 # TBD
+## Changed
+### `nstd.env`
+- `nstd_env_temp_dir` now returns `NSTDOptionalString`.
+
+# 0.8.0
 ## Added
 ### `nstd.alloc`
 - Added `NSTDAllocator` & `NSTD_ALLOCATOR`.

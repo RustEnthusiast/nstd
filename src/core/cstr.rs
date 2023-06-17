@@ -1,25 +1,19 @@
 //! Unowned C string slices.
 pub mod raw;
 use self::raw::{nstd_core_cstr_raw_len, nstd_core_cstr_raw_len_with_null};
-use super::NSTD_INT_MAX;
 use crate::{
     core::{
         mem::nstd_core_mem_search,
         optional::{gen_optional, NSTDOptional},
         slice::{nstd_core_slice_new_unchecked, NSTDSlice},
     },
-    NSTDBool, NSTDChar, NSTDUInt,
+    NSTDBool, NSTDChar, NSTDUInt, NSTD_INT_MAX,
 };
 use nstdapi::nstdapi;
 
 /// An immutable slice of a C string.
-///
-/// # Safety
-///
-/// The user of this structure must ensure that the pointed-to data remains valid and unmodified
-/// while an instance of this structure is in use.
 #[nstdapi]
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy)]
 pub struct NSTDCStr {
     /// A pointer to the first character in the C string.
     ptr: *const NSTDChar,
@@ -447,14 +441,7 @@ pub const fn nstd_core_cstr_last(cstr: &NSTDCStr) -> *const NSTDChar {
 }
 
 /// A mutable slice of a C string.
-///
-/// # Safety
-///
-/// The user of this structure must ensure that the pointed-to data remains valid, unmodified, and
-/// unreferenced in any other code while an instance of this structure is in use, else data races
-/// may occur.
 #[nstdapi]
-#[derive(Debug)]
 pub struct NSTDCStrMut {
     /// A pointer to the first character in the C string.
     ptr: *mut NSTDChar,
@@ -630,17 +617,14 @@ pub unsafe fn nstd_core_cstr_mut_from_raw_with_null(raw: *mut NSTDChar) -> NSTDC
 /// # Example
 ///
 /// ```
-/// use nstd_sys::{
-///     alloc::NSTD_ALLOCATOR,
-///     core::cstr::{nstd_core_cstr_len, nstd_core_cstr_mut_as_const, nstd_core_cstr_mut_new},
-///     cstring::{nstd_cstring_from_cstr, nstd_cstring_len},
+/// use nstd_sys::core::cstr::{
+///     nstd_core_cstr_len, nstd_core_cstr_mut_as_const, nstd_core_cstr_mut_new,
 /// };
 ///
 /// let mut str = String::from("Faded than a ho");
-/// let cstr = nstd_core_cstr_mut_new(str.as_mut_ptr().cast(), str.len()).unwrap();
-/// let cstr = nstd_core_cstr_mut_as_const(&cstr);
-/// let cstring = unsafe { nstd_cstring_from_cstr(&NSTD_ALLOCATOR, &cstr).unwrap() };
-/// assert!(nstd_cstring_len(&cstring) == nstd_core_cstr_len(&cstr));
+/// let cstr_mut = nstd_core_cstr_mut_new(str.as_mut_ptr().cast(), str.len()).unwrap();
+/// let cstr = nstd_core_cstr_mut_as_const(&cstr_mut);
+/// assert!(nstd_core_cstr_len(&cstr) == str.len());
 /// ```
 #[inline]
 #[nstdapi]

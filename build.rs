@@ -62,19 +62,6 @@ fn main() {
             }
         }
     }
-    #[cfg(feature = "nstd_os_unix_shared_lib")]
-    {
-        use build_target::Family;
-        if build_target::target_family() == Ok(Family::Unix) {
-            let nstd_os_unix_shared_lib = CModule {
-                name: "nstd_os_unix_shared_lib",
-                src: &["src/os/unix/shared_lib.c"],
-                flags: &["-std=c99", "/std:c11"],
-                ..Default::default()
-            };
-            nstd_os_unix_shared_lib.build();
-        }
-    }
     #[cfg(feature = "nstd_timed_mutex")]
     {
         let nstd_timed_mutex = CModule {

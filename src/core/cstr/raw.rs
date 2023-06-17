@@ -3,7 +3,7 @@ use crate::{NSTDBool, NSTDChar, NSTDUInt};
 use cfg_if::cfg_if;
 use nstdapi::nstdapi;
 
-/// Gets the length of a raw null terminated C string, excluding the null-terminator.
+/// Gets the length of a raw null terminated C string, not counting the C string's null byte.
 ///
 /// # Parameters:
 ///
@@ -11,7 +11,7 @@ use nstdapi::nstdapi;
 ///
 /// # Returns
 ///
-/// `NSTDUInt len` - The length of the C string, excluding the null-terminator.
+/// `NSTDUInt len` - The length of the C string, not counting the C string's null byte.
 ///
 /// # Safety
 ///
@@ -80,7 +80,7 @@ pub unsafe fn nstd_core_cstr_raw_len(mut cstr: *const NSTDChar) -> NSTDUInt {
     }
 }
 
-/// Gets the length of a raw null terminated C string, including the null-terminator.
+/// Gets the length of a raw null terminated C string, counting the C string's null byte.
 ///
 /// # Parameters:
 ///
@@ -88,7 +88,7 @@ pub unsafe fn nstd_core_cstr_raw_len(mut cstr: *const NSTDChar) -> NSTDUInt {
 ///
 /// # Returns
 ///
-/// `NSTDUInt len` - The length of the C string, including the null-terminator.
+/// `NSTDUInt len` - The length of the C string, counting the C string's null byte.
 ///
 /// # Safety
 ///
