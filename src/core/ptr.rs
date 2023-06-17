@@ -1,23 +1,17 @@
 //! A sized pointer to some arbitrary type.
 pub mod raw;
-use super::NSTD_INT_MAX;
 use crate::{
     core::{
         mem::nstd_core_mem_copy,
         optional::{gen_optional, NSTDOptional},
     },
-    NSTDAny, NSTDAnyMut, NSTDUInt,
+    NSTDAny, NSTDAnyMut, NSTDUInt, NSTD_INT_MAX,
 };
 use nstdapi::nstdapi;
 
 /// A sized immutable pointer to some arbitrary type.
-///
-/// # Safety
-///
-/// The user of this structure must ensure that the pointed-to data remains valid and unmodified
-/// while an instance of this structure is in use.
 #[nstdapi]
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy)]
 pub struct NSTDPtr {
     /// A raw pointer to the data.
     raw: NSTDAny,
@@ -127,14 +121,7 @@ pub const fn nstd_core_ptr_get(ptr: &NSTDPtr) -> NSTDAny {
 }
 
 /// A sized pointer to some arbitrary type.
-///
-/// # Safety
-///
-/// The user of this structure must ensure that the pointed-to data remains valid, unmodified, and
-/// unreferenced in any other code while an instance of this structure is in use, else data races
-/// may occur.
 #[nstdapi]
-#[derive(Debug)]
 pub struct NSTDPtrMut {
     /// A raw pointer to the data.
     raw: NSTDAnyMut,

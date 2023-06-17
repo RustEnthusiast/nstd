@@ -72,18 +72,8 @@ typedef NSTDUInt16 NSTDChar16;
 typedef NSTDUInt32 NSTDChar32;
 
 /// An opaque pointer to some immutable data.
-///
-/// # Safety
-///
-/// Accessing any data through this pointer type is unsafe. Raw pointers have no way of knowing if
-/// the data being pointed to is or isn't valid.
 typedef const void *NSTDAny;
 /// An opaque pointer to some mutable data.
-///
-/// # Safety
-///
-/// Accessing or mutating any data through this pointer type is unsafe. Raw pointers have no way of
-/// knowing if the data being pointed to is or isn't valid.
 typedef void *NSTDAnyMut;
 
 /// A boolean type, can either be `NSTD_TRUE` (1) or `NSTD_FALSE` (0).

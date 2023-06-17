@@ -4,11 +4,6 @@
 #include "optional.h"
 
 /// An immutable view into a sequence of values in memory.
-///
-/// # Safety
-///
-/// The user of this structure must ensure that the pointed-to data remains valid and unmodified
-/// while an instance of this structure is in use.
 typedef struct {
     /// A pointer to the first element in the slice.
     NSTDAny ptr;
@@ -140,12 +135,6 @@ NSTDAPI NSTDAny nstd_core_slice_first(const NSTDSlice *slice);
 NSTDAPI NSTDAny nstd_core_slice_last(const NSTDSlice *slice);
 
 /// A view into a sequence of values in memory.
-///
-/// # Safety
-///
-/// The user of this structure must ensure that the pointed-to data remains valid, unmodified, and
-/// unreferenced in any other code while an instance of this structure is in use, else data races
-/// may occur.
 typedef struct {
     /// A pointer to the first element in the slice.
     NSTDAnyMut ptr;
