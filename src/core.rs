@@ -19,11 +19,7 @@ pub mod str;
 pub mod time;
 pub mod unichar;
 use self::str::NSTDStr;
-use super::NSTDInt;
 use nstdapi::nstdapi;
-
-/// [NSTDInt]'s maximum value.
-pub(crate) const NSTD_INT_MAX: NSTDInt = NSTDInt::MAX;
 
 /// Takes advantage of Rust's unwinding behavior by panicking while a thread is already unwinding
 /// from a panic, resulting in program abortion.
@@ -46,7 +42,7 @@ impl Drop for Abort {
 /// This operation will always panic.
 #[inline]
 #[nstdapi]
-pub fn nstd_core_abort() -> ! {
+pub const fn nstd_core_abort() -> ! {
     #[allow(unused_variables)]
     let abort = Abort;
     panic!();

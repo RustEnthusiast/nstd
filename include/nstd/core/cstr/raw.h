@@ -2,7 +2,7 @@
 #define NSTD_CORE_CSTR_RAW_H
 #include "../../nstd.h"
 
-/// Gets the length of a raw null terminated C string, excluding the null-terminator.
+/// Gets the length of a raw null terminated C string, not counting the C string's null byte.
 ///
 /// # Parameters:
 ///
@@ -10,7 +10,7 @@
 ///
 /// # Returns
 ///
-/// `NSTDUInt len` - The length of the C string, excluding the null-terminator.
+/// `NSTDUInt len` - The length of the C string, not counting the C string's null byte.
 ///
 /// # Safety
 ///
@@ -18,7 +18,7 @@
 /// null-terminating byte.
 NSTDAPI NSTDUInt nstd_core_cstr_raw_len(const NSTDChar *cstr);
 
-/// Gets the length of a raw null terminated C string, including the null-terminator.
+/// Gets the length of a raw null terminated C string, counting the C string's null byte.
 ///
 /// # Parameters:
 ///
@@ -26,7 +26,7 @@ NSTDAPI NSTDUInt nstd_core_cstr_raw_len(const NSTDChar *cstr);
 ///
 /// # Returns
 ///
-/// `NSTDUInt len` - The length of the C string, including the null-terminator.
+/// `NSTDUInt len` - The length of the C string, counting the C string's null byte.
 ///
 /// # Safety
 ///

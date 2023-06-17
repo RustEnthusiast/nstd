@@ -1,6 +1,6 @@
 [package]
 name = "nstd-sys"
-version = "0.7.0"
+version = "0.8.0"
 edition = "2021"
 license = "MIT"
 homepage = "https://github.com/RustEnthusiast/nstd"
@@ -56,7 +56,7 @@ nstd_os_unix_io = ["errno", "libc", "nstd_alloc", "nstd_core", "nstd_os", "nstd_
 nstd_os_unix_mutex = [
     "libc", "nstd_core", "nstd_heap_ptr", "nstd_os", "nstd_os_unix_time", "nstd_thread"
 ]
-nstd_os_unix_shared_lib = ["build-target", "cc", "nstd_core", "nstd_os"]
+nstd_os_unix_shared_lib = ["libc", "nstd_core", "nstd_os"]
 nstd_os_unix_time = ["libc", "nstd_core", "nstd_os"]
 nstd_os_windows_alloc = ["nstd_core", "nstd_os", "windows-sys/Win32_System_Memory"]
 nstd_os_windows_shared_lib = ["nstd_core", "nstd_os", "windows-sys/Win32_System_LibraryLoader"]

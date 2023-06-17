@@ -1,6 +1,6 @@
 //! Low level memory allocation for Windows.
 pub mod heap;
-use crate::{core::NSTD_INT_MAX, NSTDAnyMut, NSTDUInt, NSTD_NULL};
+use crate::{NSTDAnyMut, NSTDUInt, NSTD_INT_MAX, NSTD_NULL};
 use nstdapi::nstdapi;
 use windows_sys::Win32::System::Memory::{
     GetProcessHeap, HeapAlloc, HeapFree, HeapReAlloc, HEAP_ZERO_MEMORY,
