@@ -169,6 +169,16 @@ typedef enum {
     NSTD_GL_CULL_BACK
 } NSTDGLCull;
 
+/// Describes how a polygon should be rasterized.
+typedef enum {
+    /// Polygons are filled.
+    NSTD_GL_POLYGON_MODE_FILL,
+    /// Polygons are drawn using lines.
+    NSTD_GL_POLYGON_MODE_LINE,
+    /// Polygons are drawn using points.
+    NSTD_GL_POLYGON_MODE_POINT
+} NSTDGLPolygonMode;
+
 /// Describes the creation of a GPU shader program.
 typedef struct {
     /// The vertex shader module.
@@ -187,6 +197,8 @@ typedef struct {
     NSTDGLFrontFace front_face;
     /// Describes which polygons are discarded by the shader.
     NSTDGLCull cull_mode;
+    /// Describes how a polygon should be rasterized.
+    NSTDGLPolygonMode polygon_mode;
 } NSTDGLShaderDescriptor;
 
 /// A GPU shader program.

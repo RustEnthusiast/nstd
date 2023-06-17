@@ -310,6 +310,30 @@ impl From<NSTDGLCull> for Option<Face> {
     }
 }
 
+/// Describes how a polygon should be rasterized.
+#[nstdapi]
+#[derive(Clone, Copy, PartialEq, Eq)]
+#[allow(non_camel_case_types)]
+pub enum NSTDGLPolygonMode {
+    /// Polygons are filled.
+    NSTD_GL_POLYGON_MODE_FILL,
+    /// Polygons are drawn using lines.
+    NSTD_GL_POLYGON_MODE_LINE,
+    /// Polygons are drawn using points.
+    NSTD_GL_POLYGON_MODE_POINT,
+}
+impl From<NSTDGLPolygonMode> for PolygonMode {
+    /// Converts an [NSTDGLPolygonMode] into a [PolygonMode].
+    #[inline]
+    fn from(value: NSTDGLPolygonMode) -> Self {
+        match value {
+            NSTDGLPolygonMode::NSTD_GL_POLYGON_MODE_FILL => Self::Fill,
+            NSTDGLPolygonMode::NSTD_GL_POLYGON_MODE_LINE => Self::Line,
+            NSTDGLPolygonMode::NSTD_GL_POLYGON_MODE_POINT => Self::Point,
+        }
+    }
+}
+
 /// Describes the creation of a GPU shader program.
 #[nstdapi]
 #[derive(Clone, Copy)]
@@ -330,6 +354,8 @@ pub struct NSTDGLShaderDescriptor<'a> {
     pub front_face: NSTDGLFrontFace,
     /// Describes which polygons are discarded by the shader.
     pub cull_mode: NSTDGLCull,
+    /// Describes how a polygon should be rasterized.
+    pub polygon_mode: NSTDGLPolygonMode,
 }
 
 /// A GPU shader program.
@@ -468,7 +494,7 @@ pub unsafe fn nstd_gl_shader_new(
             topology: PrimitiveTopology::TriangleList,
             front_face: desc.front_face.into(),
             cull_mode: desc.cull_mode.into(),
-            polygon_mode: PolygonMode::Fill,
+            polygon_mode: desc.polygon_mode.into(),
             strip_index_format: None,
             unclipped_depth: false,
             conservative: false,
