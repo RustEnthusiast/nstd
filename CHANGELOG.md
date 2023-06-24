@@ -2,6 +2,8 @@
 ## Changed
 ### `nstd.env`
 - `nstd_env_temp_dir` now returns `NSTDOptionalString`.
+### `nstd.thread`
+- `NSTDThreadResult` is now `NSTDOptionalHeapPtr`.
 
 # 0.8.0
 ## Added

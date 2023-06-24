@@ -1,6 +1,5 @@
 #ifndef NSTD_THREAD_H
 #define NSTD_THREAD_H
-#include "core/def.h"
 #include "core/optional.h"
 #include "core/result.h"
 #include "core/str.h"
@@ -33,7 +32,7 @@ typedef struct {
 } NSTDThreadDescriptor;
 
 /// A thread function's return value.
-typedef NSTDErrorCode NSTDThreadResult;
+typedef NSTDOptionalHeapPtr NSTDThreadResult;
 
 /// Returned from `nstd_thread_join`, contains the thread function's return value on success.
 NSTDOptional(NSTDThreadResult) NSTDOptionalThreadResult;
@@ -127,6 +126,10 @@ NSTDAPI NSTDBool nstd_thread_is_finished(const NSTDThread *thread);
 ///
 /// `NSTDOptionalThreadResult errc` - The thread function's return code, or none if joining the
 /// thread fails.
+///
+/// # Safety
+///
+/// The data type that the thread function returns must be able to be safely sent between threads.
 NSTDAPI NSTDOptionalThreadResult nstd_thread_join(NSTDThread thread);
 
 /// Detaches a thread from it's handle, allowing it to run in the background.

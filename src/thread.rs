@@ -2,7 +2,6 @@
 use crate::{
     core::{
         cstr::nstd_core_cstr_get_null,
-        def::NSTDErrorCode,
         optional::NSTDOptional,
         result::NSTDResult,
         str::{nstd_core_str_as_cstr, NSTDOptionalStr, NSTDStr},
@@ -41,7 +40,7 @@ pub struct NSTDThreadDescriptor {
 }
 
 /// A thread function's return value.
-pub type NSTDThreadResult = NSTDErrorCode;
+pub type NSTDThreadResult = NSTDOptionalHeapPtr<'static>;
 
 /// Returned from `nstd_thread_join`, contains the thread function's return value on success.
 pub type NSTDOptionalThreadResult = NSTDOptional<NSTDThreadResult>;
@@ -78,12 +77,14 @@ pub type NSTDThreadCountResult = NSTDResult<NSTDUInt, NSTDIOError>;
 /// };
 ///
 /// unsafe extern "C" fn thread_fn(data: NSTDOptionalHeapPtr) -> NSTDThreadResult {
-///     0
+///     NSTDOptional::None
 /// }
 ///
 /// if let Some(thread) = unsafe { nstd_thread_spawn(thread_fn, NSTDOptional::None) } {
-///     if let NSTDOptional::Some(errc) = nstd_thread_join(thread) {
-///         assert!(errc == 0);
+///     if let NSTDOptional::Some(ret) = nstd_thread_join(thread) {
+///         if let NSTDOptional::Some(_) = ret {
+///             panic!("this shouldn't be here");
+///         }
 ///     }
 /// }
 /// ```
@@ -198,9 +199,13 @@ pub fn nstd_thread_is_finished(thread: &NSTDThread) -> NSTDBool {
 ///
 /// `NSTDOptionalThreadResult errc` - The thread function's return code, or none if joining the
 /// thread fails.
+///
+/// # Safety
+///
+/// The data type that the thread function returns must be able to be safely sent between threads.
 #[inline]
 #[nstdapi]
-pub fn nstd_thread_join(thread: NSTDThread) -> NSTDOptionalThreadResult {
+pub unsafe fn nstd_thread_join(thread: NSTDThread) -> NSTDOptionalThreadResult {
     match thread.join() {
         Ok(errc) => NSTDOptional::Some(errc),
         _ => NSTDOptional::None,
