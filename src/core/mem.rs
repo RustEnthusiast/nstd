@@ -61,9 +61,7 @@ pub unsafe fn nstd_core_mem_compare(
                 unix,
                 windows,
                 any(target_env = "wasi", target_os = "wasi"),
-                target_os = "fuchsia",
-                target_os = "solid_asp3",
-                target_os = "vxworks"
+                target_os = "solid_asp3"
             ),
             feature = "libc"
         ))] {
@@ -133,9 +131,7 @@ pub unsafe fn nstd_core_mem_search(
                 unix,
                 windows,
                 any(target_env = "wasi", target_os = "wasi"),
-                target_os = "fuchsia",
-                target_os = "solid_asp3",
-                target_os = "vxworks"
+                target_os = "solid_asp3"
             ),
             feature = "libc"
         ))] {
@@ -226,9 +222,7 @@ pub unsafe fn nstd_core_mem_zero(buf: *mut NSTDByte, size: NSTDUInt) {
                 unix,
                 windows,
                 any(target_env = "wasi", target_os = "wasi"),
-                target_os = "fuchsia",
-                target_os = "solid_asp3",
-                target_os = "vxworks"
+                target_os = "solid_asp3"
             ),
             feature = "libc"
         ))] {
@@ -339,9 +333,7 @@ pub unsafe fn nstd_core_mem_fill(buf: *mut NSTDByte, size: NSTDUInt, fill: NSTDB
                 unix,
                 windows,
                 any(target_env = "wasi", target_os = "wasi"),
-                target_os = "fuchsia",
-                target_os = "solid_asp3",
-                target_os = "vxworks"
+                target_os = "solid_asp3"
             ),
             feature = "libc"
         ))] {
