@@ -4,6 +4,10 @@
 - `nstd_env_temp_dir` now returns `NSTDOptionalString`.
 ### `nstd.thread`
 - `NSTDThreadResult` is now `NSTDOptionalHeapPtr`.
+- `nstd_thread_spawn` now takes `const NSTDThreadDescriptor *desc`.
+## Removed
+### `nstd.thread`
+- `nstd_thread_spawn_with_desc`.
 
 # 0.8.0
 ## Added

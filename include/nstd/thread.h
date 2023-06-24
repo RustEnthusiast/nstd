@@ -41,13 +41,15 @@ NSTDOptional(NSTDThreadResult) NSTDOptionalThreadResult;
 /// success.
 NSTDResult(NSTDUInt, NSTDIOError) NSTDThreadCountResult;
 
-/// Spawns a new thread and returns a handle to it.
+/// Spawns a new thread executing the function `thread_fn` and returns a handle to the new thread.
 ///
 /// # Parameters:
 ///
 /// - `NSTDThreadResult (*thread_fn)(NSTDOptionalHeapPtr)` - The thread function.
 ///
 /// - `NSTDOptionalHeapPtr data` - Data to send to the thread.
+///
+/// - `const NSTDThreadDescriptor *desc` - The thread descriptor. This value may be null.
 ///
 /// # Returns
 ///
@@ -57,32 +59,10 @@ NSTDResult(NSTDUInt, NSTDIOError) NSTDThreadCountResult;
 ///
 /// - The caller of this function must guarantee that `thread_fn` is a valid function pointer.
 ///
-/// - The data type that `data` holds must be able to be safely sent between threads.
-NSTDAPI NSTDThread
-nstd_thread_spawn(NSTDThreadResult (*thread_fn)(NSTDOptionalHeapPtr), NSTDOptionalHeapPtr data);
-
-/// Spawns a new thread configured with a descriptor.
-///
-/// # Parameters:
-///
-/// - `NSTDThreadResult (*thread_fn)(NSTDOptionalHeapPtr)` - The thread function.
-///
-/// - `NSTDOptionalHeapPtr data` - Data to send to the thread.
-///
-/// - `const NSTDThreadDescriptor *desc` - The thread descriptor.
-///
-/// # Returns
-///
-/// `NSTDThread thread` - A handle to the new thread, null on error.
-///
-/// # Safety
-///
-/// - The caller of this function must guarantee that `thread_fn` is a valid function pointer.
-///
-/// - This operation can cause undefined behavior if `desc`'s data is invalid.
+/// - This operation can cause undefined behavior if `desc.name`'s data is invalid.
 ///
 /// - The data type that `data` holds must be able to be safely sent between threads.
-NSTDAPI NSTDThread nstd_thread_spawn_with_desc(
+NSTDAPI NSTDThread nstd_thread_spawn(
     NSTDThreadResult (*thread_fn)(NSTDOptionalHeapPtr), NSTDOptionalHeapPtr data,
     const NSTDThreadDescriptor *desc
 );

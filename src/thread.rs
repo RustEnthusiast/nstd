@@ -49,13 +49,15 @@ pub type NSTDOptionalThreadResult = NSTDOptional<NSTDThreadResult>;
 /// success.
 pub type NSTDThreadCountResult = NSTDResult<NSTDUInt, NSTDIOError>;
 
-/// Spawns a new thread and returns a handle to it.
+/// Spawns a new thread executing the function `thread_fn` and returns a handle to the new thread.
 ///
 /// # Parameters:
 ///
 /// - `NSTDThreadResult (*thread_fn)(NSTDOptionalHeapPtr)` - The thread function.
 ///
 /// - `NSTDOptionalHeapPtr data` - Data to send to the thread.
+///
+/// - `const NSTDThreadDescriptor *desc` - The thread descriptor. This value may be null.
 ///
 /// # Returns
 ///
@@ -64,6 +66,8 @@ pub type NSTDThreadCountResult = NSTDResult<NSTDUInt, NSTDIOError>;
 /// # Safety
 ///
 /// - The caller of this function must guarantee that `thread_fn` is a valid function pointer.
+///
+/// - This operation can cause undefined behavior if `desc.name`'s data is invalid.
 ///
 /// - The data type that `data` holds must be able to be safely sent between threads.
 ///
@@ -80,8 +84,8 @@ pub type NSTDThreadCountResult = NSTDResult<NSTDUInt, NSTDIOError>;
 ///     NSTDOptional::None
 /// }
 ///
-/// if let Some(thread) = unsafe { nstd_thread_spawn(thread_fn, NSTDOptional::None) } {
-///     if let NSTDOptional::Some(ret) = nstd_thread_join(thread) {
+/// if let Some(thread) = unsafe { nstd_thread_spawn(thread_fn, NSTDOptional::None, None) } {
+///     if let NSTDOptional::Some(ret) = unsafe { nstd_thread_join(thread) } {
 ///         if let NSTDOptional::Some(_) = ret {
 ///             panic!("this shouldn't be here");
 ///         }
@@ -92,60 +96,30 @@ pub type NSTDThreadCountResult = NSTDResult<NSTDUInt, NSTDIOError>;
 pub unsafe fn nstd_thread_spawn(
     thread_fn: unsafe extern "C" fn(NSTDOptionalHeapPtr) -> NSTDThreadResult,
     data: NSTDOptionalHeapPtr<'static>,
-) -> Option<NSTDThread> {
-    if let Ok(thread) = Builder::new().spawn(move || thread_fn(data)) {
-        return Some(Box::new(thread));
-    }
-    None
-}
-
-/// Spawns a new thread configured with a descriptor.
-///
-/// # Parameters:
-///
-/// - `NSTDThreadResult (*thread_fn)(NSTDOptionalHeapPtr)` - The thread function.
-///
-/// - `NSTDOptionalHeapPtr data` - Data to send to the thread.
-///
-/// - `const NSTDThreadDescriptor *desc` - The thread descriptor.
-///
-/// # Returns
-///
-/// `NSTDThread thread` - A handle to the new thread, null on error.
-///
-/// # Safety
-///
-/// - The caller of this function must guarantee that `thread_fn` is a valid function pointer.
-///
-/// - This operation can cause undefined behavior if `desc`'s data is invalid.
-///
-/// - The data type that `data` holds must be able to be safely sent between threads.
-#[nstdapi]
-pub unsafe fn nstd_thread_spawn_with_desc(
-    thread_fn: unsafe extern "C" fn(NSTDOptionalHeapPtr) -> NSTDThreadResult,
-    data: NSTDOptionalHeapPtr<'static>,
-    desc: &NSTDThreadDescriptor,
+    desc: Option<&NSTDThreadDescriptor>,
 ) -> Option<NSTDThread> {
     // Create the thread builder.
     let mut builder = Builder::new();
-    // Set the thread name.
-    if let NSTDOptional::Some(name) = &desc.name {
-        // Make sure `name` doesn't contain any null bytes.
-        let c_name = nstd_core_str_as_cstr(name);
-        if !nstd_core_cstr_get_null(&c_name).is_null() {
-            return None;
+    if let Some(desc) = desc {
+        // Set the thread name.
+        if let NSTDOptional::Some(name) = &desc.name {
+            // Make sure `name` doesn't contain any null bytes.
+            let c_name = nstd_core_str_as_cstr(name);
+            if !nstd_core_cstr_get_null(&c_name).is_null() {
+                return None;
+            }
+            builder = builder.name(name.as_str().to_string());
         }
-        builder = builder.name(name.as_str().to_string());
-    }
-    // Set the thread stack size.
-    if desc.stack_size != 0 {
-        builder = builder.stack_size(desc.stack_size);
+        // Set the thread stack size.
+        if desc.stack_size != 0 {
+            builder = builder.stack_size(desc.stack_size);
+        }
     }
     // Spawn the new thread.
-    if let Ok(thread) = builder.spawn(move || thread_fn(data)) {
-        return Some(Box::new(thread));
+    match builder.spawn(move || thread_fn(data)) {
+        Ok(thread) => Some(Box::new(thread)),
+        _ => None,
     }
-    None
 }
 
 /// Returns a handle to the calling thread.
