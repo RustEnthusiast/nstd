@@ -6,10 +6,16 @@
 #include "nstd.h"
 
 /// A mutual exclusion primitive useful for protecting shared data.
-typedef NSTDAnyMut NSTDMutex;
+typedef struct {
+    /// The Rust [Mutex].
+    NSTDAnyMut mtx;
+} NSTDMutex;
 
 /// A guard providing access to a mutex's protected data.
-typedef NSTDAnyMut NSTDMutexGuard;
+typedef struct {
+    /// The Rust [MutexGuard].
+    NSTDAnyMut guard;
+} NSTDMutexGuard;
 
 /// A lock result returned from `nstd_mutex_lock` containing the mutex guard whether or not the
 /// data is poisoned.

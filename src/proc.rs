@@ -1,6 +1,10 @@
 //! Calling/Child process management.
 use crate::{
-    core::{slice::NSTDSlice, str::NSTDStr},
+    core::{
+        optional::{gen_optional, NSTDOptional},
+        slice::NSTDSlice,
+        str::NSTDStr,
+    },
     io::NSTDIOError,
     NSTDInt32, NSTDUInt32,
 };
@@ -8,7 +12,12 @@ use nstdapi::nstdapi;
 use std::process::{Child, Command};
 
 /// A handle to a child process.
-pub type NSTDChildProcess = Box<Child>;
+#[nstdapi]
+pub struct NSTDChildProcess {
+    /// A handle to a child process.
+    proc: Box<Child>,
+}
+gen_optional!(NSTDOptionalChildProcess, NSTDChildProcess);
 
 /// Spawns a new child process with the name `program` and returns a handle to it.
 ///
@@ -23,7 +32,8 @@ pub type NSTDChildProcess = Box<Child>;
 ///
 /// # Returns
 ///
-/// `NSTDChildProcess child` - A handle to the new child process, null on error.
+/// `NSTDOptionalChildProcess child` - A handle to the new child process on success, or an
+/// uninitialized "none" variant if spawning the child process fails.
 ///
 /// # Panics
 ///
@@ -42,7 +52,7 @@ pub unsafe fn nstd_proc_spawn(
     program: &NSTDStr,
     args: &NSTDSlice,
     vars: &NSTDSlice,
-) -> Option<NSTDChildProcess> {
+) -> NSTDOptionalChildProcess {
     // Create the process command builder.
     let mut cmd = Command::new(program.as_str());
     // Add the arguments.
@@ -55,7 +65,12 @@ pub unsafe fn nstd_proc_spawn(
         )
     }));
     // Spawn the process.
-    cmd.spawn().ok().map(Box::new)
+    match cmd.spawn() {
+        Ok(proc) => NSTDOptional::Some(NSTDChildProcess {
+            proc: Box::new(proc),
+        }),
+        _ => NSTDOptional::None,
+    }
 }
 
 /// Returns the OS-assigned ID of a child process.
@@ -70,7 +85,7 @@ pub unsafe fn nstd_proc_spawn(
 #[inline]
 #[nstdapi]
 pub fn nstd_proc_child_id(handle: &NSTDChildProcess) -> NSTDUInt32 {
-    handle.id()
+    handle.proc.id()
 }
 
 /// Attempts to kill a child process.
@@ -85,7 +100,7 @@ pub fn nstd_proc_child_id(handle: &NSTDChildProcess) -> NSTDUInt32 {
 #[inline]
 #[nstdapi]
 pub fn nstd_proc_kill(handle: &mut NSTDChildProcess) -> NSTDIOError {
-    if let Err(err) = handle.kill() {
+    if let Err(err) = handle.proc.kill() {
         return NSTDIOError::from_err(err.kind());
     }
     NSTDIOError::NSTD_IO_ERROR_NONE
@@ -102,7 +117,7 @@ pub fn nstd_proc_kill(handle: &mut NSTDChildProcess) -> NSTDIOError {
 /// `NSTDIOError errc` - The operation error code.
 #[nstdapi]
 pub fn nstd_proc_join(handle: &mut NSTDChildProcess) -> NSTDIOError {
-    match handle.wait() {
+    match handle.proc.wait() {
         Ok(status) if status.success() => NSTDIOError::NSTD_IO_ERROR_NONE,
         Err(err) => NSTDIOError::from_err(err.kind()),
         _ => NSTDIOError::NSTD_IO_ERROR_UNKNOWN,

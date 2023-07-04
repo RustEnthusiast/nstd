@@ -22,6 +22,7 @@ pub enum NSTDOptional<T> {
     /// The initialized variant.
     Some(T),
 }
+#[cfg(test)]
 impl<T> NSTDOptional<T> {
     /// Attempts to return the contained `Some` value in an `NSTDOptional`.
     ///

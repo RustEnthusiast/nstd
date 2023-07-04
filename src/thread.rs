@@ -2,7 +2,7 @@
 use crate::{
     core::{
         cstr::nstd_core_cstr_get_null,
-        optional::NSTDOptional,
+        optional::{gen_optional, NSTDOptional},
         result::NSTDResult,
         str::{nstd_core_str_as_cstr, NSTDOptionalStr, NSTDStr},
         time::NSTDDuration,
@@ -15,13 +15,26 @@ use nstdapi::nstdapi;
 use std::thread::{Builder, JoinHandle, Thread, ThreadId};
 
 /// Represents a running thread.
-pub type NSTDThread = Box<JoinHandle<NSTDThreadResult>>;
+#[nstdapi]
+pub struct NSTDThread {
+    /// The thread join handle.
+    thread: Box<JoinHandle<NSTDThreadResult>>,
+}
+gen_optional!(NSTDOptionalThread, NSTDThread);
 
 /// A handle to a running thread.
-pub type NSTDThreadHandle = Box<Thread>;
+#[nstdapi]
+pub struct NSTDThreadHandle {
+    /// A handle to the thread.
+    handle: Box<Thread>,
+}
 
 /// A thread's unique identifier.
-pub type NSTDThreadID = Box<ThreadId>;
+#[nstdapi]
+pub struct NSTDThreadID {
+    /// The thread ID.
+    id: Box<ThreadId>,
+}
 
 /// Describes the creation of a new thread.
 ///
@@ -61,7 +74,8 @@ pub type NSTDThreadCountResult = NSTDResult<NSTDUInt, NSTDIOError>;
 ///
 /// # Returns
 ///
-/// `NSTDThread thread` - A handle to the new thread, null on error.
+/// `NSTDOptionalThread thread` - A handle to the new thread on success, or an uninitialized "none"
+/// variant on error.
 ///
 /// # Safety
 ///
@@ -97,7 +111,7 @@ pub unsafe fn nstd_thread_spawn(
     thread_fn: unsafe extern "C" fn(NSTDOptionalHeapPtr) -> NSTDThreadResult,
     data: NSTDOptionalHeapPtr<'static>,
     desc: Option<&NSTDThreadDescriptor>,
-) -> Option<NSTDThread> {
+) -> NSTDOptionalThread {
     // Create the thread builder.
     let mut builder = Builder::new();
     if let Some(desc) = desc {
@@ -106,7 +120,7 @@ pub unsafe fn nstd_thread_spawn(
             // Make sure `name` doesn't contain any null bytes.
             let c_name = nstd_core_str_as_cstr(name);
             if !nstd_core_cstr_get_null(&c_name).is_null() {
-                return None;
+                return NSTDOptional::None;
             }
             builder = builder.name(name.as_str().to_string());
         }
@@ -117,8 +131,10 @@ pub unsafe fn nstd_thread_spawn(
     }
     // Spawn the new thread.
     match builder.spawn(move || thread_fn(data)) {
-        Ok(thread) => Some(Box::new(thread)),
-        _ => None,
+        Ok(thread) => NSTDOptional::Some(NSTDThread {
+            thread: Box::new(thread),
+        }),
+        _ => NSTDOptional::None,
     }
 }
 
@@ -130,7 +146,9 @@ pub unsafe fn nstd_thread_spawn(
 #[inline]
 #[nstdapi]
 pub fn nstd_thread_current() -> NSTDThreadHandle {
-    Box::new(std::thread::current())
+    NSTDThreadHandle {
+        handle: Box::new(std::thread::current()),
+    }
 }
 
 /// Retrieves a raw handle to a thread.
@@ -145,7 +163,9 @@ pub fn nstd_thread_current() -> NSTDThreadHandle {
 #[inline]
 #[nstdapi]
 pub fn nstd_thread_handle(thread: &NSTDThread) -> NSTDThreadHandle {
-    Box::new(thread.thread().clone())
+    NSTDThreadHandle {
+        handle: Box::new(thread.thread.thread().clone()),
+    }
 }
 
 /// Checks if a thread has finished running.
@@ -160,7 +180,7 @@ pub fn nstd_thread_handle(thread: &NSTDThread) -> NSTDThreadHandle {
 #[inline]
 #[nstdapi]
 pub fn nstd_thread_is_finished(thread: &NSTDThread) -> NSTDBool {
-    thread.is_finished()
+    thread.thread.is_finished()
 }
 
 /// Joins a thread by it's handle.
@@ -180,7 +200,7 @@ pub fn nstd_thread_is_finished(thread: &NSTDThread) -> NSTDBool {
 #[inline]
 #[nstdapi]
 pub unsafe fn nstd_thread_join(thread: NSTDThread) -> NSTDOptionalThreadResult {
-    match thread.join() {
+    match thread.thread.join() {
         Ok(errc) => NSTDOptional::Some(errc),
         _ => NSTDOptional::None,
     }
@@ -208,7 +228,7 @@ pub fn nstd_thread_detach(thread: NSTDThread) {}
 #[inline]
 #[nstdapi]
 pub fn nstd_thread_name(handle: &NSTDThreadHandle) -> NSTDOptionalStr {
-    match handle.name() {
+    match handle.handle.name() {
         Some(name) => NSTDOptional::Some(NSTDStr::from_str(name)),
         _ => NSTDOptional::None,
     }
@@ -226,7 +246,9 @@ pub fn nstd_thread_name(handle: &NSTDThreadHandle) -> NSTDOptionalStr {
 #[inline]
 #[nstdapi]
 pub fn nstd_thread_id(handle: &NSTDThreadHandle) -> NSTDThreadID {
-    Box::new(handle.id())
+    NSTDThreadID {
+        id: Box::new(handle.handle.id()),
+    }
 }
 
 /// Frees an instance of `NSTDThreadHandle`.
@@ -297,7 +319,7 @@ pub fn nstd_thread_is_panicking() -> NSTDBool {
 #[inline]
 #[nstdapi]
 pub fn nstd_thread_id_compare(xid: &NSTDThreadID, yid: &NSTDThreadID) -> NSTDBool {
-    xid == yid
+    xid.id == yid.id
 }
 
 /// Frees an instance of `NSTDThreadID`.

@@ -9,7 +9,11 @@ use std::io::{Stdout, StdoutLock};
 use std::os::unix::io::AsRawFd;
 
 /// A handle to the standard output stream.
-pub type NSTDStdout = Box<Stdout>;
+#[nstdapi]
+pub struct NSTDStdout {
+    /// Rust's [Stdout].
+    out: Box<Stdout>,
+}
 
 /// Constructs a new handle to the standard output stream.
 ///
@@ -19,7 +23,9 @@ pub type NSTDStdout = Box<Stdout>;
 #[inline]
 #[nstdapi]
 pub fn nstd_io_stdout() -> NSTDStdout {
-    NSTDStdout::new(std::io::stdout())
+    NSTDStdout {
+        out: Box::new(std::io::stdout()),
+    }
 }
 
 /// Writes some data to the standard output stream, returning how many bytes were written.
@@ -47,9 +53,9 @@ pub fn nstd_io_stdout() -> NSTDStdout {
 #[nstdapi]
 pub unsafe fn nstd_io_stdout_write(handle: &mut NSTDStdout, bytes: &NSTDSlice) -> NSTDIOResult {
     #[cfg(not(unix))]
-    return crate::io::stdio::write(handle, bytes);
+    return crate::io::stdio::write(&mut handle.out, bytes);
     #[cfg(unix)]
-    return crate::os::unix::io::stdio::write(handle.lock().as_raw_fd(), bytes).into();
+    return crate::os::unix::io::stdio::write(handle.out.lock().as_raw_fd(), bytes).into();
 }
 
 /// Writes an entire buffer to the standard output stream.
@@ -76,9 +82,9 @@ pub unsafe fn nstd_io_stdout_write(handle: &mut NSTDStdout, bytes: &NSTDSlice) -
 #[nstdapi]
 pub unsafe fn nstd_io_stdout_write_all(handle: &mut NSTDStdout, bytes: &NSTDSlice) -> NSTDIOError {
     #[cfg(not(unix))]
-    return crate::io::stdio::write_all(handle, bytes);
+    return crate::io::stdio::write_all(&mut handle.out, bytes);
     #[cfg(unix)]
-    return crate::os::unix::io::stdio::write_all(handle.lock().as_raw_fd(), bytes).into();
+    return crate::os::unix::io::stdio::write_all(handle.out.lock().as_raw_fd(), bytes).into();
 }
 
 /// Flushes the standard output stream.
@@ -93,7 +99,7 @@ pub unsafe fn nstd_io_stdout_write_all(handle: &mut NSTDStdout, bytes: &NSTDSlic
 #[inline]
 #[nstdapi]
 pub fn nstd_io_stdout_flush(handle: &mut NSTDStdout) -> NSTDIOError {
-    crate::io::stdio::flush(handle)
+    crate::io::stdio::flush(&mut handle.out)
 }
 
 /// Frees an instance of `NSTDStdout`.
@@ -107,7 +113,11 @@ pub fn nstd_io_stdout_flush(handle: &mut NSTDStdout) -> NSTDIOError {
 pub fn nstd_io_stdout_free(handle: NSTDStdout) {}
 
 /// A locked handle to the standard output stream.
-pub type NSTDStdoutLock = Box<StdoutLock<'static>>;
+#[nstdapi]
+pub struct NSTDStdoutLock {
+    /// Rust's [StdoutLock].
+    out: Box<StdoutLock<'static>>,
+}
 
 /// Constructs a new locked handle to the standard output stream.
 ///
@@ -117,7 +127,9 @@ pub type NSTDStdoutLock = Box<StdoutLock<'static>>;
 #[inline]
 #[nstdapi]
 pub fn nstd_io_stdout_lock() -> NSTDStdoutLock {
-    NSTDStdoutLock::new(std::io::stdout().lock())
+    NSTDStdoutLock {
+        out: Box::new(std::io::stdout().lock()),
+    }
 }
 
 /// Writes some data to the standard output stream.
@@ -148,9 +160,9 @@ pub unsafe fn nstd_io_stdout_lock_write(
     bytes: &NSTDSlice,
 ) -> NSTDIOResult {
     #[cfg(not(unix))]
-    return crate::io::stdio::write(handle, bytes);
+    return crate::io::stdio::write(&mut handle.out, bytes);
     #[cfg(unix)]
-    return crate::os::unix::io::stdio::write(handle.as_raw_fd(), bytes).into();
+    return crate::os::unix::io::stdio::write(handle.out.as_raw_fd(), bytes).into();
 }
 
 /// Writes an entire buffer to the standard output stream.
@@ -180,9 +192,9 @@ pub unsafe fn nstd_io_stdout_lock_write_all(
     bytes: &NSTDSlice,
 ) -> NSTDIOError {
     #[cfg(not(unix))]
-    return crate::io::stdio::write_all(handle, bytes);
+    return crate::io::stdio::write_all(&mut handle.out, bytes);
     #[cfg(unix)]
-    return crate::os::unix::io::stdio::write_all(handle.as_raw_fd(), bytes).into();
+    return crate::os::unix::io::stdio::write_all(handle.out.as_raw_fd(), bytes).into();
 }
 
 /// Flushes the standard output stream.
@@ -197,7 +209,7 @@ pub unsafe fn nstd_io_stdout_lock_write_all(
 #[inline]
 #[nstdapi]
 pub fn nstd_io_stdout_lock_flush(handle: &mut NSTDStdoutLock) -> NSTDIOError {
-    crate::io::stdio::flush(handle)
+    crate::io::stdio::flush(&mut handle.out)
 }
 
 /// Frees and unlocks an instance of `NSTDStdoutLock`.

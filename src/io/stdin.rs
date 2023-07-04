@@ -16,7 +16,11 @@ use std::io::{Stdin, StdinLock};
 use std::os::unix::io::AsRawFd;
 
 /// A handle to the standard input stream.
-pub type NSTDStdin = Box<Stdin>;
+#[nstdapi]
+pub struct NSTDStdin {
+    /// Rust's [Stdin].
+    r#in: Box<Stdin>,
+}
 
 /// Constructs a new handle to the standard input stream.
 ///
@@ -26,7 +30,9 @@ pub type NSTDStdin = Box<Stdin>;
 #[inline]
 #[nstdapi]
 pub fn nstd_io_stdin() -> NSTDStdin {
-    NSTDStdin::new(std::io::stdin())
+    NSTDStdin {
+        r#in: Box::new(std::io::stdin()),
+    }
 }
 
 /// Reads some data from stdin into a byte slice buffer.
@@ -57,9 +63,9 @@ pub unsafe fn nstd_io_stdin_read(
     buffer: &mut NSTDSliceMut,
 ) -> NSTDIOResult {
     #[cfg(not(unix))]
-    return crate::io::stdio::read(handle, buffer);
+    return crate::io::stdio::read(&mut handle.r#in, buffer);
     #[cfg(unix)]
-    return crate::os::unix::io::stdio::read(handle.lock().as_raw_fd(), buffer).into();
+    return crate::os::unix::io::stdio::read(handle.r#in.lock().as_raw_fd(), buffer).into();
 }
 
 /// Continuously reads data from stdin into a buffer until EOF is reached.
@@ -83,11 +89,11 @@ pub unsafe fn nstd_io_stdin_read(
 #[nstdapi]
 pub fn nstd_io_stdin_read_all(handle: &mut NSTDStdin, buffer: &mut NSTDVec) -> NSTDIOResult {
     #[cfg(not(unix))]
-    return crate::io::stdio::read_all(handle, buffer);
+    return crate::io::stdio::read_all(&mut handle.r#in, buffer);
     #[cfg(unix)]
     // SAFETY: `handle` owns the file descriptor.
     unsafe {
-        crate::os::unix::io::stdio::read_all(handle.lock().as_raw_fd(), buffer).into()
+        crate::os::unix::io::stdio::read_all(handle.r#in.lock().as_raw_fd(), buffer).into()
     }
 }
 
@@ -115,11 +121,11 @@ pub fn nstd_io_stdin_read_to_string(
     buffer: &mut NSTDString,
 ) -> NSTDIOResult {
     #[cfg(not(unix))]
-    return crate::io::stdio::read_to_string(handle, buffer);
+    return crate::io::stdio::read_to_string(&mut handle.r#in, buffer);
     #[cfg(unix)]
     // SAFETY: `handle` owns the file descriptor.
     unsafe {
-        crate::os::unix::io::stdio::read_to_string(handle.lock().as_raw_fd(), buffer).into()
+        crate::os::unix::io::stdio::read_to_string(handle.r#in.lock().as_raw_fd(), buffer).into()
     }
 }
 
@@ -150,9 +156,9 @@ pub unsafe fn nstd_io_stdin_read_exact(
     buffer: &mut NSTDSliceMut,
 ) -> NSTDIOError {
     #[cfg(not(unix))]
-    return crate::io::stdio::read_exact(handle, buffer);
+    return crate::io::stdio::read_exact(&mut handle.r#in, buffer);
     #[cfg(unix)]
-    return crate::os::unix::io::stdio::read_exact(handle.lock().as_raw_fd(), buffer).into();
+    return crate::os::unix::io::stdio::read_exact(handle.r#in.lock().as_raw_fd(), buffer).into();
 }
 
 /// Reads a line from stdin and appends it to `buffer`.
@@ -170,7 +176,7 @@ pub unsafe fn nstd_io_stdin_read_exact(
 #[nstdapi]
 pub fn nstd_io_stdin_read_line(handle: &mut NSTDStdin, buffer: &mut NSTDString) -> NSTDIOResult {
     let mut buf = String::new();
-    match handle.read_line(&mut buf) {
+    match handle.r#in.read_line(&mut buf) {
         Ok(r) => {
             let bytes = NSTDSlice::from_slice(buf.as_bytes());
             // SAFETY: `bytes` refers to `buf`'s data, which is still valid UTF-8 here.
@@ -197,7 +203,11 @@ pub fn nstd_io_stdin_read_line(handle: &mut NSTDStdin, buffer: &mut NSTDString) 
 pub fn nstd_io_stdin_free(handle: NSTDStdin) {}
 
 /// A locked handle to the standard input stream.
-pub type NSTDStdinLock = Box<StdinLock<'static>>;
+#[nstdapi]
+pub struct NSTDStdinLock {
+    /// Rust's [StdinLock].
+    r#in: Box<StdinLock<'static>>,
+}
 
 /// Constructs a new locked handle to the standard input stream.
 ///
@@ -207,7 +217,9 @@ pub type NSTDStdinLock = Box<StdinLock<'static>>;
 #[inline]
 #[nstdapi]
 pub fn nstd_io_stdin_lock() -> NSTDStdinLock {
-    NSTDStdinLock::new(std::io::stdin().lock())
+    NSTDStdinLock {
+        r#in: Box::new(std::io::stdin().lock()),
+    }
 }
 
 /// Reads some data from stdin into a byte slice buffer.
@@ -238,9 +250,9 @@ pub unsafe fn nstd_io_stdin_lock_read(
     buffer: &mut NSTDSliceMut,
 ) -> NSTDIOResult {
     #[cfg(not(unix))]
-    return crate::io::stdio::read(handle, buffer);
+    return crate::io::stdio::read(&mut handle.r#in, buffer);
     #[cfg(unix)]
-    return crate::os::unix::io::stdio::read(handle.as_raw_fd(), buffer).into();
+    return crate::os::unix::io::stdio::read(handle.r#in.as_raw_fd(), buffer).into();
 }
 
 /// Continuously reads data from stdin into a buffer until EOF is reached.
@@ -267,11 +279,11 @@ pub fn nstd_io_stdin_lock_read_all(
     buffer: &mut NSTDVec,
 ) -> NSTDIOResult {
     #[cfg(not(unix))]
-    return crate::io::stdio::read_all(handle, buffer);
+    return crate::io::stdio::read_all(&mut handle.r#in, buffer);
     #[cfg(unix)]
     // SAFETY: `handle` owns the file descriptor.
     unsafe {
-        crate::os::unix::io::stdio::read_all(handle.as_raw_fd(), buffer).into()
+        crate::os::unix::io::stdio::read_all(handle.r#in.as_raw_fd(), buffer).into()
     }
 }
 
@@ -299,11 +311,11 @@ pub fn nstd_io_stdin_lock_read_to_string(
     buffer: &mut NSTDString,
 ) -> NSTDIOResult {
     #[cfg(not(unix))]
-    return crate::io::stdio::read_to_string(handle, buffer);
+    return crate::io::stdio::read_to_string(&mut handle.r#in, buffer);
     #[cfg(unix)]
     // SAFETY: `handle` owns the file descriptor.
     unsafe {
-        crate::os::unix::io::stdio::read_to_string(handle.as_raw_fd(), buffer).into()
+        crate::os::unix::io::stdio::read_to_string(handle.r#in.as_raw_fd(), buffer).into()
     }
 }
 
@@ -334,9 +346,9 @@ pub unsafe fn nstd_io_stdin_lock_read_exact(
     buffer: &mut NSTDSliceMut,
 ) -> NSTDIOError {
     #[cfg(not(unix))]
-    return crate::io::stdio::read_exact(handle, buffer);
+    return crate::io::stdio::read_exact(&mut handle.r#in, buffer);
     #[cfg(unix)]
-    return crate::os::unix::io::stdio::read_exact(handle.as_raw_fd(), buffer).into();
+    return crate::os::unix::io::stdio::read_exact(handle.r#in.as_raw_fd(), buffer).into();
 }
 
 /// Frees and unlocks an instance of `NSTDStdinLock`.

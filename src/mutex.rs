@@ -11,10 +11,18 @@ use nstdapi::nstdapi;
 use std::sync::{Mutex, MutexGuard, TryLockError};
 
 /// A mutual exclusion primitive useful for protecting shared data.
-pub type NSTDMutex<'a> = Box<Mutex<NSTDHeapPtr<'a>>>;
+#[nstdapi]
+pub struct NSTDMutex<'a> {
+    /// The Rust [Mutex].
+    mtx: Box<Mutex<NSTDHeapPtr<'a>>>,
+}
 
 /// A guard providing access to a mutex's protected data.
-pub type NSTDMutexGuard<'m, 'a> = Box<MutexGuard<'m, NSTDHeapPtr<'a>>>;
+#[nstdapi]
+pub struct NSTDMutexGuard<'m, 'a> {
+    /// The Rust [MutexGuard].
+    guard: Box<MutexGuard<'m, NSTDHeapPtr<'a>>>,
+}
 
 /// A lock result returned from `nstd_mutex_lock` containing the mutex guard whether or not the
 /// data is poisoned.
@@ -38,7 +46,9 @@ pub type NSTDOptionalMutexLockResult<'m, 'a> = NSTDOptional<NSTDMutexLockResult<
 #[inline]
 #[nstdapi]
 pub fn nstd_mutex_new(data: NSTDHeapPtr) -> NSTDMutex {
-    Box::new(Mutex::new(data))
+    NSTDMutex {
+        mtx: Box::new(Mutex::new(data)),
+    }
 }
 
 /// Determines whether or not a mutex's data is poisoned.
@@ -56,7 +66,7 @@ pub fn nstd_mutex_new(data: NSTDHeapPtr) -> NSTDMutex {
 #[inline]
 #[nstdapi]
 pub fn nstd_mutex_is_poisoned(mutex: &NSTDMutex) -> NSTDBool {
-    mutex.is_poisoned()
+    mutex.mtx.is_poisoned()
 }
 
 /// Waits for a mutex lock to become acquired, returning a guard wrapping the protected data.
@@ -77,9 +87,13 @@ pub fn nstd_mutex_is_poisoned(mutex: &NSTDMutex) -> NSTDBool {
 /// This operation may panic if the lock is already held by the current thread.
 #[nstdapi]
 pub fn nstd_mutex_lock<'m, 'a>(mutex: &'m NSTDMutex<'a>) -> NSTDMutexLockResult<'m, 'a> {
-    match mutex.lock() {
-        Ok(guard) => NSTDResult::Ok(Box::new(guard)),
-        Err(err) => NSTDResult::Err(Box::new(err.into_inner())),
+    match mutex.mtx.lock() {
+        Ok(guard) => NSTDResult::Ok(NSTDMutexGuard {
+            guard: Box::new(guard),
+        }),
+        Err(err) => NSTDResult::Err(NSTDMutexGuard {
+            guard: Box::new(err.into_inner()),
+        }),
     }
 }
 
@@ -97,13 +111,15 @@ pub fn nstd_mutex_lock<'m, 'a>(mutex: &'m NSTDMutex<'a>) -> NSTDMutexLockResult<
 pub fn nstd_mutex_try_lock<'m, 'a>(
     mutex: &'m NSTDMutex<'a>,
 ) -> NSTDOptionalMutexLockResult<'m, 'a> {
-    match mutex.try_lock() {
-        Ok(guard) => NSTDOptional::Some(NSTDResult::Ok(Box::new(guard))),
+    match mutex.mtx.try_lock() {
+        Ok(guard) => NSTDOptional::Some(NSTDResult::Ok(NSTDMutexGuard {
+            guard: Box::new(guard),
+        })),
         Err(err) => match err {
             TryLockError::WouldBlock => NSTDOptional::None,
-            TryLockError::Poisoned(err) => {
-                NSTDOptional::Some(NSTDResult::Err(Box::new(err.into_inner())))
-            }
+            TryLockError::Poisoned(err) => NSTDOptional::Some(NSTDResult::Err(NSTDMutexGuard {
+                guard: Box::new(err.into_inner()),
+            })),
         },
     }
 }
@@ -120,7 +136,7 @@ pub fn nstd_mutex_try_lock<'m, 'a>(
 #[inline]
 #[nstdapi]
 pub fn nstd_mutex_get(guard: &NSTDMutexGuard) -> NSTDAny {
-    nstd_heap_ptr_get(guard)
+    nstd_heap_ptr_get(&guard.guard)
 }
 
 /// Returns a mutable pointer to a mutex's raw data.
@@ -135,7 +151,7 @@ pub fn nstd_mutex_get(guard: &NSTDMutexGuard) -> NSTDAny {
 #[inline]
 #[nstdapi]
 pub fn nstd_mutex_get_mut(guard: &mut NSTDMutexGuard) -> NSTDAnyMut {
-    nstd_heap_ptr_get_mut(guard)
+    nstd_heap_ptr_get_mut(&mut guard.guard)
 }
 
 /// Consumes a mutex and returns the data it was protecting.
@@ -151,7 +167,7 @@ pub fn nstd_mutex_get_mut(guard: &mut NSTDMutexGuard) -> NSTDAnyMut {
 #[inline]
 #[nstdapi]
 pub fn nstd_mutex_into_inner(mutex: NSTDMutex) -> NSTDOptionalHeapPtr {
-    match mutex.into_inner() {
+    match mutex.mtx.into_inner() {
         Ok(data) => NSTDOptional::Some(data),
         _ => NSTDOptional::None,
     }
@@ -193,7 +209,7 @@ pub fn nstd_mutex_free(mutex: NSTDMutex) {}
 #[inline]
 #[nstdapi]
 pub unsafe fn nstd_mutex_drop(mutex: NSTDMutex, callback: unsafe extern "C" fn(NSTDAnyMut)) {
-    if let Ok(data) = mutex.into_inner() {
+    if let Ok(data) = mutex.mtx.into_inner() {
         nstd_heap_ptr_drop(data, callback);
     }
 }

@@ -7,7 +7,10 @@
 #include "io.h"
 
 /// A handle to the standard input stream.
-typedef NSTDAnyMut NSTDStdin;
+typedef struct {
+    /// Rust's [Stdin].
+    NSTDAnyMut in;
+} NSTDStdin;
 
 /// Constructs a new handle to the standard input stream.
 ///
@@ -121,7 +124,10 @@ NSTDAPI NSTDIOResult nstd_io_stdin_read_line(NSTDStdin *handle, NSTDString *buff
 NSTDAPI void nstd_io_stdin_free(NSTDStdin handle);
 
 /// A locked handle to the standard input stream.
-typedef NSTDAnyMut NSTDStdinLock;
+typedef struct {
+    /// Rust's [StdinLock].
+    NSTDAnyMut in;
+} NSTDStdinLock;
 
 /// Constructs a new locked handle to the standard input stream.
 ///

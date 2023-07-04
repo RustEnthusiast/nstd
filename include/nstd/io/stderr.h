@@ -5,7 +5,10 @@
 #include "io.h"
 
 /// A handle to the standard error stream.
-typedef NSTDAnyMut NSTDStderr;
+typedef struct {
+    /// Rust's [Stderr].
+    NSTDAnyMut err;
+} NSTDStderr;
 
 /// Constructs a new handle to the standard error stream.
 ///
@@ -78,7 +81,10 @@ NSTDAPI NSTDIOError nstd_io_stderr_flush(NSTDStderr *handle);
 NSTDAPI void nstd_io_stderr_free(NSTDStderr handle);
 
 /// A locked handle to the standard error stream.
-typedef NSTDAnyMut NSTDStderrLock;
+typedef struct {
+    /// Rust's [StderrLock].
+    NSTDAnyMut err;
+} NSTDStderrLock;
 
 /// Constructs a new locked handle to the standard error stream.
 ///

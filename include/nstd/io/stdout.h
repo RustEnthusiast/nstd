@@ -5,7 +5,10 @@
 #include "io.h"
 
 /// A handle to the standard output stream.
-typedef NSTDAnyMut NSTDStdout;
+typedef struct {
+    /// Rust's [Stdout].
+    NSTDAnyMut out;
+} NSTDStdout;
 
 /// Constructs a new handle to the standard output stream.
 ///
@@ -78,7 +81,10 @@ NSTDAPI NSTDIOError nstd_io_stdout_flush(NSTDStdout *handle);
 NSTDAPI void nstd_io_stdout_free(NSTDStdout handle);
 
 /// A locked handle to the standard output stream.
-typedef NSTDAnyMut NSTDStdoutLock;
+typedef struct {
+    /// Rust's [StdoutLock].
+    NSTDAnyMut out;
+} NSTDStdoutLock;
 
 /// Constructs a new locked handle to the standard output stream.
 ///

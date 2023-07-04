@@ -9,13 +9,25 @@
 #include "nstd.h"
 
 /// Represents a running thread.
-typedef NSTDAnyMut NSTDThread;
+typedef struct {
+    /// The thread join handle.
+    NSTDAnyMut thread;
+} NSTDThread;
+
+/// Represents an optional value of type `NSTDThread`.
+NSTDOptional(NSTDThread) NSTDOptionalThread;
 
 /// A handle to a running thread.
-typedef NSTDAnyMut NSTDThreadHandle;
+typedef struct {
+    /// A handle to the thread.
+    NSTDAnyMut handle;
+} NSTDThreadHandle;
 
 /// A thread's unique identifier.
-typedef NSTDAnyMut NSTDThreadID;
+typedef struct {
+    /// The thread ID.
+    NSTDAnyMut id;
+} NSTDThreadID;
 
 /// Describes the creation of a new thread.
 ///
@@ -53,7 +65,8 @@ NSTDResult(NSTDUInt, NSTDIOError) NSTDThreadCountResult;
 ///
 /// # Returns
 ///
-/// `NSTDThread thread` - A handle to the new thread, null on error.
+/// `NSTDOptionalThread thread` - A handle to the new thread on success, or an uninitialized "none"
+/// variant on error.
 ///
 /// # Safety
 ///
@@ -62,7 +75,7 @@ NSTDResult(NSTDUInt, NSTDIOError) NSTDThreadCountResult;
 /// - This operation can cause undefined behavior if `desc.name`'s data is invalid.
 ///
 /// - The data type that `data` holds must be able to be safely sent between threads.
-NSTDAPI NSTDThread nstd_thread_spawn(
+NSTDAPI NSTDOptionalThread nstd_thread_spawn(
     NSTDThreadResult (*thread_fn)(NSTDOptionalHeapPtr), NSTDOptionalHeapPtr data,
     const NSTDThreadDescriptor *desc
 );
