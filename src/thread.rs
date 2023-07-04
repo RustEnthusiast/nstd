@@ -98,7 +98,8 @@ pub type NSTDThreadCountResult = NSTDResult<NSTDUInt, NSTDIOError>;
 ///     NSTDOptional::None
 /// }
 ///
-/// if let Some(thread) = unsafe { nstd_thread_spawn(thread_fn, NSTDOptional::None, None) } {
+/// let thread = unsafe { nstd_thread_spawn(thread_fn, NSTDOptional::None, None) };
+/// if let NSTDOptional::Some(thread) = thread {
 ///     if let NSTDOptional::Some(ret) = unsafe { nstd_thread_join(thread) } {
 ///         if let NSTDOptional::Some(_) = ret {
 ///             panic!("this shouldn't be here");

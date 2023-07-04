@@ -17,7 +17,6 @@ pub enum NSTDResult<T, E> {
     /// The success variant.
     Ok(T),
 }
-#[cfg(test)]
 impl<T, E> NSTDResult<T, E> {
     /// Attempts to return the contained `Ok` value in an `NSTDResult`.
     ///
