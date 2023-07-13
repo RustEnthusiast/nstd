@@ -44,7 +44,7 @@ impl CModule {
 fn main() {
     println!("cargo:rerun-if-changed=src/*");
     println!("cargo:rerun-if-changed=include/*");
-    #[cfg(feature = "nstd_timed_mutex")]
+    #[cfg(feature = "timed_mutex")]
     {
         let nstd_timed_mutex = CModule {
             name: "nstd_timed_mutex",

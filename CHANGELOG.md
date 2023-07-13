@@ -1,5 +1,7 @@
 # TBD
 ## Added
+### `nstd`
+- Added an `nstd` feature to enable all modules.
 ### `nstd.io`
 - Added `NSTDOptionalStd[in|out|err][Lock]`.
 ### `nstd.mutex`
@@ -8,6 +10,8 @@
 - Added `NSTDOptionalThreadHandle`.
 - Added `NSTDOptionalThreadID`.
 ## Changed
+### `nstd`
+- Removed the `nstd_` prefix from all features.
 ### `nstd.env`
 - `nstd_env_temp_dir` now returns `NSTDOptionalString`.
 ### `nstd.io`
@@ -23,6 +27,8 @@ respectively.
 - `nstd_thread_[current|handle]` functions now return `NSTDOptionalThreadHandle`.
 - `nstd_thread_id` now returns `NSTDOptionalThreadID`.
 ## Removed
+### `nstd`
+- Removed the `asm` feature.
 ### `nstd.thread`
 - `nstd_thread_spawn_with_desc`.
 
