@@ -16,6 +16,7 @@ use crate::{
 use alloc::alloc::Layout;
 use cfg_if::cfg_if;
 use core::{
+    marker::PhantomData,
     ops::{Deref, DerefMut},
     ptr::addr_of,
 };
@@ -24,14 +25,14 @@ use nstdapi::nstdapi;
 /// An FFI safe [Box] variant for `nstd`.
 #[repr(transparent)]
 #[allow(dead_code)]
-pub(crate) struct CBox<T>(*mut T);
+pub(crate) struct CBox<T>(NSTDAnyMut, PhantomData<T>);
 #[allow(dead_code)]
 impl<T> CBox<T> {
     /// Creates a new heap allocated [CBox] object.
     pub(crate) fn new(value: T) -> Option<Self> {
         let size = core::mem::size_of::<T>();
         match size {
-            0 => Some(Self(nstd_core_ptr_raw_dangling_mut() as _)),
+            0 => Some(Self(nstd_core_ptr_raw_dangling_mut(), Default::default())),
             // SAFETY: `size` is greater than 0.
             _ => match unsafe { nstd_alloc_allocate(size) } {
                 NSTD_NULL => None,
@@ -39,22 +40,22 @@ impl<T> CBox<T> {
                     // SAFETY: `mem` is a non-null pointer to `size` uninitialized bytes.
                     unsafe { nstd_core_mem_copy(mem as _, addr_of!(value) as _, size) };
                     core::mem::forget(value);
-                    Some(Self(mem as _))
+                    Some(Self(mem, Default::default()))
                 }
             },
         }
     }
 
     /// Moves a [CBox] value onto the stack.
-    pub(crate) fn into_inner(self) -> T {
+    pub(crate) fn into_inner(mut self) -> T {
         // SAFETY: `self.0` points to a valid object of type `T`.
-        let value = unsafe { self.0.read() };
+        let value = unsafe { (self.0 as *const T).read() };
         let size = core::mem::size_of::<T>();
         if size > 0 {
             // SAFETY:
             // - `self.0` points to a valid object of type `T`.
             // - `size` is greater than 0.
-            unsafe { nstd_alloc_deallocate(&mut (self.0 as _), size) };
+            unsafe { nstd_alloc_deallocate(&mut self.0, size) };
         }
         core::mem::forget(self);
         value
@@ -68,7 +69,7 @@ impl<T> Deref for CBox<T> {
     #[inline]
     fn deref(&self) -> &Self::Target {
         // SAFETY: `self.0` points to a valid object of type `T`.
-        unsafe { &*self.0 }
+        unsafe { &*(self.0 as *const _) }
     }
 }
 impl<T> DerefMut for CBox<T> {
@@ -76,7 +77,7 @@ impl<T> DerefMut for CBox<T> {
     #[inline]
     fn deref_mut(&mut self) -> &mut Self::Target {
         // SAFETY: `self.0` points to a valid object of type `T`.
-        unsafe { &mut *self.0 }
+        unsafe { &mut *(self.0 as *mut _) }
     }
 }
 impl<T> Drop for CBox<T> {
