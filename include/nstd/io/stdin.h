@@ -1,5 +1,6 @@
 #ifndef NSTD_IO_STDIN_H
 #define NSTD_IO_STDIN_H
+#include "../core/optional.h"
 #include "../core/slice.h"
 #include "../nstd.h"
 #include "../string.h"
@@ -12,12 +13,16 @@ typedef struct {
     NSTDAnyMut in;
 } NSTDStdin;
 
+/// Represents an optional value of type `NSTDStdin`.
+NSTDOptional(NSTDStdin) NSTDOptionalStdin;
+
 /// Constructs a new handle to the standard input stream.
 ///
 /// # Returns
 ///
-/// `NSTDStdin handle` - A handle to the standard input stream.
-NSTDAPI NSTDStdin nstd_io_stdin(void);
+/// `NSTDOptionalStdin handle` - A handle to the standard input stream on success, or an
+/// uninitialized "none" variant on error.
+NSTDAPI NSTDOptionalStdin nstd_io_stdin(void);
 
 /// Reads some data from stdin into a byte slice buffer.
 ///
@@ -129,12 +134,16 @@ typedef struct {
     NSTDAnyMut in;
 } NSTDStdinLock;
 
+/// Represents an optional value of type `NSTDStdinLock`.
+NSTDOptional(NSTDStdinLock) NSTDOptionalStdinLock;
+
 /// Constructs a new locked handle to the standard input stream.
 ///
 /// # Returns
 ///
-/// `NSTDStdinLock handle` - A locked handle to the standard input stream.
-NSTDAPI NSTDStdinLock nstd_io_stdin_lock(void);
+/// `NSTDOptionalStdinLock handle` - A locked handle to the standard input stream on success, or an
+/// uninitialized "none" variant on error.
+NSTDAPI NSTDOptionalStdinLock nstd_io_stdin_lock(void);
 
 /// Reads some data from stdin into a byte slice buffer.
 ///

@@ -6,10 +6,94 @@ use crate::os::windows::alloc::{
     nstd_os_windows_alloc_deallocate, nstd_os_windows_alloc_reallocate,
     NSTDWindowsAllocError::{self, *},
 };
-use crate::{core::ptr::raw::MAX_ALIGN, NSTDAny, NSTDAnyMut, NSTDUInt, NSTD_NULL};
+use crate::{
+    core::{
+        mem::nstd_core_mem_copy,
+        ptr::raw::{nstd_core_ptr_raw_dangling_mut, MAX_ALIGN},
+    },
+    NSTDAny, NSTDAnyMut, NSTDUInt, NSTD_NULL,
+};
 use alloc::alloc::Layout;
 use cfg_if::cfg_if;
+use core::{
+    ops::{Deref, DerefMut},
+    ptr::addr_of,
+};
 use nstdapi::nstdapi;
+
+/// An FFI safe [Box] variant for `nstd`.
+#[repr(transparent)]
+#[allow(dead_code)]
+pub(crate) struct CBox<T>(*mut T);
+#[allow(dead_code)]
+impl<T> CBox<T> {
+    /// Creates a new heap allocated [CBox] object.
+    pub(crate) fn new(value: T) -> Option<Self> {
+        let size = core::mem::size_of::<T>();
+        match size {
+            0 => Some(Self(nstd_core_ptr_raw_dangling_mut() as _)),
+            // SAFETY: `size` is greater than 0.
+            _ => match unsafe { nstd_alloc_allocate(size) } {
+                NSTD_NULL => None,
+                mem => {
+                    // SAFETY: `mem` is a non-null pointer to `size` uninitialized bytes.
+                    unsafe { nstd_core_mem_copy(mem as _, addr_of!(value) as _, size) };
+                    core::mem::forget(value);
+                    Some(Self(mem as _))
+                }
+            },
+        }
+    }
+
+    /// Moves a [CBox] value onto the stack.
+    pub(crate) fn into_inner(self) -> T {
+        // SAFETY: `self.0` points to a valid object of type `T`.
+        let value = unsafe { self.0.read() };
+        let size = core::mem::size_of::<T>();
+        if size > 0 {
+            // SAFETY:
+            // - `self.0` points to a valid object of type `T`.
+            // - `size` is greater than 0.
+            unsafe { nstd_alloc_deallocate(&mut (self.0 as _), size) };
+        }
+        core::mem::forget(self);
+        value
+    }
+}
+impl<T> Deref for CBox<T> {
+    /// [CBox]'s dereference target.
+    type Target = T;
+
+    /// Immutably dereferences a [CBox].
+    #[inline]
+    fn deref(&self) -> &Self::Target {
+        // SAFETY: `self.0` points to a valid object of type `T`.
+        unsafe { &*self.0 }
+    }
+}
+impl<T> DerefMut for CBox<T> {
+    /// Mutably dereferences a [CBox].
+    #[inline]
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        // SAFETY: `self.0` points to a valid object of type `T`.
+        unsafe { &mut *self.0 }
+    }
+}
+impl<T> Drop for CBox<T> {
+    /// [CBox]'s destructor.
+    fn drop(&mut self) {
+        // SAFETY:
+        // - `self.0` points to a valid object of type `T`.
+        // - `size` is greater than 0.
+        unsafe {
+            self.0.read();
+            let size = core::mem::size_of::<T>();
+            if size > 0 {
+                nstd_alloc_deallocate(&mut (self.0 as _), size);
+            }
+        }
+    }
+}
 
 /// Describes an error returned from allocation functions.
 #[repr(C)]

@@ -1,7 +1,8 @@
 //! A handle to the standard input stream.
 use crate::{
-    alloc::NSTDAllocError,
+    alloc::{CBox, NSTDAllocError},
     core::{
+        optional::{gen_optional, NSTDOptional},
         result::NSTDResult,
         slice::{NSTDSlice, NSTDSliceMut},
         str::nstd_core_str_from_bytes_unchecked,
@@ -19,19 +20,22 @@ use std::os::unix::io::AsRawFd;
 #[nstdapi]
 pub struct NSTDStdin {
     /// Rust's [Stdin].
-    r#in: Box<Stdin>,
+    r#in: CBox<Stdin>,
 }
+gen_optional!(NSTDOptionalStdin, NSTDStdin);
 
 /// Constructs a new handle to the standard input stream.
 ///
 /// # Returns
 ///
-/// `NSTDStdin handle` - A handle to the standard input stream.
+/// `NSTDOptionalStdin handle` - A handle to the standard input stream on success, or an
+/// uninitialized "none" variant on error.
 #[inline]
 #[nstdapi]
-pub fn nstd_io_stdin() -> NSTDStdin {
-    NSTDStdin {
-        r#in: Box::new(std::io::stdin()),
+pub fn nstd_io_stdin() -> NSTDOptionalStdin {
+    match CBox::new(std::io::stdin()) {
+        Some(r#in) => NSTDOptional::Some(NSTDStdin { r#in }),
+        _ => NSTDOptional::None,
     }
 }
 
@@ -206,19 +210,22 @@ pub fn nstd_io_stdin_free(handle: NSTDStdin) {}
 #[nstdapi]
 pub struct NSTDStdinLock {
     /// Rust's [StdinLock].
-    r#in: Box<StdinLock<'static>>,
+    r#in: CBox<StdinLock<'static>>,
 }
+gen_optional!(NSTDOptionalStdinLock, NSTDStdinLock);
 
 /// Constructs a new locked handle to the standard input stream.
 ///
 /// # Returns
 ///
-/// `NSTDStdinLock handle` - A locked handle to the standard input stream.
+/// `NSTDOptionalStdinLock handle` - A locked handle to the standard input stream on success, or an
+/// uninitialized "none" variant on error.
 #[inline]
 #[nstdapi]
-pub fn nstd_io_stdin_lock() -> NSTDStdinLock {
-    NSTDStdinLock {
-        r#in: Box::new(std::io::stdin().lock()),
+pub fn nstd_io_stdin_lock() -> NSTDOptionalStdinLock {
+    match CBox::new(std::io::stdin().lock()) {
+        Some(r#in) => NSTDOptional::Some(NSTDStdinLock { r#in }),
+        _ => NSTDOptional::None,
     }
 }
 

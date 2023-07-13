@@ -1,10 +1,27 @@
 # TBD
+## Added
+### `nstd.io`
+- Added `NSTDOptionalStd[in|out|err][Lock]`.
+### `nstd.mutex`
+- Added `NSTDOptionalMutex`.
+### `nstd.thread`
+- Added `NSTDOptionalThreadHandle`.
+- Added `NSTDOptionalThreadID`.
 ## Changed
 ### `nstd.env`
 - `nstd_env_temp_dir` now returns `NSTDOptionalString`.
+### `nstd.io`
+- `nstd_io_std[in|out|err]` functions now return `NSTDOptionalStd[in|out|err]` respectively.
+- `nstd_io_std[in|out|err]_lock` functions now return `NSTDOptionalStd[in|out|err]Lock`
+respectively.
+### `nstd.mutex`
+- `nstd_mutex_new` now returns `NSTDOptionalMutex`.
+- `nstd_mutex_lock` now returns `NSTDOptionalMutexLockResult`.
 ### `nstd.thread`
 - `NSTDThreadResult` is now `NSTDOptionalHeapPtr`.
 - `nstd_thread_spawn` now takes `const NSTDThreadDescriptor *desc`.
+- `nstd_thread_[current|handle]` functions now return `NSTDOptionalThreadHandle`.
+- `nstd_thread_id` now returns `NSTDOptionalThreadID`.
 ## Removed
 ### `nstd.thread`
 - `nstd_thread_spawn_with_desc`.

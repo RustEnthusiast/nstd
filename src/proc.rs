@@ -1,5 +1,6 @@
 //! Calling/Child process management.
 use crate::{
+    alloc::CBox,
     core::{
         optional::{gen_optional, NSTDOptional},
         slice::NSTDSlice,
@@ -15,7 +16,7 @@ use std::process::{Child, Command};
 #[nstdapi]
 pub struct NSTDChildProcess {
     /// A handle to a child process.
-    proc: Box<Child>,
+    proc: CBox<Child>,
 }
 gen_optional!(NSTDOptionalChildProcess, NSTDChildProcess);
 
@@ -65,12 +66,12 @@ pub unsafe fn nstd_proc_spawn(
         )
     }));
     // Spawn the process.
-    match cmd.spawn() {
-        Ok(proc) => NSTDOptional::Some(NSTDChildProcess {
-            proc: Box::new(proc),
-        }),
-        _ => NSTDOptional::None,
+    if let Ok(proc) = cmd.spawn() {
+        if let Some(proc) = CBox::new(proc) {
+            return NSTDOptional::Some(NSTDChildProcess { proc });
+        }
     }
+    NSTDOptional::None
 }
 
 /// Returns the OS-assigned ID of a child process.

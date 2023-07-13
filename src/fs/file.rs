@@ -1,5 +1,6 @@
 //! A handle to an opened file.
 use crate::{
+    alloc::CBox,
     core::{
         result::NSTDResult,
         slice::{NSTDSlice, NSTDSliceMut},
@@ -37,7 +38,7 @@ pub const NSTD_FILE_TRUNC: NSTDUInt8 = 1 << 4;
 #[nstdapi]
 pub struct NSTDFile {
     /// The inner [File].
-    f: Box<File>,
+    f: CBox<File>,
 }
 
 /// A result type yielding an `NSTDFile` on success.
@@ -69,7 +70,10 @@ pub unsafe fn nstd_fs_file_open(name: &NSTDStr, mask: NSTDUInt8) -> NSTDFileResu
         .truncate((mask & NSTD_FILE_TRUNC) != 0)
         .open(name.as_str())
     {
-        Ok(f) => NSTDResult::Ok(NSTDFile { f: Box::new(f) }),
+        Ok(f) => match CBox::new(f) {
+            Some(f) => NSTDResult::Ok(NSTDFile { f }),
+            _ => NSTDResult::Err(NSTDIOError::NSTD_IO_ERROR_OUT_OF_MEMORY),
+        },
         Err(err) => NSTDResult::Err(NSTDIOError::from_err(err.kind())),
     }
 }
@@ -135,7 +139,7 @@ pub unsafe fn nstd_fs_file_write_all(file: &mut NSTDFile, bytes: &NSTDSlice) -> 
 #[inline]
 #[nstdapi]
 pub fn nstd_fs_file_flush(file: &mut NSTDFile) -> NSTDIOError {
-    crate::io::stdio::flush(&mut file.f)
+    crate::io::stdio::flush(&mut *file.f)
 }
 
 /// Reads some data from an open file into a buffer.

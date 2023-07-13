@@ -1,6 +1,10 @@
 //! A handle to the standard output stream.
 use crate::{
-    core::slice::NSTDSlice,
+    alloc::CBox,
+    core::{
+        optional::{gen_optional, NSTDOptional},
+        slice::NSTDSlice,
+    },
     io::{NSTDIOError, NSTDIOResult},
 };
 use nstdapi::nstdapi;
@@ -12,19 +16,22 @@ use std::os::unix::io::AsRawFd;
 #[nstdapi]
 pub struct NSTDStdout {
     /// Rust's [Stdout].
-    out: Box<Stdout>,
+    out: CBox<Stdout>,
 }
+gen_optional!(NSTDOptionalStdout, NSTDStdout);
 
 /// Constructs a new handle to the standard output stream.
 ///
 /// # Returns
 ///
-/// `NSTDStdout handle` - A handle to the standard output stream.
+/// `NSTDOptionalStdout handle` - A handle to the standard output stream on success, or an
+/// uninitialized "none" variant on error.
 #[inline]
 #[nstdapi]
-pub fn nstd_io_stdout() -> NSTDStdout {
-    NSTDStdout {
-        out: Box::new(std::io::stdout()),
+pub fn nstd_io_stdout() -> NSTDOptionalStdout {
+    match CBox::new(std::io::stdout()) {
+        Some(out) => NSTDOptional::Some(NSTDStdout { out }),
+        _ => NSTDOptional::None,
     }
 }
 
@@ -99,7 +106,7 @@ pub unsafe fn nstd_io_stdout_write_all(handle: &mut NSTDStdout, bytes: &NSTDSlic
 #[inline]
 #[nstdapi]
 pub fn nstd_io_stdout_flush(handle: &mut NSTDStdout) -> NSTDIOError {
-    crate::io::stdio::flush(&mut handle.out)
+    crate::io::stdio::flush(&mut *handle.out)
 }
 
 /// Frees an instance of `NSTDStdout`.
@@ -116,19 +123,22 @@ pub fn nstd_io_stdout_free(handle: NSTDStdout) {}
 #[nstdapi]
 pub struct NSTDStdoutLock {
     /// Rust's [StdoutLock].
-    out: Box<StdoutLock<'static>>,
+    out: CBox<StdoutLock<'static>>,
 }
+gen_optional!(NSTDOptionalStdoutLock, NSTDStdoutLock);
 
 /// Constructs a new locked handle to the standard output stream.
 ///
 /// # Returns
 ///
-/// `NSTDStdoutLock handle` - A locked handle to the standard output stream.
+/// `NSTDOptionalStdoutLock handle` - A locked handle to the standard output stream on success, or
+/// an uninitialized "none" variant on error.
 #[inline]
 #[nstdapi]
-pub fn nstd_io_stdout_lock() -> NSTDStdoutLock {
-    NSTDStdoutLock {
-        out: Box::new(std::io::stdout().lock()),
+pub fn nstd_io_stdout_lock() -> NSTDOptionalStdoutLock {
+    match CBox::new(std::io::stdout().lock()) {
+        Some(out) => NSTDOptional::Some(NSTDStdoutLock { out }),
+        _ => NSTDOptional::None,
     }
 }
 
@@ -209,7 +219,7 @@ pub unsafe fn nstd_io_stdout_lock_write_all(
 #[inline]
 #[nstdapi]
 pub fn nstd_io_stdout_lock_flush(handle: &mut NSTDStdoutLock) -> NSTDIOError {
-    crate::io::stdio::flush(&mut handle.out)
+    crate::io::stdio::flush(&mut *handle.out)
 }
 
 /// Frees and unlocks an instance of `NSTDStdoutLock`.

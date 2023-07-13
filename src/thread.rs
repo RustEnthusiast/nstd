@@ -1,5 +1,6 @@
 //! Thread spawning, joining, and detaching.
 use crate::{
+    alloc::CBox,
     core::{
         cstr::nstd_core_cstr_get_null,
         optional::{gen_optional, NSTDOptional},
@@ -18,7 +19,7 @@ use std::thread::{Builder, JoinHandle, Thread, ThreadId};
 #[nstdapi]
 pub struct NSTDThread {
     /// The thread join handle.
-    thread: Box<JoinHandle<NSTDThreadResult>>,
+    thread: CBox<JoinHandle<NSTDThreadResult>>,
 }
 gen_optional!(NSTDOptionalThread, NSTDThread);
 
@@ -26,15 +27,17 @@ gen_optional!(NSTDOptionalThread, NSTDThread);
 #[nstdapi]
 pub struct NSTDThreadHandle {
     /// A handle to the thread.
-    handle: Box<Thread>,
+    handle: CBox<Thread>,
 }
+gen_optional!(NSTDOptionalThreadHandle, NSTDThreadHandle);
 
 /// A thread's unique identifier.
 #[nstdapi]
 pub struct NSTDThreadID {
     /// The thread ID.
-    id: Box<ThreadId>,
+    id: CBox<ThreadId>,
 }
+gen_optional!(NSTDOptionalThreadID, NSTDThreadID);
 
 /// Describes the creation of a new thread.
 ///
@@ -131,24 +134,26 @@ pub unsafe fn nstd_thread_spawn(
         }
     }
     // Spawn the new thread.
-    match builder.spawn(move || thread_fn(data)) {
-        Ok(thread) => NSTDOptional::Some(NSTDThread {
-            thread: Box::new(thread),
-        }),
-        _ => NSTDOptional::None,
+    if let Ok(thread) = builder.spawn(move || thread_fn(data)) {
+        if let Some(thread) = CBox::new(thread) {
+            return NSTDOptional::Some(NSTDThread { thread });
+        }
     }
+    NSTDOptional::None
 }
 
 /// Returns a handle to the calling thread.
 ///
 /// # Returns
 ///
-/// `NSTDThreadHandle handle` - A handle to the current thread.
+/// `NSTDOptionalThreadHandle handle` - A handle to the current thread on success, or an
+/// uninitialized "none" variant on error.
 #[inline]
 #[nstdapi]
-pub fn nstd_thread_current() -> NSTDThreadHandle {
-    NSTDThreadHandle {
-        handle: Box::new(std::thread::current()),
+pub fn nstd_thread_current() -> NSTDOptionalThreadHandle {
+    match CBox::new(std::thread::current()) {
+        Some(handle) => NSTDOptional::Some(NSTDThreadHandle { handle }),
+        _ => NSTDOptional::None,
     }
 }
 
@@ -160,12 +165,14 @@ pub fn nstd_thread_current() -> NSTDThreadHandle {
 ///
 /// # Returns
 ///
-/// `NSTDThreadHandle handle` - A raw handle to the thread.
+/// `NSTDOptionalThreadHandle handle` - A raw handle to the thread on success, or an uninitialized
+/// "none" variant on error.
 #[inline]
 #[nstdapi]
-pub fn nstd_thread_handle(thread: &NSTDThread) -> NSTDThreadHandle {
-    NSTDThreadHandle {
-        handle: Box::new(thread.thread.thread().clone()),
+pub fn nstd_thread_handle(thread: &NSTDThread) -> NSTDOptionalThreadHandle {
+    match CBox::new(thread.thread.thread().clone()) {
+        Some(handle) => NSTDOptional::Some(NSTDThreadHandle { handle }),
+        _ => NSTDOptional::None,
     }
 }
 
@@ -201,7 +208,7 @@ pub fn nstd_thread_is_finished(thread: &NSTDThread) -> NSTDBool {
 #[inline]
 #[nstdapi]
 pub unsafe fn nstd_thread_join(thread: NSTDThread) -> NSTDOptionalThreadResult {
-    match thread.thread.join() {
+    match thread.thread.into_inner().join() {
         Ok(errc) => NSTDOptional::Some(errc),
         _ => NSTDOptional::None,
     }
@@ -243,12 +250,14 @@ pub fn nstd_thread_name(handle: &NSTDThreadHandle) -> NSTDOptionalStr {
 ///
 /// # Returns
 ///
-/// `NSTDThreadID id` - The thread's unique ID.
+/// `NSTDOptionalThreadID id` - The thread's unique ID on success, or an uninitialized "none"
+/// variant on error.
 #[inline]
 #[nstdapi]
-pub fn nstd_thread_id(handle: &NSTDThreadHandle) -> NSTDThreadID {
-    NSTDThreadID {
-        id: Box::new(handle.handle.id()),
+pub fn nstd_thread_id(handle: &NSTDThreadHandle) -> NSTDOptionalThreadID {
+    match CBox::new(handle.handle.id()) {
+        Some(id) => NSTDOptional::Some(NSTDThreadID { id }),
+        _ => NSTDOptional::None,
     }
 }
 
@@ -320,7 +329,7 @@ pub fn nstd_thread_is_panicking() -> NSTDBool {
 #[inline]
 #[nstdapi]
 pub fn nstd_thread_id_compare(xid: &NSTDThreadID, yid: &NSTDThreadID) -> NSTDBool {
-    xid.id == yid.id
+    *xid.id == *yid.id
 }
 
 /// Frees an instance of `NSTDThreadID`.

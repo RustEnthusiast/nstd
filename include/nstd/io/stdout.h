@@ -1,5 +1,6 @@
 #ifndef NSTD_IO_STDOUT_H
 #define NSTD_IO_STDOUT_H
+#include "../core/optional.h"
 #include "../core/slice.h"
 #include "../nstd.h"
 #include "io.h"
@@ -10,12 +11,16 @@ typedef struct {
     NSTDAnyMut out;
 } NSTDStdout;
 
+/// Represents an optional value of type `NSTDStdout`.
+NSTDOptional(NSTDStdout) NSTDOptionalStdout;
+
 /// Constructs a new handle to the standard output stream.
 ///
 /// # Returns
 ///
-/// `NSTDStdout handle` - A handle to the standard output stream.
-NSTDAPI NSTDStdout nstd_io_stdout(void);
+/// `NSTDOptionalStdout handle` - A handle to the standard output stream on success, or an
+/// uninitialized "none" variant on error.
+NSTDAPI NSTDOptionalStdout nstd_io_stdout(void);
 
 /// Writes some data to the standard output stream, returning how many bytes were written.
 ///
@@ -86,12 +91,16 @@ typedef struct {
     NSTDAnyMut out;
 } NSTDStdoutLock;
 
+/// Represents an optional value of type `NSTDStdoutLock`.
+NSTDOptional(NSTDStdoutLock) NSTDOptionalStdoutLock;
+
 /// Constructs a new locked handle to the standard output stream.
 ///
 /// # Returns
 ///
-/// `NSTDStdoutLock handle` - A locked handle to the standard output stream.
-NSTDAPI NSTDStdoutLock nstd_io_stdout_lock(void);
+/// `NSTDOptionalStdoutLock handle` - A locked handle to the standard output stream on success, or
+/// an uninitialized "none" variant on error.
+NSTDAPI NSTDOptionalStdoutLock nstd_io_stdout_lock(void);
 
 /// Writes some data to the standard output stream.
 ///
