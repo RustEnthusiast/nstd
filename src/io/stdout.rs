@@ -60,7 +60,7 @@ pub fn nstd_io_stdout() -> NSTDOptionalStdout {
 #[nstdapi]
 pub unsafe fn nstd_io_stdout_write(handle: &mut NSTDStdout, bytes: &NSTDSlice) -> NSTDIOResult {
     #[cfg(not(unix))]
-    return crate::io::stdio::write(&mut handle.out, bytes);
+    return crate::io::stdio::write(&mut *handle.out, bytes);
     #[cfg(unix)]
     return crate::os::unix::io::stdio::write(handle.out.lock().as_raw_fd(), bytes).into();
 }
@@ -89,7 +89,7 @@ pub unsafe fn nstd_io_stdout_write(handle: &mut NSTDStdout, bytes: &NSTDSlice) -
 #[nstdapi]
 pub unsafe fn nstd_io_stdout_write_all(handle: &mut NSTDStdout, bytes: &NSTDSlice) -> NSTDIOError {
     #[cfg(not(unix))]
-    return crate::io::stdio::write_all(&mut handle.out, bytes);
+    return crate::io::stdio::write_all(&mut *handle.out, bytes);
     #[cfg(unix)]
     return crate::os::unix::io::stdio::write_all(handle.out.lock().as_raw_fd(), bytes).into();
 }
@@ -170,7 +170,7 @@ pub unsafe fn nstd_io_stdout_lock_write(
     bytes: &NSTDSlice,
 ) -> NSTDIOResult {
     #[cfg(not(unix))]
-    return crate::io::stdio::write(&mut handle.out, bytes);
+    return crate::io::stdio::write(&mut *handle.out, bytes);
     #[cfg(unix)]
     return crate::os::unix::io::stdio::write(handle.out.as_raw_fd(), bytes).into();
 }
@@ -202,7 +202,7 @@ pub unsafe fn nstd_io_stdout_lock_write_all(
     bytes: &NSTDSlice,
 ) -> NSTDIOError {
     #[cfg(not(unix))]
-    return crate::io::stdio::write_all(&mut handle.out, bytes);
+    return crate::io::stdio::write_all(&mut *handle.out, bytes);
     #[cfg(unix)]
     return crate::os::unix::io::stdio::write_all(handle.out.as_raw_fd(), bytes).into();
 }

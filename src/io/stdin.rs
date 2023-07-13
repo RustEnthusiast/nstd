@@ -67,7 +67,7 @@ pub unsafe fn nstd_io_stdin_read(
     buffer: &mut NSTDSliceMut,
 ) -> NSTDIOResult {
     #[cfg(not(unix))]
-    return crate::io::stdio::read(&mut handle.r#in, buffer);
+    return crate::io::stdio::read(&mut *handle.r#in, buffer);
     #[cfg(unix)]
     return crate::os::unix::io::stdio::read(handle.r#in.lock().as_raw_fd(), buffer).into();
 }
@@ -93,7 +93,7 @@ pub unsafe fn nstd_io_stdin_read(
 #[nstdapi]
 pub fn nstd_io_stdin_read_all(handle: &mut NSTDStdin, buffer: &mut NSTDVec) -> NSTDIOResult {
     #[cfg(not(unix))]
-    return crate::io::stdio::read_all(&mut handle.r#in, buffer);
+    return crate::io::stdio::read_all(&mut *handle.r#in, buffer);
     #[cfg(unix)]
     // SAFETY: `handle` owns the file descriptor.
     unsafe {
@@ -125,7 +125,7 @@ pub fn nstd_io_stdin_read_to_string(
     buffer: &mut NSTDString,
 ) -> NSTDIOResult {
     #[cfg(not(unix))]
-    return crate::io::stdio::read_to_string(&mut handle.r#in, buffer);
+    return crate::io::stdio::read_to_string(&mut *handle.r#in, buffer);
     #[cfg(unix)]
     // SAFETY: `handle` owns the file descriptor.
     unsafe {
@@ -160,7 +160,7 @@ pub unsafe fn nstd_io_stdin_read_exact(
     buffer: &mut NSTDSliceMut,
 ) -> NSTDIOError {
     #[cfg(not(unix))]
-    return crate::io::stdio::read_exact(&mut handle.r#in, buffer);
+    return crate::io::stdio::read_exact(&mut *handle.r#in, buffer);
     #[cfg(unix)]
     return crate::os::unix::io::stdio::read_exact(handle.r#in.lock().as_raw_fd(), buffer).into();
 }
@@ -257,7 +257,7 @@ pub unsafe fn nstd_io_stdin_lock_read(
     buffer: &mut NSTDSliceMut,
 ) -> NSTDIOResult {
     #[cfg(not(unix))]
-    return crate::io::stdio::read(&mut handle.r#in, buffer);
+    return crate::io::stdio::read(&mut *handle.r#in, buffer);
     #[cfg(unix)]
     return crate::os::unix::io::stdio::read(handle.r#in.as_raw_fd(), buffer).into();
 }
@@ -286,7 +286,7 @@ pub fn nstd_io_stdin_lock_read_all(
     buffer: &mut NSTDVec,
 ) -> NSTDIOResult {
     #[cfg(not(unix))]
-    return crate::io::stdio::read_all(&mut handle.r#in, buffer);
+    return crate::io::stdio::read_all(&mut *handle.r#in, buffer);
     #[cfg(unix)]
     // SAFETY: `handle` owns the file descriptor.
     unsafe {
@@ -318,7 +318,7 @@ pub fn nstd_io_stdin_lock_read_to_string(
     buffer: &mut NSTDString,
 ) -> NSTDIOResult {
     #[cfg(not(unix))]
-    return crate::io::stdio::read_to_string(&mut handle.r#in, buffer);
+    return crate::io::stdio::read_to_string(&mut *handle.r#in, buffer);
     #[cfg(unix)]
     // SAFETY: `handle` owns the file descriptor.
     unsafe {
@@ -353,7 +353,7 @@ pub unsafe fn nstd_io_stdin_lock_read_exact(
     buffer: &mut NSTDSliceMut,
 ) -> NSTDIOError {
     #[cfg(not(unix))]
-    return crate::io::stdio::read_exact(&mut handle.r#in, buffer);
+    return crate::io::stdio::read_exact(&mut *handle.r#in, buffer);
     #[cfg(unix)]
     return crate::os::unix::io::stdio::read_exact(handle.r#in.as_raw_fd(), buffer).into();
 }
