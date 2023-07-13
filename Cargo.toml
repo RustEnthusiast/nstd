@@ -30,7 +30,6 @@ panic = "abort"
 default = ["std", "nstd_core"]
 std = []
 capi = ["nstdapi/capi"]
-asm = []
 nstd_alloc = ["libc", "nstd_core", "nstd_os_windows_alloc"]
 nstd_core = []
 nstd_cstring = ["nstd_alloc", "nstd_core", "nstd_vec"]
