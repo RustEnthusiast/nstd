@@ -63,6 +63,7 @@ pub mod vec;
 use ::core::ffi::{c_char, c_void};
 
 /// [NSTDInt]'s maximum value.
+#[allow(dead_code)]
 pub(crate) const NSTD_INT_MAX: NSTDInt = NSTDInt::MAX;
 
 /// A null pointer value constant.
