@@ -20,12 +20,10 @@ This will allow users of the framework to disable compilation of our module if t
 require it.
 
 To do this, open the `Cargo.toml` file and head to the `[features]` section. The module features
-are listed in alphabetical order following the `default`, `std`, `capi`, `asm`, and `unstable`
-features. Place the new feature where it is appropriate.
+are listed in alphabetical order following the `default`, `std`, and `capi` features. Place the new
+feature where it is appropriate.
 
-The naming convention for a module feature is as follows: `nstd_{module_name}`.
-
-The new feature should look something like this: `nstd_{module_name} = []`.
+The new feature should look something like this: `{module_name} = []`.
 
 The square brackets contain any dependencies that our module requires.
 
@@ -55,8 +53,8 @@ modules are listed here in alphabetical order. Every top-level module must be hi
 feature gate, we will need to enforce that here by using Rust's `cfg` attribute. Place a
 declaration of your module where it is appropriate. The module declaration should look like this:
 ```rs
-#[cfg(feature = "nstd_{module_name}")]
-#[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_{module_name}")))]
+#[cfg(feature = "{module_name}")]
+#[cfg_attr(doc_cfg, doc(cfg(feature = "{module_name}")))]
 pub mod {module_name};
 ```
 
