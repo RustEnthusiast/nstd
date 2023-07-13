@@ -1,12 +1,19 @@
 #ifndef NSTD_PROC_H
 #define NSTD_PROC_H
+#include "core/optional.h"
 #include "core/slice.h"
 #include "core/str.h"
 #include "io/io.h"
 #include "nstd.h"
 
 /// A handle to a child process.
-typedef NSTDAnyMut NSTDChildProcess;
+typedef struct {
+    /// A handle to a child process.
+    NSTDAnyMut proc;
+} NSTDChildProcess;
+
+/// Represents an optional value of type `NSTDChildProcess`.
+NSTDOptional(NSTDChildProcess) NSTDOptionalChildProcess;
 
 /// Spawns a new child process with the name `program` and returns a handle to it.
 ///
@@ -21,7 +28,8 @@ typedef NSTDAnyMut NSTDChildProcess;
 ///
 /// # Returns
 ///
-/// `NSTDChildProcess child` - A handle to the new child process, null on error.
+/// `NSTDOptionalChildProcess child` - A handle to the new child process on success, or an
+/// uninitialized "none" variant if spawning the child process fails.
 ///
 /// # Panics
 ///
@@ -35,7 +43,7 @@ typedef NSTDAnyMut NSTDChildProcess;
 ///
 /// The user must ensure that all of `program`, `args`, and `vars` and their data remain valid for
 /// reads while this function is executing.
-NSTDAPI NSTDChildProcess
+NSTDAPI NSTDOptionalChildProcess
 nstd_proc_spawn(const NSTDStr *program, const NSTDSlice *args, const NSTDSlice *vars);
 
 /// Returns the OS-assigned ID of a child process.
