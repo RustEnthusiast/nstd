@@ -1,18 +1,26 @@
 #ifndef NSTD_IO_STDERR_H
 #define NSTD_IO_STDERR_H
+#include "../core/optional.h"
 #include "../core/slice.h"
 #include "../nstd.h"
 #include "io.h"
 
 /// A handle to the standard error stream.
-typedef NSTDAnyMut NSTDStderr;
+typedef struct {
+    /// Rust's [Stderr].
+    NSTDAnyMut err;
+} NSTDStderr;
+
+/// Represents an optional value of type `NSTDStderr`.
+NSTDOptional(NSTDStderr) NSTDOptionalStderr;
 
 /// Constructs a new handle to the standard error stream.
 ///
 /// # Returns
 ///
-/// `NSTDStderr handle` - A handle to the standard error stream.
-NSTDAPI NSTDStderr nstd_io_stderr(void);
+/// `NSTDOptionalStderr handle` - A handle to the standard error stream, or an uninitialized "none"
+/// variant on error.
+NSTDAPI NSTDOptionalStderr nstd_io_stderr(void);
 
 /// Writes some data to the standard error stream, returning how many bytes were written.
 ///
@@ -78,14 +86,21 @@ NSTDAPI NSTDIOError nstd_io_stderr_flush(NSTDStderr *handle);
 NSTDAPI void nstd_io_stderr_free(NSTDStderr handle);
 
 /// A locked handle to the standard error stream.
-typedef NSTDAnyMut NSTDStderrLock;
+typedef struct {
+    /// Rust's [StderrLock].
+    NSTDAnyMut err;
+} NSTDStderrLock;
+
+/// Represents an optional value of type `NSTDStderrLock`.
+NSTDOptional(NSTDStderrLock) NSTDOptionalStderrLock;
 
 /// Constructs a new locked handle to the standard error stream.
 ///
 /// # Returns
 ///
-/// `NSTDStderrLock handle` - A locked handle to the standard error stream.
-NSTDAPI NSTDStderrLock nstd_io_stderr_lock(void);
+/// `NSTDOptionalStderrLock handle` - A locked handle to the standard error stream on success, or
+/// an uninitialized "none" variant on error.
+NSTDAPI NSTDOptionalStderrLock nstd_io_stderr_lock(void);
 
 /// Writes some data to the standard error stream, returning how many bytes were written.
 ///

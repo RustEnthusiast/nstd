@@ -27,7 +27,10 @@
 #define NSTD_FILE_TRUNC (1 << 4)
 
 /// A handle to an opened file.
-typedef NSTDAnyMut NSTDFile;
+typedef struct {
+    /// The inner [File].
+    NSTDAnyMut f;
+} NSTDFile;
 
 /// A result type yielding an `NSTDFile` on success.
 NSTDResult(NSTDFile, NSTDIOError) NSTDFileResult;

@@ -1,5 +1,6 @@
 //! A handle to an opened file.
 use crate::{
+    alloc::CBox,
     core::{
         result::NSTDResult,
         slice::{NSTDSlice, NSTDSliceMut},
@@ -34,7 +35,11 @@ pub const NSTD_FILE_APPEND: NSTDUInt8 = 1 << 3;
 pub const NSTD_FILE_TRUNC: NSTDUInt8 = 1 << 4;
 
 /// A handle to an opened file.
-pub type NSTDFile = Box<File>;
+#[nstdapi]
+pub struct NSTDFile {
+    /// The inner [File].
+    f: CBox<File>,
+}
 
 /// A result type yielding an `NSTDFile` on success.
 pub type NSTDFileResult = NSTDResult<NSTDFile, NSTDIOError>;
@@ -65,7 +70,10 @@ pub unsafe fn nstd_fs_file_open(name: &NSTDStr, mask: NSTDUInt8) -> NSTDFileResu
         .truncate((mask & NSTD_FILE_TRUNC) != 0)
         .open(name.as_str())
     {
-        Ok(f) => NSTDResult::Ok(Box::new(f)),
+        Ok(f) => match CBox::new(f) {
+            Some(f) => NSTDResult::Ok(NSTDFile { f }),
+            _ => NSTDResult::Err(NSTDIOError::NSTD_IO_ERROR_OUT_OF_MEMORY),
+        },
         Err(err) => NSTDResult::Err(NSTDIOError::from_err(err.kind())),
     }
 }
@@ -90,9 +98,9 @@ pub unsafe fn nstd_fs_file_open(name: &NSTDStr, mask: NSTDUInt8) -> NSTDFileResu
 #[nstdapi]
 pub unsafe fn nstd_fs_file_write(file: &mut NSTDFile, bytes: &NSTDSlice) -> NSTDIOResult {
     #[cfg(not(unix))]
-    return crate::io::stdio::write(file, bytes);
+    return crate::io::stdio::write(&mut *file.f, bytes);
     #[cfg(unix)]
-    return crate::os::unix::io::stdio::write(file.as_raw_fd(), bytes).into();
+    return crate::os::unix::io::stdio::write(file.f.as_raw_fd(), bytes).into();
 }
 
 /// Writes a whole buffer to a file.
@@ -114,9 +122,9 @@ pub unsafe fn nstd_fs_file_write(file: &mut NSTDFile, bytes: &NSTDSlice) -> NSTD
 #[nstdapi]
 pub unsafe fn nstd_fs_file_write_all(file: &mut NSTDFile, bytes: &NSTDSlice) -> NSTDIOError {
     #[cfg(not(unix))]
-    return crate::io::stdio::write_all(file, bytes);
+    return crate::io::stdio::write_all(&mut *file.f, bytes);
     #[cfg(unix)]
-    return crate::os::unix::io::stdio::write_all(file.as_raw_fd(), bytes).into();
+    return crate::os::unix::io::stdio::write_all(file.f.as_raw_fd(), bytes).into();
 }
 
 /// Flushes a file stream.
@@ -131,7 +139,7 @@ pub unsafe fn nstd_fs_file_write_all(file: &mut NSTDFile, bytes: &NSTDSlice) -> 
 #[inline]
 #[nstdapi]
 pub fn nstd_fs_file_flush(file: &mut NSTDFile) -> NSTDIOError {
-    crate::io::stdio::flush(file)
+    crate::io::stdio::flush(&mut *file.f)
 }
 
 /// Reads some data from an open file into a buffer.
@@ -154,9 +162,9 @@ pub fn nstd_fs_file_flush(file: &mut NSTDFile) -> NSTDIOError {
 #[nstdapi]
 pub unsafe fn nstd_fs_file_read(file: &mut NSTDFile, buffer: &mut NSTDSliceMut) -> NSTDIOResult {
     #[cfg(not(unix))]
-    return crate::io::stdio::read(file, buffer);
+    return crate::io::stdio::read(&mut *file.f, buffer);
     #[cfg(unix)]
-    return crate::os::unix::io::stdio::read(file.as_raw_fd(), buffer).into();
+    return crate::os::unix::io::stdio::read(file.f.as_raw_fd(), buffer).into();
 }
 
 /// Continuously reads data from `file` into a buffer until EOF is reached.
@@ -180,10 +188,10 @@ pub unsafe fn nstd_fs_file_read(file: &mut NSTDFile, buffer: &mut NSTDSliceMut) 
 #[nstdapi]
 pub fn nstd_fs_file_read_all(file: &mut NSTDFile, buffer: &mut NSTDVec) -> NSTDIOResult {
     #[cfg(not(unix))]
-    return crate::io::stdio::read_all(file, buffer);
+    return crate::io::stdio::read_all(&mut *file.f, buffer);
     #[cfg(unix)]
     // SAFETY: `file` owns the file descriptor.
-    return unsafe { crate::os::unix::io::stdio::read_all(file.as_raw_fd(), buffer).into() };
+    return unsafe { crate::os::unix::io::stdio::read_all(file.f.as_raw_fd(), buffer).into() };
 }
 
 /// Continuously reads UTF-8 data from `file` into a string buffer until EOF is reached.
@@ -207,10 +215,12 @@ pub fn nstd_fs_file_read_all(file: &mut NSTDFile, buffer: &mut NSTDVec) -> NSTDI
 #[nstdapi]
 pub fn nstd_fs_file_read_to_string(file: &mut NSTDFile, buffer: &mut NSTDString) -> NSTDIOResult {
     #[cfg(not(unix))]
-    return crate::io::stdio::read_to_string(file, buffer);
+    return crate::io::stdio::read_to_string(&mut *file.f, buffer);
     #[cfg(unix)]
     // SAFETY: `file` owns the file descriptor.
-    return unsafe { crate::os::unix::io::stdio::read_to_string(file.as_raw_fd(), buffer).into() };
+    return unsafe {
+        crate::os::unix::io::stdio::read_to_string(file.f.as_raw_fd(), buffer).into()
+    };
 }
 
 /// Reads enough data from `file` to fill the entirety of `buffer`.
@@ -240,9 +250,9 @@ pub unsafe fn nstd_fs_file_read_exact(
     buffer: &mut NSTDSliceMut,
 ) -> NSTDIOError {
     #[cfg(not(unix))]
-    return crate::io::stdio::read_exact(file, buffer);
+    return crate::io::stdio::read_exact(&mut *file.f, buffer);
     #[cfg(unix)]
-    return crate::os::unix::io::stdio::read_exact(file.as_raw_fd(), buffer).into();
+    return crate::os::unix::io::stdio::read_exact(file.f.as_raw_fd(), buffer).into();
 }
 
 /// Closes a file handle.

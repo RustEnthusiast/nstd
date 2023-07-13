@@ -6,10 +6,19 @@
 #include "nstd.h"
 
 /// A mutual exclusion primitive useful for protecting shared data.
-typedef NSTDAnyMut NSTDMutex;
+typedef struct {
+    /// The Rust [Mutex].
+    NSTDAnyMut mtx;
+} NSTDMutex;
+
+/// Represents an optional value of type `NSTDMutex`.
+NSTDOptional(NSTDMutex) NSTDOptionalMutex;
 
 /// A guard providing access to a mutex's protected data.
-typedef NSTDAnyMut NSTDMutexGuard;
+typedef struct {
+    /// The Rust [MutexGuard].
+    NSTDAnyMut guard;
+} NSTDMutexGuard;
 
 /// A lock result returned from `nstd_mutex_lock` containing the mutex guard whether or not the
 /// data is poisoned.
@@ -29,8 +38,9 @@ NSTDOptional(NSTDMutexLockResult) NSTDOptionalMutexLockResult;
 ///
 /// # Returns
 ///
-/// `NSTDMutex mutex` - The new mutex protecting `data`.
-NSTDAPI NSTDMutex nstd_mutex_new(NSTDHeapPtr data);
+/// `NSTDOptionalMutex mutex` - The new mutex protecting `data` on success, or an uninitialized
+/// "none" variant on error.
+NSTDAPI NSTDOptionalMutex nstd_mutex_new(NSTDHeapPtr data);
 
 /// Determines whether or not a mutex's data is poisoned.
 ///
@@ -57,12 +67,25 @@ NSTDAPI NSTDBool nstd_mutex_is_poisoned(const NSTDMutex *mutex);
 ///
 /// # Returns
 ///
-/// `NSTDMutexLockResult guard` - A handle to the mutex's protected data.
+/// `NSTDOptionalMutexLockResult guard` - A handle to the mutex's protected data on success, or an
+/// uninitialized "none" variant on error.
 ///
 /// # Panics
 ///
 /// This operation may panic if the lock is already held by the current thread.
-NSTDAPI NSTDMutexLockResult nstd_mutex_lock(const NSTDMutex *mutex);
+NSTDAPI NSTDOptionalMutexLockResult nstd_mutex_lock(const NSTDMutex *mutex);
+
+/// The non-blocking variant of `nstd_mutex_lock` returning an uninitialized "none" result if the
+/// mutex is locked by another thread.
+///
+/// # Parameters:
+///
+/// - `const NSTDMutex *mutex` - The mutex to lock.
+///
+/// # Returns
+///
+/// `NSTDOptionalMutexLockResult guard` - A handle to the mutex's protected data.
+NSTDAPI NSTDOptionalMutexLockResult nstd_mutex_try_lock(const NSTDMutex *mutex);
 
 /// Returns a pointer to a mutex's raw data.
 ///
@@ -85,18 +108,6 @@ NSTDAPI NSTDAny nstd_mutex_get(const NSTDMutexGuard *guard);
 ///
 /// `NSTDAnyMut data` - A mutable pointer to the mutex's data.
 NSTDAPI NSTDAnyMut nstd_mutex_get_mut(NSTDMutexGuard *guard);
-
-/// The non-blocking variant of `nstd_mutex_lock` returning an uninitialized "none" result if the
-/// mutex is locked by another thread.
-///
-/// # Parameters:
-///
-/// - `const NSTDMutex *mutex` - The mutex to lock.
-///
-/// # Returns
-///
-/// `NSTDOptionalMutexLockResult guard` - A handle to the mutex's protected data.
-NSTDAPI NSTDOptionalMutexLockResult nstd_mutex_try_lock(const NSTDMutex *mutex);
 
 /// Consumes a mutex and returns the data it was protecting.
 ///
