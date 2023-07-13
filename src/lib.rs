@@ -4,74 +4,75 @@
 #![warn(clippy::undocumented_unsafe_blocks)]
 #![cfg_attr(not(any(test, feature = "std")), no_std)]
 #![cfg_attr(doc_cfg, feature(doc_cfg))]
-#[cfg(feature = "nstd_alloc")]
-#[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_alloc")))]
+#[cfg(feature = "alloc")]
+#[cfg_attr(doc_cfg, doc(cfg(feature = "alloc")))]
 pub mod alloc;
-#[cfg(feature = "nstd_app")]
-#[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_app")))]
+#[cfg(feature = "app")]
+#[cfg_attr(doc_cfg, doc(cfg(feature = "app")))]
 pub mod app;
-#[cfg(feature = "nstd_core")]
-#[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_core")))]
+#[cfg(feature = "core")]
+#[cfg_attr(doc_cfg, doc(cfg(feature = "core")))]
 pub mod core;
-#[cfg(feature = "nstd_cstring")]
-#[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_cstring")))]
+#[cfg(feature = "cstring")]
+#[cfg_attr(doc_cfg, doc(cfg(feature = "cstring")))]
 pub mod cstring;
-#[cfg(feature = "nstd_env")]
-#[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_env")))]
+#[cfg(feature = "env")]
+#[cfg_attr(doc_cfg, doc(cfg(feature = "env")))]
 pub mod env;
-#[cfg(feature = "nstd_fs")]
-#[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_fs")))]
+#[cfg(feature = "fs")]
+#[cfg_attr(doc_cfg, doc(cfg(feature = "fs")))]
 pub mod fs;
-#[cfg(feature = "nstd_heap_ptr")]
-#[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_heap_ptr")))]
+#[cfg(feature = "heap_ptr")]
+#[cfg_attr(doc_cfg, doc(cfg(feature = "heap_ptr")))]
 pub mod heap_ptr;
-#[cfg(feature = "nstd_image")]
-#[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_image")))]
+#[cfg(feature = "image")]
+#[cfg_attr(doc_cfg, doc(cfg(feature = "image")))]
 pub mod image;
-#[cfg(feature = "nstd_io")]
-#[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_io")))]
+#[cfg(feature = "io")]
+#[cfg_attr(doc_cfg, doc(cfg(feature = "io")))]
 pub mod io;
-#[cfg(feature = "nstd_math")]
-#[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_math")))]
+#[cfg(feature = "math")]
+#[cfg_attr(doc_cfg, doc(cfg(feature = "math")))]
 pub mod math;
-#[cfg(feature = "nstd_mutex")]
-#[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_mutex")))]
+#[cfg(feature = "mutex")]
+#[cfg_attr(doc_cfg, doc(cfg(feature = "mutex")))]
 pub mod mutex;
-#[cfg(feature = "nstd_os")]
-#[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_os")))]
+#[cfg(feature = "os")]
+#[cfg_attr(doc_cfg, doc(cfg(feature = "os")))]
 pub mod os;
-#[cfg(feature = "nstd_proc")]
-#[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_proc")))]
+#[cfg(feature = "proc")]
+#[cfg_attr(doc_cfg, doc(cfg(feature = "proc")))]
 pub mod proc;
-#[cfg(feature = "nstd_shared_lib")]
-#[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_shared_lib")))]
+#[cfg(feature = "shared_lib")]
+#[cfg_attr(doc_cfg, doc(cfg(feature = "shared_lib")))]
 pub mod shared_lib;
-#[cfg(feature = "nstd_shared_ptr")]
-#[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_shared_ptr")))]
+#[cfg(feature = "shared_ptr")]
+#[cfg_attr(doc_cfg, doc(cfg(feature = "shared_ptr")))]
 pub mod shared_ptr;
-#[cfg(feature = "nstd_string")]
-#[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_string")))]
+#[cfg(feature = "string")]
+#[cfg_attr(doc_cfg, doc(cfg(feature = "string")))]
 pub mod string;
 #[cfg(test)]
 pub(crate) mod test;
-#[cfg(feature = "nstd_thread")]
-#[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_thread")))]
+#[cfg(feature = "thread")]
+#[cfg_attr(doc_cfg, doc(cfg(feature = "thread")))]
 pub mod thread;
-#[cfg(feature = "nstd_time")]
-#[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_time")))]
+#[cfg(feature = "time")]
+#[cfg_attr(doc_cfg, doc(cfg(feature = "time")))]
 pub mod time;
-#[cfg(feature = "nstd_timed_mutex")]
-#[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_timed_mutex")))]
+#[cfg(feature = "timed_mutex")]
+#[cfg_attr(doc_cfg, doc(cfg(feature = "timed_mutex")))]
 pub mod timed_mutex;
-#[cfg(feature = "nstd_vec")]
-#[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_vec")))]
+#[cfg(feature = "vec")]
+#[cfg_attr(doc_cfg, doc(cfg(feature = "vec")))]
 pub mod vec;
-#[cfg(feature = "nstd_window")]
-#[cfg_attr(doc_cfg, doc(cfg(feature = "nstd_window")))]
+#[cfg(feature = "window")]
+#[cfg_attr(doc_cfg, doc(cfg(feature = "window")))]
 pub mod window;
 use ::core::ffi::{c_char, c_void};
 
 /// [NSTDInt]'s maximum value.
+#[allow(dead_code)]
 pub(crate) const NSTD_INT_MAX: NSTDInt = NSTDInt::MAX;
 
 /// A null pointer value constant.

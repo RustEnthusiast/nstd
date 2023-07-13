@@ -1,9 +1,9 @@
 //! Thread spawning, joining, and detaching.
 use crate::{
+    alloc::CBox,
     core::{
         cstr::nstd_core_cstr_get_null,
-        def::NSTDErrorCode,
-        optional::NSTDOptional,
+        optional::{gen_optional, NSTDOptional},
         result::NSTDResult,
         str::{nstd_core_str_as_cstr, NSTDOptionalStr, NSTDStr},
         time::NSTDDuration,
@@ -16,13 +16,28 @@ use nstdapi::nstdapi;
 use std::thread::{Builder, JoinHandle, Thread, ThreadId};
 
 /// Represents a running thread.
-pub type NSTDThread = Box<JoinHandle<NSTDThreadResult>>;
+#[nstdapi]
+pub struct NSTDThread {
+    /// The thread join handle.
+    thread: CBox<JoinHandle<NSTDThreadResult>>,
+}
+gen_optional!(NSTDOptionalThread, NSTDThread);
 
 /// A handle to a running thread.
-pub type NSTDThreadHandle = Box<Thread>;
+#[nstdapi]
+pub struct NSTDThreadHandle {
+    /// A handle to the thread.
+    handle: CBox<Thread>,
+}
+gen_optional!(NSTDOptionalThreadHandle, NSTDThreadHandle);
 
 /// A thread's unique identifier.
-pub type NSTDThreadID = Box<ThreadId>;
+#[nstdapi]
+pub struct NSTDThreadID {
+    /// The thread ID.
+    id: CBox<ThreadId>,
+}
+gen_optional!(NSTDOptionalThreadID, NSTDThreadID);
 
 /// Describes the creation of a new thread.
 ///
@@ -41,7 +56,7 @@ pub struct NSTDThreadDescriptor {
 }
 
 /// A thread function's return value.
-pub type NSTDThreadResult = NSTDErrorCode;
+pub type NSTDThreadResult = NSTDOptionalHeapPtr<'static>;
 
 /// Returned from `nstd_thread_join`, contains the thread function's return value on success.
 pub type NSTDOptionalThreadResult = NSTDOptional<NSTDThreadResult>;
@@ -50,7 +65,7 @@ pub type NSTDOptionalThreadResult = NSTDOptional<NSTDThreadResult>;
 /// success.
 pub type NSTDThreadCountResult = NSTDResult<NSTDUInt, NSTDIOError>;
 
-/// Spawns a new thread and returns a handle to it.
+/// Spawns a new thread executing the function `thread_fn` and returns a handle to the new thread.
 ///
 /// # Parameters:
 ///
@@ -58,13 +73,18 @@ pub type NSTDThreadCountResult = NSTDResult<NSTDUInt, NSTDIOError>;
 ///
 /// - `NSTDOptionalHeapPtr data` - Data to send to the thread.
 ///
+/// - `const NSTDThreadDescriptor *desc` - The thread descriptor. This value may be null.
+///
 /// # Returns
 ///
-/// `NSTDThread thread` - A handle to the new thread, null on error.
+/// `NSTDOptionalThread thread` - A handle to the new thread on success, or an uninitialized "none"
+/// variant on error.
 ///
 /// # Safety
 ///
 /// - The caller of this function must guarantee that `thread_fn` is a valid function pointer.
+///
+/// - This operation can cause undefined behavior if `desc.name`'s data is invalid.
 ///
 /// - The data type that `data` holds must be able to be safely sent between threads.
 ///
@@ -78,12 +98,15 @@ pub type NSTDThreadCountResult = NSTDResult<NSTDUInt, NSTDIOError>;
 /// };
 ///
 /// unsafe extern "C" fn thread_fn(data: NSTDOptionalHeapPtr) -> NSTDThreadResult {
-///     0
+///     NSTDOptional::None
 /// }
 ///
-/// if let Some(thread) = unsafe { nstd_thread_spawn(thread_fn, NSTDOptional::None) } {
-///     if let NSTDOptional::Some(errc) = nstd_thread_join(thread) {
-///         assert!(errc == 0);
+/// let thread = unsafe { nstd_thread_spawn(thread_fn, NSTDOptional::None, None) };
+/// if let NSTDOptional::Some(thread) = thread {
+///     if let NSTDOptional::Some(ret) = unsafe { nstd_thread_join(thread) } {
+///         if let NSTDOptional::Some(_) = ret {
+///             panic!("this shouldn't be here");
+///         }
 ///     }
 /// }
 /// ```
@@ -91,71 +114,47 @@ pub type NSTDThreadCountResult = NSTDResult<NSTDUInt, NSTDIOError>;
 pub unsafe fn nstd_thread_spawn(
     thread_fn: unsafe extern "C" fn(NSTDOptionalHeapPtr) -> NSTDThreadResult,
     data: NSTDOptionalHeapPtr<'static>,
-) -> Option<NSTDThread> {
-    if let Ok(thread) = Builder::new().spawn(move || thread_fn(data)) {
-        return Some(Box::new(thread));
-    }
-    None
-}
-
-/// Spawns a new thread configured with a descriptor.
-///
-/// # Parameters:
-///
-/// - `NSTDThreadResult (*thread_fn)(NSTDOptionalHeapPtr)` - The thread function.
-///
-/// - `NSTDOptionalHeapPtr data` - Data to send to the thread.
-///
-/// - `const NSTDThreadDescriptor *desc` - The thread descriptor.
-///
-/// # Returns
-///
-/// `NSTDThread thread` - A handle to the new thread, null on error.
-///
-/// # Safety
-///
-/// - The caller of this function must guarantee that `thread_fn` is a valid function pointer.
-///
-/// - This operation can cause undefined behavior if `desc`'s data is invalid.
-///
-/// - The data type that `data` holds must be able to be safely sent between threads.
-#[nstdapi]
-pub unsafe fn nstd_thread_spawn_with_desc(
-    thread_fn: unsafe extern "C" fn(NSTDOptionalHeapPtr) -> NSTDThreadResult,
-    data: NSTDOptionalHeapPtr<'static>,
-    desc: &NSTDThreadDescriptor,
-) -> Option<NSTDThread> {
+    desc: Option<&NSTDThreadDescriptor>,
+) -> NSTDOptionalThread {
     // Create the thread builder.
     let mut builder = Builder::new();
-    // Set the thread name.
-    if let NSTDOptional::Some(name) = &desc.name {
-        // Make sure `name` doesn't contain any null bytes.
-        let c_name = nstd_core_str_as_cstr(name);
-        if !nstd_core_cstr_get_null(&c_name).is_null() {
-            return None;
+    if let Some(desc) = desc {
+        // Set the thread name.
+        if let NSTDOptional::Some(name) = &desc.name {
+            // Make sure `name` doesn't contain any null bytes.
+            let c_name = nstd_core_str_as_cstr(name);
+            if !nstd_core_cstr_get_null(&c_name).is_null() {
+                return NSTDOptional::None;
+            }
+            builder = builder.name(name.as_str().to_string());
         }
-        builder = builder.name(name.as_str().to_string());
-    }
-    // Set the thread stack size.
-    if desc.stack_size != 0 {
-        builder = builder.stack_size(desc.stack_size);
+        // Set the thread stack size.
+        if desc.stack_size != 0 {
+            builder = builder.stack_size(desc.stack_size);
+        }
     }
     // Spawn the new thread.
     if let Ok(thread) = builder.spawn(move || thread_fn(data)) {
-        return Some(Box::new(thread));
+        if let Some(thread) = CBox::new(thread) {
+            return NSTDOptional::Some(NSTDThread { thread });
+        }
     }
-    None
+    NSTDOptional::None
 }
 
 /// Returns a handle to the calling thread.
 ///
 /// # Returns
 ///
-/// `NSTDThreadHandle handle` - A handle to the current thread.
+/// `NSTDOptionalThreadHandle handle` - A handle to the current thread on success, or an
+/// uninitialized "none" variant on error.
 #[inline]
 #[nstdapi]
-pub fn nstd_thread_current() -> NSTDThreadHandle {
-    Box::new(std::thread::current())
+pub fn nstd_thread_current() -> NSTDOptionalThreadHandle {
+    match CBox::new(std::thread::current()) {
+        Some(handle) => NSTDOptional::Some(NSTDThreadHandle { handle }),
+        _ => NSTDOptional::None,
+    }
 }
 
 /// Retrieves a raw handle to a thread.
@@ -166,11 +165,15 @@ pub fn nstd_thread_current() -> NSTDThreadHandle {
 ///
 /// # Returns
 ///
-/// `NSTDThreadHandle handle` - A raw handle to the thread.
+/// `NSTDOptionalThreadHandle handle` - A raw handle to the thread on success, or an uninitialized
+/// "none" variant on error.
 #[inline]
 #[nstdapi]
-pub fn nstd_thread_handle(thread: &NSTDThread) -> NSTDThreadHandle {
-    Box::new(thread.thread().clone())
+pub fn nstd_thread_handle(thread: &NSTDThread) -> NSTDOptionalThreadHandle {
+    match CBox::new(thread.thread.thread().clone()) {
+        Some(handle) => NSTDOptional::Some(NSTDThreadHandle { handle }),
+        _ => NSTDOptional::None,
+    }
 }
 
 /// Checks if a thread has finished running.
@@ -185,7 +188,7 @@ pub fn nstd_thread_handle(thread: &NSTDThread) -> NSTDThreadHandle {
 #[inline]
 #[nstdapi]
 pub fn nstd_thread_is_finished(thread: &NSTDThread) -> NSTDBool {
-    thread.is_finished()
+    thread.thread.is_finished()
 }
 
 /// Joins a thread by it's handle.
@@ -198,10 +201,14 @@ pub fn nstd_thread_is_finished(thread: &NSTDThread) -> NSTDBool {
 ///
 /// `NSTDOptionalThreadResult errc` - The thread function's return code, or none if joining the
 /// thread fails.
+///
+/// # Safety
+///
+/// The data type that the thread function returns must be able to be safely sent between threads.
 #[inline]
 #[nstdapi]
-pub fn nstd_thread_join(thread: NSTDThread) -> NSTDOptionalThreadResult {
-    match thread.join() {
+pub unsafe fn nstd_thread_join(thread: NSTDThread) -> NSTDOptionalThreadResult {
+    match thread.thread.into_inner().join() {
         Ok(errc) => NSTDOptional::Some(errc),
         _ => NSTDOptional::None,
     }
@@ -229,7 +236,7 @@ pub fn nstd_thread_detach(thread: NSTDThread) {}
 #[inline]
 #[nstdapi]
 pub fn nstd_thread_name(handle: &NSTDThreadHandle) -> NSTDOptionalStr {
-    match handle.name() {
+    match handle.handle.name() {
         Some(name) => NSTDOptional::Some(NSTDStr::from_str(name)),
         _ => NSTDOptional::None,
     }
@@ -243,11 +250,15 @@ pub fn nstd_thread_name(handle: &NSTDThreadHandle) -> NSTDOptionalStr {
 ///
 /// # Returns
 ///
-/// `NSTDThreadID id` - The thread's unique ID.
+/// `NSTDOptionalThreadID id` - The thread's unique ID on success, or an uninitialized "none"
+/// variant on error.
 #[inline]
 #[nstdapi]
-pub fn nstd_thread_id(handle: &NSTDThreadHandle) -> NSTDThreadID {
-    Box::new(handle.id())
+pub fn nstd_thread_id(handle: &NSTDThreadHandle) -> NSTDOptionalThreadID {
+    match CBox::new(handle.handle.id()) {
+        Some(id) => NSTDOptional::Some(NSTDThreadID { id }),
+        _ => NSTDOptional::None,
+    }
 }
 
 /// Frees an instance of `NSTDThreadHandle`.
@@ -318,7 +329,7 @@ pub fn nstd_thread_is_panicking() -> NSTDBool {
 #[inline]
 #[nstdapi]
 pub fn nstd_thread_id_compare(xid: &NSTDThreadID, yid: &NSTDThreadID) -> NSTDBool {
-    xid == yid
+    *xid.id == *yid.id
 }
 
 /// Frees an instance of `NSTDThreadID`.

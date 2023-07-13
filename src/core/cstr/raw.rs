@@ -36,39 +36,11 @@ pub unsafe fn nstd_core_cstr_raw_len(mut cstr: *const NSTDChar) -> NSTDUInt {
                 unix,
                 windows,
                 any(target_env = "wasi", target_os = "wasi"),
-                target_os = "fuchsia",
-                target_os = "solid_asp3",
-                target_os = "vxworks"
+                target_os = "solid_asp3"
             ),
             feature = "libc"
         ))] {
             libc::strlen(cstr)
-        } else if #[cfg(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64")))] {
-            let len;
-            core::arch::asm!(
-                include_str!("raw/x86/len.asm"),
-                len = out(reg) len,
-                cstr = inout(reg) cstr => _
-            );
-            len
-        } else if #[cfg(all(feature = "asm", target_arch = "arm"))] {
-            let len;
-            core::arch::asm!(
-                include_str!("raw/arm/len.asm"),
-                len = out(reg) len,
-                cstr = inout(reg) cstr => _,
-                byte = out(reg) _
-            );
-            len
-        } else if #[cfg(all(feature = "asm", target_arch = "aarch64"))] {
-            let len;
-            core::arch::asm!(
-                include_str!("raw/arm64/len.asm"),
-                len = out(reg) len,
-                cstr = inout(reg) cstr => _,
-                byte = out(reg) _
-            );
-            len
         } else {
             let mut i = 0;
             while *cstr != 0 {
@@ -149,46 +121,11 @@ pub unsafe fn nstd_core_cstr_raw_compare(
                 unix,
                 windows,
                 any(target_env = "wasi", target_os = "wasi"),
-                target_os = "fuchsia",
-                target_os = "solid_asp3",
-                target_os = "vxworks"
+                target_os = "solid_asp3"
             ),
             feature = "libc"
         ))] {
             libc::strcmp(cstr1, cstr2) == 0
-        } else if #[cfg(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64")))] {
-            use crate::core::def::NSTDByte;
-            let is_eq: NSTDByte;
-            core::arch::asm!(
-                include_str!("raw/x86/compare.asm"),
-                cstr1 = inout(reg) cstr1 => _,
-                cstr2 = inout(reg) cstr2 => _,
-                is_eq = out(reg_byte) is_eq,
-                byte = out(reg_byte) _
-            );
-            is_eq != 0
-        } else if #[cfg(all(feature = "asm", target_arch = "arm"))] {
-            let is_eq: NSTDUInt;
-            core::arch::asm!(
-                include_str!("raw/arm/compare.asm"),
-                cstr1 = inout(reg) cstr1 => _,
-                cstr2 = inout(reg) cstr2 => _,
-                is_eq = out(reg) is_eq,
-                ch1 = out(reg) _,
-                ch2 = out(reg) _
-            );
-            is_eq != 0
-        } else if #[cfg(all(feature = "asm", target_arch = "aarch64"))] {
-            let is_eq: NSTDUInt;
-            core::arch::asm!(
-                include_str!("raw/arm64/compare.asm"),
-                cstr1 = inout(reg) cstr1 => _,
-                cstr2 = inout(reg) cstr2 => _,
-                is_eq = out(reg) is_eq,
-                ch1 = out(reg) _,
-                ch2 = out(reg) _
-            );
-            is_eq != 0
         } else {
             use crate::{NSTD_FALSE, NSTD_TRUE};
             // If the C strings point to the same data return true.
@@ -245,37 +182,10 @@ pub unsafe fn nstd_core_cstr_raw_compare(
 #[nstdapi]
 #[allow(unused_mut)]
 pub unsafe fn nstd_core_cstr_raw_copy(mut dest: *mut NSTDChar, mut src: *const NSTDChar) {
-    cfg_if! {
-        if #[cfg(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64")))] {
-            core::arch::asm!(
-                include_str!("raw/x86/copy.asm"),
-                dest = inout(reg) dest => _,
-                src = inout(reg) src => _,
-                byte = out(reg_byte) _
-            );
-        }
-        else if #[cfg(all(feature = "asm", target_arch = "arm"))] {
-            core::arch::asm!(
-                include_str!("raw/arm/copy.asm"),
-                dest = inout(reg) dest => _,
-                src = inout(reg) src => _,
-                byte = out(reg) _
-            );
-        }
-        else if #[cfg(all(feature = "asm", target_arch = "aarch64"))] {
-            core::arch::asm!(
-                include_str!("raw/arm64/copy.asm"),
-                dest = inout(reg) dest => _,
-                src = inout(reg) src => _,
-                byte = out(reg) _
-            );
-        } else {
-            while *src != 0 {
-                *dest = *src;
-                dest = dest.offset(1);
-                src = src.offset(1);
-            }
-        }
+    while *src != 0 {
+        *dest = *src;
+        dest = dest.offset(1);
+        src = src.offset(1);
     }
 }
 
@@ -324,34 +234,11 @@ pub unsafe fn nstd_core_cstr_raw_copy_with_null(mut dest: *mut NSTDChar, mut src
                 unix,
                 windows,
                 any(target_env = "wasi", target_os = "wasi"),
-                target_os = "fuchsia",
-                target_os = "solid_asp3",
-                target_os = "vxworks"
+                target_os = "solid_asp3"
             ),
             feature = "libc"
         ))] {
             libc::strcpy(dest, src);
-        } else if #[cfg(all(feature = "asm", any(target_arch = "x86", target_arch = "x86_64")))] {
-            core::arch::asm!(
-                include_str!("raw/x86/copy_with_null.asm"),
-                dest = inout(reg) dest => _,
-                src = inout(reg) src => _,
-                byte = out(reg_byte) _
-            );
-        } else if #[cfg(all(feature = "asm", target_arch = "arm"))] {
-            core::arch::asm!(
-                include_str!("raw/arm/copy_with_null.asm"),
-                dest = inout(reg) dest => _,
-                src = inout(reg) src => _,
-                byte = out(reg) _
-            );
-        } else if #[cfg(all(feature = "asm", target_arch = "aarch64"))] {
-            core::arch::asm!(
-                include_str!("raw/arm64/copy_with_null.asm"),
-                dest = inout(reg) dest => _,
-                src = inout(reg) src => _,
-                byte = out(reg) _
-            );
         } else {
             while {
                 *dest = *src;
