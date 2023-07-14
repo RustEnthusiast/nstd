@@ -115,7 +115,9 @@ impl<'m, 'a> NSTDUnixMutexGuard<'m, 'a> {
 impl Drop for NSTDUnixMutexGuard<'_, '_> {
     /// Drops the guard, releasing the lock for the mutex.
     fn drop(&mut self) {
-        if nstd_thread_is_panicking() {
+        #[allow(unused_unsafe)]
+        // SAFETY: This operation is safe.
+        if unsafe { nstd_thread_is_panicking() } {
             self.mutex.poisoned.set(NSTD_TRUE);
         }
         // SAFETY: `self` has a valid reference to the mutex.

@@ -32,7 +32,9 @@ impl<T> CBox<T> {
     pub(crate) fn new(value: T) -> Option<Self> {
         let size = core::mem::size_of::<T>();
         match size {
-            0 => Some(Self(nstd_core_ptr_raw_dangling_mut(), Default::default())),
+            #[allow(unused_unsafe)]
+            // SAFETY: This operation is safe.
+            0 => unsafe { Some(Self(nstd_core_ptr_raw_dangling_mut(), Default::default())) },
             // SAFETY: `size` is greater than 0.
             _ => match unsafe { nstd_alloc_allocate(size) } {
                 NSTD_NULL => None,

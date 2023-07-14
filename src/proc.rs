@@ -146,7 +146,7 @@ pub fn nstd_proc_free(handle: NSTDChildProcess) {}
 /// ```
 /// use nstd_sys::proc::nstd_proc_exit;
 ///
-/// nstd_proc_exit(0);
+/// unsafe { nstd_proc_exit(0) };
 /// ```
 #[inline]
 #[nstdapi]

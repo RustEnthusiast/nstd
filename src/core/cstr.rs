@@ -52,9 +52,11 @@ gen_optional!(NSTDOptionalCStr, NSTDCStr);
 /// ```
 /// use nstd_sys::core::cstr::{nstd_core_cstr_is_null_terminated, nstd_core_cstr_new};
 ///
-/// let str = "This is a null-terminated C string slice.\0";
-/// let cstr = nstd_core_cstr_new(str.as_ptr().cast(), str.len()).unwrap();
-/// assert!(unsafe { nstd_core_cstr_is_null_terminated(&cstr) });
+/// unsafe {
+///     let str = "This is a null-terminated C string slice.\0";
+///     let cstr = nstd_core_cstr_new(str.as_ptr().cast(), str.len()).unwrap();
+///     assert!(nstd_core_cstr_is_null_terminated(&cstr));
+/// }
 /// ```
 #[inline]
 #[nstdapi]
@@ -219,10 +221,12 @@ pub const fn nstd_core_cstr_as_bytes(cstr: &NSTDCStr) -> NSTDSlice {
 /// ```
 /// use nstd_sys::core::cstr::{nstd_core_cstr_as_ptr, nstd_core_cstr_new};
 ///
-/// let str = "assert!(Rust + C >= God)";
-/// let str_ptr = str.as_ptr().cast();
-/// let cstr = nstd_core_cstr_new(str_ptr, str.len()).unwrap();
-/// assert!(str_ptr == nstd_core_cstr_as_ptr(&cstr));
+/// unsafe {
+///     let str = "assert!(Rust + C >= God)";
+///     let str_ptr = str.as_ptr().cast();
+///     let cstr = nstd_core_cstr_new(str_ptr, str.len()).unwrap();
+///     assert!(str_ptr == nstd_core_cstr_as_ptr(&cstr));
+/// }
 /// ```
 #[inline]
 #[nstdapi]
@@ -245,9 +249,11 @@ pub const fn nstd_core_cstr_as_ptr(cstr: &NSTDCStr) -> *const NSTDChar {
 /// ```
 /// use nstd_sys::core::cstr::{nstd_core_cstr_from_raw, nstd_core_cstr_len};
 ///
-/// let str = "Sunflower seeds yum\0";
-/// let cstr = unsafe { nstd_core_cstr_from_raw(str.as_ptr().cast()) };
-/// assert!(nstd_core_cstr_len(&cstr) == 19);
+/// unsafe {
+///     let str = "Sunflower seeds yum\0";
+///     let cstr = nstd_core_cstr_from_raw(str.as_ptr().cast());
+///     assert!(nstd_core_cstr_len(&cstr) == 19);
+/// }
 /// ```
 #[inline]
 #[nstdapi]
@@ -279,6 +285,7 @@ pub const fn nstd_core_cstr_len(cstr: &NSTDCStr) -> NSTDUInt {
 ///     NSTD_FALSE, NSTD_TRUE,
 /// };
 ///
+/// # unsafe {
 /// let nn_bytes = "Hello, world!";
 /// let nn_cstr = nstd_core_cstr_new(nn_bytes.as_ptr().cast(), nn_bytes.len()).unwrap();
 ///
@@ -288,11 +295,10 @@ pub const fn nstd_core_cstr_len(cstr: &NSTDCStr) -> NSTDUInt {
 /// let mn_bytes = "Hello, \0world!";
 /// let mn_cstr = nstd_core_cstr_new(mn_bytes.as_ptr().cast(), mn_bytes.len()).unwrap();
 ///
-/// unsafe {
-///     assert!(nstd_core_cstr_is_null_terminated(&nn_cstr) == NSTD_FALSE);
-///     assert!(nstd_core_cstr_is_null_terminated(&nt_cstr) == NSTD_TRUE);
-///     assert!(nstd_core_cstr_is_null_terminated(&mn_cstr) == NSTD_FALSE);
-/// }
+/// assert!(nstd_core_cstr_is_null_terminated(&nn_cstr) == NSTD_FALSE);
+/// assert!(nstd_core_cstr_is_null_terminated(&nt_cstr) == NSTD_TRUE);
+/// assert!(nstd_core_cstr_is_null_terminated(&mn_cstr) == NSTD_FALSE);
+/// # }
 /// ```
 #[inline]
 #[nstdapi]
@@ -480,9 +486,11 @@ gen_optional!(NSTDOptionalCStrMut, NSTDCStrMut);
 /// ```
 /// use nstd_sys::core::cstr::{nstd_core_cstr_mut_is_null_terminated, nstd_core_cstr_mut_new};
 ///
-/// let mut str = String::from("This is a null-terminated C string slice.\0");
-/// let cstr = nstd_core_cstr_mut_new(str.as_mut_ptr().cast(), str.len()).unwrap();
-/// assert!(unsafe { nstd_core_cstr_mut_is_null_terminated(&cstr) });
+/// unsafe {
+///     let mut str = String::from("This is a null-terminated C string slice.\0");
+///     let cstr = nstd_core_cstr_mut_new(str.as_mut_ptr().cast(), str.len()).unwrap();
+///     assert!(nstd_core_cstr_mut_is_null_terminated(&cstr));
+/// }
 /// ```
 #[inline]
 #[nstdapi]
@@ -621,10 +629,12 @@ pub unsafe fn nstd_core_cstr_mut_from_raw_with_null(raw: *mut NSTDChar) -> NSTDC
 ///     nstd_core_cstr_len, nstd_core_cstr_mut_as_const, nstd_core_cstr_mut_new,
 /// };
 ///
-/// let mut str = String::from("Faded than a ho");
-/// let cstr_mut = nstd_core_cstr_mut_new(str.as_mut_ptr().cast(), str.len()).unwrap();
-/// let cstr = nstd_core_cstr_mut_as_const(&cstr_mut);
-/// assert!(nstd_core_cstr_len(&cstr) == str.len());
+/// unsafe {
+///     let mut str = String::from("Faded than a ho");
+///     let cstr_mut = nstd_core_cstr_mut_new(str.as_mut_ptr().cast(), str.len()).unwrap();
+///     let cstr = nstd_core_cstr_mut_as_const(&cstr_mut);
+///     assert!(nstd_core_cstr_len(&cstr) == str.len());
+/// }
 /// ```
 #[inline]
 #[nstdapi]
@@ -682,10 +692,12 @@ pub const fn nstd_core_cstr_mut_as_bytes(cstr: &NSTDCStrMut) -> NSTDSlice {
 /// ```
 /// use nstd_sys::core::cstr::{nstd_core_cstr_mut_as_ptr, nstd_core_cstr_mut_new};
 ///
-/// let mut str = String::from("assert!(Rust + C >= God)");
-/// let str_ptr = str.as_mut_ptr().cast();
-/// let mut cstr = nstd_core_cstr_mut_new(str_ptr, str.len()).unwrap();
-/// assert!(str_ptr == nstd_core_cstr_mut_as_ptr(&mut cstr));
+/// unsafe {
+///     let mut str = String::from("assert!(Rust + C >= God)");
+///     let str_ptr = str.as_mut_ptr().cast();
+///     let mut cstr = nstd_core_cstr_mut_new(str_ptr, str.len()).unwrap();
+///     assert!(str_ptr == nstd_core_cstr_mut_as_ptr(&mut cstr));
+/// }
 /// ```
 #[inline]
 #[nstdapi]
@@ -708,9 +720,11 @@ pub fn nstd_core_cstr_mut_as_ptr(cstr: &mut NSTDCStrMut) -> *mut NSTDChar {
 /// ```
 /// use nstd_sys::core::cstr::{nstd_core_cstr_mut_as_ptr_const, nstd_core_cstr_mut_new};
 ///
-/// let mut str = String::from("assert!(Rust + C >= God)");
-/// let cstr = nstd_core_cstr_mut_new(str.as_mut_ptr().cast(), str.len()).unwrap();
-/// assert!(str.as_ptr().cast() == nstd_core_cstr_mut_as_ptr_const(&cstr));
+/// unsafe {
+///     let mut str = String::from("assert!(Rust + C >= God)");
+///     let cstr = nstd_core_cstr_mut_new(str.as_mut_ptr().cast(), str.len()).unwrap();
+///     assert!(str.as_ptr().cast() == nstd_core_cstr_mut_as_ptr_const(&cstr));
+/// }
 /// ```
 #[inline]
 #[nstdapi]
@@ -733,9 +747,11 @@ pub const fn nstd_core_cstr_mut_as_ptr_const(cstr: &NSTDCStrMut) -> *const NSTDC
 /// ```
 /// use nstd_sys::core::cstr::{nstd_core_cstr_mut_from_raw, nstd_core_cstr_mut_len};
 ///
-/// let mut str = String::from("Sunflower seeds yum\0");
-/// let cstr = unsafe { nstd_core_cstr_mut_from_raw(str.as_mut_ptr().cast()) };
-/// assert!(nstd_core_cstr_mut_len(&cstr) == 19);
+/// unsafe {
+///     let mut str = String::from("Sunflower seeds yum\0");
+///     let cstr = nstd_core_cstr_mut_from_raw(str.as_mut_ptr().cast());
+///     assert!(nstd_core_cstr_mut_len(&cstr) == 19);
+/// }
 /// ```
 #[inline]
 #[nstdapi]
@@ -767,6 +783,7 @@ pub const fn nstd_core_cstr_mut_len(cstr: &NSTDCStrMut) -> NSTDUInt {
 ///     NSTD_FALSE, NSTD_TRUE,
 /// };
 ///
+/// # unsafe {
 /// let mut nn_bytes = String::from("Hello, world!");
 /// let nn_cstr = nstd_core_cstr_mut_new(nn_bytes.as_mut_ptr().cast(), nn_bytes.len()).unwrap();
 ///
@@ -776,11 +793,10 @@ pub const fn nstd_core_cstr_mut_len(cstr: &NSTDCStrMut) -> NSTDUInt {
 /// let mut mn_bytes = String::from("Hello, \0world!");
 /// let mn_cstr = nstd_core_cstr_mut_new(mn_bytes.as_mut_ptr().cast(), mn_bytes.len()).unwrap();
 ///
-/// unsafe {
-///     assert!(nstd_core_cstr_mut_is_null_terminated(&nn_cstr) == NSTD_FALSE);
-///     assert!(nstd_core_cstr_mut_is_null_terminated(&nt_cstr) == NSTD_TRUE);
-///     assert!(nstd_core_cstr_mut_is_null_terminated(&mn_cstr) == NSTD_FALSE);
-/// }
+/// assert!(nstd_core_cstr_mut_is_null_terminated(&nn_cstr) == NSTD_FALSE);
+/// assert!(nstd_core_cstr_mut_is_null_terminated(&nt_cstr) == NSTD_TRUE);
+/// assert!(nstd_core_cstr_mut_is_null_terminated(&mn_cstr) == NSTD_FALSE);
+/// # }
 /// ```
 #[inline]
 #[nstdapi]
