@@ -47,7 +47,7 @@ pub type NSTDOptionalCString<'a> = NSTDOptional<NSTDCString<'a>>;
 /// ```
 /// use nstd_sys::{alloc::NSTD_ALLOCATOR, cstring::nstd_cstring_new};
 ///
-/// let cstring = nstd_cstring_new(&NSTD_ALLOCATOR);
+/// let cstring = unsafe { nstd_cstring_new(&NSTD_ALLOCATOR) };
 /// ```
 #[inline]
 #[nstdapi]
@@ -73,7 +73,7 @@ pub fn nstd_cstring_new(allocator: &NSTDAllocator) -> NSTDOptionalCString {
 /// ```
 /// use nstd_sys::{alloc::NSTD_ALLOCATOR, cstring::nstd_cstring_new_with_cap};
 ///
-/// let cstring = nstd_cstring_new_with_cap(&NSTD_ALLOCATOR, 10);
+/// let cstring = unsafe { nstd_cstring_new_with_cap(&NSTD_ALLOCATOR, 10) };
 /// ```
 #[inline]
 #[nstdapi]
@@ -358,8 +358,10 @@ pub fn nstd_cstring_cap(cstring: &NSTDCString) -> NSTDUInt {
 ///     NSTDChar,
 /// };
 ///
-/// let mut cstring = nstd_cstring_new(&NSTD_ALLOCATOR).unwrap();
-/// nstd_cstring_push(&mut cstring, b'!' as NSTDChar);
+/// unsafe {
+///     let mut cstring = nstd_cstring_new(&NSTD_ALLOCATOR).unwrap();
+///     nstd_cstring_push(&mut cstring, b'!' as NSTDChar);
+/// }
 /// ```
 #[nstdapi]
 pub fn nstd_cstring_push(cstring: &mut NSTDCString, chr: NSTDChar) -> NSTDAllocError {
@@ -415,8 +417,8 @@ pub fn nstd_cstring_push(cstring: &mut NSTDCString, chr: NSTDChar) -> NSTDAllocE
 ///     NSTDChar,
 /// };
 ///
-/// let mut cstring = nstd_cstring_new(&NSTD_ALLOCATOR).unwrap();
 /// unsafe {
+///     let mut cstring = nstd_cstring_new(&NSTD_ALLOCATOR).unwrap();
 ///     let cstr = nstd_core_cstr_from_raw("baNaNa\0".as_ptr().cast());
 ///     assert!(nstd_cstring_push_cstr(&mut cstring, &cstr) == NSTD_ALLOC_ERROR_NONE);
 /// }

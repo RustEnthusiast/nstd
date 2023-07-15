@@ -146,9 +146,12 @@ Each module may have additional features, for example `nstd.os` has the addition
 the low level memory allocation API for Windows without enabling memory allocation for other
 operating systems.
 
+The `std` feature flag links the Rust standard library into the binary.
+
 The `capi` feature flag is used to build `nstd` as a C library.
 
-The `std` feature flag links the Rust standard library into the binary.
+The `link` feature flag will link to an existing `nstd` library on the system. This feature is
+encouraged but not required to be enabled for Rust crates that use `nstd`'s `capi` feature.
 
 `std` and `nstd_core` are enabled by default.
 

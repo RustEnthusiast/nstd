@@ -34,8 +34,12 @@ impl From<timespec> for NSTDUnixTime {
         const NANOS_IN_SEC: NSTDFloat64 = 1_000_000_000.0;
         let mut seconds = value.tv_sec as _;
         seconds += value.tv_nsec as NSTDFloat64 / NANOS_IN_SEC;
-        Self {
-            duration: nstd_core_time_duration_new(seconds),
+        #[allow(unused_unsafe)]
+        // SAFETY: This operation is safe.
+        unsafe {
+            Self {
+                duration: nstd_core_time_duration_new(seconds),
+            }
         }
     }
 }

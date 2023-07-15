@@ -83,7 +83,7 @@ pub type NSTDOptionalString<'a> = NSTDOptional<NSTDString<'a>>;
 /// ```
 /// use nstd_sys::{alloc::NSTD_ALLOCATOR, string::nstd_string_new};
 ///
-/// let string = nstd_string_new(&NSTD_ALLOCATOR);
+/// let string = unsafe { nstd_string_new(&NSTD_ALLOCATOR) };
 /// ```
 #[inline]
 #[nstdapi]
@@ -110,7 +110,7 @@ pub const fn nstd_string_new(allocator: &NSTDAllocator) -> NSTDString {
 /// ```
 /// use nstd_sys::{alloc::NSTD_ALLOCATOR, string::nstd_string_new_with_cap};
 ///
-/// let string = nstd_string_new_with_cap(&NSTD_ALLOCATOR, 20);
+/// let string = unsafe { nstd_string_new_with_cap(&NSTD_ALLOCATOR, 20) };
 /// ```
 #[inline]
 #[nstdapi]
@@ -368,8 +368,10 @@ pub const fn nstd_string_cap(string: &NSTDString) -> NSTDUInt {
 ///     string::{nstd_string_new, nstd_string_push},
 /// };
 ///
-/// let mut string = nstd_string_new(&NSTD_ALLOCATOR);
-/// assert!(nstd_string_push(&mut string, '🦀'.into()) == NSTD_ALLOC_ERROR_NONE);
+/// unsafe {
+///     let mut string = nstd_string_new(&NSTD_ALLOCATOR);
+///     assert!(nstd_string_push(&mut string, '🦀'.into()) == NSTD_ALLOC_ERROR_NONE);
+/// }
 /// ```
 #[nstdapi]
 pub fn nstd_string_push(string: &mut NSTDString, chr: NSTDUnichar) -> NSTDAllocError {

@@ -62,7 +62,7 @@ pub const fn nstd_core_unichar_new(value: NSTDChar32) -> NSTDOptionalUnichar {
 /// ```
 /// use nstd_sys::core::unichar::nstd_core_unichar_replacement;
 ///
-/// assert!(nstd_core_unichar_replacement() == char::REPLACEMENT_CHARACTER.into());
+/// assert!(unsafe { nstd_core_unichar_replacement() } == char::REPLACEMENT_CHARACTER.into());
 /// ```
 #[inline]
 #[nstdapi]
@@ -103,8 +103,10 @@ gen_deterministic!(
     /// ```
     /// use nstd_sys::{core::unichar::nstd_core_unichar_is_ascii, NSTD_FALSE};
     ///
-    /// assert!(nstd_core_unichar_is_ascii('='.into()) != NSTD_FALSE);
-    /// assert!(nstd_core_unichar_is_ascii('💯'.into()) == NSTD_FALSE);
+    /// unsafe {
+    ///     assert!(nstd_core_unichar_is_ascii('='.into()) != NSTD_FALSE);
+    ///     assert!(nstd_core_unichar_is_ascii('💯'.into()) == NSTD_FALSE);
+    /// }
     /// ```
     nstd_core_unichar_is_ascii,
     is_ascii
@@ -125,8 +127,10 @@ gen_deterministic!(
     /// ```
     /// use nstd_sys::{core::unichar::nstd_core_unichar_is_alphabetic, NSTD_FALSE};
     ///
-    /// assert!(nstd_core_unichar_is_alphabetic('G'.into()) != NSTD_FALSE);
-    /// assert!(nstd_core_unichar_is_alphabetic('0'.into()) == NSTD_FALSE);
+    /// unsafe {
+    ///     assert!(nstd_core_unichar_is_alphabetic('G'.into()) != NSTD_FALSE);
+    ///     assert!(nstd_core_unichar_is_alphabetic('0'.into()) == NSTD_FALSE);
+    /// }
     /// ```
     nstd_core_unichar_is_alphabetic,
     is_alphabetic
@@ -147,8 +151,10 @@ gen_deterministic!(
     /// ```
     /// use nstd_sys::{core::unichar::nstd_core_unichar_is_numeric, NSTD_FALSE};
     ///
-    /// assert!(nstd_core_unichar_is_numeric('9'.into()) != NSTD_FALSE);
-    /// assert!(nstd_core_unichar_is_numeric('a'.into()) == NSTD_FALSE);
+    /// unsafe {
+    ///     assert!(nstd_core_unichar_is_numeric('9'.into()) != NSTD_FALSE);
+    ///     assert!(nstd_core_unichar_is_numeric('a'.into()) == NSTD_FALSE);
+    /// }
     /// ```
     nstd_core_unichar_is_numeric,
     is_numeric
@@ -169,9 +175,11 @@ gen_deterministic!(
     /// ```
     /// use nstd_sys::{core::unichar::nstd_core_unichar_is_alphanumeric, NSTD_FALSE};
     ///
-    /// assert!(nstd_core_unichar_is_alphanumeric('Z'.into()) != NSTD_FALSE);
-    /// assert!(nstd_core_unichar_is_alphanumeric('5'.into()) != NSTD_FALSE);
-    /// assert!(nstd_core_unichar_is_alphanumeric(';'.into()) == NSTD_FALSE);
+    /// unsafe {
+    ///     assert!(nstd_core_unichar_is_alphanumeric('Z'.into()) != NSTD_FALSE);
+    ///     assert!(nstd_core_unichar_is_alphanumeric('5'.into()) != NSTD_FALSE);
+    ///     assert!(nstd_core_unichar_is_alphanumeric(';'.into()) == NSTD_FALSE);
+    /// }
     /// ```
     nstd_core_unichar_is_alphanumeric,
     is_alphanumeric
@@ -192,8 +200,10 @@ gen_deterministic!(
     /// ```
     /// use nstd_sys::{core::unichar::nstd_core_unichar_is_lowercase, NSTD_FALSE};
     ///
-    /// assert!(nstd_core_unichar_is_lowercase('v'.into()) != NSTD_FALSE);
-    /// assert!(nstd_core_unichar_is_lowercase('M'.into()) == NSTD_FALSE);
+    /// unsafe {
+    ///     assert!(nstd_core_unichar_is_lowercase('v'.into()) != NSTD_FALSE);
+    ///     assert!(nstd_core_unichar_is_lowercase('M'.into()) == NSTD_FALSE);
+    /// }
     /// ```
     nstd_core_unichar_is_lowercase,
     is_lowercase
@@ -214,8 +224,10 @@ gen_deterministic!(
     /// ```
     /// use nstd_sys::{core::unichar::nstd_core_unichar_is_uppercase, NSTD_FALSE};
     ///
-    /// assert!(nstd_core_unichar_is_uppercase('P'.into()) != NSTD_FALSE);
-    /// assert!(nstd_core_unichar_is_uppercase('s'.into()) == NSTD_FALSE);
+    /// unsafe {
+    ///     assert!(nstd_core_unichar_is_uppercase('P'.into()) != NSTD_FALSE);
+    ///     assert!(nstd_core_unichar_is_uppercase('s'.into()) == NSTD_FALSE);
+    /// }
     /// ```
     nstd_core_unichar_is_uppercase,
     is_uppercase
@@ -236,8 +248,10 @@ gen_deterministic!(
     /// ```
     /// use nstd_sys::{core::unichar::nstd_core_unichar_is_whitespace, NSTD_FALSE};
     ///
-    /// assert!(nstd_core_unichar_is_whitespace('\n'.into()) != NSTD_FALSE);
-    /// assert!(nstd_core_unichar_is_whitespace('.'.into()) == NSTD_FALSE);
+    /// unsafe {
+    ///     assert!(nstd_core_unichar_is_whitespace('\n'.into()) != NSTD_FALSE);
+    ///     assert!(nstd_core_unichar_is_whitespace('.'.into()) == NSTD_FALSE);
+    /// }
     /// ```
     nstd_core_unichar_is_whitespace,
     is_whitespace
@@ -258,8 +272,10 @@ gen_deterministic!(
     /// ```
     /// use nstd_sys::{core::unichar::nstd_core_unichar_is_control, NSTD_FALSE};
     ///
-    /// assert!(nstd_core_unichar_is_control('\0'.into()) != NSTD_FALSE);
-    /// assert!(nstd_core_unichar_is_control('\\'.into()) == NSTD_FALSE);
+    /// unsafe {
+    ///     assert!(nstd_core_unichar_is_control('\0'.into()) != NSTD_FALSE);
+    ///     assert!(nstd_core_unichar_is_control('\\'.into()) == NSTD_FALSE);
+    /// }
     /// ```
     nstd_core_unichar_is_control,
     is_control
@@ -282,10 +298,12 @@ gen_deterministic!(
 /// ```
 /// use nstd_sys::{core::unichar::nstd_core_unichar_is_digit, NSTD_FALSE};
 ///
-/// assert!(nstd_core_unichar_is_digit('5'.into(), 16) != NSTD_FALSE);
-/// assert!(nstd_core_unichar_is_digit('E'.into(), 16) != NSTD_FALSE);
-/// assert!(nstd_core_unichar_is_digit('F'.into(), 10) == NSTD_FALSE);
-/// assert!(nstd_core_unichar_is_digit('0'.into(), 37) == NSTD_FALSE);
+/// unsafe {
+///     assert!(nstd_core_unichar_is_digit('5'.into(), 16) != NSTD_FALSE);
+///     assert!(nstd_core_unichar_is_digit('E'.into(), 16) != NSTD_FALSE);
+///     assert!(nstd_core_unichar_is_digit('F'.into(), 10) == NSTD_FALSE);
+///     assert!(nstd_core_unichar_is_digit('0'.into(), 37) == NSTD_FALSE);
+/// }
 /// ```
 #[inline]
 #[nstdapi]
