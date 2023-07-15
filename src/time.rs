@@ -22,10 +22,14 @@ cfg_if! {
             fn from(value: SystemTime) -> Self {
                 match value.duration_since(UNIX_EPOCH) {
                     Ok(dur) => NSTDTime::from_duration(
-                        nstd_core_time_duration_new(dur.as_secs_f64()),
+                        #[allow(unused_unsafe)]
+                        // SAFETY: This operation is safe.
+                        unsafe { nstd_core_time_duration_new(dur.as_secs_f64()) },
                     ),
                     Err(dur) => NSTDTime::from_duration(
-                        nstd_core_time_duration_new(-dur.duration().as_secs_f64()),
+                        #[allow(unused_unsafe)]
+                        // SAFETY: This operation is safe.
+                        unsafe { nstd_core_time_duration_new(-dur.duration().as_secs_f64()) },
                     ),
                 }
             }
@@ -53,11 +57,19 @@ cfg_if! {
             /// Converts a [SystemTime] into an [NSTDTime] object.
             fn from(value: SystemTime) -> Self {
                 match value.duration_since(UNIX_EPOCH) {
+                    #[allow(unused_unsafe)]
                     Ok(dur) => NSTDTime {
-                        duration: nstd_core_time_duration_new(dur.as_secs_f64()),
+                        // SAFETY: This operation is safe.
+                        duration: unsafe {
+                            nstd_core_time_duration_new(dur.as_secs_f64())
+                        },
                     },
+                    #[allow(unused_unsafe)]
                     Err(dur) => NSTDTime {
-                        duration: nstd_core_time_duration_new(-dur.duration().as_secs_f64()),
+                        // SAFETY: This operation is safe.
+                        duration: unsafe {
+                            nstd_core_time_duration_new(-dur.duration().as_secs_f64())
+                        },
                     },
                 }
             }

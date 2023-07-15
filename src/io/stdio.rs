@@ -81,7 +81,9 @@ pub(crate) unsafe fn read<R: Read>(stream: &mut R, buffer: &mut NSTDSliceMut) ->
 /// This does not mean there were no bytes read from `stream` in this case.
 pub(crate) fn read_all<R: Read>(stream: &mut R, buffer: &mut NSTDVec) -> NSTDIOResult {
     // Make sure the buffer's element size is 1.
-    if nstd_vec_stride(buffer) != 1 {
+    #[allow(unused_unsafe)]
+    // SAFETY: This operation is safe.
+    if unsafe { nstd_vec_stride(buffer) } != 1 {
         return NSTDResult::Err(NSTDIOError::NSTD_IO_ERROR_INVALID_INPUT);
     }
     // Attempt to read data into `buffer`.

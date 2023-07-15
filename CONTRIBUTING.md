@@ -20,8 +20,8 @@ This will allow users of the framework to disable compilation of our module if t
 require it.
 
 To do this, open the `Cargo.toml` file and head to the `[features]` section. The module features
-are listed in alphabetical order following the `default`, `std`, and `capi` features. Place the new
-feature where it is appropriate.
+are listed in alphabetical order following the `default`, `std`, `capi`, and `link` features. Place
+the new feature where it is appropriate.
 
 The new feature should look something like this: `{module_name} = []`.
 

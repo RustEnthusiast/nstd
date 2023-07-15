@@ -29,7 +29,9 @@ macro_rules! gen_inc {
         #[doc = concat!("use nstd_sys::core::ops::", stringify!($name), ";")]
         ///
         /// let mut x = 5;
+        /// # unsafe {
         #[doc = concat!(stringify!($name), "(&mut x);")]
+        /// # }
         /// assert!(x == 6);
         /// ```
         #[inline]
@@ -71,7 +73,9 @@ macro_rules! gen_dec {
         #[doc = concat!("use nstd_sys::core::ops::", stringify!($name), ";")]
         ///
         /// let mut x = 5;
+        /// # unsafe {
         #[doc = concat!(stringify!($name), "(&mut x);")]
+        /// # }
         /// assert!(x == 4);
         /// ```
         #[inline]
@@ -117,7 +121,9 @@ macro_rules! gen_neg {
         /// ```
         #[doc = concat!("use nstd_sys::core::ops::", stringify!($name), ";")]
         ///
+        /// # unsafe {
         #[doc = concat!("assert!(", stringify!($name), "(69) == -69);")]
+        /// # }
         /// ```
         #[inline]
         #[nstdapi]
@@ -156,7 +162,9 @@ macro_rules! gen_add {
         /// ```
         #[doc = concat!("use nstd_sys::core::ops::", stringify!($name), ";")]
         ///
+        /// # unsafe {
         #[doc = concat!("assert!(", stringify!($name), "(4, 5) == 9);")]
+        /// # }
         /// ```
         #[inline]
         #[nstdapi]
@@ -200,7 +208,9 @@ macro_rules! gen_sub {
         /// ```
         #[doc = concat!("use nstd_sys::core::ops::", stringify!($name), ";")]
         ///
+        /// # unsafe {
         #[doc = concat!("assert!(", stringify!($name), "(9, 5) == 4);")]
+        /// # }
         /// ```
         #[inline]
         #[nstdapi]
@@ -244,7 +254,9 @@ macro_rules! gen_mul {
         /// ```
         #[doc = concat!("use nstd_sys::core::ops::", stringify!($name), ";")]
         ///
+        /// # unsafe {
         #[doc = concat!("assert!(", stringify!($name), "(3, 4) == 12);")]
+        /// # }
         /// ```
         #[inline]
         #[nstdapi]
@@ -288,7 +300,9 @@ macro_rules! gen_div {
         /// ```
         #[doc = concat!("use nstd_sys::core::ops::", stringify!($name), ";")]
         ///
+        /// # unsafe {
         #[doc = concat!("assert!(", stringify!($name), "(15, 3) == 5);")]
+        /// # }
         /// ```
         #[inline]
         #[nstdapi]
@@ -335,7 +349,9 @@ macro_rules! gen_rem {
         /// ```
         #[doc = concat!("use nstd_sys::core::ops::", stringify!($name), ";")]
         ///
+        /// # unsafe {
         #[doc = concat!("assert!(", stringify!($name), "(23, 5) == 3);")]
+        /// # }
         /// ```
         #[inline]
         #[nstdapi]
@@ -383,7 +399,9 @@ macro_rules! gen_shl {
         /// ```
         #[doc = concat!("use nstd_sys::core::ops::", stringify!($name), ";")]
         ///
+        /// # unsafe {
         #[doc = concat!("assert!(", stringify!($name), "(1, 4) == 16);")]
+        /// # }
         /// ```
         #[inline]
         #[nstdapi]
@@ -428,7 +446,9 @@ macro_rules! gen_shr {
         /// ```
         #[doc = concat!("use nstd_sys::core::ops::", stringify!($name), ";")]
         ///
+        /// # unsafe {
         #[doc = concat!("assert!(", stringify!($name), "(16, 4) == 1);")]
+        /// # }
         /// ```
         #[inline]
         #[nstdapi]

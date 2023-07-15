@@ -13,7 +13,9 @@ use nstdapi::nstdapi;
 /// ```
 /// use nstd_sys::core::fty::nstd_core_fty_min_f32;
 ///
+/// # unsafe {
 /// assert!(nstd_core_fty_min_f32() == f32::MIN);
+/// # }
 /// ```
 #[inline]
 #[nstdapi]
@@ -31,7 +33,9 @@ pub const fn nstd_core_fty_min_f32() -> NSTDFloat32 {
 /// ```
 /// use nstd_sys::core::fty::nstd_core_fty_max_f32;
 ///
+/// # unsafe {
 /// assert!(nstd_core_fty_max_f32() == f32::MAX);
+/// # }
 /// ```
 #[inline]
 #[nstdapi]
@@ -49,7 +53,9 @@ pub const fn nstd_core_fty_max_f32() -> NSTDFloat32 {
 /// ```
 /// use nstd_sys::core::fty::nstd_core_fty_min_f64;
 ///
+/// # unsafe {
 /// assert!(nstd_core_fty_min_f64() == f64::MIN);
+/// # }
 /// ```
 #[inline]
 #[nstdapi]
@@ -67,7 +73,9 @@ pub const fn nstd_core_fty_min_f64() -> NSTDFloat64 {
 /// ```
 /// use nstd_sys::core::fty::nstd_core_fty_max_f64;
 ///
+/// # unsafe {
 /// assert!(nstd_core_fty_max_f64() == f64::MAX);
+/// # }
 /// ```
 #[inline]
 #[nstdapi]
@@ -86,7 +94,9 @@ pub const fn nstd_core_fty_max_f64() -> NSTDFloat64 {
 /// ```
 /// use nstd_sys::core::fty::nstd_core_fty_nan_f32;
 ///
+/// # unsafe {
 /// assert!(nstd_core_fty_nan_f32().is_nan());
+/// # }
 /// ```
 #[inline]
 #[nstdapi]
@@ -104,7 +114,9 @@ pub const fn nstd_core_fty_nan_f32() -> NSTDFloat32 {
 /// ```
 /// use nstd_sys::core::fty::nstd_core_fty_nan_f64;
 ///
+/// # unsafe {
 /// assert!(nstd_core_fty_nan_f64().is_nan());
+/// # }
 /// ```
 #[inline]
 #[nstdapi]
@@ -123,7 +135,9 @@ pub const fn nstd_core_fty_nan_f64() -> NSTDFloat64 {
 /// ```
 /// use nstd_sys::core::fty::nstd_core_fty_inf_f32;
 ///
+/// # unsafe {
 /// assert!(nstd_core_fty_inf_f32() == f32::INFINITY);
+/// # }
 /// ```
 #[inline]
 #[nstdapi]
@@ -141,7 +155,9 @@ pub const fn nstd_core_fty_inf_f32() -> NSTDFloat32 {
 /// ```
 /// use nstd_sys::core::fty::nstd_core_fty_inf_f64;
 ///
+/// # unsafe {
 /// assert!(nstd_core_fty_inf_f64() == f64::INFINITY);
+/// # }
 /// ```
 #[inline]
 #[nstdapi]
@@ -160,7 +176,9 @@ pub const fn nstd_core_fty_inf_f64() -> NSTDFloat64 {
 /// ```
 /// use nstd_sys::core::fty::nstd_core_fty_neg_inf_f32;
 ///
+/// # unsafe {
 /// assert!(nstd_core_fty_neg_inf_f32() == f32::NEG_INFINITY);
+/// # }
 /// ```
 #[inline]
 #[nstdapi]
@@ -178,7 +196,9 @@ pub const fn nstd_core_fty_neg_inf_f32() -> NSTDFloat32 {
 /// ```
 /// use nstd_sys::core::fty::nstd_core_fty_neg_inf_f64;
 ///
+/// # unsafe {
 /// assert!(nstd_core_fty_neg_inf_f64() == f64::NEG_INFINITY);
+/// # }
 /// ```
 #[inline]
 #[nstdapi]

@@ -30,6 +30,7 @@ panic = "abort"
 default = ["core", "std"]
 std = []
 capi = ["nstdapi/capi"]
+link = ["capi", "nstdapi/link"]
 nstd = [
     "alloc", "app", "core", "cstring", "env", "fs", "heap_ptr", "io", "math", "mutex", "os",
     "os_unix_alloc", "os_unix_io", "os_unix_mutex", "os_unix_shared_lib", "os_unix_time",
@@ -68,7 +69,7 @@ vec = ["alloc", "core"]
 cfg-if = "1.0"
 gilrs = { version = "0.10", optional = true }
 libc = { version = "0.2", optional = true, default-features = false }
-nstdapi = "0.1"
+nstdapi = "0.2"
 winit = { version = "0.28", optional = true }
 
 [target.'cfg(unix)'.dependencies]

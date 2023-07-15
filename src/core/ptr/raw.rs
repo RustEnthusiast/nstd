@@ -28,7 +28,7 @@ const fn is_power_of_two(align: NSTDUInt) -> NSTDBool {
 /// ```
 /// use nstd_sys::core::{ptr::raw::nstd_core_ptr_raw_dangling, slice::nstd_core_slice_new};
 ///
-/// let slice = nstd_core_slice_new(nstd_core_ptr_raw_dangling(), 1, 0).unwrap();
+/// let slice = unsafe { nstd_core_slice_new(nstd_core_ptr_raw_dangling(), 1, 0).unwrap() };
 /// ```
 #[inline]
 #[nstdapi]
@@ -48,7 +48,7 @@ pub const fn nstd_core_ptr_raw_dangling() -> NSTDAny {
 /// ```
 /// use nstd_sys::core::{ptr::raw::nstd_core_ptr_raw_dangling_mut, slice::nstd_core_slice_mut_new};
 ///
-/// let slice = nstd_core_slice_mut_new(nstd_core_ptr_raw_dangling_mut(), 1, 0).unwrap();
+/// let slice = unsafe { nstd_core_slice_mut_new(nstd_core_ptr_raw_dangling_mut(), 1, 0).unwrap() };
 /// ```
 #[inline]
 #[nstdapi]
