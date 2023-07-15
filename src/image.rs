@@ -1,10 +1,22 @@
 //! Multi-format image processing.
-use crate::{core::slice::NSTDSlice, NSTDUInt32};
+use crate::{
+    alloc::CBox,
+    core::{
+        optional::{gen_optional, NSTDOptional},
+        slice::NSTDSlice,
+    },
+    NSTDUInt32,
+};
 use image::DynamicImage;
 use nstdapi::nstdapi;
 
 /// An image of any format.
-pub type NSTDImage = Box<DynamicImage>;
+#[nstdapi]
+pub struct NSTDImage {
+    /// The [DynamicImage].
+    img: CBox<DynamicImage>,
+}
+gen_optional!(NSTDOptionalImage, NSTDImage);
 
 /// Loads an image from an in-memory buffer.
 ///
@@ -14,7 +26,7 @@ pub type NSTDImage = Box<DynamicImage>;
 ///
 /// # Returns
 ///
-/// `NSTDImage img` - The new image, or null on error.
+/// `NSTDOptionalImage img` - The new image on success, or an uninitialized "none" variant on error.
 ///
 /// # Panics
 ///
@@ -23,13 +35,14 @@ pub type NSTDImage = Box<DynamicImage>;
 /// # Safety
 ///
 /// This operation can cause undefined behavior if `buffer`'s data is invalid.
-#[inline]
 #[nstdapi]
-pub unsafe fn nstd_image_load(buffer: &NSTDSlice) -> Option<NSTDImage> {
-    match image::load_from_memory(buffer.as_slice()) {
-        Ok(img) => Some(Box::new(img)),
-        _ => None,
+pub unsafe fn nstd_image_load(buffer: &NSTDSlice) -> NSTDOptionalImage {
+    if let Ok(img) = image::load_from_memory(buffer.as_slice()) {
+        if let Some(img) = CBox::new(img) {
+            return NSTDOptional::Some(NSTDImage { img });
+        }
     }
+    NSTDOptional::None
 }
 
 /// Returns an image's raw pixel data as a byte slice.
@@ -44,7 +57,7 @@ pub unsafe fn nstd_image_load(buffer: &NSTDSlice) -> Option<NSTDImage> {
 #[inline]
 #[nstdapi]
 pub fn nstd_image_as_bytes(img: &NSTDImage) -> NSTDSlice {
-    NSTDSlice::from_slice(img.as_bytes())
+    NSTDSlice::from_slice(img.img.as_bytes())
 }
 
 /// Returns the width of an image.
@@ -59,7 +72,7 @@ pub fn nstd_image_as_bytes(img: &NSTDImage) -> NSTDSlice {
 #[inline]
 #[nstdapi]
 pub fn nstd_image_width(img: &NSTDImage) -> NSTDUInt32 {
-    img.width()
+    img.img.width()
 }
 
 /// Returns the height of an image.
@@ -74,7 +87,7 @@ pub fn nstd_image_width(img: &NSTDImage) -> NSTDUInt32 {
 #[inline]
 #[nstdapi]
 pub fn nstd_image_height(img: &NSTDImage) -> NSTDUInt32 {
-    img.height()
+    img.img.height()
 }
 
 /// Frees image data.
