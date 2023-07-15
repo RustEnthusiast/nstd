@@ -31,10 +31,11 @@ default = ["core", "std"]
 std = []
 capi = ["nstdapi/capi"]
 nstd = [
-    "alloc", "core", "cstring", "env", "fs", "heap_ptr", "image", "io", "math", "mutex", "os",
-    "os_unix_alloc", "os_unix_io", "os_unix_mutex", "os_unix_shared_lib", "os_unix_time",
-    "os_windows_alloc", "os_windows_shared_lib", "os_windows_str", "proc", "shared_lib",
-    "shared_ptr", "string", "thread", "time", "timed_mutex", "vec"
+    "alloc", "core", "cstring", "env", "fs", "heap_ptr", "image", "image_gif", "image_ico",
+    "image_jpeg", "image_png", "io", "math", "mutex", "os", "os_unix_alloc", "os_unix_io",
+    "os_unix_mutex", "os_unix_shared_lib", "os_unix_time", "os_windows_alloc",
+    "os_windows_shared_lib", "os_windows_str", "proc", "shared_lib", "shared_ptr", "string",
+    "thread", "time", "timed_mutex", "vec"
 ]
 alloc = ["core", "libc", "os_windows_alloc"]
 core = []
