@@ -1,4 +1,4 @@
-# TBD
+# 0.9.0
 ## Added
 ### `nstd`
 - Added an `nstd` feature to enable all modules.
