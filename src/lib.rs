@@ -67,7 +67,7 @@ use ::core::ffi::{c_char, c_void};
 
 /// [NSTDInt]'s maximum value.
 #[allow(dead_code)]
-pub(crate) const NSTD_INT_MAX: NSTDInt = NSTDInt::MAX;
+const NSTD_INT_MAX: NSTDInt = NSTDInt::MAX;
 
 /// A null pointer value constant.
 pub const NSTD_NULL: NSTDAnyMut = ::core::ptr::null_mut();
@@ -117,6 +117,53 @@ pub type NSTDChar32 = NSTDUInt32;
 pub type NSTDAny = *const c_void;
 /// An opaque pointer to some mutable data.
 pub type NSTDAnyMut = *mut c_void;
+
+/// An opaque reference to some immutable data.
+#[repr(transparent)]
+pub struct NSTDRef<'a>(&'a ());
+impl<'a> NSTDRef<'a> {
+    /// Gets the immutable reference.
+    ///
+    /// # Safety
+    ///
+    /// This reference must be pointing to a valid object of type `T`.
+    #[inline]
+    #[allow(dead_code)]
+    unsafe fn get<T>(&'a self) -> &'a T {
+        ::core::mem::transmute(self.0)
+    }
+}
+impl<'a, T> From<&'a T> for NSTDRef<'a> {
+    /// Creates a new opaque reference.
+    #[inline]
+    fn from(value: &'a T) -> Self {
+        // SAFETY: Reference to reference transmute.
+        Self(unsafe { ::core::mem::transmute(value) })
+    }
+}
+/// An opaque reference to some mutable data.
+#[repr(transparent)]
+pub struct NSTDRefMut<'a>(&'a mut ());
+impl<'a> NSTDRefMut<'a> {
+    /// Gets the mutable reference.
+    ///
+    /// # Safety
+    ///
+    /// This reference must be pointing to a valid object of type `T`.
+    #[inline]
+    #[allow(dead_code)]
+    unsafe fn get<T>(&'a mut self) -> &'a mut T {
+        ::core::mem::transmute_copy(&self.0)
+    }
+}
+impl<'a, T> From<&'a mut T> for NSTDRefMut<'a> {
+    /// Creates a new opaque reference.
+    #[inline]
+    fn from(value: &'a mut T) -> Self {
+        // SAFETY: Reference to reference transmute.
+        Self(unsafe { ::core::mem::transmute(value) })
+    }
+}
 
 /// A boolean type, can either be `NSTD_TRUE` (1) or `NSTD_FALSE` (0).
 pub type NSTDBool = bool;
