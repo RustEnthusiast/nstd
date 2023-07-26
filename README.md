@@ -7,7 +7,7 @@ Rust syntax).
 
 # Example using C
 ```c
-// Build nstd with features set to "capi nstd_core nstd_io".
+// Build nstd with features set to "capi core io".
 #include <assert.h>
 #include <nstd.h>
 
@@ -139,10 +139,10 @@ flag multiple times in case you need both.
 `nstd` lets you decide what features you want to use.
 
 Any module that falls under the top level module has a dedicated feature flag, for example
-`nstd.core` has the feature flag `nstd_core` and `nstd.alloc` has the feature flag `nstd_alloc`.
+`nstd.core` has the feature flag `core` and `nstd.alloc` has the feature flag `alloc`.
 
 Each module may have additional features, for example `nstd.os` has the additional
-`nstd_os_windows_alloc` feature for memory allocation on Windows, this allows other modules to use
+`os_windows_alloc` feature for memory allocation on Windows, this allows other modules to use
 the low level memory allocation API for Windows without enabling memory allocation for other
 operating systems.
 
@@ -153,11 +153,11 @@ The `capi` feature flag is used to build `nstd` as a C library.
 The `link` feature flag will link to an existing `nstd` library on the system. This feature is
 encouraged but not required to be enabled for Rust crates that use `nstd`'s `capi` feature.
 
-`std` and `nstd_core` are enabled by default.
+`std` and `core` are enabled by default.
 
 Example:
 ```sh
-cargo rustc --release --crate-type cdylib --crate-type staticlib --features "capi nstd_alloc"
+cargo rustc --release --crate-type cdylib --crate-type staticlib --features "capi alloc string"
 ```
 
 To build with all features:
