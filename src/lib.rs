@@ -63,7 +63,11 @@ pub mod timed_mutex;
 #[cfg(feature = "vec")]
 #[cfg_attr(doc_cfg, doc(cfg(feature = "vec")))]
 pub mod vec;
-use ::core::ffi::{c_char, c_void};
+use ::core::{
+    ffi::{c_char, c_void},
+    marker::PhantomData,
+    ops::{Deref, DerefMut},
+};
 
 /// [NSTDInt]'s maximum value.
 #[allow(dead_code)]
@@ -118,50 +122,56 @@ pub type NSTDAny = *const c_void;
 /// An opaque pointer to some mutable data.
 pub type NSTDAnyMut = *mut c_void;
 
-/// An opaque reference to some immutable data.
+/// An FFI-safe reference to some immutable data.
 #[repr(transparent)]
-pub struct NSTDRef<'a>(&'a ());
-impl<'a> NSTDRef<'a> {
+pub struct NSTDRef<'a, T>(&'a c_void, PhantomData<&'a T>);
+impl<'a, T> Deref for NSTDRef<'a, T> {
+    /// `NSTDRef`'s dereference target.
+    type Target = T;
+
     /// Gets the immutable reference.
-    ///
-    /// # Safety
-    ///
-    /// This reference must be pointing to a valid object of type `T`.
     #[inline]
-    #[allow(dead_code)]
-    unsafe fn get<T>(&'a self) -> &'a T {
-        ::core::mem::transmute(self.0)
+    fn deref(&self) -> &T {
+        // SAFETY: `self.0` is of type `&T`.
+        unsafe { ::core::mem::transmute(self.0) }
     }
 }
-impl<'a, T> From<&'a T> for NSTDRef<'a> {
-    /// Creates a new opaque reference.
+impl<'a, T> From<&'a T> for NSTDRef<'a, T> {
+    /// Creates a new FFI-safe reference.
     #[inline]
     fn from(value: &'a T) -> Self {
         // SAFETY: Reference to reference transmute.
-        Self(unsafe { ::core::mem::transmute(value) })
+        Self(unsafe { ::core::mem::transmute(value) }, Default::default())
     }
 }
-/// An opaque reference to some mutable data.
+/// An FFI-safe reference to some mutable data.
 #[repr(transparent)]
-pub struct NSTDRefMut<'a>(&'a mut ());
-impl<'a> NSTDRefMut<'a> {
-    /// Gets the mutable reference.
-    ///
-    /// # Safety
-    ///
-    /// This reference must be pointing to a valid object of type `T`.
+pub struct NSTDRefMut<'a, T>(&'a mut c_void, PhantomData<&'a mut T>);
+impl<'a, T> Deref for NSTDRefMut<'a, T> {
+    /// `NSTDRefMut`'s dereference target.
+    type Target = T;
+
+    /// Gets the reference.
     #[inline]
-    #[allow(dead_code)]
-    unsafe fn get<T>(&'a mut self) -> &'a mut T {
-        ::core::mem::transmute_copy(&self.0)
+    fn deref(&self) -> &T {
+        // SAFETY: `self.0` is of type `&mut T`.
+        unsafe { ::core::mem::transmute_copy(&self.0) }
     }
 }
-impl<'a, T> From<&'a mut T> for NSTDRefMut<'a> {
-    /// Creates a new opaque reference.
+impl<'a, T> DerefMut for NSTDRefMut<'a, T> {
+    /// Gets the mutable reference.
+    #[inline]
+    fn deref_mut(&mut self) -> &mut T {
+        // SAFETY: `self.0` is of type `&mut T`.
+        unsafe { ::core::mem::transmute_copy(&self.0) }
+    }
+}
+impl<'a, T> From<&'a mut T> for NSTDRefMut<'a, T> {
+    /// Creates a new FFI-safe reference.
     #[inline]
     fn from(value: &'a mut T) -> Self {
         // SAFETY: Reference to reference transmute.
-        Self(unsafe { ::core::mem::transmute(value) })
+        Self(unsafe { ::core::mem::transmute(value) }, Default::default())
     }
 }
 
