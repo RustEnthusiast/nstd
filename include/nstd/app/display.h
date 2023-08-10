@@ -1,14 +1,24 @@
 #ifndef NSTD_APP_DISPLAY_H
 #define NSTD_APP_DISPLAY_H
+#include "../core/optional.h"
 #include "../nstd.h"
 #include "../string.h"
 #include "../vec.h"
 
 /// Represents a monitor/display.
-typedef NSTDAnyMut NSTDDisplay;
+typedef struct {
+    /// The inner [MonitorHandle].
+    NSTDAnyMut display;
+} NSTDDisplay;
+
+/// Represents an optional value of type `NSTDDisplay`.
+NSTDOptional(NSTDDisplay) NSTDOptionalDisplay;
 
 /// An owned display mode handle.
-typedef NSTDAnyMut NSTDDisplayMode;
+typedef struct {
+    /// The inner [VideoMode].
+    NSTDAnyMut mode;
+} NSTDDisplayMode;
 
 /// Represents the size of a display.
 typedef struct {
@@ -140,8 +150,9 @@ NSTDAPI NSTDUInt32 nstd_app_display_mode_refresh_rate(const NSTDDisplayMode *mod
 ///
 /// # Returns
 ///
-/// `NSTDDisplay display` - A handle to the display that `mode` is valid for.
-NSTDAPI NSTDDisplay nstd_app_display_mode_handle(const NSTDDisplayMode *mode);
+/// `NSTDOptionalDisplay display` - A handle to the display that `mode` is valid for on success, or
+/// an uninitialized "none" variant on error.
+NSTDAPI NSTDOptionalDisplay nstd_app_display_mode_handle(const NSTDDisplayMode *mode);
 
 /// Frees an instance of `NSTDDisplayMode`.
 ///

@@ -1,11 +1,18 @@
 #ifndef NSTD_APP_GAMEPAD_H
 #define NSTD_APP_GAMEPAD_H
+#include "../core/optional.h"
 #include "../core/str.h"
 #include "../nstd.h"
 #include "events.h"
 
 /// A handle to a gamepad.
-typedef NSTDAnyMut NSTDGamepad;
+typedef struct {
+    /// The inner [Gamepad].
+    NSTDAnyMut gamepad;
+} NSTDGamepad;
+
+/// Represents an optional value of type `NSTDGamepad`.
+NSTDOptional(NSTDGamepad) NSTDOptionalGamepad;
 
 /// Returns a gamepad's unique ID.
 ///
@@ -15,8 +22,9 @@ typedef NSTDAnyMut NSTDGamepad;
 ///
 /// # Returns
 ///
-/// `NSTDGamepadID id` - The gamepad's unique ID.
-NSTDAPI NSTDGamepadID nstd_app_gamepad_id(const NSTDGamepad *gamepad);
+/// `NSTDOptionalGamepadID id` - The gamepad's unique ID on success, or an uninitialized "none"
+/// variant on error.
+NSTDAPI NSTDOptionalGamepadID nstd_app_gamepad_id(const NSTDGamepad *gamepad);
 
 /// Returns the name of a gamepad.
 ///

@@ -1,18 +1,29 @@
 //! Provides access to physical displays.
 use crate::{
-    core::optional::NSTDOptional,
+    alloc::{CBox, NSTD_ALLOCATOR},
+    core::optional::{gen_optional, NSTDOptional},
     string::{NSTDOptionalString, NSTDString},
-    vec::NSTDVec,
+    vec::{nstd_vec_new, nstd_vec_push, NSTDVec},
     NSTDFloat64, NSTDInt32, NSTDUInt16, NSTDUInt32,
 };
 use nstdapi::nstdapi;
+use std::ptr::addr_of;
 use winit::monitor::{MonitorHandle, VideoMode};
 
 /// Represents a monitor/display.
-pub type NSTDDisplay = Box<MonitorHandle>;
+#[nstdapi]
+pub struct NSTDDisplay {
+    /// The inner [MonitorHandle].
+    pub(super) handle: CBox<MonitorHandle>,
+}
+gen_optional!(NSTDOptionalDisplay, NSTDDisplay);
 
 /// An owned display mode handle.
-pub type NSTDDisplayMode = Box<VideoMode>;
+#[nstdapi]
+pub struct NSTDDisplayMode {
+    /// The inner [VideoMode].
+    mode: CBox<VideoMode>,
+}
 
 /// Represents the size of a display.
 #[nstdapi]
@@ -46,7 +57,7 @@ pub struct NSTDDisplayPosition {
 #[inline]
 #[nstdapi]
 pub fn nstd_app_display_name(display: &NSTDDisplay) -> NSTDOptionalString {
-    match display.name() {
+    match display.handle.name() {
         Some(name) => NSTDOptional::Some(NSTDString::from_string(name)),
         _ => NSTDOptional::None,
     }
@@ -64,7 +75,7 @@ pub fn nstd_app_display_name(display: &NSTDDisplay) -> NSTDOptionalString {
 #[inline]
 #[nstdapi]
 pub fn nstd_app_display_size(display: &NSTDDisplay) -> NSTDDisplaySize {
-    let size = display.size();
+    let size = display.handle.size();
     NSTDDisplaySize {
         width: size.width,
         height: size.height,
@@ -83,7 +94,7 @@ pub fn nstd_app_display_size(display: &NSTDDisplay) -> NSTDDisplaySize {
 #[inline]
 #[nstdapi]
 pub fn nstd_app_display_position(display: &NSTDDisplay) -> NSTDDisplayPosition {
-    let position = display.position();
+    let position = display.handle.position();
     NSTDDisplayPosition {
         x: position.x,
         y: position.y,
@@ -102,7 +113,7 @@ pub fn nstd_app_display_position(display: &NSTDDisplay) -> NSTDDisplayPosition {
 #[inline]
 #[nstdapi]
 pub fn nstd_app_display_refresh_rate(display: &NSTDDisplay) -> NSTDUInt32 {
-    display.refresh_rate_millihertz().unwrap_or_default()
+    display.handle.refresh_rate_millihertz().unwrap_or_default()
 }
 
 /// Returns the scale factor of a display.
@@ -117,7 +128,7 @@ pub fn nstd_app_display_refresh_rate(display: &NSTDDisplay) -> NSTDUInt32 {
 #[inline]
 #[nstdapi]
 pub fn nstd_app_display_scale_factor(display: &NSTDDisplay) -> NSTDFloat64 {
-    display.scale_factor()
+    display.handle.scale_factor()
 }
 
 /// Returns a display's valid display configurations.
@@ -129,10 +140,16 @@ pub fn nstd_app_display_scale_factor(display: &NSTDDisplay) -> NSTDFloat64 {
 /// # Returns
 ///
 /// `NSTDVec modes` - A vector of `display`'s `NSTDDisplayMode`s.
-#[inline]
 #[nstdapi]
 pub unsafe fn nstd_app_display_modes(display: &NSTDDisplay) -> NSTDVec {
-    display.video_modes().map(Box::new).collect()
+    let mut modes = nstd_vec_new(&NSTD_ALLOCATOR, std::mem::size_of::<NSTDDisplayMode>());
+    for mode in display.handle.video_modes() {
+        if let Some(mode) = CBox::new(mode) {
+            let m = NSTDDisplayMode { mode };
+            nstd_vec_push(&mut modes, addr_of!(m) as _);
+        }
+    }
+    modes
 }
 
 /// Frees an instance of `NSTDDisplay`.
@@ -157,7 +174,7 @@ pub fn nstd_app_display_free(display: NSTDDisplay) {}
 #[inline]
 #[nstdapi]
 pub fn nstd_app_display_mode_size(mode: &NSTDDisplayMode) -> NSTDDisplaySize {
-    let size = mode.size();
+    let size = mode.mode.size();
     NSTDDisplaySize {
         width: size.width,
         height: size.height,
@@ -176,7 +193,7 @@ pub fn nstd_app_display_mode_size(mode: &NSTDDisplayMode) -> NSTDDisplaySize {
 #[inline]
 #[nstdapi]
 pub fn nstd_app_display_mode_bit_depth(mode: &NSTDDisplayMode) -> NSTDUInt16 {
-    mode.bit_depth()
+    mode.mode.bit_depth()
 }
 
 /// Returns the refresh rate of a display mode in millihertz.
@@ -191,7 +208,7 @@ pub fn nstd_app_display_mode_bit_depth(mode: &NSTDDisplayMode) -> NSTDUInt16 {
 #[inline]
 #[nstdapi]
 pub fn nstd_app_display_mode_refresh_rate(mode: &NSTDDisplayMode) -> NSTDUInt32 {
-    mode.refresh_rate_millihertz()
+    mode.mode.refresh_rate_millihertz()
 }
 
 /// Returns a handle to a display mode's display.
@@ -202,11 +219,15 @@ pub fn nstd_app_display_mode_refresh_rate(mode: &NSTDDisplayMode) -> NSTDUInt32 
 ///
 /// # Returns
 ///
-/// `NSTDDisplay display` - A handle to the display that `mode` is valid for.
+/// `NSTDOptionalDisplay display` - A handle to the display that `mode` is valid for on success, or
+/// an uninitialized "none" variant on error.
 #[inline]
 #[nstdapi]
-pub fn nstd_app_display_mode_handle(mode: &NSTDDisplayMode) -> NSTDDisplay {
-    Box::new(mode.monitor())
+pub fn nstd_app_display_mode_handle(mode: &NSTDDisplayMode) -> NSTDOptionalDisplay {
+    match CBox::new(mode.mode.monitor()) {
+        Some(handle) => NSTDOptional::Some(NSTDDisplay { handle }),
+        _ => NSTDOptional::None,
+    }
 }
 
 /// Frees an instance of `NSTDDisplayMode`.

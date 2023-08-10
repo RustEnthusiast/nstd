@@ -38,7 +38,7 @@ nstd = [
     "shared_ptr", "string", "thread", "time", "timed_mutex", "vec"
 ]
 alloc = ["core", "libc", "os_windows_alloc"]
-app = ["core", "gilrs", "heap_ptr", "std", "string", "vec", "winit"]
+app = ["alloc", "core", "gilrs", "heap_ptr", "std", "string", "vec", "winit"]
 core = []
 cstring = ["alloc", "core", "vec"]
 env = ["alloc", "core", "io", "std", "string", "vec"]

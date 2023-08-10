@@ -94,8 +94,9 @@ NSTDAPI NSTDVec nstd_app_displays(NSTDAppHandle app);
 ///
 /// # Returns
 ///
-/// `NSTDDisplay display` - A handle to the primary display, null on error.
-NSTDAPI NSTDDisplay nstd_app_primary_display(NSTDAppHandle app);
+/// `NSTDOptionalDisplay display` - A handle to the primary display on success, or an uninitialized
+/// "none" variant on error.
+NSTDAPI NSTDOptionalDisplay nstd_app_primary_display(NSTDAppHandle app);
 
 /// Sets the `nstd` application's device filtering mode.
 ///
@@ -116,8 +117,9 @@ NSTDAPI void nstd_app_set_device_event_filter(NSTDAppHandle app, NSTDDeviceEvent
 ///
 /// # Returns
 ///
-/// `NSTDGamepad gamepad` - A handle to the gamepad with ID `id`.
-NSTDAPI NSTDGamepad nstd_app_gamepad(const NSTDAppData *app, const NSTDGamepadID *id);
+/// `NSTDOptionalGamepad gamepad` - A handle to the gamepad with ID `id` on success, or an
+/// uninitialized "none" variant on error.
+NSTDAPI NSTDOptionalGamepad nstd_app_gamepad(const NSTDAppData *app, const NSTDGamepadID *id);
 
 /// Returns a vector of all connected gamepad handles detected by `app`.
 ///
@@ -158,13 +160,6 @@ NSTDAPI void nstd_app_exit_with_code(NSTDAppData *app, NSTDErrorCode errc);
 ///
 /// `NSTDBool is_eq` - `NSTD_TRUE` if the two window IDs compare equal.
 NSTDAPI NSTDBool nstd_app_window_id_compare(const NSTDWindowID *id1, const NSTDWindowID *id2);
-
-/// Frees an instance of `NSTDWindowID`.
-///
-/// # Parameters:
-///
-/// - `NSTDWindowID id` - The window ID to free.
-NSTDAPI void nstd_app_window_id_free(NSTDWindowID id);
 
 /// Checks if two `NSTDDeviceID`s refer to the same device.
 ///
