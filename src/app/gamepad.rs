@@ -1,14 +1,22 @@
 //! Gamepad access.
 use crate::{
-    app::events::{NSTDGamepadAxis, NSTDGamepadButton, NSTDGamepadID},
-    core::str::NSTDStr,
+    alloc::CBox,
+    app::events::{NSTDGamepadAxis, NSTDGamepadButton, NSTDGamepadID, NSTDOptionalGamepadID},
+    core::{optional::NSTDOptional, str::NSTDStr},
     NSTDBool, NSTDFloat32,
 };
 use gilrs::Gamepad;
 use nstdapi::nstdapi;
 
 /// A handle to a gamepad.
-pub type NSTDGamepad<'a> = Box<Gamepad<'a>>;
+#[nstdapi]
+pub struct NSTDGamepad<'a> {
+    /// The inner [Gamepad].
+    pub(super) gamepad: CBox<Gamepad<'a>>,
+}
+
+/// Represents an optional value of type `NSTDGamepad`.
+pub type NSTDOptionalGamepad<'a> = NSTDOptional<NSTDGamepad<'a>>;
 
 /// Returns a gamepad's unique ID.
 ///
@@ -18,11 +26,12 @@ pub type NSTDGamepad<'a> = Box<Gamepad<'a>>;
 ///
 /// # Returns
 ///
-/// `NSTDGamepadID id` - The gamepad's unique ID.
+/// `NSTDOptionalGamepadID id` - The gamepad's unique ID on success, or an uninitialized "none"
+/// variant on error.
 #[inline]
 #[nstdapi]
-pub fn nstd_app_gamepad_id(gamepad: &NSTDGamepad) -> NSTDGamepadID {
-    Box::new(gamepad.id())
+pub fn nstd_app_gamepad_id(gamepad: &NSTDGamepad) -> NSTDOptionalGamepadID {
+    NSTDGamepadID::from_gilrs(gamepad.gamepad.id())
 }
 
 /// Returns the name of a gamepad.
@@ -37,7 +46,7 @@ pub fn nstd_app_gamepad_id(gamepad: &NSTDGamepad) -> NSTDGamepadID {
 #[inline]
 #[nstdapi]
 pub fn nstd_app_gamepad_name(gamepad: &NSTDGamepad) -> NSTDStr {
-    NSTDStr::from_str(gamepad.name())
+    NSTDStr::from_str(gamepad.gamepad.name())
 }
 
 /// Returns the operating system supplied name of a gamepad.
@@ -52,7 +61,7 @@ pub fn nstd_app_gamepad_name(gamepad: &NSTDGamepad) -> NSTDStr {
 #[inline]
 #[nstdapi]
 pub fn nstd_app_gamepad_os_name(gamepad: &NSTDGamepad) -> NSTDStr {
-    NSTDStr::from_str(gamepad.os_name())
+    NSTDStr::from_str(gamepad.gamepad.os_name())
 }
 
 /// Determines whether or not a gamepad is currently connected to the system.
@@ -67,7 +76,7 @@ pub fn nstd_app_gamepad_os_name(gamepad: &NSTDGamepad) -> NSTDStr {
 #[inline]
 #[nstdapi]
 pub fn nstd_app_gamepad_is_connected(gamepad: &NSTDGamepad) -> NSTDBool {
-    gamepad.is_connected()
+    gamepad.gamepad.is_connected()
 }
 
 /// Determines whether or not a gamepad's `button` is currently pressed.
@@ -87,7 +96,7 @@ pub fn nstd_app_gamepad_button_is_pressed(
     gamepad: &NSTDGamepad,
     button: NSTDGamepadButton,
 ) -> NSTDBool {
-    gamepad.is_pressed(button.into_winit())
+    gamepad.gamepad.is_pressed(button.into_winit())
 }
 
 /// Gets the current value of a gamepad axis.
@@ -104,7 +113,7 @@ pub fn nstd_app_gamepad_button_is_pressed(
 #[inline]
 #[nstdapi]
 pub fn nstd_app_gamepad_axis_value(gamepad: &NSTDGamepad, axis: NSTDGamepadAxis) -> NSTDFloat32 {
-    gamepad.value(axis.into_winit())
+    gamepad.gamepad.value(axis.into_winit())
 }
 
 /// Frees an instance of `NSTDGamepad`.
