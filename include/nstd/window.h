@@ -8,7 +8,13 @@
 #include "nstd.h"
 
 /// An `nstd` application window.
-typedef NSTDAnyMut NSTDWindow;
+typedef struct {
+    /// The inner window.
+    NSTDAnyMut window;
+} NSTDWindow;
+
+/// Represents an optional value of type `NSTDWindow`.
+NSTDOptional(NSTDWindow) NSTDOptionalWindow;
 
 /// Describes the position of a window.
 typedef struct {
@@ -50,8 +56,9 @@ typedef enum {
 ///
 /// # Returns
 ///
-/// `NSTDWindow window` - A handle to the newly created window, or null on error.
-NSTDAPI NSTDWindow nstd_window_new(NSTDAppHandle app);
+/// `NSTDOptionalWindow window` - A handle to the newly created window, or an uninitialized "none"
+/// variant on error.
+NSTDAPI NSTDOptionalWindow nstd_window_new(NSTDAppHandle app);
 
 /// Returns a window's unique identifier.
 ///
