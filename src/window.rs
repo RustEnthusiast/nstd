@@ -11,6 +11,7 @@ use crate::{
     NSTDBool, NSTDFloat64, NSTDInt32, NSTDUInt32,
 };
 use nstdapi::nstdapi;
+use std::ops::Deref;
 use winit::{
     dpi::{PhysicalPosition, PhysicalSize},
     error::ExternalError,
@@ -22,6 +23,16 @@ use winit::{
 pub struct NSTDWindow {
     /// The inner window.
     window: CBox<Window>,
+}
+impl Deref for NSTDWindow {
+    /// `NSTDWindow`'s dereference target.
+    type Target = Window;
+
+    /// Immutably dereferences an `NSTDWindow`.
+    #[inline]
+    fn deref(&self) -> &Self::Target {
+        &self.window
+    }
 }
 gen_optional!(NSTDOptionalWindow, NSTDWindow);
 
