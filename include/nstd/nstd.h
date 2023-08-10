@@ -76,6 +76,11 @@ typedef const void *NSTDAny;
 /// An opaque pointer to some mutable data.
 typedef void *NSTDAnyMut;
 
+/// An opaque reference to some immutable data.
+typedef const void *NSTDRef;
+/// An opaque reference to some mutable data.
+typedef void *NSTDRefMut;
+
 /// A boolean type, can either be `NSTD_TRUE` (1) or `NSTD_FALSE` (0).
 typedef bool NSTDBool;
 

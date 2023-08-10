@@ -223,8 +223,10 @@ pub fn nstd_heap_ptr_allocator<'a>(hptr: &NSTDHeapPtr<'a>) -> &'a NSTDAllocator 
 ///
 /// const SIZE: usize = core::mem::size_of::<i32>();
 ///
-/// let hptr = unsafe { nstd_heap_ptr_new_zeroed(&NSTD_ALLOCATOR, SIZE).unwrap() };
-/// assert!(nstd_heap_ptr_size(&hptr) == SIZE);
+/// unsafe {
+///     let hptr = nstd_heap_ptr_new_zeroed(&NSTD_ALLOCATOR, SIZE).unwrap();
+///     assert!(nstd_heap_ptr_size(&hptr) == SIZE);
+/// }
 /// ```
 #[inline]
 #[nstdapi]

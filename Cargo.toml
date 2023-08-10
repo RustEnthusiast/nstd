@@ -1,6 +1,6 @@
 [package]
 name = "nstd-sys"
-version = "0.8.0"
+version = "0.9.0"
 edition = "2021"
 license = "MIT"
 homepage = "https://github.com/RustEnthusiast/nstd"
@@ -30,11 +30,13 @@ panic = "abort"
 default = ["core", "std"]
 std = []
 capi = ["nstdapi/capi"]
+link = ["capi", "nstdapi/link"]
 nstd = [
-    "alloc", "app", "core", "cstring", "env", "fs", "heap_ptr", "image", "io", "math", "mutex",
-    "os", "os_unix_alloc", "os_unix_io", "os_unix_mutex", "os_unix_shared_lib", "os_unix_time",
-    "os_windows_alloc", "os_windows_shared_lib", "os_windows_str", "proc", "shared_lib",
-    "shared_ptr", "string", "thread", "time", "timed_mutex", "vec", "window"
+    "alloc", "app", "core", "cstring", "env", "fs", "heap_ptr", "image", "image_gif", "image_ico",
+    "image_jpeg", "image_png", "io", "math", "mutex", "os", "os_unix_alloc", "os_unix_io",
+    "os_unix_mutex", "os_unix_shared_lib", "os_unix_time", "os_windows_alloc",
+    "os_windows_shared_lib", "os_windows_str", "proc", "shared_lib", "shared_ptr", "string",
+    "thread", "time", "timed_mutex", "vec", "window"
 ]
 alloc = ["core", "libc", "os_windows_alloc"]
 app = ["core", "gilrs", "heap_ptr", "std", "string", "vec", "winit"]
@@ -43,7 +45,7 @@ cstring = ["alloc", "core", "vec"]
 env = ["alloc", "core", "io", "std", "string", "vec"]
 fs = ["alloc", "core", "io", "os_unix_io", "std", "string", "time", "vec"]
 heap_ptr = ["alloc", "core"]
-image = ["core", "dep:image", "std"]
+image = ["alloc", "core", "dep:image", "std"]
 image_gif = ["image", "image/gif"]
 image_ico = ["image", "image/ico"]
 image_jpeg = ["image", "image/jpeg"]
@@ -75,7 +77,7 @@ cfg-if = "1.0"
 gilrs = { version = "0.10", optional = true }
 image = { version = "0.24", optional = true, default-features = false }
 libc = { version = "0.2", optional = true, default-features = false }
-nstdapi = "0.1"
+nstdapi = "0.2"
 winit = { version = "0.28", optional = true }
 
 [target.'cfg(unix)'.dependencies]

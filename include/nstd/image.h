@@ -1,10 +1,17 @@
 #ifndef NSTD_IMAGE_H
 #define NSTD_IMAGE_H
+#include "core/optional.h"
 #include "core/slice.h"
 #include "nstd.h"
 
 /// An image of any format.
-typedef NSTDAnyMut NSTDImage;
+typedef struct {
+    /// The [DynamicImage].
+    NSTDAnyMut img;
+ } NSTDImage;
+
+/// Represents an optional value of typ `NSTDImage`.
+NSTDOptional(NSTDImage) NSTDOptionalImage;
 
 /// Loads an image from an in-memory buffer.
 ///
@@ -14,7 +21,7 @@ typedef NSTDAnyMut NSTDImage;
 ///
 /// # Returns
 ///
-/// `NSTDImage img` - The new image, or null on error.
+/// `NSTDOptionalImage img` - The new image on success, or an uninitialized "none" variant on error.
 ///
 /// # Panics
 ///
@@ -23,7 +30,7 @@ typedef NSTDAnyMut NSTDImage;
 /// # Safety
 ///
 /// This operation can cause undefined behavior if `buffer`'s data is invalid.
-NSTDAPI NSTDImage nstd_image_load(const NSTDSlice *buffer);
+NSTDAPI NSTDOptionalImage nstd_image_load(const NSTDSlice *buffer);
 
 /// Returns an image's raw pixel data as a byte slice.
 ///

@@ -1,7 +1,10 @@
 #![doc = include_str!("../README.md")]
-#![warn(missing_docs)]
-#![warn(clippy::missing_panics_doc)]
-#![warn(clippy::undocumented_unsafe_blocks)]
+#![warn(
+    missing_docs,
+    clippy::missing_panics_doc,
+    clippy::undocumented_unsafe_blocks
+)]
+#![cfg_attr(feature = "link", allow(dead_code, unused_imports))]
 #![cfg_attr(not(any(test, feature = "std")), no_std)]
 #![cfg_attr(doc_cfg, feature(doc_cfg))]
 #[cfg(feature = "alloc")]
@@ -69,11 +72,15 @@ pub mod vec;
 #[cfg(feature = "window")]
 #[cfg_attr(doc_cfg, doc(cfg(feature = "window")))]
 pub mod window;
-use ::core::ffi::{c_char, c_void};
+use ::core::{
+    ffi::{c_char, c_void},
+    marker::PhantomData,
+    ops::{Deref, DerefMut},
+};
 
 /// [NSTDInt]'s maximum value.
 #[allow(dead_code)]
-pub(crate) const NSTD_INT_MAX: NSTDInt = NSTDInt::MAX;
+const NSTD_INT_MAX: NSTDInt = NSTDInt::MAX;
 
 /// A null pointer value constant.
 pub const NSTD_NULL: NSTDAnyMut = ::core::ptr::null_mut();
@@ -123,6 +130,59 @@ pub type NSTDChar32 = NSTDUInt32;
 pub type NSTDAny = *const c_void;
 /// An opaque pointer to some mutable data.
 pub type NSTDAnyMut = *mut c_void;
+
+/// An FFI-safe reference to some immutable data.
+#[repr(transparent)]
+pub struct NSTDRef<'a, T>(&'a c_void, PhantomData<&'a T>);
+impl<'a, T> Deref for NSTDRef<'a, T> {
+    /// `NSTDRef`'s dereference target.
+    type Target = T;
+
+    /// Gets the immutable reference.
+    #[inline]
+    fn deref(&self) -> &T {
+        // SAFETY: `self.0` is of type `&T`.
+        unsafe { ::core::mem::transmute(self.0) }
+    }
+}
+impl<'a, T> From<&'a T> for NSTDRef<'a, T> {
+    /// Creates a new FFI-safe reference.
+    #[inline]
+    fn from(value: &'a T) -> Self {
+        // SAFETY: Reference to reference transmute.
+        Self(unsafe { ::core::mem::transmute(value) }, Default::default())
+    }
+}
+/// An FFI-safe reference to some mutable data.
+#[repr(transparent)]
+pub struct NSTDRefMut<'a, T>(&'a mut c_void, PhantomData<&'a mut T>);
+impl<'a, T> Deref for NSTDRefMut<'a, T> {
+    /// `NSTDRefMut`'s dereference target.
+    type Target = T;
+
+    /// Gets the reference.
+    #[inline]
+    fn deref(&self) -> &T {
+        // SAFETY: `self.0` is of type `&mut T`.
+        unsafe { ::core::mem::transmute_copy(&self.0) }
+    }
+}
+impl<'a, T> DerefMut for NSTDRefMut<'a, T> {
+    /// Gets the mutable reference.
+    #[inline]
+    fn deref_mut(&mut self) -> &mut T {
+        // SAFETY: `self.0` is of type `&mut T`.
+        unsafe { ::core::mem::transmute_copy(&self.0) }
+    }
+}
+impl<'a, T> From<&'a mut T> for NSTDRefMut<'a, T> {
+    /// Creates a new FFI-safe reference.
+    #[inline]
+    fn from(value: &'a mut T) -> Self {
+        // SAFETY: Reference to reference transmute.
+        Self(unsafe { ::core::mem::transmute(value) }, Default::default())
+    }
+}
 
 /// A boolean type, can either be `NSTD_TRUE` (1) or `NSTD_FALSE` (0).
 pub type NSTDBool = bool;

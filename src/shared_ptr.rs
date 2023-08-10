@@ -313,8 +313,10 @@ pub fn nstd_shared_ptr_owners(shared_ptr: &NSTDSharedPtr) -> NSTDUInt {
 ///
 /// const SIZE: usize = core::mem::size_of::<f64>();
 ///
-/// let shared_ptr = unsafe { nstd_shared_ptr_new_zeroed(&NSTD_ALLOCATOR, SIZE).unwrap() };
-/// assert!(nstd_shared_ptr_size(&shared_ptr) == SIZE);
+/// unsafe {
+///     let shared_ptr = nstd_shared_ptr_new_zeroed(&NSTD_ALLOCATOR, SIZE).unwrap();
+///     assert!(nstd_shared_ptr_size(&shared_ptr) == SIZE);
+/// }
 /// ```
 #[inline]
 #[nstdapi]
