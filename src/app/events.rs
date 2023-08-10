@@ -26,7 +26,7 @@ pub struct NSTDWindowID {
 impl NSTDWindowID {
     /// Creates an [NSTDWindowID] from a [WindowId].
     #[inline]
-    pub(super) fn from_winit(id: WindowId) -> Self {
+    pub(crate) fn from_winit(id: WindowId) -> Self {
         Self { id: id.into() }
     }
 }
