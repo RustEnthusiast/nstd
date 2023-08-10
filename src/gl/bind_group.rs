@@ -3,7 +3,14 @@ use super::{
     buffer::NSTDGLBuffer, render_pass::NSTDGLRenderPass, sampler::NSTDGLSampler,
     shader::NSTDGLShaderStage::*, texture::NSTDGLTexture, NSTDGLRenderer,
 };
-use crate::{core::slice::NSTDSlice, NSTDBool, NSTDUInt32, NSTDUInt8};
+use crate::{
+    alloc::CBox,
+    core::{
+        optional::{gen_optional, NSTDOptional},
+        slice::NSTDSlice,
+    },
+    NSTDBool, NSTDUInt32, NSTDUInt8,
+};
 use nstdapi::nstdapi;
 use wgpu::{
     BindGroup as WgpuBindGroup, BindGroupDescriptor, BindGroupEntry, BindGroupLayout,
@@ -151,9 +158,9 @@ impl<'a> From<NSTDGLBindingResource<'a>> for BindingResource<'a> {
     fn from(value: NSTDGLBindingResource<'a>) -> Self {
         match value {
             NSTDGLBindingResource::Buffer { buffer } => {
-                Self::Buffer(buffer.as_entire_buffer_binding())
+                Self::Buffer(buffer.buffer().as_entire_buffer_binding())
             }
-            NSTDGLBindingResource::Sampler { sampler } => Self::Sampler(sampler),
+            NSTDGLBindingResource::Sampler { sampler } => Self::Sampler(sampler.sampler()),
             NSTDGLBindingResource::Texture { texture } => Self::TextureView(texture.view()),
         }
     }
@@ -183,7 +190,7 @@ struct BindGroup {
 #[nstdapi]
 pub struct NSTDGLBindGroup {
     /// Heap data.
-    bind_group: Box<BindGroup>,
+    bind_group: CBox<BindGroup>,
 }
 impl NSTDGLBindGroup {
     /// Returns a reference to the bind group's layout.
@@ -192,6 +199,7 @@ impl NSTDGLBindGroup {
         &self.bind_group.layout
     }
 }
+gen_optional!(NSTDGLOptionalBindGroup, NSTDGLBindGroup);
 
 /// Creates a new shader bind group.
 ///
@@ -203,7 +211,8 @@ impl NSTDGLBindGroup {
 ///
 /// # Returns
 ///
-/// `NSTDGLBindGroup bind_group` - The new bind group.
+/// `NSTDGLOptionalBindGroup bind_group` - The new bind group on success, or an uninitialized
+/// "none" variant on error.
 ///
 /// # Panics
 ///
@@ -220,7 +229,7 @@ impl NSTDGLBindGroup {
 pub unsafe fn nstd_gl_bind_group_new(
     renderer: &NSTDGLRenderer,
     entries: &NSTDSlice,
-) -> NSTDGLBindGroup {
+) -> NSTDGLOptionalBindGroup {
     // Create the entries.
     let entries = entries.as_slice::<NSTDGLBindGroupEntry>();
     let mut layout_entries = Vec::with_capacity(entries.len());
@@ -266,8 +275,9 @@ pub unsafe fn nstd_gl_bind_group_new(
     };
     let bind_group = renderer.renderer.device.create_bind_group(&bind_group_desc);
     // Construct the bind group.
-    NSTDGLBindGroup {
-        bind_group: Box::new(BindGroup { bind_group, layout }),
+    match CBox::new(BindGroup { bind_group, layout }) {
+        Some(bind_group) => NSTDOptional::Some(NSTDGLBindGroup { bind_group }),
+        _ => NSTDOptional::None,
     }
 }
 
@@ -287,7 +297,9 @@ pub fn nstd_gl_bind_group_bind<'a: 'b, 'b>(
     render_pass: &mut NSTDGLRenderPass<'b>,
     index: NSTDUInt32,
 ) {
-    render_pass.set_bind_group(index, &bind_group.bind_group.bind_group, &[]);
+    render_pass
+        .pass
+        .set_bind_group(index, &bind_group.bind_group.bind_group, &[]);
 }
 
 /// Frees an instance of `NSTDGLBindGroup`.

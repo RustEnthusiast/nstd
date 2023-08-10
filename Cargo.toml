@@ -45,8 +45,8 @@ cstring = ["alloc", "core", "vec"]
 env = ["alloc", "core", "io", "std", "string", "vec"]
 fs = ["alloc", "core", "io", "os_unix_io", "std", "string", "time", "vec"]
 gl = [
-    "core", "dep:image", "image", "naga", "pollster", "std", "web-sys/Document", "web-sys/Element",
-    "web-sys/Window", "wgpu", "window"
+    "alloc", "core", "dep:image", "image", "naga", "pollster", "std", "web-sys/Document",
+    "web-sys/Element", "web-sys/Window", "wgpu", "window"
 ]
 heap_ptr = ["alloc", "core"]
 image = ["alloc", "core", "dep:image", "std"]

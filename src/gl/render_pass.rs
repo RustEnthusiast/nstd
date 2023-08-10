@@ -1,10 +1,21 @@
 //! Represents a single render pass.
-use crate::{core::range::NSTDRangeU32, NSTDInt32};
+use crate::{
+    alloc::CBox,
+    core::{optional::NSTDOptional, range::NSTDRangeU32},
+    NSTDInt32,
+};
 use nstdapi::nstdapi;
 use wgpu::RenderPass;
 
 /// Represents a single render pass.
-pub type NSTDGLRenderPass<'a> = Box<RenderPass<'a>>;
+#[nstdapi]
+pub struct NSTDGLRenderPass<'a> {
+    /// The inner `RenderPass`.
+    pub(super) pass: CBox<RenderPass<'a>>,
+}
+
+/// Represents an optional value of type `NSTDGLRenderPass`.
+pub type NSTDGLOptionalRenderPass<'a> = NSTDOptional<NSTDGLRenderPass<'a>>;
 
 /// Draws primitives from active vertex buffers.
 ///
@@ -22,7 +33,9 @@ pub fn nstd_gl_render_pass_draw(
     vertices: NSTDRangeU32,
     instances: NSTDRangeU32,
 ) {
-    render_pass.draw(vertices.start..vertices.end, instances.start..instances.end);
+    render_pass
+        .pass
+        .draw(vertices.start..vertices.end, instances.start..instances.end);
 }
 
 /// Draws indexed primitives from active vertex and index buffers.
@@ -44,7 +57,7 @@ pub fn nstd_gl_render_pass_draw_indexed(
     base: NSTDInt32,
     instances: NSTDRangeU32,
 ) {
-    render_pass.draw_indexed(
+    render_pass.pass.draw_indexed(
         indices.start..indices.end,
         base,
         instances.start..instances.end,

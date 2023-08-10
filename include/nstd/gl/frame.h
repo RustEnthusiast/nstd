@@ -52,8 +52,10 @@ NSTDAPI NSTDGLFrameResult nstd_gl_frame_new(const NSTDGLRenderer *renderer);
 ///
 /// # Returns
 ///
-/// `NSTDGLRenderPass render_pass` - The new render pass.
-NSTDAPI NSTDGLRenderPass nstd_gl_frame_render(NSTDGLFrame *frame, const NSTDGLColor *clear_color);
+/// `NSTDGLOptionalRenderPass render_pass` - The new render pass on success, or an uninitialized
+/// "none" variant on error.
+NSTDAPI NSTDGLOptionalRenderPass
+nstd_gl_frame_render(NSTDGLFrame *frame, const NSTDGLColor *clear_color);
 
 /// Draws `frame` onto the display.
 ///

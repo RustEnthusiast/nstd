@@ -1,5 +1,6 @@
 #ifndef NSTD_GL_BUFFER_H
 #define NSTD_GL_BUFFER_H
+#include "../core/optional.h"
 #include "../core/slice.h"
 #include "../nstd.h"
 #include "gl.h"
@@ -17,7 +18,13 @@
 #define NSTD_GL_DEST_BUFFER (1 << 4)
 
 /// GPU memory buffers.
-typedef NSTDAnyMut NSTDGLBuffer;
+typedef struct {
+    /// The inner `buffer`.
+    NSTDAnyMut buffer;
+} NSTDGLBuffer;
+
+/// Represents an optional value of type `NSTDGLBuffer`.
+NSTDOptional(NSTDGLBuffer) NSTDGLOptionalBuffer;
 
 /// Creates and initializes a new GPU buffer with `data`.
 ///
@@ -29,6 +36,11 @@ typedef NSTDAnyMut NSTDGLBuffer;
 ///
 /// - `NSTDUInt8 usages` - A bit mask describing what type of buffer to create.
 ///
+/// # Returns
+///
+/// `NSTDGLOptionalBuffer buffer` - The new buffer on success, or an uninitialized "none" variant
+/// on error.
+///
 /// # Panics
 ///
 /// This operation will panic if `data`'s stride is not 1.
@@ -36,7 +48,7 @@ typedef NSTDAnyMut NSTDGLBuffer;
 /// # Safety
 ///
 /// `data` must be valid for reads.
-NSTDAPI NSTDGLBuffer
+NSTDAPI NSTDGLOptionalBuffer
 nstd_gl_buffer_new(const NSTDGLRenderer *renderer, const NSTDSlice *data, NSTDUInt8 usages);
 
 /// Makes `buffer` an active vertex buffer for `render_pass` at `index`.

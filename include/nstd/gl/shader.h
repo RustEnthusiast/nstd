@@ -1,5 +1,6 @@
 #ifndef NSTD_GL_SHADER_H
 #define NSTD_GL_SHADER_H
+#include "../core/optional.h"
 #include "../core/slice.h"
 #include "../core/str.h"
 #include "../nstd.h"
@@ -47,7 +48,13 @@ typedef struct {
 } NSTDGLShaderSource;
 
 /// A GPU shader module.
-typedef NSTDAnyMut NSTDGLShaderModule;
+typedef struct {
+    /// The inner `ShaderModule`.
+    NSTDAnyMut module;
+} NSTDGLShaderModule;
+
+/// Represents an optional value of type `NSTDGLShaderModule`.
+NSTDOptional(NSTDGLShaderModule) NSTDGLOptionalShaderModule;
 
 /// Describes the stepping mode of a vertex buffer within a shader.
 typedef enum {
@@ -202,7 +209,13 @@ typedef struct {
 } NSTDGLShaderDescriptor;
 
 /// A GPU shader program.
-typedef NSTDAnyMut NSTDGLShader;
+typedef struct {
+    /// The inner `RenderPipeline`.
+    NSTDAnyMut pipeline;
+} NSTDGLShader;
+
+/// Represents an optional value of type `NSTDGLShader`.
+NSTDOptional(NSTDGLShader) NSTDGLOptionalShader;
 
 /// Creates a new compiled shader object from a shader source object.
 ///
@@ -214,7 +227,8 @@ typedef NSTDAnyMut NSTDGLShader;
 ///
 /// # Returns
 ///
-/// `NSTDGLShaderModule module` - The new compiled shader object.
+/// `NSTDGLOptionalShaderModule module` - The new compiled shader object on success, or an
+/// uninitialized "none" variant on error.
 ///
 /// # Panics
 ///
@@ -223,7 +237,7 @@ typedef NSTDAnyMut NSTDGLShader;
 /// # Safety
 ///
 /// `source.wgsl`, `spirv`, and `glsl`'s data must be valid.
-NSTDAPI NSTDGLShaderModule
+NSTDAPI NSTDGLOptionalShaderModule
 nstd_gl_shader_module_new(const NSTDGLRenderer *renderer, const NSTDGLShaderSource *source);
 
 /// Frees an instance of [NSTDGLShaderModule].
@@ -243,7 +257,8 @@ NSTDAPI void nstd_gl_shader_module_free(NSTDGLShaderModule module);
 ///
 /// # Returns
 ///
-/// `NSTDGLShader shader` - The new GPU shader program.
+/// `NSTDGLOptionalShader shader` - The new GPU shader program on success, or an uninitialized
+/// "none" variant on error.
 ///
 /// # Panics
 ///
@@ -262,7 +277,7 @@ NSTDAPI void nstd_gl_shader_module_free(NSTDGLShaderModule module);
 /// - `desc.buffers.attributes`'s data must be properly aligned and valid for reads.
 ///
 /// - `desc.bind_groups`'s data must be properly aligned and valid for reads.
-NSTDAPI NSTDGLShader
+NSTDAPI NSTDGLOptionalShader
 nstd_gl_shader_new(const NSTDGLRenderer *renderer, const NSTDGLShaderDescriptor *desc);
 
 /// Makes a shader program active for the given render pass.

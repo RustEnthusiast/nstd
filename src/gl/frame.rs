@@ -1,10 +1,16 @@
 //! An individual window surface texture.
-use super::{render_pass::NSTDGLRenderPass, NSTDGLColor, NSTDGLRenderer};
-use crate::core::result::NSTDResult;
+use super::{
+    render_pass::{NSTDGLOptionalRenderPass, NSTDGLRenderPass},
+    NSTDGLColor, NSTDGLRenderer,
+};
+use crate::{
+    alloc::CBox,
+    core::{optional::NSTDOptional, result::NSTDResult},
+};
 use nstdapi::nstdapi;
 use wgpu::{
-    Color, CommandEncoder, LoadOp, Operations, RenderPassColorAttachment, RenderPassDescriptor,
-    SurfaceError, SurfaceTexture, TextureView,
+    Color, CommandEncoder, LoadOp, Operations, RenderPass, RenderPassColorAttachment,
+    RenderPassDescriptor, SurfaceError, SurfaceTexture, TextureView,
 };
 
 /// Describes an error returned from `nstd_gl_frame_new`.
@@ -42,12 +48,33 @@ struct Frame {
     /// The GPU command encoder.
     encoder: CommandEncoder,
 }
+impl Frame {
+    /// Creates a new render pass for the frame.
+    fn render(&mut self, clear_color: Option<&NSTDGLColor>) -> RenderPass {
+        let render_pass_desc = RenderPassDescriptor {
+            label: None,
+            color_attachments: &[Some(RenderPassColorAttachment {
+                view: &self.view,
+                ops: Operations {
+                    load: LoadOp::Clear(match clear_color {
+                        Some(clear_color) => clear_color.as_wgpu(),
+                        _ => Color::BLACK,
+                    }),
+                    store: true,
+                },
+                resolve_target: None,
+            })],
+            depth_stencil_attachment: None,
+        };
+        self.encoder.begin_render_pass(&render_pass_desc)
+    }
+}
 
 /// An individual window surface texture.
 #[nstdapi]
 pub struct NSTDGLFrame {
     /// The inner frame.
-    frame: Box<Frame>,
+    frame: CBox<Frame>,
 }
 
 /// A result type returned from `nstd_gl_frame_new`.
@@ -79,13 +106,15 @@ pub fn nstd_gl_frame_new(renderer: &NSTDGLRenderer) -> NSTDGLFrameResult {
                 .device
                 .create_command_encoder(&Default::default());
             // Construct the new frame.
-            NSTDResult::Ok(NSTDGLFrame {
-                frame: Box::new(Frame {
-                    texture,
-                    view,
-                    encoder,
-                }),
-            })
+            let frame = Frame {
+                texture,
+                view,
+                encoder,
+            };
+            match CBox::new(frame) {
+                Some(frame) => NSTDResult::Ok(NSTDGLFrame { frame }),
+                _ => NSTDResult::Err(NSTDGLFrameError::NSTD_GL_FRAME_ERROR_OUT_OF_MEMORY),
+            }
         }
         Err(err) => NSTDResult::Err(err.into()),
     }
@@ -101,28 +130,18 @@ pub fn nstd_gl_frame_new(renderer: &NSTDGLRenderer) -> NSTDGLFrameResult {
 ///
 /// # Returns
 ///
-/// `NSTDGLRenderPass render_pass` - The new render pass.
+/// `NSTDGLOptionalRenderPass render_pass` - The new render pass on success, or an uninitialized
+/// "none" variant on error.
 #[nstdapi]
 pub fn nstd_gl_frame_render<'a>(
     frame: &'a mut NSTDGLFrame,
     clear_color: Option<&NSTDGLColor>,
-) -> NSTDGLRenderPass<'a> {
-    let render_pass_desc = RenderPassDescriptor {
-        label: None,
-        color_attachments: &[Some(RenderPassColorAttachment {
-            view: &frame.frame.view,
-            ops: Operations {
-                load: LoadOp::Clear(match clear_color {
-                    Some(clear_color) => clear_color.as_wgpu(),
-                    _ => Color::BLACK,
-                }),
-                store: true,
-            },
-            resolve_target: None,
-        })],
-        depth_stencil_attachment: None,
-    };
-    Box::new(frame.frame.encoder.begin_render_pass(&render_pass_desc))
+) -> NSTDGLOptionalRenderPass<'a> {
+    let pass = frame.frame.render(clear_color);
+    match CBox::new(pass) {
+        Some(pass) => NSTDOptional::Some(NSTDGLRenderPass { pass }),
+        _ => NSTDOptional::None,
+    }
 }
 
 /// Draws `frame` onto the display.
@@ -132,13 +151,12 @@ pub fn nstd_gl_frame_render<'a>(
 /// - `NSTDGLFrame frame` - The frame to display.
 ///
 /// - `const NSTDGLRenderer *renderer` - The renderer used to create the frame.
-#[inline]
 #[nstdapi]
 pub fn nstd_gl_frame_submit(frame: NSTDGLFrame, renderer: &NSTDGLRenderer) {
-    // Submit the encoder's commands and output the next surface texture.
+    let frame = frame.frame.into_inner();
     renderer
         .renderer
         .device_handle
-        .submit(Some(frame.frame.encoder.finish()));
-    frame.frame.texture.present();
+        .submit(Some(frame.encoder.finish()));
+    frame.texture.present();
 }

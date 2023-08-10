@@ -1,5 +1,6 @@
 #ifndef NSTD_GL_BIND_GROUP_H
 #define NSTD_GL_BIND_GROUP_H
+#include "../core/optional.h"
 #include "../core/slice.h"
 #include "../nstd.h"
 #include "buffer.h"
@@ -102,6 +103,9 @@ typedef struct {
     NSTDAnyMut bind_group;
 } NSTDGLBindGroup;
 
+/// Represents an optional value of type `NSTDGLBindGroup`.
+NSTDOptional(NSTDGLBindGroup) NSTDGLOptionalBindGroup;
+
 /// Creates a new shader bind group.
 ///
 /// # Parameters:
@@ -112,7 +116,8 @@ typedef struct {
 ///
 /// # Returns
 ///
-/// `NSTDGLBindGroup bind_group` - The new bind group.
+/// `NSTDGLOptionalBindGroup bind_group` - The new bind group on success, or an uninitialized
+/// "none" variant on error.
 ///
 /// # Panics
 ///
@@ -125,7 +130,7 @@ typedef struct {
 /// # Safety
 ///
 /// `entries` must be valid for reads.
-NSTDAPI NSTDGLBindGroup
+NSTDAPI NSTDGLOptionalBindGroup
 nstd_gl_bind_group_new(const NSTDGLRenderer *renderer, const NSTDSlice *entries);
 
 /// Makes a bind group active for the given render pass.

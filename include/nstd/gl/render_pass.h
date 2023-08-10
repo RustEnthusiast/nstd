@@ -1,10 +1,17 @@
 #ifndef NSTD_GL_RENDER_PASS_H
 #define NSTD_GL_RENDER_PASS_H
+#include "../core/optional.h"
 #include "../core/range.h"
 #include "../nstd.h"
 
 /// Represents a single render pass.
-typedef NSTDAnyMut NSTDGLRenderPass;
+typedef struct {
+    /// The inner `RenderPass`.
+    NSTDAnyMut pass;
+} NSTDGLRenderPass;
+
+/// Represents an optional value of type `NSTDGLRenderPass`.
+NSTDOptional(NSTDGLRenderPass) NSTDGLOptionalRenderPass;
 
 /// Draws primitives from active vertex buffers.
 ///

@@ -1,6 +1,10 @@
 //! A shader's texture.
 use super::NSTDGLRenderer;
-use crate::image::NSTDImage;
+use crate::{
+    alloc::CBox,
+    core::optional::{gen_optional, NSTDOptional},
+    image::NSTDImage,
+};
 use image::GenericImageView;
 use nstdapi::nstdapi;
 use std::num::NonZeroU32;
@@ -22,7 +26,7 @@ struct Texture {
 #[nstdapi]
 pub struct NSTDGLTexture {
     /// The `wgpu` texture.
-    texture: Box<Texture>,
+    texture: CBox<Texture>,
 }
 impl NSTDGLTexture {
     /// Returns an immutable reference to the texture view.
@@ -31,6 +35,7 @@ impl NSTDGLTexture {
         &self.texture.view
     }
 }
+gen_optional!(NSTDGLOptionalTexture, NSTDGLTexture);
 
 /// Creates a new `NSTDGLTexture` from an `NSTDImage`.
 ///
@@ -42,9 +47,10 @@ impl NSTDGLTexture {
 ///
 /// # Returns
 ///
-/// `NSTDGLTexture texture` - The new texture.
+/// `NSTDGLOptionalTexture texture` - The new texture on success, or an uninitialized "none"
+/// variant on error.
 #[nstdapi]
-pub fn nstd_gl_texture_new(renderer: &NSTDGLRenderer, image: &NSTDImage) -> NSTDGLTexture {
+pub fn nstd_gl_texture_new(renderer: &NSTDGLRenderer, image: &NSTDImage) -> NSTDGLOptionalTexture {
     // Create the texture.
     let dimensions = image.dimensions();
     let size = Extent3d {
@@ -82,8 +88,9 @@ pub fn nstd_gl_texture_new(renderer: &NSTDGLRenderer, image: &NSTDImage) -> NSTD
         .write_texture(copy_view, &rgba, image_layout, size);
     // Create the texture view.
     let view = texture.create_view(&Default::default());
-    NSTDGLTexture {
-        texture: Box::new(Texture { texture, view }),
+    match CBox::new(Texture { texture, view }) {
+        Some(texture) => NSTDOptional::Some(NSTDGLTexture { texture }),
+        _ => NSTDOptional::None,
     }
 }
 

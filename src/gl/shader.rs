@@ -1,7 +1,12 @@
 //! GPU shader programs.
 use super::{bind_group::NSTDGLBindGroup, render_pass::NSTDGLRenderPass, NSTDGLRenderer};
 use crate::{
-    core::{slice::NSTDSlice, str::NSTDStr},
+    alloc::CBox,
+    core::{
+        optional::{gen_optional, NSTDOptional},
+        slice::NSTDSlice,
+        str::NSTDStr,
+    },
     NSTDUInt32, NSTDUInt64,
 };
 use naga::ShaderStage;
@@ -90,7 +95,12 @@ impl NSTDGLShaderSource<'_> {
 }
 
 /// A GPU shader module.
-pub type NSTDGLShaderModule = Box<ShaderModule>;
+#[nstdapi]
+pub struct NSTDGLShaderModule {
+    /// The inner `ShaderModule`.
+    module: CBox<ShaderModule>,
+}
+gen_optional!(NSTDGLOptionalShaderModule, NSTDGLShaderModule);
 
 /// Describes the stepping mode of a vertex buffer within a shader.
 #[nstdapi]
@@ -359,7 +369,12 @@ pub struct NSTDGLShaderDescriptor<'a> {
 }
 
 /// A GPU shader program.
-pub type NSTDGLShader = Box<RenderPipeline>;
+#[nstdapi]
+pub struct NSTDGLShader {
+    /// The inner `RenderPipeline`.
+    pipeline: CBox<RenderPipeline>,
+}
+gen_optional!(NSTDGLOptionalShader, NSTDGLShader);
 
 /// Creates a new compiled shader object from a shader source object.
 ///
@@ -371,7 +386,8 @@ pub type NSTDGLShader = Box<RenderPipeline>;
 ///
 /// # Returns
 ///
-/// `NSTDGLShaderModule module` - The new compiled shader object.
+/// `NSTDGLOptionalShaderModule module` - The new compiled shader object on success, or an
+/// uninitialized "none" variant on error.
 ///
 /// # Panics
 ///
@@ -380,17 +396,20 @@ pub type NSTDGLShader = Box<RenderPipeline>;
 /// # Safety
 ///
 /// `source.wgsl`, `spirv`, and `glsl`'s data must be valid.
-#[inline]
 #[nstdapi]
 pub unsafe fn nstd_gl_shader_module_new(
     renderer: &NSTDGLRenderer,
     source: &NSTDGLShaderSource,
-) -> NSTDGLShaderModule {
+) -> NSTDGLOptionalShaderModule {
     let module_desc = ShaderModuleDescriptor {
         label: None,
         source: source.as_wgpu(),
     };
-    Box::new(renderer.renderer.device.create_shader_module(module_desc))
+    let module = renderer.renderer.device.create_shader_module(module_desc);
+    match CBox::new(module) {
+        Some(module) => NSTDOptional::Some(NSTDGLShaderModule { module }),
+        _ => NSTDOptional::None,
+    }
 }
 
 /// Frees an instance of [NSTDGLShaderModule].
@@ -413,7 +432,8 @@ pub fn nstd_gl_shader_module_free(module: NSTDGLShaderModule) {}
 ///
 /// # Returns
 ///
-/// `NSTDGLShader shader` - The new GPU shader program.
+/// `NSTDGLOptionalShader shader` - The new GPU shader program on success, or an uninitialized
+/// "none" variant on error.
 ///
 /// # Panics
 ///
@@ -436,7 +456,7 @@ pub fn nstd_gl_shader_module_free(module: NSTDGLShaderModule) {}
 pub unsafe fn nstd_gl_shader_new(
     renderer: &NSTDGLRenderer,
     desc: &NSTDGLShaderDescriptor,
-) -> NSTDGLShader {
+) -> NSTDGLOptionalShader {
     let renderer = &renderer.renderer;
     // Create the vertex buffer layouts.
     let desc_buffers = desc.buffers.as_slice::<NSTDGLVertexBufferLayout>();
@@ -481,12 +501,12 @@ pub unsafe fn nstd_gl_shader_new(
         label: None,
         layout: Some(&pipeline_layout),
         vertex: VertexState {
-            module: desc.vertex,
+            module: &desc.vertex.module,
             entry_point: "vertex",
             buffers: &buffers,
         },
         fragment: desc.fragment.map(|fragment| FragmentState {
-            module: fragment,
+            module: &fragment.module,
             entry_point: "fragment",
             targets: &targets,
         }),
@@ -507,7 +527,11 @@ pub unsafe fn nstd_gl_shader_new(
         depth_stencil: None,
         multiview: None,
     };
-    Box::new(renderer.device.create_render_pipeline(&pipeline_desc))
+    let pipeline = renderer.device.create_render_pipeline(&pipeline_desc);
+    match CBox::new(pipeline) {
+        Some(pipeline) => NSTDOptional::Some(NSTDGLShader { pipeline }),
+        _ => NSTDOptional::None,
+    }
 }
 
 /// Makes a shader program active for the given render pass.
@@ -523,7 +547,7 @@ pub fn nstd_gl_shader_bind<'a: 'b, 'b>(
     shader: &'a NSTDGLShader,
     render_pass: &mut NSTDGLRenderPass<'b>,
 ) {
-    render_pass.set_pipeline(shader);
+    render_pass.pass.set_pipeline(&shader.pipeline);
 }
 
 /// Frees an instance of `NSTDGLShader`.

@@ -20,6 +20,8 @@ typedef struct {
 typedef enum {
     /// No error occurred.
     NSTD_GL_ERROR_NONE,
+    /// Allocating memory failed.
+    NSTD_GL_ERROR_OUT_OF_MEMORY,
     /// A canvas could not be created for a web window.
     NSTD_GL_ERROR_CANVAS_NOT_CREATED,
     /// A rendering surface could not be created.

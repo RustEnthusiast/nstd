@@ -6,7 +6,7 @@ pub mod render_pass;
 pub mod sampler;
 pub mod shader;
 pub mod texture;
-use crate::{core::result::NSTDResult, window::NSTDWindow, NSTDFloat64, NSTDUInt32};
+use crate::{alloc::CBox, core::result::NSTDResult, window::NSTDWindow, NSTDFloat64, NSTDUInt32};
 use nstdapi::nstdapi;
 use pollster::FutureExt;
 use wgpu::{
@@ -47,6 +47,8 @@ impl NSTDGLColor {
 pub enum NSTDGLError {
     /// No error occurred.
     NSTD_GL_ERROR_NONE,
+    /// Allocating memory failed.
+    NSTD_GL_ERROR_OUT_OF_MEMORY,
     /// A canvas could not be created for a web window.
     NSTD_GL_ERROR_CANVAS_NOT_CREATED,
     /// A rendering surface could not be created.
@@ -225,7 +227,7 @@ struct Renderer {
 #[nstdapi]
 pub struct NSTDGLRenderer {
     /// The inner renderer.
-    renderer: Box<Renderer>,
+    renderer: CBox<Renderer>,
 }
 
 /// The result type returned from `nstd_gl_renderer_new`.
@@ -286,7 +288,7 @@ pub unsafe fn nstd_gl_renderer_new(desc: &NSTDGLRendererDescriptor) -> NSTDGLRen
     };
     let instance = Instance::new(instance_desc);
     // Create the rendering surface.
-    let surface = match instance.create_surface(desc.window.as_ref()) {
+    let surface = match instance.create_surface(&**desc.window) {
         Ok(surface) => surface,
         _ => return NSTDResult::Err(NSTDGLError::NSTD_GL_ERROR_SURFACE_NOT_CREATED),
     };
@@ -326,14 +328,16 @@ pub unsafe fn nstd_gl_renderer_new(desc: &NSTDGLRendererDescriptor) -> NSTDGLRen
     };
     surface.configure(&device, &surface_config);
     // Construct the renderer.
-    NSTDResult::Ok(NSTDGLRenderer {
-        renderer: Box::new(Renderer {
-            surface,
-            surface_config,
-            device,
-            device_handle,
-        }),
-    })
+    let renderer = Renderer {
+        surface,
+        surface_config,
+        device,
+        device_handle,
+    };
+    match CBox::new(renderer) {
+        Some(renderer) => NSTDResult::Ok(NSTDGLRenderer { renderer }),
+        _ => NSTDResult::Err(NSTDGLError::NSTD_GL_ERROR_OUT_OF_MEMORY),
+    }
 }
 
 /// Resizes a renderer's surface.

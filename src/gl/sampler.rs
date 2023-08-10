@@ -1,6 +1,10 @@
 //! A shader's texture sampler.
 use self::NSTDGLSamplerBorderColor::*;
 use super::NSTDGLRenderer;
+use crate::{
+    alloc::CBox,
+    core::optional::{gen_optional, NSTDOptional},
+};
 use nstdapi::nstdapi;
 use wgpu::{AddressMode, FilterMode, Sampler, SamplerBorderColor, SamplerDescriptor};
 
@@ -115,7 +119,19 @@ impl From<&NSTDGLSamplerDescriptor> for SamplerDescriptor<'_> {
 }
 
 /// A shader's texture sampler.
-pub type NSTDGLSampler = Box<Sampler>;
+#[nstdapi]
+pub struct NSTDGLSampler {
+    /// The inner `Sampler`.
+    sampler: CBox<Sampler>,
+}
+impl NSTDGLSampler {
+    /// Returns an immutable reference to the inner sampler.
+    #[inline]
+    pub(super) fn sampler(&self) -> &Sampler {
+        &self.sampler
+    }
+}
+gen_optional!(NSTDGLOptionalSampler, NSTDGLSampler);
 
 /// Creates a new texture sampler.
 ///
@@ -127,14 +143,18 @@ pub type NSTDGLSampler = Box<Sampler>;
 ///
 /// # Returns
 ///
-/// `NSTDGLSampler sampler` - The new texture sampler.
+/// `NSTDGLOptionalSampler sampler` - The new texture sampler on success, or an uninitialized
+/// "none" variant on error.
 #[inline]
 #[nstdapi]
 pub fn nstd_gl_sampler_new(
     renderer: &NSTDGLRenderer,
     desc: &NSTDGLSamplerDescriptor,
-) -> NSTDGLSampler {
-    Box::new(renderer.renderer.device.create_sampler(&desc.into()))
+) -> NSTDGLOptionalSampler {
+    match CBox::new(renderer.renderer.device.create_sampler(&desc.into())) {
+        Some(sampler) => NSTDOptional::Some(NSTDGLSampler { sampler }),
+        _ => NSTDOptional::None,
+    }
 }
 
 /// Frees a texture sampler.

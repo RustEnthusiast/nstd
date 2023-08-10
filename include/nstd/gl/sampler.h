@@ -1,5 +1,6 @@
 #ifndef NSTD_GL_SAMPLER_H
 #define NSTD_GL_SAMPLER_H
+#include "../core/optional.h"
 #include "../nstd.h"
 #include "gl.h"
 
@@ -54,7 +55,13 @@ typedef struct {
 } NSTDGLSamplerDescriptor;
 
 /// A shader's texture sampler.
-typedef NSTDAnyMut NSTDGLSampler;
+typedef struct {
+    /// The inner `Sampler`.
+    NSTDAnyMut sampler;
+} NSTDGLSampler;
+
+/// Represents an optional value of type `NSTDGLSampler`.
+NSTDOptional(NSTDGLSampler) NSTDGLOptionalSampler;
 
 /// Creates a new texture sampler.
 ///
@@ -66,8 +73,9 @@ typedef NSTDAnyMut NSTDGLSampler;
 ///
 /// # Returns
 ///
-/// `NSTDGLSampler sampler` - The new texture sampler.
-NSTDAPI NSTDGLSampler
+/// `NSTDGLOptionalSampler sampler` - The new texture sampler on success, or an uninitialized
+/// "none" variant on error.
+NSTDAPI NSTDGLOptionalSampler
 nstd_gl_sampler_new(const NSTDGLRenderer *renderer, const NSTDGLSamplerDescriptor *desc);
 
 /// Frees a texture sampler.
