@@ -9,12 +9,23 @@ use crate::{
 };
 use image::DynamicImage;
 use nstdapi::nstdapi;
+use std::ops::Deref;
 
 /// An image of any format.
 #[nstdapi]
 pub struct NSTDImage {
     /// The [DynamicImage].
     img: CBox<DynamicImage>,
+}
+impl Deref for NSTDImage {
+    /// `NSTDImage`'s dereference target.
+    type Target = DynamicImage;
+
+    /// Immutably dereferences an `NSTDImage`.
+    #[inline]
+    fn deref(&self) -> &Self::Target {
+        &self.img
+    }
 }
 gen_optional!(NSTDOptionalImage, NSTDImage);
 
