@@ -74,7 +74,7 @@ thread = ["alloc", "core", "heap_ptr", "io", "std"]
 time = ["core", "os_unix_time", "std"]
 timed_mutex = ["capi", "cc", "core", "heap_ptr", "os_unix_mutex", "thread"]
 vec = ["alloc", "core"]
-window = ["app", "core", "image", "std", "winit"]
+window = ["alloc", "app", "core", "image", "std", "winit"]
 
 [dependencies]
 cfg-if = "1.0"

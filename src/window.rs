@@ -1,5 +1,6 @@
 //! An `nstd` application window.
 use crate::{
+    alloc::CBox,
     app::events::{NSTDAppHandle, NSTDWindowID},
     core::{
         def::NSTDErrorCode,
@@ -17,7 +18,12 @@ use winit::{
 };
 
 /// An `nstd` application window.
-pub type NSTDWindow = Box<Window>;
+#[nstdapi]
+pub struct NSTDWindow {
+    /// The inner window.
+    window: CBox<Window>,
+}
+gen_optional!(NSTDOptionalWindow, NSTDWindow);
 
 /// Describes the position of a window.
 #[nstdapi]
@@ -73,15 +79,19 @@ impl From<NSTDCursorGrabMode> for CursorGrabMode {
 ///
 /// # Returns
 ///
-/// `NSTDWindow window` - A handle to the newly created window, or null on error.
+/// `NSTDOptionalWindow window` - A handle to the newly created window, or an uninitialized "none"
+/// variant on error.
 #[nstdapi]
-pub fn nstd_window_new(app: NSTDAppHandle) -> Option<NSTDWindow> {
+pub fn nstd_window_new(app: NSTDAppHandle) -> NSTDOptionalWindow {
     let window = match Window::new(&app) {
         Ok(window) => window,
-        _ => return None,
+        _ => return NSTDOptional::None,
     };
     window.set_title("");
-    Some(Box::new(window))
+    match CBox::new(window) {
+        Some(window) => NSTDOptional::Some(NSTDWindow { window }),
+        _ => NSTDOptional::None,
+    }
 }
 
 /// Returns a window's unique identifier.
@@ -96,7 +106,7 @@ pub fn nstd_window_new(app: NSTDAppHandle) -> Option<NSTDWindow> {
 #[inline]
 #[nstdapi]
 pub fn nstd_window_id(window: &NSTDWindow) -> NSTDWindowID {
-    NSTDWindowID::from_winit(window.id())
+    NSTDWindowID::from_winit(window.window.id())
 }
 
 /// Sets the title of a window.
@@ -113,7 +123,7 @@ pub fn nstd_window_id(window: &NSTDWindow) -> NSTDWindowID {
 #[inline]
 #[nstdapi]
 pub unsafe fn nstd_window_set_title(window: &NSTDWindow, title: &NSTDStr) {
-    window.set_title(title.as_str())
+    window.window.set_title(title.as_str())
 }
 
 /// Sets a window's icon to an RGBA image.
@@ -130,7 +140,9 @@ pub fn nstd_window_set_icon(window: &NSTDWindow, icon: &NSTDImage) {
     let bytes = nstd_image_as_bytes(icon);
     // SAFETY: `icon` owns the data.
     let rgba = Vec::from(unsafe { bytes.as_slice() });
-    window.set_window_icon(Icon::from_rgba(rgba, width, height).ok());
+    window
+        .window
+        .set_window_icon(Icon::from_rgba(rgba, width, height).ok());
 }
 
 /// Sets the position of a window.
@@ -143,7 +155,9 @@ pub fn nstd_window_set_icon(window: &NSTDWindow, icon: &NSTDImage) {
 #[inline]
 #[nstdapi]
 pub fn nstd_window_set_outer_position(window: &NSTDWindow, pos: NSTDWindowPosition) {
-    window.set_outer_position(PhysicalPosition::new(pos.x, pos.y));
+    window
+        .window
+        .set_outer_position(PhysicalPosition::new(pos.x, pos.y));
 }
 
 /// Gets the position of a window.
@@ -160,7 +174,7 @@ pub fn nstd_window_set_outer_position(window: &NSTDWindow, pos: NSTDWindowPositi
 #[inline]
 #[nstdapi]
 pub fn nstd_window_get_outer_position(window: &NSTDWindow) -> NSTDOptionalWindowPosition {
-    match window.outer_position() {
+    match window.window.outer_position() {
         Ok(pos) => NSTDOptional::Some(NSTDWindowPosition { x: pos.x, y: pos.y }),
         _ => NSTDOptional::None,
     }
@@ -180,7 +194,7 @@ pub fn nstd_window_get_outer_position(window: &NSTDWindow) -> NSTDOptionalWindow
 #[inline]
 #[nstdapi]
 pub fn nstd_window_get_inner_position(window: &NSTDWindow) -> NSTDOptionalWindowPosition {
-    match window.inner_position() {
+    match window.window.inner_position() {
         Ok(pos) => NSTDOptional::Some(NSTDWindowPosition { x: pos.x, y: pos.y }),
         _ => NSTDOptional::None,
     }
@@ -196,7 +210,9 @@ pub fn nstd_window_get_inner_position(window: &NSTDWindow) -> NSTDOptionalWindow
 #[inline]
 #[nstdapi]
 pub fn nstd_window_set_inner_size(window: &NSTDWindow, size: NSTDWindowSize) {
-    window.set_inner_size(PhysicalSize::new(size.width, size.height));
+    window
+        .window
+        .set_inner_size(PhysicalSize::new(size.width, size.height));
 }
 
 /// Gets the size of a window's client area.
@@ -211,7 +227,7 @@ pub fn nstd_window_set_inner_size(window: &NSTDWindow, size: NSTDWindowSize) {
 #[inline]
 #[nstdapi]
 pub fn nstd_window_get_inner_size(window: &NSTDWindow) -> NSTDWindowSize {
-    let size = window.inner_size();
+    let size = window.window.inner_size();
     NSTDWindowSize {
         width: size.width,
         height: size.height,
@@ -230,7 +246,7 @@ pub fn nstd_window_get_inner_size(window: &NSTDWindow) -> NSTDWindowSize {
 #[inline]
 #[nstdapi]
 pub fn nstd_window_get_outer_size(window: &NSTDWindow) -> NSTDWindowSize {
-    let size = window.outer_size();
+    let size = window.window.outer_size();
     NSTDWindowSize {
         width: size.width,
         height: size.height,
@@ -251,7 +267,7 @@ pub fn nstd_window_set_min_size(window: &NSTDWindow, size: NSTDOptionalWindowSiz
         NSTDOptional::Some(size) => Some(PhysicalSize::new(size.width, size.height)),
         _ => None,
     };
-    window.set_min_inner_size(size);
+    window.window.set_min_inner_size(size);
 }
 
 /// Sets a window's maximum size.
@@ -268,7 +284,7 @@ pub fn nstd_window_set_max_size(window: &NSTDWindow, size: NSTDOptionalWindowSiz
         NSTDOptional::Some(size) => Some(PhysicalSize::new(size.width, size.height)),
         _ => None,
     };
-    window.set_max_inner_size(size);
+    window.window.set_max_inner_size(size);
 }
 
 /// Returns the scale factor of a window.
@@ -283,7 +299,7 @@ pub fn nstd_window_set_max_size(window: &NSTDWindow, size: NSTDOptionalWindowSiz
 #[inline]
 #[nstdapi]
 pub fn nstd_window_scale_factor(window: &NSTDWindow) -> NSTDFloat64 {
-    window.scale_factor()
+    window.window.scale_factor()
 }
 
 /// Sets whether or not a window is resizable.
@@ -296,7 +312,7 @@ pub fn nstd_window_scale_factor(window: &NSTDWindow) -> NSTDFloat64 {
 #[inline]
 #[nstdapi]
 pub fn nstd_window_set_resizable(window: &NSTDWindow, resizable: NSTDBool) {
-    window.set_resizable(resizable);
+    window.window.set_resizable(resizable);
 }
 
 /// Checks if a window is resizable.
@@ -311,7 +327,7 @@ pub fn nstd_window_set_resizable(window: &NSTDWindow, resizable: NSTDBool) {
 #[inline]
 #[nstdapi]
 pub fn nstd_window_is_resizable(window: &NSTDWindow) -> NSTDBool {
-    window.is_resizable()
+    window.window.is_resizable()
 }
 
 /// Sets the grabbing mode of the system cursor.
@@ -336,7 +352,7 @@ pub fn nstd_window_set_cursor_grab_mode(
     window: &NSTDWindow,
     mode: NSTDCursorGrabMode,
 ) -> NSTDErrorCode {
-    match window.set_cursor_grab(mode.into()) {
+    match window.window.set_cursor_grab(mode.into()) {
         Ok(_) => 0,
         Err(ExternalError::NotSupported(_)) => 1,
         Err(ExternalError::Os(_)) => 2,
@@ -353,7 +369,7 @@ pub fn nstd_window_set_cursor_grab_mode(
 #[inline]
 #[nstdapi]
 pub fn nstd_window_set_cursor_visible(window: &NSTDWindow, visible: NSTDBool) {
-    window.set_cursor_visible(visible);
+    window.window.set_cursor_visible(visible);
 }
 
 /// Permanently closes & frees a window and it's data.
