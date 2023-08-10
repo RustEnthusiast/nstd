@@ -76,7 +76,7 @@ impl From<NSTDCursorGrabMode> for CursorGrabMode {
 /// `NSTDWindow window` - A handle to the newly created window, or null on error.
 #[nstdapi]
 pub fn nstd_window_new(app: NSTDAppHandle) -> Option<NSTDWindow> {
-    let window = match Window::new(app) {
+    let window = match Window::new(&app) {
         Ok(window) => window,
         _ => return None,
     };
@@ -96,7 +96,7 @@ pub fn nstd_window_new(app: NSTDAppHandle) -> Option<NSTDWindow> {
 #[inline]
 #[nstdapi]
 pub fn nstd_window_id(window: &NSTDWindow) -> NSTDWindowID {
-    Box::new(window.id())
+    NSTDWindowID::from_winit(window.id())
 }
 
 /// Sets the title of a window.

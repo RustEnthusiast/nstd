@@ -19,7 +19,7 @@ impl CModule {
     #[cfg(feature = "cc")]
     fn build(self) {
         use cc::Build;
-        if std::env::var("DOCS_RS").is_err() {
+        if !cfg!(feature = "link") && std::env::var("DOCS_RS").is_err() {
             // Create the compiler.
             let mut cc = Build::new();
             // Add compiler flags.
@@ -44,6 +44,8 @@ impl CModule {
 fn main() {
     println!("cargo:rerun-if-changed=src/*");
     println!("cargo:rerun-if-changed=include/*");
+    #[cfg(feature = "link")]
+    println!("cargo:rustc-link-lib=nstd");
     #[cfg(feature = "timed_mutex")]
     {
         let nstd_timed_mutex = CModule {

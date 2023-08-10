@@ -1,12 +1,13 @@
 //! Contains callback based events through function pointers.
 use crate::{
+    alloc::CBox,
     core::{
-        optional::{NSTDOptional, NSTDOptionalUInt16},
+        optional::{gen_optional, NSTDOptional, NSTDOptionalUInt16},
         str::NSTDStr,
         unichar::NSTDUnichar,
     },
     heap_ptr::NSTDOptionalHeapPtr,
-    NSTDBool, NSTDFloat32, NSTDFloat64, NSTDInt32, NSTDUInt32,
+    NSTDBool, NSTDFloat32, NSTDFloat64, NSTDInt32, NSTDRef, NSTDRefMut, NSTDUInt32, NSTDUInt64,
 };
 use gilrs::{Axis, Button, Event as GamepadEvent, GamepadId, Gilrs};
 use nstdapi::nstdapi;
@@ -17,13 +18,54 @@ use winit::{
 };
 
 /// A window's unique identifier.
-pub type NSTDWindowID = Box<WindowId>;
+#[nstdapi]
+pub struct NSTDWindowID {
+    /// The window's unique identifier.
+    pub(super) id: NSTDUInt64,
+}
+impl NSTDWindowID {
+    /// Creates an [NSTDWindowID] from a [WindowId].
+    #[inline]
+    pub(crate) fn from_winit(id: WindowId) -> Self {
+        Self { id: id.into() }
+    }
+}
 
 /// A device's unique identifier.
-pub type NSTDDeviceID = Box<DeviceId>;
+#[nstdapi]
+pub struct NSTDDeviceID {
+    /// The inner [DeviceId].
+    pub(super) id: CBox<DeviceId>,
+}
+impl NSTDDeviceID {
+    /// Creates an [NSTDDeviceID] from a [DeviceId].
+    #[inline]
+    pub(super) fn from_winit(id: DeviceId) -> NSTDOptionalDeviceID {
+        match CBox::new(id) {
+            Some(id) => NSTDOptional::Some(NSTDDeviceID { id }),
+            _ => NSTDOptional::None,
+        }
+    }
+}
+gen_optional!(NSTDOptionalDeviceID, NSTDDeviceID);
 
 /// A gamepad's unique identifier.
-pub type NSTDGamepadID = Box<GamepadId>;
+#[nstdapi]
+pub struct NSTDGamepadID {
+    /// The inner [GamepadId].
+    pub(super) id: CBox<GamepadId>,
+}
+impl NSTDGamepadID {
+    /// Creates an [NSTDGamepadID] from a [GamepadId].
+    #[inline]
+    pub(super) fn from_gilrs(id: GamepadId) -> NSTDOptionalGamepadID {
+        match CBox::new(id) {
+            Some(id) => NSTDOptional::Some(NSTDGamepadID { id }),
+            _ => NSTDOptional::None,
+        }
+    }
+}
+gen_optional!(NSTDOptionalGamepadID, NSTDGamepadID);
 
 /// Identifier for an analog axis on a device.
 pub type NSTDAnalogAxisID = NSTDUInt32;
@@ -547,7 +589,7 @@ impl NSTDGamepadAxis {
 }
 
 /// A handle to the application event loop.
-pub type NSTDAppHandle<'a> = &'a EventLoopWindowTarget<()>;
+pub type NSTDAppHandle<'a> = NSTDRef<'a, EventLoopWindowTarget<()>>;
 
 /// Application data passed to each event.
 #[nstdapi]
@@ -557,31 +599,31 @@ pub struct NSTDAppData<'a> {
     /// Custom user data.
     pub data: &'a mut NSTDOptionalHeapPtr<'static>,
     /// The gamepad input manager.
-    pub(crate) gil: &'a mut Gilrs,
+    pub(crate) gil: NSTDRefMut<'a, Gilrs>,
     /// The application's control flow.
-    control_flow: &'a mut ControlFlow,
+    control_flow: NSTDRefMut<'a, ControlFlow>,
 }
 impl<'a> NSTDAppData<'a> {
     /// Creates a new instance of [NSTDAppData].
     #[inline]
     pub(crate) fn new(
-        handle: NSTDAppHandle<'a>,
+        handle: &'a EventLoopWindowTarget<()>,
         control_flow: &'a mut ControlFlow,
         data: &'a mut NSTDOptionalHeapPtr<'static>,
         gil: &'a mut Gilrs,
     ) -> Self {
         Self {
-            handle,
-            control_flow,
+            handle: handle.into(),
+            control_flow: control_flow.into(),
             data,
-            gil,
+            gil: gil.into(),
         }
     }
 
     /// Returns a reference to the control flow cell.
     #[inline]
     pub(crate) fn control_flow(&mut self) -> &mut ControlFlow {
-        self.control_flow
+        &mut self.control_flow
     }
 
     /// Returns the next gamepad event if there is one.

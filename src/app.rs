@@ -3,26 +3,28 @@ pub mod display;
 pub mod events;
 pub mod gamepad;
 use self::{
-    display::NSTDDisplay,
+    display::{NSTDDisplay, NSTDOptionalDisplay},
     events::{
         NSTDAppData, NSTDAppEvents, NSTDAppHandle, NSTDDeviceEventFilter, NSTDDeviceID,
         NSTDGamepadAxis, NSTDGamepadButton, NSTDGamepadID, NSTDKey, NSTDMouseInput,
         NSTDScrollDelta, NSTDTouchState, NSTDWindowID,
     },
-    gamepad::NSTDGamepad,
+    gamepad::{NSTDGamepad, NSTDOptionalGamepad},
 };
 use crate::{
+    alloc::{CBox, NSTD_ALLOCATOR},
     core::{
         def::NSTDErrorCode,
         optional::{gen_optional, NSTDOptional},
         str::NSTDStr,
     },
     heap_ptr::NSTDOptionalHeapPtr,
-    vec::NSTDVec,
+    vec::{nstd_vec_new, nstd_vec_push, NSTDVec},
     NSTDBool,
 };
 use gilrs::{Error::NotImplemented, EventType as GamepadEvent, Gilrs};
 use nstdapi::nstdapi;
+use std::ptr::addr_of;
 use winit::{
     event::{DeviceEvent, ElementState, Event, StartCause, WindowEvent},
     event_loop::{ControlFlow, DeviceEventFilter, EventLoop},
@@ -42,7 +44,7 @@ pub struct NSTDApp {
     /// The application event callback function pointers.
     pub events: NSTDAppEvents,
     /// Private app data.
-    inner: Box<AppData>,
+    inner: CBox<AppData>,
 }
 gen_optional!(NSTDOptionalApp, NSTDApp);
 
@@ -75,10 +77,13 @@ pub fn nstd_app_new() -> NSTDOptionalApp {
         _ => return NSTDOptional::None,
     };
     // Construct the `nstd` application.
-    NSTDOptional::Some(NSTDApp {
-        events: NSTDAppEvents::default(),
-        inner: Box::new(AppData { event_loop, gil }),
-    })
+    match CBox::new(AppData { event_loop, gil }) {
+        Some(inner) => NSTDOptional::Some(NSTDApp {
+            events: NSTDAppEvents::default(),
+            inner,
+        }),
+        _ => NSTDOptional::None,
+    }
 }
 
 /// Returns a handle to an `NSTDApp`'s event loop.
@@ -93,7 +98,7 @@ pub fn nstd_app_new() -> NSTDOptionalApp {
 #[inline]
 #[nstdapi]
 pub fn nstd_app_handle(app: &NSTDApp) -> NSTDAppHandle {
-    &app.inner.event_loop
+    NSTDAppHandle::from(&*app.inner.event_loop)
 }
 
 /// Runs an `NSTDApp`'s event loop.
@@ -116,7 +121,7 @@ pub unsafe fn nstd_app_run(app: NSTDApp, mut data: NSTDOptionalHeapPtr<'static>)
     let AppData {
         event_loop,
         mut gil,
-    } = *app.inner;
+    } = app.inner.into_inner();
     // Run the winit event loop.
     event_loop.run(move |event, handle, control_flow| {
         // Instantiate a new instance of `NSTDAppData`.
@@ -133,55 +138,59 @@ pub unsafe fn nstd_app_run(app: NSTDApp, mut data: NSTDOptionalHeapPtr<'static>)
             Event::MainEventsCleared => {
                 // Dispatch gamepad events.
                 while let Some(event) = app_data.next_gamepad_event() {
-                    match event.event {
-                        // A gamepad was connected to the system.
-                        GamepadEvent::Connected => {
-                            if let Some(gamepad_connected) = app.events.gamepad_connected {
-                                gamepad_connected(app_data, Box::new(event.id));
+                    if let NSTDOptional::Some(id) = NSTDGamepadID::from_gilrs(event.id) {
+                        match event.event {
+                            // A gamepad was connected to the system.
+                            GamepadEvent::Connected => {
+                                if let Some(gamepad_connected) = app.events.gamepad_connected {
+                                    gamepad_connected(app_data, id);
+                                }
                             }
-                        }
-                        // A gamepad was disconnected from the system.
-                        GamepadEvent::Disconnected => {
-                            if let Some(gamepad_disconnected) = app.events.gamepad_disconnected {
-                                gamepad_disconnected(app_data, Box::new(event.id));
+                            // A gamepad was disconnected from the system.
+                            GamepadEvent::Disconnected => {
+                                if let Some(gamepad_disconnected) = app.events.gamepad_disconnected
+                                {
+                                    gamepad_disconnected(app_data, id);
+                                }
                             }
-                        }
-                        // A gamepad button was pressed.
-                        GamepadEvent::ButtonPressed(button, code) => {
-                            if let Some(gamepad_button_pressed) = app.events.gamepad_button_pressed
-                            {
-                                let button = NSTDGamepadButton::from_winit(button);
-                                let code = code.into_u32();
-                                gamepad_button_pressed(app_data, Box::new(event.id), button, code);
+                            // A gamepad button was pressed.
+                            GamepadEvent::ButtonPressed(button, code) => {
+                                if let Some(gamepad_button_pressed) =
+                                    app.events.gamepad_button_pressed
+                                {
+                                    let button = NSTDGamepadButton::from_winit(button);
+                                    let code = code.into_u32();
+                                    gamepad_button_pressed(app_data, id, button, code);
+                                }
                             }
-                        }
-                        // A gamepad button was released.
-                        GamepadEvent::ButtonReleased(button, code) => {
-                            if let Some(gamepad_button_released) =
-                                app.events.gamepad_button_released
-                            {
-                                let button = NSTDGamepadButton::from_winit(button);
-                                let code = code.into_u32();
-                                gamepad_button_released(app_data, Box::new(event.id), button, code);
+                            // A gamepad button was released.
+                            GamepadEvent::ButtonReleased(button, code) => {
+                                if let Some(gamepad_button_released) =
+                                    app.events.gamepad_button_released
+                                {
+                                    let button = NSTDGamepadButton::from_winit(button);
+                                    let code = code.into_u32();
+                                    gamepad_button_released(app_data, id, button, code);
+                                }
                             }
-                        }
-                        // A gamepad button's value changed.
-                        GamepadEvent::ButtonChanged(button, value, code) => {
-                            if let Some(gamepad_input) = app.events.gamepad_input {
-                                let button = NSTDGamepadButton::from_winit(button);
-                                let code = code.into_u32();
-                                gamepad_input(app_data, Box::new(event.id), button, code, value);
+                            // A gamepad button's value changed.
+                            GamepadEvent::ButtonChanged(button, value, code) => {
+                                if let Some(gamepad_input) = app.events.gamepad_input {
+                                    let button = NSTDGamepadButton::from_winit(button);
+                                    let code = code.into_u32();
+                                    gamepad_input(app_data, id, button, code, value);
+                                }
                             }
-                        }
-                        // A gamepad axis value has changed.
-                        GamepadEvent::AxisChanged(axis, value, code) => {
-                            if let Some(gamepad_axis_input) = app.events.gamepad_axis_input {
-                                let axis = NSTDGamepadAxis::from_winit(axis);
-                                let code = code.into_u32();
-                                gamepad_axis_input(app_data, Box::new(event.id), axis, code, value);
+                            // A gamepad axis value has changed.
+                            GamepadEvent::AxisChanged(axis, value, code) => {
+                                if let Some(gamepad_axis_input) = app.events.gamepad_axis_input {
+                                    let axis = NSTDGamepadAxis::from_winit(axis);
+                                    let code = code.into_u32();
+                                    gamepad_axis_input(app_data, id, axis, code, value);
+                                }
                             }
+                            _ => (),
                         }
-                        _ => (),
                     }
                 }
                 // Dispatch update event.
@@ -190,198 +199,230 @@ pub unsafe fn nstd_app_run(app: NSTDApp, mut data: NSTDOptionalHeapPtr<'static>)
                 }
             }
             // A device event was received.
-            Event::DeviceEvent { device_id, event } => match event {
-                // A device was connected to the system.
-                DeviceEvent::Added => {
-                    if let Some(device_added) = app.events.device_added {
-                        device_added(app_data, Box::new(device_id));
+            Event::DeviceEvent { device_id, event } => {
+                if let NSTDOptional::Some(id) = NSTDDeviceID::from_winit(device_id) {
+                    match event {
+                        // A device was connected to the system.
+                        DeviceEvent::Added => {
+                            if let Some(device_added) = app.events.device_added {
+                                device_added(app_data, id);
+                            }
+                        }
+                        // A device was disconnected from the system.
+                        DeviceEvent::Removed => {
+                            if let Some(device_removed) = app.events.device_removed {
+                                device_removed(app_data, id);
+                            }
+                        }
+                        // A mouse device was moved.
+                        DeviceEvent::MouseMotion { delta } => {
+                            if let Some(mouse_moved) = app.events.mouse_moved {
+                                mouse_moved(app_data, id, delta.0, -delta.1);
+                            }
+                        }
+                        // A scroll wheel was scrolled.
+                        DeviceEvent::MouseWheel { delta } => {
+                            if let Some(mouse_scrolled) = app.events.mouse_scrolled {
+                                let (x, y, delta_t) = NSTDScrollDelta::from_winit(delta);
+                                mouse_scrolled(app_data, id, x, y, delta_t);
+                            }
+                        }
+                        // There was motion on some analog axis.
+                        DeviceEvent::Motion { axis, value } => {
+                            if let Some(axis_motion) = app.events.axis_motion {
+                                axis_motion(app_data, id, axis, value);
+                            }
+                        }
+                        // A button's state was changed.
+                        DeviceEvent::Button { button, state } => {
+                            if let Some(button_input) = app.events.button_input {
+                                let is_down = state == ElementState::Pressed;
+                                button_input(app_data, id, button, is_down);
+                            }
+                        }
+                        // There was some keyboard input.
+                        DeviceEvent::Key(input) => {
+                            if let Some(key_input) = app.events.key_input {
+                                let key = NSTDKey::from_winit(input.virtual_keycode);
+                                let is_down = input.state == ElementState::Pressed;
+                                key_input(app_data, id, key, input.scancode, is_down);
+                            }
+                        }
+                        _ => (),
                     }
                 }
-                // A device was disconnected from the system.
-                DeviceEvent::Removed => {
-                    if let Some(device_removed) = app.events.device_removed {
-                        device_removed(app_data, Box::new(device_id));
-                    }
-                }
-                // A mouse device was moved.
-                DeviceEvent::MouseMotion { delta } => {
-                    if let Some(mouse_moved) = app.events.mouse_moved {
-                        mouse_moved(app_data, Box::new(device_id), delta.0, -delta.1);
-                    }
-                }
-                // A scroll wheel was scrolled.
-                DeviceEvent::MouseWheel { delta } => {
-                    if let Some(mouse_scrolled) = app.events.mouse_scrolled {
-                        let (x, y, delta_t) = NSTDScrollDelta::from_winit(delta);
-                        mouse_scrolled(app_data, Box::new(device_id), x, y, delta_t);
-                    }
-                }
-                // There was motion on some analog axis.
-                DeviceEvent::Motion { axis, value } => {
-                    if let Some(axis_motion) = app.events.axis_motion {
-                        axis_motion(app_data, Box::new(device_id), axis, value);
-                    }
-                }
-                // A button's state was changed.
-                DeviceEvent::Button { button, state } => {
-                    if let Some(button_input) = app.events.button_input {
-                        let is_down = state == ElementState::Pressed;
-                        button_input(app_data, Box::new(device_id), button, is_down);
-                    }
-                }
-                // There was some keyboard input.
-                DeviceEvent::Key(input) => {
-                    if let Some(key_input) = app.events.key_input {
-                        let key = NSTDKey::from_winit(input.virtual_keycode);
-                        let is_down = input.state == ElementState::Pressed;
-                        key_input(app_data, Box::new(device_id), key, input.scancode, is_down);
-                    }
-                }
-                _ => (),
-            },
+            }
             // A window event was received.
-            Event::WindowEvent { window_id, event } => match event {
-                // A window's scale factor has changed.
-                WindowEvent::ScaleFactorChanged {
-                    scale_factor,
-                    new_inner_size,
-                } => {
-                    if let Some(window_dpi_changed) = app.events.window_dpi_changed {
-                        window_dpi_changed(
-                            app_data,
-                            Box::new(window_id),
-                            scale_factor,
-                            &mut new_inner_size.width,
-                            &mut new_inner_size.height,
-                        );
+            Event::WindowEvent { window_id, event } => {
+                let id = NSTDWindowID::from_winit(window_id);
+                match event {
+                    // A window's scale factor has changed.
+                    WindowEvent::ScaleFactorChanged {
+                        scale_factor,
+                        new_inner_size,
+                    } => {
+                        if let Some(window_dpi_changed) = app.events.window_dpi_changed {
+                            window_dpi_changed(
+                                app_data,
+                                id,
+                                scale_factor,
+                                &mut new_inner_size.width,
+                                &mut new_inner_size.height,
+                            );
+                        }
                     }
-                }
-                // A window was resized.
-                WindowEvent::Resized(size) => {
-                    if let Some(window_resized) = app.events.window_resized {
-                        window_resized(app_data, Box::new(window_id), size.width, size.height);
+                    // A window was resized.
+                    WindowEvent::Resized(size) => {
+                        if let Some(window_resized) = app.events.window_resized {
+                            window_resized(app_data, id, size.width, size.height);
+                        }
                     }
-                }
-                // A window was moved.
-                WindowEvent::Moved(pos) => {
-                    if let Some(window_moved) = app.events.window_moved {
-                        window_moved(app_data, Box::new(window_id), pos.x, pos.y);
+                    // A window was moved.
+                    WindowEvent::Moved(pos) => {
+                        if let Some(window_moved) = app.events.window_moved {
+                            window_moved(app_data, id, pos.x, pos.y);
+                        }
                     }
-                }
-                // A window's focus has changed.
-                WindowEvent::Focused(is_focused) => {
-                    if let Some(window_focus_changed) = app.events.window_focus_changed {
-                        window_focus_changed(app_data, Box::new(window_id), is_focused);
+                    // A window's focus has changed.
+                    WindowEvent::Focused(is_focused) => {
+                        if let Some(window_focus_changed) = app.events.window_focus_changed {
+                            window_focus_changed(app_data, id, is_focused);
+                        }
                     }
-                }
-                // A window received mouse button input.
-                WindowEvent::MouseInput {
-                    device_id,
-                    state,
-                    button,
-                    ..
-                } => {
-                    if let Some(window_mouse_input) = app.events.window_mouse_input {
-                        let window_id = Box::new(window_id);
-                        let device_id = Box::new(device_id);
-                        let input = NSTDMouseInput::from_winit(button);
-                        let is_down = state == ElementState::Pressed;
-                        window_mouse_input(app_data, window_id, device_id, &input, is_down);
+                    // A window received mouse button input.
+                    WindowEvent::MouseInput {
+                        device_id,
+                        state,
+                        button,
+                        ..
+                    } => {
+                        if let Some(window_mouse_input) = app.events.window_mouse_input {
+                            if let NSTDOptional::Some(device_id) =
+                                NSTDDeviceID::from_winit(device_id)
+                            {
+                                let window_id = id;
+                                let input = NSTDMouseInput::from_winit(button);
+                                let is_down = state == ElementState::Pressed;
+                                window_mouse_input(app_data, window_id, device_id, &input, is_down);
+                            }
+                        }
                     }
-                }
-                // A window received key input.
-                WindowEvent::KeyboardInput {
-                    device_id, input, ..
-                } => {
-                    if let Some(window_key_input) = app.events.window_key_input {
-                        let window_id = Box::new(window_id);
-                        let device_id = Box::new(device_id);
-                        let key = NSTDKey::from_winit(input.virtual_keycode);
-                        let is_down = input.state == ElementState::Pressed;
-                        let scancode = input.scancode;
-                        window_key_input(app_data, window_id, device_id, key, scancode, is_down);
+                    // A window received key input.
+                    WindowEvent::KeyboardInput {
+                        device_id, input, ..
+                    } => {
+                        if let Some(window_key_input) = app.events.window_key_input {
+                            if let NSTDOptional::Some(device_id) =
+                                NSTDDeviceID::from_winit(device_id)
+                            {
+                                let window_id = id;
+                                let key = NSTDKey::from_winit(input.virtual_keycode);
+                                let is_down = input.state == ElementState::Pressed;
+                                let scancode = input.scancode;
+                                window_key_input(
+                                    app_data, window_id, device_id, key, scancode, is_down,
+                                );
+                            }
+                        }
                     }
-                }
-                // A window received character input.
-                WindowEvent::ReceivedCharacter(chr) => {
-                    if let Some(window_received_char) = app.events.window_received_char {
-                        window_received_char(app_data, Box::new(window_id), chr.into());
+                    // A window received character input.
+                    WindowEvent::ReceivedCharacter(chr) => {
+                        if let Some(window_received_char) = app.events.window_received_char {
+                            window_received_char(app_data, id, chr.into());
+                        }
                     }
-                }
-                // A window was scrolled.
-                WindowEvent::MouseWheel {
-                    device_id,
-                    delta,
-                    phase,
-                    ..
-                } => {
-                    if let Some(window_scrolled) = app.events.window_scrolled {
-                        let window_id = Box::new(window_id);
-                        let device_id = Box::new(device_id);
-                        let (x, y, delta_t) = NSTDScrollDelta::from_winit(delta);
-                        let touch = NSTDTouchState::from_winit(phase);
-                        window_scrolled(app_data, window_id, device_id, x, y, delta_t, touch);
+                    // A window was scrolled.
+                    WindowEvent::MouseWheel {
+                        device_id,
+                        delta,
+                        phase,
+                        ..
+                    } => {
+                        if let Some(window_scrolled) = app.events.window_scrolled {
+                            if let NSTDOptional::Some(device_id) =
+                                NSTDDeviceID::from_winit(device_id)
+                            {
+                                let window_id = id;
+                                let (x, y, delta_t) = NSTDScrollDelta::from_winit(delta);
+                                let touch = NSTDTouchState::from_winit(phase);
+                                window_scrolled(
+                                    app_data, window_id, device_id, x, y, delta_t, touch,
+                                );
+                            }
+                        }
                     }
-                }
-                // The cursor was moved over a window.
-                WindowEvent::CursorMoved {
-                    device_id,
-                    position: pos,
-                    ..
-                } => {
-                    if let Some(window_cursor_moved) = app.events.window_cursor_moved {
-                        let window_id = Box::new(window_id);
-                        window_cursor_moved(app_data, window_id, Box::new(device_id), pos.x, pos.y);
+                    // The cursor was moved over a window.
+                    WindowEvent::CursorMoved {
+                        device_id,
+                        position: pos,
+                        ..
+                    } => {
+                        if let Some(window_cursor_moved) = app.events.window_cursor_moved {
+                            if let NSTDOptional::Some(device_id) =
+                                NSTDDeviceID::from_winit(device_id)
+                            {
+                                let window_id = id;
+                                window_cursor_moved(app_data, window_id, device_id, pos.x, pos.y);
+                            }
+                        }
                     }
-                }
-                // The cursor entered a window.
-                WindowEvent::CursorEntered { device_id } => {
-                    if let Some(window_cursor_entered) = app.events.window_cursor_entered {
-                        window_cursor_entered(app_data, Box::new(window_id), Box::new(device_id));
+                    // The cursor entered a window.
+                    WindowEvent::CursorEntered { device_id } => {
+                        if let Some(window_cursor_entered) = app.events.window_cursor_entered {
+                            if let NSTDOptional::Some(device_id) =
+                                NSTDDeviceID::from_winit(device_id)
+                            {
+                                window_cursor_entered(app_data, id, device_id);
+                            }
+                        }
                     }
-                }
-                // The cursor left a window.
-                WindowEvent::CursorLeft { device_id } => {
-                    if let Some(window_cursor_left) = app.events.window_cursor_left {
-                        window_cursor_left(app_data, Box::new(window_id), Box::new(device_id));
+                    // The cursor left a window.
+                    WindowEvent::CursorLeft { device_id } => {
+                        if let Some(window_cursor_left) = app.events.window_cursor_left {
+                            if let NSTDOptional::Some(device_id) =
+                                NSTDDeviceID::from_winit(device_id)
+                            {
+                                window_cursor_left(app_data, id, device_id);
+                            }
+                        }
                     }
-                }
-                // A file was dropped into a window.
-                WindowEvent::DroppedFile(path) => {
-                    if let Some(window_file_received) = app.events.window_file_received {
-                        let path = path.to_string_lossy();
-                        let path = NSTDStr::from_str(&path);
-                        window_file_received(app_data, Box::new(window_id), &path);
+                    // A file was dropped into a window.
+                    WindowEvent::DroppedFile(path) => {
+                        if let Some(window_file_received) = app.events.window_file_received {
+                            let path = path.to_string_lossy();
+                            let path = NSTDStr::from_str(&path);
+                            window_file_received(app_data, id, &path);
+                        }
                     }
-                }
-                // A file was hovered over a window.
-                WindowEvent::HoveredFile(path) => {
-                    if let Some(window_file_hovered) = app.events.window_file_hovered {
-                        let path = path.to_string_lossy();
-                        let path = NSTDStr::from_str(&path);
-                        window_file_hovered(app_data, Box::new(window_id), &path);
+                    // A file was hovered over a window.
+                    WindowEvent::HoveredFile(path) => {
+                        if let Some(window_file_hovered) = app.events.window_file_hovered {
+                            let path = path.to_string_lossy();
+                            let path = NSTDStr::from_str(&path);
+                            window_file_hovered(app_data, id, &path);
+                        }
                     }
-                }
-                // A file was dragged away from a window.
-                WindowEvent::HoveredFileCancelled => {
-                    if let Some(window_file_canceled) = app.events.window_file_canceled {
-                        window_file_canceled(app_data, Box::new(window_id));
+                    // A file was dragged away from a window.
+                    WindowEvent::HoveredFileCancelled => {
+                        if let Some(window_file_canceled) = app.events.window_file_canceled {
+                            window_file_canceled(app_data, id);
+                        }
                     }
-                }
-                // A window requests closing.
-                WindowEvent::CloseRequested => {
-                    if let Some(window_close_requested) = app.events.window_close_requested {
-                        window_close_requested(app_data, Box::new(window_id));
+                    // A window requests closing.
+                    WindowEvent::CloseRequested => {
+                        if let Some(window_close_requested) = app.events.window_close_requested {
+                            window_close_requested(app_data, id);
+                        }
                     }
-                }
-                // A window was permanently closed.
-                WindowEvent::Destroyed => {
-                    if let Some(window_closed) = app.events.window_closed {
-                        window_closed(app_data, Box::new(window_id));
+                    // A window was permanently closed.
+                    WindowEvent::Destroyed => {
+                        if let Some(window_closed) = app.events.window_closed {
+                            window_closed(app_data, id);
+                        }
                     }
+                    _ => (),
                 }
-                _ => (),
-            },
+            }
             // The event loop is being exited.
             Event::LoopDestroyed => {
                 if let Some(exit) = app.events.exit {
@@ -413,10 +454,17 @@ pub fn nstd_app_free(app: NSTDApp) {}
 /// # Returns
 ///
 /// `NSTDVec displays` - A vector of `NSTDDisplay` handles.
-#[inline]
 #[nstdapi]
 pub fn nstd_app_displays(app: NSTDAppHandle) -> NSTDVec {
-    app.available_monitors().map(Box::new).collect()
+    let mut displays = nstd_vec_new(&NSTD_ALLOCATOR, std::mem::size_of::<NSTDDisplay>());
+    for display in app.available_monitors() {
+        if let Some(handle) = CBox::new(display) {
+            let display = NSTDDisplay { handle };
+            // SAFETY: `display` is stored on the stack.
+            unsafe { nstd_vec_push(&mut displays, addr_of!(display) as _) };
+        }
+    }
+    displays
 }
 
 /// Returns a handle to the primary display.
@@ -427,11 +475,16 @@ pub fn nstd_app_displays(app: NSTDAppHandle) -> NSTDVec {
 ///
 /// # Returns
 ///
-/// `NSTDDisplay display` - A handle to the primary display, null on error.
-#[inline]
+/// `NSTDOptionalDisplay display` - A handle to the primary display on success, or an uninitialized
+/// "none" variant on error.
 #[nstdapi]
-pub fn nstd_app_primary_display(app: NSTDAppHandle) -> Option<NSTDDisplay> {
-    app.primary_monitor().map(Box::new)
+pub fn nstd_app_primary_display(app: NSTDAppHandle) -> NSTDOptionalDisplay {
+    if let Some(handle) = app.primary_monitor() {
+        if let Some(handle) = CBox::new(handle) {
+            return NSTDOptional::Some(NSTDDisplay { handle });
+        }
+    }
+    NSTDOptional::None
 }
 
 /// Sets the `nstd` application's device filtering mode.
@@ -457,11 +510,18 @@ pub fn nstd_app_set_device_event_filter(app: NSTDAppHandle, filter: NSTDDeviceEv
 ///
 /// # Returns
 ///
-/// `NSTDGamepad gamepad` - A handle to the gamepad with ID `id`.
+/// `NSTDOptionalGamepad gamepad` - A handle to the gamepad with ID `id` on success, or an
+/// uninitialized "none" variant on error.
 #[inline]
 #[nstdapi]
-pub fn nstd_app_gamepad<'a>(app: &'a NSTDAppData<'a>, id: &NSTDGamepadID) -> NSTDGamepad<'a> {
-    Box::new(app.gil.gamepad(**id))
+pub fn nstd_app_gamepad<'a>(
+    app: &'a NSTDAppData<'a>,
+    id: &NSTDGamepadID,
+) -> NSTDOptionalGamepad<'a> {
+    match CBox::new(app.gil.gamepad(*id.id)) {
+        Some(gamepad) => NSTDOptional::Some(NSTDGamepad { gamepad }),
+        _ => NSTDOptional::None,
+    }
 }
 
 /// Returns a vector of all connected gamepad handles detected by `app`.
@@ -473,10 +533,17 @@ pub fn nstd_app_gamepad<'a>(app: &'a NSTDAppData<'a>, id: &NSTDGamepadID) -> NST
 /// # Returns
 ///
 /// `NSTDVec gamepads` - A vector of `NSTDGamepad` handles.
-#[inline]
 #[nstdapi]
 pub fn nstd_app_gamepads(app: &NSTDAppData) -> NSTDVec<'static> {
-    app.gil.gamepads().map(|g| Box::new(g.1)).collect()
+    let mut gamepads = nstd_vec_new(&NSTD_ALLOCATOR, std::mem::size_of::<NSTDGamepad>());
+    for gamepad in app.gil.gamepads() {
+        if let Some(gamepad) = CBox::new(gamepad.1) {
+            let gamepad = NSTDGamepad { gamepad };
+            // SAFETY: `gamepad` is stored on the stack.
+            unsafe { nstd_vec_push(&mut gamepads, addr_of!(gamepad) as _) };
+        }
+    }
+    gamepads
 }
 
 /// Signals an `NSTDApp`'s event loop to exit.
@@ -517,18 +584,8 @@ pub fn nstd_app_exit_with_code(app: &mut NSTDAppData, errc: NSTDErrorCode) {
 #[inline]
 #[nstdapi]
 pub fn nstd_app_window_id_compare(id1: &NSTDWindowID, id2: &NSTDWindowID) -> NSTDBool {
-    id1 == id2
+    id1.id == id2.id
 }
-
-/// Frees an instance of `NSTDWindowID`.
-///
-/// # Parameters:
-///
-/// - `NSTDWindowID id` - The window ID to free.
-#[inline]
-#[nstdapi]
-#[allow(unused_variables)]
-pub fn nstd_app_window_id_free(id: NSTDWindowID) {}
 
 /// Checks if two `NSTDDeviceID`s refer to the same device.
 ///
@@ -544,7 +601,7 @@ pub fn nstd_app_window_id_free(id: NSTDWindowID) {}
 #[inline]
 #[nstdapi]
 pub fn nstd_app_device_id_compare(id1: &NSTDDeviceID, id2: &NSTDDeviceID) -> NSTDBool {
-    id1 == id2
+    *id1.id == *id2.id
 }
 
 /// Frees an instance of `NSTDDeviceID`.
@@ -571,7 +628,7 @@ pub fn nstd_app_device_id_free(id: NSTDDeviceID) {}
 #[inline]
 #[nstdapi]
 pub fn nstd_app_gamepad_id_compare(id1: &NSTDGamepadID, id2: &NSTDGamepadID) -> NSTDBool {
-    id1 == id2
+    *id1.id == *id2.id
 }
 
 /// Frees an instance of `NSTDGamepadID`.

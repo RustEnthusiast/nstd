@@ -80,10 +80,12 @@ pub const unsafe fn nstd_core_ptr_new_unchecked(obj: NSTDAny, size: NSTDUInt) ->
 /// use core::ptr::addr_of;
 /// use nstd_sys::core::ptr::{nstd_core_ptr_new, nstd_core_ptr_size};
 ///
-/// const VALUE_SIZE: usize = core::mem::size_of::<isize>();
-/// let x = 33isize;
-/// let ptr = nstd_core_ptr_new(addr_of!(x).cast(), VALUE_SIZE).unwrap();
-/// assert!(nstd_core_ptr_size(&ptr) == VALUE_SIZE);
+/// unsafe {
+///     const VALUE_SIZE: usize = core::mem::size_of::<isize>();
+///     let x = 33isize;
+///     let ptr = nstd_core_ptr_new(addr_of!(x).cast(), VALUE_SIZE).unwrap();
+///     assert!(nstd_core_ptr_size(&ptr) == VALUE_SIZE);
+/// }
 /// ```
 #[inline]
 #[nstdapi]
@@ -107,10 +109,10 @@ pub const fn nstd_core_ptr_size(ptr: &NSTDPtr) -> NSTDUInt {
 /// use core::ptr::addr_of;
 /// use nstd_sys::core::ptr::{nstd_core_ptr_get, nstd_core_ptr_new};
 ///
-/// const VALUE_SIZE: usize = core::mem::size_of::<u32>();
-/// let x = 45u32;
-/// let ptr = nstd_core_ptr_new(addr_of!(x).cast(), VALUE_SIZE).unwrap();
 /// unsafe {
+///     const VALUE_SIZE: usize = core::mem::size_of::<u32>();
+///     let x = 45u32;
+///     let ptr = nstd_core_ptr_new(addr_of!(x).cast(), VALUE_SIZE).unwrap();
 ///     assert!(*nstd_core_ptr_get(&ptr).cast::<u32>() == x);
 /// }
 /// ```
@@ -206,10 +208,12 @@ pub const fn nstd_core_ptr_mut_as_const(ptr: &NSTDPtrMut) -> NSTDPtr {
 /// use core::ptr::addr_of_mut;
 /// use nstd_sys::core::ptr::{nstd_core_ptr_mut_new, nstd_core_ptr_mut_size};
 ///
-/// const VALUE_SIZE: usize = core::mem::size_of::<isize>();
-/// let mut x = 33isize;
-/// let ptr = nstd_core_ptr_mut_new(addr_of_mut!(x).cast(), VALUE_SIZE).unwrap();
-/// assert!(nstd_core_ptr_mut_size(&ptr) == VALUE_SIZE);
+/// unsafe {
+///     const VALUE_SIZE: usize = core::mem::size_of::<isize>();
+///     let mut x = 33isize;
+///     let ptr = nstd_core_ptr_mut_new(addr_of_mut!(x).cast(), VALUE_SIZE).unwrap();
+///     assert!(nstd_core_ptr_mut_size(&ptr) == VALUE_SIZE);
+/// }
 /// ```
 #[inline]
 #[nstdapi]
@@ -233,10 +237,10 @@ pub const fn nstd_core_ptr_mut_size(ptr: &NSTDPtrMut) -> NSTDUInt {
 /// use core::ptr::addr_of_mut;
 /// use nstd_sys::core::ptr::{nstd_core_ptr_mut_get, nstd_core_ptr_mut_new};
 ///
-/// const VALUE_SIZE: usize = core::mem::size_of::<u32>();
-/// let mut x = 8u32;
-/// let mut ptr = nstd_core_ptr_mut_new(addr_of_mut!(x).cast(), VALUE_SIZE).unwrap();
 /// unsafe {
+///     const VALUE_SIZE: usize = core::mem::size_of::<u32>();
+///     let mut x = 8u32;
+///     let mut ptr = nstd_core_ptr_mut_new(addr_of_mut!(x).cast(), VALUE_SIZE).unwrap();
 ///     let x_ptr = nstd_core_ptr_mut_get(&mut ptr).cast();
 ///     *x_ptr *= 2;
 ///     assert!(x == *x_ptr);
@@ -264,10 +268,10 @@ pub fn nstd_core_ptr_mut_get(ptr: &mut NSTDPtrMut) -> NSTDAnyMut {
 /// use core::ptr::addr_of_mut;
 /// use nstd_sys::core::ptr::{nstd_core_ptr_mut_get_const, nstd_core_ptr_mut_new};
 ///
-/// const VALUE_SIZE: usize = core::mem::size_of::<u32>();
-/// let mut x = 45u32;
-/// let ptr = nstd_core_ptr_mut_new(addr_of_mut!(x).cast(), VALUE_SIZE).unwrap();
 /// unsafe {
+///     const VALUE_SIZE: usize = core::mem::size_of::<u32>();
+///     let mut x = 45u32;
+///     let ptr = nstd_core_ptr_mut_new(addr_of_mut!(x).cast(), VALUE_SIZE).unwrap();
 ///     assert!(*nstd_core_ptr_mut_get_const(&ptr).cast::<u32>() == x);
 /// }
 /// ```
@@ -302,10 +306,10 @@ pub const fn nstd_core_ptr_mut_get_const(ptr: &NSTDPtrMut) -> NSTDAny {
 ///     nstd_core_ptr_mut_get_const, nstd_core_ptr_mut_new, nstd_core_ptr_mut_write,
 /// };
 ///
-/// const VALUE_SIZE: usize = core::mem::size_of::<i64>();
-/// let mut x = -69i64;
-/// let mut ptr = nstd_core_ptr_mut_new(addr_of_mut!(x).cast(), VALUE_SIZE).unwrap();
 /// unsafe {
+///     const VALUE_SIZE: usize = core::mem::size_of::<i64>();
+///     let mut x = -69i64;
+///     let mut ptr = nstd_core_ptr_mut_new(addr_of_mut!(x).cast(), VALUE_SIZE).unwrap();
 ///     let y = 420i64;
 ///     nstd_core_ptr_mut_write(&mut ptr, addr_of!(y).cast());
 ///     assert!(x == y);

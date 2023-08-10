@@ -7,13 +7,28 @@
 #include "../nstd.h"
 
 /// A window's unique identifier.
-typedef NSTDAnyMut NSTDWindowID;
+typedef struct {
+    /// The window's unique identifier.
+    NSTDUInt64 id;
+} NSTDWindowID;
 
 /// A device's unique identifier.
-typedef NSTDAnyMut NSTDDeviceID;
+typedef struct {
+    /// The inner [DeviceId].
+    NSTDAnyMut id;
+} NSTDDeviceID;
+
+/// Represents an optional value of type `NSTDDeviceID`.
+NSTDOptional(NSTDDeviceID) NSTDOptionalDeviceID;
 
 /// A gamepad's unique identifier.
-typedef NSTDAnyMut NSTDGamepadID;
+typedef struct {
+    /// The inner [GamepadId].
+    NSTDAnyMut id;
+} NSTDGamepadID;
+
+/// Represents an optional value of type `NSTDGamepadID`.
+NSTDOptional(NSTDGamepadID) NSTDOptionalGamepadID;
 
 /// Identifier for an analog axis on a device.
 typedef NSTDUInt32 NSTDAnalogAxisID;
@@ -296,7 +311,7 @@ typedef enum {
 } NSTDGamepadAxis;
 
 /// A handle to the application event loop.
-typedef NSTDAny NSTDAppHandle;
+typedef NSTDRef NSTDAppHandle;
 
 /// Application data passed to each event.
 typedef struct {
@@ -305,9 +320,9 @@ typedef struct {
     /// Custom user data.
     NSTDOptionalHeapPtr *data;
     /// The gamepad input manager.
-    NSTDAnyMut gil;
+    NSTDRefMut gil;
     /// The application's control flow.
-    NSTDAnyMut control_flow;
+    NSTDRefMut control_flow;
 } NSTDAppData;
 
 /// Contains callback based events through function pointers.
@@ -335,8 +350,8 @@ typedef struct {
     /// Called when a keyboard key is pressed or unpressed.
     void (*key_input)(NSTDAppData *, NSTDDeviceID, NSTDKey, NSTDUInt32, NSTDBool);
     /// Called when a window's scale factor changes.
-    void (*window_dpi_changed)(NSTDAppData *, NSTDWindowID, NSTDFloat64, NSTDUInt32 *,
-    NSTDUInt32 *);
+    void (*window_dpi_changed
+    )(NSTDAppData *, NSTDWindowID, NSTDFloat64, NSTDUInt32 *, NSTDUInt32 *);
     /// Called when a window is resized.
     void (*window_resized)(NSTDAppData *, NSTDWindowID, NSTDUInt32, NSTDUInt32);
     /// Called when a window is moved.
@@ -344,19 +359,20 @@ typedef struct {
     /// Focus for a window changed.
     void (*window_focus_changed)(NSTDAppData *, NSTDWindowID, NSTDBool);
     /// Mouse input was received.
-    void (*window_mouse_input)(NSTDAppData *, NSTDWindowID, NSTDDeviceID, const NSTDMouseInput *,
-    NSTDBool);
+    void (*window_mouse_input
+    )(NSTDAppData *, NSTDWindowID, NSTDDeviceID, const NSTDMouseInput *, NSTDBool);
     /// Called when a window receives key input.
-    void (*window_key_input)(NSTDAppData *, NSTDWindowID, NSTDDeviceID, NSTDKey, NSTDUInt32,
-    NSTDBool);
+    void (*window_key_input
+    )(NSTDAppData *, NSTDWindowID, NSTDDeviceID, NSTDKey, NSTDUInt32, NSTDBool);
     /// Called when a window receives a character.
     void (*window_received_char)(NSTDAppData *, NSTDWindowID, NSTDUnichar);
     /// Called when a scroll device is scrolled over a window.
-    void (*window_scrolled)(NSTDAppData *, NSTDWindowID, NSTDDeviceID, NSTDFloat64, NSTDFloat64,
-    NSTDScrollDelta, NSTDTouchState);
+    void (*window_scrolled
+    )(NSTDAppData *, NSTDWindowID, NSTDDeviceID, NSTDFloat64, NSTDFloat64, NSTDScrollDelta,
+      NSTDTouchState);
     /// Called when the cursor is moved over a window.
-    void (*window_cursor_moved)(NSTDAppData *, NSTDWindowID, NSTDDeviceID, NSTDFloat64,
-    NSTDFloat64);
+    void (*window_cursor_moved
+    )(NSTDAppData *, NSTDWindowID, NSTDDeviceID, NSTDFloat64, NSTDFloat64);
     /// The cursor entered a window.
     void (*window_cursor_entered)(NSTDAppData *, NSTDWindowID, NSTDDeviceID);
     /// The cursor left a window.
@@ -382,8 +398,8 @@ typedef struct {
     /// A gamepad button's value changed.
     void (*gamepad_input)(NSTDAppData *, NSTDGamepadID, NSTDGamepadButton, NSTDUInt32, NSTDFloat32);
     /// A gamepad axis value has changed.
-    void (*gamepad_axis_input)(NSTDAppData *, NSTDGamepadID, NSTDGamepadAxis, NSTDUInt32,
-    NSTDFloat32);
+    void (*gamepad_axis_input
+    )(NSTDAppData *, NSTDGamepadID, NSTDGamepadAxis, NSTDUInt32, NSTDFloat32);
     /// Called once before exiting the application event loop.
     void (*exit)(NSTDAppData *);
 } NSTDAppEvents;
