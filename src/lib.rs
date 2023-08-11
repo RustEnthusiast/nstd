@@ -91,9 +91,10 @@ use ::core::{
     ffi::{c_char, c_void},
     marker::PhantomData,
     ops::{Deref, DerefMut},
+    ptr::{addr_of, addr_of_mut},
 };
 
-/// [NSTDInt]'s maximum value.
+/// [`NSTDInt`]'s maximum value.
 #[allow(dead_code)]
 const NSTD_INT_MAX: NSTDInt = NSTDInt::MAX;
 
@@ -150,14 +151,14 @@ pub type NSTDAnyMut = *mut c_void;
 #[repr(transparent)]
 pub struct NSTDRef<'a, T>(&'a c_void, PhantomData<&'a T>);
 impl<T> Deref for NSTDRef<'_, T> {
-    /// `NSTDRef`'s dereference target.
+    /// [`NSTDRef`]'s dereference target.
     type Target = T;
 
     /// Gets the immutable reference.
     #[inline]
     fn deref(&self) -> &T {
         // SAFETY: `self.0` is of type `&T`.
-        unsafe { ::core::mem::transmute(self.0) }
+        unsafe { &*(addr_of!(*self.0).cast()) }
     }
 }
 impl<'a, T> From<&'a T> for NSTDRef<'a, T> {
@@ -165,21 +166,21 @@ impl<'a, T> From<&'a T> for NSTDRef<'a, T> {
     #[inline]
     fn from(value: &'a T) -> Self {
         // SAFETY: Reference to reference transmute.
-        Self(unsafe { ::core::mem::transmute(value) }, Default::default())
+        Self(unsafe { &*(addr_of!(*value).cast()) }, PhantomData)
     }
 }
 /// An FFI-safe reference to some mutable data.
 #[repr(transparent)]
 pub struct NSTDRefMut<'a, T>(&'a mut c_void, PhantomData<&'a mut T>);
 impl<T> Deref for NSTDRefMut<'_, T> {
-    /// `NSTDRefMut`'s dereference target.
+    /// [`NSTDRefMut`]'s dereference target.
     type Target = T;
 
     /// Gets the reference.
     #[inline]
     fn deref(&self) -> &T {
         // SAFETY: `self.0` is of type `&mut T`.
-        unsafe { ::core::mem::transmute_copy(&self.0) }
+        unsafe { &*(addr_of!(*self.0).cast()) }
     }
 }
 impl<T> DerefMut for NSTDRefMut<'_, T> {
@@ -187,7 +188,7 @@ impl<T> DerefMut for NSTDRefMut<'_, T> {
     #[inline]
     fn deref_mut(&mut self) -> &mut T {
         // SAFETY: `self.0` is of type `&mut T`.
-        unsafe { ::core::mem::transmute_copy(&self.0) }
+        unsafe { &mut *(addr_of_mut!(*self.0).cast()) }
     }
 }
 impl<'a, T> From<&'a mut T> for NSTDRefMut<'a, T> {
@@ -195,7 +196,7 @@ impl<'a, T> From<&'a mut T> for NSTDRefMut<'a, T> {
     #[inline]
     fn from(value: &'a mut T) -> Self {
         // SAFETY: Reference to reference transmute.
-        Self(unsafe { ::core::mem::transmute(value) }, Default::default())
+        Self(unsafe { &mut *addr_of_mut!(*value).cast() }, PhantomData)
     }
 }
 
