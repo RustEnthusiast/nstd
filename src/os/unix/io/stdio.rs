@@ -136,7 +136,7 @@ pub(crate) unsafe fn read(
 /// the file is properly synchronized within the process(es).
 pub(crate) unsafe fn read_all(
     fd: NSTDUnixFileDescriptor,
-    buffer: &mut NSTDVec,
+    buffer: &mut NSTDVec<'_>,
 ) -> NSTDUnixIOResult {
     /// The default buffer size for piped/FIFO/socket file objects.
     const PIPE_BUF_SIZE: NSTDUInt = 32;
@@ -215,7 +215,7 @@ pub(crate) unsafe fn read_all(
 /// the file is properly synchronized within the process(es).
 pub(crate) unsafe fn read_to_string(
     fd: NSTDUnixFileDescriptor,
-    buffer: &mut NSTDString,
+    buffer: &mut NSTDString<'_>,
 ) -> NSTDUnixIOResult {
     // Read data from the file.
     let buf = buffer.as_mut_vec();

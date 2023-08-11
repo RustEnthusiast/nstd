@@ -50,7 +50,7 @@ pub type NSTDOptionalMutexLockResult<'m, 'a> = NSTDOptional<NSTDMutexLockResult<
 /// "none" variant on error.
 #[inline]
 #[nstdapi]
-pub fn nstd_mutex_new(data: NSTDHeapPtr) -> NSTDOptionalMutex {
+pub fn nstd_mutex_new(data: NSTDHeapPtr<'_>) -> NSTDOptionalMutex<'_> {
     match CBox::new(Mutex::new(data)) {
         Some(mtx) => NSTDOptional::Some(NSTDMutex { mtx }),
         _ => NSTDOptional::None,
@@ -71,7 +71,7 @@ pub fn nstd_mutex_new(data: NSTDHeapPtr) -> NSTDOptionalMutex {
 /// `NSTDBool is_poisoned` - A boolean value indicating whether or not `mutex` is poisoned.
 #[inline]
 #[nstdapi]
-pub fn nstd_mutex_is_poisoned(mutex: &NSTDMutex) -> NSTDBool {
+pub fn nstd_mutex_is_poisoned(mutex: &NSTDMutex<'_>) -> NSTDBool {
     mutex.mtx.is_poisoned()
 }
 
@@ -146,7 +146,7 @@ pub fn nstd_mutex_try_lock<'m, 'a>(
 /// `NSTDAny data` - A pointer to the mutex's data.
 #[inline]
 #[nstdapi]
-pub fn nstd_mutex_get(guard: &NSTDMutexGuard) -> NSTDAny {
+pub fn nstd_mutex_get(guard: &NSTDMutexGuard<'_, '_>) -> NSTDAny {
     nstd_heap_ptr_get(&guard.guard)
 }
 
@@ -161,7 +161,7 @@ pub fn nstd_mutex_get(guard: &NSTDMutexGuard) -> NSTDAny {
 /// `NSTDAnyMut data` - A mutable pointer to the mutex's data.
 #[inline]
 #[nstdapi]
-pub fn nstd_mutex_get_mut(guard: &mut NSTDMutexGuard) -> NSTDAnyMut {
+pub fn nstd_mutex_get_mut(guard: &mut NSTDMutexGuard<'_, '_>) -> NSTDAnyMut {
     nstd_heap_ptr_get_mut(&mut guard.guard)
 }
 
@@ -177,7 +177,7 @@ pub fn nstd_mutex_get_mut(guard: &mut NSTDMutexGuard) -> NSTDAnyMut {
 /// if the mutex was poisoned.
 #[inline]
 #[nstdapi]
-pub fn nstd_mutex_into_inner(mutex: NSTDMutex) -> NSTDOptionalHeapPtr {
+pub fn nstd_mutex_into_inner(mutex: NSTDMutex<'_>) -> NSTDOptionalHeapPtr<'_> {
     match mutex.mtx.into_inner().into_inner() {
         Ok(data) => NSTDOptional::Some(data),
         _ => NSTDOptional::None,
@@ -192,7 +192,7 @@ pub fn nstd_mutex_into_inner(mutex: NSTDMutex) -> NSTDOptionalHeapPtr {
 #[inline]
 #[nstdapi]
 #[allow(unused_variables)]
-pub fn nstd_mutex_unlock(guard: NSTDMutexGuard) {}
+pub fn nstd_mutex_unlock(guard: NSTDMutexGuard<'_, '_>) {}
 
 /// Frees an instance of `NSTDMutex`.
 ///
@@ -202,7 +202,7 @@ pub fn nstd_mutex_unlock(guard: NSTDMutexGuard) {}
 #[inline]
 #[nstdapi]
 #[allow(unused_variables)]
-pub fn nstd_mutex_free(mutex: NSTDMutex) {}
+pub fn nstd_mutex_free(mutex: NSTDMutex<'_>) {}
 
 /// Frees an instance of `NSTDMutex` after invoking `callback` with the mutex's data.
 ///
@@ -219,7 +219,7 @@ pub fn nstd_mutex_free(mutex: NSTDMutex) {}
 /// This operation makes a direct call on a C function pointer (`callback`).
 #[inline]
 #[nstdapi]
-pub unsafe fn nstd_mutex_drop(mutex: NSTDMutex, callback: unsafe extern "C" fn(NSTDAnyMut)) {
+pub unsafe fn nstd_mutex_drop(mutex: NSTDMutex<'_>, callback: unsafe extern "C" fn(NSTDAnyMut)) {
     if let Ok(data) = mutex.mtx.into_inner().into_inner() {
         nstd_heap_ptr_drop(data, callback);
     }

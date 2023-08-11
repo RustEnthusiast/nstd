@@ -92,7 +92,7 @@ impl<T> Drop for CBox<T> {
             self.0.read();
             let size = core::mem::size_of::<T>();
             if size > 0 {
-                nstd_alloc_deallocate(&mut (self.0 as _), size);
+                nstd_alloc_deallocate(&mut self.0, size);
             }
         }
     }

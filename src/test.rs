@@ -3,7 +3,7 @@ use std::time::Instant;
 
 /// Basic testing framework for `nstd`.
 #[allow(dead_code)]
-pub fn run_test<F: Fn()>(test: F) {
+pub(crate) fn run_test<F: Fn()>(test: F) {
     let mut scores = Vec::new();
     let mut score = 0_u128;
     let mut secs_passed = 0;

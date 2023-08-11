@@ -51,7 +51,7 @@ pub type NSTDOptionalCString<'a> = NSTDOptional<NSTDCString<'a>>;
 /// ```
 #[inline]
 #[nstdapi]
-pub fn nstd_cstring_new(allocator: &NSTDAllocator) -> NSTDOptionalCString {
+pub fn nstd_cstring_new(allocator: &NSTDAllocator) -> NSTDOptionalCString<'_> {
     nstd_cstring_new_with_cap(allocator, 1)
 }
 
@@ -77,7 +77,10 @@ pub fn nstd_cstring_new(allocator: &NSTDAllocator) -> NSTDOptionalCString {
 /// ```
 #[inline]
 #[nstdapi]
-pub fn nstd_cstring_new_with_cap(allocator: &NSTDAllocator, cap: NSTDUInt) -> NSTDOptionalCString {
+pub fn nstd_cstring_new_with_cap(
+    allocator: &NSTDAllocator,
+    cap: NSTDUInt,
+) -> NSTDOptionalCString<'_> {
     let mut bytes = nstd_vec_new_with_cap(allocator, 1, cap);
     let nul: NSTDChar = 0;
     // SAFETY: `nul` is stored on the stack.
@@ -180,7 +183,7 @@ pub unsafe fn nstd_cstring_from_cstr_unchecked<'a>(
 ///
 /// This operation will panic if `bytes`'s stride is not 1.
 #[nstdapi]
-pub fn nstd_cstring_from_bytes(bytes: NSTDVec) -> NSTDOptionalCString {
+pub fn nstd_cstring_from_bytes(bytes: NSTDVec<'_>) -> NSTDOptionalCString<'_> {
     assert!(nstd_vec_stride(&bytes) == 1);
     let ptr = nstd_vec_as_ptr(&bytes) as *const NSTDChar;
     // SAFETY: `ptr` is non-null, vector length's can never be greater than `NSTDInt`'s max value.
@@ -236,7 +239,7 @@ pub fn nstd_cstring_allocator<'a>(cstring: &NSTDCString<'a>) -> &'a NSTDAllocato
 ///
 /// `NSTDCStr cstr` - The new C string slice.
 #[nstdapi]
-pub fn nstd_cstring_as_cstr(cstring: &NSTDCString) -> NSTDCStr {
+pub fn nstd_cstring_as_cstr(cstring: &NSTDCString<'_>) -> NSTDCStr {
     let ptr = nstd_vec_as_ptr(&cstring.bytes);
     let len = nstd_vec_len(&cstring.bytes);
     // SAFETY: `ptr` is never null, owned C strings can never be longer than `NSTDInt`'s max value.
@@ -254,7 +257,7 @@ pub fn nstd_cstring_as_cstr(cstring: &NSTDCString) -> NSTDCStr {
 /// `NSTDSlice bytes` - The C string's active data.
 #[inline]
 #[nstdapi]
-pub fn nstd_cstring_as_bytes(cstring: &NSTDCString) -> NSTDSlice {
+pub fn nstd_cstring_as_bytes(cstring: &NSTDCString<'_>) -> NSTDSlice {
     nstd_vec_as_slice(&cstring.bytes)
 }
 
@@ -269,7 +272,7 @@ pub fn nstd_cstring_as_bytes(cstring: &NSTDCString) -> NSTDSlice {
 /// `const NSTDChar *ptr` - A raw pointer to a C string's memory.
 #[inline]
 #[nstdapi]
-pub fn nstd_cstring_as_ptr(cstring: &NSTDCString) -> *const NSTDChar {
+pub fn nstd_cstring_as_ptr(cstring: &NSTDCString<'_>) -> *const NSTDChar {
     nstd_vec_as_ptr(&cstring.bytes).cast()
 }
 
@@ -284,7 +287,7 @@ pub fn nstd_cstring_as_ptr(cstring: &NSTDCString) -> *const NSTDChar {
 /// `NSTDVec bytes` - The C string's raw data.
 #[inline]
 #[nstdapi]
-pub fn nstd_cstring_into_bytes(cstring: NSTDCString) -> NSTDVec {
+pub fn nstd_cstring_into_bytes(cstring: NSTDCString<'_>) -> NSTDVec<'_> {
     cstring.bytes
 }
 
@@ -299,7 +302,7 @@ pub fn nstd_cstring_into_bytes(cstring: NSTDCString) -> NSTDVec {
 /// `NSTDUInt len` - The length of the C string without it's null byte.
 #[inline]
 #[nstdapi]
-pub fn nstd_cstring_len(cstring: &NSTDCString) -> NSTDUInt {
+pub fn nstd_cstring_len(cstring: &NSTDCString<'_>) -> NSTDUInt {
     nstd_vec_len(&cstring.bytes) - 1
 }
 
@@ -314,7 +317,7 @@ pub fn nstd_cstring_len(cstring: &NSTDCString) -> NSTDUInt {
 /// `NSTDUInt len` - The length of the C string including it's null byte.
 #[inline]
 #[nstdapi]
-pub fn nstd_cstring_len_with_null(cstring: &NSTDCString) -> NSTDUInt {
+pub fn nstd_cstring_len_with_null(cstring: &NSTDCString<'_>) -> NSTDUInt {
     nstd_vec_len(&cstring.bytes)
 }
 
@@ -331,7 +334,7 @@ pub fn nstd_cstring_len_with_null(cstring: &NSTDCString) -> NSTDUInt {
 /// `NSTDUInt cap` - The C string's capacity.
 #[inline]
 #[nstdapi]
-pub fn nstd_cstring_cap(cstring: &NSTDCString) -> NSTDUInt {
+pub fn nstd_cstring_cap(cstring: &NSTDCString<'_>) -> NSTDUInt {
     nstd_vec_cap(&cstring.bytes)
 }
 
@@ -364,7 +367,7 @@ pub fn nstd_cstring_cap(cstring: &NSTDCString) -> NSTDUInt {
 /// }
 /// ```
 #[nstdapi]
-pub fn nstd_cstring_push(cstring: &mut NSTDCString, chr: NSTDChar) -> NSTDAllocError {
+pub fn nstd_cstring_push(cstring: &mut NSTDCString<'_>, chr: NSTDChar) -> NSTDAllocError {
     if chr != 0 {
         // SAFETY: C strings always contain an exclusive null byte at the end.
         unsafe {
@@ -424,7 +427,10 @@ pub fn nstd_cstring_push(cstring: &mut NSTDCString, chr: NSTDChar) -> NSTDAllocE
 /// }
 /// ```
 #[nstdapi]
-pub unsafe fn nstd_cstring_push_cstr(cstring: &mut NSTDCString, cstr: &NSTDCStr) -> NSTDAllocError {
+pub unsafe fn nstd_cstring_push_cstr(
+    cstring: &mut NSTDCString<'_>,
+    cstr: &NSTDCStr,
+) -> NSTDAllocError {
     // Make sure the C string slice doesn't contain a null byte.
     assert!(nstd_core_cstr_get_null(cstr).is_null());
     // Pop the old null byte.
@@ -465,7 +471,7 @@ pub unsafe fn nstd_cstring_push_cstr(cstring: &mut NSTDCString, cstr: &NSTDCStr)
 /// }
 /// ```
 #[nstdapi]
-pub fn nstd_cstring_pop(cstring: &mut NSTDCString) -> NSTDChar {
+pub fn nstd_cstring_pop(cstring: &mut NSTDCString<'_>) -> NSTDChar {
     let mut ret = 0;
     let len = nstd_cstring_len(cstring);
     if len > 0 {
@@ -490,7 +496,7 @@ pub fn nstd_cstring_pop(cstring: &mut NSTDCString) -> NSTDChar {
 /// - `NSTDCString *cstring` - The C string to clear.
 #[inline]
 #[nstdapi]
-pub fn nstd_cstring_clear(cstring: &mut NSTDCString) {
+pub fn nstd_cstring_clear(cstring: &mut NSTDCString<'_>) {
     nstd_vec_clear(&mut cstring.bytes);
 }
 
@@ -502,4 +508,4 @@ pub fn nstd_cstring_clear(cstring: &mut NSTDCString) {
 #[inline]
 #[nstdapi]
 #[allow(unused_variables)]
-pub fn nstd_cstring_free(cstring: NSTDCString) {}
+pub fn nstd_cstring_free(cstring: NSTDCString<'_>) {}

@@ -79,7 +79,7 @@ pub(crate) unsafe fn read<R: Read>(stream: &mut R, buffer: &mut NSTDSliceMut) ->
 ///
 /// If extending the buffer fails, an error code of `NSTD_IO_ERROR_OUT_OF_MEMORY` will be returned.
 /// This does not mean there were no bytes read from `stream` in this case.
-pub(crate) fn read_all<R: Read>(stream: &mut R, buffer: &mut NSTDVec) -> NSTDIOResult {
+pub(crate) fn read_all<R: Read>(stream: &mut R, buffer: &mut NSTDVec<'_>) -> NSTDIOResult {
     // Make sure the buffer's element size is 1.
     #[allow(unused_unsafe)]
     // SAFETY: This operation is safe.
@@ -107,7 +107,7 @@ pub(crate) fn read_all<R: Read>(stream: &mut R, buffer: &mut NSTDVec) -> NSTDIOR
 ///
 /// If extending the buffer fails, an error code of `NSTD_IO_ERROR_OUT_OF_MEMORY` will be returned.
 /// This does not mean there were no bytes read from `stream` in this case.
-pub(crate) fn read_to_string<R: Read>(stream: &mut R, buffer: &mut NSTDString) -> NSTDIOResult {
+pub(crate) fn read_to_string<R: Read>(stream: &mut R, buffer: &mut NSTDString<'_>) -> NSTDIOResult {
     // Attempt to read data into `buffer`.
     let mut buf = String::new();
     match stream.read_to_string(&mut buf) {

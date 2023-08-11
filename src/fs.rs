@@ -196,7 +196,7 @@ pub unsafe fn nstd_fs_remove_dirs(name: &NSTDStr) -> NSTDIOError {
 ///
 /// This operation can cause undefined behavior if `path`'s data is invalid.
 #[nstdapi]
-pub unsafe fn nstd_fs_read(path: &NSTDStr) -> NSTDIOBufferResult {
+pub unsafe fn nstd_fs_read(path: &NSTDStr) -> NSTDIOBufferResult<'_> {
     match std::fs::read(path.as_str()) {
         Ok(contents) => NSTDResult::Ok(NSTDVec::from_vec(contents)),
         Err(err) => NSTDResult::Err(NSTDIOError::from_err(err.kind())),
@@ -217,7 +217,7 @@ pub unsafe fn nstd_fs_read(path: &NSTDStr) -> NSTDIOBufferResult {
 ///
 /// This operation can cause undefined behavior if `path`'s data is invalid.
 #[nstdapi]
-pub unsafe fn nstd_fs_read_to_string(path: &NSTDStr) -> NSTDIOStringResult {
+pub unsafe fn nstd_fs_read_to_string(path: &NSTDStr) -> NSTDIOStringResult<'_> {
     match std::fs::read_to_string(path.as_str()) {
         Ok(contents) => NSTDResult::Ok(NSTDString::from_string(contents)),
         Err(err) => NSTDResult::Err(NSTDIOError::from_err(err.kind())),
@@ -315,7 +315,7 @@ pub unsafe fn nstd_fs_copy(from: &NSTDStr, to: &NSTDStr) -> NSTDIOError {
 ///
 /// This operation can cause undefined behavior if `path`'s data is invalid.
 #[nstdapi]
-pub unsafe fn nstd_fs_absolute(path: &NSTDStr) -> NSTDIOStringResult {
+pub unsafe fn nstd_fs_absolute(path: &NSTDStr) -> NSTDIOStringResult<'_> {
     match std::fs::canonicalize(path.as_str()) {
         Ok(path) => match path.into_os_string().into_string() {
             Ok(path) => NSTDResult::Ok(NSTDString::from_string(path)),

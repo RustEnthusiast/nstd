@@ -31,7 +31,7 @@ use windows_sys::Win32::Globalization::{u_strFromUTF8, U_BUFFER_OVERFLOW_ERROR, 
 ///
 /// `str`'s data must be valid for reads, especially in terms of UTF-8 conformance.
 #[nstdapi]
-pub unsafe fn nstd_os_windows_str_to_utf16(str: &NSTDStr) -> NSTDVec {
+pub unsafe fn nstd_os_windows_str_to_utf16(str: &NSTDStr) -> NSTDVec<'_> {
     // The size of a UTF-16 code point.
     const CHAR_SIZE: NSTDUInt = core::mem::size_of::<NSTDChar16>();
     // Make sure the string slice's length is greater than 0.

@@ -91,7 +91,7 @@ pub unsafe fn nstd_io_stdin_read(
 /// error code on failure.
 #[inline]
 #[nstdapi]
-pub fn nstd_io_stdin_read_all(handle: &mut NSTDStdin, buffer: &mut NSTDVec) -> NSTDIOResult {
+pub fn nstd_io_stdin_read_all(handle: &mut NSTDStdin, buffer: &mut NSTDVec<'_>) -> NSTDIOResult {
     #[cfg(not(unix))]
     return crate::io::stdio::read_all(&mut *handle.r#in, buffer);
     #[cfg(unix)]
@@ -122,7 +122,7 @@ pub fn nstd_io_stdin_read_all(handle: &mut NSTDStdin, buffer: &mut NSTDVec) -> N
 #[nstdapi]
 pub fn nstd_io_stdin_read_to_string(
     handle: &mut NSTDStdin,
-    buffer: &mut NSTDString,
+    buffer: &mut NSTDString<'_>,
 ) -> NSTDIOResult {
     #[cfg(not(unix))]
     return crate::io::stdio::read_to_string(&mut *handle.r#in, buffer);
@@ -178,7 +178,10 @@ pub unsafe fn nstd_io_stdin_read_exact(
 /// `NSTDIOResult read` - The number of bytes read from `handle` on success, or the I/O operation
 /// error code on failure.
 #[nstdapi]
-pub fn nstd_io_stdin_read_line(handle: &mut NSTDStdin, buffer: &mut NSTDString) -> NSTDIOResult {
+pub fn nstd_io_stdin_read_line(
+    handle: &mut NSTDStdin,
+    buffer: &mut NSTDString<'_>,
+) -> NSTDIOResult {
     let mut buf = String::new();
     match handle.r#in.read_line(&mut buf) {
         Ok(r) => {
@@ -283,7 +286,7 @@ pub unsafe fn nstd_io_stdin_lock_read(
 #[nstdapi]
 pub fn nstd_io_stdin_lock_read_all(
     handle: &mut NSTDStdinLock,
-    buffer: &mut NSTDVec,
+    buffer: &mut NSTDVec<'_>,
 ) -> NSTDIOResult {
     #[cfg(not(unix))]
     return crate::io::stdio::read_all(&mut *handle.r#in, buffer);
@@ -315,7 +318,7 @@ pub fn nstd_io_stdin_lock_read_all(
 #[nstdapi]
 pub fn nstd_io_stdin_lock_read_to_string(
     handle: &mut NSTDStdinLock,
-    buffer: &mut NSTDString,
+    buffer: &mut NSTDString<'_>,
 ) -> NSTDIOResult {
     #[cfg(not(unix))]
     return crate::io::stdio::read_to_string(&mut *handle.r#in, buffer);

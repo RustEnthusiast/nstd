@@ -98,7 +98,7 @@ pub unsafe fn nstd_env_set_current_dir(path: &NSTDStr) -> NSTDIOError {
 ///
 /// The user of this function must ensure that `key` is valid for reads.
 #[nstdapi]
-pub unsafe fn nstd_env_var(key: &NSTDStr) -> NSTDIOStringResult {
+pub unsafe fn nstd_env_var(key: &NSTDStr) -> NSTDIOStringResult<'_> {
     match std::env::var(key.as_str()) {
         Ok(var) => NSTDResult::Ok(NSTDString::from_string(var)),
         Err(VarError::NotPresent) => NSTDResult::Err(NSTDIOError::NSTD_IO_ERROR_NOT_FOUND),
@@ -165,7 +165,7 @@ pub unsafe fn nstd_env_remove_var(key: &NSTDStr) {
 /// This operation will panic if any program arguments contain invalid Unicode.
 #[nstdapi]
 pub fn nstd_env_args() -> NSTDVec<'static> {
-    let mut args = nstd_vec_new(&NSTD_ALLOCATOR, std::mem::size_of::<NSTDString>());
+    let mut args = nstd_vec_new(&NSTD_ALLOCATOR, std::mem::size_of::<NSTDString<'_>>());
     for arg in std::env::args() {
         let arg = NSTDString::from_string(arg);
         // SAFETY: `arg` is stored on the stack.
@@ -189,7 +189,7 @@ pub fn nstd_env_args() -> NSTDVec<'static> {
 /// This operation will panic if any environment variables contain invalid Unicode.
 #[nstdapi]
 pub fn nstd_env_vars() -> NSTDVec<'static> {
-    let mut vars = nstd_vec_new(&NSTD_ALLOCATOR, std::mem::size_of::<[NSTDString; 2]>());
+    let mut vars = nstd_vec_new(&NSTD_ALLOCATOR, std::mem::size_of::<[NSTDString<'_>; 2]>());
     for (k, v) in std::env::vars() {
         let var = [NSTDString::from_string(k), NSTDString::from_string(v)];
         // SAFETY: `var` is stored on the stack.

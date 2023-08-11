@@ -51,7 +51,7 @@ impl NSTDUnixIOError {
     /// Retrieves the last system error and turns it into an `NSTDUnixIOError`.
     #[allow(unused)]
     fn last() -> Self {
-        #[allow(unreachable_patterns)]
+        #[allow(trivial_numeric_casts, unreachable_patterns)]
         match errno::errno().0 as c_int {
             0 => Self::NSTD_UNIX_IO_ERROR_NONE,
             EBADF => Self::NSTD_UNIX_IO_ERROR_NOT_FOUND,

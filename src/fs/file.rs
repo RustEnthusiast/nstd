@@ -186,7 +186,7 @@ pub unsafe fn nstd_fs_file_read(file: &mut NSTDFile, buffer: &mut NSTDSliceMut) 
 /// error code on failure.
 #[inline]
 #[nstdapi]
-pub fn nstd_fs_file_read_all(file: &mut NSTDFile, buffer: &mut NSTDVec) -> NSTDIOResult {
+pub fn nstd_fs_file_read_all(file: &mut NSTDFile, buffer: &mut NSTDVec<'_>) -> NSTDIOResult {
     #[cfg(not(unix))]
     return crate::io::stdio::read_all(&mut *file.f, buffer);
     #[cfg(unix)]
@@ -213,7 +213,10 @@ pub fn nstd_fs_file_read_all(file: &mut NSTDFile, buffer: &mut NSTDVec) -> NSTDI
 /// error code on failure.
 #[inline]
 #[nstdapi]
-pub fn nstd_fs_file_read_to_string(file: &mut NSTDFile, buffer: &mut NSTDString) -> NSTDIOResult {
+pub fn nstd_fs_file_read_to_string(
+    file: &mut NSTDFile,
+    buffer: &mut NSTDString<'_>,
+) -> NSTDIOResult {
     #[cfg(not(unix))]
     return crate::io::stdio::read_to_string(&mut *file.f, buffer);
     #[cfg(unix)]

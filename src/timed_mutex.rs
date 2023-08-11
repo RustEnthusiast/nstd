@@ -125,7 +125,7 @@ extern "C" {
     ///
     /// `NSTDOptionalTimedMutex mutex` - The new mutex protecting `data` on success, or an
     /// uninitialized "none" value if the OS failed to initialize the mutex.
-    pub fn nstd_timed_mutex_new(data: NSTDHeapPtr) -> NSTDOptionalTimedMutex;
+    pub fn nstd_timed_mutex_new(data: NSTDHeapPtr<'_>) -> NSTDOptionalTimedMutex<'_>;
 
     /// Determines whether or not a timed mutex's data is poisoned.
     ///
@@ -139,7 +139,7 @@ extern "C" {
     /// # Returns
     ///
     /// `NSTDBool is_poisoned` - A boolean value indicating whether or not `mutex` is poisoned.
-    pub fn nstd_timed_mutex_is_poisoned(mutex: &NSTDTimedMutex) -> NSTDBool;
+    pub fn nstd_timed_mutex_is_poisoned(mutex: &NSTDTimedMutex<'_>) -> NSTDBool;
 
     /// Waits for a timed mutex lock to become acquired, returning a guard wrapping the protected data.
     ///
@@ -216,7 +216,7 @@ extern "C" {
     /// # Returns
     ///
     /// `NSTDAny data` - A pointer to the guard's protected data.
-    pub fn nstd_timed_mutex_get(guard: &NSTDTimedMutexGuard) -> NSTDAny;
+    pub fn nstd_timed_mutex_get(guard: &NSTDTimedMutexGuard<'_, '_>) -> NSTDAny;
 
     /// Returns an raw pointer to a timed mutex guard's protected data.
     ///
@@ -227,7 +227,7 @@ extern "C" {
     /// # Returns
     ///
     /// `NSTDAnyMut data` - A pointer to the guard's protected data.
-    pub fn nstd_timed_mutex_get_mut(guard: &mut NSTDTimedMutexGuard) -> NSTDAnyMut;
+    pub fn nstd_timed_mutex_get_mut(guard: &mut NSTDTimedMutexGuard<'_, '_>) -> NSTDAnyMut;
 
     /// Consumes a timed mutex and returns the data it was protecting.
     ///
@@ -239,21 +239,21 @@ extern "C" {
     ///
     /// `NSTDOptionalHeapPtr data` - Ownership of the mutex's data, or an uninitialized "none"
     /// variant if the mutex was poisoned.
-    pub fn nstd_timed_mutex_into_inner(mutex: NSTDTimedMutex) -> NSTDOptionalHeapPtr;
+    pub fn nstd_timed_mutex_into_inner(mutex: NSTDTimedMutex<'_>) -> NSTDOptionalHeapPtr<'_>;
 
     /// Unlocks a timed mutex by consuming a mutex guard.
     ///
     /// # Parameters:
     ///
     /// - `NSTDTimedMutexGuard guard` - The mutex guard.
-    pub fn nstd_timed_mutex_unlock(guard: NSTDTimedMutexGuard);
+    pub fn nstd_timed_mutex_unlock(guard: NSTDTimedMutexGuard<'_, '_>);
 
     /// Frees an instance of `NSTDTimedMutex`.
     ///
     /// # Parameters:
     ///
     /// - `NSTDTimedMutex mutex` - The timed mutex to free.
-    pub fn nstd_timed_mutex_free(mutex: NSTDTimedMutex);
+    pub fn nstd_timed_mutex_free(mutex: NSTDTimedMutex<'_>);
 
     /// Frees an instance of `NSTDTimedMutex` after invoking `callback` with the mutex's data.
     ///
@@ -268,5 +268,8 @@ extern "C" {
     /// # Safety
     ///
     /// This operation makes a direct call on a C function pointer (`callback`).
-    pub fn nstd_timed_mutex_drop(mutex: NSTDTimedMutex, callback: unsafe extern "C" fn(NSTDAnyMut));
+    pub fn nstd_timed_mutex_drop(
+        mutex: NSTDTimedMutex<'_>,
+        callback: unsafe extern "C" fn(NSTDAnyMut),
+    );
 }

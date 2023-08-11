@@ -1,6 +1,30 @@
 #![doc = include_str!("../README.md")]
 #![warn(
+    deprecated_in_future,
+    ffi_unwind_calls,
+    future_incompatible,
+    let_underscore,
+    macro_use_extern_crate,
+    meta_variable_misuse,
+    missing_abi,
+    missing_copy_implementations,
     missing_docs,
+    non_ascii_idents,
+    nonstandard_style,
+    noop_method_call,
+    rust_2018_compatibility,
+    rust_2018_idioms,
+    rust_2021_compatibility,
+    single_use_lifetimes,
+    trivial_casts,
+    trivial_numeric_casts,
+    unreachable_pub,
+    unused,
+    unused_import_braces,
+    unused_lifetimes,
+    unused_qualifications,
+    unused_tuple_struct_fields,
+    variant_size_differences,
     clippy::missing_panics_doc,
     clippy::undocumented_unsafe_blocks
 )]
@@ -125,7 +149,7 @@ pub type NSTDAnyMut = *mut c_void;
 /// An FFI-safe reference to some immutable data.
 #[repr(transparent)]
 pub struct NSTDRef<'a, T>(&'a c_void, PhantomData<&'a T>);
-impl<'a, T> Deref for NSTDRef<'a, T> {
+impl<T> Deref for NSTDRef<'_, T> {
     /// `NSTDRef`'s dereference target.
     type Target = T;
 
@@ -147,7 +171,7 @@ impl<'a, T> From<&'a T> for NSTDRef<'a, T> {
 /// An FFI-safe reference to some mutable data.
 #[repr(transparent)]
 pub struct NSTDRefMut<'a, T>(&'a mut c_void, PhantomData<&'a mut T>);
-impl<'a, T> Deref for NSTDRefMut<'a, T> {
+impl<T> Deref for NSTDRefMut<'_, T> {
     /// `NSTDRefMut`'s dereference target.
     type Target = T;
 
@@ -158,7 +182,7 @@ impl<'a, T> Deref for NSTDRefMut<'a, T> {
         unsafe { ::core::mem::transmute_copy(&self.0) }
     }
 }
-impl<'a, T> DerefMut for NSTDRefMut<'a, T> {
+impl<T> DerefMut for NSTDRefMut<'_, T> {
     /// Gets the mutable reference.
     #[inline]
     fn deref_mut(&mut self) -> &mut T {

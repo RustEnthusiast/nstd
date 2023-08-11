@@ -87,7 +87,7 @@ pub type NSTDOptionalString<'a> = NSTDOptional<NSTDString<'a>>;
 /// ```
 #[inline]
 #[nstdapi]
-pub const fn nstd_string_new(allocator: &NSTDAllocator) -> NSTDString {
+pub const fn nstd_string_new(allocator: &NSTDAllocator) -> NSTDString<'_> {
     NSTDString {
         bytes: nstd_vec_new(allocator, 1),
     }
@@ -114,7 +114,7 @@ pub const fn nstd_string_new(allocator: &NSTDAllocator) -> NSTDString {
 /// ```
 #[inline]
 #[nstdapi]
-pub fn nstd_string_new_with_cap(allocator: &NSTDAllocator, cap: NSTDUInt) -> NSTDString {
+pub fn nstd_string_new_with_cap(allocator: &NSTDAllocator, cap: NSTDUInt) -> NSTDString<'_> {
     NSTDString {
         bytes: nstd_vec_new_with_cap(allocator, 1, cap),
     }
@@ -178,7 +178,7 @@ pub unsafe fn nstd_string_from_str<'a>(
 /// This operation will panic if `bytes`'s stride is not 1.
 #[inline]
 #[nstdapi]
-pub fn nstd_string_from_bytes(bytes: NSTDVec) -> NSTDOptionalString {
+pub fn nstd_string_from_bytes(bytes: NSTDVec<'_>) -> NSTDOptionalString<'_> {
     // SAFETY: We're ensuring that the vector is properly encoded as UTF-8.
     match core::str::from_utf8(unsafe { bytes.as_slice() }).is_ok() {
         true => NSTDOptional::Some(NSTDString { bytes }),
@@ -231,7 +231,7 @@ pub fn nstd_string_allocator<'a>(string: &NSTDString<'a>) -> &'a NSTDAllocator {
 /// `NSTDStr str` - The new string slice.
 #[inline]
 #[nstdapi]
-pub fn nstd_string_as_str(string: &NSTDString) -> NSTDStr {
+pub fn nstd_string_as_str(string: &NSTDString<'_>) -> NSTDStr {
     let bytes = nstd_vec_as_slice(&string.bytes);
     // SAFETY: The string's bytes are always be UTF-8 encoded.
     unsafe { nstd_core_str_from_bytes_unchecked(&bytes) }
@@ -248,7 +248,7 @@ pub fn nstd_string_as_str(string: &NSTDString) -> NSTDStr {
 /// `NSTDStrMut str` - The new string slice.
 #[inline]
 #[nstdapi]
-pub fn nstd_string_as_str_mut(string: &mut NSTDString) -> NSTDStrMut {
+pub fn nstd_string_as_str_mut(string: &mut NSTDString<'_>) -> NSTDStrMut {
     let mut bytes = nstd_vec_as_slice_mut(&mut string.bytes);
     // SAFETY: The string's bytes are always be UTF-8 encoded.
     unsafe { nstd_core_str_mut_from_bytes_unchecked(&mut bytes) }
@@ -265,7 +265,7 @@ pub fn nstd_string_as_str_mut(string: &mut NSTDString) -> NSTDStrMut {
 /// `NSTDSlice bytes` - The string's active data.
 #[inline]
 #[nstdapi]
-pub fn nstd_string_as_bytes(string: &NSTDString) -> NSTDSlice {
+pub fn nstd_string_as_bytes(string: &NSTDString<'_>) -> NSTDSlice {
     nstd_vec_as_slice(&string.bytes)
 }
 
@@ -280,7 +280,7 @@ pub fn nstd_string_as_bytes(string: &NSTDString) -> NSTDSlice {
 /// `const NSTDByte *ptr` - A raw pointer to a string's memory.
 #[inline]
 #[nstdapi]
-pub const fn nstd_string_as_ptr(string: &NSTDString) -> *const NSTDByte {
+pub const fn nstd_string_as_ptr(string: &NSTDString<'_>) -> *const NSTDByte {
     nstd_vec_as_ptr(&string.bytes).cast()
 }
 
@@ -295,7 +295,7 @@ pub const fn nstd_string_as_ptr(string: &NSTDString) -> *const NSTDByte {
 /// `NSTDVec bytes` - The string's raw data.
 #[inline]
 #[nstdapi]
-pub fn nstd_string_into_bytes(string: NSTDString) -> NSTDVec {
+pub fn nstd_string_into_bytes(string: NSTDString<'_>) -> NSTDVec<'_> {
     string.bytes
 }
 
@@ -310,7 +310,7 @@ pub fn nstd_string_into_bytes(string: NSTDString) -> NSTDVec {
 /// `NSTDUInt len` - The length of the string.
 #[inline]
 #[nstdapi]
-pub fn nstd_string_len(string: &NSTDString) -> NSTDUInt {
+pub fn nstd_string_len(string: &NSTDString<'_>) -> NSTDUInt {
     let str = nstd_string_as_str(string);
     // SAFETY: The string's data is valid here.
     unsafe { nstd_core_str_len(&str) }
@@ -327,7 +327,7 @@ pub fn nstd_string_len(string: &NSTDString) -> NSTDUInt {
 /// `NSTDUInt byte_len` - The number of bytes in the string.
 #[inline]
 #[nstdapi]
-pub const fn nstd_string_byte_len(string: &NSTDString) -> NSTDUInt {
+pub const fn nstd_string_byte_len(string: &NSTDString<'_>) -> NSTDUInt {
     nstd_vec_len(&string.bytes)
 }
 
@@ -344,7 +344,7 @@ pub const fn nstd_string_byte_len(string: &NSTDString) -> NSTDUInt {
 /// `NSTDUInt cap` - The string's capacity.
 #[inline]
 #[nstdapi]
-pub const fn nstd_string_cap(string: &NSTDString) -> NSTDUInt {
+pub const fn nstd_string_cap(string: &NSTDString<'_>) -> NSTDUInt {
     nstd_vec_cap(&string.bytes)
 }
 
@@ -374,7 +374,7 @@ pub const fn nstd_string_cap(string: &NSTDString) -> NSTDUInt {
 /// }
 /// ```
 #[nstdapi]
-pub fn nstd_string_push(string: &mut NSTDString, chr: NSTDUnichar) -> NSTDAllocError {
+pub fn nstd_string_push(string: &mut NSTDString<'_>, chr: NSTDUnichar) -> NSTDAllocError {
     let chr = char::from(chr);
     let mut buf = [0; 4];
     chr.encode_utf8(&mut buf);
@@ -419,7 +419,7 @@ pub fn nstd_string_push(string: &mut NSTDString, chr: NSTDUnichar) -> NSTDAllocE
 /// ```
 #[inline]
 #[nstdapi]
-pub unsafe fn nstd_string_push_str(string: &mut NSTDString, str: &NSTDStr) -> NSTDAllocError {
+pub unsafe fn nstd_string_push_str(string: &mut NSTDString<'_>, str: &NSTDStr) -> NSTDAllocError {
     let str_bytes = nstd_core_str_as_bytes(str);
     nstd_vec_extend(&mut string.bytes, &str_bytes)
 }
@@ -450,7 +450,7 @@ pub unsafe fn nstd_string_push_str(string: &mut NSTDString, str: &NSTDStr) -> NS
 /// }
 /// ```
 #[nstdapi]
-pub fn nstd_string_pop(string: &mut NSTDString) -> NSTDOptionalUnichar {
+pub fn nstd_string_pop(string: &mut NSTDString<'_>) -> NSTDOptionalUnichar {
     // SAFETY: `NSTDString` is always UTF-8 encoded.
     let str = unsafe { core::str::from_utf8_unchecked(string.bytes.as_slice()) };
     if let Some(chr) = str.chars().last() {
@@ -468,7 +468,7 @@ pub fn nstd_string_pop(string: &mut NSTDString) -> NSTDOptionalUnichar {
 /// - `NSTDString *string` - The string to clear.
 #[inline]
 #[nstdapi]
-pub fn nstd_string_clear(string: &mut NSTDString) {
+pub fn nstd_string_clear(string: &mut NSTDString<'_>) {
     nstd_vec_clear(&mut string.bytes);
 }
 
@@ -637,4 +637,4 @@ gen_from_primitive!(
 #[inline]
 #[nstdapi]
 #[allow(unused_variables)]
-pub fn nstd_string_free(string: NSTDString) {}
+pub fn nstd_string_free(string: NSTDString<'_>) {}

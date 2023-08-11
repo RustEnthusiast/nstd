@@ -135,7 +135,7 @@ impl<A> FromIterator<A> for NSTDVec<'_> {
         for v in iter {
             // SAFETY: `v` is stored on the stack.
             errc = unsafe { nstd_vec_push(&mut s, addr_of!(v).cast()) };
-            assert!(errc == NSTDAllocError::NSTD_ALLOC_ERROR_NONE);
+            assert!(errc == NSTD_ALLOC_ERROR_NONE);
             // Be sure to forget `v` so it doesn't get dropped.
             core::mem::forget(v);
         }
@@ -179,7 +179,7 @@ pub type NSTDOptionalVec<'a> = NSTDOptional<NSTDVec<'a>>;
 /// ```
 #[inline]
 #[nstdapi]
-pub const fn nstd_vec_new(allocator: &NSTDAllocator, stride: NSTDUInt) -> NSTDVec {
+pub const fn nstd_vec_new(allocator: &NSTDAllocator, stride: NSTDUInt) -> NSTDVec<'_> {
     NSTDVec {
         allocator,
         ptr: nstd_core_ptr_raw_dangling_mut(),
@@ -234,7 +234,7 @@ pub fn nstd_vec_new_with_cap(
     allocator: &NSTDAllocator,
     stride: NSTDUInt,
     mut cap: NSTDUInt,
-) -> NSTDVec {
+) -> NSTDVec<'_> {
     // Check if either `stride` or `cap` are zero.
     if stride == 0 || cap == 0 {
         return NSTDVec {
@@ -376,7 +376,7 @@ pub const fn nstd_vec_allocator<'a>(vec: &NSTDVec<'a>) -> &'a NSTDAllocator {
 /// `NSTDUInt len` - The length of the vector.
 #[inline]
 #[nstdapi]
-pub const fn nstd_vec_len(vec: &NSTDVec) -> NSTDUInt {
+pub const fn nstd_vec_len(vec: &NSTDVec<'_>) -> NSTDUInt {
     vec.len
 }
 
@@ -393,7 +393,7 @@ pub const fn nstd_vec_len(vec: &NSTDVec) -> NSTDUInt {
 /// `NSTDUInt cap` - The vector's capacity.
 #[inline]
 #[nstdapi]
-pub const fn nstd_vec_cap(vec: &NSTDVec) -> NSTDUInt {
+pub const fn nstd_vec_cap(vec: &NSTDVec<'_>) -> NSTDUInt {
     vec.cap
 }
 
@@ -408,7 +408,7 @@ pub const fn nstd_vec_cap(vec: &NSTDVec) -> NSTDUInt {
 /// `NSTDUInt stride` - The size of each value in the vector.
 #[inline]
 #[nstdapi]
-pub const fn nstd_vec_stride(vec: &NSTDVec) -> NSTDUInt {
+pub const fn nstd_vec_stride(vec: &NSTDVec<'_>) -> NSTDUInt {
     vec.stride
 }
 
@@ -437,7 +437,7 @@ pub const fn nstd_vec_stride(vec: &NSTDVec) -> NSTDUInt {
 /// ```
 #[inline]
 #[nstdapi]
-pub const fn nstd_vec_reserved(vec: &NSTDVec) -> NSTDUInt {
+pub const fn nstd_vec_reserved(vec: &NSTDVec<'_>) -> NSTDUInt {
     vec.cap - vec.len
 }
 
@@ -452,7 +452,7 @@ pub const fn nstd_vec_reserved(vec: &NSTDVec) -> NSTDUInt {
 /// `NSTDSlice slice` - An *immutable* view into the vector.
 #[inline]
 #[nstdapi]
-pub fn nstd_vec_as_slice(vec: &NSTDVec) -> NSTDSlice {
+pub fn nstd_vec_as_slice(vec: &NSTDVec<'_>) -> NSTDSlice {
     // SAFETY: `vec.ptr` is checked, vector lengths are never greater than `NSTDInt`'s max value.
     unsafe { nstd_core_slice_new_unchecked(vec.ptr, vec.stride, vec.len) }
 }
@@ -468,7 +468,7 @@ pub fn nstd_vec_as_slice(vec: &NSTDVec) -> NSTDSlice {
 /// `NSTDSliceMut slice` - A *mutable* view into the vector.
 #[inline]
 #[nstdapi]
-pub fn nstd_vec_as_slice_mut(vec: &mut NSTDVec) -> NSTDSliceMut {
+pub fn nstd_vec_as_slice_mut(vec: &mut NSTDVec<'_>) -> NSTDSliceMut {
     // SAFETY: `vec.ptr` is checked, vector lengths are never greater than `NSTDInt`'s max value.
     unsafe { nstd_core_slice_mut_new_unchecked(vec.ptr, vec.stride, vec.len) }
 }
@@ -484,7 +484,7 @@ pub fn nstd_vec_as_slice_mut(vec: &mut NSTDVec) -> NSTDSliceMut {
 /// `NSTDAny ptr` - A pointer to the vector's raw data.
 #[inline]
 #[nstdapi]
-pub const fn nstd_vec_as_ptr(vec: &NSTDVec) -> NSTDAny {
+pub const fn nstd_vec_as_ptr(vec: &NSTDVec<'_>) -> NSTDAny {
     vec.ptr
 }
 
@@ -499,7 +499,7 @@ pub const fn nstd_vec_as_ptr(vec: &NSTDVec) -> NSTDAny {
 /// `NSTDAnyMut ptr` - A pointer to the vector's raw data.
 #[inline]
 #[nstdapi]
-pub fn nstd_vec_as_ptr_mut(vec: &mut NSTDVec) -> NSTDAnyMut {
+pub fn nstd_vec_as_ptr_mut(vec: &mut NSTDVec<'_>) -> NSTDAnyMut {
     vec.ptr
 }
 
@@ -517,7 +517,7 @@ pub fn nstd_vec_as_ptr_mut(vec: &mut NSTDVec) -> NSTDAnyMut {
 /// `NSTDAny end` - A pointer to the end of the vector.
 #[inline]
 #[nstdapi]
-pub fn nstd_vec_end(vec: &NSTDVec) -> NSTDAny {
+pub fn nstd_vec_end(vec: &NSTDVec<'_>) -> NSTDAny {
     // SAFETY: `len` is within the bounds of the vector and does not overflow `isize`.
     unsafe { vec.ptr.add(vec.byte_len()) }
 }
@@ -536,7 +536,7 @@ pub fn nstd_vec_end(vec: &NSTDVec) -> NSTDAny {
 /// `NSTDAnyMut end` - A mutable pointer to the end of the vector.
 #[inline]
 #[nstdapi]
-pub fn nstd_vec_end_mut(vec: &mut NSTDVec) -> NSTDAnyMut {
+pub fn nstd_vec_end_mut(vec: &mut NSTDVec<'_>) -> NSTDAnyMut {
     // SAFETY: `len` is within the bounds of the vector and does not overflow `isize`.
     unsafe { vec.ptr.add(vec.byte_len()) }
 }
@@ -584,7 +584,7 @@ pub fn nstd_vec_end_mut(vec: &mut NSTDVec) -> NSTDAnyMut {
 /// ```
 #[inline]
 #[nstdapi]
-pub const fn nstd_vec_get(vec: &NSTDVec, mut pos: NSTDUInt) -> NSTDAny {
+pub const fn nstd_vec_get(vec: &NSTDVec<'_>, mut pos: NSTDUInt) -> NSTDAny {
     if pos < vec.len {
         pos *= vec.stride;
         // SAFETY: `pos` is a valid index.
@@ -641,7 +641,7 @@ pub const fn nstd_vec_get(vec: &NSTDVec, mut pos: NSTDUInt) -> NSTDAny {
 /// ```
 #[inline]
 #[nstdapi]
-pub fn nstd_vec_get_mut(vec: &mut NSTDVec, pos: NSTDUInt) -> NSTDAnyMut {
+pub fn nstd_vec_get_mut(vec: &mut NSTDVec<'_>, pos: NSTDUInt) -> NSTDAnyMut {
     nstd_vec_get(vec, pos) as NSTDAnyMut
 }
 
@@ -684,7 +684,7 @@ pub fn nstd_vec_get_mut(vec: &mut NSTDVec, pos: NSTDUInt) -> NSTDAnyMut {
 /// ```
 #[inline]
 #[nstdapi]
-pub unsafe fn nstd_vec_push(vec: &mut NSTDVec, value: NSTDAny) -> NSTDAllocError {
+pub unsafe fn nstd_vec_push(vec: &mut NSTDVec<'_>, value: NSTDAny) -> NSTDAllocError {
     // Attempt to reserve space for the push.
     let errc = vec.try_reserve();
     // On success: copy bytes to the end of the vector.
@@ -735,7 +735,7 @@ pub unsafe fn nstd_vec_push(vec: &mut NSTDVec, value: NSTDAny) -> NSTDAllocError
 /// ```
 #[inline]
 #[nstdapi]
-pub fn nstd_vec_pop(vec: &mut NSTDVec) -> NSTDAny {
+pub fn nstd_vec_pop(vec: &mut NSTDVec<'_>) -> NSTDAny {
     if vec.len > 0 {
         vec.len -= 1;
         return vec.end();
@@ -795,7 +795,7 @@ pub fn nstd_vec_pop(vec: &mut NSTDVec) -> NSTDAny {
 /// ```
 #[nstdapi]
 pub unsafe fn nstd_vec_insert(
-    vec: &mut NSTDVec,
+    vec: &mut NSTDVec<'_>,
     value: NSTDAny,
     mut index: NSTDUInt,
 ) -> NSTDErrorCode {
@@ -862,7 +862,7 @@ pub unsafe fn nstd_vec_insert(
 /// }
 /// ```
 #[nstdapi]
-pub fn nstd_vec_remove(vec: &mut NSTDVec, mut index: NSTDUInt) -> NSTDErrorCode {
+pub fn nstd_vec_remove(vec: &mut NSTDVec<'_>, mut index: NSTDUInt) -> NSTDErrorCode {
     // Make sure `index` is valid. This also ensures that `vec.len` is at least 1.
     if index < vec.len {
         // Move bytes after `index` to the left by one element.
@@ -929,7 +929,7 @@ pub fn nstd_vec_remove(vec: &mut NSTDVec, mut index: NSTDUInt) -> NSTDErrorCode 
 /// }
 /// ```
 #[nstdapi]
-pub unsafe fn nstd_vec_extend(vec: &mut NSTDVec, values: &NSTDSlice) -> NSTDAllocError {
+pub unsafe fn nstd_vec_extend(vec: &mut NSTDVec<'_>, values: &NSTDSlice) -> NSTDAllocError {
     // Ensure value sizes are the same for both the vector and the slice.
     assert!(vec.stride == nstd_core_slice_stride(values));
     let len = nstd_core_slice_len(values);
@@ -962,7 +962,7 @@ pub unsafe fn nstd_vec_extend(vec: &mut NSTDVec, values: &NSTDSlice) -> NSTDAllo
 /// - `NSTDUInt len` - The number of elements to keep.
 #[inline]
 #[nstdapi]
-pub fn nstd_vec_truncate(vec: &mut NSTDVec, len: NSTDUInt) {
+pub fn nstd_vec_truncate(vec: &mut NSTDVec<'_>, len: NSTDUInt) {
     if vec.len > len {
         vec.len = len;
     }
@@ -984,7 +984,7 @@ pub fn nstd_vec_truncate(vec: &mut NSTDVec, len: NSTDUInt) {
 /// - `len`'s value must not be greater than the vector's capacity.
 #[inline]
 #[nstdapi]
-pub unsafe fn nstd_vec_set_len(vec: &mut NSTDVec, len: NSTDUInt) {
+pub unsafe fn nstd_vec_set_len(vec: &mut NSTDVec<'_>, len: NSTDUInt) {
     vec.len = len;
 }
 
@@ -1001,12 +1001,12 @@ pub unsafe fn nstd_vec_set_len(vec: &mut NSTDVec, len: NSTDUInt) {
 ///
 /// `NSTDAllocError errc` - The allocation operation error code.
 #[nstdapi]
-pub fn nstd_vec_reserve(vec: &mut NSTDVec, size: NSTDUInt) -> NSTDAllocError {
+pub fn nstd_vec_reserve(vec: &mut NSTDVec<'_>, size: NSTDUInt) -> NSTDAllocError {
     // Calculate the number of bytes to allocate.
     let bytes_to_alloc = size * vec.stride;
     if bytes_to_alloc == 0 {
         vec.cap += size;
-        return NSTDAllocError::NSTD_ALLOC_ERROR_NONE;
+        return NSTD_ALLOC_ERROR_NONE;
     }
     // Checking if the vector is null and needs to make it's first allocation.
     if !vec.has_allocated() {
@@ -1048,7 +1048,7 @@ pub fn nstd_vec_reserve(vec: &mut NSTDVec, size: NSTDUInt) -> NSTDAllocError {
 ///
 /// `NSTDAllocError errc` - The allocation operation error code.
 #[nstdapi]
-pub fn nstd_vec_shrink(vec: &mut NSTDVec) -> NSTDAllocError {
+pub fn nstd_vec_shrink(vec: &mut NSTDVec<'_>) -> NSTDAllocError {
     // Make sure the vector's capacity is greater than it's length.
     if vec.cap > vec.len {
         // Make sure the vector's stride is greater than 0 before reallocating.
@@ -1078,7 +1078,7 @@ pub fn nstd_vec_shrink(vec: &mut NSTDVec) -> NSTDAllocError {
 /// - `NSTDVec *vec` - The vector to clear.
 #[inline]
 #[nstdapi]
-pub fn nstd_vec_clear(vec: &mut NSTDVec) {
+pub fn nstd_vec_clear(vec: &mut NSTDVec<'_>) {
     vec.len = 0;
 }
 
@@ -1090,7 +1090,7 @@ pub fn nstd_vec_clear(vec: &mut NSTDVec) {
 #[inline]
 #[nstdapi]
 #[allow(unused_variables)]
-pub fn nstd_vec_free(vec: NSTDVec) {}
+pub fn nstd_vec_free(vec: NSTDVec<'_>) {}
 
 /// Frees an instance of `NSTDVec` after invoking `callback` with each of the vector's elements.
 ///
@@ -1104,7 +1104,7 @@ pub fn nstd_vec_free(vec: NSTDVec) {}
 ///
 /// This operation makes a direct call on a C function pointer (`callback`).
 #[nstdapi]
-pub unsafe fn nstd_vec_drop(mut vec: NSTDVec, callback: unsafe extern "C" fn(NSTDAnyMut)) {
+pub unsafe fn nstd_vec_drop(mut vec: NSTDVec<'_>, callback: unsafe extern "C" fn(NSTDAnyMut)) {
     let mut ptr = nstd_vec_as_ptr_mut(&mut vec);
     let end = nstd_vec_end(&vec);
     while ptr < end as _ {

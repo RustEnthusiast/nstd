@@ -86,7 +86,7 @@ pub unsafe fn nstd_heap_ptr_new(
     allocator: &NSTDAllocator,
     element_size: NSTDUInt,
     init: NSTDAny,
-) -> NSTDOptionalHeapPtr {
+) -> NSTDOptionalHeapPtr<'_> {
     if element_size == 0 {
         NSTDOptional::Some(NSTDHeapPtr::zero_sized(allocator))
     } else {
@@ -140,7 +140,7 @@ pub unsafe fn nstd_heap_ptr_new(
 pub unsafe fn nstd_heap_ptr_new_zeroed(
     allocator: &NSTDAllocator,
     element_size: NSTDUInt,
-) -> NSTDOptionalHeapPtr {
+) -> NSTDOptionalHeapPtr<'_> {
     if element_size == 0 {
         NSTDOptional::Some(NSTDHeapPtr::zero_sized(allocator))
     } else {
@@ -230,7 +230,7 @@ pub fn nstd_heap_ptr_allocator<'a>(hptr: &NSTDHeapPtr<'a>) -> &'a NSTDAllocator 
 /// ```
 #[inline]
 #[nstdapi]
-pub fn nstd_heap_ptr_size(hptr: &NSTDHeapPtr) -> NSTDUInt {
+pub fn nstd_heap_ptr_size(hptr: &NSTDHeapPtr<'_>) -> NSTDUInt {
     hptr.size
 }
 
@@ -267,7 +267,7 @@ pub fn nstd_heap_ptr_size(hptr: &NSTDHeapPtr) -> NSTDUInt {
 /// ```
 #[inline]
 #[nstdapi]
-pub fn nstd_heap_ptr_get(hptr: &NSTDHeapPtr) -> NSTDAny {
+pub fn nstd_heap_ptr_get(hptr: &NSTDHeapPtr<'_>) -> NSTDAny {
     hptr.ptr
 }
 
@@ -307,7 +307,7 @@ pub fn nstd_heap_ptr_get(hptr: &NSTDHeapPtr) -> NSTDAny {
 /// ```
 #[inline]
 #[nstdapi]
-pub fn nstd_heap_ptr_get_mut(hptr: &mut NSTDHeapPtr) -> NSTDAnyMut {
+pub fn nstd_heap_ptr_get_mut(hptr: &mut NSTDHeapPtr<'_>) -> NSTDAnyMut {
     hptr.ptr
 }
 
@@ -319,7 +319,7 @@ pub fn nstd_heap_ptr_get_mut(hptr: &mut NSTDHeapPtr) -> NSTDAnyMut {
 #[inline]
 #[nstdapi]
 #[allow(unused_variables)]
-pub fn nstd_heap_ptr_free(hptr: NSTDHeapPtr) {}
+pub fn nstd_heap_ptr_free(hptr: NSTDHeapPtr<'_>) {}
 
 /// Frees an instance of `NSTDHeapPtr` after invoking `callback` with the heap object's data.
 ///
@@ -334,6 +334,9 @@ pub fn nstd_heap_ptr_free(hptr: NSTDHeapPtr) {}
 /// This operation makes a direct call on a C function pointer (`callback`).
 #[inline]
 #[nstdapi]
-pub unsafe fn nstd_heap_ptr_drop(hptr: NSTDHeapPtr, callback: unsafe extern "C" fn(NSTDAnyMut)) {
+pub unsafe fn nstd_heap_ptr_drop(
+    hptr: NSTDHeapPtr<'_>,
+    callback: unsafe extern "C" fn(NSTDAnyMut),
+) {
     callback(hptr.ptr);
 }

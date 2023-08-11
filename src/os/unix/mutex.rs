@@ -154,7 +154,7 @@ pub type NSTDUnixOptionalMutexLockResult<'m, 'a> = NSTDOptional<NSTDUnixMutexLoc
 /// `NSTDUnixOptionalMutex mutex` - The new initialized mutex on success, or an uninitialized "none"
 /// value if the OS was unable to create and initialize the mutex.
 #[nstdapi]
-pub fn nstd_os_unix_mutex_new(data: NSTDHeapPtr) -> NSTDUnixOptionalMutex {
+pub fn nstd_os_unix_mutex_new(data: NSTDHeapPtr<'_>) -> NSTDUnixOptionalMutex<'_> {
     let mutex = RawMutex(UnsafeCell::new(PTHREAD_MUTEX_INITIALIZER));
     if let Some(attrs) = MutexAttrs::new() {
         // SAFETY: `attrs` is properly initialized.
@@ -180,7 +180,7 @@ pub fn nstd_os_unix_mutex_new(data: NSTDHeapPtr) -> NSTDUnixOptionalMutex {
 /// `pthread_mutex_t raw` - The native mutex handle.
 #[inline]
 #[nstdapi]
-pub fn nstd_os_unix_mutex_handle(mutex: &NSTDUnixMutex) -> pthread_mutex_t {
+pub fn nstd_os_unix_mutex_handle(mutex: &NSTDUnixMutex<'_>) -> pthread_mutex_t {
     // SAFETY: `mutex` is behind an initialized reference.
     unsafe { *mutex.inner.0.get() }
 }
@@ -196,7 +196,7 @@ pub fn nstd_os_unix_mutex_handle(mutex: &NSTDUnixMutex) -> pthread_mutex_t {
 /// `NSTDBool is_poisoned` - `NSTD_TRUE` if the mutex's data is poisoned.
 #[inline]
 #[nstdapi]
-pub fn nstd_os_unix_mutex_is_poisoned(mutex: &NSTDUnixMutex) -> NSTDBool {
+pub fn nstd_os_unix_mutex_is_poisoned(mutex: &NSTDUnixMutex<'_>) -> NSTDBool {
     mutex.poisoned.get()
 }
 
@@ -302,6 +302,7 @@ pub fn nstd_os_unix_mutex_timed_lock<'m, 'a>(
         use libc::{pthread_mutex_timedlock, timespec};
         if let NSTDOptional::Some(mut time) = nstd_os_unix_time_now() {
             time = nstd_os_unix_time_add(time, duration);
+            #[allow(trivial_numeric_casts)]
             let duration = timespec {
                 tv_sec: nstd_os_unix_time_seconds(time) as _,
                 tv_nsec: nstd_os_unix_time_nanoseconds(time) as _,
@@ -330,7 +331,7 @@ pub fn nstd_os_unix_mutex_timed_lock<'m, 'a>(
 /// `NSTDAny data` - A pointer to the mutex's data.
 #[inline]
 #[nstdapi]
-pub fn nstd_os_unix_mutex_get(guard: &NSTDUnixMutexGuard) -> NSTDAny {
+pub fn nstd_os_unix_mutex_get(guard: &NSTDUnixMutexGuard<'_, '_>) -> NSTDAny {
     // SAFETY: `mutex` is behind a valid reference.
     nstd_heap_ptr_get(unsafe { &*guard.mutex.data.get() })
 }
@@ -346,7 +347,7 @@ pub fn nstd_os_unix_mutex_get(guard: &NSTDUnixMutexGuard) -> NSTDAny {
 /// `NSTDAnyMut data` - A pointer to the mutex's data.
 #[inline]
 #[nstdapi]
-pub fn nstd_os_unix_mutex_get_mut(guard: &mut NSTDUnixMutexGuard) -> NSTDAnyMut {
+pub fn nstd_os_unix_mutex_get_mut(guard: &mut NSTDUnixMutexGuard<'_, '_>) -> NSTDAnyMut {
     // SAFETY: `mutex` is behind a valid reference.
     nstd_heap_ptr_get_mut(unsafe { &mut *guard.mutex.data.get() })
 }
@@ -363,7 +364,7 @@ pub fn nstd_os_unix_mutex_get_mut(guard: &mut NSTDUnixMutexGuard) -> NSTDAnyMut 
 /// if the mutex was poisoned.
 #[inline]
 #[nstdapi]
-pub fn nstd_os_unix_mutex_into_inner(mutex: NSTDUnixMutex) -> NSTDOptionalHeapPtr {
+pub fn nstd_os_unix_mutex_into_inner(mutex: NSTDUnixMutex<'_>) -> NSTDOptionalHeapPtr<'_> {
     match nstd_os_unix_mutex_is_poisoned(&mutex) {
         false => NSTDOptional::Some(mutex.data.into_inner()),
         true => NSTDOptional::None,
@@ -378,7 +379,7 @@ pub fn nstd_os_unix_mutex_into_inner(mutex: NSTDUnixMutex) -> NSTDOptionalHeapPt
 #[inline]
 #[nstdapi]
 #[allow(unused_variables)]
-pub fn nstd_os_unix_mutex_unlock(guard: NSTDUnixMutexGuard) {}
+pub fn nstd_os_unix_mutex_unlock(guard: NSTDUnixMutexGuard<'_, '_>) {}
 
 /// Frees an instance of `NSTDUnixMutex`.
 ///
@@ -388,7 +389,7 @@ pub fn nstd_os_unix_mutex_unlock(guard: NSTDUnixMutexGuard) {}
 #[inline]
 #[nstdapi]
 #[allow(unused_variables)]
-pub fn nstd_os_unix_mutex_free(mutex: NSTDUnixMutex) {}
+pub fn nstd_os_unix_mutex_free(mutex: NSTDUnixMutex<'_>) {}
 
 /// Frees an instance of `NSTDUnixMutex` after invoking `callback` with the mutex's data.
 ///
@@ -406,7 +407,7 @@ pub fn nstd_os_unix_mutex_free(mutex: NSTDUnixMutex) {}
 #[inline]
 #[nstdapi]
 pub unsafe fn nstd_os_unix_mutex_drop(
-    mutex: NSTDUnixMutex,
+    mutex: NSTDUnixMutex<'_>,
     callback: unsafe extern "C" fn(NSTDAnyMut),
 ) {
     if !mutex.poisoned.get() {

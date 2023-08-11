@@ -104,7 +104,7 @@ pub unsafe fn nstd_shared_ptr_new(
     allocator: &NSTDAllocator,
     element_size: NSTDUInt,
     init: NSTDAny,
-) -> NSTDOptionalSharedPtr {
+) -> NSTDOptionalSharedPtr<'_> {
     // Allocate a region of memory for the object and the pointer count.
     let buffer_size = element_size + USIZE_SIZE;
     let raw = (allocator.allocate)(allocator.state, buffer_size);
@@ -161,7 +161,7 @@ pub unsafe fn nstd_shared_ptr_new(
 pub unsafe fn nstd_shared_ptr_new_zeroed(
     allocator: &NSTDAllocator,
     element_size: NSTDUInt,
-) -> NSTDOptionalSharedPtr {
+) -> NSTDOptionalSharedPtr<'_> {
     // SAFETY: The allocated memory is validated after allocation.
     unsafe {
         // Allocate a region of memory for the object and the pointer count.
@@ -289,7 +289,7 @@ pub fn nstd_shared_ptr_allocator<'a>(shared_ptr: &NSTDSharedPtr<'a>) -> &'a NSTD
 /// ```
 #[inline]
 #[nstdapi]
-pub fn nstd_shared_ptr_owners(shared_ptr: &NSTDSharedPtr) -> NSTDUInt {
+pub fn nstd_shared_ptr_owners(shared_ptr: &NSTDSharedPtr<'_>) -> NSTDUInt {
     shared_ptr.ptrs()
 }
 
@@ -320,7 +320,7 @@ pub fn nstd_shared_ptr_owners(shared_ptr: &NSTDSharedPtr) -> NSTDUInt {
 /// ```
 #[inline]
 #[nstdapi]
-pub fn nstd_shared_ptr_size(shared_ptr: &NSTDSharedPtr) -> NSTDUInt {
+pub fn nstd_shared_ptr_size(shared_ptr: &NSTDSharedPtr<'_>) -> NSTDUInt {
     shared_ptr.size - USIZE_SIZE
 }
 
@@ -353,7 +353,7 @@ pub fn nstd_shared_ptr_size(shared_ptr: &NSTDSharedPtr) -> NSTDUInt {
 /// ```
 #[inline]
 #[nstdapi]
-pub fn nstd_shared_ptr_get(shared_ptr: &NSTDSharedPtr) -> NSTDAny {
+pub fn nstd_shared_ptr_get(shared_ptr: &NSTDSharedPtr<'_>) -> NSTDAny {
     shared_ptr.ptr
 }
 
@@ -365,7 +365,7 @@ pub fn nstd_shared_ptr_get(shared_ptr: &NSTDSharedPtr) -> NSTDAny {
 #[inline]
 #[nstdapi]
 #[allow(unused_variables)]
-pub fn nstd_shared_ptr_free(shared_ptr: NSTDSharedPtr) {}
+pub fn nstd_shared_ptr_free(shared_ptr: NSTDSharedPtr<'_>) {}
 
 /// Frees an instance of `NSTDSharedPtr` after invoking `callback` with the shared object.
 ///
@@ -381,7 +381,7 @@ pub fn nstd_shared_ptr_free(shared_ptr: NSTDSharedPtr) {}
 #[inline]
 #[nstdapi]
 pub unsafe fn nstd_shared_ptr_drop(
-    shared_ptr: NSTDSharedPtr,
+    shared_ptr: NSTDSharedPtr<'_>,
     callback: unsafe extern "C" fn(NSTDAnyMut),
 ) {
     callback(shared_ptr.ptr);
