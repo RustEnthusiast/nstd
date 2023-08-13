@@ -89,7 +89,7 @@ impl<T> Drop for CBox<T> {
         // - `self.0` points to a valid object of type `T`.
         // - `size` is greater than 0.
         unsafe {
-            self.0.read();
+            drop(self.0.cast::<T>().read());
             let size = core::mem::size_of::<T>();
             if size > 0 {
                 nstd_alloc_deallocate(&mut self.0, size);
