@@ -21,15 +21,16 @@ pub struct NSTDUnixTime {
     duration: NSTDDuration,
 }
 impl NSTDUnixTime {
-    /// Creates a new [NSTDUnixTime] object from an [NSTDDuration].
+    /// Creates a new [`NSTDUnixTime`] object from an [`NSTDDuration`].
     #[inline]
     #[allow(dead_code)]
-    pub(crate) fn from_duration(duration: NSTDDuration) -> Self {
+    pub(crate) const fn from_duration(duration: NSTDDuration) -> Self {
         Self { duration }
     }
 }
 impl From<timespec> for NSTDUnixTime {
-    /// Converts a [timespec] into an [NSTDUnixTime] object.
+    /// Converts a [timespec] into an [`NSTDUnixTime`] object.
+    #[allow(clippy::cast_precision_loss)]
     fn from(value: timespec) -> Self {
         const NANOS_IN_SEC: NSTDFloat64 = 1_000_000_000.0;
         let mut seconds = value.tv_sec as _;
@@ -75,7 +76,7 @@ pub fn nstd_os_unix_time_now() -> NSTDUnixOptionalTime {
 /// `NSTDFloat64`.
 #[inline]
 #[nstdapi]
-pub fn nstd_os_unix_time_get(time: NSTDUnixTime) -> NSTDFloat64 {
+pub const fn nstd_os_unix_time_get(time: NSTDUnixTime) -> NSTDFloat64 {
     nstd_core_time_duration_get(time.duration)
 }
 
@@ -90,7 +91,7 @@ pub fn nstd_os_unix_time_get(time: NSTDUnixTime) -> NSTDFloat64 {
 /// `NSTDInt64 seconds` - The number of seconds held in `time`.
 #[inline]
 #[nstdapi]
-pub fn nstd_os_unix_time_seconds(time: NSTDUnixTime) -> NSTDInt64 {
+pub const fn nstd_os_unix_time_seconds(time: NSTDUnixTime) -> NSTDInt64 {
     nstd_core_time_duration_seconds(time.duration)
 }
 

@@ -22,6 +22,7 @@ pub struct NSTDSharedPtr<'a> {
 impl NSTDSharedPtr<'_> {
     /// Returns a copy of the number of pointers sharing the object.
     #[inline]
+    #[allow(clippy::missing_const_for_fn)]
     fn ptrs(&self) -> usize {
         // SAFETY:
         // - Shared pointers are always non-null.
@@ -34,8 +35,9 @@ impl NSTDSharedPtr<'_> {
     /// # Note
     ///
     /// The returned pointer may be unaligned, so reading/writing must be done with
-    /// [core::ptr::read_unaligned] and [core::ptr::write_unaligned].
+    /// [`core::ptr::read_unaligned`] and [`core::ptr::write_unaligned`].
     #[inline]
+    #[allow(clippy::missing_const_for_fn)]
     fn ptrs_mut(&self) -> *mut usize {
         // SAFETY:
         // - Shared pointers are always non-null.
@@ -44,7 +46,7 @@ impl NSTDSharedPtr<'_> {
     }
 }
 impl Drop for NSTDSharedPtr<'_> {
-    /// [NSTDSharedPtr]'s destructor.
+    /// [`NSTDSharedPtr`]'s destructor.
     fn drop(&mut self) {
         // SAFETY: Shared pointers are always non-null.
         unsafe {
@@ -242,7 +244,7 @@ pub fn nstd_shared_ptr_share<'a>(shared_ptr: &NSTDSharedPtr<'a>) -> NSTDSharedPt
 /// `const NSTDAllocator *allocator` - The shared object's allocator.
 #[inline]
 #[nstdapi]
-pub fn nstd_shared_ptr_allocator<'a>(shared_ptr: &NSTDSharedPtr<'a>) -> &'a NSTDAllocator {
+pub const fn nstd_shared_ptr_allocator<'a>(shared_ptr: &NSTDSharedPtr<'a>) -> &'a NSTDAllocator {
     shared_ptr.allocator
 }
 
@@ -320,7 +322,7 @@ pub fn nstd_shared_ptr_owners(shared_ptr: &NSTDSharedPtr<'_>) -> NSTDUInt {
 /// ```
 #[inline]
 #[nstdapi]
-pub fn nstd_shared_ptr_size(shared_ptr: &NSTDSharedPtr<'_>) -> NSTDUInt {
+pub const fn nstd_shared_ptr_size(shared_ptr: &NSTDSharedPtr<'_>) -> NSTDUInt {
     shared_ptr.size - USIZE_SIZE
 }
 
@@ -353,7 +355,7 @@ pub fn nstd_shared_ptr_size(shared_ptr: &NSTDSharedPtr<'_>) -> NSTDUInt {
 /// ```
 #[inline]
 #[nstdapi]
-pub fn nstd_shared_ptr_get(shared_ptr: &NSTDSharedPtr<'_>) -> NSTDAny {
+pub const fn nstd_shared_ptr_get(shared_ptr: &NSTDSharedPtr<'_>) -> NSTDAny {
     shared_ptr.ptr
 }
 
@@ -364,7 +366,11 @@ pub fn nstd_shared_ptr_get(shared_ptr: &NSTDSharedPtr<'_>) -> NSTDAny {
 /// - `NSTDSharedPtr shared_ptr` - The shared object to free.
 #[inline]
 #[nstdapi]
-#[allow(unused_variables)]
+#[allow(
+    unused_variables,
+    clippy::missing_const_for_fn,
+    clippy::needless_pass_by_value
+)]
 pub fn nstd_shared_ptr_free(shared_ptr: NSTDSharedPtr<'_>) {}
 
 /// Frees an instance of `NSTDSharedPtr` after invoking `callback` with the shared object.
@@ -380,6 +386,7 @@ pub fn nstd_shared_ptr_free(shared_ptr: NSTDSharedPtr<'_>) {}
 /// This operation makes a direct call on a C function pointer (`callback`).
 #[inline]
 #[nstdapi]
+#[allow(clippy::needless_pass_by_value)]
 pub unsafe fn nstd_shared_ptr_drop(
     shared_ptr: NSTDSharedPtr<'_>,
     callback: unsafe extern "C" fn(NSTDAnyMut),

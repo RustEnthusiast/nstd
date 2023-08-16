@@ -17,7 +17,7 @@ pub struct NSTDHeapPtr<'a> {
     size: NSTDUInt,
 }
 impl<'a> NSTDHeapPtr<'a> {
-    /// Constructs a zero-sized [NSTDHeapPtr].
+    /// Constructs a zero-sized [`NSTDHeapPtr`].
     #[inline]
     const fn zero_sized(allocator: &'a NSTDAllocator) -> Self {
         Self {
@@ -28,7 +28,7 @@ impl<'a> NSTDHeapPtr<'a> {
     }
 }
 impl Drop for NSTDHeapPtr<'_> {
-    /// [NSTDHeapPtr]'s destructor.
+    /// [`NSTDHeapPtr`]'s destructor.
     #[inline]
     fn drop(&mut self) {
         if self.size > 0 {
@@ -199,7 +199,7 @@ pub fn nstd_heap_ptr_clone<'a>(hptr: &NSTDHeapPtr<'a>) -> NSTDOptionalHeapPtr<'a
 /// `const NSTDAllocator *allocator` - The heap object's allocator.
 #[inline]
 #[nstdapi]
-pub fn nstd_heap_ptr_allocator<'a>(hptr: &NSTDHeapPtr<'a>) -> &'a NSTDAllocator {
+pub const fn nstd_heap_ptr_allocator<'a>(hptr: &NSTDHeapPtr<'a>) -> &'a NSTDAllocator {
     hptr.allocator
 }
 
@@ -230,7 +230,7 @@ pub fn nstd_heap_ptr_allocator<'a>(hptr: &NSTDHeapPtr<'a>) -> &'a NSTDAllocator 
 /// ```
 #[inline]
 #[nstdapi]
-pub fn nstd_heap_ptr_size(hptr: &NSTDHeapPtr<'_>) -> NSTDUInt {
+pub const fn nstd_heap_ptr_size(hptr: &NSTDHeapPtr<'_>) -> NSTDUInt {
     hptr.size
 }
 
@@ -267,7 +267,7 @@ pub fn nstd_heap_ptr_size(hptr: &NSTDHeapPtr<'_>) -> NSTDUInt {
 /// ```
 #[inline]
 #[nstdapi]
-pub fn nstd_heap_ptr_get(hptr: &NSTDHeapPtr<'_>) -> NSTDAny {
+pub const fn nstd_heap_ptr_get(hptr: &NSTDHeapPtr<'_>) -> NSTDAny {
     hptr.ptr
 }
 
@@ -318,7 +318,11 @@ pub fn nstd_heap_ptr_get_mut(hptr: &mut NSTDHeapPtr<'_>) -> NSTDAnyMut {
 /// - `NSTDHeapPtr hptr` - A pointer to the heap object.
 #[inline]
 #[nstdapi]
-#[allow(unused_variables)]
+#[allow(
+    unused_variables,
+    clippy::missing_const_for_fn,
+    clippy::needless_pass_by_value
+)]
 pub fn nstd_heap_ptr_free(hptr: NSTDHeapPtr<'_>) {}
 
 /// Frees an instance of `NSTDHeapPtr` after invoking `callback` with the heap object's data.
@@ -334,6 +338,7 @@ pub fn nstd_heap_ptr_free(hptr: NSTDHeapPtr<'_>) {}
 /// This operation makes a direct call on a C function pointer (`callback`).
 #[inline]
 #[nstdapi]
+#[allow(clippy::needless_pass_by_value)]
 pub unsafe fn nstd_heap_ptr_drop(
     hptr: NSTDHeapPtr<'_>,
     callback: unsafe extern "C" fn(NSTDAnyMut),

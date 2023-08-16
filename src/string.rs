@@ -45,7 +45,7 @@ pub struct NSTDString<'a> {
     bytes: NSTDVec<'a>,
 }
 impl<'a> NSTDString<'a> {
-    /// Creates a new [NSTDString] from a Rust [String].
+    /// Creates a new [`NSTDString`] from a Rust [String].
     #[inline]
     pub(crate) fn from_string(string: String) -> NSTDString<'a> {
         NSTDString {
@@ -158,7 +158,7 @@ pub unsafe fn nstd_string_from_str<'a>(
     let bytes = nstd_core_str_as_bytes(str);
     match nstd_vec_from_slice(allocator, &bytes) {
         NSTDOptional::Some(bytes) => NSTDOptional::Some(NSTDString { bytes }),
-        _ => NSTDOptional::None,
+        NSTDOptional::None => NSTDOptional::None,
     }
 }
 
@@ -201,7 +201,7 @@ pub fn nstd_string_from_bytes(bytes: NSTDVec<'_>) -> NSTDOptionalString<'_> {
 pub fn nstd_string_clone<'a>(string: &NSTDString<'a>) -> NSTDOptionalString<'a> {
     match nstd_vec_clone(&string.bytes) {
         NSTDOptional::Some(bytes) => NSTDOptional::Some(NSTDString { bytes }),
-        _ => NSTDOptional::None,
+        NSTDOptional::None => NSTDOptional::None,
     }
 }
 
@@ -216,7 +216,7 @@ pub fn nstd_string_clone<'a>(string: &NSTDString<'a>) -> NSTDOptionalString<'a> 
 /// `const NSTDAllocator *allocator` - The string's allocator.
 #[inline]
 #[nstdapi]
-pub fn nstd_string_allocator<'a>(string: &NSTDString<'a>) -> &'a NSTDAllocator {
+pub const fn nstd_string_allocator<'a>(string: &NSTDString<'a>) -> &'a NSTDAllocator {
     nstd_vec_allocator(&string.bytes)
 }
 
@@ -231,7 +231,7 @@ pub fn nstd_string_allocator<'a>(string: &NSTDString<'a>) -> &'a NSTDAllocator {
 /// `NSTDStr str` - The new string slice.
 #[inline]
 #[nstdapi]
-pub fn nstd_string_as_str(string: &NSTDString<'_>) -> NSTDStr {
+pub const fn nstd_string_as_str(string: &NSTDString<'_>) -> NSTDStr {
     let bytes = nstd_vec_as_slice(&string.bytes);
     // SAFETY: The string's bytes are always be UTF-8 encoded.
     unsafe { nstd_core_str_from_bytes_unchecked(&bytes) }
@@ -265,7 +265,7 @@ pub fn nstd_string_as_str_mut(string: &mut NSTDString<'_>) -> NSTDStrMut {
 /// `NSTDSlice bytes` - The string's active data.
 #[inline]
 #[nstdapi]
-pub fn nstd_string_as_bytes(string: &NSTDString<'_>) -> NSTDSlice {
+pub const fn nstd_string_as_bytes(string: &NSTDString<'_>) -> NSTDSlice {
     nstd_vec_as_slice(&string.bytes)
 }
 
@@ -295,6 +295,7 @@ pub const fn nstd_string_as_ptr(string: &NSTDString<'_>) -> *const NSTDByte {
 /// `NSTDVec bytes` - The string's raw data.
 #[inline]
 #[nstdapi]
+#[allow(clippy::missing_const_for_fn)]
 pub fn nstd_string_into_bytes(string: NSTDString<'_>) -> NSTDVec<'_> {
     string.bytes
 }
@@ -381,7 +382,7 @@ pub fn nstd_string_push(string: &mut NSTDString<'_>, chr: NSTDUnichar) -> NSTDAl
     // SAFETY: `buf`'s data is stored on the stack, UTF-8 characters never occupy more than 4
     // bytes.
     unsafe {
-        let buf = nstd_core_slice_new_unchecked(buf.as_ptr() as _, 1, chr.len_utf8());
+        let buf = nstd_core_slice_new_unchecked(buf.as_ptr().cast(), 1, chr.len_utf8());
         nstd_vec_extend(&mut string.bytes, &buf)
     }
 }
@@ -636,5 +637,9 @@ gen_from_primitive!(
 /// - `NSTDString string` - The string to free.
 #[inline]
 #[nstdapi]
-#[allow(unused_variables)]
+#[allow(
+    unused_variables,
+    clippy::missing_const_for_fn,
+    clippy::needless_pass_by_value
+)]
 pub fn nstd_string_free(string: NSTDString<'_>) {}

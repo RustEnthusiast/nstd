@@ -132,7 +132,11 @@ pub fn nstd_proc_join(handle: &mut NSTDChildProcess) -> NSTDIOError {
 /// - `NSTDChildProcess handle` - A handle to the child process.
 #[inline]
 #[nstdapi]
-#[allow(unused_variables)]
+#[allow(
+    unused_variables,
+    clippy::missing_const_for_fn,
+    clippy::needless_pass_by_value
+)]
 pub fn nstd_proc_free(handle: NSTDChildProcess) {}
 
 /// Terminates the process with the given `exit_code`.

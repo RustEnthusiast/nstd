@@ -25,8 +25,23 @@
     unused_qualifications,
     unused_tuple_struct_fields,
     variant_size_differences,
-    clippy::missing_panics_doc,
+    clippy::all,
+    clippy::cargo,
+    clippy::complexity,
+    clippy::correctness,
+    clippy::nursery,
+    clippy::pedantic,
+    clippy::perf,
+    clippy::style,
+    clippy::suspicious,
     clippy::undocumented_unsafe_blocks
+)]
+#![allow(
+    clippy::match_bool,
+    clippy::module_name_repetitions,
+    clippy::must_use_candidate,
+    clippy::redundant_pub_crate,
+    clippy::significant_drop_in_scrutinee
 )]
 #![cfg_attr(feature = "link", allow(dead_code, unused_imports))]
 #![cfg_attr(not(any(test, feature = "std")), no_std)]

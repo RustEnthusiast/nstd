@@ -29,10 +29,9 @@ gen_optional!(NSTDOptionalStdout, NSTDStdout);
 #[inline]
 #[nstdapi]
 pub fn nstd_io_stdout() -> NSTDOptionalStdout {
-    match CBox::new(std::io::stdout()) {
-        Some(out) => NSTDOptional::Some(NSTDStdout { out }),
-        _ => NSTDOptional::None,
-    }
+    CBox::new(std::io::stdout()).map_or(NSTDOptional::None, |out| {
+        NSTDOptional::Some(NSTDStdout { out })
+    })
 }
 
 /// Writes some data to the standard output stream, returning how many bytes were written.
@@ -116,7 +115,11 @@ pub fn nstd_io_stdout_flush(handle: &mut NSTDStdout) -> NSTDIOError {
 /// - `NSTDStdout handle` - A handle to the standard output stream.
 #[inline]
 #[nstdapi]
-#[allow(unused_variables)]
+#[allow(
+    unused_variables,
+    clippy::missing_const_for_fn,
+    clippy::needless_pass_by_value
+)]
 pub fn nstd_io_stdout_free(handle: NSTDStdout) {}
 
 /// A locked handle to the standard output stream.
@@ -136,10 +139,9 @@ gen_optional!(NSTDOptionalStdoutLock, NSTDStdoutLock);
 #[inline]
 #[nstdapi]
 pub fn nstd_io_stdout_lock() -> NSTDOptionalStdoutLock {
-    match CBox::new(std::io::stdout().lock()) {
-        Some(out) => NSTDOptional::Some(NSTDStdoutLock { out }),
-        _ => NSTDOptional::None,
-    }
+    CBox::new(std::io::stdout().lock()).map_or(NSTDOptional::None, |out| {
+        NSTDOptional::Some(NSTDStdoutLock { out })
+    })
 }
 
 /// Writes some data to the standard output stream.
@@ -229,5 +231,9 @@ pub fn nstd_io_stdout_lock_flush(handle: &mut NSTDStdoutLock) -> NSTDIOError {
 /// - `NSTDStdoutLock handle` - A locked handle to the standard output stream.
 #[inline]
 #[nstdapi]
-#[allow(unused_variables)]
+#[allow(
+    unused_variables,
+    clippy::missing_const_for_fn,
+    clippy::needless_pass_by_value
+)]
 pub fn nstd_io_stdout_unlock(handle: NSTDStdoutLock) {}

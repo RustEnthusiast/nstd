@@ -13,7 +13,7 @@ pub struct NSTDWindowsSharedLib {
     handle: NSTDWindowsHandle,
 }
 impl Drop for NSTDWindowsSharedLib {
-    /// [NSTDWindowsSharedLib]'s destructor.
+    /// [`NSTDWindowsSharedLib`]'s destructor.
     #[inline]
     fn drop(&mut self) {
         // SAFETY: `handle` is non-null.
@@ -64,7 +64,7 @@ pub unsafe fn nstd_os_windows_shared_lib_load(
 /// `NSTDWindowsHandle handle` - A native handle to the dynamically loaded library.
 #[inline]
 #[nstdapi]
-pub fn nstd_os_windows_shared_lib_handle(lib: &NSTDWindowsSharedLib) -> NSTDWindowsHandle {
+pub const fn nstd_os_windows_shared_lib_handle(lib: &NSTDWindowsSharedLib) -> NSTDWindowsHandle {
     lib.handle
 }
 
@@ -129,5 +129,9 @@ pub unsafe fn nstd_os_windows_shared_lib_get_mut(
 /// <https://docs.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-freelibrary>.
 #[inline]
 #[nstdapi]
-#[allow(unused_variables)]
+#[allow(
+    unused_variables,
+    clippy::missing_const_for_fn,
+    clippy::needless_pass_by_value
+)]
 pub unsafe fn nstd_os_windows_shared_lib_free(lib: NSTDWindowsSharedLib) {}

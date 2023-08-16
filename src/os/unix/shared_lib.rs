@@ -10,7 +10,7 @@ pub struct NSTDUnixSharedLib {
     handle: NSTDAnyMut,
 }
 impl Drop for NSTDUnixSharedLib {
-    /// [NSTDUnixSharedLib]'s destructor.
+    /// [`NSTDUnixSharedLib`]'s destructor.
     #[inline]
     fn drop(&mut self) {
         // SAFETY: `self.handle` is valid.
@@ -58,7 +58,7 @@ pub unsafe fn nstd_os_unix_shared_lib_load(path: *const NSTDChar) -> NSTDUnixOpt
 /// `NSTDAnyMut handle` - A raw handle to the dynamically loaded library.
 #[inline]
 #[nstdapi]
-pub fn nstd_os_unix_shared_lib_handle(lib: &NSTDUnixSharedLib) -> NSTDAnyMut {
+pub const fn nstd_os_unix_shared_lib_handle(lib: &NSTDUnixSharedLib) -> NSTDAnyMut {
     lib.handle
 }
 
@@ -121,5 +121,9 @@ pub unsafe fn nstd_os_unix_shared_lib_get_mut(
 /// See <https://man7.org/linux/man-pages/man3/dlclose.3p.html>.
 #[inline]
 #[nstdapi]
-#[allow(unused_variables)]
+#[allow(
+    unused_variables,
+    clippy::missing_const_for_fn,
+    clippy::needless_pass_by_value
+)]
 pub fn nstd_os_unix_shared_lib_free(lib: NSTDUnixSharedLib) {}

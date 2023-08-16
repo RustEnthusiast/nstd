@@ -29,10 +29,9 @@ gen_optional!(NSTDOptionalStderr, NSTDStderr);
 #[inline]
 #[nstdapi]
 pub fn nstd_io_stderr() -> NSTDOptionalStderr {
-    match CBox::new(std::io::stderr()) {
-        Some(err) => NSTDOptional::Some(NSTDStderr { err }),
-        _ => NSTDOptional::None,
-    }
+    CBox::new(std::io::stderr()).map_or(NSTDOptional::None, |err| {
+        NSTDOptional::Some(NSTDStderr { err })
+    })
 }
 
 /// Writes some data to the standard error stream, returning how many bytes were written.
@@ -116,7 +115,11 @@ pub fn nstd_io_stderr_flush(handle: &mut NSTDStderr) -> NSTDIOError {
 /// - `NSTDStderr handle` - A handle to the standard error stream.
 #[inline]
 #[nstdapi]
-#[allow(unused_variables)]
+#[allow(
+    unused_variables,
+    clippy::missing_const_for_fn,
+    clippy::needless_pass_by_value
+)]
 pub fn nstd_io_stderr_free(handle: NSTDStderr) {}
 
 /// A locked handle to the standard error stream.
@@ -136,10 +139,9 @@ gen_optional!(NSTDOptionalStderrLock, NSTDStderrLock);
 #[inline]
 #[nstdapi]
 pub fn nstd_io_stderr_lock() -> NSTDOptionalStderrLock {
-    match CBox::new(std::io::stderr().lock()) {
-        Some(err) => NSTDOptional::Some(NSTDStderrLock { err }),
-        _ => NSTDOptional::None,
-    }
+    CBox::new(std::io::stderr().lock()).map_or(NSTDOptional::None, |err| {
+        NSTDOptional::Some(NSTDStderrLock { err })
+    })
 }
 
 /// Writes some data to the standard error stream, returning how many bytes were written.
@@ -229,5 +231,9 @@ pub fn nstd_io_stderr_lock_flush(handle: &mut NSTDStderrLock) -> NSTDIOError {
 /// - `NSTDStderrLock handle` - A locked handle to the standard error stream.
 #[inline]
 #[nstdapi]
-#[allow(unused_variables)]
+#[allow(
+    unused_variables,
+    clippy::missing_const_for_fn,
+    clippy::needless_pass_by_value
+)]
 pub fn nstd_io_stderr_unlock(handle: NSTDStderrLock) {}

@@ -21,12 +21,12 @@ pub struct NSTDSlice {
     stride: NSTDUInt,
 }
 impl NSTDSlice {
-    /// Creates a new [NSTDSlice] from a Rust slice.
+    /// Creates a new [`NSTDSlice`] from a Rust slice.
     #[inline]
     #[allow(dead_code)]
     pub(crate) const fn from_slice<T>(s: &[T]) -> Self {
         Self {
-            ptr: s.as_ptr() as _,
+            ptr: s.as_ptr().cast(),
             len: s.len(),
             stride: core::mem::size_of::<T>(),
         }
@@ -53,7 +53,7 @@ impl NSTDSlice {
     #[inline]
     pub(crate) const unsafe fn as_slice<T>(&self) -> &[T] {
         assert!(self.stride == core::mem::size_of::<T>());
-        core::slice::from_raw_parts(self.ptr as _, self.len)
+        core::slice::from_raw_parts(self.ptr.cast(), self.len)
     }
 }
 gen_optional!(NSTDOptionalSlice, NSTDSlice);
@@ -847,9 +847,9 @@ pub const fn nstd_core_slice_mut_last_const(slice: &NSTDSliceMut) -> NSTDAny {
 /// ```
 #[nstdapi]
 pub unsafe fn nstd_core_slice_mut_copy(dest: &mut NSTDSliceMut, src: &NSTDSlice) {
-    assert!(dest.len == src.len && nstd_core_slice_mut_stride(dest) == nstd_core_slice_stride(src));
+    assert!(dest.len == src.len && dest.stride == src.stride);
     let len = src.byte_len();
-    let dest = nstd_core_slice_mut_as_ptr(dest) as _;
-    let src = nstd_core_slice_as_ptr(src) as _;
+    let dest = nstd_core_slice_mut_as_ptr(dest).cast();
+    let src = nstd_core_slice_as_ptr(src).cast();
     nstd_core_mem_copy(dest, src, len);
 }

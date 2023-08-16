@@ -4,7 +4,11 @@ extern crate alloc;
 use crate::os::windows::alloc::{
     nstd_os_windows_alloc_allocate, nstd_os_windows_alloc_allocate_zeroed,
     nstd_os_windows_alloc_deallocate, nstd_os_windows_alloc_reallocate,
-    NSTDWindowsAllocError::{self, *},
+    NSTDWindowsAllocError::{
+        self, NSTD_WINDOWS_ALLOC_ERROR_HEAP_NOT_FOUND, NSTD_WINDOWS_ALLOC_ERROR_INVALID_HEAP,
+        NSTD_WINDOWS_ALLOC_ERROR_INVALID_LAYOUT, NSTD_WINDOWS_ALLOC_ERROR_MEMORY_NOT_FOUND,
+        NSTD_WINDOWS_ALLOC_ERROR_NONE, NSTD_WINDOWS_ALLOC_ERROR_OUT_OF_MEMORY,
+    },
 };
 use crate::{
     core::{
@@ -28,27 +32,27 @@ use nstdapi::nstdapi;
 pub(crate) struct CBox<T>(NSTDAnyMut, PhantomData<T>);
 #[allow(dead_code)]
 impl<T> CBox<T> {
-    /// Creates a new heap allocated [CBox] object.
+    /// Creates a new heap allocated [`CBox`] object.
     pub(crate) fn new(value: T) -> Option<Self> {
         let size = core::mem::size_of::<T>();
         match size {
             #[allow(unused_unsafe)]
             // SAFETY: This operation is safe.
-            0 => unsafe { Some(Self(nstd_core_ptr_raw_dangling_mut(), Default::default())) },
+            0 => unsafe { Some(Self(nstd_core_ptr_raw_dangling_mut(), PhantomData)) },
             // SAFETY: `size` is greater than 0.
             _ => match unsafe { nstd_alloc_allocate(size) } {
                 NSTD_NULL => None,
                 mem => {
                     // SAFETY: `mem` is a non-null pointer to `size` uninitialized bytes.
-                    unsafe { nstd_core_mem_copy(mem as _, addr_of!(value) as _, size) };
+                    unsafe { nstd_core_mem_copy(mem.cast(), addr_of!(value).cast(), size) };
                     core::mem::forget(value);
-                    Some(Self(mem, Default::default()))
+                    Some(Self(mem, PhantomData))
                 }
             },
         }
     }
 
-    /// Moves a [CBox] value onto the stack.
+    /// Moves a [`CBox`] value onto the stack.
     pub(crate) fn into_inner(mut self) -> T {
         // SAFETY: `self.0` points to a valid object of type `T`.
         let value = unsafe { (self.0 as *const T).read() };
@@ -64,10 +68,10 @@ impl<T> CBox<T> {
     }
 }
 impl<T> Deref for CBox<T> {
-    /// [CBox]'s dereference target.
+    /// [`CBox`]'s dereference target.
     type Target = T;
 
-    /// Immutably dereferences a [CBox].
+    /// Immutably dereferences a [`CBox`].
     #[inline]
     fn deref(&self) -> &Self::Target {
         // SAFETY: `self.0` points to a valid object of type `T`.
@@ -75,15 +79,15 @@ impl<T> Deref for CBox<T> {
     }
 }
 impl<T> DerefMut for CBox<T> {
-    /// Mutably dereferences a [CBox].
+    /// Mutably dereferences a [`CBox`].
     #[inline]
     fn deref_mut(&mut self) -> &mut Self::Target {
         // SAFETY: `self.0` points to a valid object of type `T`.
-        unsafe { &mut *(self.0 as *mut _) }
+        unsafe { &mut *self.0.cast() }
     }
 }
 impl<T> Drop for CBox<T> {
-    /// [CBox]'s destructor.
+    /// [`CBox`]'s destructor.
     fn drop(&mut self) {
         // SAFETY:
         // - `self.0` points to a valid object of type `T`.
@@ -118,7 +122,7 @@ pub enum NSTDAllocError {
 }
 #[cfg(windows)]
 impl From<NSTDWindowsAllocError> for NSTDAllocError {
-    /// Converts an [NSTDWindowsAllocError] into an [NSTDAllocError].
+    /// Converts an [`NSTDWindowsAllocError`] into an [`NSTDAllocError`].
     fn from(err: NSTDWindowsAllocError) -> Self {
         match err {
             NSTD_WINDOWS_ALLOC_ERROR_NONE => Self::NSTD_ALLOC_ERROR_NONE,
@@ -131,7 +135,7 @@ impl From<NSTDWindowsAllocError> for NSTDAllocError {
     }
 }
 
-/// A structure of function pointers making up an allocator VTable.
+/// A structure of function pointers making up an allocator's virtual table.
 #[nstdapi]
 #[derive(Clone, Copy)]
 pub struct NSTDAllocator {
@@ -346,7 +350,7 @@ unsafe extern "C" fn rust_deallocate(
     NSTDAllocError::NSTD_ALLOC_ERROR_INVALID_LAYOUT
 }
 
-/// Rust's [Global] [NSTDAllocator].
+/// Rust's [Global] [`NSTDAllocator`].
 #[allow(dead_code)]
 pub(crate) static GLOBAL_ALLOCATOR: NSTDAllocator = NSTDAllocator {
     state: NSTD_NULL,

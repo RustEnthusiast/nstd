@@ -58,7 +58,7 @@ cfg_if! {
             locked: NSTDBool,
         }
         impl Drop for NSTDTimedMutex<'_> {
-            /// [NSTDTimedMutex]'s destructor.
+            /// [`NSTDTimedMutex`]'s destructor.
             #[inline]
             fn drop(&mut self) {
                 // SAFETY: `NSTDTimeMutex` has been initialized and is valid for reads.
@@ -88,7 +88,7 @@ cfg_if! {
             pd: PhantomData<*const ()>,
         }
         impl Drop for NSTDTimedMutexGuard<'_, '_> {
-            /// [NSTDTimedMutexGuard]'s destructor.
+            /// [`NSTDTimedMutexGuard`]'s destructor.
             #[inline]
             fn drop(&mut self) {
                 // SAFETY: `self` is a valid guard for the mutex.

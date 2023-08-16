@@ -14,7 +14,7 @@ pub struct NSTDDuration {
     seconds: NSTDFloat64,
 }
 impl NSTDDuration {
-    /// Converts an [NSTDDuration] into a [Duration].
+    /// Converts an [`NSTDDuration`] into a [Duration].
     ///
     /// # Panics
     ///
@@ -69,6 +69,7 @@ pub const fn nstd_core_time_duration_get(duration: NSTDDuration) -> NSTDFloat64 
 /// `NSTDInt64 seconds` - The number of seconds held in `duration`.
 #[inline]
 #[nstdapi]
+#[allow(clippy::cast_possible_truncation)]
 pub const fn nstd_core_time_duration_seconds(duration: NSTDDuration) -> NSTDInt64 {
     duration.seconds as _
 }
@@ -85,10 +86,17 @@ pub const fn nstd_core_time_duration_seconds(duration: NSTDDuration) -> NSTDInt6
 #[nstdapi]
 pub fn nstd_core_time_duration_nanoseconds(duration: NSTDDuration) -> NSTDUInt32 {
     const NANOS_IN_SEC: NSTDFloat64 = 1_000_000_000.0;
-    let nanos = duration.seconds - duration.seconds as NSTDInt64 as NSTDFloat64;
-    match nanos >= 0.0 {
-        true => (nanos * NANOS_IN_SEC) as _,
-        false => (nanos * -NANOS_IN_SEC) as _,
+    #[allow(
+        clippy::cast_possible_truncation,
+        clippy::cast_precision_loss,
+        clippy::cast_sign_loss
+    )]
+    {
+        let nanos = duration.seconds - duration.seconds as NSTDInt64 as NSTDFloat64;
+        match nanos >= 0.0 {
+            true => (nanos * NANOS_IN_SEC) as _,
+            false => (nanos * -NANOS_IN_SEC) as _,
+        }
     }
 }
 

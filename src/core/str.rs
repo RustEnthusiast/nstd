@@ -68,7 +68,7 @@ pub struct NSTDStr {
     len: NSTDUInt,
 }
 impl NSTDStr {
-    /// Creates a new [NSTDStr] from a Rust [&str].
+    /// Creates a new [`NSTDStr`] from a Rust [&str].
     #[inline]
     #[allow(dead_code)]
     pub(crate) const fn from_str(str: &str) -> Self {
@@ -78,7 +78,7 @@ impl NSTDStr {
         }
     }
 
-    /// Creates a Rust string slice from this [NSTDStr].
+    /// Creates a Rust string slice from this [`NSTDStr`].
     ///
     /// # Safety
     ///
@@ -506,10 +506,10 @@ pub const fn nstd_core_str_byte_len(str: &NSTDStr) -> NSTDUInt {
 #[inline]
 #[nstdapi]
 pub unsafe fn nstd_core_str_get(str: &NSTDStr, pos: NSTDUInt) -> NSTDOptionalUnichar {
-    match str.as_str().chars().nth(pos) {
-        Some(chr) => NSTDOptional::Some(chr.into()),
-        _ => NSTDOptional::None,
-    }
+    str.as_str()
+        .chars()
+        .nth(pos)
+        .map_or(NSTDOptional::None, |chr| NSTDOptional::Some(chr.into()))
 }
 
 /// Creates a substring of an existing string slice.
@@ -557,6 +557,7 @@ pub unsafe fn nstd_core_str_get(str: &NSTDStr, pos: NSTDUInt) -> NSTDOptionalUni
 /// }
 /// ```
 #[nstdapi]
+#[allow(clippy::suspicious_operation_groupings)]
 pub const unsafe fn nstd_core_str_substr(str: &NSTDStr, range: NSTDURange) -> NSTDOptionalStr {
     // Make sure the range is valid for the bounds of `str`.
     assert!(range.start <= range.end && range.end <= str.len);
@@ -828,7 +829,7 @@ pub struct NSTDStrMut {
     len: NSTDUInt,
 }
 impl NSTDStrMut {
-    /// Creates a Rust string slice from this [NSTDStrMut].
+    /// Creates a Rust string slice from this [`NSTDStrMut`].
     ///
     /// # Safety
     ///
@@ -1279,10 +1280,10 @@ pub const fn nstd_core_str_mut_byte_len(str: &NSTDStrMut) -> NSTDUInt {
 #[inline]
 #[nstdapi]
 pub unsafe fn nstd_core_str_mut_get(str: &NSTDStrMut, pos: NSTDUInt) -> NSTDOptionalUnichar {
-    match str.as_str().chars().nth(pos) {
-        Some(chr) => NSTDOptional::Some(chr.into()),
-        _ => NSTDOptional::None,
-    }
+    str.as_str()
+        .chars()
+        .nth(pos)
+        .map_or(NSTDOptional::None, |chr| NSTDOptional::Some(chr.into()))
 }
 
 /// Creates a substring of an existing string slice.
@@ -1332,6 +1333,7 @@ pub unsafe fn nstd_core_str_mut_get(str: &NSTDStrMut, pos: NSTDUInt) -> NSTDOpti
 /// }
 /// ```
 #[nstdapi]
+#[allow(clippy::suspicious_operation_groupings)]
 pub unsafe fn nstd_core_str_mut_substr(
     str: &mut NSTDStrMut,
     range: NSTDURange,

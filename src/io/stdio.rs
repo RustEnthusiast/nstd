@@ -73,7 +73,7 @@ pub(crate) unsafe fn read<R: Read>(stream: &mut R, buffer: &mut NSTDSliceMut) ->
     }
 }
 
-/// Extends an [NSTDVec] with data from a [Read] stream until EOF is reached.
+/// Extends an [`NSTDVec`] with data from a [Read] stream until EOF is reached.
 ///
 /// # Note
 ///
@@ -101,7 +101,7 @@ pub(crate) fn read_all<R: Read>(stream: &mut R, buffer: &mut NSTDVec<'_>) -> NST
     }
 }
 
-/// Extends an [NSTDString] with UTF-8 data from a [Read] stream until EOF is reached.
+/// Extends an [`NSTDString`] with UTF-8 data from a [Read] stream until EOF is reached.
 ///
 /// # Note
 ///

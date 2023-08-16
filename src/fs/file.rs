@@ -70,10 +70,10 @@ pub unsafe fn nstd_fs_file_open(name: &NSTDStr, mask: NSTDUInt8) -> NSTDFileResu
         .truncate((mask & NSTD_FILE_TRUNC) != 0)
         .open(name.as_str())
     {
-        Ok(f) => match CBox::new(f) {
-            Some(f) => NSTDResult::Ok(NSTDFile { f }),
-            _ => NSTDResult::Err(NSTDIOError::NSTD_IO_ERROR_OUT_OF_MEMORY),
-        },
+        Ok(f) => CBox::new(f).map_or(
+            NSTDResult::Err(NSTDIOError::NSTD_IO_ERROR_OUT_OF_MEMORY),
+            |f| NSTDResult::Ok(NSTDFile { f }),
+        ),
         Err(err) => NSTDResult::Err(NSTDIOError::from_err(err.kind())),
     }
 }
@@ -265,5 +265,9 @@ pub unsafe fn nstd_fs_file_read_exact(
 /// - `NSTDFile file` - The file handle to close.
 #[inline]
 #[nstdapi]
-#[allow(unused_variables)]
+#[allow(
+    unused_variables,
+    clippy::missing_const_for_fn,
+    clippy::needless_pass_by_value
+)]
 pub fn nstd_fs_file_close(file: NSTDFile) {}

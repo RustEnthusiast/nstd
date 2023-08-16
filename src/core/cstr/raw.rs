@@ -28,7 +28,7 @@ use nstdapi::nstdapi;
 /// ```
 #[inline]
 #[nstdapi]
-#[allow(unused_mut)]
+#[allow(unused_mut, clippy::missing_const_for_fn)]
 pub unsafe fn nstd_core_cstr_raw_len(mut cstr: *const NSTDChar) -> NSTDUInt {
     cfg_if! {
         if #[cfg(all(
@@ -180,7 +180,7 @@ pub unsafe fn nstd_core_cstr_raw_compare(
 /// ```
 #[inline]
 #[nstdapi]
-#[allow(unused_mut)]
+#[allow(clippy::missing_const_for_fn)]
 pub unsafe fn nstd_core_cstr_raw_copy(mut dest: *mut NSTDChar, mut src: *const NSTDChar) {
     while *src != 0 {
         *dest = *src;
@@ -226,7 +226,7 @@ pub unsafe fn nstd_core_cstr_raw_copy(mut dest: *mut NSTDChar, mut src: *const N
 /// ```
 #[inline]
 #[nstdapi]
-#[allow(unused_mut)]
+#[allow(unused_mut, clippy::missing_const_for_fn)]
 pub unsafe fn nstd_core_cstr_raw_copy_with_null(mut dest: *mut NSTDChar, mut src: *const NSTDChar) {
     cfg_if! {
         if #[cfg(all(

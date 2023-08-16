@@ -36,14 +36,14 @@ pub struct NSTDVec<'a> {
     cap: NSTDUInt,
 }
 impl<'a> NSTDVec<'a> {
-    /// Creates a new [NSTDVec] from a Rust [Vec].
+    /// Creates a new [`NSTDVec`] from a Rust [Vec].
     #[allow(dead_code)]
     pub(crate) fn from_vec<T>(vec: Vec<T>) -> NSTDVec<'a> {
         let cap = vec.capacity();
         let data = vec.leak();
         NSTDVec {
             allocator: &GLOBAL_ALLOCATOR,
-            ptr: data.as_ptr() as _,
+            ptr: data.as_mut_ptr().cast(),
             stride: core::mem::size_of::<T>(),
             len: data.len(),
             cap,
@@ -52,7 +52,7 @@ impl<'a> NSTDVec<'a> {
 
     /// Checks if the vector's capacity is greater than 0.
     #[inline]
-    fn has_allocated(&self) -> NSTDBool {
+    const fn has_allocated(&self) -> NSTDBool {
         self.cap > 0
     }
 
@@ -106,7 +106,7 @@ impl<'a> NSTDVec<'a> {
     }
 }
 impl Drop for NSTDVec<'_> {
-    /// [NSTDVec]'s destructor.
+    /// [`NSTDVec`]'s destructor.
     #[inline]
     fn drop(&mut self) {
         let buffer_len = self.buffer_byte_len();
@@ -117,11 +117,11 @@ impl Drop for NSTDVec<'_> {
     }
 }
 impl<A> FromIterator<A> for NSTDVec<'_> {
-    /// Creates a new [NSTDVec] from an iterator.
+    /// Creates a new [`NSTDVec`] from an iterator.
     ///
     /// # Note
     ///
-    /// Each value will need to be dropped manually, as [NSTDVec] does not automatically drop it's
+    /// Each value will need to be dropped manually, as [`NSTDVec`] does not automatically drop it's
     /// contents.
     ///
     /// # Panics
@@ -452,7 +452,7 @@ pub const fn nstd_vec_reserved(vec: &NSTDVec<'_>) -> NSTDUInt {
 /// `NSTDSlice slice` - An *immutable* view into the vector.
 #[inline]
 #[nstdapi]
-pub fn nstd_vec_as_slice(vec: &NSTDVec<'_>) -> NSTDSlice {
+pub const fn nstd_vec_as_slice(vec: &NSTDVec<'_>) -> NSTDSlice {
     // SAFETY: `vec.ptr` is checked, vector lengths are never greater than `NSTDInt`'s max value.
     unsafe { nstd_core_slice_new_unchecked(vec.ptr, vec.stride, vec.len) }
 }
@@ -517,7 +517,7 @@ pub fn nstd_vec_as_ptr_mut(vec: &mut NSTDVec<'_>) -> NSTDAnyMut {
 /// `NSTDAny end` - A pointer to the end of the vector.
 #[inline]
 #[nstdapi]
-pub fn nstd_vec_end(vec: &NSTDVec<'_>) -> NSTDAny {
+pub const fn nstd_vec_end(vec: &NSTDVec<'_>) -> NSTDAny {
     // SAFETY: `len` is within the bounds of the vector and does not overflow `isize`.
     unsafe { vec.ptr.add(vec.byte_len()) }
 }
@@ -1008,19 +1008,8 @@ pub fn nstd_vec_reserve(vec: &mut NSTDVec<'_>, size: NSTDUInt) -> NSTDAllocError
         vec.cap += size;
         return NSTD_ALLOC_ERROR_NONE;
     }
-    // Checking if the vector is null and needs to make it's first allocation.
-    if !vec.has_allocated() {
-        // SAFETY: `bytes_to_alloc` is above 0.
-        let mem = unsafe { (vec.allocator.allocate)(vec.allocator.state, bytes_to_alloc) };
-        if !mem.is_null() {
-            vec.ptr = mem;
-            vec.cap = size;
-            return NSTD_ALLOC_ERROR_NONE;
-        }
-        NSTDAllocError::NSTD_ALLOC_ERROR_OUT_OF_MEMORY
-    }
-    // Otherwise increase the vector's capacity.
-    else {
+    // Check if the vector has allocated.
+    if vec.has_allocated() {
         // This can't be 0 because the vector is non-null.
         // After an nstd vector has allocated it will always have at least one value allocated.
         // An example of this behavior can be seen in `nstd_vec_shrink`.
@@ -1035,6 +1024,15 @@ pub fn nstd_vec_reserve(vec: &mut NSTDVec<'_>, size: NSTDUInt) -> NSTDAllocError
             vec.cap += size;
         }
         errc
+    } else {
+        // SAFETY: `bytes_to_alloc` is above 0.
+        let mem = unsafe { (vec.allocator.allocate)(vec.allocator.state, bytes_to_alloc) };
+        if !mem.is_null() {
+            vec.ptr = mem;
+            vec.cap = size;
+            return NSTD_ALLOC_ERROR_NONE;
+        }
+        NSTDAllocError::NSTD_ALLOC_ERROR_OUT_OF_MEMORY
     }
 }
 
@@ -1089,7 +1087,11 @@ pub fn nstd_vec_clear(vec: &mut NSTDVec<'_>) {
 /// - `NSTDVec vec` - The vector to free.
 #[inline]
 #[nstdapi]
-#[allow(unused_variables)]
+#[allow(
+    unused_variables,
+    clippy::missing_const_for_fn,
+    clippy::needless_pass_by_value
+)]
 pub fn nstd_vec_free(vec: NSTDVec<'_>) {}
 
 /// Frees an instance of `NSTDVec` after invoking `callback` with each of the vector's elements.

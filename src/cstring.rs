@@ -84,7 +84,7 @@ pub fn nstd_cstring_new_with_cap(
     let mut bytes = nstd_vec_new_with_cap(allocator, 1, cap);
     let nul: NSTDChar = 0;
     // SAFETY: `nul` is stored on the stack.
-    match unsafe { nstd_vec_push(&mut bytes, addr_of!(nul) as _) } {
+    match unsafe { nstd_vec_push(&mut bytes, addr_of!(nul).cast()) } {
         NSTDAllocError::NSTD_ALLOC_ERROR_NONE => NSTDOptional::Some(NSTDCString { bytes }),
         _ => NSTDOptional::None,
     }
@@ -160,7 +160,7 @@ pub unsafe fn nstd_cstring_from_cstr_unchecked<'a>(
     let bytes = nstd_core_cstr_as_bytes(cstr);
     if let NSTDOptional::Some(mut bytes) = nstd_vec_from_slice(allocator, &bytes) {
         let null: NSTDChar = 0;
-        let null = addr_of!(null) as _;
+        let null = addr_of!(null).cast();
         if nstd_vec_push(&mut bytes, null) == NSTDAllocError::NSTD_ALLOC_ERROR_NONE {
             return NSTDOptional::Some(NSTDCString { bytes });
         }
@@ -185,7 +185,7 @@ pub unsafe fn nstd_cstring_from_cstr_unchecked<'a>(
 #[nstdapi]
 pub fn nstd_cstring_from_bytes(bytes: NSTDVec<'_>) -> NSTDOptionalCString<'_> {
     assert!(nstd_vec_stride(&bytes) == 1);
-    let ptr = nstd_vec_as_ptr(&bytes) as *const NSTDChar;
+    let ptr = nstd_vec_as_ptr(&bytes).cast();
     // SAFETY: `ptr` is non-null, vector length's can never be greater than `NSTDInt`'s max value.
     let cstr = unsafe { nstd_core_cstr_new_unchecked(ptr, nstd_vec_len(&bytes)) };
     // SAFETY: `cstr`'s data is owned by `bytes`.
@@ -210,7 +210,7 @@ pub fn nstd_cstring_from_bytes(bytes: NSTDVec<'_>) -> NSTDOptionalCString<'_> {
 pub fn nstd_cstring_clone<'a>(cstring: &NSTDCString<'a>) -> NSTDOptionalCString<'a> {
     match nstd_vec_clone(&cstring.bytes) {
         NSTDOptional::Some(bytes) => NSTDOptional::Some(NSTDCString { bytes }),
-        _ => NSTDOptional::None,
+        NSTDOptional::None => NSTDOptional::None,
     }
 }
 
@@ -225,7 +225,7 @@ pub fn nstd_cstring_clone<'a>(cstring: &NSTDCString<'a>) -> NSTDOptionalCString<
 /// `const NSTDAllocator *allocator` - The C string's allocator.
 #[inline]
 #[nstdapi]
-pub fn nstd_cstring_allocator<'a>(cstring: &NSTDCString<'a>) -> &'a NSTDAllocator {
+pub const fn nstd_cstring_allocator<'a>(cstring: &NSTDCString<'a>) -> &'a NSTDAllocator {
     nstd_vec_allocator(&cstring.bytes)
 }
 
@@ -239,11 +239,11 @@ pub fn nstd_cstring_allocator<'a>(cstring: &NSTDCString<'a>) -> &'a NSTDAllocato
 ///
 /// `NSTDCStr cstr` - The new C string slice.
 #[nstdapi]
-pub fn nstd_cstring_as_cstr(cstring: &NSTDCString<'_>) -> NSTDCStr {
+pub const fn nstd_cstring_as_cstr(cstring: &NSTDCString<'_>) -> NSTDCStr {
     let ptr = nstd_vec_as_ptr(&cstring.bytes);
     let len = nstd_vec_len(&cstring.bytes);
     // SAFETY: `ptr` is never null, owned C strings can never be longer than `NSTDInt`'s max value.
-    unsafe { nstd_core_cstr_new_unchecked(ptr as _, len) }
+    unsafe { nstd_core_cstr_new_unchecked(ptr.cast(), len) }
 }
 
 /// Returns an immutable byte slice of the C string's active data, including the null byte.
@@ -257,7 +257,7 @@ pub fn nstd_cstring_as_cstr(cstring: &NSTDCString<'_>) -> NSTDCStr {
 /// `NSTDSlice bytes` - The C string's active data.
 #[inline]
 #[nstdapi]
-pub fn nstd_cstring_as_bytes(cstring: &NSTDCString<'_>) -> NSTDSlice {
+pub const fn nstd_cstring_as_bytes(cstring: &NSTDCString<'_>) -> NSTDSlice {
     nstd_vec_as_slice(&cstring.bytes)
 }
 
@@ -272,7 +272,7 @@ pub fn nstd_cstring_as_bytes(cstring: &NSTDCString<'_>) -> NSTDSlice {
 /// `const NSTDChar *ptr` - A raw pointer to a C string's memory.
 #[inline]
 #[nstdapi]
-pub fn nstd_cstring_as_ptr(cstring: &NSTDCString<'_>) -> *const NSTDChar {
+pub const fn nstd_cstring_as_ptr(cstring: &NSTDCString<'_>) -> *const NSTDChar {
     nstd_vec_as_ptr(&cstring.bytes).cast()
 }
 
@@ -287,6 +287,7 @@ pub fn nstd_cstring_as_ptr(cstring: &NSTDCString<'_>) -> *const NSTDChar {
 /// `NSTDVec bytes` - The C string's raw data.
 #[inline]
 #[nstdapi]
+#[allow(clippy::missing_const_for_fn)]
 pub fn nstd_cstring_into_bytes(cstring: NSTDCString<'_>) -> NSTDVec<'_> {
     cstring.bytes
 }
@@ -302,7 +303,7 @@ pub fn nstd_cstring_into_bytes(cstring: NSTDCString<'_>) -> NSTDVec<'_> {
 /// `NSTDUInt len` - The length of the C string without it's null byte.
 #[inline]
 #[nstdapi]
-pub fn nstd_cstring_len(cstring: &NSTDCString<'_>) -> NSTDUInt {
+pub const fn nstd_cstring_len(cstring: &NSTDCString<'_>) -> NSTDUInt {
     nstd_vec_len(&cstring.bytes) - 1
 }
 
@@ -317,7 +318,7 @@ pub fn nstd_cstring_len(cstring: &NSTDCString<'_>) -> NSTDUInt {
 /// `NSTDUInt len` - The length of the C string including it's null byte.
 #[inline]
 #[nstdapi]
-pub fn nstd_cstring_len_with_null(cstring: &NSTDCString<'_>) -> NSTDUInt {
+pub const fn nstd_cstring_len_with_null(cstring: &NSTDCString<'_>) -> NSTDUInt {
     nstd_vec_len(&cstring.bytes)
 }
 
@@ -334,7 +335,7 @@ pub fn nstd_cstring_len_with_null(cstring: &NSTDCString<'_>) -> NSTDUInt {
 /// `NSTDUInt cap` - The C string's capacity.
 #[inline]
 #[nstdapi]
-pub fn nstd_cstring_cap(cstring: &NSTDCString<'_>) -> NSTDUInt {
+pub const fn nstd_cstring_cap(cstring: &NSTDCString<'_>) -> NSTDUInt {
     nstd_vec_cap(&cstring.bytes)
 }
 
@@ -373,7 +374,7 @@ pub fn nstd_cstring_push(cstring: &mut NSTDCString<'_>, chr: NSTDChar) -> NSTDAl
         unsafe {
             // Push a new null byte onto the end of the C string.
             let nul: NSTDChar = 0;
-            let errc = nstd_vec_push(&mut cstring.bytes, addr_of!(nul) as _);
+            let errc = nstd_vec_push(&mut cstring.bytes, addr_of!(nul).cast());
             if errc != NSTDAllocError::NSTD_ALLOC_ERROR_NONE {
                 return errc;
             }
@@ -507,5 +508,9 @@ pub fn nstd_cstring_clear(cstring: &mut NSTDCString<'_>) {
 /// - `NSTDCString cstring` - The C string to free.
 #[inline]
 #[nstdapi]
-#[allow(unused_variables)]
+#[allow(
+    unused_variables,
+    clippy::missing_const_for_fn,
+    clippy::needless_pass_by_value
+)]
 pub fn nstd_cstring_free(cstring: NSTDCString<'_>) {}

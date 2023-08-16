@@ -28,7 +28,7 @@ impl From<NSTDUnichar> for char {
     #[inline]
     fn from(value: NSTDUnichar) -> Self {
         // SAFETY: `value` is always a valid Unicode scalar value.
-        unsafe { char::from_u32_unchecked(value.value) }
+        unsafe { Self::from_u32_unchecked(value.value) }
     }
 }
 gen_optional!(NSTDOptionalUnichar, NSTDUnichar);

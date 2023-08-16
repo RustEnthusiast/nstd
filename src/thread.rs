@@ -151,10 +151,9 @@ pub unsafe fn nstd_thread_spawn(
 #[inline]
 #[nstdapi]
 pub fn nstd_thread_current() -> NSTDOptionalThreadHandle {
-    match CBox::new(std::thread::current()) {
-        Some(handle) => NSTDOptional::Some(NSTDThreadHandle { handle }),
-        _ => NSTDOptional::None,
-    }
+    CBox::new(std::thread::current()).map_or(NSTDOptional::None, |handle| {
+        NSTDOptional::Some(NSTDThreadHandle { handle })
+    })
 }
 
 /// Retrieves a raw handle to a thread.
@@ -170,10 +169,9 @@ pub fn nstd_thread_current() -> NSTDOptionalThreadHandle {
 #[inline]
 #[nstdapi]
 pub fn nstd_thread_handle(thread: &NSTDThread) -> NSTDOptionalThreadHandle {
-    match CBox::new(thread.thread.thread().clone()) {
-        Some(handle) => NSTDOptional::Some(NSTDThreadHandle { handle }),
-        _ => NSTDOptional::None,
-    }
+    CBox::new(thread.thread.thread().clone()).map_or(NSTDOptional::None, |handle| {
+        NSTDOptional::Some(NSTDThreadHandle { handle })
+    })
 }
 
 /// Checks if a thread has finished running.
@@ -208,10 +206,11 @@ pub fn nstd_thread_is_finished(thread: &NSTDThread) -> NSTDBool {
 #[inline]
 #[nstdapi]
 pub unsafe fn nstd_thread_join(thread: NSTDThread) -> NSTDOptionalThreadResult {
-    match thread.thread.into_inner().join() {
-        Ok(errc) => NSTDOptional::Some(errc),
-        _ => NSTDOptional::None,
-    }
+    thread
+        .thread
+        .into_inner()
+        .join()
+        .map_or(NSTDOptional::None, NSTDOptional::Some)
 }
 
 /// Detaches a thread from it's handle, allowing it to run in the background.
@@ -221,7 +220,11 @@ pub unsafe fn nstd_thread_join(thread: NSTDThread) -> NSTDOptionalThreadResult {
 /// - `NSTDThread thread` - The thread handle.
 #[inline]
 #[nstdapi]
-#[allow(unused_variables)]
+#[allow(
+    unused_variables,
+    clippy::missing_const_for_fn,
+    clippy::needless_pass_by_value
+)]
 pub fn nstd_thread_detach(thread: NSTDThread) {}
 
 /// Returns the name of a thread.
@@ -236,10 +239,9 @@ pub fn nstd_thread_detach(thread: NSTDThread) {}
 #[inline]
 #[nstdapi]
 pub fn nstd_thread_name(handle: &NSTDThreadHandle) -> NSTDOptionalStr {
-    match handle.handle.name() {
-        Some(name) => NSTDOptional::Some(NSTDStr::from_str(name)),
-        _ => NSTDOptional::None,
-    }
+    handle.handle.name().map_or(NSTDOptional::None, |name| {
+        NSTDOptional::Some(NSTDStr::from_str(name))
+    })
 }
 
 /// Returns a thread's unique identifier.
@@ -255,10 +257,9 @@ pub fn nstd_thread_name(handle: &NSTDThreadHandle) -> NSTDOptionalStr {
 #[inline]
 #[nstdapi]
 pub fn nstd_thread_id(handle: &NSTDThreadHandle) -> NSTDOptionalThreadID {
-    match CBox::new(handle.handle.id()) {
-        Some(id) => NSTDOptional::Some(NSTDThreadID { id }),
-        _ => NSTDOptional::None,
-    }
+    CBox::new(handle.handle.id()).map_or(NSTDOptional::None, |id| {
+        NSTDOptional::Some(NSTDThreadID { id })
+    })
 }
 
 /// Frees an instance of `NSTDThreadHandle`.
@@ -268,7 +269,11 @@ pub fn nstd_thread_id(handle: &NSTDThreadHandle) -> NSTDOptionalThreadID {
 /// - `NSTDThreadHandle handle` - The handle to free.
 #[inline]
 #[nstdapi]
-#[allow(unused_variables)]
+#[allow(
+    unused_variables,
+    clippy::missing_const_for_fn,
+    clippy::needless_pass_by_value
+)]
 pub fn nstd_thread_handle_free(handle: NSTDThreadHandle) {}
 
 /// Puts the current thread to sleep for a specified duration.
@@ -308,6 +313,7 @@ pub fn nstd_thread_count() -> NSTDThreadCountResult {
 /// `NSTDBool is_panicking` - Determines whether or not the calling thread is panicking.
 #[inline]
 #[nstdapi]
+#[allow(clippy::missing_const_for_fn)]
 pub fn nstd_thread_is_panicking() -> NSTDBool {
     #[cfg(panic = "unwind")]
     return std::thread::panicking();
@@ -328,8 +334,8 @@ pub fn nstd_thread_is_panicking() -> NSTDBool {
 /// `NSTDBool is_eq` - True if the two identifiers refer to the same thread.
 #[inline]
 #[nstdapi]
-pub fn nstd_thread_id_compare(xid: &NSTDThreadID, yid: &NSTDThreadID) -> NSTDBool {
-    *xid.id == *yid.id
+pub fn nstd_thread_id_compare(x_id: &NSTDThreadID, y_id: &NSTDThreadID) -> NSTDBool {
+    *x_id.id == *y_id.id
 }
 
 /// Frees an instance of `NSTDThreadID`.
@@ -339,5 +345,9 @@ pub fn nstd_thread_id_compare(xid: &NSTDThreadID, yid: &NSTDThreadID) -> NSTDBoo
 /// - `NSTDThreadID id` - A thread identifier.
 #[inline]
 #[nstdapi]
-#[allow(unused_variables)]
+#[allow(
+    unused_variables,
+    clippy::missing_const_for_fn,
+    clippy::needless_pass_by_value
+)]
 pub fn nstd_thread_id_free(id: NSTDThreadID) {}

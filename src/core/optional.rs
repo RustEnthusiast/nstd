@@ -35,7 +35,7 @@ impl<T> NSTDOptional<T> {
     pub fn unwrap(self) -> T {
         match self {
             Self::Some(value) => value,
-            _ => panic!("called `NSTDOptional::unwrap()` on a `None` value"),
+            Self::None => panic!("called `NSTDOptional::unwrap()` on a `None` value"),
         }
     }
 
@@ -48,7 +48,7 @@ impl<T> NSTDOptional<T> {
     pub fn expect(self, msg: &str) -> T {
         match self {
             Self::Some(value) => value,
-            _ => panic!("{msg}"),
+            Self::None => panic!("{msg}"),
         }
     }
 }

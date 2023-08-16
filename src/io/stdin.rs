@@ -33,10 +33,9 @@ gen_optional!(NSTDOptionalStdin, NSTDStdin);
 #[inline]
 #[nstdapi]
 pub fn nstd_io_stdin() -> NSTDOptionalStdin {
-    match CBox::new(std::io::stdin()) {
-        Some(r#in) => NSTDOptional::Some(NSTDStdin { r#in }),
-        _ => NSTDOptional::None,
-    }
+    CBox::new(std::io::stdin()).map_or(NSTDOptional::None, |r#in| {
+        NSTDOptional::Some(NSTDStdin { r#in })
+    })
 }
 
 /// Reads some data from stdin into a byte slice buffer.
@@ -206,7 +205,11 @@ pub fn nstd_io_stdin_read_line(
 /// - `NSTDStdin handle` - A handle to the standard input stream.
 #[inline]
 #[nstdapi]
-#[allow(unused_variables)]
+#[allow(
+    unused_variables,
+    clippy::missing_const_for_fn,
+    clippy::needless_pass_by_value
+)]
 pub fn nstd_io_stdin_free(handle: NSTDStdin) {}
 
 /// A locked handle to the standard input stream.
@@ -226,10 +229,9 @@ gen_optional!(NSTDOptionalStdinLock, NSTDStdinLock);
 #[inline]
 #[nstdapi]
 pub fn nstd_io_stdin_lock() -> NSTDOptionalStdinLock {
-    match CBox::new(std::io::stdin().lock()) {
-        Some(r#in) => NSTDOptional::Some(NSTDStdinLock { r#in }),
-        _ => NSTDOptional::None,
-    }
+    CBox::new(std::io::stdin().lock()).map_or(NSTDOptional::None, |r#in| {
+        NSTDOptional::Some(NSTDStdinLock { r#in })
+    })
 }
 
 /// Reads some data from stdin into a byte slice buffer.
@@ -368,5 +370,9 @@ pub unsafe fn nstd_io_stdin_lock_read_exact(
 /// - `NSTDStdinLock handle` - A locked handle to the standard input stream.
 #[inline]
 #[nstdapi]
-#[allow(unused_variables)]
+#[allow(
+    unused_variables,
+    clippy::missing_const_for_fn,
+    clippy::needless_pass_by_value
+)]
 pub fn nstd_io_stdin_unlock(handle: NSTDStdinLock) {}

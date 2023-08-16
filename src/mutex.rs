@@ -51,10 +51,9 @@ pub type NSTDOptionalMutexLockResult<'m, 'a> = NSTDOptional<NSTDMutexLockResult<
 #[inline]
 #[nstdapi]
 pub fn nstd_mutex_new(data: NSTDHeapPtr<'_>) -> NSTDOptionalMutex<'_> {
-    match CBox::new(Mutex::new(data)) {
-        Some(mtx) => NSTDOptional::Some(NSTDMutex { mtx }),
-        _ => NSTDOptional::None,
-    }
+    CBox::new(Mutex::new(data)).map_or(NSTDOptional::None, |mtx| {
+        NSTDOptional::Some(NSTDMutex { mtx })
+    })
 }
 
 /// Determines whether or not a mutex's data is poisoned.
@@ -95,14 +94,12 @@ pub fn nstd_mutex_is_poisoned(mutex: &NSTDMutex<'_>) -> NSTDBool {
 #[nstdapi]
 pub fn nstd_mutex_lock<'m, 'a>(mutex: &'m NSTDMutex<'a>) -> NSTDOptionalMutexLockResult<'m, 'a> {
     match mutex.mtx.lock() {
-        Ok(guard) => match CBox::new(guard) {
-            Some(guard) => NSTDOptional::Some(NSTDResult::Ok(NSTDMutexGuard { guard })),
-            _ => NSTDOptional::None,
-        },
-        Err(err) => match CBox::new(err.into_inner()) {
-            Some(guard) => NSTDOptional::Some(NSTDResult::Err(NSTDMutexGuard { guard })),
-            _ => NSTDOptional::None,
-        },
+        Ok(guard) => CBox::new(guard).map_or(NSTDOptional::None, |guard| {
+            NSTDOptional::Some(NSTDResult::Ok(NSTDMutexGuard { guard }))
+        }),
+        Err(err) => CBox::new(err.into_inner()).map_or(NSTDOptional::None, |guard| {
+            NSTDOptional::Some(NSTDResult::Err(NSTDMutexGuard { guard }))
+        }),
     }
 }
 
@@ -121,16 +118,15 @@ pub fn nstd_mutex_try_lock<'m, 'a>(
     mutex: &'m NSTDMutex<'a>,
 ) -> NSTDOptionalMutexLockResult<'m, 'a> {
     match mutex.mtx.try_lock() {
-        Ok(guard) => match CBox::new(guard) {
-            Some(guard) => NSTDOptional::Some(NSTDResult::Ok(NSTDMutexGuard { guard })),
-            _ => NSTDOptional::None,
-        },
+        Ok(guard) => CBox::new(guard).map_or(NSTDOptional::None, |guard| {
+            NSTDOptional::Some(NSTDResult::Ok(NSTDMutexGuard { guard }))
+        }),
         Err(err) => match err {
             TryLockError::WouldBlock => NSTDOptional::None,
-            TryLockError::Poisoned(err) => match CBox::new(err.into_inner()) {
-                Some(guard) => NSTDOptional::Some(NSTDResult::Err(NSTDMutexGuard { guard })),
-                _ => NSTDOptional::None,
-            },
+            TryLockError::Poisoned(err) => CBox::new(err.into_inner())
+                .map_or(NSTDOptional::None, |guard| {
+                    NSTDOptional::Some(NSTDResult::Err(NSTDMutexGuard { guard }))
+                }),
         },
     }
 }
@@ -178,10 +174,11 @@ pub fn nstd_mutex_get_mut(guard: &mut NSTDMutexGuard<'_, '_>) -> NSTDAnyMut {
 #[inline]
 #[nstdapi]
 pub fn nstd_mutex_into_inner(mutex: NSTDMutex<'_>) -> NSTDOptionalHeapPtr<'_> {
-    match mutex.mtx.into_inner().into_inner() {
-        Ok(data) => NSTDOptional::Some(data),
-        _ => NSTDOptional::None,
-    }
+    mutex
+        .mtx
+        .into_inner()
+        .into_inner()
+        .map_or(NSTDOptional::None, NSTDOptional::Some)
 }
 
 /// Unlocks a mutex by consuming a mutex guard.
@@ -191,7 +188,11 @@ pub fn nstd_mutex_into_inner(mutex: NSTDMutex<'_>) -> NSTDOptionalHeapPtr<'_> {
 /// - `NSTDMutexGuard guard` - The mutex guard.
 #[inline]
 #[nstdapi]
-#[allow(unused_variables)]
+#[allow(
+    unused_variables,
+    clippy::missing_const_for_fn,
+    clippy::needless_pass_by_value
+)]
 pub fn nstd_mutex_unlock(guard: NSTDMutexGuard<'_, '_>) {}
 
 /// Frees an instance of `NSTDMutex`.
@@ -201,7 +202,11 @@ pub fn nstd_mutex_unlock(guard: NSTDMutexGuard<'_, '_>) {}
 /// - `NSTDMutex mutex` - The mutex to free.
 #[inline]
 #[nstdapi]
-#[allow(unused_variables)]
+#[allow(
+    unused_variables,
+    clippy::missing_const_for_fn,
+    clippy::needless_pass_by_value
+)]
 pub fn nstd_mutex_free(mutex: NSTDMutex<'_>) {}
 
 /// Frees an instance of `NSTDMutex` after invoking `callback` with the mutex's data.

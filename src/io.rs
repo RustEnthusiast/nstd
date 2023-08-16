@@ -5,7 +5,14 @@ pub(crate) mod stdio;
 pub mod stdout;
 #[cfg(unix)]
 use crate::os::unix::io::{
-    NSTDUnixIOError::{self, *},
+    NSTDUnixIOError::{
+        self, NSTD_UNIX_IO_ERROR_BLOCKING, NSTD_UNIX_IO_ERROR_BROKEN_PIPE,
+        NSTD_UNIX_IO_ERROR_CONNECTION_RESET, NSTD_UNIX_IO_ERROR_INTERRUPTED,
+        NSTD_UNIX_IO_ERROR_INVALID_DATA, NSTD_UNIX_IO_ERROR_INVALID_INPUT, NSTD_UNIX_IO_ERROR_NONE,
+        NSTD_UNIX_IO_ERROR_NOT_FOUND, NSTD_UNIX_IO_ERROR_NO_CONNECTION,
+        NSTD_UNIX_IO_ERROR_OUT_OF_MEMORY, NSTD_UNIX_IO_ERROR_PERMISSION_DENIED,
+        NSTD_UNIX_IO_ERROR_TIMED_OUT, NSTD_UNIX_IO_ERROR_UNEXPECTED_EOF,
+    },
     NSTDUnixIOResult,
 };
 use crate::{
@@ -66,35 +73,35 @@ pub enum NSTDIOError {
     NSTD_IO_ERROR_OUT_OF_MEMORY,
 }
 impl NSTDIOError {
-    /// Creates a new instance of [NSTDIOError] from a Rust [ErrorKind].
-    pub(crate) fn from_err(err: ErrorKind) -> Self {
+    /// Creates a new instance of [`NSTDIOError`] from a Rust [`ErrorKind`].
+    pub(crate) const fn from_err(err: ErrorKind) -> Self {
         match err {
-            ErrorKind::NotFound => NSTDIOError::NSTD_IO_ERROR_NOT_FOUND,
-            ErrorKind::PermissionDenied => NSTDIOError::NSTD_IO_ERROR_PERMISSION_DENIED,
-            ErrorKind::ConnectionRefused => NSTDIOError::NSTD_IO_ERROR_CONNECTION_REFUSED,
-            ErrorKind::ConnectionReset => NSTDIOError::NSTD_IO_ERROR_CONNECTION_RESET,
-            ErrorKind::ConnectionAborted => NSTDIOError::NSTD_IO_ERROR_CONNECTION_TERMINATED,
-            ErrorKind::NotConnected => NSTDIOError::NSTD_IO_ERROR_NO_CONNECTION,
-            ErrorKind::AddrInUse => NSTDIOError::NSTD_IO_ERROR_SOCKET_IN_USE,
-            ErrorKind::AddrNotAvailable => NSTDIOError::NSTD_IO_ERROR_ADDRESS_NOT_FOUND,
-            ErrorKind::BrokenPipe => NSTDIOError::NSTD_IO_ERROR_BROKEN_PIPE,
-            ErrorKind::AlreadyExists => NSTDIOError::NSTD_IO_ERROR_ALREADY_EXISTS,
-            ErrorKind::WouldBlock => NSTDIOError::NSTD_IO_ERROR_BLOCKING,
-            ErrorKind::InvalidInput => NSTDIOError::NSTD_IO_ERROR_INVALID_INPUT,
-            ErrorKind::InvalidData => NSTDIOError::NSTD_IO_ERROR_INVALID_DATA,
-            ErrorKind::TimedOut => NSTDIOError::NSTD_IO_ERROR_TIMED_OUT,
-            ErrorKind::WriteZero => NSTDIOError::NSTD_IO_ERROR_WRITE_ZERO,
-            ErrorKind::Interrupted => NSTDIOError::NSTD_IO_ERROR_INTERRUPTED,
-            ErrorKind::Unsupported => NSTDIOError::NSTD_IO_ERROR_UNSUPPORTED,
-            ErrorKind::UnexpectedEof => NSTDIOError::NSTD_IO_ERROR_UNEXPECTED_EOF,
-            ErrorKind::OutOfMemory => NSTDIOError::NSTD_IO_ERROR_OUT_OF_MEMORY,
-            _ => NSTDIOError::NSTD_IO_ERROR_UNKNOWN,
+            ErrorKind::NotFound => Self::NSTD_IO_ERROR_NOT_FOUND,
+            ErrorKind::PermissionDenied => Self::NSTD_IO_ERROR_PERMISSION_DENIED,
+            ErrorKind::ConnectionRefused => Self::NSTD_IO_ERROR_CONNECTION_REFUSED,
+            ErrorKind::ConnectionReset => Self::NSTD_IO_ERROR_CONNECTION_RESET,
+            ErrorKind::ConnectionAborted => Self::NSTD_IO_ERROR_CONNECTION_TERMINATED,
+            ErrorKind::NotConnected => Self::NSTD_IO_ERROR_NO_CONNECTION,
+            ErrorKind::AddrInUse => Self::NSTD_IO_ERROR_SOCKET_IN_USE,
+            ErrorKind::AddrNotAvailable => Self::NSTD_IO_ERROR_ADDRESS_NOT_FOUND,
+            ErrorKind::BrokenPipe => Self::NSTD_IO_ERROR_BROKEN_PIPE,
+            ErrorKind::AlreadyExists => Self::NSTD_IO_ERROR_ALREADY_EXISTS,
+            ErrorKind::WouldBlock => Self::NSTD_IO_ERROR_BLOCKING,
+            ErrorKind::InvalidInput => Self::NSTD_IO_ERROR_INVALID_INPUT,
+            ErrorKind::InvalidData => Self::NSTD_IO_ERROR_INVALID_DATA,
+            ErrorKind::TimedOut => Self::NSTD_IO_ERROR_TIMED_OUT,
+            ErrorKind::WriteZero => Self::NSTD_IO_ERROR_WRITE_ZERO,
+            ErrorKind::Interrupted => Self::NSTD_IO_ERROR_INTERRUPTED,
+            ErrorKind::Unsupported => Self::NSTD_IO_ERROR_UNSUPPORTED,
+            ErrorKind::UnexpectedEof => Self::NSTD_IO_ERROR_UNEXPECTED_EOF,
+            ErrorKind::OutOfMemory => Self::NSTD_IO_ERROR_OUT_OF_MEMORY,
+            _ => Self::NSTD_IO_ERROR_UNKNOWN,
         }
     }
 }
 #[cfg(unix)]
 impl From<NSTDUnixIOError> for NSTDIOError {
-    /// Converts an [NSTDUnixIOError] into an [NSTDIOError].
+    /// Converts an [`NSTDUnixIOError`] into an [`NSTDIOError`].
     fn from(err: NSTDUnixIOError) -> Self {
         match err {
             NSTD_UNIX_IO_ERROR_NONE => Self::NSTD_IO_ERROR_NONE,
@@ -115,12 +122,12 @@ impl From<NSTDUnixIOError> for NSTDIOError {
     }
 }
 
-/// A result type that yields an [NSTDUInt] representing the number of bytes read or written by an
+/// A result type that yields an [`NSTDUInt`] representing the number of bytes read or written by an
 /// I/O operation on success and an I/O operation error code on failure.
 pub type NSTDIOResult = NSTDResult<NSTDUInt, NSTDIOError>;
 #[cfg(unix)]
 impl From<NSTDUnixIOResult> for NSTDIOResult {
-    /// Converts an [NSTDUnixIOResult] into an [NSTDIOResult].
+    /// Converts an [`NSTDUnixIOResult`] into an [`NSTDIOResult`].
     #[inline]
     fn from(value: NSTDUnixIOResult) -> Self {
         match value {
@@ -130,7 +137,7 @@ impl From<NSTDUnixIOResult> for NSTDIOResult {
     }
 }
 
-/// A result type that yields an [NSTDVec] on success and an I/O operation error code on failure.
+/// A result type that yields an [`NSTDVec`] on success and an I/O operation error code on failure.
 pub type NSTDIOBufferResult<'a> = NSTDResult<NSTDVec<'a>, NSTDIOError>;
 
 /// A result type that yields a UTF-8 string on success and an I/O operation error code on failure.

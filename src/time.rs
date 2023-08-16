@@ -18,15 +18,15 @@ cfg_if! {
         /// A structure representing system time since January 1st 1970.
         pub type NSTDTime = NSTDUnixTime;
         impl From<SystemTime> for NSTDTime {
-            /// Converts a [SystemTime] into an [NSTDTime] object.
+            /// Converts a [`SystemTime`] into an [`NSTDTime`] object.
             fn from(value: SystemTime) -> Self {
                 match value.duration_since(UNIX_EPOCH) {
-                    Ok(dur) => NSTDTime::from_duration(
+                    Ok(dur) => Self::from_duration(
                         #[allow(unused_unsafe)]
                         // SAFETY: This operation is safe.
                         unsafe { nstd_core_time_duration_new(dur.as_secs_f64()) },
                     ),
-                    Err(dur) => NSTDTime::from_duration(
+                    Err(dur) => Self::from_duration(
                         #[allow(unused_unsafe)]
                         // SAFETY: This operation is safe.
                         unsafe { nstd_core_time_duration_new(-dur.duration().as_secs_f64()) },
@@ -54,18 +54,18 @@ cfg_if! {
             duration: NSTDDuration,
         }
         impl From<SystemTime> for NSTDTime {
-            /// Converts a [SystemTime] into an [NSTDTime] object.
+            /// Converts a [`SystemTime`] into an [`NSTDTime`] object.
             fn from(value: SystemTime) -> Self {
                 match value.duration_since(UNIX_EPOCH) {
                     #[allow(unused_unsafe)]
-                    Ok(dur) => NSTDTime {
+                    Ok(dur) => Self {
                         // SAFETY: This operation is safe.
                         duration: unsafe {
                             nstd_core_time_duration_new(dur.as_secs_f64())
                         },
                     },
                     #[allow(unused_unsafe)]
-                    Err(dur) => NSTDTime {
+                    Err(dur) => Self {
                         // SAFETY: This operation is safe.
                         duration: unsafe {
                             nstd_core_time_duration_new(-dur.duration().as_secs_f64())
@@ -105,7 +105,7 @@ pub fn nstd_time_now() -> NSTDOptionalTime {
 /// `NSTDFloat64`.
 #[inline]
 #[nstdapi]
-pub fn nstd_time_get(time: NSTDTime) -> NSTDFloat64 {
+pub const fn nstd_time_get(time: NSTDTime) -> NSTDFloat64 {
     #[cfg(unix)]
     return nstd_os_unix_time_get(time);
     #[cfg(not(unix))]
@@ -123,7 +123,7 @@ pub fn nstd_time_get(time: NSTDTime) -> NSTDFloat64 {
 /// `NSTDInt64 seconds` - The number of seconds held in `time`.
 #[inline]
 #[nstdapi]
-pub fn nstd_time_seconds(time: NSTDTime) -> NSTDInt64 {
+pub const fn nstd_time_seconds(time: NSTDTime) -> NSTDInt64 {
     #[cfg(unix)]
     return nstd_os_unix_time_seconds(time);
     #[cfg(not(unix))]

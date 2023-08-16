@@ -214,12 +214,13 @@ pub unsafe fn nstd_os_windows_alloc_reallocate(
 pub unsafe fn nstd_os_windows_alloc_deallocate(ptr: &mut NSTDAnyMut) -> NSTDWindowsAllocError {
     match GetProcessHeap() {
         0 => NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_HEAP_NOT_FOUND,
-        heap => match HeapFree(heap, 0, *ptr) {
-            0 => NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_MEMORY_NOT_FOUND,
-            _ => {
+        heap => {
+            if HeapFree(heap, 0, *ptr) == 0 {
+                NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_MEMORY_NOT_FOUND
+            } else {
                 *ptr = NSTD_NULL;
                 NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_NONE
             }
-        },
+        }
     }
 }

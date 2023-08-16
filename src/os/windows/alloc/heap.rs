@@ -17,7 +17,7 @@ pub struct NSTDWindowsHeap {
     handle: NSTDWindowsHandle,
 }
 impl Drop for NSTDWindowsHeap {
-    /// [NSTDWindowsHeap] destructor.
+    /// [`NSTDWindowsHeap`] destructor.
     #[inline]
     fn drop(&mut self) {
         // SAFETY: `self.handle` may have been acquired through `GetProcessHeap`.
@@ -150,7 +150,7 @@ pub unsafe fn nstd_os_windows_alloc_heap_new(size: NSTDUInt) -> NSTDWindowsHeapR
 /// ```
 #[inline]
 #[nstdapi]
-pub fn nstd_os_windows_alloc_heap_handle(heap: &NSTDWindowsHeap) -> NSTDWindowsHandle {
+pub const fn nstd_os_windows_alloc_heap_handle(heap: &NSTDWindowsHeap) -> NSTDWindowsHandle {
     heap.handle
 }
 
@@ -520,5 +520,9 @@ pub unsafe fn nstd_os_windows_alloc_heap_deallocate(
 /// ```
 #[inline]
 #[nstdapi]
-#[allow(unused_variables)]
+#[allow(
+    unused_variables,
+    clippy::missing_const_for_fn,
+    clippy::needless_pass_by_value
+)]
 pub unsafe fn nstd_os_windows_alloc_heap_free(heap: NSTDWindowsHeap) {}

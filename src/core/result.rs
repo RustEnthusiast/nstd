@@ -30,7 +30,7 @@ impl<T, E> NSTDResult<T, E> {
     pub fn unwrap(self) -> T {
         match self {
             Self::Ok(value) => value,
-            _ => panic!("called `NSTDResult::unwrap()` on an `Err` value"),
+            Self::Err(_) => panic!("called `NSTDResult::unwrap()` on an `Err` value"),
         }
     }
 
@@ -43,7 +43,7 @@ impl<T, E> NSTDResult<T, E> {
     pub fn expect(self, msg: &str) -> T {
         match self {
             Self::Ok(value) => value,
-            _ => panic!("{msg}"),
+            Self::Err(_) => panic!("{msg}"),
         }
     }
 }

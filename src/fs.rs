@@ -317,10 +317,10 @@ pub unsafe fn nstd_fs_copy(from: &NSTDStr, to: &NSTDStr) -> NSTDIOError {
 #[nstdapi]
 pub unsafe fn nstd_fs_absolute(path: &NSTDStr) -> NSTDIOStringResult<'_> {
     match std::fs::canonicalize(path.as_str()) {
-        Ok(path) => match path.into_os_string().into_string() {
-            Ok(path) => NSTDResult::Ok(NSTDString::from_string(path)),
-            _ => NSTDResult::Err(NSTDIOError::NSTD_IO_ERROR_INVALID_DATA),
-        },
+        Ok(path) => path.into_os_string().into_string().map_or(
+            NSTDResult::Err(NSTDIOError::NSTD_IO_ERROR_INVALID_DATA),
+            |path| NSTDResult::Ok(NSTDString::from_string(path)),
+        ),
         Err(err) => NSTDResult::Err(NSTDIOError::from_err(err.kind())),
     }
 }
@@ -363,7 +363,7 @@ pub unsafe fn nstd_fs_metadata(path: &NSTDStr) -> NSTDFileMetadataResult {
                     NSTDFileType::NSTD_FILE_TYPE_UNKNOWN
                 }
             },
-            permissions: metadata.permissions().readonly() as _,
+            permissions: metadata.permissions().readonly().into(),
         }),
         Err(err) => NSTDResult::Err(NSTDIOError::from_err(err.kind())),
     }

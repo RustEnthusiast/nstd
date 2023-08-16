@@ -18,10 +18,10 @@ use std::{env::VarError, ptr::addr_of};
 #[nstdapi]
 pub fn nstd_env_current_dir() -> NSTDIOStringResult<'static> {
     match std::env::current_dir() {
-        Ok(dir) => match dir.to_str() {
-            Some(dir) => NSTDResult::Ok(NSTDString::from_string(dir.into())),
-            _ => NSTDResult::Err(NSTDIOError::NSTD_IO_ERROR_INVALID_DATA),
-        },
+        Ok(dir) => dir.to_str().map_or(
+            NSTDResult::Err(NSTDIOError::NSTD_IO_ERROR_INVALID_DATA),
+            |dir| NSTDResult::Ok(NSTDString::from_string(dir.into())),
+        ),
         Err(err) => NSTDResult::Err(NSTDIOError::from_err(err.kind())),
     }
 }
@@ -40,10 +40,10 @@ pub fn nstd_env_current_dir() -> NSTDIOStringResult<'static> {
 #[nstdapi]
 pub fn nstd_env_current_exe() -> NSTDIOStringResult<'static> {
     match std::env::current_exe() {
-        Ok(exe) => match exe.to_str() {
-            Some(exe) => NSTDResult::Ok(NSTDString::from_string(exe.into())),
-            _ => NSTDResult::Err(NSTDIOError::NSTD_IO_ERROR_INVALID_DATA),
-        },
+        Ok(exe) => exe.to_str().map_or(
+            NSTDResult::Err(NSTDIOError::NSTD_IO_ERROR_INVALID_DATA),
+            |exe| NSTDResult::Ok(NSTDString::from_string(exe.into())),
+        ),
         Err(err) => NSTDResult::Err(NSTDIOError::from_err(err.kind())),
     }
 }
@@ -55,10 +55,11 @@ pub fn nstd_env_current_exe() -> NSTDIOStringResult<'static> {
 /// `NSTDOptionalString temp` - A path to the temporary directory.
 #[nstdapi]
 pub fn nstd_env_temp_dir() -> NSTDOptionalString<'static> {
-    match std::env::temp_dir().to_str() {
-        Some(temp) => NSTDOptional::Some(NSTDString::from_string(temp.into())),
-        _ => NSTDOptional::None,
-    }
+    std::env::temp_dir()
+        .to_str()
+        .map_or(NSTDOptional::None, |temp| {
+            NSTDOptional::Some(NSTDString::from_string(temp.into()))
+        })
 }
 
 /// Sets the current working directory for the process.
@@ -169,7 +170,7 @@ pub fn nstd_env_args() -> NSTDVec<'static> {
     for arg in std::env::args() {
         let arg = NSTDString::from_string(arg);
         // SAFETY: `arg` is stored on the stack.
-        let errc = unsafe { nstd_vec_push(&mut args, addr_of!(arg) as _) };
+        let errc = unsafe { nstd_vec_push(&mut args, addr_of!(arg).cast()) };
         if errc == NSTD_ALLOC_ERROR_NONE {
             std::mem::forget(arg);
         }
@@ -193,7 +194,7 @@ pub fn nstd_env_vars() -> NSTDVec<'static> {
     for (k, v) in std::env::vars() {
         let var = [NSTDString::from_string(k), NSTDString::from_string(v)];
         // SAFETY: `var` is stored on the stack.
-        let errc = unsafe { nstd_vec_push(&mut vars, addr_of!(var) as _) };
+        let errc = unsafe { nstd_vec_push(&mut vars, addr_of!(var).cast()) };
         if errc == NSTD_ALLOC_ERROR_NONE {
             std::mem::forget(var);
         }

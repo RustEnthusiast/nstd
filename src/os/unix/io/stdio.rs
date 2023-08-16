@@ -2,7 +2,11 @@
 #![allow(unused)]
 use super::{
     NSTDUnixFileDescriptor,
-    NSTDUnixIOError::{self, *},
+    NSTDUnixIOError::{
+        self, NSTD_UNIX_IO_ERROR_INTERRUPTED, NSTD_UNIX_IO_ERROR_INVALID_DATA,
+        NSTD_UNIX_IO_ERROR_INVALID_INPUT, NSTD_UNIX_IO_ERROR_INVALID_SEEK, NSTD_UNIX_IO_ERROR_NONE,
+        NSTD_UNIX_IO_ERROR_OUT_OF_MEMORY, NSTD_UNIX_IO_ERROR_UNEXPECTED_EOF,
+    },
     NSTDUnixIOResult,
 };
 use crate::{
@@ -56,6 +60,7 @@ pub(crate) unsafe fn write(fd: NSTDUnixFileDescriptor, bytes: &NSTDSlice) -> NST
     // Write the data.
     match libc::write(fd, nstd_core_slice_as_ptr(bytes), len) {
         -1 => NSTDResult::Err(NSTDUnixIOError::last()),
+        #[allow(clippy::cast_sign_loss)]
         w => NSTDResult::Ok(w as _),
     }
 }
@@ -85,6 +90,7 @@ pub(crate) unsafe fn write_all(fd: NSTDUnixFileDescriptor, bytes: &NSTDSlice) ->
                 NSTD_UNIX_IO_ERROR_INTERRUPTED => (),
                 err => return err,
             },
+            #[allow(clippy::cast_sign_loss)]
             w => {
                 written += w as NSTDUInt;
                 pos = pos.offset(w);
@@ -116,6 +122,7 @@ pub(crate) unsafe fn read(
     // Read data into `buffer`.
     match libc::read(fd, nstd_core_slice_mut_as_ptr(buffer), len) {
         -1 => NSTDResult::Err(NSTDUnixIOError::last()),
+        #[allow(clippy::cast_sign_loss)]
         r => NSTDResult::Ok(r as _),
     }
 }
@@ -155,7 +162,10 @@ pub(crate) unsafe fn read_all(
             -1 => return NSTDResult::Err(NSTDUnixIOError::last()),
             size => match lseek(fd, offset, SEEK_SET) {
                 -1 => return NSTDResult::Err(NSTDUnixIOError::last()),
-                _ => ((size - offset) as _, false),
+                _ => match (size - offset).try_into() {
+                    Ok(buf_size) => (buf_size, false),
+                    _ => return NSTDResult::Err(NSTD_UNIX_IO_ERROR_INVALID_SEEK),
+                },
             },
         },
     };
@@ -184,6 +194,7 @@ pub(crate) unsafe fn read_all(
                 err => return NSTDResult::Err(err),
             },
             0 => return NSTDResult::Ok(len - start_len),
+            #[allow(clippy::cast_sign_loss)]
             r => {
                 let read = r as NSTDUInt;
                 nstd_vec_set_len(buffer, len + read);
@@ -223,7 +234,7 @@ pub(crate) unsafe fn read_to_string(
     let mut res = read_all(fd, buf);
     let read = nstd_vec_len(buf) - start_len;
     // Make sure the successfully read data is valid UTF-8.
-    let read_start = nstd_vec_end(buf).sub(read) as _;
+    let read_start = nstd_vec_end(buf).sub(read).cast();
     let bytes = core::slice::from_raw_parts(read_start, read);
     if core::str::from_utf8(bytes).is_err() {
         let len = nstd_vec_len(buf);
@@ -262,6 +273,7 @@ pub(crate) unsafe fn read_exact(
                 err => return err,
             },
             0 => return NSTD_UNIX_IO_ERROR_UNEXPECTED_EOF,
+            #[allow(clippy::cast_sign_loss)]
             r => {
                 read += r as NSTDUInt;
                 pos = pos.offset(r);

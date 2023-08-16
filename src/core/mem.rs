@@ -65,7 +65,7 @@ pub unsafe fn nstd_core_mem_compare(
             ),
             feature = "libc"
         ))] {
-            libc::memcmp(buf1 as _, buf2 as _, num) == 0
+            libc::memcmp(buf1.cast(), buf2.cast(), num) == 0
         } else {
             use crate::{NSTD_INT_MAX, NSTD_TRUE};
             // If the two pointers point to the same buffer, or `num` is 0, return true.
@@ -135,7 +135,7 @@ pub unsafe fn nstd_core_mem_search(
             ),
             feature = "libc"
         ))] {
-            libc::memchr(buf as _, delim as _, size) as _
+            libc::memchr(buf.cast(), delim.into(), size) as _
         } else {
             use crate::NSTD_INT_MAX;
             assert!(size <= NSTD_INT_MAX as _);
@@ -191,7 +191,7 @@ pub unsafe fn nstd_core_mem_zero(buf: *mut NSTDByte, size: NSTDUInt) {
             ),
             feature = "libc"
         ))] {
-            libc::memset(buf as _, 0, size);
+            libc::memset(buf.cast(), 0, size);
         } else {
             use crate::NSTD_INT_MAX;
             assert!(size <= NSTD_INT_MAX as _);
@@ -247,7 +247,7 @@ pub unsafe fn nstd_core_mem_fill(buf: *mut NSTDByte, size: NSTDUInt, fill: NSTDB
             ),
             feature = "libc"
         ))] {
-            libc::memset(buf as _, fill as _, size);
+            libc::memset(buf.cast(), fill.into(), size);
         } else {
             use crate::NSTD_INT_MAX;
             assert!(size <= NSTD_INT_MAX as _);

@@ -27,7 +27,7 @@ use nstdapi::nstdapi;
 #[repr(transparent)]
 struct RawMutex(UnsafeCell<pthread_mutex_t>);
 impl Drop for RawMutex {
-    /// [RawMutex]'s destructor.
+    /// [`RawMutex`]'s destructor.
     fn drop(&mut self) {
         // SAFETY: Destroying a locked mutex results in undefined behavior, so here we check if the
         // mutex is locked. If the mutex *is* locked then it's guard must have been leaked, in this
@@ -47,7 +47,7 @@ impl Drop for RawMutex {
 /// A mutex attribute builder.
 struct MutexAttrs(pthread_mutexattr_t);
 impl MutexAttrs {
-    /// Creates a new instance of [MutexAttrs].
+    /// Creates a new instance of [`MutexAttrs`].
     fn new() -> Option<Self> {
         let mut attr = MaybeUninit::uninit();
         // SAFETY: All operations are thread-safe, errors are checked.
@@ -62,7 +62,7 @@ impl MutexAttrs {
     }
 }
 impl Drop for MutexAttrs {
-    /// [MutexAttrs] destructor.
+    /// [`MutexAttrs`] destructor.
     #[inline]
     fn drop(&mut self) {
         // SAFETY: Rust's type system will ensure that `Self` is properly initialized.
@@ -105,10 +105,10 @@ pub struct NSTDUnixMutexGuard<'m, 'a> {
 impl<'m, 'a> NSTDUnixMutexGuard<'m, 'a> {
     /// Constructs a new mutex guard.
     #[inline]
-    fn new(mutex: &'m NSTDUnixMutex<'a>) -> Self {
+    const fn new(mutex: &'m NSTDUnixMutex<'a>) -> Self {
         Self {
             mutex,
-            pd: Default::default(),
+            pd: PhantomData,
         }
     }
 }
@@ -277,7 +277,7 @@ pub fn nstd_os_unix_mutex_try_lock<'m, 'a>(
 /// `NSTDUnixOptionalMutexLockResult guard` - A handle to the mutex's data, or "none" if the mutex
 /// remains locked for the time span of `duration`.
 #[nstdapi]
-#[allow(unused_variables)]
+#[allow(unused_variables, clippy::doc_markdown, clippy::missing_const_for_fn)]
 pub fn nstd_os_unix_mutex_timed_lock<'m, 'a>(
     mutex: &'m NSTDUnixMutex<'a>,
     duration: NSTDDuration,
@@ -304,8 +304,8 @@ pub fn nstd_os_unix_mutex_timed_lock<'m, 'a>(
             time = nstd_os_unix_time_add(time, duration);
             #[allow(trivial_numeric_casts)]
             let duration = timespec {
-                tv_sec: nstd_os_unix_time_seconds(time) as _,
-                tv_nsec: nstd_os_unix_time_nanoseconds(time) as _,
+                tv_sec: nstd_os_unix_time_seconds(time).into(),
+                tv_nsec: nstd_os_unix_time_nanoseconds(time).into(),
             };
             // SAFETY: `mutex` is behind an initialized reference.
             if unsafe { pthread_mutex_timedlock(mutex.inner.0.get(), &duration) } == 0 {
@@ -378,7 +378,11 @@ pub fn nstd_os_unix_mutex_into_inner(mutex: NSTDUnixMutex<'_>) -> NSTDOptionalHe
 /// - `NSTDUnixMutexGuard guard` - The mutex guard to take ownership of.
 #[inline]
 #[nstdapi]
-#[allow(unused_variables)]
+#[allow(
+    unused_variables,
+    clippy::missing_const_for_fn,
+    clippy::needless_pass_by_value
+)]
 pub fn nstd_os_unix_mutex_unlock(guard: NSTDUnixMutexGuard<'_, '_>) {}
 
 /// Frees an instance of `NSTDUnixMutex`.
@@ -388,7 +392,11 @@ pub fn nstd_os_unix_mutex_unlock(guard: NSTDUnixMutexGuard<'_, '_>) {}
 /// - `NSTDUnixMutex mutex` - The mutex to free.
 #[inline]
 #[nstdapi]
-#[allow(unused_variables)]
+#[allow(
+    unused_variables,
+    clippy::missing_const_for_fn,
+    clippy::needless_pass_by_value
+)]
 pub fn nstd_os_unix_mutex_free(mutex: NSTDUnixMutex<'_>) {}
 
 /// Frees an instance of `NSTDUnixMutex` after invoking `callback` with the mutex's data.

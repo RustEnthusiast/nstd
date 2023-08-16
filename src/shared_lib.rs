@@ -30,7 +30,7 @@ cfg_if! {
             handle: NSTDAnyMut,
         }
         impl Drop for NSTDSharedLib {
-            /// [NSTDSharedLib]s destructor.
+            /// [`NSTDSharedLib`]s destructor.
             #[inline]
             fn drop(&mut self) {
                 // SAFETY: `self.handle` is valid.
@@ -111,7 +111,7 @@ pub unsafe fn nstd_shared_lib_load(path: &NSTDStr) -> NSTDOptionalSharedLib {
     #[cfg(windows)]
     {
         let utf16 = nstd_os_windows_str_to_utf16(path);
-        nstd_os_windows_shared_lib_load(nstd_vec_as_ptr(&utf16) as _)
+        nstd_os_windows_shared_lib_load(nstd_vec_as_ptr(&utf16).cast())
     }
 }
 
@@ -174,5 +174,9 @@ pub unsafe fn nstd_shared_lib_get_mut(
 /// - `NSTDSharedLib lib` - The library handle.
 #[inline]
 #[nstdapi]
-#[allow(unused_variables)]
+#[allow(
+    unused_variables,
+    clippy::missing_const_for_fn,
+    clippy::needless_pass_by_value
+)]
 pub fn nstd_shared_lib_free(lib: NSTDSharedLib) {}

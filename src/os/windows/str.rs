@@ -35,26 +35,43 @@ pub unsafe fn nstd_os_windows_str_to_utf16(str: &NSTDStr) -> NSTDVec<'_> {
     // The size of a UTF-16 code point.
     const CHAR_SIZE: NSTDUInt = core::mem::size_of::<NSTDChar16>();
     // Make sure the string slice's length is greater than 0.
-    let len = nstd_core_str_byte_len(str) as _;
+    let len = nstd_core_str_byte_len(str).try_into().unwrap_or_default();
     if len == 0 {
         return nstd_vec_new(&NSTD_ALLOCATOR, CHAR_SIZE);
     }
     // Precalculate the length of the UTF-16 buffer.
     let mut u16_len = 0;
-    let ptr = nstd_core_str_as_ptr(str);
+    let str_ptr = nstd_core_str_as_ptr(str);
     let mut errc = U_ZERO_ERROR;
-    u_strFromUTF8(core::ptr::null_mut(), 0, &mut u16_len, ptr, len, &mut errc);
+    u_strFromUTF8(
+        core::ptr::null_mut(),
+        0,
+        &mut u16_len,
+        str_ptr,
+        len,
+        &mut errc,
+    );
     assert!(errc == U_ZERO_ERROR || errc == U_BUFFER_OVERFLOW_ERROR);
     errc = U_ZERO_ERROR;
     // Make sure there is space for the null-terminator.
     u16_len += 1;
     // Create the buffer.
-    let mut buf = nstd_vec_new_with_cap(&NSTD_ALLOCATOR, CHAR_SIZE, u16_len as _);
-    assert!(nstd_vec_cap(&buf) == u16_len as _);
-    // Fill the buffer.
-    let buf_ptr = nstd_vec_as_ptr_mut(&mut buf) as _;
-    u_strFromUTF8(buf_ptr, u16_len, core::ptr::null_mut(), ptr, len, &mut errc);
-    assert!(errc == U_ZERO_ERROR);
-    nstd_vec_set_len(&mut buf, u16_len as _);
-    buf
+    #[allow(clippy::cast_sign_loss)]
+    {
+        let mut buf = nstd_vec_new_with_cap(&NSTD_ALLOCATOR, CHAR_SIZE, u16_len as _);
+        assert!(nstd_vec_cap(&buf) == u16_len as _);
+        // Fill the buffer.
+        let buf_ptr = nstd_vec_as_ptr_mut(&mut buf).cast();
+        u_strFromUTF8(
+            buf_ptr,
+            u16_len,
+            core::ptr::null_mut(),
+            str_ptr,
+            len,
+            &mut errc,
+        );
+        assert!(errc == U_ZERO_ERROR);
+        nstd_vec_set_len(&mut buf, u16_len as _);
+        buf
+    }
 }
