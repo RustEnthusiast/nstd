@@ -2,6 +2,7 @@
 ## Added
 ### `nstd`
 - Added `NSTDRef[Mut]`.
+- Added `NSTDAnyRef[Mut]`.
 
 # 0.9.0
 ## Added

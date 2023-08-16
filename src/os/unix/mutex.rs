@@ -304,7 +304,7 @@ pub fn nstd_os_unix_mutex_timed_lock<'m, 'a>(
             time = nstd_os_unix_time_add(time, duration);
             #[allow(trivial_numeric_casts)]
             let duration = timespec {
-                tv_sec: nstd_os_unix_time_seconds(time).into(),
+                tv_sec: nstd_os_unix_time_seconds(time) as _,
                 tv_nsec: nstd_os_unix_time_nanoseconds(time).into(),
             };
             // SAFETY: `mutex` is behind an initialized reference.

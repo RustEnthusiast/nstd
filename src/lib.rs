@@ -157,6 +157,9 @@ pub type NSTDChar16 = NSTDUInt16;
 /// A 32-bit character type.
 pub type NSTDChar32 = NSTDUInt32;
 
+/// A boolean type, can either be `NSTD_TRUE` (1) or `NSTD_FALSE` (0).
+pub type NSTDBool = bool;
+
 /// An opaque pointer to some immutable data.
 pub type NSTDAny = *const c_void;
 /// An opaque pointer to some mutable data.
@@ -215,5 +218,57 @@ impl<'a, T> From<&'a mut T> for NSTDRefMut<'a, T> {
     }
 }
 
-/// A boolean type, can either be `NSTD_TRUE` (1) or `NSTD_FALSE` (0).
-pub type NSTDBool = bool;
+/// An FFI-safe reference to some immutable data, without type safety.
+#[repr(transparent)]
+pub struct NSTDAnyRef<'a>(&'a c_void);
+impl NSTDAnyRef<'_> {
+    /// Gets the immutable reference.
+    ///
+    /// # Safety
+    ///
+    /// This reference must be pointing to an object of type `T`.
+    #[inline]
+    pub const unsafe fn get<T>(&self) -> &T {
+        &*addr_of!(*self.0).cast()
+    }
+}
+impl<'a, T> From<&'a T> for NSTDAnyRef<'a> {
+    /// Creates a new FFI-safe reference.
+    #[inline]
+    fn from(value: &'a T) -> Self {
+        // SAFETY: Reference to reference transmute.
+        Self(unsafe { &*(addr_of!(*value).cast()) })
+    }
+}
+/// An FFI-safe reference to some mutable data, without type safety.
+#[repr(transparent)]
+pub struct NSTDAnyRefMut<'a>(&'a mut c_void);
+impl NSTDAnyRefMut<'_> {
+    /// Gets an immutable reference to the data.
+    ///
+    /// # Safety
+    ///
+    /// This reference must be pointing to an object of type `T`.
+    #[inline]
+    pub const unsafe fn get<T>(&self) -> &T {
+        &*addr_of!(*self.0).cast()
+    }
+
+    /// Gets the mutable reference.
+    ///
+    /// # Safety
+    ///
+    /// This reference must be pointing to an object of type `T`.
+    #[inline]
+    pub unsafe fn get_mut<T>(&mut self) -> &mut T {
+        &mut *addr_of_mut!(*self.0).cast()
+    }
+}
+impl<'a, T> From<&'a mut T> for NSTDAnyRefMut<'a> {
+    /// Creates a new FFI-safe reference.
+    #[inline]
+    fn from(value: &'a mut T) -> Self {
+        // SAFETY: Reference to reference transmute.
+        Self(unsafe { &mut *addr_of_mut!(*value).cast() })
+    }
+}

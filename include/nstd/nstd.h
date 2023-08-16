@@ -71,6 +71,9 @@ typedef NSTDUInt16 NSTDChar16;
 /// A 32-bit character type.
 typedef NSTDUInt32 NSTDChar32;
 
+/// A boolean type, can either be `NSTD_TRUE` (1) or `NSTD_FALSE` (0).
+typedef bool NSTDBool;
+
 /// An opaque pointer to some immutable data.
 typedef const void *NSTDAny;
 /// An opaque pointer to some mutable data.
@@ -81,7 +84,9 @@ typedef const void *NSTDRef;
 /// An opaque reference to some mutable data.
 typedef void *NSTDRefMut;
 
-/// A boolean type, can either be `NSTD_TRUE` (1) or `NSTD_FALSE` (0).
-typedef bool NSTDBool;
+/// An opaque reference to some immutable data, without type safety.
+typedef const void *NSTDAnyRef;
+/// An opaque reference to some mutable data, without type safety.
+typedef void *NSTDAnyRefMut;
 
 #endif
