@@ -200,14 +200,14 @@ NSTDAPI NSTDBool nstd_thread_is_panicking(void);
 ///
 /// # Parameters:
 ///
-/// - `const NSTDThreadID *xid` - The first identifier.
+/// - `const NSTDThreadID *x_id` - The first identifier.
 ///
-/// - `const NSTDThreadID *yid` - The second identifier.
+/// - `const NSTDThreadID *y_id` - The second identifier.
 ///
 /// # Returns
 ///
 /// `NSTDBool is_eq` - True if the two identifiers refer to the same thread.
-NSTDAPI NSTDBool nstd_thread_id_compare(const NSTDThreadID *xid, const NSTDThreadID *yid);
+NSTDAPI NSTDBool nstd_thread_id_compare(const NSTDThreadID *x_id, const NSTDThreadID *y_id);
 
 /// Frees an instance of `NSTDThreadID`.
 ///

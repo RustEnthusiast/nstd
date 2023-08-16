@@ -40,7 +40,7 @@ typedef enum {
     NSTD_UNIX_IO_ERROR_OUT_OF_MEMORY
 } NSTDUnixIOError;
 
-/// A result type that yields an [NSTDUInt] representing the number of bytes read or written by a
+/// A result type that yields an [`NSTDUInt`] representing the number of bytes read or written by a
 /// Unix I/O operation on success and a Unix I/O operation error code on failure.
 NSTDResult(NSTDUInt, NSTDUnixIOError) NSTDUnixIOResult;
 

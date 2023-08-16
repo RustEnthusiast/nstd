@@ -135,7 +135,7 @@ impl From<NSTDWindowsAllocError> for NSTDAllocError {
     }
 }
 
-/// A structure of function pointers making up an allocator's virtual table.
+/// A structure of function pointers making up an allocator's virtual function table.
 #[nstdapi]
 #[derive(Clone, Copy)]
 pub struct NSTDAllocator {

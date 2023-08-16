@@ -18,7 +18,7 @@ typedef enum {
     NSTD_ALLOC_ERROR_INVALID_LAYOUT
 } NSTDAllocError;
 
-/// A structure of function pointers making up an allocator VTable.
+/// A structure of function pointers making up an allocator's virtual function table.
 typedef struct {
     /// An opaque pointer to the allocator's state.
     NSTDAny state;
