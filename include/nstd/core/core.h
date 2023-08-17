@@ -12,23 +12,6 @@
 /// This operation will always panic.
 NSTDAPI void nstd_core_abort(void);
 
-/// Terminates the program immediately in an abnormal fashion with a UTF-8 encoded payload.
-///
-/// This operation will never return.
-///
-/// # Parameters:
-///
-/// - `const NSTDStr *msg` - The message to abort with.
-///
-/// # Panics
-///
-/// This function will always panic.
-///
-/// # Safety
-///
-/// `msg`'s data must be valid for reads.
-NSTDAPI void nstd_core_abort_with_msg(const NSTDStr *msg);
-
 /// Invokes the runtime's panic handler.
 ///
 /// This operation will never return.

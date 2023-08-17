@@ -48,29 +48,6 @@ pub const fn nstd_core_abort() -> ! {
     panic!();
 }
 
-/// Terminates the program immediately in an abnormal fashion with a UTF-8 encoded payload.
-///
-/// This operation will never return.
-///
-/// # Parameters:
-///
-/// - `const NSTDStr *msg` - The message to abort with.
-///
-/// # Panics
-///
-/// This function will always panic.
-///
-/// # Safety
-///
-/// `msg`'s data must be valid for reads.
-#[inline]
-#[nstdapi]
-pub const unsafe fn nstd_core_abort_with_msg(msg: &NSTDStr) -> ! {
-    #[allow(unused_variables)]
-    let abort = Abort;
-    panic!("{}", msg.as_str());
-}
-
 /// Invokes the runtime's panic handler.
 ///
 /// This operation will never return.
