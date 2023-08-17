@@ -49,7 +49,7 @@ typedef struct {
     NSTDAnyMut (*allocate)(NSTDAny, NSTDUInt);
     /// Allocates a contiguous sequence of `size` bytes in memory.
     ///
-    /// The initialized memory is zero-initialized.
+    /// The allocated memory is zero-initialized.
     ///
     /// If allocation fails, a null pointer is returned.
     ///
@@ -71,8 +71,6 @@ typedef struct {
     /// # Safety
     ///
     /// - Behavior is undefined if `size` is zero.
-    ///
-    /// - The new memory buffer should be considered uninitialized.
     NSTDAnyMut (*allocate_zeroed)(NSTDAny, NSTDUInt);
     /// Reallocates memory that was previously allocated by this allocator.
     ///
