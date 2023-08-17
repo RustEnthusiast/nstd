@@ -1,8 +1,8 @@
 //! Represents an optional (possibly uninitialized) value.
 use crate::{
-    NSTDAny, NSTDAnyMut, NSTDBool, NSTDChar, NSTDChar16, NSTDChar32, NSTDChar8, NSTDFloat32,
-    NSTDFloat64, NSTDInt, NSTDInt16, NSTDInt32, NSTDInt64, NSTDInt8, NSTDUInt, NSTDUInt16,
-    NSTDUInt32, NSTDUInt64, NSTDUInt8,
+    NSTDAny, NSTDAnyMut, NSTDAnyRef, NSTDAnyRefMut, NSTDBool, NSTDChar, NSTDChar16, NSTDChar32,
+    NSTDChar8, NSTDFloat32, NSTDFloat64, NSTDInt, NSTDInt16, NSTDInt32, NSTDInt64, NSTDInt8,
+    NSTDRef, NSTDRefMut, NSTDUInt, NSTDUInt16, NSTDUInt32, NSTDUInt64, NSTDUInt8,
 };
 use nstdapi::nstdapi;
 
@@ -93,3 +93,13 @@ gen_optional!(NSTDOptionalInt32, NSTDInt32);
 gen_optional!(NSTDOptionalUInt32, NSTDUInt32);
 gen_optional!(NSTDOptionalInt64, NSTDInt64);
 gen_optional!(NSTDOptionalUInt64, NSTDUInt64);
+
+/// Represents an optional value of type `NSTDRef`.
+pub type NSTDOptionalRef<'a, T> = NSTDOptional<NSTDRef<'a, T>>;
+/// Represents an optional value of type `NSTDRefMut`.
+pub type NSTDOptionalRefMut<'a, T> = NSTDOptional<NSTDRefMut<'a, T>>;
+
+/// Represents an optional value of type `NSTDAnyRef`.
+pub type NSTDOptionalAnyRef<'a> = NSTDOptional<NSTDAnyRef<'a>>;
+/// Represents an optional value of type `NSTDAnyRefMut`.
+pub type NSTDOptionalAnyRefMut<'a> = NSTDOptional<NSTDAnyRefMut<'a>>;

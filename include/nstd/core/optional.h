@@ -55,4 +55,14 @@ NSTDOptional(NSTDInt64) NSTDOptionalInt64;
 /// Represents an optional value of type `NSTDUInt64`.
 NSTDOptional(NSTDUInt64) NSTDOptionalUInt64;
 
+/// Represents an optional value of type `NSTDRef`.
+NSTDOptional(NSTDRef) NSTDOptionalRef;
+/// Represents an optional value of type `NSTDRefMut`.
+NSTDOptional(NSTDRefMut) NSTDOptionalRefMut;
+
+/// Represents an optional value of type `NSTDAnyRef`.
+NSTDOptional(NSTDAnyRef) NSTDOptionalAnyRef;
+/// Represents an optional value of type `NSTDAnyRefMut`.
+NSTDOptional(NSTDAnyRefMut) NSTDOptionalAnyRefMut;
+
 #endif

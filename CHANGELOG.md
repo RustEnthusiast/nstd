@@ -3,6 +3,9 @@
 ### `nstd`
 - Added `NSTDRef[Mut]`.
 - Added `NSTDAnyRef[Mut]`.
+### `nstd.core`
+- Added `NSTDOptionalRef[Mut]`.
+- Added `NSTDOptionalAnyRef[Mut]`.
 ## Removed
 ### `nstd.core`
 - Removed `nstd_core_abort_with_msg`.

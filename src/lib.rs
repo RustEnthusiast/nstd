@@ -175,8 +175,9 @@ impl<T> Deref for NSTDRef<'_, T> {
     /// Gets the immutable reference.
     #[inline]
     fn deref(&self) -> &T {
+        let ptr: *const c_void = self.0;
         // SAFETY: `self.0` is of type `&T`.
-        unsafe { &*(addr_of!(*self.0).cast()) }
+        unsafe { &*(ptr.cast()) }
     }
 }
 impl<'a, T> From<&'a T> for NSTDRef<'a, T> {
@@ -197,16 +198,18 @@ impl<T> Deref for NSTDRefMut<'_, T> {
     /// Gets the reference.
     #[inline]
     fn deref(&self) -> &T {
+        let ptr: *const c_void = self.0;
         // SAFETY: `self.0` is of type `&mut T`.
-        unsafe { &*(addr_of!(*self.0).cast()) }
+        unsafe { &*(ptr.cast()) }
     }
 }
 impl<T> DerefMut for NSTDRefMut<'_, T> {
     /// Gets the mutable reference.
     #[inline]
     fn deref_mut(&mut self) -> &mut T {
+        let ptr: *mut c_void = self.0;
         // SAFETY: `self.0` is of type `&mut T`.
-        unsafe { &mut *(addr_of_mut!(*self.0).cast()) }
+        unsafe { &mut *(ptr.cast()) }
     }
 }
 impl<'a, T> From<&'a mut T> for NSTDRefMut<'a, T> {
@@ -229,7 +232,8 @@ impl NSTDAnyRef<'_> {
     /// This reference must be pointing to an object of type `T`.
     #[inline]
     pub const unsafe fn get<T>(&self) -> &T {
-        &*addr_of!(*self.0).cast()
+        let ptr: *const c_void = self.0;
+        &*ptr.cast()
     }
 }
 impl<'a, T> From<&'a T> for NSTDAnyRef<'a> {
@@ -251,7 +255,8 @@ impl NSTDAnyRefMut<'_> {
     /// This reference must be pointing to an object of type `T`.
     #[inline]
     pub const unsafe fn get<T>(&self) -> &T {
-        &*addr_of!(*self.0).cast()
+        let ptr: *const c_void = self.0;
+        &*ptr.cast()
     }
 
     /// Gets the mutable reference.
@@ -261,7 +266,8 @@ impl NSTDAnyRefMut<'_> {
     /// This reference must be pointing to an object of type `T`.
     #[inline]
     pub unsafe fn get_mut<T>(&mut self) -> &mut T {
-        &mut *addr_of_mut!(*self.0).cast()
+        let ptr: *mut c_void = self.0;
+        &mut *ptr.cast()
     }
 }
 impl<'a, T> From<&'a mut T> for NSTDAnyRefMut<'a> {
