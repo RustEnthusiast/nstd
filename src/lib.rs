@@ -167,6 +167,7 @@ pub type NSTDAnyMut = *mut c_void;
 
 /// An FFI-safe reference to some immutable data.
 #[repr(transparent)]
+#[derive(Clone, Copy)]
 pub struct NSTDRef<'a, T>(&'a c_void, PhantomData<&'a T>);
 impl<T> Deref for NSTDRef<'_, T> {
     /// [`NSTDRef`]'s dereference target.
@@ -223,6 +224,7 @@ impl<'a, T> From<&'a mut T> for NSTDRefMut<'a, T> {
 
 /// An FFI-safe reference to some immutable data, without type safety.
 #[repr(transparent)]
+#[derive(Clone, Copy)]
 pub struct NSTDAnyRef<'a>(&'a c_void);
 impl NSTDAnyRef<'_> {
     /// Gets the immutable reference.
