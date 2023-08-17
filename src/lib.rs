@@ -189,6 +189,14 @@ impl<'a, T> From<&'a T> for NSTDRef<'a, T> {
         Self(unsafe { &*(addr_of!(*value).cast()) }, PhantomData)
     }
 }
+impl<'a, T> From<&'a mut T> for NSTDRef<'a, T> {
+    /// Creates a new FFI-safe reference.
+    #[inline]
+    fn from(value: &'a mut T) -> Self {
+        // SAFETY: Reference to reference transmute.
+        Self(unsafe { &*(addr_of!(*value).cast()) }, PhantomData)
+    }
+}
 /// An FFI-safe reference to some mutable data.
 #[repr(transparent)]
 pub struct NSTDRefMut<'a, T>(&'a mut c_void, PhantomData<&'a mut T>);
@@ -242,6 +250,14 @@ impl<'a, T> From<&'a T> for NSTDAnyRef<'a> {
     /// Creates a new FFI-safe reference.
     #[inline]
     fn from(value: &'a T) -> Self {
+        // SAFETY: Reference to reference transmute.
+        Self(unsafe { &*(addr_of!(*value).cast()) })
+    }
+}
+impl<'a, T> From<&'a mut T> for NSTDAnyRef<'a> {
+    /// Creates a new FFI-safe reference.
+    #[inline]
+    fn from(value: &'a mut T) -> Self {
         // SAFETY: Reference to reference transmute.
         Self(unsafe { &*(addr_of!(*value).cast()) })
     }
