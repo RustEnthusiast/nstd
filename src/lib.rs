@@ -235,6 +235,13 @@ impl<'a, T> From<&'a mut T> for NSTDRefMut<'a, T> {
 #[derive(Clone, Copy)]
 pub struct NSTDAnyRef<'a>(&'a c_void);
 impl NSTDAnyRef<'_> {
+    /// Returns a raw pointer to the referenced data.
+    #[inline]
+    const fn as_ptr<T>(&self) -> *const T {
+        let ptr: *const c_void = self.0;
+        ptr.cast()
+    }
+
     /// Gets the immutable reference.
     ///
     /// # Safety
@@ -242,8 +249,7 @@ impl NSTDAnyRef<'_> {
     /// This reference must be pointing to an object of type `T`.
     #[inline]
     pub const unsafe fn get<T>(&self) -> &T {
-        let ptr: *const c_void = self.0;
-        &*ptr.cast()
+        &*self.as_ptr()
     }
 }
 impl<'a, T> From<&'a T> for NSTDAnyRef<'a> {
@@ -266,6 +272,20 @@ impl<'a, T> From<&'a mut T> for NSTDAnyRef<'a> {
 #[repr(transparent)]
 pub struct NSTDAnyRefMut<'a>(&'a mut c_void);
 impl NSTDAnyRefMut<'_> {
+    /// Returns a raw pointer to the referenced data.
+    #[inline]
+    const fn as_ptr<T>(&self) -> *const T {
+        let ptr: *const c_void = self.0;
+        ptr.cast()
+    }
+
+    /// Returns a mutable raw pointer to the referenced data.
+    #[inline]
+    fn as_mut_ptr<T>(&mut self) -> *mut T {
+        let ptr: *mut c_void = self.0;
+        ptr.cast()
+    }
+
     /// Gets an immutable reference to the data.
     ///
     /// # Safety
@@ -273,8 +293,7 @@ impl NSTDAnyRefMut<'_> {
     /// This reference must be pointing to an object of type `T`.
     #[inline]
     pub const unsafe fn get<T>(&self) -> &T {
-        let ptr: *const c_void = self.0;
-        &*ptr.cast()
+        &*self.as_ptr()
     }
 
     /// Gets the mutable reference.
@@ -284,8 +303,7 @@ impl NSTDAnyRefMut<'_> {
     /// This reference must be pointing to an object of type `T`.
     #[inline]
     pub unsafe fn get_mut<T>(&mut self) -> &mut T {
-        let ptr: *mut c_void = self.0;
-        &mut *ptr.cast()
+        &mut *self.as_mut_ptr()
     }
 }
 impl<'a, T> From<&'a mut T> for NSTDAnyRefMut<'a> {
