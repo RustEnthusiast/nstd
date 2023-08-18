@@ -308,8 +308,5 @@ gen_deterministic!(
 #[inline]
 #[nstdapi]
 pub fn nstd_core_unichar_is_digit(chr: NSTDUnichar, radix: NSTDUInt32) -> NSTDBool {
-    match radix <= 36 {
-        true => char::from(chr).is_digit(radix),
-        false => false,
-    }
+    radix <= 36 && char::from(chr).is_digit(radix)
 }
