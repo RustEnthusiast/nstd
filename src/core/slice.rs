@@ -75,7 +75,7 @@ gen_optional!(NSTDOptionalSlice, NSTDSlice);
 #[inline]
 #[nstdapi]
 pub fn nstd_core_slice_new(ptr: NSTDAny, stride: NSTDUInt, len: NSTDUInt) -> NSTDOptionalSlice {
-    match !ptr.is_null() && len * stride <= NSTD_INT_MAX as _ {
+    match !ptr.is_null() && len * stride <= NSTD_INT_MAX {
         true => NSTDOptional::Some(NSTDSlice { ptr, len, stride }),
         false => NSTDOptional::None,
     }
@@ -398,7 +398,7 @@ pub fn nstd_core_slice_mut_new(
     stride: NSTDUInt,
     len: NSTDUInt,
 ) -> NSTDOptionalSliceMut {
-    match !ptr.is_null() && len * stride <= NSTD_INT_MAX as _ {
+    match !ptr.is_null() && len * stride <= NSTD_INT_MAX {
         true => NSTDOptional::Some(NSTDSliceMut { ptr, len, stride }),
         false => NSTDOptional::None,
     }

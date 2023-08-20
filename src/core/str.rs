@@ -203,7 +203,7 @@ pub const unsafe fn nstd_core_str_from_cstr_unchecked(cstr: &NSTDCStr) -> NSTDSt
 pub unsafe fn nstd_core_str_from_raw_cstr(cstr: *const NSTDChar) -> NSTDOptionalStr {
     if !cstr.is_null() {
         let len = nstd_core_cstr_raw_len(cstr);
-        if len <= NSTD_INT_MAX as _ {
+        if len <= NSTD_INT_MAX {
             let ptr = cstr.cast();
             let bytes = core::slice::from_raw_parts(ptr, len);
             if core::str::from_utf8(bytes).is_ok() {
@@ -245,7 +245,7 @@ pub unsafe fn nstd_core_str_from_raw_cstr(cstr: *const NSTDChar) -> NSTDOptional
 pub unsafe fn nstd_core_str_from_raw_cstr_with_null(cstr: *const NSTDChar) -> NSTDOptionalStr {
     if !cstr.is_null() {
         let len = nstd_core_cstr_raw_len_with_null(cstr);
-        if len <= NSTD_INT_MAX as _ {
+        if len <= NSTD_INT_MAX {
             let ptr = cstr.cast();
             let bytes = core::slice::from_raw_parts(ptr, len);
             if core::str::from_utf8(bytes).is_ok() {
@@ -954,7 +954,7 @@ pub unsafe fn nstd_core_str_mut_from_cstr_unchecked(cstr: &mut NSTDCStrMut) -> N
 pub unsafe fn nstd_core_str_mut_from_raw_cstr(cstr: *mut NSTDChar) -> NSTDOptionalStrMut {
     if !cstr.is_null() {
         let len = nstd_core_cstr_raw_len(cstr);
-        if len <= NSTD_INT_MAX as _ {
+        if len <= NSTD_INT_MAX {
             let ptr = cstr.cast();
             let bytes = core::slice::from_raw_parts(ptr, len);
             if core::str::from_utf8(bytes).is_ok() {
@@ -998,7 +998,7 @@ pub unsafe fn nstd_core_str_mut_from_raw_cstr(cstr: *mut NSTDChar) -> NSTDOption
 pub unsafe fn nstd_core_str_mut_from_raw_cstr_with_null(cstr: *mut NSTDChar) -> NSTDOptionalStrMut {
     if !cstr.is_null() {
         let len = nstd_core_cstr_raw_len_with_null(cstr);
-        if len <= NSTD_INT_MAX as _ {
+        if len <= NSTD_INT_MAX {
             let ptr = cstr.cast();
             let bytes = core::slice::from_raw_parts(ptr, len);
             if core::str::from_utf8(bytes).is_ok() {

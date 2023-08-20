@@ -61,7 +61,7 @@ gen_optional!(NSTDOptionalCStr, NSTDCStr);
 #[inline]
 #[nstdapi]
 pub fn nstd_core_cstr_new(raw: *const NSTDChar, len: NSTDUInt) -> NSTDOptionalCStr {
-    match !raw.is_null() && len <= NSTD_INT_MAX as _ {
+    match !raw.is_null() && len <= NSTD_INT_MAX {
         true => NSTDOptional::Some(NSTDCStr { ptr: raw, len }),
         false => NSTDOptional::None,
     }
@@ -495,7 +495,7 @@ gen_optional!(NSTDOptionalCStrMut, NSTDCStrMut);
 #[inline]
 #[nstdapi]
 pub fn nstd_core_cstr_mut_new(raw: *mut NSTDChar, len: NSTDUInt) -> NSTDOptionalCStrMut {
-    match !raw.is_null() && len <= NSTD_INT_MAX as _ {
+    match !raw.is_null() && len <= NSTD_INT_MAX {
         true => NSTDOptional::Some(NSTDCStrMut { ptr: raw, len }),
         false => NSTDOptional::None,
     }

@@ -73,7 +73,7 @@ pub unsafe fn nstd_core_mem_compare(
                 return NSTD_TRUE;
             }
             // Check if `num` exceeds `isize::MAX`.
-            assert!(num <= NSTD_INT_MAX as _);
+            assert!(num <= NSTD_INT_MAX);
             // Otherwise compare them manually.
             let buf1 = core::slice::from_raw_parts(buf1, num);
             let buf2 = core::slice::from_raw_parts(buf2, num);
@@ -138,7 +138,7 @@ pub unsafe fn nstd_core_mem_search(
             libc::memchr(buf.cast(), delim.into(), size) as _
         } else {
             use crate::NSTD_INT_MAX;
-            assert!(size <= NSTD_INT_MAX as _);
+            assert!(size <= NSTD_INT_MAX);
             let mut i = 0;
             while i < size {
                 if *buf.add(i) == delim {
@@ -194,7 +194,7 @@ pub unsafe fn nstd_core_mem_zero(buf: *mut NSTDByte, size: NSTDUInt) {
             libc::memset(buf.cast(), 0, size);
         } else {
             use crate::NSTD_INT_MAX;
-            assert!(size <= NSTD_INT_MAX as _);
+            assert!(size <= NSTD_INT_MAX);
             let mut i = 0;
             while i < size {
                 *buf.add(i) = 0;
@@ -250,7 +250,7 @@ pub unsafe fn nstd_core_mem_fill(buf: *mut NSTDByte, size: NSTDUInt, fill: NSTDB
             libc::memset(buf.cast(), fill.into(), size);
         } else {
             use crate::NSTD_INT_MAX;
-            assert!(size <= NSTD_INT_MAX as _);
+            assert!(size <= NSTD_INT_MAX);
             let mut i = 0;
             while i < size {
                 *buf.add(i) = fill;

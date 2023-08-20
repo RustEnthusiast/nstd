@@ -44,7 +44,7 @@ pub enum NSTDUnixAllocError {
 #[inline]
 #[nstdapi]
 pub unsafe fn nstd_os_unix_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
-    match size <= NSTD_INT_MAX as _ {
+    match size <= NSTD_INT_MAX {
         true => malloc(size),
         false => NSTD_NULL,
     }
@@ -83,7 +83,7 @@ pub unsafe fn nstd_os_unix_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
 #[inline]
 #[nstdapi]
 pub unsafe fn nstd_os_unix_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMut {
-    match size <= NSTD_INT_MAX as _ {
+    match size <= NSTD_INT_MAX {
         true => calloc(size, 1),
         false => NSTD_NULL,
     }
@@ -130,7 +130,7 @@ pub unsafe fn nstd_os_unix_alloc_reallocate(
     ptr: &mut NSTDAnyMut,
     new_size: NSTDUInt,
 ) -> NSTDUnixAllocError {
-    if new_size > NSTD_INT_MAX as _ {
+    if new_size > NSTD_INT_MAX {
         return NSTDUnixAllocError::NSTD_UNIX_ALLOC_ERROR_INVALID_LAYOUT;
     }
     let new_mem = realloc(*ptr, new_size);

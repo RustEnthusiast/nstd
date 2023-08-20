@@ -36,7 +36,7 @@ gen_optional!(NSTDOptionalPtr, NSTDPtr);
 #[inline]
 #[nstdapi]
 pub fn nstd_core_ptr_new(obj: NSTDAny, size: NSTDUInt) -> NSTDOptionalPtr {
-    match !obj.is_null() && size <= NSTD_INT_MAX as _ {
+    match !obj.is_null() && size <= NSTD_INT_MAX {
         true => NSTDOptional::Some(NSTDPtr { raw: obj, size }),
         false => NSTDOptional::None,
     }
@@ -148,7 +148,7 @@ gen_optional!(NSTDOptionalPtrMut, NSTDPtrMut);
 #[inline]
 #[nstdapi]
 pub fn nstd_core_ptr_mut_new(obj: NSTDAnyMut, size: NSTDUInt) -> NSTDOptionalPtrMut {
-    match !obj.is_null() && size <= NSTD_INT_MAX as _ {
+    match !obj.is_null() && size <= NSTD_INT_MAX {
         true => NSTDOptional::Some(NSTDPtrMut { raw: obj, size }),
         false => NSTDOptional::None,
     }

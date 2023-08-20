@@ -306,7 +306,7 @@ pub unsafe fn nstd_os_windows_alloc_heap_allocate(
     heap: &NSTDWindowsHeap,
     size: NSTDUInt,
 ) -> NSTDAnyMut {
-    match size <= NSTD_INT_MAX as _ {
+    match size <= NSTD_INT_MAX {
         true => HeapAlloc(heap.handle, 0, size),
         false => NSTD_NULL,
     }
@@ -361,7 +361,7 @@ pub unsafe fn nstd_os_windows_alloc_heap_allocate_zeroed(
     heap: &NSTDWindowsHeap,
     size: NSTDUInt,
 ) -> NSTDAnyMut {
-    match size <= NSTD_INT_MAX as _ {
+    match size <= NSTD_INT_MAX {
         true => HeapAlloc(heap.handle, HEAP_ZERO_MEMORY, size),
         false => NSTD_NULL,
     }
@@ -419,7 +419,7 @@ pub unsafe fn nstd_os_windows_alloc_heap_reallocate(
     ptr: &mut NSTDAnyMut,
     size: NSTDUInt,
 ) -> NSTDWindowsAllocError {
-    if size > NSTD_INT_MAX as _ {
+    if size > NSTD_INT_MAX {
         return NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_INVALID_LAYOUT;
     }
     match HeapReAlloc(heap.handle, 0, *ptr, size) {

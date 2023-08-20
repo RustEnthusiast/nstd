@@ -65,7 +65,7 @@ pub enum NSTDWindowsAllocError {
 #[inline]
 #[nstdapi]
 pub unsafe fn nstd_os_windows_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
-    if size <= NSTD_INT_MAX as _ {
+    if size <= NSTD_INT_MAX {
         let heap = GetProcessHeap();
         if heap != 0 {
             return HeapAlloc(heap, 0, size);
@@ -108,7 +108,7 @@ pub unsafe fn nstd_os_windows_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
 #[inline]
 #[nstdapi]
 pub unsafe fn nstd_os_windows_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMut {
-    if size <= NSTD_INT_MAX as _ {
+    if size <= NSTD_INT_MAX {
         let heap = GetProcessHeap();
         if heap != 0 {
             return HeapAlloc(heap, HEAP_ZERO_MEMORY, size);
@@ -166,7 +166,7 @@ pub unsafe fn nstd_os_windows_alloc_reallocate(
     ptr: &mut NSTDAnyMut,
     new_size: NSTDUInt,
 ) -> NSTDWindowsAllocError {
-    if new_size > NSTD_INT_MAX as _ {
+    if new_size > NSTD_INT_MAX {
         return NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_INVALID_LAYOUT;
     }
     match GetProcessHeap() {

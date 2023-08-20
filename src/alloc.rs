@@ -396,7 +396,7 @@ pub unsafe fn nstd_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
             target_os = "solid_asp3"
         ))] {
             use crate::NSTD_INT_MAX;
-            match size <= NSTD_INT_MAX as _ {
+            match size <= NSTD_INT_MAX {
                 true => libc::malloc(size),
                 false => NSTD_NULL,
             }
@@ -450,7 +450,7 @@ pub unsafe fn nstd_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMut {
             target_os = "solid_asp3"
         ))] {
             use crate::NSTD_INT_MAX;
-            match size <= NSTD_INT_MAX as _ {
+            match size <= NSTD_INT_MAX {
                 true => libc::calloc(size, 1),
                 false => NSTD_NULL,
             }
@@ -527,7 +527,7 @@ pub unsafe fn nstd_alloc_reallocate(
             target_os = "solid_asp3"
         ))] {
             use crate::NSTD_INT_MAX;
-            if new_size > NSTD_INT_MAX as _ {
+            if new_size > NSTD_INT_MAX {
                 return NSTDAllocError::NSTD_ALLOC_ERROR_INVALID_LAYOUT;
             }
             let new_mem = libc::realloc(*ptr, new_size);

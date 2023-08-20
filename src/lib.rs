@@ -109,9 +109,9 @@ use ::core::{
     ptr::{addr_of, addr_of_mut},
 };
 
-/// [`NSTDInt`]'s maximum value.
+/// [`NSTDInt`]'s maximum value represented as [`NSTDUInt`].
 #[allow(dead_code)]
-const NSTD_INT_MAX: NSTDInt = NSTDInt::MAX;
+const NSTD_INT_MAX: NSTDUInt = NSTDInt::MAX as _;
 
 /// A null pointer value constant.
 pub const NSTD_NULL: NSTDAnyMut = ::core::ptr::null_mut();
