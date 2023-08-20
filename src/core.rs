@@ -69,9 +69,9 @@ pub const fn nstd_core_panic() -> ! {
 ///
 /// This operation will never return.
 ///
-/// In contrast to `nstd_core_abort_with_msg`, which will terminate the program immediately, this
-/// method of abortion will begin unwinding the stack (when panic = "unwind"). This can be useful
-/// for Rust programs that don't unwind through call frames from foreign languages.
+/// In contrast to `nstd_core_abort`, which will terminate the program immediately, this method of
+/// abortion will begin unwinding the stack (when panic = "unwind"). This can be useful for Rust
+/// programs that don't unwind through call frames from foreign languages.
 ///
 /// # Parameters:
 ///
