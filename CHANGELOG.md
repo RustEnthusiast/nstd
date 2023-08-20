@@ -9,6 +9,7 @@
 ## Removed
 ### `nstd.core`
 - Removed `nstd_core_abort_with_msg`.
+- Removed `nstd_core_ops_[inc|dec]_*` functions.
 
 # 0.9.0
 ## Added
