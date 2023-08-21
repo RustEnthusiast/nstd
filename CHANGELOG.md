@@ -8,8 +8,13 @@
 - Added `NSTDOptionalAnyRef[Mut]`.
 ## Changed
 ### `nstd.core`
+- `nstd_core_str[_mut]_from_bytes` functions no longer panic.
 - Functions in `nstd.core.mem` no longer panic.
 - Functions in `nstd.core.ops` now return optionals instead of panicking.
+### `nstd.fs`
+- `nstd_fs_write` no longer panics.
+### `nstd.proc`
+- `nstd_proc_spawn` no longer panics.
 ## Removed
 ### `nstd.core`
 - Removed `nstd_core_abort_with_msg`.

@@ -173,10 +173,6 @@ NSTDAPI NSTDIOStringResult nstd_fs_read_to_string(const NSTDStr *path);
 ///
 /// `NSTDIOError errc` - The I/O operation error code.
 ///
-/// # Panics
-///
-/// This operation will panic if `content`'s stride is not 1.
-///
 /// # Safety
 ///
 /// This operation can cause undefined behavior if either `path` or `content`'s data is invalid.

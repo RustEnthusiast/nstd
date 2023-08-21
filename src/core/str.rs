@@ -267,10 +267,6 @@ pub unsafe fn nstd_core_str_from_raw_cstr_with_null(cstr: *const NSTDChar) -> NS
 /// `NSTDOptionalStr str` - The new string slice on success, or a "none" variant if the
 /// result is not valid UTF-8.
 ///
-/// # Panics
-///
-/// This operation will panic if `bytes`'s stride is not 1.
-///
 /// # Safety
 ///
 /// - `bytes` must remain valid while the returned string slice is in use.
@@ -294,14 +290,15 @@ pub unsafe fn nstd_core_str_from_raw_cstr_with_null(cstr: *const NSTDChar) -> NS
 /// ```
 #[nstdapi]
 pub const unsafe fn nstd_core_str_from_bytes(bytes: &NSTDSlice) -> NSTDOptionalStr {
-    match core::str::from_utf8(bytes.as_slice()).is_ok() {
-        true => {
-            let ptr = nstd_core_slice_as_ptr(bytes).cast();
-            let len = nstd_core_slice_len(bytes);
-            NSTDOptional::Some(NSTDStr { ptr, len })
+    if let Some(bytes) = bytes.as_slice() {
+        if core::str::from_utf8(bytes).is_ok() {
+            return NSTDOptional::Some(NSTDStr {
+                ptr: bytes.as_ptr(),
+                len: bytes.len(),
+            });
         }
-        false => NSTDOptional::None,
     }
+    NSTDOptional::None
 }
 
 /// Creates a string slice from raw bytes, without checking for UTF-8.
@@ -1020,10 +1017,6 @@ pub unsafe fn nstd_core_str_mut_from_raw_cstr_with_null(cstr: *mut NSTDChar) -> 
 /// `NSTDOptionalStrMut str` - The new string slice on success, or a "none" variant if the
 /// result is not valid UTF-8.
 ///
-/// # Panics
-///
-/// This operation will panic if `bytes`'s stride is not 1.
-///
 /// # Safety
 ///
 /// - `bytes` must remain valid while the returned string slice is in use.
@@ -1047,14 +1040,15 @@ pub unsafe fn nstd_core_str_mut_from_raw_cstr_with_null(cstr: *mut NSTDChar) -> 
 /// ```
 #[nstdapi]
 pub unsafe fn nstd_core_str_mut_from_bytes(bytes: &mut NSTDSliceMut) -> NSTDOptionalStrMut {
-    match core::str::from_utf8(bytes.as_slice()).is_ok() {
-        true => {
-            let ptr = nstd_core_slice_mut_as_ptr(bytes).cast();
-            let len = nstd_core_slice_mut_len(bytes);
-            NSTDOptional::Some(NSTDStrMut { ptr, len })
+    if let Some(bytes) = bytes.as_slice_mut() {
+        if core::str::from_utf8(bytes).is_ok() {
+            return NSTDOptional::Some(NSTDStrMut {
+                ptr: bytes.as_mut_ptr(),
+                len: bytes.len(),
+            });
         }
-        false => NSTDOptional::None,
     }
+    NSTDOptional::None
 }
 
 /// Creates a string slice from raw bytes, without checking for UTF-8.

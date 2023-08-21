@@ -96,10 +96,6 @@ NSTDAPI NSTDOptionalStr nstd_core_str_from_raw_cstr_with_null(const NSTDChar *cs
 /// `NSTDOptionalStr str` - The new string slice on success, or a "none" variant if the
 /// result is not valid UTF-8.
 ///
-/// # Panics
-///
-/// This operation will panic if `bytes`'s stride is not 1.
-///
 /// # Safety
 ///
 /// - `bytes` must remain valid while the returned string slice is in use.
@@ -492,10 +488,6 @@ NSTDAPI NSTDOptionalStrMut nstd_core_str_mut_from_raw_cstr_with_null(NSTDChar *c
 ///
 /// `NSTDOptionalStrMut str` - The new string slice on success, or a "none" variant if the
 /// result is not valid UTF-8.
-///
-/// # Panics
-///
-/// This operation will panic if `bytes`'s stride is not 1.
 ///
 /// # Safety
 ///

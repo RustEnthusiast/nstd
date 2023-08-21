@@ -40,9 +40,7 @@ impl NSTDSlice {
 
     /// Creates a Rust slice from this `NSTDSlice`.
     ///
-    /// # Panics
-    ///
-    /// This operation will panic if `size_of::<T>()` does not match the slice's stride.
+    /// Returns [`None`] if `size_of::<T>()` does not match the slice's stride.
     ///
     /// # Safety
     ///
@@ -51,9 +49,11 @@ impl NSTDSlice {
     ///
     /// - The slice's data must be properly aligned.
     #[inline]
-    pub(crate) const unsafe fn as_slice<T>(&self) -> &[T] {
-        assert!(self.stride == core::mem::size_of::<T>());
-        core::slice::from_raw_parts(self.ptr.cast(), self.len)
+    pub(crate) const unsafe fn as_slice<T>(&self) -> Option<&[T]> {
+        match self.stride == core::mem::size_of::<T>() {
+            true => Some(core::slice::from_raw_parts(self.ptr.cast(), self.len)),
+            false => None,
+        }
     }
 }
 gen_optional!(NSTDOptionalSlice, NSTDSlice);
@@ -338,29 +338,9 @@ pub struct NSTDSliceMut {
     stride: NSTDUInt,
 }
 impl NSTDSliceMut {
-    /// Creates a Rust slice from this `NSTDSliceMut`.
-    ///
-    /// # Panics
-    ///
-    /// This operation will panic if `size_of::<T>()` does not match the slice's stride.
-    ///
-    /// # Safety
-    ///
-    /// - The `NSTDSliceMut`'s data must remain valid and unmodified while the returned slice is in
-    /// use.
-    ///
-    /// - The slice's data must be properly aligned.
-    #[inline]
-    pub(crate) const unsafe fn as_slice<T>(&self) -> &[T] {
-        assert!(self.stride == core::mem::size_of::<T>());
-        core::slice::from_raw_parts(self.ptr as _, self.len)
-    }
-
     /// Creates a mutable Rust slice from this `NSTDSliceMut`.
     ///
-    /// # Panics
-    ///
-    /// This operation will panic if `size_of::<T>()` does not match the slice's stride.
+    /// Returns [`None`] if `size_of::<T>()` does not match the slice's stride.
     ///
     /// # Safety
     ///
@@ -370,10 +350,11 @@ impl NSTDSliceMut {
     /// - The slice's data must be properly aligned.
     #[inline]
     #[allow(dead_code)]
-    pub(crate) unsafe fn as_slice_mut<T>(&mut self) -> &mut [T] {
-        assert!(nstd_core_slice_mut_stride(self) == core::mem::size_of::<T>());
-        let ptr = nstd_core_slice_mut_as_ptr(self).cast();
-        core::slice::from_raw_parts_mut(ptr, self.len)
+    pub(crate) unsafe fn as_slice_mut<T>(&mut self) -> Option<&mut [T]> {
+        match self.stride == core::mem::size_of::<T>() {
+            true => Some(core::slice::from_raw_parts_mut(self.ptr.cast(), self.len)),
+            false => None,
+        }
     }
 }
 gen_optional!(NSTDOptionalSliceMut, NSTDSliceMut);

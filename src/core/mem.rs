@@ -116,7 +116,7 @@ pub unsafe fn nstd_core_mem_compare(
 /// }
 /// ```
 #[nstdapi]
-#[allow(unused_mut)]
+#[allow(unused_mut, clippy::missing_const_for_fn)]
 pub unsafe fn nstd_core_mem_search(
     mut buf: *const NSTDByte,
     size: NSTDUInt,
@@ -172,7 +172,7 @@ pub unsafe fn nstd_core_mem_search(
 /// ```
 #[inline]
 #[nstdapi]
-#[allow(unused_mut)]
+#[allow(unused_mut, clippy::missing_const_for_fn)]
 pub unsafe fn nstd_core_mem_zero(mut buf: *mut NSTDByte, size: NSTDUInt) {
     cfg_if! {
         if #[cfg(all(
@@ -224,7 +224,7 @@ pub unsafe fn nstd_core_mem_zero(mut buf: *mut NSTDByte, size: NSTDUInt) {
 /// ```
 #[inline]
 #[nstdapi]
-#[allow(unused_mut)]
+#[allow(unused_mut, clippy::missing_const_for_fn)]
 pub unsafe fn nstd_core_mem_fill(mut buf: *mut NSTDByte, size: NSTDUInt, fill: NSTDByte) {
     cfg_if! {
         if #[cfg(all(

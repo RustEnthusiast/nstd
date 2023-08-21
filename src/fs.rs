@@ -236,20 +236,18 @@ pub unsafe fn nstd_fs_read_to_string(path: &NSTDStr) -> NSTDIOStringResult<'_> {
 ///
 /// `NSTDIOError errc` - The I/O operation error code.
 ///
-/// # Panics
-///
-/// This operation will panic if `content`'s stride is not 1.
-///
 /// # Safety
 ///
 /// This operation can cause undefined behavior if either `path` or `content`'s data is invalid.
-#[inline]
 #[nstdapi]
 pub unsafe fn nstd_fs_write(path: &NSTDStr, content: &NSTDSlice) -> NSTDIOError {
-    if let Err(err) = std::fs::write(path.as_str(), content.as_slice()) {
-        return NSTDIOError::from_err(err.kind());
-    }
-    NSTDIOError::NSTD_IO_ERROR_NONE
+    content.as_slice().map_or(
+        NSTDIOError::NSTD_IO_ERROR_INVALID_INPUT,
+        |bytes| match std::fs::write(path.as_str(), bytes) {
+            Ok(_) => NSTDIOError::NSTD_IO_ERROR_NONE,
+            Err(err) => NSTDIOError::from_err(err.kind()),
+        },
+    )
 }
 
 /// Renames a file or directory, replacing the destination if it already exists.

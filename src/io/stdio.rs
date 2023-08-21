@@ -4,7 +4,7 @@ use crate::{
     alloc::NSTDAllocError,
     core::{
         result::NSTDResult,
-        slice::{nstd_core_slice_mut_stride, nstd_core_slice_stride, NSTDSlice, NSTDSliceMut},
+        slice::{NSTDSlice, NSTDSliceMut},
         str::nstd_core_str_from_bytes_unchecked,
     },
     io::{NSTDIOError, NSTDIOResult},
@@ -19,15 +19,13 @@ use std::io::{Read, Write};
 ///
 /// This function can cause undefined behavior if `bytes`'s data is invalid.
 pub(crate) unsafe fn write<W: Write>(stream: &mut W, bytes: &NSTDSlice) -> NSTDIOResult {
-    // Make sure the slice's element size is 1.
-    if nstd_core_slice_stride(bytes) != 1 {
-        return NSTDResult::Err(NSTDIOError::NSTD_IO_ERROR_INVALID_INPUT);
-    }
-    // Attempt to write the bytes to stdout.
-    match stream.write(bytes.as_slice()) {
-        Ok(w) => NSTDResult::Ok(w),
-        Err(err) => NSTDResult::Err(NSTDIOError::from_err(err.kind())),
-    }
+    bytes.as_slice().map_or(
+        NSTDResult::Err(NSTDIOError::NSTD_IO_ERROR_INVALID_INPUT),
+        |bytes| match stream.write(bytes) {
+            Ok(w) => NSTDResult::Ok(w),
+            Err(err) => NSTDResult::Err(NSTDIOError::from_err(err.kind())),
+        },
+    )
 }
 
 /// Writes an `nstd` byte slice to a [Write] stream.
@@ -36,15 +34,13 @@ pub(crate) unsafe fn write<W: Write>(stream: &mut W, bytes: &NSTDSlice) -> NSTDI
 ///
 /// This function can cause undefined behavior if `bytes`'s data is invalid.
 pub(crate) unsafe fn write_all<W: Write>(stream: &mut W, bytes: &NSTDSlice) -> NSTDIOError {
-    // Make sure the slice's element size is 1.
-    if nstd_core_slice_stride(bytes) != 1 {
-        return NSTDIOError::NSTD_IO_ERROR_INVALID_INPUT;
-    }
-    // Attempt to write the bytes to stdout.
-    if let Err(err) = stream.write_all(bytes.as_slice()) {
-        return NSTDIOError::from_err(err.kind());
-    }
-    NSTDIOError::NSTD_IO_ERROR_NONE
+    bytes.as_slice().map_or(
+        NSTDIOError::NSTD_IO_ERROR_INVALID_INPUT,
+        |bytes| match stream.write_all(bytes) {
+            Ok(_) => NSTDIOError::NSTD_IO_ERROR_NONE,
+            Err(err) => NSTDIOError::from_err(err.kind()),
+        },
+    )
 }
 
 /// Flushes a [Write] stream.
@@ -62,15 +58,13 @@ pub(crate) fn flush<W: Write>(stream: &mut W) -> NSTDIOError {
 ///
 /// `buffer`'s data must be valid for writes.
 pub(crate) unsafe fn read<R: Read>(stream: &mut R, buffer: &mut NSTDSliceMut) -> NSTDIOResult {
-    // Make sure the buffer's element size is 1.
-    if nstd_core_slice_mut_stride(buffer) != 1 {
-        return NSTDResult::Err(NSTDIOError::NSTD_IO_ERROR_INVALID_INPUT);
-    }
-    // Attempt to read bytes into the buffer.
-    match stream.read(buffer.as_slice_mut()) {
-        Ok(r) => NSTDResult::Ok(r),
-        Err(err) => NSTDResult::Err(NSTDIOError::from_err(err.kind())),
-    }
+    buffer.as_slice_mut().map_or(
+        NSTDResult::Err(NSTDIOError::NSTD_IO_ERROR_INVALID_INPUT),
+        |buffer| match stream.read(buffer) {
+            Ok(r) => NSTDResult::Ok(r),
+            Err(err) => NSTDResult::Err(NSTDIOError::from_err(err.kind())),
+        },
+    )
 }
 
 /// Extends an [`NSTDVec`] with data from a [Read] stream until EOF is reached.
@@ -132,13 +126,11 @@ pub(crate) fn read_to_string<R: Read>(stream: &mut R, buffer: &mut NSTDString<'_
 ///
 /// `buffer`'s data must be valid for writes.
 pub(crate) unsafe fn read_exact<R: Read>(stream: &mut R, buffer: &mut NSTDSliceMut) -> NSTDIOError {
-    // Make sure the buffer's element size is 1.
-    if nstd_core_slice_mut_stride(buffer) != 1 {
-        return NSTDIOError::NSTD_IO_ERROR_INVALID_INPUT;
-    }
-    // Attempt to fill the buffer with data from stdin.
-    if let Err(err) = stream.read_exact(buffer.as_slice_mut()) {
-        return NSTDIOError::from_err(err.kind());
-    }
-    NSTDIOError::NSTD_IO_ERROR_NONE
+    buffer.as_slice_mut().map_or(
+        NSTDIOError::NSTD_IO_ERROR_INVALID_INPUT,
+        |buffer| match stream.read_exact(buffer) {
+            Ok(_) => NSTDIOError::NSTD_IO_ERROR_NONE,
+            Err(err) => NSTDIOError::from_err(err.kind()),
+        },
+    )
 }

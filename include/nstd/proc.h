@@ -31,14 +31,6 @@ NSTDOptional(NSTDChildProcess) NSTDOptionalChildProcess;
 /// `NSTDOptionalChildProcess child` - A handle to the new child process on success, or an
 /// uninitialized "none" variant if spawning the child process fails.
 ///
-/// # Panics
-///
-/// This operation will panic in any of the following situations:
-///
-/// - `args`'s stride is not equal to `sizeof(NSTDStr)`.
-///
-/// - `vars`'s stride is not equal to `sizeof(NSTDStr[2])`.
-///
 /// # Safety
 ///
 /// The user must ensure that all of `program`, `args`, and `vars` and their data remain valid for

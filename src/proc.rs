@@ -36,14 +36,6 @@ gen_optional!(NSTDOptionalChildProcess, NSTDChildProcess);
 /// `NSTDOptionalChildProcess child` - A handle to the new child process on success, or an
 /// uninitialized "none" variant if spawning the child process fails.
 ///
-/// # Panics
-///
-/// This operation will panic in any of the following situations:
-///
-/// - `args`'s stride is not equal to `sizeof(NSTDStr)`.
-///
-/// - `vars`'s stride is not equal to `sizeof(NSTDStr[2])`.
-///
 /// # Safety
 ///
 /// The user must ensure that all of `program`, `args`, and `vars` and their data remain valid for
@@ -56,19 +48,23 @@ pub unsafe fn nstd_proc_spawn(
 ) -> NSTDOptionalChildProcess {
     // Create the process command builder.
     let mut cmd = Command::new(program.as_str());
-    // Add the arguments.
-    cmd.args(args.as_slice::<NSTDStr>().iter().map(|arg| arg.as_str()));
-    // Add the environment variables.
-    cmd.envs(vars.as_slice::<[NSTDStr; 2]>().iter().map(|vars| {
-        (
-            vars.get_unchecked(0).as_str(),
-            vars.get_unchecked(1).as_str(),
-        )
-    }));
-    // Spawn the process.
-    if let Ok(proc) = cmd.spawn() {
-        if let Some(proc) = CBox::new(proc) {
-            return NSTDOptional::Some(NSTDChildProcess { proc });
+    if let Some(args) = args.as_slice::<NSTDStr>() {
+        if let Some(vars) = vars.as_slice::<[NSTDStr; 2]>() {
+            // Add the arguments.
+            cmd.args(args.iter().map(|arg| arg.as_str()));
+            // Add the environment variables.
+            cmd.envs(vars.iter().map(|vars| {
+                (
+                    vars.get_unchecked(0).as_str(),
+                    vars.get_unchecked(1).as_str(),
+                )
+            }));
+            // Spawn the process.
+            if let Ok(proc) = cmd.spawn() {
+                if let Some(proc) = CBox::new(proc) {
+                    return NSTDOptional::Some(NSTDChildProcess { proc });
+                }
+            }
         }
     }
     NSTDOptional::None
