@@ -6,6 +6,9 @@
 ### `nstd.core`
 - Added `NSTDOptionalRef[Mut]`.
 - Added `NSTDOptionalAnyRef[Mut]`.
+## Changed
+### `nstd.core`
+- Functions in `nstd.core.ops` now return optionals instead of panicking.
 ## Removed
 ### `nstd.core`
 - Removed `nstd_core_abort_with_msg`.

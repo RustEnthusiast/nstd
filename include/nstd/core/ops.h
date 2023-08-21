@@ -1,6 +1,7 @@
 #ifndef NSTD_CORE_OPS_H
 #define NSTD_CORE_OPS_H
 #include "../nstd.h"
+#include "optional.h"
 
 /// Returns the negative value of `x`.
 ///
@@ -10,12 +11,9 @@
 ///
 /// # Returns
 ///
-/// `NSTDInt v` - The negative value of `x`.
-///
-/// # Panics
-///
-/// This will panic if the negate operation results in an overflow.
-NSTDAPI NSTDInt nstd_core_ops_neg_int(NSTDInt x);
+/// `NSTDOptionalInt v` - The negative value of `x` on success, or an uninitialized "none" variant
+/// on overflow.
+NSTDAPI NSTDOptionalInt nstd_core_ops_neg_int(NSTDInt x);
 /// Returns the negative value of `x`.
 ///
 /// # Parameters:
@@ -24,12 +22,9 @@ NSTDAPI NSTDInt nstd_core_ops_neg_int(NSTDInt x);
 ///
 /// # Returns
 ///
-/// `NSTDInt8 v` - The negative value of `x`.
-///
-/// # Panics
-///
-/// This will panic if the negate operation results in an overflow.
-NSTDAPI NSTDInt8 nstd_core_ops_neg_i8(NSTDInt8 x);
+/// `NSTDOptionalInt8 v` - The negative value of `x` on success, or an uninitialized "none" variant
+/// on overflow.
+NSTDAPI NSTDOptionalInt8 nstd_core_ops_neg_i8(NSTDInt8 x);
 /// Returns the negative value of `x`.
 ///
 /// # Parameters:
@@ -38,12 +33,9 @@ NSTDAPI NSTDInt8 nstd_core_ops_neg_i8(NSTDInt8 x);
 ///
 /// # Returns
 ///
-/// `NSTDInt16 v` - The negative value of `x`.
-///
-/// # Panics
-///
-/// This will panic if the negate operation results in an overflow.
-NSTDAPI NSTDInt16 nstd_core_ops_neg_i16(NSTDInt16 x);
+/// `NSTDOptionalInt16 v` - The negative value of `x` on success, or an uninitialized "none" variant
+/// on overflow.
+NSTDAPI NSTDOptionalInt16 nstd_core_ops_neg_i16(NSTDInt16 x);
 /// Returns the negative value of `x`.
 ///
 /// # Parameters:
@@ -52,12 +44,9 @@ NSTDAPI NSTDInt16 nstd_core_ops_neg_i16(NSTDInt16 x);
 ///
 /// # Returns
 ///
-/// `NSTDInt32 v` - The negative value of `x`.
-///
-/// # Panics
-///
-/// This will panic if the negate operation results in an overflow.
-NSTDAPI NSTDInt32 nstd_core_ops_neg_i32(NSTDInt32 x);
+/// `NSTDOptionalInt32 v` - The negative value of `x` on success, or an uninitialized "none" variant
+/// on overflow.
+NSTDAPI NSTDOptionalInt32 nstd_core_ops_neg_i32(NSTDInt32 x);
 /// Returns the negative value of `x`.
 ///
 /// # Parameters:
@@ -66,12 +55,9 @@ NSTDAPI NSTDInt32 nstd_core_ops_neg_i32(NSTDInt32 x);
 ///
 /// # Returns
 ///
-/// `NSTDInt64 v` - The negative value of `x`.
-///
-/// # Panics
-///
-/// This will panic if the negate operation results in an overflow.
-NSTDAPI NSTDInt64 nstd_core_ops_neg_i64(NSTDInt64 x);
+/// `NSTDOptionalInt64 v` - The negative value of `x` on success, or an uninitialized "none" variant
+/// on overflow.
+NSTDAPI NSTDOptionalInt64 nstd_core_ops_neg_i64(NSTDInt64 x);
 
 /// Computes the addition operation of `x` + `y`.
 ///
@@ -83,12 +69,9 @@ NSTDAPI NSTDInt64 nstd_core_ops_neg_i64(NSTDInt64 x);
 ///
 /// # Returns
 ///
-/// `NSTDInt z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if the addition operation results in an overflow.
-NSTDAPI NSTDInt nstd_core_ops_add_int(NSTDInt x, NSTDInt y);
+/// `NSTDOptionalInt z` - The result of the operation on success, or an uninitialized "none"
+/// variant on overflow.
+NSTDAPI NSTDOptionalInt nstd_core_ops_add_int(NSTDInt x, NSTDInt y);
 /// Computes the addition operation of `x` + `y`.
 ///
 /// # Parameters:
@@ -99,12 +82,9 @@ NSTDAPI NSTDInt nstd_core_ops_add_int(NSTDInt x, NSTDInt y);
 ///
 /// # Returns
 ///
-/// `NSTDUInt z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if the addition operation results in an overflow.
-NSTDAPI NSTDUInt nstd_core_ops_add_uint(NSTDUInt x, NSTDUInt y);
+/// `NSTDOptionalUInt z` - The result of the operation on success, or an uninitialized "none"
+/// variant on overflow.
+NSTDAPI NSTDOptionalUInt nstd_core_ops_add_uint(NSTDUInt x, NSTDUInt y);
 /// Computes the addition operation of `x` + `y`.
 ///
 /// # Parameters:
@@ -115,12 +95,9 @@ NSTDAPI NSTDUInt nstd_core_ops_add_uint(NSTDUInt x, NSTDUInt y);
 ///
 /// # Returns
 ///
-/// `NSTDInt8 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if the addition operation results in an overflow.
-NSTDAPI NSTDInt8 nstd_core_ops_add_i8(NSTDInt8 x, NSTDInt8 y);
+/// `NSTDOptionalInt8 z` - The result of the operation on success, or an uninitialized "none"
+/// variant on overflow.
+NSTDAPI NSTDOptionalInt8 nstd_core_ops_add_i8(NSTDInt8 x, NSTDInt8 y);
 /// Computes the addition operation of `x` + `y`.
 ///
 /// # Parameters:
@@ -131,12 +108,9 @@ NSTDAPI NSTDInt8 nstd_core_ops_add_i8(NSTDInt8 x, NSTDInt8 y);
 ///
 /// # Returns
 ///
-/// `NSTDUInt8 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if the addition operation results in an overflow.
-NSTDAPI NSTDUInt8 nstd_core_ops_add_u8(NSTDUInt8 x, NSTDUInt8 y);
+/// `NSTDOptionalUInt8 z` - The result of the operation on success, or an uninitialized "none"
+/// variant on overflow.
+NSTDAPI NSTDOptionalUInt8 nstd_core_ops_add_u8(NSTDUInt8 x, NSTDUInt8 y);
 /// Computes the addition operation of `x` + `y`.
 ///
 /// # Parameters:
@@ -147,12 +121,9 @@ NSTDAPI NSTDUInt8 nstd_core_ops_add_u8(NSTDUInt8 x, NSTDUInt8 y);
 ///
 /// # Returns
 ///
-/// `NSTDInt16 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if the addition operation results in an overflow.
-NSTDAPI NSTDInt16 nstd_core_ops_add_i16(NSTDInt16 x, NSTDInt16 y);
+/// `NSTDOptionalInt16 z` - The result of the operation on success, or an uninitialized "none"
+/// variant on overflow.
+NSTDAPI NSTDOptionalInt16 nstd_core_ops_add_i16(NSTDInt16 x, NSTDInt16 y);
 /// Computes the addition operation of `x` + `y`.
 ///
 /// # Parameters:
@@ -163,12 +134,9 @@ NSTDAPI NSTDInt16 nstd_core_ops_add_i16(NSTDInt16 x, NSTDInt16 y);
 ///
 /// # Returns
 ///
-/// `NSTDUInt16 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if the addition operation results in an overflow.
-NSTDAPI NSTDUInt16 nstd_core_ops_add_u16(NSTDUInt16 x, NSTDUInt16 y);
+/// `NSTDOptionalUInt16 z` - The result of the operation on success, or an uninitialized "none"
+/// variant on overflow.
+NSTDAPI NSTDOptionalUInt16 nstd_core_ops_add_u16(NSTDUInt16 x, NSTDUInt16 y);
 /// Computes the addition operation of `x` + `y`.
 ///
 /// # Parameters:
@@ -179,12 +147,9 @@ NSTDAPI NSTDUInt16 nstd_core_ops_add_u16(NSTDUInt16 x, NSTDUInt16 y);
 ///
 /// # Returns
 ///
-/// `NSTDInt32 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if the addition operation results in an overflow.
-NSTDAPI NSTDInt32 nstd_core_ops_add_i32(NSTDInt32 x, NSTDInt32 y);
+/// `NSTDOptionalInt32 z` - The result of the operation on success, or an uninitialized "none"
+/// variant on overflow.
+NSTDAPI NSTDOptionalInt32 nstd_core_ops_add_i32(NSTDInt32 x, NSTDInt32 y);
 /// Computes the addition operation of `x` + `y`.
 ///
 /// # Parameters:
@@ -195,12 +160,9 @@ NSTDAPI NSTDInt32 nstd_core_ops_add_i32(NSTDInt32 x, NSTDInt32 y);
 ///
 /// # Returns
 ///
-/// `NSTDUInt32 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if the addition operation results in an overflow.
-NSTDAPI NSTDUInt32 nstd_core_ops_add_u32(NSTDUInt32 x, NSTDUInt32 y);
+/// `NSTDOptionalUInt32 z` - The result of the operation on success, or an uninitialized "none"
+/// variant on overflow.
+NSTDAPI NSTDOptionalUInt32 nstd_core_ops_add_u32(NSTDUInt32 x, NSTDUInt32 y);
 /// Computes the addition operation of `x` + `y`.
 ///
 /// # Parameters:
@@ -211,12 +173,9 @@ NSTDAPI NSTDUInt32 nstd_core_ops_add_u32(NSTDUInt32 x, NSTDUInt32 y);
 ///
 /// # Returns
 ///
-/// `NSTDInt64 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if the addition operation results in an overflow.
-NSTDAPI NSTDInt64 nstd_core_ops_add_i64(NSTDInt64 x, NSTDInt64 y);
+/// `NSTDOptionalInt64 z` - The result of the operation on success, or an uninitialized "none"
+/// variant on overflow.
+NSTDAPI NSTDOptionalInt64 nstd_core_ops_add_i64(NSTDInt64 x, NSTDInt64 y);
 /// Computes the addition operation of `x` + `y`.
 ///
 /// # Parameters:
@@ -227,12 +186,9 @@ NSTDAPI NSTDInt64 nstd_core_ops_add_i64(NSTDInt64 x, NSTDInt64 y);
 ///
 /// # Returns
 ///
-/// `NSTDUInt64 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if the addition operation results in an overflow.
-NSTDAPI NSTDUInt64 nstd_core_ops_add_u64(NSTDUInt64 x, NSTDUInt64 y);
+/// `NSTDOptionalUInt64 z` - The result of the operation on success, or an uninitialized "none"
+/// variant on overflow.
+NSTDAPI NSTDOptionalUInt64 nstd_core_ops_add_u64(NSTDUInt64 x, NSTDUInt64 y);
 
 /// Computes the subtraction operation of `x` - `y`.
 ///
@@ -244,12 +200,9 @@ NSTDAPI NSTDUInt64 nstd_core_ops_add_u64(NSTDUInt64 x, NSTDUInt64 y);
 ///
 /// # Returns
 ///
-/// `NSTDInt z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if the subtraction operation results in an overflow.
-NSTDAPI NSTDInt nstd_core_ops_sub_int(NSTDInt x, NSTDInt y);
+/// `NSTDOptionalInt z` - The result of the operation on success, or an uninitialized "none"
+/// variant on overflow.
+NSTDAPI NSTDOptionalInt nstd_core_ops_sub_int(NSTDInt x, NSTDInt y);
 /// Computes the subtraction operation of `x` - `y`.
 ///
 /// # Parameters:
@@ -260,12 +213,9 @@ NSTDAPI NSTDInt nstd_core_ops_sub_int(NSTDInt x, NSTDInt y);
 ///
 /// # Returns
 ///
-/// `NSTDUInt z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if the subtraction operation results in an overflow.
-NSTDAPI NSTDUInt nstd_core_ops_sub_uint(NSTDUInt x, NSTDUInt y);
+/// `NSTDOptionalUInt z` - The result of the operation on success, or an uninitialized "none"
+/// variant on overflow.
+NSTDAPI NSTDOptionalUInt nstd_core_ops_sub_uint(NSTDUInt x, NSTDUInt y);
 /// Computes the subtraction operation of `x` - `y`.
 ///
 /// # Parameters:
@@ -276,12 +226,9 @@ NSTDAPI NSTDUInt nstd_core_ops_sub_uint(NSTDUInt x, NSTDUInt y);
 ///
 /// # Returns
 ///
-/// `NSTDInt8 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if the subtraction operation results in an overflow.
-NSTDAPI NSTDInt8 nstd_core_ops_sub_i8(NSTDInt8 x, NSTDInt8 y);
+/// `NSTDOptionalInt8 z` - The result of the operation on success, or an uninitialized "none"
+/// variant on overflow.
+NSTDAPI NSTDOptionalInt8 nstd_core_ops_sub_i8(NSTDInt8 x, NSTDInt8 y);
 /// Computes the subtraction operation of `x` - `y`.
 ///
 /// # Parameters:
@@ -292,12 +239,9 @@ NSTDAPI NSTDInt8 nstd_core_ops_sub_i8(NSTDInt8 x, NSTDInt8 y);
 ///
 /// # Returns
 ///
-/// `NSTDUInt8 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if the subtraction operation results in an overflow.
-NSTDAPI NSTDUInt8 nstd_core_ops_sub_u8(NSTDUInt8 x, NSTDUInt8 y);
+/// `NSTDOptionalUInt8 z` - The result of the operation on success, or an uninitialized "none"
+/// variant on overflow.
+NSTDAPI NSTDOptionalUInt8 nstd_core_ops_sub_u8(NSTDUInt8 x, NSTDUInt8 y);
 /// Computes the subtraction operation of `x` - `y`.
 ///
 /// # Parameters:
@@ -308,12 +252,9 @@ NSTDAPI NSTDUInt8 nstd_core_ops_sub_u8(NSTDUInt8 x, NSTDUInt8 y);
 ///
 /// # Returns
 ///
-/// `NSTDInt16 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if the subtraction operation results in an overflow.
-NSTDAPI NSTDInt16 nstd_core_ops_sub_i16(NSTDInt16 x, NSTDInt16 y);
+/// `NSTDOptionalInt16 z` - The result of the operation on success, or an uninitialized "none"
+/// variant on overflow.
+NSTDAPI NSTDOptionalInt16 nstd_core_ops_sub_i16(NSTDInt16 x, NSTDInt16 y);
 /// Computes the subtraction operation of `x` - `y`.
 ///
 /// # Parameters:
@@ -324,12 +265,9 @@ NSTDAPI NSTDInt16 nstd_core_ops_sub_i16(NSTDInt16 x, NSTDInt16 y);
 ///
 /// # Returns
 ///
-/// `NSTDUInt16 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if the subtraction operation results in an overflow.
-NSTDAPI NSTDUInt16 nstd_core_ops_sub_u16(NSTDUInt16 x, NSTDUInt16 y);
+/// `NSTDOptionalUInt16 z` - The result of the operation on success, or an uninitialized "none"
+/// variant on overflow.
+NSTDAPI NSTDOptionalUInt16 nstd_core_ops_sub_u16(NSTDUInt16 x, NSTDUInt16 y);
 /// Computes the subtraction operation of `x` - `y`.
 ///
 /// # Parameters:
@@ -340,12 +278,9 @@ NSTDAPI NSTDUInt16 nstd_core_ops_sub_u16(NSTDUInt16 x, NSTDUInt16 y);
 ///
 /// # Returns
 ///
-/// `NSTDInt32 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if the subtraction operation results in an overflow.
-NSTDAPI NSTDInt32 nstd_core_ops_sub_i32(NSTDInt32 x, NSTDInt32 y);
+/// `NSTDOptionalInt32 z` - The result of the operation on success, or an uninitialized "none"
+/// variant on overflow.
+NSTDAPI NSTDOptionalInt32 nstd_core_ops_sub_i32(NSTDInt32 x, NSTDInt32 y);
 /// Computes the subtraction operation of `x` - `y`.
 ///
 /// # Parameters:
@@ -356,12 +291,9 @@ NSTDAPI NSTDInt32 nstd_core_ops_sub_i32(NSTDInt32 x, NSTDInt32 y);
 ///
 /// # Returns
 ///
-/// `NSTDUInt32 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if the subtraction operation results in an overflow.
-NSTDAPI NSTDUInt32 nstd_core_ops_sub_u32(NSTDUInt32 x, NSTDUInt32 y);
+/// `NSTDOptionalUInt32 z` - The result of the operation on success, or an uninitialized "none"
+/// variant on overflow.
+NSTDAPI NSTDOptionalUInt32 nstd_core_ops_sub_u32(NSTDUInt32 x, NSTDUInt32 y);
 /// Computes the subtraction operation of `x` - `y`.
 ///
 /// # Parameters:
@@ -372,12 +304,9 @@ NSTDAPI NSTDUInt32 nstd_core_ops_sub_u32(NSTDUInt32 x, NSTDUInt32 y);
 ///
 /// # Returns
 ///
-/// `NSTDInt64 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if the subtraction operation results in an overflow.
-NSTDAPI NSTDInt64 nstd_core_ops_sub_i64(NSTDInt64 x, NSTDInt64 y);
+/// `NSTDOptionalInt64 z` - The result of the operation on success, or an uninitialized "none"
+/// variant on overflow.
+NSTDAPI NSTDOptionalInt64 nstd_core_ops_sub_i64(NSTDInt64 x, NSTDInt64 y);
 /// Computes the subtraction operation of `x` - `y`.
 ///
 /// # Parameters:
@@ -388,12 +317,9 @@ NSTDAPI NSTDInt64 nstd_core_ops_sub_i64(NSTDInt64 x, NSTDInt64 y);
 ///
 /// # Returns
 ///
-/// `NSTDUInt64 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if the subtraction operation results in an overflow.
-NSTDAPI NSTDUInt64 nstd_core_ops_sub_u64(NSTDUInt64 x, NSTDUInt64 y);
+/// `NSTDOptionalUInt64 z` - The result of the operation on success, or an uninitialized "none"
+/// variant on overflow.
+NSTDAPI NSTDOptionalUInt64 nstd_core_ops_sub_u64(NSTDUInt64 x, NSTDUInt64 y);
 
 /// Computes the multiplication operation of `x` * `y`.
 ///
@@ -405,12 +331,9 @@ NSTDAPI NSTDUInt64 nstd_core_ops_sub_u64(NSTDUInt64 x, NSTDUInt64 y);
 ///
 /// # Returns
 ///
-/// `NSTDInt z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if the multiplication operation results in an overflow.
-NSTDAPI NSTDInt nstd_core_ops_mul_int(NSTDInt x, NSTDInt y);
+/// `NSTDOptionalInt z` - The result of the operation on success, or an uninitialized "none"
+/// variant on overflow.
+NSTDAPI NSTDOptionalInt nstd_core_ops_mul_int(NSTDInt x, NSTDInt y);
 /// Computes the multiplication operation of `x` * `y`.
 ///
 /// # Parameters:
@@ -421,12 +344,9 @@ NSTDAPI NSTDInt nstd_core_ops_mul_int(NSTDInt x, NSTDInt y);
 ///
 /// # Returns
 ///
-/// `NSTDUInt z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if the multiplication operation results in an overflow.
-NSTDAPI NSTDUInt nstd_core_ops_mul_uint(NSTDUInt x, NSTDUInt y);
+/// `NSTDOptionalUInt z` - The result of the operation on success, or an uninitialized "none"
+/// variant on overflow.
+NSTDAPI NSTDOptionalUInt nstd_core_ops_mul_uint(NSTDUInt x, NSTDUInt y);
 /// Computes the multiplication operation of `x` * `y`.
 ///
 /// # Parameters:
@@ -437,12 +357,9 @@ NSTDAPI NSTDUInt nstd_core_ops_mul_uint(NSTDUInt x, NSTDUInt y);
 ///
 /// # Returns
 ///
-/// `NSTDInt8 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if the multiplication operation results in an overflow.
-NSTDAPI NSTDInt8 nstd_core_ops_mul_i8(NSTDInt8 x, NSTDInt8 y);
+/// `NSTDOptionalInt8 z` - The result of the operation on success, or an uninitialized "none"
+/// variant on overflow.
+NSTDAPI NSTDOptionalInt8 nstd_core_ops_mul_i8(NSTDInt8 x, NSTDInt8 y);
 /// Computes the multiplication operation of `x` * `y`.
 ///
 /// # Parameters:
@@ -453,12 +370,9 @@ NSTDAPI NSTDInt8 nstd_core_ops_mul_i8(NSTDInt8 x, NSTDInt8 y);
 ///
 /// # Returns
 ///
-/// `NSTDUInt8 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if the multiplication operation results in an overflow.
-NSTDAPI NSTDUInt8 nstd_core_ops_mul_u8(NSTDUInt8 x, NSTDUInt8 y);
+/// `NSTDOptionalUInt8 z` - The result of the operation on success, or an uninitialized "none"
+/// variant on overflow.
+NSTDAPI NSTDOptionalUInt8 nstd_core_ops_mul_u8(NSTDUInt8 x, NSTDUInt8 y);
 /// Computes the multiplication operation of `x` * `y`.
 ///
 /// # Parameters:
@@ -469,12 +383,9 @@ NSTDAPI NSTDUInt8 nstd_core_ops_mul_u8(NSTDUInt8 x, NSTDUInt8 y);
 ///
 /// # Returns
 ///
-/// `NSTDInt16 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if the multiplication operation results in an overflow.
-NSTDAPI NSTDInt16 nstd_core_ops_mul_i16(NSTDInt16 x, NSTDInt16 y);
+/// `NSTDOptionalInt16 z` - The result of the operation on success, or an uninitialized "none"
+/// variant on overflow.
+NSTDAPI NSTDOptionalInt16 nstd_core_ops_mul_i16(NSTDInt16 x, NSTDInt16 y);
 /// Computes the multiplication operation of `x` * `y`.
 ///
 /// # Parameters:
@@ -485,12 +396,9 @@ NSTDAPI NSTDInt16 nstd_core_ops_mul_i16(NSTDInt16 x, NSTDInt16 y);
 ///
 /// # Returns
 ///
-/// `NSTDUInt16 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if the multiplication operation results in an overflow.
-NSTDAPI NSTDUInt16 nstd_core_ops_mul_u16(NSTDUInt16 x, NSTDUInt16 y);
+/// `NSTDOptionalUInt16 z` - The result of the operation on success, or an uninitialized "none"
+/// variant on overflow.
+NSTDAPI NSTDOptionalUInt16 nstd_core_ops_mul_u16(NSTDUInt16 x, NSTDUInt16 y);
 /// Computes the multiplication operation of `x` * `y`.
 ///
 /// # Parameters:
@@ -501,12 +409,9 @@ NSTDAPI NSTDUInt16 nstd_core_ops_mul_u16(NSTDUInt16 x, NSTDUInt16 y);
 ///
 /// # Returns
 ///
-/// `NSTDInt32 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if the multiplication operation results in an overflow.
-NSTDAPI NSTDInt32 nstd_core_ops_mul_i32(NSTDInt32 x, NSTDInt32 y);
+/// `NSTDOptionalInt32 z` - The result of the operation on success, or an uninitialized "none"
+/// variant on overflow.
+NSTDAPI NSTDOptionalInt32 nstd_core_ops_mul_i32(NSTDInt32 x, NSTDInt32 y);
 /// Computes the multiplication operation of `x` * `y`.
 ///
 /// # Parameters:
@@ -517,12 +422,9 @@ NSTDAPI NSTDInt32 nstd_core_ops_mul_i32(NSTDInt32 x, NSTDInt32 y);
 ///
 /// # Returns
 ///
-/// `NSTDUInt32 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if the multiplication operation results in an overflow.
-NSTDAPI NSTDUInt32 nstd_core_ops_mul_u32(NSTDUInt32 x, NSTDUInt32 y);
+/// `NSTDOptionalUInt32 z` - The result of the operation on success, or an uninitialized "none"
+/// variant on overflow.
+NSTDAPI NSTDOptionalUInt32 nstd_core_ops_mul_u32(NSTDUInt32 x, NSTDUInt32 y);
 /// Computes the multiplication operation of `x` * `y`.
 ///
 /// # Parameters:
@@ -533,12 +435,9 @@ NSTDAPI NSTDUInt32 nstd_core_ops_mul_u32(NSTDUInt32 x, NSTDUInt32 y);
 ///
 /// # Returns
 ///
-/// `NSTDInt64 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if the multiplication operation results in an overflow.
-NSTDAPI NSTDInt64 nstd_core_ops_mul_i64(NSTDInt64 x, NSTDInt64 y);
+/// `NSTDOptionalInt64 z` - The result of the operation on success, or an uninitialized "none"
+/// variant on overflow.
+NSTDAPI NSTDOptionalInt64 nstd_core_ops_mul_i64(NSTDInt64 x, NSTDInt64 y);
 /// Computes the multiplication operation of `x` * `y`.
 ///
 /// # Parameters:
@@ -549,12 +448,9 @@ NSTDAPI NSTDInt64 nstd_core_ops_mul_i64(NSTDInt64 x, NSTDInt64 y);
 ///
 /// # Returns
 ///
-/// `NSTDUInt64 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if the multiplication operation results in an overflow.
-NSTDAPI NSTDUInt64 nstd_core_ops_mul_u64(NSTDUInt64 x, NSTDUInt64 y);
+/// `NSTDOptionalUInt64 z` - The result of the operation on success, or an uninitialized "none"
+/// variant on overflow.
+NSTDAPI NSTDOptionalUInt64 nstd_core_ops_mul_u64(NSTDUInt64 x, NSTDUInt64 y);
 
 /// Computes the division operation of `x` / `y`.
 ///
@@ -566,12 +462,9 @@ NSTDAPI NSTDUInt64 nstd_core_ops_mul_u64(NSTDUInt64 x, NSTDUInt64 y);
 ///
 /// # Returns
 ///
-/// `NSTDInt z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if `y` is 0 or the division operation results in an overflow.
-NSTDAPI NSTDInt nstd_core_ops_div_int(NSTDInt x, NSTDInt y);
+/// `NSTDOptionalInt z` - The result of the operation on success, or an uninitialized "none"
+/// variant if `y` is 0 or overflow occurs.
+NSTDAPI NSTDOptionalInt nstd_core_ops_div_int(NSTDInt x, NSTDInt y);
 /// Computes the division operation of `x` / `y`.
 ///
 /// # Parameters:
@@ -582,12 +475,9 @@ NSTDAPI NSTDInt nstd_core_ops_div_int(NSTDInt x, NSTDInt y);
 ///
 /// # Returns
 ///
-/// `NSTDUInt z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if `y` is 0 or the division operation results in an overflow.
-NSTDAPI NSTDUInt nstd_core_ops_div_uint(NSTDUInt x, NSTDUInt y);
+/// `NSTDOptionalUInt z` - The result of the operation on success, or an uninitialized "none"
+/// variant if `y` is 0 or overflow occurs.
+NSTDAPI NSTDOptionalUInt nstd_core_ops_div_uint(NSTDUInt x, NSTDUInt y);
 /// Computes the division operation of `x` / `y`.
 ///
 /// # Parameters:
@@ -598,12 +488,9 @@ NSTDAPI NSTDUInt nstd_core_ops_div_uint(NSTDUInt x, NSTDUInt y);
 ///
 /// # Returns
 ///
-/// `NSTDInt8 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if `y` is 0 or the division operation results in an overflow.
-NSTDAPI NSTDInt8 nstd_core_ops_div_i8(NSTDInt8 x, NSTDInt8 y);
+/// `NSTDOptionalInt8 z` - The result of the operation on success, or an uninitialized "none"
+/// variant if `y` is 0 or overflow occurs.
+NSTDAPI NSTDOptionalInt8 nstd_core_ops_div_i8(NSTDInt8 x, NSTDInt8 y);
 /// Computes the division operation of `x` / `y`.
 ///
 /// # Parameters:
@@ -614,12 +501,9 @@ NSTDAPI NSTDInt8 nstd_core_ops_div_i8(NSTDInt8 x, NSTDInt8 y);
 ///
 /// # Returns
 ///
-/// `NSTDUInt8 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if `y` is 0 or the division operation results in an overflow.
-NSTDAPI NSTDUInt8 nstd_core_ops_div_u8(NSTDUInt8 x, NSTDUInt8 y);
+/// `NSTDOptionalUInt8 z` - The result of the operation on success, or an uninitialized "none"
+/// variant if `y` is 0 or overflow occurs.
+NSTDAPI NSTDOptionalUInt8 nstd_core_ops_div_u8(NSTDUInt8 x, NSTDUInt8 y);
 /// Computes the division operation of `x` / `y`.
 ///
 /// # Parameters:
@@ -630,12 +514,9 @@ NSTDAPI NSTDUInt8 nstd_core_ops_div_u8(NSTDUInt8 x, NSTDUInt8 y);
 ///
 /// # Returns
 ///
-/// `NSTDInt16 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if `y` is 0 or the division operation results in an overflow.
-NSTDAPI NSTDInt16 nstd_core_ops_div_i16(NSTDInt16 x, NSTDInt16 y);
+/// `NSTDOptionalInt16 z` - The result of the operation on success, or an uninitialized "none"
+/// variant if `y` is 0 or overflow occurs.
+NSTDAPI NSTDOptionalInt16 nstd_core_ops_div_i16(NSTDInt16 x, NSTDInt16 y);
 /// Computes the division operation of `x` / `y`.
 ///
 /// # Parameters:
@@ -646,12 +527,9 @@ NSTDAPI NSTDInt16 nstd_core_ops_div_i16(NSTDInt16 x, NSTDInt16 y);
 ///
 /// # Returns
 ///
-/// `NSTDUInt16 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if `y` is 0 or the division operation results in an overflow.
-NSTDAPI NSTDUInt16 nstd_core_ops_div_u16(NSTDUInt16 x, NSTDUInt16 y);
+/// `NSTDOptionalUInt16 z` - The result of the operation on success, or an uninitialized "none"
+/// variant if `y` is 0 or overflow occurs.
+NSTDAPI NSTDOptionalUInt16 nstd_core_ops_div_u16(NSTDUInt16 x, NSTDUInt16 y);
 /// Computes the division operation of `x` / `y`.
 ///
 /// # Parameters:
@@ -662,12 +540,9 @@ NSTDAPI NSTDUInt16 nstd_core_ops_div_u16(NSTDUInt16 x, NSTDUInt16 y);
 ///
 /// # Returns
 ///
-/// `NSTDInt32 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if `y` is 0 or the division operation results in an overflow.
-NSTDAPI NSTDInt32 nstd_core_ops_div_i32(NSTDInt32 x, NSTDInt32 y);
+/// `NSTDOptionalInt32 z` - The result of the operation on success, or an uninitialized "none"
+/// variant if `y` is 0 or overflow occurs.
+NSTDAPI NSTDOptionalInt32 nstd_core_ops_div_i32(NSTDInt32 x, NSTDInt32 y);
 /// Computes the division operation of `x` / `y`.
 ///
 /// # Parameters:
@@ -678,12 +553,9 @@ NSTDAPI NSTDInt32 nstd_core_ops_div_i32(NSTDInt32 x, NSTDInt32 y);
 ///
 /// # Returns
 ///
-/// `NSTDUInt32 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if `y` is 0 or the division operation results in an overflow.
-NSTDAPI NSTDUInt32 nstd_core_ops_div_u32(NSTDUInt32 x, NSTDUInt32 y);
+/// `NSTDOptionalUInt32 z` - The result of the operation on success, or an uninitialized "none"
+/// variant if `y` is 0 or overflow occurs.
+NSTDAPI NSTDOptionalUInt32 nstd_core_ops_div_u32(NSTDUInt32 x, NSTDUInt32 y);
 /// Computes the division operation of `x` / `y`.
 ///
 /// # Parameters:
@@ -694,12 +566,9 @@ NSTDAPI NSTDUInt32 nstd_core_ops_div_u32(NSTDUInt32 x, NSTDUInt32 y);
 ///
 /// # Returns
 ///
-/// `NSTDInt64 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if `y` is 0 or the division operation results in an overflow.
-NSTDAPI NSTDInt64 nstd_core_ops_div_i64(NSTDInt64 x, NSTDInt64 y);
+/// `NSTDOptionalInt64 z` - The result of the operation on success, or an uninitialized "none"
+/// variant if `y` is 0 or overflow occurs.
+NSTDAPI NSTDOptionalInt64 nstd_core_ops_div_i64(NSTDInt64 x, NSTDInt64 y);
 /// Computes the division operation of `x` / `y`.
 ///
 /// # Parameters:
@@ -710,12 +579,9 @@ NSTDAPI NSTDInt64 nstd_core_ops_div_i64(NSTDInt64 x, NSTDInt64 y);
 ///
 /// # Returns
 ///
-/// `NSTDUInt64 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if `y` is 0 or the division operation results in an overflow.
-NSTDAPI NSTDUInt64 nstd_core_ops_div_u64(NSTDUInt64 x, NSTDUInt64 y);
+/// `NSTDOptionalUInt64 z` - The result of the operation on success, or an uninitialized "none"
+/// variant if `y` is 0 or overflow occurs.
+NSTDAPI NSTDOptionalUInt64 nstd_core_ops_div_u64(NSTDUInt64 x, NSTDUInt64 y);
 
 /// Computes the remainder of `x` / `y`.
 ///
@@ -727,12 +593,9 @@ NSTDAPI NSTDUInt64 nstd_core_ops_div_u64(NSTDUInt64 x, NSTDUInt64 y);
 ///
 /// # Returns
 ///
-/// `NSTDInt z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if `y` is 0 or the remainder operation results in an overflow.
-NSTDAPI NSTDInt nstd_core_ops_rem_int(NSTDInt x, NSTDInt y);
+/// `NSTDOptionalInt z` - The result of the operation on success, or an uninitialized "none"
+/// variant if `y` is 0 or overflow occurs.
+NSTDAPI NSTDOptionalInt nstd_core_ops_rem_int(NSTDInt x, NSTDInt y);
 /// Computes the remainder of `x` / `y`.
 ///
 /// # Parameters:
@@ -743,12 +606,9 @@ NSTDAPI NSTDInt nstd_core_ops_rem_int(NSTDInt x, NSTDInt y);
 ///
 /// # Returns
 ///
-/// `NSTDUInt z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if `y` is 0 or the remainder operation results in an overflow.
-NSTDAPI NSTDUInt nstd_core_ops_rem_uint(NSTDUInt x, NSTDUInt y);
+/// `NSTDOptionalUInt z` - The result of the operation on success, or an uninitialized "none"
+/// variant if `y` is 0 or overflow occurs.
+NSTDAPI NSTDOptionalUInt nstd_core_ops_rem_uint(NSTDUInt x, NSTDUInt y);
 /// Computes the remainder of `x` / `y`.
 ///
 /// # Parameters:
@@ -759,12 +619,9 @@ NSTDAPI NSTDUInt nstd_core_ops_rem_uint(NSTDUInt x, NSTDUInt y);
 ///
 /// # Returns
 ///
-/// `NSTDInt8 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if `y` is 0 or the remainder operation results in an overflow.
-NSTDAPI NSTDInt8 nstd_core_ops_rem_i8(NSTDInt8 x, NSTDInt8 y);
+/// `NSTDOptionalInt8 z` - The result of the operation on success, or an uninitialized "none"
+/// variant if `y` is 0 or overflow occurs.
+NSTDAPI NSTDOptionalInt8 nstd_core_ops_rem_i8(NSTDInt8 x, NSTDInt8 y);
 /// Computes the remainder of `x` / `y`.
 ///
 /// # Parameters:
@@ -775,12 +632,9 @@ NSTDAPI NSTDInt8 nstd_core_ops_rem_i8(NSTDInt8 x, NSTDInt8 y);
 ///
 /// # Returns
 ///
-/// `NSTDUInt8 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if `y` is 0 or the remainder operation results in an overflow.
-NSTDAPI NSTDUInt8 nstd_core_ops_rem_u8(NSTDUInt8 x, NSTDUInt8 y);
+/// `NSTDOptionalUInt8 z` - The result of the operation on success, or an uninitialized "none"
+/// variant if `y` is 0 or overflow occurs.
+NSTDAPI NSTDOptionalUInt8 nstd_core_ops_rem_u8(NSTDUInt8 x, NSTDUInt8 y);
 /// Computes the remainder of `x` / `y`.
 ///
 /// # Parameters:
@@ -791,12 +645,9 @@ NSTDAPI NSTDUInt8 nstd_core_ops_rem_u8(NSTDUInt8 x, NSTDUInt8 y);
 ///
 /// # Returns
 ///
-/// `NSTDInt16 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if `y` is 0 or the remainder operation results in an overflow.
-NSTDAPI NSTDInt16 nstd_core_ops_rem_i16(NSTDInt16 x, NSTDInt16 y);
+/// `NSTDOptionalInt16 z` - The result of the operation on success, or an uninitialized "none"
+/// variant if `y` is 0 or overflow occurs.
+NSTDAPI NSTDOptionalInt16 nstd_core_ops_rem_i16(NSTDInt16 x, NSTDInt16 y);
 /// Computes the remainder of `x` / `y`.
 ///
 /// # Parameters:
@@ -807,12 +658,9 @@ NSTDAPI NSTDInt16 nstd_core_ops_rem_i16(NSTDInt16 x, NSTDInt16 y);
 ///
 /// # Returns
 ///
-/// `NSTDUInt16 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if `y` is 0 or the remainder operation results in an overflow.
-NSTDAPI NSTDUInt16 nstd_core_ops_rem_u16(NSTDUInt16 x, NSTDUInt16 y);
+/// `NSTDOptionalUInt16 z` - The result of the operation on success, or an uninitialized "none"
+/// variant if `y` is 0 or overflow occurs.
+NSTDAPI NSTDOptionalUInt16 nstd_core_ops_rem_u16(NSTDUInt16 x, NSTDUInt16 y);
 /// Computes the remainder of `x` / `y`.
 ///
 /// # Parameters:
@@ -823,12 +671,9 @@ NSTDAPI NSTDUInt16 nstd_core_ops_rem_u16(NSTDUInt16 x, NSTDUInt16 y);
 ///
 /// # Returns
 ///
-/// `NSTDInt32 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if `y` is 0 or the remainder operation results in an overflow.
-NSTDAPI NSTDInt32 nstd_core_ops_rem_i32(NSTDInt32 x, NSTDInt32 y);
+/// `NSTDOptionalInt32 z` - The result of the operation on success, or an uninitialized "none"
+/// variant if `y` is 0 or overflow occurs.
+NSTDAPI NSTDOptionalInt32 nstd_core_ops_rem_i32(NSTDInt32 x, NSTDInt32 y);
 /// Computes the remainder of `x` / `y`.
 ///
 /// # Parameters:
@@ -839,12 +684,9 @@ NSTDAPI NSTDInt32 nstd_core_ops_rem_i32(NSTDInt32 x, NSTDInt32 y);
 ///
 /// # Returns
 ///
-/// `NSTDUInt32 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if `y` is 0 or the remainder operation results in an overflow.
-NSTDAPI NSTDUInt32 nstd_core_ops_rem_u32(NSTDUInt32 x, NSTDUInt32 y);
+/// `NSTDOptionalUInt32 z` - The result of the operation on success, or an uninitialized "none"
+/// variant if `y` is 0 or overflow occurs.
+NSTDAPI NSTDOptionalUInt32 nstd_core_ops_rem_u32(NSTDUInt32 x, NSTDUInt32 y);
 /// Computes the remainder of `x` / `y`.
 ///
 /// # Parameters:
@@ -855,12 +697,9 @@ NSTDAPI NSTDUInt32 nstd_core_ops_rem_u32(NSTDUInt32 x, NSTDUInt32 y);
 ///
 /// # Returns
 ///
-/// `NSTDInt64 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if `y` is 0 or the remainder operation results in an overflow.
-NSTDAPI NSTDInt64 nstd_core_ops_rem_i64(NSTDInt64 x, NSTDInt64 y);
+/// `NSTDOptionalInt64 z` - The result of the operation on success, or an uninitialized "none"
+/// variant if `y` is 0 or overflow occurs.
+NSTDAPI NSTDOptionalInt64 nstd_core_ops_rem_i64(NSTDInt64 x, NSTDInt64 y);
 /// Computes the remainder of `x` / `y`.
 ///
 /// # Parameters:
@@ -871,12 +710,9 @@ NSTDAPI NSTDInt64 nstd_core_ops_rem_i64(NSTDInt64 x, NSTDInt64 y);
 ///
 /// # Returns
 ///
-/// `NSTDUInt64 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if `y` is 0 or the remainder operation results in an overflow.
-NSTDAPI NSTDUInt64 nstd_core_ops_rem_u64(NSTDUInt64 x, NSTDUInt64 y);
+/// `NSTDOptionalUInt64 z` - The result of the operation on success, or an uninitialized "none"
+/// variant if `y` is 0 or overflow occurs.
+NSTDAPI NSTDOptionalUInt64 nstd_core_ops_rem_u64(NSTDUInt64 x, NSTDUInt64 y);
 
 /// Shifts value `x` `y` bits to the left.
 ///
@@ -888,12 +724,9 @@ NSTDAPI NSTDUInt64 nstd_core_ops_rem_u64(NSTDUInt64 x, NSTDUInt64 y);
 ///
 /// # Returns
 ///
-/// `NSTDInt z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if the left shift operation results in an overflow.
-NSTDAPI NSTDInt nstd_core_ops_shl_int(NSTDInt x, NSTDUInt32 y);
+/// `NSTDOptionalInt z` - The result of the operation on success, or an uninitialized "none"
+/// variant on overflow.
+NSTDAPI NSTDOptionalInt nstd_core_ops_shl_int(NSTDInt x, NSTDUInt32 y);
 /// Shifts value `x` `y` bits to the left.
 ///
 /// # Parameters:
@@ -904,12 +737,9 @@ NSTDAPI NSTDInt nstd_core_ops_shl_int(NSTDInt x, NSTDUInt32 y);
 ///
 /// # Returns
 ///
-/// `NSTDUInt z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if the left shift operation results in an overflow.
-NSTDAPI NSTDUInt nstd_core_ops_shl_uint(NSTDUInt x, NSTDUInt32 y);
+/// `NSTDOptionalUInt z` - The result of the operation on success, or an uninitialized "none"
+/// variant on overflow.
+NSTDAPI NSTDOptionalUInt nstd_core_ops_shl_uint(NSTDUInt x, NSTDUInt32 y);
 /// Shifts value `x` `y` bits to the left.
 ///
 /// # Parameters:
@@ -920,12 +750,9 @@ NSTDAPI NSTDUInt nstd_core_ops_shl_uint(NSTDUInt x, NSTDUInt32 y);
 ///
 /// # Returns
 ///
-/// `NSTDInt8 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if the left shift operation results in an overflow.
-NSTDAPI NSTDInt8 nstd_core_ops_shl_i8(NSTDInt8 x, NSTDUInt32 y);
+/// `NSTDOptionalInt8 z` - The result of the operation on success, or an uninitialized "none"
+/// variant on overflow.
+NSTDAPI NSTDOptionalInt8 nstd_core_ops_shl_i8(NSTDInt8 x, NSTDUInt32 y);
 /// Shifts value `x` `y` bits to the left.
 ///
 /// # Parameters:
@@ -936,12 +763,9 @@ NSTDAPI NSTDInt8 nstd_core_ops_shl_i8(NSTDInt8 x, NSTDUInt32 y);
 ///
 /// # Returns
 ///
-/// `NSTDUInt8 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if the left shift operation results in an overflow.
-NSTDAPI NSTDUInt8 nstd_core_ops_shl_u8(NSTDUInt8 x, NSTDUInt32 y);
+/// `NSTDOptionalUInt8 z` - The result of the operation on success, or an uninitialized "none"
+/// variant on overflow.
+NSTDAPI NSTDOptionalUInt8 nstd_core_ops_shl_u8(NSTDUInt8 x, NSTDUInt32 y);
 /// Shifts value `x` `y` bits to the left.
 ///
 /// # Parameters:
@@ -952,12 +776,9 @@ NSTDAPI NSTDUInt8 nstd_core_ops_shl_u8(NSTDUInt8 x, NSTDUInt32 y);
 ///
 /// # Returns
 ///
-/// `NSTDInt16 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if the left shift operation results in an overflow.
-NSTDAPI NSTDInt16 nstd_core_ops_shl_i16(NSTDInt16 x, NSTDUInt32 y);
+/// `NSTDOptionalInt16 z` - The result of the operation on success, or an uninitialized "none"
+/// variant on overflow.
+NSTDAPI NSTDOptionalInt16 nstd_core_ops_shl_i16(NSTDInt16 x, NSTDUInt32 y);
 /// Shifts value `x` `y` bits to the left.
 ///
 /// # Parameters:
@@ -968,12 +789,9 @@ NSTDAPI NSTDInt16 nstd_core_ops_shl_i16(NSTDInt16 x, NSTDUInt32 y);
 ///
 /// # Returns
 ///
-/// `NSTDUInt16 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if the left shift operation results in an overflow.
-NSTDAPI NSTDUInt16 nstd_core_ops_shl_u16(NSTDUInt16 x, NSTDUInt32 y);
+/// `NSTDOptionalUInt16 z` - The result of the operation on success, or an uninitialized "none"
+/// variant on overflow.
+NSTDAPI NSTDOptionalUInt16 nstd_core_ops_shl_u16(NSTDUInt16 x, NSTDUInt32 y);
 /// Shifts value `x` `y` bits to the left.
 ///
 /// # Parameters:
@@ -984,12 +802,9 @@ NSTDAPI NSTDUInt16 nstd_core_ops_shl_u16(NSTDUInt16 x, NSTDUInt32 y);
 ///
 /// # Returns
 ///
-/// `NSTDInt32 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if the left shift operation results in an overflow.
-NSTDAPI NSTDInt32 nstd_core_ops_shl_i32(NSTDInt32 x, NSTDUInt32 y);
+/// `NSTDOptionalInt32 z` - The result of the operation on success, or an uninitialized "none"
+/// variant on overflow.
+NSTDAPI NSTDOptionalInt32 nstd_core_ops_shl_i32(NSTDInt32 x, NSTDUInt32 y);
 /// Shifts value `x` `y` bits to the left.
 ///
 /// # Parameters:
@@ -1000,12 +815,9 @@ NSTDAPI NSTDInt32 nstd_core_ops_shl_i32(NSTDInt32 x, NSTDUInt32 y);
 ///
 /// # Returns
 ///
-/// `NSTDUInt32 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if the left shift operation results in an overflow.
-NSTDAPI NSTDUInt32 nstd_core_ops_shl_u32(NSTDUInt32 x, NSTDUInt32 y);
+/// `NSTDOptionalUInt32 z` - The result of the operation on success, or an uninitialized "none"
+/// variant on overflow.
+NSTDAPI NSTDOptionalUInt32 nstd_core_ops_shl_u32(NSTDUInt32 x, NSTDUInt32 y);
 /// Shifts value `x` `y` bits to the left.
 ///
 /// # Parameters:
@@ -1016,12 +828,9 @@ NSTDAPI NSTDUInt32 nstd_core_ops_shl_u32(NSTDUInt32 x, NSTDUInt32 y);
 ///
 /// # Returns
 ///
-/// `NSTDInt64 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if the left shift operation results in an overflow.
-NSTDAPI NSTDInt64 nstd_core_ops_shl_i64(NSTDInt64 x, NSTDUInt32 y);
+/// `NSTDOptionalInt64 z` - The result of the operation on success, or an uninitialized "none"
+/// variant on overflow.
+NSTDAPI NSTDOptionalInt64 nstd_core_ops_shl_i64(NSTDInt64 x, NSTDUInt32 y);
 /// Shifts value `x` `y` bits to the left.
 ///
 /// # Parameters:
@@ -1032,12 +841,9 @@ NSTDAPI NSTDInt64 nstd_core_ops_shl_i64(NSTDInt64 x, NSTDUInt32 y);
 ///
 /// # Returns
 ///
-/// `NSTDUInt64 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if the left shift operation results in an overflow.
-NSTDAPI NSTDUInt64 nstd_core_ops_shl_u64(NSTDUInt64 x, NSTDUInt32 y);
+/// `NSTDOptionalUInt64 z` - The result of the operation on success, or an uninitialized "none"
+/// variant on overflow.
+NSTDAPI NSTDOptionalUInt64 nstd_core_ops_shl_u64(NSTDUInt64 x, NSTDUInt32 y);
 
 /// Shifts value `x` `y` bits to the right.
 ///
@@ -1049,12 +855,9 @@ NSTDAPI NSTDUInt64 nstd_core_ops_shl_u64(NSTDUInt64 x, NSTDUInt32 y);
 ///
 /// # Returns
 ///
-/// `NSTDInt z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if the right shift operation results in an overflow.
-NSTDAPI NSTDInt nstd_core_ops_shr_int(NSTDInt x, NSTDUInt32 y);
+/// `NSTDOptionalInt z` - The result of the operation on success, or an uninitialized "none"
+/// variant on overflow.
+NSTDAPI NSTDOptionalInt nstd_core_ops_shr_int(NSTDInt x, NSTDUInt32 y);
 /// Shifts value `x` `y` bits to the right.
 ///
 /// # Parameters:
@@ -1065,12 +868,9 @@ NSTDAPI NSTDInt nstd_core_ops_shr_int(NSTDInt x, NSTDUInt32 y);
 ///
 /// # Returns
 ///
-/// `NSTDUInt z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if the right shift operation results in an overflow.
-NSTDAPI NSTDUInt nstd_core_ops_shr_uint(NSTDUInt x, NSTDUInt32 y);
+/// `NSTDOptionalUInt z` - The result of the operation on success, or an uninitialized "none"
+/// variant on overflow.
+NSTDAPI NSTDOptionalUInt nstd_core_ops_shr_uint(NSTDUInt x, NSTDUInt32 y);
 /// Shifts value `x` `y` bits to the right.
 ///
 /// # Parameters:
@@ -1081,12 +881,9 @@ NSTDAPI NSTDUInt nstd_core_ops_shr_uint(NSTDUInt x, NSTDUInt32 y);
 ///
 /// # Returns
 ///
-/// `NSTDInt8 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if the right shift operation results in an overflow.
-NSTDAPI NSTDInt8 nstd_core_ops_shr_i8(NSTDInt8 x, NSTDUInt32 y);
+/// `NSTDOptionalInt8 z` - The result of the operation on success, or an uninitialized "none"
+/// variant on overflow.
+NSTDAPI NSTDOptionalInt8 nstd_core_ops_shr_i8(NSTDInt8 x, NSTDUInt32 y);
 /// Shifts value `x` `y` bits to the right.
 ///
 /// # Parameters:
@@ -1097,12 +894,9 @@ NSTDAPI NSTDInt8 nstd_core_ops_shr_i8(NSTDInt8 x, NSTDUInt32 y);
 ///
 /// # Returns
 ///
-/// `NSTDUInt8 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if the right shift operation results in an overflow.
-NSTDAPI NSTDUInt8 nstd_core_ops_shr_u8(NSTDUInt8 x, NSTDUInt32 y);
+/// `NSTDOptionalUInt8 z` - The result of the operation on success, or an uninitialized "none"
+/// variant on overflow.
+NSTDAPI NSTDOptionalUInt8 nstd_core_ops_shr_u8(NSTDUInt8 x, NSTDUInt32 y);
 /// Shifts value `x` `y` bits to the right.
 ///
 /// # Parameters:
@@ -1113,12 +907,9 @@ NSTDAPI NSTDUInt8 nstd_core_ops_shr_u8(NSTDUInt8 x, NSTDUInt32 y);
 ///
 /// # Returns
 ///
-/// `NSTDInt16 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if the right shift operation results in an overflow.
-NSTDAPI NSTDInt16 nstd_core_ops_shr_i16(NSTDInt16 x, NSTDUInt32 y);
+/// `NSTDOptionalInt16 z` - The result of the operation on success, or an uninitialized "none"
+/// variant on overflow.
+NSTDAPI NSTDOptionalInt16 nstd_core_ops_shr_i16(NSTDInt16 x, NSTDUInt32 y);
 /// Shifts value `x` `y` bits to the right.
 ///
 /// # Parameters:
@@ -1129,12 +920,9 @@ NSTDAPI NSTDInt16 nstd_core_ops_shr_i16(NSTDInt16 x, NSTDUInt32 y);
 ///
 /// # Returns
 ///
-/// `NSTDUInt16 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if the right shift operation results in an overflow.
-NSTDAPI NSTDUInt16 nstd_core_ops_shr_u16(NSTDUInt16 x, NSTDUInt32 y);
+/// `NSTDOptionalUInt16 z` - The result of the operation on success, or an uninitialized "none"
+/// variant on overflow.
+NSTDAPI NSTDOptionalUInt16 nstd_core_ops_shr_u16(NSTDUInt16 x, NSTDUInt32 y);
 /// Shifts value `x` `y` bits to the right.
 ///
 /// # Parameters:
@@ -1145,12 +933,9 @@ NSTDAPI NSTDUInt16 nstd_core_ops_shr_u16(NSTDUInt16 x, NSTDUInt32 y);
 ///
 /// # Returns
 ///
-/// `NSTDInt32 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if the right shift operation results in an overflow.
-NSTDAPI NSTDInt32 nstd_core_ops_shr_i32(NSTDInt32 x, NSTDUInt32 y);
+/// `NSTDOptionalInt32 z` - The result of the operation on success, or an uninitialized "none"
+/// variant on overflow.
+NSTDAPI NSTDOptionalInt32 nstd_core_ops_shr_i32(NSTDInt32 x, NSTDUInt32 y);
 /// Shifts value `x` `y` bits to the right.
 ///
 /// # Parameters:
@@ -1161,12 +946,9 @@ NSTDAPI NSTDInt32 nstd_core_ops_shr_i32(NSTDInt32 x, NSTDUInt32 y);
 ///
 /// # Returns
 ///
-/// `NSTDUInt32 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if the right shift operation results in an overflow.
-NSTDAPI NSTDUInt32 nstd_core_ops_shr_u32(NSTDUInt32 x, NSTDUInt32 y);
+/// `NSTDOptionalUInt32 z` - The result of the operation on success, or an uninitialized "none"
+/// variant on overflow.
+NSTDAPI NSTDOptionalUInt32 nstd_core_ops_shr_u32(NSTDUInt32 x, NSTDUInt32 y);
 /// Shifts value `x` `y` bits to the right.
 ///
 /// # Parameters:
@@ -1177,12 +959,9 @@ NSTDAPI NSTDUInt32 nstd_core_ops_shr_u32(NSTDUInt32 x, NSTDUInt32 y);
 ///
 /// # Returns
 ///
-/// `NSTDInt64 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if the right shift operation results in an overflow.
-NSTDAPI NSTDInt64 nstd_core_ops_shr_i64(NSTDInt64 x, NSTDUInt32 y);
+/// `NSTDOptionalInt64 z` - The result of the operation on success, or an uninitialized "none"
+/// variant on overflow.
+NSTDAPI NSTDOptionalInt64 nstd_core_ops_shr_i64(NSTDInt64 x, NSTDUInt32 y);
 /// Shifts value `x` `y` bits to the right.
 ///
 /// # Parameters:
@@ -1193,11 +972,8 @@ NSTDAPI NSTDInt64 nstd_core_ops_shr_i64(NSTDInt64 x, NSTDUInt32 y);
 ///
 /// # Returns
 ///
-/// `NSTDUInt64 z` - The result of the operation.
-///
-/// # Panics
-///
-/// This will panic if the right shift operation results in an overflow.
-NSTDAPI NSTDUInt64 nstd_core_ops_shr_u64(NSTDUInt64 x, NSTDUInt32 y);
+/// `NSTDOptionalUInt64 z` - The result of the operation on success, or an uninitialized "none"
+/// variant on overflow.
+NSTDAPI NSTDOptionalUInt64 nstd_core_ops_shr_u64(NSTDUInt64 x, NSTDUInt32 y);
 
 #endif
