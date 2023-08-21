@@ -17,10 +17,6 @@
 ///
 /// `NSTDBool is_eq` - `NSTD_TRUE` if the memory buffers carry the same data.
 ///
-/// # Panics
-///
-/// This operation may panic if `num` is greater than `NSTDInt`'s max value.
-///
 /// # Safety
 ///
 /// - This function is highly unsafe as it does not know how large either of the memory buffers
@@ -45,10 +41,6 @@ NSTDAPI NSTDBool nstd_core_mem_compare(const NSTDByte *buf1, const NSTDByte *buf
 ///
 /// `const NSTDByte *delim_ptr` - A pointer to the delimiter byte, or null if it was not found.
 ///
-/// # Panics
-///
-/// This operation may panic if `size` is greater than `NSTDInt`'s max value.
-///
 /// # Safety
 ///
 /// This operation makes access to raw pointer data, leading to undefined behavior if `buf`'s
@@ -62,10 +54,6 @@ NSTDAPI const NSTDByte *nstd_core_mem_search(const NSTDByte *buf, NSTDUInt size,
 /// - `NSTDByte *buf` - A pointer to the first byte in the memory buffer.
 ///
 /// - `NSTDUInt size` - The number of bytes to set to 0.
-///
-/// # Panics
-///
-/// This operation will panic if `size` is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -81,10 +69,6 @@ NSTDAPI void nstd_core_mem_zero(NSTDByte *buf, NSTDUInt size);
 /// - `NSTDUInt size` - The size of the memory buffer.
 ///
 /// - `NSTDByte fill` - The byte value to fill the memory buffer with.
-///
-/// # Panics
-///
-/// This operation will panic if `size` is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///

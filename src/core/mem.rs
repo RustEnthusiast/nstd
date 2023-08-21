@@ -17,10 +17,6 @@ use nstdapi::nstdapi;
 ///
 /// `NSTDBool is_eq` - `NSTD_TRUE` if the memory buffers carry the same data.
 ///
-/// # Panics
-///
-/// This operation may panic if `num` is greater than `NSTDInt`'s max value.
-///
 /// # Safety
 ///
 /// - This function is highly unsafe as it does not know how large either of the memory buffers
@@ -50,9 +46,10 @@ use nstdapi::nstdapi;
 /// }
 /// ```
 #[nstdapi]
+#[allow(unused_mut)]
 pub unsafe fn nstd_core_mem_compare(
-    buf1: *const NSTDByte,
-    buf2: *const NSTDByte,
+    mut buf1: *const NSTDByte,
+    mut buf2: *const NSTDByte,
     num: NSTDUInt,
 ) -> NSTDBool {
     cfg_if! {
@@ -67,17 +64,20 @@ pub unsafe fn nstd_core_mem_compare(
         ))] {
             libc::memcmp(buf1.cast(), buf2.cast(), num) == 0
         } else {
-            use crate::{NSTD_INT_MAX, NSTD_TRUE};
-            // If the two pointers point to the same buffer, or `num` is 0, return true.
+            use crate::{NSTD_FALSE, NSTD_TRUE};
             if buf1 == buf2 || num == 0 {
                 return NSTD_TRUE;
             }
-            // Check if `num` exceeds `isize::MAX`.
-            assert!(num <= NSTD_INT_MAX);
-            // Otherwise compare them manually.
-            let buf1 = core::slice::from_raw_parts(buf1, num);
-            let buf2 = core::slice::from_raw_parts(buf2, num);
-            buf1 == buf2
+            let mut i = 0;
+            while i < num {
+                if *buf1 != *buf2 {
+                    return NSTD_FALSE;
+                }
+                buf1 = buf1.add(1);
+                buf2 = buf2.add(1);
+                i += 1;
+            }
+            NSTD_TRUE
         }
     }
 }
@@ -96,10 +96,6 @@ pub unsafe fn nstd_core_mem_compare(
 /// # Returns
 ///
 /// `const NSTDByte *delim_ptr` - A pointer to the delimiter byte, or null if it was not found.
-///
-/// # Panics
-///
-/// This operation may panic if `size` is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -120,8 +116,9 @@ pub unsafe fn nstd_core_mem_compare(
 /// }
 /// ```
 #[nstdapi]
+#[allow(unused_mut)]
 pub unsafe fn nstd_core_mem_search(
-    buf: *const NSTDByte,
+    mut buf: *const NSTDByte,
     size: NSTDUInt,
     delim: NSTDByte,
 ) -> *const NSTDByte {
@@ -137,13 +134,12 @@ pub unsafe fn nstd_core_mem_search(
         ))] {
             libc::memchr(buf.cast(), delim.into(), size) as _
         } else {
-            use crate::NSTD_INT_MAX;
-            assert!(size <= NSTD_INT_MAX);
             let mut i = 0;
             while i < size {
-                if *buf.add(i) == delim {
-                    return buf.add(i);
+                if *buf == delim {
+                    return buf;
                 }
+                buf = buf.add(1);
                 i += 1;
             }
             core::ptr::null()
@@ -158,10 +154,6 @@ pub unsafe fn nstd_core_mem_search(
 /// - `NSTDByte *buf` - A pointer to the first byte in the memory buffer.
 ///
 /// - `NSTDUInt size` - The number of bytes to set to 0.
-///
-/// # Panics
-///
-/// This operation will panic if `size` is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -180,7 +172,8 @@ pub unsafe fn nstd_core_mem_search(
 /// ```
 #[inline]
 #[nstdapi]
-pub unsafe fn nstd_core_mem_zero(buf: *mut NSTDByte, size: NSTDUInt) {
+#[allow(unused_mut)]
+pub unsafe fn nstd_core_mem_zero(mut buf: *mut NSTDByte, size: NSTDUInt) {
     cfg_if! {
         if #[cfg(all(
             any(
@@ -193,11 +186,10 @@ pub unsafe fn nstd_core_mem_zero(buf: *mut NSTDByte, size: NSTDUInt) {
         ))] {
             libc::memset(buf.cast(), 0, size);
         } else {
-            use crate::NSTD_INT_MAX;
-            assert!(size <= NSTD_INT_MAX);
             let mut i = 0;
             while i < size {
-                *buf.add(i) = 0;
+                *buf = 0;
+                buf = buf.add(1);
                 i += 1;
             }
         }
@@ -213,10 +205,6 @@ pub unsafe fn nstd_core_mem_zero(buf: *mut NSTDByte, size: NSTDUInt) {
 /// - `NSTDUInt size` - The size of the memory buffer.
 ///
 /// - `NSTDByte fill` - The byte value to fill the memory buffer with.
-///
-/// # Panics
-///
-/// This operation will panic if `size` is greater than `NSTDInt`'s max value.
 ///
 /// # Safety
 ///
@@ -236,7 +224,8 @@ pub unsafe fn nstd_core_mem_zero(buf: *mut NSTDByte, size: NSTDUInt) {
 /// ```
 #[inline]
 #[nstdapi]
-pub unsafe fn nstd_core_mem_fill(buf: *mut NSTDByte, size: NSTDUInt, fill: NSTDByte) {
+#[allow(unused_mut)]
+pub unsafe fn nstd_core_mem_fill(mut buf: *mut NSTDByte, size: NSTDUInt, fill: NSTDByte) {
     cfg_if! {
         if #[cfg(all(
             any(
@@ -249,11 +238,10 @@ pub unsafe fn nstd_core_mem_fill(buf: *mut NSTDByte, size: NSTDUInt, fill: NSTDB
         ))] {
             libc::memset(buf.cast(), fill.into(), size);
         } else {
-            use crate::NSTD_INT_MAX;
-            assert!(size <= NSTD_INT_MAX);
             let mut i = 0;
             while i < size {
-                *buf.add(i) = fill;
+                *buf = fill;
+                buf = buf.add(1);
                 i += 1;
             }
         }

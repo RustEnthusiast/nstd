@@ -8,6 +8,7 @@
 - Added `NSTDOptionalAnyRef[Mut]`.
 ## Changed
 ### `nstd.core`
+- Functions in `nstd.core.mem` no longer panic.
 - Functions in `nstd.core.ops` now return optionals instead of panicking.
 ## Removed
 ### `nstd.core`
