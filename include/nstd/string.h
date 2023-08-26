@@ -39,8 +39,9 @@ NSTDAPI NSTDString nstd_string_new(const NSTDAllocator *allocator);
 ///
 /// # Returns
 ///
-/// `NSTDString string` - The new string.
-NSTDAPI NSTDString nstd_string_new_with_cap(const NSTDAllocator *allocator, NSTDUInt cap);
+/// `NSTDOptionalString string` - The new string on success, or an uninitialized "none" variant if
+/// allocating fails.
+NSTDAPI NSTDOptionalString nstd_string_new_with_cap(const NSTDAllocator *allocator, NSTDUInt cap);
 
 /// Creates an owned version of an unowned string slice.
 ///

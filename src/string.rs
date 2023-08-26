@@ -103,7 +103,8 @@ pub const fn nstd_string_new(allocator: &NSTDAllocator) -> NSTDString<'_> {
 ///
 /// # Returns
 ///
-/// `NSTDString string` - The new string.
+/// `NSTDOptionalString string` - The new string on success, or an uninitialized "none" variant if
+/// allocating fails.
 ///
 /// # Example
 ///
@@ -114,9 +115,13 @@ pub const fn nstd_string_new(allocator: &NSTDAllocator) -> NSTDString<'_> {
 /// ```
 #[inline]
 #[nstdapi]
-pub fn nstd_string_new_with_cap(allocator: &NSTDAllocator, cap: NSTDUInt) -> NSTDString<'_> {
-    NSTDString {
-        bytes: nstd_vec_new_with_cap(allocator, 1, cap),
+pub fn nstd_string_new_with_cap(
+    allocator: &NSTDAllocator,
+    cap: NSTDUInt,
+) -> NSTDOptionalString<'_> {
+    match nstd_vec_new_with_cap(allocator, 1, cap) {
+        NSTDOptional::Some(bytes) => NSTDOptional::Some(NSTDString { bytes }),
+        NSTDOptional::None => NSTDOptional::None,
     }
 }
 
@@ -455,6 +460,7 @@ pub fn nstd_string_pop(string: &mut NSTDString<'_>) -> NSTDOptionalUnichar {
     // SAFETY: `NSTDString` is always UTF-8 encoded.
     let str = unsafe { core::str::from_utf8_unchecked(string.bytes.as_slice()) };
     if let Some(chr) = str.chars().last() {
+        #[allow(clippy::arithmetic_side_effects)]
         let len = nstd_vec_len(&string.bytes) - chr.len_utf8();
         nstd_vec_truncate(&mut string.bytes, len);
         return NSTDOptional::Some(chr.into());

@@ -34,6 +34,7 @@ impl NSTDSlice {
 
     /// Returns the number of bytes that this slice covers.
     #[inline]
+    #[allow(clippy::arithmetic_side_effects)]
     pub(crate) const fn byte_len(&self) -> usize {
         self.len * self.stride
     }
@@ -75,10 +76,12 @@ gen_optional!(NSTDOptionalSlice, NSTDSlice);
 #[inline]
 #[nstdapi]
 pub fn nstd_core_slice_new(ptr: NSTDAny, stride: NSTDUInt, len: NSTDUInt) -> NSTDOptionalSlice {
-    match !ptr.is_null() && len * stride <= NSTD_INT_MAX {
-        true => NSTDOptional::Some(NSTDSlice { ptr, len, stride }),
-        false => NSTDOptional::None,
+    if let Some(size) = len.checked_mul(stride) {
+        if size <= NSTD_INT_MAX && !ptr.is_null() {
+            return NSTDOptional::Some(NSTDSlice { ptr, len, stride });
+        }
     }
+    NSTDOptional::None
 }
 
 /// Creates a new slice from raw data without checking if `ptr` is null.
@@ -244,6 +247,7 @@ pub const fn nstd_core_slice_stride(slice: &NSTDSlice) -> NSTDUInt {
 #[inline]
 #[nstdapi]
 pub const fn nstd_core_slice_get(slice: &NSTDSlice, mut pos: NSTDUInt) -> NSTDAny {
+    #[allow(clippy::arithmetic_side_effects)]
     if pos < slice.len {
         pos *= slice.stride;
         // SAFETY: We've checked `pos`.
@@ -322,6 +326,7 @@ pub const fn nstd_core_slice_first(slice: &NSTDSlice) -> NSTDAny {
 #[nstdapi]
 pub const fn nstd_core_slice_last(slice: &NSTDSlice) -> NSTDAny {
     match slice.len > 0 {
+        #[allow(clippy::arithmetic_side_effects)]
         true => nstd_core_slice_get(slice, slice.len - 1),
         false => NSTD_NULL,
     }
@@ -379,10 +384,12 @@ pub fn nstd_core_slice_mut_new(
     stride: NSTDUInt,
     len: NSTDUInt,
 ) -> NSTDOptionalSliceMut {
-    match !ptr.is_null() && len * stride <= NSTD_INT_MAX {
-        true => NSTDOptional::Some(NSTDSliceMut { ptr, len, stride }),
-        false => NSTDOptional::None,
+    if let Some(size) = len.checked_mul(stride) {
+        if size <= NSTD_INT_MAX && !ptr.is_null() {
+            return NSTDOptional::Some(NSTDSliceMut { ptr, len, stride });
+        }
     }
+    NSTDOptional::None
 }
 
 /// Creates a new slice from raw data without checking if `ptr` is null.
@@ -601,7 +608,7 @@ pub const fn nstd_core_slice_mut_stride(slice: &NSTDSliceMut) -> NSTDUInt {
 #[inline]
 #[nstdapi]
 pub fn nstd_core_slice_mut_get(slice: &mut NSTDSliceMut, pos: NSTDUInt) -> NSTDAnyMut {
-    nstd_core_slice_mut_get_const(slice, pos) as NSTDAnyMut
+    nstd_core_slice_mut_get_const(slice, pos).cast_mut()
 }
 
 /// Returns an immutable pointer to the element at index `pos` in `slice`.
@@ -638,10 +645,11 @@ pub fn nstd_core_slice_mut_get(slice: &mut NSTDSliceMut, pos: NSTDUInt) -> NSTDA
 #[inline]
 #[nstdapi]
 pub const fn nstd_core_slice_mut_get_const(slice: &NSTDSliceMut, mut pos: NSTDUInt) -> NSTDAny {
+    #[allow(clippy::arithmetic_side_effects)]
     if pos < slice.len {
-        pos *= nstd_core_slice_mut_stride(slice);
+        pos *= slice.stride;
         // SAFETY: We've checked `pos`.
-        return unsafe { nstd_core_slice_mut_as_ptr_const(slice).add(pos) };
+        return unsafe { slice.ptr.add(pos) };
     }
     NSTD_NULL
 }
@@ -674,7 +682,7 @@ pub const fn nstd_core_slice_mut_get_const(slice: &NSTDSliceMut, mut pos: NSTDUI
 #[inline]
 #[nstdapi]
 pub fn nstd_core_slice_mut_first(slice: &mut NSTDSliceMut) -> NSTDAnyMut {
-    nstd_core_slice_mut_first_const(slice) as NSTDAnyMut
+    nstd_core_slice_mut_first_const(slice).cast_mut()
 }
 
 /// Returns an immutable pointer to the first element in the slice.
@@ -745,7 +753,7 @@ pub const fn nstd_core_slice_mut_first_const(slice: &NSTDSliceMut) -> NSTDAny {
 #[inline]
 #[nstdapi]
 pub fn nstd_core_slice_mut_last(slice: &mut NSTDSliceMut) -> NSTDAnyMut {
-    nstd_core_slice_mut_last_const(slice) as NSTDAnyMut
+    nstd_core_slice_mut_last_const(slice).cast_mut()
 }
 
 /// Returns an immutable pointer to the last element in the slice.
@@ -780,6 +788,7 @@ pub fn nstd_core_slice_mut_last(slice: &mut NSTDSliceMut) -> NSTDAnyMut {
 #[nstdapi]
 pub const fn nstd_core_slice_mut_last_const(slice: &NSTDSliceMut) -> NSTDAny {
     match slice.len > 0 {
+        #[allow(clippy::arithmetic_side_effects)]
         true => nstd_core_slice_mut_get_const(slice, slice.len - 1),
         false => NSTD_NULL,
     }

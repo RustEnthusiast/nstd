@@ -112,7 +112,10 @@ pub type NSTDThreadCountResult = NSTDResult<NSTDUInt, NSTDIOError>;
 /// ```
 #[nstdapi]
 pub unsafe fn nstd_thread_spawn(
-    thread_fn: unsafe extern "C" fn(NSTDOptionalHeapPtr<'_>) -> NSTDThreadResult,
+    #[cfg(not(feature = "capi"))] thread_fn: unsafe fn(NSTDOptionalHeapPtr<'_>) -> NSTDThreadResult,
+    #[cfg(feature = "capi")] thread_fn: unsafe extern "C" fn(
+        NSTDOptionalHeapPtr<'_>,
+    ) -> NSTDThreadResult,
     data: NSTDOptionalHeapPtr<'static>,
     desc: Option<&NSTDThreadDescriptor>,
 ) -> NSTDOptionalThread {

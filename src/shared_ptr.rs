@@ -52,6 +52,7 @@ impl Drop for NSTDSharedPtr<'_> {
         unsafe {
             // Update the pointer count.
             let ptrs = self.ptrs_mut();
+            #[allow(clippy::arithmetic_side_effects)]
             let new_size = self.ptrs() - 1;
             core::ptr::write_unaligned(ptrs, new_size);
             // If the pointer count is zero, free the data.
@@ -108,22 +109,23 @@ pub unsafe fn nstd_shared_ptr_new(
     init: NSTDAny,
 ) -> NSTDOptionalSharedPtr<'_> {
     // Allocate a region of memory for the object and the pointer count.
-    let buffer_size = element_size + USIZE_SIZE;
-    let raw = (allocator.allocate)(allocator.state, buffer_size);
-    if raw.is_null() {
-        return NSTDOptional::None;
+    if let Some(buffer_size) = element_size.checked_add(USIZE_SIZE) {
+        let raw = (allocator.allocate)(allocator.state, buffer_size);
+        if !raw.is_null() {
+            // Initialize the shared object.
+            nstd_core_mem_copy(raw.cast(), init.cast(), element_size);
+            // Set the pointer count to one.
+            let ptrs = raw.add(element_size).cast::<usize>();
+            core::ptr::write_unaligned(ptrs, 1);
+            // Construct the pointer.
+            return NSTDOptional::Some(NSTDSharedPtr {
+                allocator,
+                ptr: raw,
+                size: buffer_size,
+            });
+        }
     }
-    // Initialize the shared object.
-    nstd_core_mem_copy(raw.cast(), init.cast(), element_size);
-    // Set the pointer count to one.
-    let ptrs = raw.add(element_size).cast::<usize>();
-    core::ptr::write_unaligned(ptrs, 1);
-    // Construct the pointer.
-    NSTDOptional::Some(NSTDSharedPtr {
-        allocator,
-        ptr: raw,
-        size: buffer_size,
-    })
+    NSTDOptional::None
 }
 
 /// Creates a new zero-initialized instance of a shared pointer.
@@ -164,24 +166,22 @@ pub unsafe fn nstd_shared_ptr_new_zeroed(
     allocator: &NSTDAllocator,
     element_size: NSTDUInt,
 ) -> NSTDOptionalSharedPtr<'_> {
-    // SAFETY: The allocated memory is validated after allocation.
-    unsafe {
-        // Allocate a region of memory for the object and the pointer count.
-        let buffer_size = element_size + USIZE_SIZE;
+    // Allocate a region of memory for the object and the pointer count.
+    if let Some(buffer_size) = element_size.checked_add(USIZE_SIZE) {
         let raw = (allocator.allocate_zeroed)(allocator.state, buffer_size);
-        if raw.is_null() {
-            return NSTDOptional::None;
+        if !raw.is_null() {
+            // Set the pointer count to one.
+            let ptrs = raw.add(element_size).cast::<usize>();
+            core::ptr::write_unaligned(ptrs, 1);
+            // Construct the pointer.
+            return NSTDOptional::Some(NSTDSharedPtr {
+                allocator,
+                ptr: raw,
+                size: buffer_size,
+            });
         }
-        // Set the pointer count to one.
-        let ptrs = raw.add(element_size).cast::<usize>();
-        core::ptr::write_unaligned(ptrs, 1);
-        // Construct the pointer.
-        NSTDOptional::Some(NSTDSharedPtr {
-            allocator,
-            ptr: raw,
-            size: buffer_size,
-        })
     }
+    NSTDOptional::None
 }
 
 /// Shares `shared_ptr`.
@@ -223,7 +223,8 @@ pub fn nstd_shared_ptr_share<'a>(shared_ptr: &NSTDSharedPtr<'a>) -> NSTDSharedPt
     unsafe {
         // Update the pointer count.
         let ptrs = shared_ptr.ptrs_mut();
-        core::ptr::write_unaligned(ptrs, shared_ptr.ptrs() + 1);
+        #[allow(clippy::arithmetic_side_effects)]
+        core::ptr::write_unaligned(ptrs, *ptrs + 1);
         // Construct the new shared pointer instance.
         NSTDSharedPtr {
             allocator: shared_ptr.allocator,
@@ -322,6 +323,7 @@ pub fn nstd_shared_ptr_owners(shared_ptr: &NSTDSharedPtr<'_>) -> NSTDUInt {
 /// ```
 #[inline]
 #[nstdapi]
+#[allow(clippy::arithmetic_side_effects)]
 pub const fn nstd_shared_ptr_size(shared_ptr: &NSTDSharedPtr<'_>) -> NSTDUInt {
     shared_ptr.size - USIZE_SIZE
 }

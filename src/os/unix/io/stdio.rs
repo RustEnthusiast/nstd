@@ -85,6 +85,7 @@ pub(crate) unsafe fn write_all(fd: NSTDUnixFileDescriptor, bytes: &NSTDSlice) ->
     let mut written = 0;
     let mut pos = nstd_core_slice_as_ptr(bytes);
     while written < len {
+        #[allow(clippy::arithmetic_side_effects)]
         match libc::write(fd, pos, len - written) {
             -1 => match NSTDUnixIOError::last() {
                 NSTD_UNIX_IO_ERROR_INTERRUPTED => (),
@@ -162,8 +163,11 @@ pub(crate) unsafe fn read_all(
             -1 => return NSTDResult::Err(NSTDUnixIOError::last()),
             size => match lseek(fd, offset, SEEK_SET) {
                 -1 => return NSTDResult::Err(NSTDUnixIOError::last()),
-                _ => match (size - offset).try_into() {
-                    Ok(buf_size) => (buf_size, false),
+                _ => match size.checked_sub(offset) {
+                    Some(buf_size) => match buf_size.try_into() {
+                        Ok(buf_size) => (buf_size, false),
+                        _ => return NSTDResult::Err(NSTD_UNIX_IO_ERROR_INVALID_SEEK),
+                    },
                     _ => return NSTDResult::Err(NSTD_UNIX_IO_ERROR_INVALID_SEEK),
                 },
             },
@@ -179,6 +183,7 @@ pub(crate) unsafe fn read_all(
         let len = nstd_vec_len(buffer);
         // Reserve extra space for the vector if the file is piped or there have not been any reads
         // yet.
+        #[allow(clippy::arithmetic_side_effects)]
         if is_piped || start_len == len {
             let reserved = nstd_vec_cap(buffer) - len;
             if reserved < buf_size
@@ -193,8 +198,9 @@ pub(crate) unsafe fn read_all(
                 NSTD_UNIX_IO_ERROR_INTERRUPTED => (),
                 err => return NSTDResult::Err(err),
             },
+            #[allow(clippy::arithmetic_side_effects)]
             0 => return NSTDResult::Ok(len - start_len),
-            #[allow(clippy::cast_sign_loss)]
+            #[allow(clippy::arithmetic_side_effects, clippy::cast_sign_loss)]
             r => {
                 let read = r as NSTDUInt;
                 nstd_vec_set_len(buffer, len + read);
@@ -232,12 +238,14 @@ pub(crate) unsafe fn read_to_string(
     let buf = buffer.as_mut_vec();
     let start_len = nstd_vec_len(buf);
     let mut res = read_all(fd, buf);
+    #[allow(clippy::arithmetic_side_effects)]
     let read = nstd_vec_len(buf) - start_len;
     // Make sure the successfully read data is valid UTF-8.
     let read_start = nstd_vec_end(buf).sub(read).cast();
     let bytes = core::slice::from_raw_parts(read_start, read);
     if core::str::from_utf8(bytes).is_err() {
         let len = nstd_vec_len(buf);
+        #[allow(clippy::arithmetic_side_effects)]
         nstd_vec_set_len(buf, len - read);
         res = NSTDResult::Err(NSTD_UNIX_IO_ERROR_INVALID_DATA);
     }
@@ -267,6 +275,7 @@ pub(crate) unsafe fn read_exact(
     let mut read = 0;
     let mut pos = nstd_core_slice_mut_as_ptr(buffer);
     while read < len {
+        #[allow(clippy::arithmetic_side_effects)]
         match libc::read(fd, pos, len - read) {
             -1 => match NSTDUnixIOError::last() {
                 NSTD_UNIX_IO_ERROR_INTERRUPTED => (),

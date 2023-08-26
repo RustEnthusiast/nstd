@@ -58,12 +58,14 @@ impl<'a> NSTDVec<'a> {
 
     /// Returns the number of active bytes in the vector.
     #[inline]
+    #[allow(clippy::arithmetic_side_effects)]
     const fn byte_len(&self) -> usize {
         self.len * self.stride
     }
 
     /// Returns the number of bytes in the vector's memory buffer.
     #[inline]
+    #[allow(clippy::arithmetic_side_effects)]
     const fn buffer_byte_len(&self) -> usize {
         self.cap * self.stride
     }
@@ -97,6 +99,7 @@ impl<'a> NSTDVec<'a> {
     #[inline]
     fn try_reserve(&mut self) -> NSTDAllocError {
         if self.len == self.cap {
+            #[allow(clippy::arithmetic_side_effects)]
             let additional = 1 + self.cap / 2;
             #[allow(unused_unsafe)]
             // SAFETY: This operation is safe.
@@ -191,8 +194,6 @@ pub const fn nstd_vec_new(allocator: &NSTDAllocator, stride: NSTDUInt) -> NSTDVe
 
 /// Creates a new vector initialized with the given capacity.
 ///
-/// If allocation fails, a vector with a capacity of 0 will be returned.
-///
 /// # Parameters:
 ///
 /// - `const NSTDAllocator *allocator` - The memory allocator.
@@ -203,7 +204,8 @@ pub const fn nstd_vec_new(allocator: &NSTDAllocator, stride: NSTDUInt) -> NSTDVe
 ///
 /// # Returns
 ///
-/// `NSTDVec vec` - The new vector.
+/// `NSTDOptionalVec vec` - The new vector on success, or an uninitialized "none" variant if
+/// allocation fails.
 ///
 /// # Example
 ///
@@ -219,7 +221,7 @@ pub const fn nstd_vec_new(allocator: &NSTDAllocator, stride: NSTDUInt) -> NSTDVe
 /// unsafe {
 ///     let numbers = [642i16, 324i16, 190i16];
 ///     let numbers = nstd_core_slice_new(numbers.as_ptr().cast(), SIZE, 3).unwrap();
-///     let mut vec = nstd_vec_new_with_cap(&NSTD_ALLOCATOR, SIZE, 3);
+///     let mut vec = nstd_vec_new_with_cap(&NSTD_ALLOCATOR, SIZE, 3).unwrap();
 ///     assert!(nstd_vec_extend(&mut vec, &numbers) == NSTD_ALLOC_ERROR_NONE);
 ///     for i in 0..nstd_vec_len(&vec) {
 ///         let sv = nstd_core_slice_get(&numbers, i).cast::<i16>();
@@ -233,33 +235,33 @@ pub const fn nstd_vec_new(allocator: &NSTDAllocator, stride: NSTDUInt) -> NSTDVe
 pub fn nstd_vec_new_with_cap(
     allocator: &NSTDAllocator,
     stride: NSTDUInt,
-    mut cap: NSTDUInt,
-) -> NSTDVec<'_> {
+    cap: NSTDUInt,
+) -> NSTDOptionalVec<'_> {
     // Check if either `stride` or `cap` are zero.
     if stride == 0 || cap == 0 {
-        return NSTDVec {
+        return NSTDOptional::Some(NSTDVec {
             allocator,
             ptr: nstd_core_ptr_raw_dangling_mut(),
             stride,
             cap,
             len: 0,
-        };
+        });
     }
     // Attempt to allocate the memory buffer.
-    // SAFETY: Both `stride` & `cap` are above 0.
-    let mut ptr = unsafe { (allocator.allocate)(allocator.state, cap * stride) };
-    if ptr.is_null() {
-        ptr = nstd_core_ptr_raw_dangling_mut();
-        cap = 0;
+    if let Some(buf_size) = cap.checked_mul(stride) {
+        // SAFETY: Both `stride` & `cap` are above 0.
+        let ptr = unsafe { (allocator.allocate)(allocator.state, buf_size) };
+        if !ptr.is_null() {
+            return NSTDOptional::Some(NSTDVec {
+                allocator,
+                ptr,
+                stride,
+                cap,
+                len: 0,
+            });
+        }
     }
-    // Construct the vector.
-    NSTDVec {
-        allocator,
-        ptr,
-        stride,
-        cap,
-        len: 0,
-    }
+    NSTDOptional::None
 }
 
 /// Creates a new vector from a slice.
@@ -311,10 +313,10 @@ pub unsafe fn nstd_vec_from_slice<'a>(
     let len = nstd_core_slice_len(slice);
     if len > 0 {
         // Allocate the new vector.
-        let mut vec = nstd_vec_new_with_cap(allocator, stride, len);
-        if !vec.has_allocated() {
+        let NSTDOptional::Some(mut vec) = nstd_vec_new_with_cap(allocator, stride, len) else {
             return NSTDOptional::None;
-        }
+        };
+        #[allow(clippy::arithmetic_side_effects)]
         let bytes = len * stride;
         nstd_core_mem_copy(vec.ptr.cast(), nstd_core_slice_as_ptr(slice).cast(), bytes);
         vec.len = len;
@@ -337,10 +339,11 @@ pub unsafe fn nstd_vec_from_slice<'a>(
 #[nstdapi]
 pub fn nstd_vec_clone<'a>(vec: &NSTDVec<'a>) -> NSTDOptionalVec<'a> {
     if vec.len > 0 {
-        let mut cloned = nstd_vec_new_with_cap(vec.allocator, vec.stride, vec.len);
-        if !cloned.has_allocated() {
+        let NSTDOptional::Some(mut cloned) =
+            nstd_vec_new_with_cap(vec.allocator, vec.stride, vec.len)
+        else {
             return NSTDOptional::None;
-        }
+        };
         // SAFETY: Both vectors are non-null.
         unsafe { nstd_core_mem_copy(cloned.ptr.cast(), vec.ptr.cast(), vec.byte_len()) };
         cloned.len = vec.len;
@@ -431,12 +434,13 @@ pub const fn nstd_vec_stride(vec: &NSTDVec<'_>) -> NSTDUInt {
 /// };
 ///
 /// unsafe {
-///     let vec = nstd_vec_new_with_cap(&NSTD_ALLOCATOR, 2, 16);
+///     let vec = nstd_vec_new_with_cap(&NSTD_ALLOCATOR, 2, 16).unwrap();
 ///     assert!(nstd_vec_reserved(&vec) == 16);
 /// }
 /// ```
 #[inline]
 #[nstdapi]
+#[allow(clippy::arithmetic_side_effects)]
 pub const fn nstd_vec_reserved(vec: &NSTDVec<'_>) -> NSTDUInt {
     vec.cap - vec.len
 }
@@ -585,6 +589,7 @@ pub fn nstd_vec_end_mut(vec: &mut NSTDVec<'_>) -> NSTDAnyMut {
 #[inline]
 #[nstdapi]
 pub const fn nstd_vec_get(vec: &NSTDVec<'_>, mut pos: NSTDUInt) -> NSTDAny {
+    #[allow(clippy::arithmetic_side_effects)]
     if pos < vec.len {
         pos *= vec.stride;
         // SAFETY: `pos` is a valid index.
@@ -642,7 +647,7 @@ pub const fn nstd_vec_get(vec: &NSTDVec<'_>, mut pos: NSTDUInt) -> NSTDAny {
 #[inline]
 #[nstdapi]
 pub fn nstd_vec_get_mut(vec: &mut NSTDVec<'_>, pos: NSTDUInt) -> NSTDAnyMut {
-    nstd_vec_get(vec, pos) as NSTDAnyMut
+    nstd_vec_get(vec, pos).cast_mut()
 }
 
 /// Pushes a value onto a vector by copying bytes to the end of the vector's buffer. The number of
@@ -690,7 +695,10 @@ pub unsafe fn nstd_vec_push(vec: &mut NSTDVec<'_>, value: NSTDAny) -> NSTDAllocE
     // On success: copy bytes to the end of the vector.
     if errc == NSTD_ALLOC_ERROR_NONE {
         nstd_core_mem_copy(vec.end().cast(), value.cast(), vec.stride);
-        vec.len += 1;
+        vec.len = match vec.len.checked_add(1) {
+            Some(len) => len,
+            _ => return NSTDAllocError::NSTD_ALLOC_ERROR_INVALID_LAYOUT,
+        };
     }
     errc
 }
@@ -736,6 +744,7 @@ pub unsafe fn nstd_vec_push(vec: &mut NSTDVec<'_>, value: NSTDAny) -> NSTDAllocE
 #[inline]
 #[nstdapi]
 pub fn nstd_vec_pop(vec: &mut NSTDVec<'_>) -> NSTDAny {
+    #[allow(clippy::arithmetic_side_effects)]
     if vec.len > 0 {
         vec.len -= 1;
         return vec.end();
@@ -810,6 +819,7 @@ pub unsafe fn nstd_vec_insert(
     // Insert the value.
     else {
         // Move elements at/after `index` over by one element.
+        #[allow(clippy::arithmetic_side_effects)]
         if vec.stride > 0 {
             let stride = vec.stride;
             let bytes_to_copy = (vec.len - index) * stride;
@@ -819,8 +829,13 @@ pub unsafe fn nstd_vec_insert(
             nstd_core_mem_copy_overlapping(dest, idxptr, bytes_to_copy);
             // Write `value` over the old value at `index`.
             nstd_core_mem_copy(idxptr, value.cast(), stride);
+            vec.len += 1;
+        } else {
+            vec.len = match vec.len.checked_add(1) {
+                Some(len) => len,
+                _ => return 2,
+            };
         }
-        vec.len += 1;
         0
     }
 }
@@ -864,6 +879,7 @@ pub unsafe fn nstd_vec_insert(
 #[nstdapi]
 pub fn nstd_vec_remove(vec: &mut NSTDVec<'_>, mut index: NSTDUInt) -> NSTDErrorCode {
     // Make sure `index` is valid. This also ensures that `vec.len` is at least 1.
+    #[allow(clippy::arithmetic_side_effects)]
     if index < vec.len {
         // Move bytes after `index` to the left by one element.
         if vec.stride > 0 {
@@ -935,8 +951,9 @@ pub unsafe fn nstd_vec_extend(vec: &mut NSTDVec<'_>, values: &NSTDSlice) -> NSTD
     let len = nstd_core_slice_len(values);
     // Making sure there's enough space for the extension.
     let mut errc = NSTD_ALLOC_ERROR_NONE;
-    let reserved = vec.cap - vec.len;
+    let reserved = nstd_vec_reserved(vec);
     if reserved < len {
+        #[allow(clippy::arithmetic_side_effects)]
         let additional = len - reserved;
         errc = nstd_vec_reserve(vec, additional);
     }
@@ -944,7 +961,10 @@ pub unsafe fn nstd_vec_extend(vec: &mut NSTDVec<'_>, values: &NSTDSlice) -> NSTD
     if errc == NSTD_ALLOC_ERROR_NONE {
         let ptr = nstd_core_slice_as_ptr(values).cast();
         nstd_core_mem_copy(vec.end().cast(), ptr, values.byte_len());
-        vec.len += len;
+        vec.len = match vec.len.checked_add(len) {
+            Some(len) => len,
+            _ => return NSTDAllocError::NSTD_ALLOC_ERROR_INVALID_LAYOUT,
+        };
     }
     errc
 }
@@ -1003,9 +1023,14 @@ pub unsafe fn nstd_vec_set_len(vec: &mut NSTDVec<'_>, len: NSTDUInt) {
 #[nstdapi]
 pub fn nstd_vec_reserve(vec: &mut NSTDVec<'_>, size: NSTDUInt) -> NSTDAllocError {
     // Calculate the number of bytes to allocate.
-    let bytes_to_alloc = size * vec.stride;
+    let Some(bytes_to_alloc) = size.checked_mul(vec.stride) else {
+        return NSTDAllocError::NSTD_ALLOC_ERROR_INVALID_LAYOUT;
+    };
     if bytes_to_alloc == 0 {
-        vec.cap += size;
+        vec.cap = match vec.cap.checked_add(size) {
+            Some(cap) => cap,
+            _ => return NSTDAllocError::NSTD_ALLOC_ERROR_INVALID_LAYOUT,
+        };
         return NSTD_ALLOC_ERROR_NONE;
     }
     // Check if the vector has allocated.
@@ -1014,12 +1039,15 @@ pub fn nstd_vec_reserve(vec: &mut NSTDVec<'_>, size: NSTDUInt) -> NSTDAllocError
         // After an nstd vector has allocated it will always have at least one value allocated.
         // An example of this behavior can be seen in `nstd_vec_shrink`.
         let byte_len = vec.buffer_byte_len();
-        let new_byte_len = byte_len + bytes_to_alloc;
+        let Some(new_byte_len) = byte_len.checked_add(bytes_to_alloc) else {
+            return NSTDAllocError::NSTD_ALLOC_ERROR_INVALID_LAYOUT;
+        };
         // SAFETY: The vector is non-null & the lengths are above 0.
         let errc = unsafe {
             (vec.allocator.reallocate)(vec.allocator.state, &mut vec.ptr, byte_len, new_byte_len)
         };
         // On success increase the buffer length.
+        #[allow(clippy::arithmetic_side_effects)]
         if errc == NSTD_ALLOC_ERROR_NONE {
             vec.cap += size;
         }
@@ -1108,8 +1136,8 @@ pub fn nstd_vec_free(vec: NSTDVec<'_>) {}
 #[nstdapi]
 pub unsafe fn nstd_vec_drop(mut vec: NSTDVec<'_>, callback: unsafe extern "C" fn(NSTDAnyMut)) {
     let mut ptr = nstd_vec_as_ptr_mut(&mut vec);
-    let end = nstd_vec_end(&vec);
-    while ptr < end as _ {
+    let end = nstd_vec_end_mut(&mut vec);
+    while ptr < end {
         callback(ptr);
         ptr = ptr.add(vec.stride);
     }

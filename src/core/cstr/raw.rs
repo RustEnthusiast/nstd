@@ -43,6 +43,7 @@ pub unsafe fn nstd_core_cstr_raw_len(mut cstr: *const NSTDChar) -> NSTDUInt {
             libc::strlen(cstr)
         } else {
             let mut i = 0;
+            #[allow(clippy::arithmetic_side_effects)]
             while *cstr != 0 {
                 cstr = cstr.offset(1);
                 i += 1;
@@ -77,6 +78,7 @@ pub unsafe fn nstd_core_cstr_raw_len(mut cstr: *const NSTDChar) -> NSTDUInt {
 /// ```
 #[inline]
 #[nstdapi]
+#[allow(clippy::arithmetic_side_effects)]
 pub unsafe fn nstd_core_cstr_raw_len_with_null(cstr: *const NSTDChar) -> NSTDUInt {
     nstd_core_cstr_raw_len(cstr) + 1
 }

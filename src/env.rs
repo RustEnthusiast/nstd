@@ -6,8 +6,9 @@ use crate::{
     string::{NSTDOptionalString, NSTDString},
     vec::{nstd_vec_new, nstd_vec_push, NSTDVec},
 };
+use core::ptr::addr_of;
 use nstdapi::nstdapi;
-use std::{env::VarError, ptr::addr_of};
+use std::env::VarError;
 
 /// Returns a complete path to the process's current working directory.
 ///
@@ -166,13 +167,13 @@ pub unsafe fn nstd_env_remove_var(key: &NSTDStr) {
 /// This operation will panic if any program arguments contain invalid Unicode.
 #[nstdapi]
 pub fn nstd_env_args() -> NSTDVec<'static> {
-    let mut args = nstd_vec_new(&NSTD_ALLOCATOR, std::mem::size_of::<NSTDString<'_>>());
+    let mut args = nstd_vec_new(&NSTD_ALLOCATOR, core::mem::size_of::<NSTDString<'_>>());
     for arg in std::env::args() {
         let arg = NSTDString::from_string(arg);
         // SAFETY: `arg` is stored on the stack.
         let errc = unsafe { nstd_vec_push(&mut args, addr_of!(arg).cast()) };
         if errc == NSTD_ALLOC_ERROR_NONE {
-            std::mem::forget(arg);
+            core::mem::forget(arg);
         }
     }
     args
@@ -190,13 +191,13 @@ pub fn nstd_env_args() -> NSTDVec<'static> {
 /// This operation will panic if any environment variables contain invalid Unicode.
 #[nstdapi]
 pub fn nstd_env_vars() -> NSTDVec<'static> {
-    let mut vars = nstd_vec_new(&NSTD_ALLOCATOR, std::mem::size_of::<[NSTDString<'_>; 2]>());
+    let mut vars = nstd_vec_new(&NSTD_ALLOCATOR, core::mem::size_of::<[NSTDString<'_>; 2]>());
     for (k, v) in std::env::vars() {
         let var = [NSTDString::from_string(k), NSTDString::from_string(v)];
         // SAFETY: `var` is stored on the stack.
         let errc = unsafe { nstd_vec_push(&mut vars, addr_of!(var).cast()) };
         if errc == NSTD_ALLOC_ERROR_NONE {
-            std::mem::forget(var);
+            core::mem::forget(var);
         }
     }
     vars

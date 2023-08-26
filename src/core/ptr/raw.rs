@@ -12,6 +12,7 @@ pub(crate) const MAX_ALIGN: usize = 16;
 
 /// Checks if `align` is a power of 2.
 #[inline]
+#[allow(clippy::arithmetic_side_effects)]
 const fn is_power_of_two(align: NSTDUInt) -> NSTDBool {
     (align != 0) && ((align & (align - 1)) == 0)
 }
@@ -89,6 +90,7 @@ pub const fn nstd_core_ptr_raw_dangling_mut() -> NSTDAnyMut {
 /// }
 /// ```
 #[nstdapi]
+#[allow(clippy::arithmetic_side_effects)]
 pub unsafe fn nstd_core_ptr_raw_align(ptr: NSTDAny, align: NSTDUInt) -> NSTDAny {
     assert!(is_power_of_two(align));
     ((ptr as NSTDUInt)
@@ -132,7 +134,7 @@ pub unsafe fn nstd_core_ptr_raw_align(ptr: NSTDAny, align: NSTDUInt) -> NSTDAny 
 #[inline]
 #[nstdapi]
 pub unsafe fn nstd_core_ptr_raw_align_mut(ptr: NSTDAnyMut, align: NSTDUInt) -> NSTDAnyMut {
-    nstd_core_ptr_raw_align(ptr, align) as NSTDAnyMut
+    nstd_core_ptr_raw_align(ptr, align).cast_mut()
 }
 
 /// Checks if `ptr` is aligned to `align`.
@@ -169,6 +171,7 @@ pub unsafe fn nstd_core_ptr_raw_align_mut(ptr: NSTDAnyMut, align: NSTDUInt) -> N
 /// ```
 #[inline]
 #[nstdapi]
+#[allow(clippy::arithmetic_side_effects)]
 pub fn nstd_core_ptr_raw_is_aligned(ptr: NSTDAny, align: NSTDUInt) -> NSTDBool {
     assert!(is_power_of_two(align));
     ptr as NSTDUInt & (align - 1) == 0

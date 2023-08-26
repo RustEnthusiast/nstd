@@ -85,6 +85,7 @@ pub const fn nstd_core_time_duration_seconds(duration: NSTDDuration) -> NSTDInt6
 /// `NSTDUInt32 nanoseconds` - The number of nanoseconds held in `duration`.
 #[nstdapi]
 pub fn nstd_core_time_duration_nanoseconds(duration: NSTDDuration) -> NSTDUInt32 {
+    /// The number of nanoseconds in a full second.
     const NANOS_IN_SEC: NSTDFloat64 = 1_000_000_000.0;
     #[allow(
         clippy::cast_possible_truncation,

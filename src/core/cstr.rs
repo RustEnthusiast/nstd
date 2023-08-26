@@ -441,6 +441,7 @@ pub const fn nstd_core_cstr_first(cstr: &NSTDCStr) -> *const NSTDChar {
 #[nstdapi]
 pub const fn nstd_core_cstr_last(cstr: &NSTDCStr) -> *const NSTDChar {
     match cstr.len > 0 {
+        #[allow(clippy::arithmetic_side_effects)]
         true => nstd_core_cstr_get(cstr, cstr.len - 1),
         false => core::ptr::null(),
     }
@@ -844,7 +845,7 @@ pub unsafe fn nstd_core_cstr_mut_is_null_terminated(cstr: &NSTDCStrMut) -> NSTDB
 #[inline]
 #[nstdapi]
 pub unsafe fn nstd_core_cstr_mut_get_null(cstr: &mut NSTDCStrMut) -> *mut NSTDChar {
-    nstd_core_cstr_mut_get_null_const(cstr) as *mut NSTDChar
+    nstd_core_cstr_mut_get_null_const(cstr).cast_mut()
 }
 
 /// Returns an immutable pointer to the first null byte in a C string slice if one is present.
@@ -924,7 +925,7 @@ pub unsafe fn nstd_core_cstr_mut_get_null_const(cstr: &NSTDCStrMut) -> *const NS
 #[inline]
 #[nstdapi]
 pub fn nstd_core_cstr_mut_get(cstr: &mut NSTDCStrMut, pos: NSTDUInt) -> *mut NSTDChar {
-    nstd_core_cstr_mut_get_const(cstr, pos) as *mut NSTDChar
+    nstd_core_cstr_mut_get_const(cstr, pos).cast_mut()
 }
 
 /// Return an immutable pointer to the character at index `pos` in `cstr`.
@@ -1063,6 +1064,7 @@ pub const fn nstd_core_cstr_mut_first_const(cstr: &NSTDCStrMut) -> *const NSTDCh
 #[nstdapi]
 pub fn nstd_core_cstr_mut_last(cstr: &mut NSTDCStrMut) -> *mut NSTDChar {
     match cstr.len > 0 {
+        #[allow(clippy::arithmetic_side_effects)]
         true => nstd_core_cstr_mut_get(cstr, cstr.len - 1),
         false => core::ptr::null_mut(),
     }
@@ -1096,6 +1098,7 @@ pub fn nstd_core_cstr_mut_last(cstr: &mut NSTDCStrMut) -> *mut NSTDChar {
 #[nstdapi]
 pub const fn nstd_core_cstr_mut_last_const(cstr: &NSTDCStrMut) -> *const NSTDChar {
     match cstr.len > 0 {
+        #[allow(clippy::arithmetic_side_effects)]
         true => nstd_core_cstr_mut_get_const(cstr, cstr.len - 1),
         false => core::ptr::null(),
     }

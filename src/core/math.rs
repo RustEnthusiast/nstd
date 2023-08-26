@@ -1,5 +1,10 @@
 //! Low level math operations.
 use crate::{
+    core::optional::{
+        NSTDOptional, NSTDOptionalInt, NSTDOptionalInt16, NSTDOptionalInt32, NSTDOptionalInt64,
+        NSTDOptionalInt8, NSTDOptionalUInt, NSTDOptionalUInt16, NSTDOptionalUInt32,
+        NSTDOptionalUInt64, NSTDOptionalUInt8,
+    },
     NSTDFloat32, NSTDFloat64, NSTDInt, NSTDInt16, NSTDInt32, NSTDInt64, NSTDInt8, NSTDUInt,
     NSTDUInt16, NSTDUInt32, NSTDUInt64, NSTDUInt8,
 };
@@ -410,7 +415,7 @@ gen_clamp!(
 
 /// Generates the `div_ceil` functions.
 macro_rules! gen_div_ceil {
-    ($name: ident, $T: ty) => {
+    ($name: ident, $T: ty, $Opt: ty) => {
         /// Divides two numbers and rounds the result up to the next integer.
         ///
         /// # Parameters:
@@ -421,51 +426,52 @@ macro_rules! gen_div_ceil {
         ///
         /// # Returns
         ///
-        #[doc = concat!("`", stringify!($T), " v` - The divided value, rounded up.")]
-        ///
-        /// # Panics
-        ///
-        /// This operation will panic if `y` is 0.
+        #[doc = concat!("`", stringify!($Opt), " v` - The divided value rounded up on success, or an uninitialized \"none\" variant if `y` is 0 or overflow occurs.")]
         ///
         /// # Example
         ///
         /// ```
-        #[doc = concat!("use nstd_sys::core::math::", stringify!($name), ";")]
+        #[doc = concat!("use nstd_sys::core::{math::", stringify!($name), ", optional::NSTDOptional};")]
         ///
         /// # unsafe {
-        #[doc = concat!("assert!(", stringify!($name), "(8, 5) == 2);")]
-        #[doc = concat!("assert!(", stringify!($name), "(8, 3) == 3);")]
-        #[doc = concat!("assert!(", stringify!($name), "(8, 2) == 4);")]
+        #[doc = concat!("assert!(", stringify!($name), "(8, 5) == NSTDOptional::Some(2));")]
+        #[doc = concat!("assert!(", stringify!($name), "(8, 3) == NSTDOptional::Some(3));")]
+        #[doc = concat!("assert!(", stringify!($name), "(8, 2) == NSTDOptional::Some(4));")]
+        #[doc = concat!("assert!(", stringify!($name), "(8, 0) == NSTDOptional::None);")]
         /// # }
         /// ```
-        #[inline]
         #[nstdapi]
         #[allow(unused_comparisons)]
-        pub const fn $name(x: $T, y: $T) -> $T {
-            let d = x / y;
-            let r = x % y;
-            if (r > 0 && y > 0) || (r < 0 && y < 0) {
-                d + 1
-            } else {
-                d
+        pub const fn $name(x: $T, y: $T) -> $Opt {
+            if let Some(v) = x.checked_div(y) {
+                if let Some(r) = x.checked_rem(y) {
+                    return match (r > 0 && y > 0) || (r < 0 && y < 0) {
+                        true => match v.checked_add(1) {
+                            Some(v) => NSTDOptional::Some(v),
+                            _ => NSTDOptional::None,
+                        },
+                        false => NSTDOptional::Some(v),
+                    };
+                }
             }
+            NSTDOptional::None
         }
     };
 }
-gen_div_ceil!(nstd_core_math_div_ceil_int, NSTDInt);
-gen_div_ceil!(nstd_core_math_div_ceil_uint, NSTDUInt);
-gen_div_ceil!(nstd_core_math_div_ceil_i8, NSTDInt8);
-gen_div_ceil!(nstd_core_math_div_ceil_u8, NSTDUInt8);
-gen_div_ceil!(nstd_core_math_div_ceil_i16, NSTDInt16);
-gen_div_ceil!(nstd_core_math_div_ceil_u16, NSTDUInt16);
-gen_div_ceil!(nstd_core_math_div_ceil_i32, NSTDInt32);
-gen_div_ceil!(nstd_core_math_div_ceil_u32, NSTDUInt32);
-gen_div_ceil!(nstd_core_math_div_ceil_i64, NSTDInt64);
-gen_div_ceil!(nstd_core_math_div_ceil_u64, NSTDUInt64);
+gen_div_ceil!(nstd_core_math_div_ceil_int, NSTDInt, NSTDOptionalInt);
+gen_div_ceil!(nstd_core_math_div_ceil_uint, NSTDUInt, NSTDOptionalUInt);
+gen_div_ceil!(nstd_core_math_div_ceil_i8, NSTDInt8, NSTDOptionalInt8);
+gen_div_ceil!(nstd_core_math_div_ceil_u8, NSTDUInt8, NSTDOptionalUInt8);
+gen_div_ceil!(nstd_core_math_div_ceil_i16, NSTDInt16, NSTDOptionalInt16);
+gen_div_ceil!(nstd_core_math_div_ceil_u16, NSTDUInt16, NSTDOptionalUInt16);
+gen_div_ceil!(nstd_core_math_div_ceil_i32, NSTDInt32, NSTDOptionalInt32);
+gen_div_ceil!(nstd_core_math_div_ceil_u32, NSTDUInt32, NSTDOptionalUInt32);
+gen_div_ceil!(nstd_core_math_div_ceil_i64, NSTDInt64, NSTDOptionalInt64);
+gen_div_ceil!(nstd_core_math_div_ceil_u64, NSTDUInt64, NSTDOptionalUInt64);
 
 /// Generates the `div_floor` functions.
 macro_rules! gen_div_floor {
-    ($name: ident, $T: ty) => {
+    ($name: ident, $T: ty, $Opt: ty) => {
         /// Divides two numbers and rounds the result down to the next integer.
         ///
         /// # Parameters:
@@ -476,44 +482,45 @@ macro_rules! gen_div_floor {
         ///
         /// # Returns
         ///
-        #[doc = concat!(" `", stringify!($T), " v` - The divided value, rounded down.")]
-        ///
-        /// # Panics
-        ///
-        /// This operation will panic if `y` is 0.
+        #[doc = concat!(" `", stringify!($Opt), " v` - The divided value rounded down on success, or an uninitialized \"none\" variant if `y` is 0 or overflow occurs.")]
         ///
         /// # Example
         ///
         /// ```
-        #[doc = concat!("use nstd_sys::core::math::", stringify!($name), ";")]
+        #[doc = concat!("use nstd_sys::core::{math::", stringify!($name), ", optional::NSTDOptional};")]
         ///
         /// # unsafe {
-        #[doc = concat!("assert!(", stringify!($name), "(5, 2) == 2);")]
-        #[doc = concat!("assert!(", stringify!($name), "(13, 4) == 3);")]
-        #[doc = concat!("assert!(", stringify!($name), "(23, 5) == 4);")]
+        #[doc = concat!("assert!(", stringify!($name), "(5, 2) == NSTDOptional::Some(2));")]
+        #[doc = concat!("assert!(", stringify!($name), "(13, 4) == NSTDOptional::Some(3));")]
+        #[doc = concat!("assert!(", stringify!($name), "(23, 5) == NSTDOptional::Some(4));")]
+        #[doc = concat!("assert!(", stringify!($name), "(23, 0) == NSTDOptional::None);")]
         /// # }
         /// ```
-        #[inline]
         #[nstdapi]
         #[allow(unused_comparisons)]
-        pub const fn $name(x: $T, y: $T) -> $T {
-            let d = x / y;
-            let r = x % y;
-            if (r > 0 && y < 0) || (r < 0 && y > 0) {
-                d - 1
-            } else {
-                d
+        pub const fn $name(x: $T, y: $T) -> $Opt {
+            if let Some(v) = x.checked_div(y) {
+                if let Some(r) = x.checked_rem(y) {
+                    return match (r > 0 && y < 0) || (r < 0 && y > 0) {
+                        true => match v.checked_sub(1) {
+                            Some(v) => NSTDOptional::Some(v),
+                            _ => NSTDOptional::None,
+                        },
+                        false => NSTDOptional::Some(v),
+                    };
+                }
             }
+            NSTDOptional::None
         }
     };
 }
-gen_div_floor!(nstd_core_math_div_floor_int, NSTDInt);
-gen_div_floor!(nstd_core_math_div_floor_uint, NSTDUInt);
-gen_div_floor!(nstd_core_math_div_floor_i8, NSTDInt8);
-gen_div_floor!(nstd_core_math_div_floor_u8, NSTDUInt8);
-gen_div_floor!(nstd_core_math_div_floor_i16, NSTDInt16);
-gen_div_floor!(nstd_core_math_div_floor_u16, NSTDUInt16);
-gen_div_floor!(nstd_core_math_div_floor_i32, NSTDInt32);
-gen_div_floor!(nstd_core_math_div_floor_u32, NSTDUInt32);
-gen_div_floor!(nstd_core_math_div_floor_i64, NSTDInt64);
-gen_div_floor!(nstd_core_math_div_floor_u64, NSTDUInt64);
+gen_div_floor!(nstd_core_math_div_floor_int, NSTDInt, NSTDOptionalInt);
+gen_div_floor!(nstd_core_math_div_floor_uint, NSTDUInt, NSTDOptionalUInt);
+gen_div_floor!(nstd_core_math_div_floor_i8, NSTDInt8, NSTDOptionalInt8);
+gen_div_floor!(nstd_core_math_div_floor_u8, NSTDUInt8, NSTDOptionalUInt8);
+gen_div_floor!(nstd_core_math_div_floor_i16, NSTDInt16, NSTDOptionalInt16);
+gen_div_floor!(nstd_core_math_div_floor_u16, NSTDUInt16, NSTDOptionalUInt16);
+gen_div_floor!(nstd_core_math_div_floor_i32, NSTDInt32, NSTDOptionalInt32);
+gen_div_floor!(nstd_core_math_div_floor_u32, NSTDUInt32, NSTDOptionalUInt32);
+gen_div_floor!(nstd_core_math_div_floor_i64, NSTDInt64, NSTDOptionalInt64);
+gen_div_floor!(nstd_core_math_div_floor_u64, NSTDUInt64, NSTDOptionalUInt64);

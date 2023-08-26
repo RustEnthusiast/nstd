@@ -69,6 +69,7 @@ pub unsafe fn nstd_core_mem_compare(
                 return NSTD_TRUE;
             }
             let mut i = 0;
+            #[allow(clippy::arithmetic_side_effects)]
             while i < num {
                 if *buf1 != *buf2 {
                     return NSTD_FALSE;
@@ -135,6 +136,7 @@ pub unsafe fn nstd_core_mem_search(
             libc::memchr(buf.cast(), delim.into(), size) as _
         } else {
             let mut i = 0;
+            #[allow(clippy::arithmetic_side_effects)]
             while i < size {
                 if *buf == delim {
                     return buf;
@@ -187,6 +189,7 @@ pub unsafe fn nstd_core_mem_zero(mut buf: *mut NSTDByte, size: NSTDUInt) {
             libc::memset(buf.cast(), 0, size);
         } else {
             let mut i = 0;
+            #[allow(clippy::arithmetic_side_effects)]
             while i < size {
                 *buf = 0;
                 buf = buf.add(1);
@@ -239,6 +242,7 @@ pub unsafe fn nstd_core_mem_fill(mut buf: *mut NSTDByte, size: NSTDUInt, fill: N
             libc::memset(buf.cast(), fill.into(), size);
         } else {
             let mut i = 0;
+            #[allow(clippy::arithmetic_side_effects)]
             while i < size {
                 *buf = fill;
                 buf = buf.add(1);

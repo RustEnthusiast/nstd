@@ -1,6 +1,9 @@
 //! A dynamically sized, null terminated, C string.
 use crate::{
-    alloc::{NSTDAllocError, NSTDAllocator},
+    alloc::{
+        NSTDAllocError::{self, NSTD_ALLOC_ERROR_NONE},
+        NSTDAllocator,
+    },
     core::{
         cstr::{
             nstd_core_cstr_as_bytes, nstd_core_cstr_get_null, nstd_core_cstr_is_null_terminated,
@@ -81,13 +84,14 @@ pub fn nstd_cstring_new_with_cap(
     allocator: &NSTDAllocator,
     cap: NSTDUInt,
 ) -> NSTDOptionalCString<'_> {
-    let mut bytes = nstd_vec_new_with_cap(allocator, 1, cap);
-    let nul: NSTDChar = 0;
-    // SAFETY: `nul` is stored on the stack.
-    match unsafe { nstd_vec_push(&mut bytes, addr_of!(nul).cast()) } {
-        NSTDAllocError::NSTD_ALLOC_ERROR_NONE => NSTDOptional::Some(NSTDCString { bytes }),
-        _ => NSTDOptional::None,
+    if let NSTDOptional::Some(mut bytes) = nstd_vec_new_with_cap(allocator, 1, cap) {
+        let nul: NSTDChar = 0;
+        // SAFETY: `nul` is stored on the stack.
+        if unsafe { nstd_vec_push(&mut bytes, addr_of!(nul).cast()) } == NSTD_ALLOC_ERROR_NONE {
+            return NSTDOptional::Some(NSTDCString { bytes });
+        }
     }
+    NSTDOptional::None
 }
 
 /// Creates an owned version of an unowned C string slice.
@@ -161,7 +165,7 @@ pub unsafe fn nstd_cstring_from_cstr_unchecked<'a>(
     if let NSTDOptional::Some(mut bytes) = nstd_vec_from_slice(allocator, &bytes) {
         let null: NSTDChar = 0;
         let null = addr_of!(null).cast();
-        if nstd_vec_push(&mut bytes, null) == NSTDAllocError::NSTD_ALLOC_ERROR_NONE {
+        if nstd_vec_push(&mut bytes, null) == NSTD_ALLOC_ERROR_NONE {
             return NSTDOptional::Some(NSTDCString { bytes });
         }
     }
@@ -303,6 +307,7 @@ pub fn nstd_cstring_into_bytes(cstring: NSTDCString<'_>) -> NSTDVec<'_> {
 /// `NSTDUInt len` - The length of the C string without it's null byte.
 #[inline]
 #[nstdapi]
+#[allow(clippy::arithmetic_side_effects)]
 pub const fn nstd_cstring_len(cstring: &NSTDCString<'_>) -> NSTDUInt {
     nstd_vec_len(&cstring.bytes) - 1
 }
@@ -375,16 +380,17 @@ pub fn nstd_cstring_push(cstring: &mut NSTDCString<'_>, chr: NSTDChar) -> NSTDAl
             // Push a new null byte onto the end of the C string.
             let nul: NSTDChar = 0;
             let errc = nstd_vec_push(&mut cstring.bytes, addr_of!(nul).cast());
-            if errc != NSTDAllocError::NSTD_ALLOC_ERROR_NONE {
+            if errc != NSTD_ALLOC_ERROR_NONE {
                 return errc;
             }
             // Write `chr` over the old null byte.
+            #[allow(clippy::arithmetic_side_effects)]
             let nulpos = nstd_vec_len(&cstring.bytes) - 2;
             let nul = nstd_vec_get_mut(&mut cstring.bytes, nulpos).cast();
             *nul = chr;
         }
     }
-    NSTDAllocError::NSTD_ALLOC_ERROR_NONE
+    NSTD_ALLOC_ERROR_NONE
 }
 
 /// Appends a C string slice to the end of a C string.
@@ -441,7 +447,7 @@ pub unsafe fn nstd_cstring_push_cstr(
     let errc = nstd_vec_extend(&mut cstring.bytes, &bytes);
     // Push a new null byte.
     let pusherrc = nstd_vec_push(&mut cstring.bytes, addr_of!(nul).cast());
-    assert!(pusherrc == NSTDAllocError::NSTD_ALLOC_ERROR_NONE);
+    assert!(pusherrc == NSTD_ALLOC_ERROR_NONE);
     errc
 }
 
@@ -479,6 +485,7 @@ pub fn nstd_cstring_pop(cstring: &mut NSTDCString<'_>) -> NSTDChar {
         // SAFETY: The C string's length is at least 1.
         unsafe {
             // Write the last character in the C string to the return value.
+            #[allow(clippy::arithmetic_side_effects)]
             let last = nstd_vec_get_mut(&mut cstring.bytes, len - 1).cast::<NSTDChar>();
             ret = *last;
             // Set the last byte to null.

@@ -17,9 +17,9 @@ use crate::{
     },
     NSTDAny, NSTDAnyMut, NSTDUInt, NSTD_NULL,
 };
-use alloc::alloc::Layout;
 use cfg_if::cfg_if;
 use core::{
+    alloc::Layout,
     marker::PhantomData,
     ops::{Deref, DerefMut},
     ptr::addr_of,

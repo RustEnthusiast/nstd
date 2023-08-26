@@ -8,6 +8,7 @@
 - Added `NSTDOptionalAnyRef[Mut]`.
 ## Changed
 ### `nstd.core`
+- `nstd_core_math_div_[ceil|floor]_*` functions now return optionals.
 - `nstd_core_str[_mut]_from_bytes` functions no longer panic.
 - Functions in `nstd.core.mem` no longer panic.
 - Functions in `nstd.core.ops` now return optionals instead of panicking.
@@ -15,6 +16,10 @@
 - `nstd_fs_write` no longer panics.
 ### `nstd.proc`
 - `nstd_proc_spawn` no longer panics.
+### `nstd.string`
+- `nstd_string_new_with_cap` now returns `NSTDOptionalString`.
+### `nstd.vec`
+- `nstd_vec_new_with_cap` now returns `NSTDOptionalVec`.
 ## Removed
 ### `nstd.core`
 - Removed `nstd_core_abort_with_msg`.

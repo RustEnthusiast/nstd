@@ -126,4 +126,4 @@ pub unsafe fn nstd_os_unix_shared_lib_get_mut(
     clippy::missing_const_for_fn,
     clippy::needless_pass_by_value
 )]
-pub fn nstd_os_unix_shared_lib_free(lib: NSTDUnixSharedLib) {}
+pub unsafe fn nstd_os_unix_shared_lib_free(lib: NSTDUnixSharedLib) {}

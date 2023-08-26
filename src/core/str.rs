@@ -560,6 +560,7 @@ pub const unsafe fn nstd_core_str_substr(str: &NSTDStr, range: NSTDURange) -> NS
     assert!(range.start <= range.end && range.end <= str.len);
     // Create the byte slice with `range` and use it to create the new string slice.
     let start = str.ptr.add(range.start).cast();
+    #[allow(clippy::arithmetic_side_effects)]
     let bytes = nstd_core_slice_new_unchecked(start, 1, range.end - range.start);
     nstd_core_str_from_bytes(&bytes)
 }
@@ -1336,6 +1337,7 @@ pub unsafe fn nstd_core_str_mut_substr(
     assert!(range.start <= range.end && range.end <= str.len);
     // Create the byte slice with `range` and use it to create the new string slice.
     let start = str.ptr.add(range.start).cast();
+    #[allow(clippy::arithmetic_side_effects)]
     let mut bytes = nstd_core_slice_mut_new_unchecked(start, 1, range.end - range.start);
     nstd_core_str_mut_from_bytes(&mut bytes)
 }

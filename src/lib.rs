@@ -3,6 +3,7 @@
     deprecated_in_future,
     ffi_unwind_calls,
     future_incompatible,
+    invalid_reference_casting,
     let_underscore,
     macro_use_extern_crate,
     meta_variable_misuse,
@@ -34,7 +35,16 @@
     clippy::perf,
     clippy::style,
     clippy::suspicious,
-    clippy::undocumented_unsafe_blocks
+    // clippy::restriction:
+    clippy::alloc_instead_of_core,
+    clippy::arithmetic_side_effects,
+    clippy::missing_docs_in_private_items,
+    clippy::std_instead_of_alloc,
+    clippy::std_instead_of_core,
+    clippy::undocumented_unsafe_blocks,
+    clippy::unnecessary_safety_comment,
+    clippy::unnecessary_safety_doc,
+    clippy::unneeded_field_pattern,
 )]
 #![allow(
     clippy::match_bool,

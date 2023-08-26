@@ -38,8 +38,6 @@ NSTDAPI NSTDVec nstd_vec_new(const NSTDAllocator *allocator, NSTDUInt stride);
 
 /// Creates a new vector initialized with the given capacity.
 ///
-/// If allocation fails, a vector with a capacity of 0 will be returned.
-///
 /// # Parameters:
 ///
 /// - `const NSTDAllocator *allocator` - The memory allocator.
@@ -50,8 +48,9 @@ NSTDAPI NSTDVec nstd_vec_new(const NSTDAllocator *allocator, NSTDUInt stride);
 ///
 /// # Returns
 ///
-/// `NSTDVec vec` - The new vector.
-NSTDAPI NSTDVec
+/// `NSTDOptionalVec vec` - The new vector on success, or an uninitialized "none" variant if
+/// allocation fails.
+NSTDAPI NSTDOptionalVec
 nstd_vec_new_with_cap(const NSTDAllocator *allocator, NSTDUInt stride, NSTDUInt cap);
 
 /// Creates a new vector from a slice.

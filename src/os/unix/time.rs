@@ -32,6 +32,7 @@ impl From<timespec> for NSTDUnixTime {
     /// Converts a [timespec] into an [`NSTDUnixTime`] object.
     #[allow(clippy::cast_precision_loss)]
     fn from(value: timespec) -> Self {
+        /// The number of nanoseconds in a full second.
         const NANOS_IN_SEC: NSTDFloat64 = 1_000_000_000.0;
         let mut seconds = value.tv_sec as _;
         seconds += value.tv_nsec as NSTDFloat64 / NANOS_IN_SEC;

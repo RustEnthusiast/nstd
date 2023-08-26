@@ -1,6 +1,7 @@
 #ifndef NSTD_CORE_MATH_H
 #define NSTD_CORE_MATH_H
 #include "../nstd.h"
+#include "optional.h"
 
 /// Converts radians to degrees.
 ///
@@ -443,12 +444,9 @@ NSTDAPI NSTDUInt64 nstd_core_math_clamp_u64(NSTDUInt64 x, NSTDUInt64 min, NSTDUI
 ///
 /// # Returns
 ///
-/// `NSTDInt v` - The divided value, rounded up.
-///
-/// # Panics
-///
-/// This operation will panic if `y` is 0.
-NSTDAPI NSTDInt nstd_core_math_div_ceil_int(NSTDInt x, NSTDInt y);
+/// `NSTDOptionalInt v` - The divided value rounded up on success, or an uninitialized "none"
+/// variant if `y` is 0 or overflow occurs.
+NSTDAPI NSTDOptionalInt nstd_core_math_div_ceil_int(NSTDInt x, NSTDInt y);
 /// Divides two numbers and rounds the result up to the next integer.
 ///
 /// # Parameters:
@@ -459,12 +457,9 @@ NSTDAPI NSTDInt nstd_core_math_div_ceil_int(NSTDInt x, NSTDInt y);
 ///
 /// # Returns
 ///
-/// `NSTDUInt v` - The divided value, rounded up.
-///
-/// # Panics
-///
-/// This operation will panic if `y` is 0.
-NSTDAPI NSTDUInt nstd_core_math_div_ceil_uint(NSTDUInt x, NSTDUInt y);
+/// `NSTDOptionalUInt v` - The divided value rounded up on success, or an uninitialized "none"
+/// variant if `y` is 0 or overflow occurs.
+NSTDAPI NSTDOptionalUInt nstd_core_math_div_ceil_uint(NSTDUInt x, NSTDUInt y);
 /// Divides two numbers and rounds the result up to the next integer.
 ///
 /// # Parameters:
@@ -475,12 +470,9 @@ NSTDAPI NSTDUInt nstd_core_math_div_ceil_uint(NSTDUInt x, NSTDUInt y);
 ///
 /// # Returns
 ///
-/// `NSTDInt8 v` - The divided value, rounded up.
-///
-/// # Panics
-///
-/// This operation will panic if `y` is 0.
-NSTDAPI NSTDInt8 nstd_core_math_div_ceil_i8(NSTDInt8 x, NSTDInt8 y);
+/// `NSTDOptionalInt8 v` - The divided value rounded up on success, or an uninitialized "none"
+/// variant if `y` is 0 or overflow occurs.
+NSTDAPI NSTDOptionalInt8 nstd_core_math_div_ceil_i8(NSTDInt8 x, NSTDInt8 y);
 /// Divides two numbers and rounds the result up to the next integer.
 ///
 /// # Parameters:
@@ -491,12 +483,9 @@ NSTDAPI NSTDInt8 nstd_core_math_div_ceil_i8(NSTDInt8 x, NSTDInt8 y);
 ///
 /// # Returns
 ///
-/// `NSTDUInt8 v` - The divided value, rounded up.
-///
-/// # Panics
-///
-/// This operation will panic if `y` is 0.
-NSTDAPI NSTDUInt8 nstd_core_math_div_ceil_u8(NSTDUInt8 x, NSTDUInt8 y);
+/// `NSTDOptionalUInt8 v` - The divided value rounded up on success, or an uninitialized "none"
+/// variant if `y` is 0 or overflow occurs.
+NSTDAPI NSTDOptionalUInt8 nstd_core_math_div_ceil_u8(NSTDUInt8 x, NSTDUInt8 y);
 /// Divides two numbers and rounds the result up to the next integer.
 ///
 /// # Parameters:
@@ -507,12 +496,9 @@ NSTDAPI NSTDUInt8 nstd_core_math_div_ceil_u8(NSTDUInt8 x, NSTDUInt8 y);
 ///
 /// # Returns
 ///
-/// `NSTDInt16 v` - The divided value, rounded up.
-///
-/// # Panics
-///
-/// This operation will panic if `y` is 0.
-NSTDAPI NSTDInt16 nstd_core_math_div_ceil_i16(NSTDInt16 x, NSTDInt16 y);
+/// `NSTDOptionalInt16 v` - The divided value rounded up on success, or an uninitialized "none"
+/// variant if `y` is 0 or overflow occurs.
+NSTDAPI NSTDOptionalInt16 nstd_core_math_div_ceil_i16(NSTDInt16 x, NSTDInt16 y);
 /// Divides two numbers and rounds the result up to the next integer.
 ///
 /// # Parameters:
@@ -523,12 +509,9 @@ NSTDAPI NSTDInt16 nstd_core_math_div_ceil_i16(NSTDInt16 x, NSTDInt16 y);
 ///
 /// # Returns
 ///
-/// `NSTDUInt16 v` - The divided value, rounded up.
-///
-/// # Panics
-///
-/// This operation will panic if `y` is 0.
-NSTDAPI NSTDUInt16 nstd_core_math_div_ceil_u16(NSTDUInt16 x, NSTDUInt16 y);
+/// `NSTDOptionalUInt16 v` - The divided value rounded up on success, or an uninitialized "none"
+/// variant if `y` is 0 or overflow occurs.
+NSTDAPI NSTDOptionalUInt16 nstd_core_math_div_ceil_u16(NSTDUInt16 x, NSTDUInt16 y);
 /// Divides two numbers and rounds the result up to the next integer.
 ///
 /// # Parameters:
@@ -539,12 +522,9 @@ NSTDAPI NSTDUInt16 nstd_core_math_div_ceil_u16(NSTDUInt16 x, NSTDUInt16 y);
 ///
 /// # Returns
 ///
-/// `NSTDInt32 v` - The divided value, rounded up.
-///
-/// # Panics
-///
-/// This operation will panic if `y` is 0.
-NSTDAPI NSTDInt32 nstd_core_math_div_ceil_i32(NSTDInt32 x, NSTDInt32 y);
+/// `NSTDOptionalInt32 v` - The divided value rounded up on success, or an uninitialized "none"
+/// variant if `y` is 0 or overflow occurs.
+NSTDAPI NSTDOptionalInt32 nstd_core_math_div_ceil_i32(NSTDInt32 x, NSTDInt32 y);
 /// Divides two numbers and rounds the result up to the next integer.
 ///
 /// # Parameters:
@@ -555,12 +535,9 @@ NSTDAPI NSTDInt32 nstd_core_math_div_ceil_i32(NSTDInt32 x, NSTDInt32 y);
 ///
 /// # Returns
 ///
-/// `NSTDUInt32 v` - The divided value, rounded up.
-///
-/// # Panics
-///
-/// This operation will panic if `y` is 0.
-NSTDAPI NSTDUInt32 nstd_core_math_div_ceil_u32(NSTDUInt32 x, NSTDUInt32 y);
+/// `NSTDOptionalUInt32 v` - The divided value rounded up on success, or an uninitialized "none"
+/// variant if `y` is 0 or overflow occurs.
+NSTDAPI NSTDOptionalUInt32 nstd_core_math_div_ceil_u32(NSTDUInt32 x, NSTDUInt32 y);
 /// Divides two numbers and rounds the result up to the next integer.
 ///
 /// # Parameters:
@@ -571,12 +548,9 @@ NSTDAPI NSTDUInt32 nstd_core_math_div_ceil_u32(NSTDUInt32 x, NSTDUInt32 y);
 ///
 /// # Returns
 ///
-/// `NSTDInt64 v` - The divided value, rounded up.
-///
-/// # Panics
-///
-/// This operation will panic if `y` is 0.
-NSTDAPI NSTDInt64 nstd_core_math_div_ceil_i64(NSTDInt64 x, NSTDInt64 y);
+/// `NSTDOptionalInt64 v` - The divided value rounded up on success, or an uninitialized "none"
+/// variant if `y` is 0 or overflow occurs.
+NSTDAPI NSTDOptionalInt64 nstd_core_math_div_ceil_i64(NSTDInt64 x, NSTDInt64 y);
 /// Divides two numbers and rounds the result up to the next integer.
 ///
 /// # Parameters:
@@ -587,12 +561,9 @@ NSTDAPI NSTDInt64 nstd_core_math_div_ceil_i64(NSTDInt64 x, NSTDInt64 y);
 ///
 /// # Returns
 ///
-/// `NSTDUInt64 v` - The divided value, rounded up.
-///
-/// # Panics
-///
-/// This operation will panic if `y` is 0.
-NSTDAPI NSTDUInt64 nstd_core_math_div_ceil_u64(NSTDUInt64 x, NSTDUInt64 y);
+/// `NSTDOptionalUInt64 v` - The divided value rounded up on success, or an uninitialized "none"
+/// variant if `y` is 0 or overflow occurs.
+NSTDAPI NSTDOptionalUInt64 nstd_core_math_div_ceil_u64(NSTDUInt64 x, NSTDUInt64 y);
 
 /// Divides two numbers and rounds the result down to the next integer.
 ///
@@ -604,12 +575,9 @@ NSTDAPI NSTDUInt64 nstd_core_math_div_ceil_u64(NSTDUInt64 x, NSTDUInt64 y);
 ///
 /// # Returns
 ///
-/// `NSTDInt v` - The divided value, rounded down.
-///
-/// # Panics
-///
-/// This operation will panic if `y` is 0.
-NSTDAPI NSTDInt nstd_core_math_div_floor_int(NSTDInt x, NSTDInt y);
+/// `NSTDOptionalInt v` - The divided value rounded down on success, or an uninitialized "none"
+/// variant if `y` is 0 or overflow occurs.
+NSTDAPI NSTDOptionalInt nstd_core_math_div_floor_int(NSTDInt x, NSTDInt y);
 /// Divides two numbers and rounds the result down to the next integer.
 ///
 /// # Parameters:
@@ -620,12 +588,9 @@ NSTDAPI NSTDInt nstd_core_math_div_floor_int(NSTDInt x, NSTDInt y);
 ///
 /// # Returns
 ///
-/// `NSTDUInt v` - The divided value, rounded down.
-///
-/// # Panics
-///
-/// This operation will panic if `y` is 0.
-NSTDAPI NSTDUInt nstd_core_math_div_floor_uint(NSTDUInt x, NSTDUInt y);
+/// `NSTDOptionalUInt v` - The divided value rounded down on success, or an uninitialized "none"
+/// variant if `y` is 0 or overflow occurs.
+NSTDAPI NSTDOptionalUInt nstd_core_math_div_floor_uint(NSTDUInt x, NSTDUInt y);
 /// Divides two numbers and rounds the result down to the next integer.
 ///
 /// # Parameters:
@@ -636,12 +601,9 @@ NSTDAPI NSTDUInt nstd_core_math_div_floor_uint(NSTDUInt x, NSTDUInt y);
 ///
 /// # Returns
 ///
-/// `NSTDInt8 v` - The divided value, rounded down.
-///
-/// # Panics
-///
-/// This operation will panic if `y` is 0.
-NSTDAPI NSTDInt8 nstd_core_math_div_floor_i8(NSTDInt8 x, NSTDInt8 y);
+/// `NSTDOptionalInt8 v` - The divided value rounded down on success, or an uninitialized "none"
+/// variant if `y` is 0 or overflow occurs.
+NSTDAPI NSTDOptionalInt8 nstd_core_math_div_floor_i8(NSTDInt8 x, NSTDInt8 y);
 /// Divides two numbers and rounds the result down to the next integer.
 ///
 /// # Parameters:
@@ -652,12 +614,9 @@ NSTDAPI NSTDInt8 nstd_core_math_div_floor_i8(NSTDInt8 x, NSTDInt8 y);
 ///
 /// # Returns
 ///
-/// `NSTDUInt8 v` - The divided value, rounded down.
-///
-/// # Panics
-///
-/// This operation will panic if `y` is 0.
-NSTDAPI NSTDUInt8 nstd_core_math_div_floor_u8(NSTDUInt8 x, NSTDUInt8 y);
+/// `NSTDOptionalUInt8 v` - The divided value rounded down on success, or an uninitialized "none"
+/// variant if `y` is 0 or overflow occurs.
+NSTDAPI NSTDOptionalUInt8 nstd_core_math_div_floor_u8(NSTDUInt8 x, NSTDUInt8 y);
 /// Divides two numbers and rounds the result down to the next integer.
 ///
 /// # Parameters:
@@ -668,12 +627,9 @@ NSTDAPI NSTDUInt8 nstd_core_math_div_floor_u8(NSTDUInt8 x, NSTDUInt8 y);
 ///
 /// # Returns
 ///
-/// `NSTDInt16 v` - The divided value, rounded down.
-///
-/// # Panics
-///
-/// This operation will panic if `y` is 0.
-NSTDAPI NSTDInt16 nstd_core_math_div_floor_i16(NSTDInt16 x, NSTDInt16 y);
+/// `NSTDOptionalInt16 v` - The divided value rounded down on success, or an uninitialized "none"
+/// variant if `y` is 0 or overflow occurs.
+NSTDAPI NSTDOptionalInt16 nstd_core_math_div_floor_i16(NSTDInt16 x, NSTDInt16 y);
 /// Divides two numbers and rounds the result down to the next integer.
 ///
 /// # Parameters:
@@ -684,12 +640,9 @@ NSTDAPI NSTDInt16 nstd_core_math_div_floor_i16(NSTDInt16 x, NSTDInt16 y);
 ///
 /// # Returns
 ///
-/// `NSTDUInt16 v` - The divided value, rounded down.
-///
-/// # Panics
-///
-/// This operation will panic if `y` is 0.
-NSTDAPI NSTDUInt16 nstd_core_math_div_floor_u16(NSTDUInt16 x, NSTDUInt16 y);
+/// `NSTDOptionalUInt16 v` - The divided value rounded down on success, or an uninitialized "none"
+/// variant if `y` is 0 or overflow occurs.
+NSTDAPI NSTDOptionalUInt16 nstd_core_math_div_floor_u16(NSTDUInt16 x, NSTDUInt16 y);
 /// Divides two numbers and rounds the result down to the next integer.
 ///
 /// # Parameters:
@@ -700,12 +653,9 @@ NSTDAPI NSTDUInt16 nstd_core_math_div_floor_u16(NSTDUInt16 x, NSTDUInt16 y);
 ///
 /// # Returns
 ///
-/// `NSTDInt32 v` - The divided value, rounded down.
-///
-/// # Panics
-///
-/// This operation will panic if `y` is 0.
-NSTDAPI NSTDInt32 nstd_core_math_div_floor_i32(NSTDInt32 x, NSTDInt32 y);
+/// `NSTDOptionalInt32 v` - The divided value rounded down on success, or an uninitialized "none"
+/// variant if `y` is 0 or overflow occurs.
+NSTDAPI NSTDOptionalInt32 nstd_core_math_div_floor_i32(NSTDInt32 x, NSTDInt32 y);
 /// Divides two numbers and rounds the result down to the next integer.
 ///
 /// # Parameters:
@@ -716,12 +666,9 @@ NSTDAPI NSTDInt32 nstd_core_math_div_floor_i32(NSTDInt32 x, NSTDInt32 y);
 ///
 /// # Returns
 ///
-/// `NSTDUInt32 v` - The divided value, rounded down.
-///
-/// # Panics
-///
-/// This operation will panic if `y` is 0.
-NSTDAPI NSTDUInt32 nstd_core_math_div_floor_u32(NSTDUInt32 x, NSTDUInt32 y);
+/// `NSTDOptionalUInt32 v` - The divided value rounded down on success, or an uninitialized "none"
+/// variant if `y` is 0 or overflow occurs.
+NSTDAPI NSTDOptionalUInt32 nstd_core_math_div_floor_u32(NSTDUInt32 x, NSTDUInt32 y);
 /// Divides two numbers and rounds the result down to the next integer.
 ///
 /// # Parameters:
@@ -732,12 +679,9 @@ NSTDAPI NSTDUInt32 nstd_core_math_div_floor_u32(NSTDUInt32 x, NSTDUInt32 y);
 ///
 /// # Returns
 ///
-/// `NSTDInt64 v` - The divided value, rounded down.
-///
-/// # Panics
-///
-/// This operation will panic if `y` is 0.
-NSTDAPI NSTDInt64 nstd_core_math_div_floor_i64(NSTDInt64 x, NSTDInt64 y);
+/// `NSTDOptionalInt64 v` - The divided value rounded down on success, or an uninitialized "none"
+/// variant if `y` is 0 or overflow occurs.
+NSTDAPI NSTDOptionalInt64 nstd_core_math_div_floor_i64(NSTDInt64 x, NSTDInt64 y);
 /// Divides two numbers and rounds the result down to the next integer.
 ///
 /// # Parameters:
@@ -748,11 +692,8 @@ NSTDAPI NSTDInt64 nstd_core_math_div_floor_i64(NSTDInt64 x, NSTDInt64 y);
 ///
 /// # Returns
 ///
-/// `NSTDUInt64 v` - The divided value, rounded down.
-///
-/// # Panics
-///
-/// This operation will panic if `y` is 0.
-NSTDAPI NSTDUInt64 nstd_core_math_div_floor_u64(NSTDUInt64 x, NSTDUInt64 y);
+/// `NSTDOptionalUInt64 v` - The divided value rounded down on success, or an uninitialized "none"
+/// variant if `y` is 0 or overflow occurs.
+NSTDAPI NSTDOptionalUInt64 nstd_core_math_div_floor_u64(NSTDUInt64 x, NSTDUInt64 y);
 
 #endif
