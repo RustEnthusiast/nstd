@@ -35,10 +35,6 @@ NSTDOptional(NSTDSharedLib) NSTDOptionalSharedLib;
 ///
 /// `NSTDOptionalSharedLib lib` - A handle to the dynamically loaded library, or none on error.
 ///
-/// # Panics
-///
-/// This operation will panic if conversion from UTF-8 to UTF-16 fails on Windows.
-///
 /// # Safety
 ///
 /// - `path`'s data must be valid for reads.

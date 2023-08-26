@@ -14,8 +14,12 @@
 - Functions in `nstd.core.ops` now return optionals instead of panicking.
 ### `nstd.fs`
 - `nstd_fs_write` no longer panics.
+### `nstd.os`
+- `nstd_os_windows_str_to_utf16` now returns `NSTDOptionalVec`.
 ### `nstd.proc`
 - `nstd_proc_spawn` no longer panics.
+### `nstd.shared_lib`
+- `nstd_shared_lib_load` no longer panics.
 ### `nstd.string`
 - `nstd_string_new_with_cap` now returns `NSTDOptionalString`.
 ### `nstd.vec`

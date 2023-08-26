@@ -73,10 +73,6 @@ pub type NSTDOptionalSharedLib = NSTDOptional<NSTDSharedLib>;
 ///
 /// `NSTDOptionalSharedLib lib` - A handle to the dynamically loaded library, or none on error.
 ///
-/// # Panics
-///
-/// This operation will panic if conversion from UTF-8 to UTF-16 fails on Windows.
-///
 /// # Safety
 ///
 /// - `path`'s data must be valid for reads.
@@ -110,7 +106,9 @@ pub unsafe fn nstd_shared_lib_load(path: &NSTDStr) -> NSTDOptionalSharedLib {
     }
     #[cfg(windows)]
     {
-        let utf16 = nstd_os_windows_str_to_utf16(path);
+        let NSTDOptional::Some(utf16) = nstd_os_windows_str_to_utf16(path) else {
+            return NSTDOptional::None;
+        };
         nstd_os_windows_shared_lib_load(nstd_vec_as_ptr(&utf16).cast())
     }
 }
