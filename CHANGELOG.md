@@ -1,4 +1,4 @@
-# TBD
+# 0.10.0
 ## Added
 ### `nstd`
 - Added `NSTDRef[Mut]`.
