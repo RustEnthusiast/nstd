@@ -9,7 +9,7 @@ description = "Cross platform general purpose C library written in Rust."
 readme = "README.md"
 
 [package.metadata.docs.rs]
-all-features = true
+features = ["nstd"]
 rustdoc-args = ["--cfg", "doc_cfg"]
 
 [package.metadata.capi]
