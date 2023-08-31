@@ -11,7 +11,7 @@ keywords = ["api", "ffi", "no_std", "no-std"]
 categories = ["no-std", "no-std::no-alloc"]
 
 [package.metadata.docs.rs]
-all-features = true
+features = ["nstd"]
 rustdoc-args = ["--cfg", "doc_cfg"]
 
 [package.metadata.capi]
