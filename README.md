@@ -101,8 +101,6 @@ can easily use the API.
 Users can refer to the [docs](https://docs.rs/nstd-sys/latest/nstd_sys/) to see which APIs expect
 or return valid references.
 
-- Input reference data is assumed to remain unaltered by other code/threads.
-
 - C function pointers are assumed to be non-null unless wrapped in an `Option`.
 
 - Private (non-`pub`) structure members must not be directly accessed by the user.
@@ -112,7 +110,7 @@ or return valid references.
 
 - Data is *moved* when using the value-copy semantic on a type that does not implement `Copy`.
 
-- Data must not be moved while being referenced by another object.
+- Data must not be moved or mutated while being referenced by another object.
 
 - Types that do not implement the `Send` trait must not be sent between threads.
 
@@ -159,9 +157,9 @@ Example:
 cargo rustc --release --crate-type cdylib --crate-type staticlib --features "capi alloc string"
 ```
 
-To build with all features:
+To build with all modules enabled:
 ```sh
-cargo rustc --release --crate-type cdylib --crate-type staticlib --all-features
+cargo rustc --release --crate-type cdylib --crate-type staticlib --features "nstd"
 ```
 
 # Installing with `cargo-c`
