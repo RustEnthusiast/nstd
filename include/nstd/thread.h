@@ -23,17 +23,11 @@ typedef struct {
     NSTDAnyMut handle;
 } NSTDThreadHandle;
 
-/// Represents an optional value of type `NSTDThreadHandle`.
-NSTDOptional(NSTDThreadHandle) NSTDOptionalThreadHandle;
-
 /// A thread's unique identifier.
 typedef struct {
     /// The thread ID.
     NSTDAnyMut id;
 } NSTDThreadID;
-
-/// Represents an optional value of type `NSTDThreadID`.
-NSTDOptional(NSTDThreadID) NSTDOptionalThreadID;
 
 /// Describes the creation of a new thread.
 ///
@@ -90,9 +84,12 @@ NSTDAPI NSTDOptionalThread nstd_thread_spawn(
 ///
 /// # Returns
 ///
-/// `NSTDOptionalThreadHandle handle` - A handle to the current thread on success, or an
-/// uninitialized "none" variant on error.
-NSTDAPI NSTDOptionalThreadHandle nstd_thread_current(void);
+/// `NSTDThreadHandle handle` - A handle to the current thread.
+///
+/// # Panics
+///
+/// Panics if allocating for the thread handle fails.
+NSTDAPI NSTDThreadHandle nstd_thread_current(void);
 
 /// Retrieves a raw handle to a thread.
 ///
@@ -102,9 +99,12 @@ NSTDAPI NSTDOptionalThreadHandle nstd_thread_current(void);
 ///
 /// # Returns
 ///
-/// `NSTDOptionalThreadHandle handle` - A raw handle to the thread on success, or an uninitialized
-/// "none" variant on error.
-NSTDAPI NSTDOptionalThreadHandle nstd_thread_handle(const NSTDThread *thread);
+/// `NSTDThreadHandle handle` - A raw handle to the thread.
+///
+/// # Panics
+///
+/// Panics if allocating for the thread handle fails.
+NSTDAPI NSTDThreadHandle nstd_thread_handle(const NSTDThread *thread);
 
 /// Checks if a thread has finished running.
 ///
@@ -159,9 +159,12 @@ NSTDAPI NSTDOptionalStr nstd_thread_name(const NSTDThreadHandle *handle);
 ///
 /// # Returns
 ///
-/// `NSTDOptionalThreadID id` - The thread's unique ID on success, or an uninitialized "none"
-/// variant on error.
-NSTDAPI NSTDOptionalThreadID nstd_thread_id(const NSTDThreadHandle *handle);
+/// `NSTDThreadID id` - The thread's unique ID.
+///
+/// # Panics
+///
+/// Panics if allocating for the thread ID fails.
+NSTDAPI NSTDThreadID nstd_thread_id(const NSTDThreadHandle *handle);
 
 /// Frees an instance of `NSTDThreadHandle`.
 ///

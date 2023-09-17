@@ -1,3 +1,9 @@
+# TBD
+## Removed
+### `nstd.thread`
+- Removed `NSTDOptionalThreadHandle`.
+- Removed `NSTDOptionalThreadID`.
+
 # 0.10.0
 ## Added
 ### `nstd`

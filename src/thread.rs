@@ -29,7 +29,6 @@ pub struct NSTDThreadHandle {
     /// A handle to the thread.
     handle: CBox<Thread>,
 }
-gen_optional!(NSTDOptionalThreadHandle, NSTDThreadHandle);
 
 /// A thread's unique identifier.
 #[nstdapi]
@@ -37,7 +36,6 @@ pub struct NSTDThreadID {
     /// The thread ID.
     id: CBox<ThreadId>,
 }
-gen_optional!(NSTDOptionalThreadID, NSTDThreadID);
 
 /// Describes the creation of a new thread.
 ///
@@ -149,14 +147,17 @@ pub unsafe fn nstd_thread_spawn(
 ///
 /// # Returns
 ///
-/// `NSTDOptionalThreadHandle handle` - A handle to the current thread on success, or an
-/// uninitialized "none" variant on error.
+/// `NSTDThreadHandle handle` - A handle to the current thread.
+///
+/// # Panics
+///
+/// Panics if allocating for the thread handle fails.
 #[inline]
 #[nstdapi]
-pub fn nstd_thread_current() -> NSTDOptionalThreadHandle {
-    CBox::new(std::thread::current()).map_or(NSTDOptional::None, |handle| {
-        NSTDOptional::Some(NSTDThreadHandle { handle })
-    })
+pub fn nstd_thread_current() -> NSTDThreadHandle {
+    NSTDThreadHandle {
+        handle: CBox::new(std::thread::current()).expect("failed to allocate for a thread handle"),
+    }
 }
 
 /// Retrieves a raw handle to a thread.
@@ -167,14 +168,18 @@ pub fn nstd_thread_current() -> NSTDOptionalThreadHandle {
 ///
 /// # Returns
 ///
-/// `NSTDOptionalThreadHandle handle` - A raw handle to the thread on success, or an uninitialized
-/// "none" variant on error.
+/// `NSTDThreadHandle handle` - A raw handle to the thread.
+///
+/// # Panics
+///
+/// Panics if allocating for the thread handle fails.
 #[inline]
 #[nstdapi]
-pub fn nstd_thread_handle(thread: &NSTDThread) -> NSTDOptionalThreadHandle {
-    CBox::new(thread.thread.thread().clone()).map_or(NSTDOptional::None, |handle| {
-        NSTDOptional::Some(NSTDThreadHandle { handle })
-    })
+pub fn nstd_thread_handle(thread: &NSTDThread) -> NSTDThreadHandle {
+    NSTDThreadHandle {
+        handle: CBox::new(thread.thread.thread().clone())
+            .expect("failed to allocate for a thread handle"),
+    }
 }
 
 /// Checks if a thread has finished running.
@@ -255,14 +260,17 @@ pub fn nstd_thread_name(handle: &NSTDThreadHandle) -> NSTDOptionalStr {
 ///
 /// # Returns
 ///
-/// `NSTDOptionalThreadID id` - The thread's unique ID on success, or an uninitialized "none"
-/// variant on error.
+/// `NSTDThreadID id` - The thread's unique ID.
+///
+/// # Panics
+///
+/// Panics if allocating for the thread ID fails.
 #[inline]
 #[nstdapi]
-pub fn nstd_thread_id(handle: &NSTDThreadHandle) -> NSTDOptionalThreadID {
-    CBox::new(handle.handle.id()).map_or(NSTDOptional::None, |id| {
-        NSTDOptional::Some(NSTDThreadID { id })
-    })
+pub fn nstd_thread_id(handle: &NSTDThreadHandle) -> NSTDThreadID {
+    NSTDThreadID {
+        id: CBox::new(handle.handle.id()).expect("failed to allocate for a thread ID"),
+    }
 }
 
 /// Frees an instance of `NSTDThreadHandle`.
