@@ -25,8 +25,10 @@ install.include.asset = [{from = "include/**/*", to = ""}]
 panic = "abort"
 
 [profile.release]
+lto = true
 overflow-checks = true
 panic = "abort"
+strip = true
 
 [features]
 default = ["core", "std"]
