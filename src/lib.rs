@@ -50,6 +50,7 @@
     clippy::match_bool,
     clippy::module_name_repetitions,
     clippy::must_use_candidate,
+    clippy::needless_pass_by_ref_mut,
     clippy::redundant_pub_crate,
     clippy::significant_drop_in_scrutinee
 )]

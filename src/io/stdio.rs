@@ -37,7 +37,7 @@ pub(crate) unsafe fn write_all<W: Write>(stream: &mut W, bytes: &NSTDSlice) -> N
     bytes.as_slice().map_or(
         NSTDIOError::NSTD_IO_ERROR_INVALID_INPUT,
         |bytes| match stream.write_all(bytes) {
-            Ok(_) => NSTDIOError::NSTD_IO_ERROR_NONE,
+            Ok(()) => NSTDIOError::NSTD_IO_ERROR_NONE,
             Err(err) => NSTDIOError::from_err(err.kind()),
         },
     )
@@ -129,7 +129,7 @@ pub(crate) unsafe fn read_exact<R: Read>(stream: &mut R, buffer: &mut NSTDSliceM
     buffer.as_slice_mut().map_or(
         NSTDIOError::NSTD_IO_ERROR_INVALID_INPUT,
         |buffer| match stream.read_exact(buffer) {
-            Ok(_) => NSTDIOError::NSTD_IO_ERROR_NONE,
+            Ok(()) => NSTDIOError::NSTD_IO_ERROR_NONE,
             Err(err) => NSTDIOError::from_err(err.kind()),
         },
     )

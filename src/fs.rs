@@ -244,7 +244,7 @@ pub unsafe fn nstd_fs_write(path: &NSTDStr, content: &NSTDSlice) -> NSTDIOError 
     content.as_slice().map_or(
         NSTDIOError::NSTD_IO_ERROR_INVALID_INPUT,
         |bytes| match std::fs::write(path.as_str(), bytes) {
-            Ok(_) => NSTDIOError::NSTD_IO_ERROR_NONE,
+            Ok(()) => NSTDIOError::NSTD_IO_ERROR_NONE,
             Err(err) => NSTDIOError::from_err(err.kind()),
         },
     )
