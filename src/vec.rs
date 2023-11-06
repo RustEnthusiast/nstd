@@ -7,9 +7,8 @@ use crate::{
     },
     core::{
         def::{NSTDByte, NSTDErrorCode},
-        mem::{nstd_core_mem_copy, nstd_core_mem_copy_overlapping},
+        mem::{nstd_core_mem_copy, nstd_core_mem_copy_overlapping, nstd_core_mem_dangling_mut},
         optional::NSTDOptional,
-        ptr::raw::nstd_core_ptr_raw_dangling_mut,
         slice::{
             nstd_core_slice_as_ptr, nstd_core_slice_len, nstd_core_slice_mut_new_unchecked,
             nstd_core_slice_new_unchecked, nstd_core_slice_stride, NSTDSlice, NSTDSliceMut,
@@ -185,7 +184,7 @@ pub type NSTDOptionalVec<'a> = NSTDOptional<NSTDVec<'a>>;
 pub const fn nstd_vec_new(allocator: &NSTDAllocator, stride: NSTDUInt) -> NSTDVec<'_> {
     NSTDVec {
         allocator,
-        ptr: nstd_core_ptr_raw_dangling_mut(),
+        ptr: nstd_core_mem_dangling_mut(),
         stride,
         cap: 0,
         len: 0,
@@ -241,7 +240,7 @@ pub fn nstd_vec_new_with_cap(
     if stride == 0 || cap == 0 {
         return NSTDOptional::Some(NSTDVec {
             allocator,
-            ptr: nstd_core_ptr_raw_dangling_mut(),
+            ptr: nstd_core_mem_dangling_mut(),
             stride,
             cap,
             len: 0,

@@ -1,5 +1,4 @@
 //! A sized pointer to some arbitrary type.
-pub mod raw;
 use crate::{
     core::{
         mem::nstd_core_mem_copy,

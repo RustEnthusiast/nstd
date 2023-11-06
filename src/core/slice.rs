@@ -1,9 +1,8 @@
 //! A view into a sequence of values in memory.
 use crate::{
     core::{
-        mem::nstd_core_mem_copy,
+        mem::{nstd_core_mem_copy, nstd_core_mem_dangling, nstd_core_mem_dangling_mut},
         optional::{gen_optional, NSTDOptional},
-        ptr::raw::{nstd_core_ptr_raw_dangling, nstd_core_ptr_raw_dangling_mut},
     },
     NSTDAny, NSTDAnyMut, NSTDUInt, NSTD_INT_MAX, NSTD_NULL,
 };
@@ -125,7 +124,7 @@ pub const unsafe fn nstd_core_slice_new_unchecked(
 #[nstdapi]
 pub const fn nstd_core_slice_empty(stride: NSTDUInt) -> NSTDSlice {
     NSTDSlice {
-        ptr: nstd_core_ptr_raw_dangling(),
+        ptr: nstd_core_mem_dangling(),
         len: 0,
         stride,
     }
@@ -433,7 +432,7 @@ pub const unsafe fn nstd_core_slice_mut_new_unchecked(
 #[nstdapi]
 pub const fn nstd_core_slice_mut_empty(stride: NSTDUInt) -> NSTDSliceMut {
     NSTDSliceMut {
-        ptr: nstd_core_ptr_raw_dangling_mut(),
+        ptr: nstd_core_mem_dangling_mut(),
         len: 0,
         stride,
     }

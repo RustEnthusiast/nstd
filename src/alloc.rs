@@ -11,10 +11,7 @@ use crate::os::windows::alloc::{
     },
 };
 use crate::{
-    core::{
-        mem::nstd_core_mem_copy,
-        ptr::raw::{nstd_core_ptr_raw_dangling_mut, MAX_ALIGN},
-    },
+    core::mem::{nstd_core_mem_copy, nstd_core_mem_dangling_mut, MAX_ALIGN},
     NSTDAny, NSTDAnyMut, NSTDUInt, NSTD_NULL,
 };
 use cfg_if::cfg_if;
@@ -38,7 +35,7 @@ impl<T> CBox<T> {
         match size {
             #[allow(unused_unsafe)]
             // SAFETY: This operation is safe.
-            0 => unsafe { Some(Self(nstd_core_ptr_raw_dangling_mut(), PhantomData)) },
+            0 => unsafe { Some(Self(nstd_core_mem_dangling_mut(), PhantomData)) },
             // SAFETY: `size` is greater than 0.
             _ => match unsafe { nstd_alloc_allocate(size) } {
                 NSTD_NULL => None,

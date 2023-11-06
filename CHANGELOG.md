@@ -1,4 +1,6 @@
 # 0.11.0
+## Changed
+- Merged `nstd.core.ptr.raw` into `nstd.core.mem`.
 ## Removed
 ### `nstd.thread`
 - Removed `NSTDOptionalThreadHandle`.
