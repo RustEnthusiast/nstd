@@ -16,7 +16,8 @@ int main(void) {
     const NSTDOptionalStr output_opt = nstd_core_str_from_raw_cstr("Hello, 🌎!");
     assert(output_opt.status);
     const NSTDStr output = output_opt.value.some;
-    assert(nstd_io_print_line(&output) == NSTD_IO_ERROR_NONE);
+    const NSTDIOError err = nstd_io_print_line(&output);
+    assert(err == NSTD_IO_ERROR_NONE);
     return 0;
 }
 ```
@@ -75,7 +76,8 @@ int main(void) {
     - `vec` - A dynamically sized contiguous sequence of values.
 
 # Platform support
-`nstd.core` should support anything that rustc supports.
+`nstd.core` should support anything that the Rust compiler supports. This module has first class
+support for bare metal environments.
 
 `nstd.os`'s child modules will only work on the operating system they target. For example,
 `nstd.os.windows` will only work on Windows and `nstd.os.unix` will only work on Unix-like systems.
@@ -85,9 +87,9 @@ Linux, Android, and iOS.
 
 # Language support
 This library can be accessed from any language that supports calling C code. As of now this will
-need to be done manually as there are no official wrappers for the API, however somewhere around
-version 0.11, the plan is to start adding official wrappers so developers from other languages
-can easily use the API.
+need to be done manually as there are no official wrappers for the API, however when the API
+becomes more stable, the plan is to start adding official wrappers so developers from other
+languages can easily use the API.
 
 # Safety
 *Please note that these safety notes (as well as the framework as a whole) are a work in progress.*
@@ -104,8 +106,8 @@ or return valid references.
 
 - Private (non-`pub`) structure members must not be directly accessed by the user.
 
-- Structured enum variants must be checked before they're accessed (eg. `NSTDOptional` or
-`NSTDResult` types).
+- Tagged enum variants must be checked before they're accessed (eg. `NSTDOptional` or `NSTDResult`
+types).
 
 - Data is *moved* when using the value-copy semantic on a type that does not implement `Copy`.
 
