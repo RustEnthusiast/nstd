@@ -1,3 +1,8 @@
+# TBD
+## Changed
+### `nstd.core`
+- `nstd_core_mem_copy[_overlapping]` functions are no longer `const`.
+
 # 0.12.0
 ## Changed
 ### `nstd.core`

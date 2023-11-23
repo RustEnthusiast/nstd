@@ -282,7 +282,8 @@ pub unsafe fn nstd_core_mem_fill(mut buf: *mut NSTDByte, size: NSTDUInt, fill: N
 /// ```
 #[inline]
 #[nstdapi]
-pub const unsafe fn nstd_core_mem_copy(dest: *mut NSTDByte, src: *const NSTDByte, num: NSTDUInt) {
+#[allow(clippy::missing_const_for_fn)]
+pub unsafe fn nstd_core_mem_copy(dest: *mut NSTDByte, src: *const NSTDByte, num: NSTDUInt) {
     core::ptr::copy_nonoverlapping(src, dest, num);
 }
 
@@ -304,7 +305,8 @@ pub const unsafe fn nstd_core_mem_copy(dest: *mut NSTDByte, src: *const NSTDByte
 /// of a buffer.
 #[inline]
 #[nstdapi]
-pub const unsafe fn nstd_core_mem_copy_overlapping(
+#[allow(clippy::missing_const_for_fn)]
+pub unsafe fn nstd_core_mem_copy_overlapping(
     dest: *mut NSTDByte,
     src: *const NSTDByte,
     num: NSTDUInt,
