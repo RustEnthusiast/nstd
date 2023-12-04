@@ -3,6 +3,21 @@ use crate::{core::def::NSTDByte, NSTDAny, NSTDAnyMut, NSTDBool, NSTDUInt};
 use cfg_if::cfg_if;
 use nstdapi::nstdapi;
 
+/// The default alignment suitable for any scalar type.
+///
+/// Corresponds to `alignof(max_align_t)`.
+/// The C/C++ standards specify that this value should be at least 8 or 16, I'm going with 16 for
+/// safety but of course this is platform dependent so if you (the reader) know of a platform that
+/// this value is smaller (or larger for that matter) on, please submit an issue/pull request.
+pub(crate) const MAX_ALIGN: usize = 16;
+
+/// Checks if `align` is a power of 2.
+#[inline]
+#[allow(clippy::arithmetic_side_effects)]
+const fn is_power_of_two(align: NSTDUInt) -> NSTDBool {
+    (align != 0) && ((align & (align - 1)) == 0)
+}
+
 /// Compares two memory buffers of `num` bytes.
 ///
 /// # Parameters:
@@ -58,7 +73,8 @@ pub unsafe fn nstd_core_mem_compare(
                 unix,
                 windows,
                 any(target_env = "wasi", target_os = "wasi"),
-                target_os = "solid_asp3"
+                target_os = "solid_asp3",
+                target_os = "teeos"
             ),
             feature = "libc"
         ))] {
@@ -129,7 +145,8 @@ pub unsafe fn nstd_core_mem_search(
                 unix,
                 windows,
                 any(target_env = "wasi", target_os = "wasi"),
-                target_os = "solid_asp3"
+                target_os = "solid_asp3",
+                target_os = "teeos"
             ),
             feature = "libc"
         ))] {
@@ -182,7 +199,8 @@ pub unsafe fn nstd_core_mem_zero(mut buf: *mut NSTDByte, size: NSTDUInt) {
                 unix,
                 windows,
                 any(target_env = "wasi", target_os = "wasi"),
-                target_os = "solid_asp3"
+                target_os = "solid_asp3",
+                target_os = "teeos"
             ),
             feature = "libc"
         ))] {
@@ -235,7 +253,8 @@ pub unsafe fn nstd_core_mem_fill(mut buf: *mut NSTDByte, size: NSTDUInt, fill: N
                 unix,
                 windows,
                 any(target_env = "wasi", target_os = "wasi"),
-                target_os = "solid_asp3"
+                target_os = "solid_asp3",
+                target_os = "teeos"
             ),
             feature = "libc"
         ))] {
@@ -346,21 +365,6 @@ pub unsafe fn nstd_core_mem_copy_overlapping(
 #[nstdapi]
 pub unsafe fn nstd_core_mem_swap(x: *mut NSTDByte, y: *mut NSTDByte, num: NSTDUInt) {
     core::ptr::swap_nonoverlapping(x, y, num);
-}
-
-/// The default alignment suitable for any scalar type.
-///
-/// Corresponds to `alignof(max_align_t)`.
-/// The C/C++ standards specify that this value should be at least 8 or 16, I'm going with 16 for
-/// safety but of course this is platform dependent so if you (the reader) know of a platform that
-/// this value is smaller (or larger for that matter) on, please submit an issue/pull request.
-pub(crate) const MAX_ALIGN: usize = 16;
-
-/// Checks if `align` is a power of 2.
-#[inline]
-#[allow(clippy::arithmetic_side_effects)]
-const fn is_power_of_two(align: NSTDUInt) -> NSTDBool {
-    (align != 0) && ((align & (align - 1)) == 0)
 }
 
 /// Creates a new dangling pointer to some immutable memory. The pointer is guaranteed to have valid

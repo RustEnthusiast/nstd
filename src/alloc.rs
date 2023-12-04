@@ -390,7 +390,8 @@ pub unsafe fn nstd_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
         if #[cfg(any(
             unix,
             any(target_env = "wasi", target_os = "wasi"),
-            target_os = "solid_asp3"
+            target_os = "solid_asp3",
+            target_os = "teeos"
         ))] {
             use crate::NSTD_INT_MAX;
             match size <= NSTD_INT_MAX {
@@ -444,7 +445,8 @@ pub unsafe fn nstd_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMut {
         if #[cfg(any(
             unix,
             any(target_env = "wasi", target_os = "wasi"),
-            target_os = "solid_asp3"
+            target_os = "solid_asp3",
+            target_os = "teeos"
         ))] {
             use crate::NSTD_INT_MAX;
             match size <= NSTD_INT_MAX {
@@ -521,7 +523,8 @@ pub unsafe fn nstd_alloc_reallocate(
         if #[cfg(any(
             unix,
             any(target_env = "wasi", target_os = "wasi"),
-            target_os = "solid_asp3"
+            target_os = "solid_asp3",
+            target_os = "teeos"
         ))] {
             use crate::NSTD_INT_MAX;
             if new_size > NSTD_INT_MAX {
@@ -586,7 +589,8 @@ pub unsafe fn nstd_alloc_deallocate(ptr: &mut NSTDAnyMut, size: NSTDUInt) -> NST
         if #[cfg(any(
             unix,
             any(target_env = "wasi", target_os = "wasi"),
-            target_os = "solid_asp3"
+            target_os = "solid_asp3",
+            target_os = "teeos"
         ))] {
             libc::free(*ptr);
             *ptr = NSTD_NULL;

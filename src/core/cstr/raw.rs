@@ -36,7 +36,8 @@ pub unsafe fn nstd_core_cstr_raw_len(mut cstr: *const NSTDChar) -> NSTDUInt {
                 unix,
                 windows,
                 any(target_env = "wasi", target_os = "wasi"),
-                target_os = "solid_asp3"
+                target_os = "solid_asp3",
+                target_os = "teeos"
             ),
             feature = "libc"
         ))] {
@@ -123,7 +124,8 @@ pub unsafe fn nstd_core_cstr_raw_compare(
                 unix,
                 windows,
                 any(target_env = "wasi", target_os = "wasi"),
-                target_os = "solid_asp3"
+                target_os = "solid_asp3",
+                target_os = "teeos"
             ),
             feature = "libc"
         ))] {
@@ -236,7 +238,8 @@ pub unsafe fn nstd_core_cstr_raw_copy_with_null(mut dest: *mut NSTDChar, mut src
                 unix,
                 windows,
                 any(target_env = "wasi", target_os = "wasi"),
-                target_os = "solid_asp3"
+                target_os = "solid_asp3",
+                target_os = "teeos"
             ),
             feature = "libc"
         ))] {
