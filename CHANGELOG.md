@@ -2,6 +2,8 @@
 ## Changed
 ### `nstd.core`
 - `nstd_core_mem_copy[_overlapping]` functions are no longer `const`.
+### `nstd.os`
+- Always define operating system constants as a `u8` value of either 0 or 1.
 
 # 0.12.0
 ## Changed

@@ -9,7 +9,7 @@
 #ifdef __cplusplus
 #    define NSTDCPP __cplusplus
 #endif
-#ifdef NSTD_OS_WINDOWS
+#if NSTD_OS_WINDOWS
 #    ifdef NSTDCPP
 #        define NSTDAPI extern "C" __declspec(dllexport)
 #    else

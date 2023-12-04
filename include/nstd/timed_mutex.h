@@ -7,9 +7,8 @@
 #include "nstd.h"
 #include "os/os.h"
 
-#if defined(NSTD_OS_ANDROID) || defined(NSTD_OS_DRAGONFLY) || defined(NSTD_OS_FREEBSD) \
-    || defined(NSTD_OS_HAIKU) || defined(NSTD_OS_LINUX) || defined(NSTD_OS_NETBSD)     \
-    || defined(NSTD_OS_NTO) || defined(NSTD_OS_OPENBSD) || defined(NSTD_OS_SOLARIS)
+#if NSTD_OS_ANDROID || NSTD_OS_DRAGONFLY || NSTD_OS_FREEBSD || NSTD_OS_HAIKU || NSTD_OS_LINUX \
+    || NSTD_OS_NETBSD || NSTD_OS_NTO || NSTD_OS_OPENBSD || NSTD_OS_SOLARIS
 #    define NSTD_TIMED_MUTEX_OS_UNIX_IMPL
 #endif
 

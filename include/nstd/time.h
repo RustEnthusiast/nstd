@@ -4,11 +4,11 @@
 #include "core/time.h"
 #include "nstd.h"
 #include "os/os.h"
-#ifdef NSTD_OS_UNIX
+#if NSTD_OS_UNIX
 #    include "os/unix/time.h"
 #endif
 
-#ifdef NSTD_OS_UNIX
+#if NSTD_OS_UNIX
 /// A structure representing system time since January 1st 1970.
 typedef NSTDUnixTime NSTDTime;
 
