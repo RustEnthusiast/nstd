@@ -26,6 +26,7 @@ int main(void) {
 - `nstd` - A cross-platform, fast, and safe general purpose C library written in Rust.
     - `alloc` - Low level memory allocation.
     - `core` - Provides core functionality for `nstd`.
+        - `alloc` - Provides useful types for memory allocation support.
         - `cstr` - Unowned C string slices.
             - `raw` - Raw C string processing.
         - `cty` - Provides functions for examining and operating on character types.

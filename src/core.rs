@@ -2,6 +2,7 @@
 //!
 //! The entire `nstd.core` module is dependency free and makes no use of Rust's [std] library,
 //! making it fit for resource constrained/embedded environments.
+pub mod alloc;
 pub mod cstr;
 pub mod cty;
 pub mod def;

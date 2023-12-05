@@ -1,5 +1,6 @@
 #ifndef NSTD_CORE_H
 #define NSTD_CORE_H
+#include "core/alloc.h"
 #include "core/core.h"
 #include "core/cstr.h"
 #include "core/cty.h"
