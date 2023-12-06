@@ -164,7 +164,8 @@ pub unsafe fn nstd_os_unix_alloc_reallocate(
         return NSTDUnixAllocError::NSTD_UNIX_ALLOC_ERROR_OUT_OF_MEMORY;
     }
     let old_size = nstd_core_alloc_layout_size(old_layout);
-    nstd_core_mem_copy(new_mem.cast(), (*ptr).cast(), old_size);
+    let new_size = nstd_core_alloc_layout_size(new_layout);
+    nstd_core_mem_copy(new_mem.cast(), (*ptr).cast(), old_size.min(new_size));
     nstd_os_unix_alloc_deallocate(*ptr);
     *ptr = new_mem;
     NSTDUnixAllocError::NSTD_UNIX_ALLOC_ERROR_NONE
