@@ -11,7 +11,11 @@ use crate::os::windows::alloc::{
     },
 };
 use crate::{
-    core::mem::{nstd_core_mem_copy, nstd_core_mem_dangling_mut, MAX_ALIGN},
+    core::{
+        alloc::nstd_core_alloc_layout_new,
+        mem::{nstd_core_mem_copy, nstd_core_mem_dangling_mut, MAX_ALIGN},
+        optional::NSTDOptional,
+    },
     NSTDAny, NSTDAnyMut, NSTDUInt, NSTD_NULL,
 };
 use cfg_if::cfg_if;
@@ -399,7 +403,10 @@ pub unsafe fn nstd_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
                 false => NSTD_NULL,
             }
         } else if #[cfg(windows)] {
-            nstd_os_windows_alloc_allocate(size)
+            match nstd_core_alloc_layout_new(size, MAX_ALIGN) {
+                NSTDOptional::Some(layout) => nstd_os_windows_alloc_allocate(layout),
+                NSTDOptional::None => NSTD_NULL,
+            }
         } else {
             if let Ok(layout) = Layout::from_size_align(size, MAX_ALIGN) {
                 return alloc::alloc::alloc(layout).cast();
@@ -454,7 +461,10 @@ pub unsafe fn nstd_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMut {
                 false => NSTD_NULL,
             }
         } else if #[cfg(windows)] {
-            nstd_os_windows_alloc_allocate_zeroed(size)
+            match nstd_core_alloc_layout_new(size, MAX_ALIGN) {
+                NSTDOptional::Some(layout) => nstd_os_windows_alloc_allocate_zeroed(layout),
+                NSTDOptional::None => NSTD_NULL,
+            }
         } else {
             if let Ok(layout) = Layout::from_size_align(size, MAX_ALIGN) {
                 return alloc::alloc::alloc_zeroed(layout).cast();
@@ -537,7 +547,14 @@ pub unsafe fn nstd_alloc_reallocate(
             *ptr = new_mem;
             NSTDAllocError::NSTD_ALLOC_ERROR_NONE
         } else if #[cfg(windows)] {
-            nstd_os_windows_alloc_reallocate(ptr, new_size).into()
+            let old_layout = nstd_core_alloc_layout_new(size, MAX_ALIGN);
+            if let NSTDOptional::Some(old_layout) = old_layout {
+                let new_layout = nstd_core_alloc_layout_new(new_size, MAX_ALIGN);
+                if let NSTDOptional::Some(new_layout) = new_layout {
+                    return nstd_os_windows_alloc_reallocate(ptr, old_layout, new_layout).into();
+                }
+            }
+            NSTDAllocError::NSTD_ALLOC_ERROR_INVALID_LAYOUT
         } else {
             if let Ok(layout) = Layout::from_size_align(size, MAX_ALIGN) {
                 let new_mem = alloc::alloc::realloc((*ptr).cast(), layout, new_size);
@@ -596,7 +613,9 @@ pub unsafe fn nstd_alloc_deallocate(ptr: &mut NSTDAnyMut, size: NSTDUInt) -> NST
             *ptr = NSTD_NULL;
             NSTDAllocError::NSTD_ALLOC_ERROR_NONE
         } else if #[cfg(windows)] {
-            nstd_os_windows_alloc_deallocate(ptr).into()
+            nstd_os_windows_alloc_deallocate(*ptr);
+            *ptr = NSTD_NULL;
+            NSTDAllocError::NSTD_ALLOC_ERROR_NONE
         } else {
             if let Ok(layout) = Layout::from_size_align(size, MAX_ALIGN) {
                 alloc::alloc::dealloc((*ptr).cast(), layout);
