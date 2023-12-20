@@ -33,10 +33,12 @@ use windows_sys::Win32::Globalization::{u_strFromUTF8, U_BUFFER_OVERFLOW_ERROR, 
 pub unsafe fn nstd_os_windows_str_to_utf16(str: &NSTDStr) -> NSTDOptionalVec<'_> {
     /// The size of a UTF-16 code point.
     const CHAR_SIZE: NSTDUInt = core::mem::size_of::<NSTDChar16>();
+    /// The alignment of a UTF-16 code point.
+    const CHAR_ALIGN: NSTDUInt = core::mem::align_of::<NSTDChar16>();
     // Make sure the string slice's length is greater than 0.
     if let Ok(len) = nstd_core_str_byte_len(str).try_into() {
         if len == 0 {
-            let mut v = nstd_vec_new(&NSTD_ALLOCATOR, CHAR_SIZE);
+            let mut v = nstd_vec_new(&NSTD_ALLOCATOR, CHAR_SIZE, CHAR_ALIGN);
             let nul: NSTDChar16 = 0;
             return match nstd_vec_push(&mut v, addr_of!(nul).cast()) {
                 NSTD_ALLOC_ERROR_NONE => NSTDOptional::Some(v),
@@ -61,7 +63,7 @@ pub unsafe fn nstd_os_windows_str_to_utf16(str: &NSTDStr) -> NSTDOptionalVec<'_>
             u16_len += 1;
             // Create the buffer.
             if let NSTDOptional::Some(mut buf) =
-                nstd_vec_new_with_cap(&NSTD_ALLOCATOR, CHAR_SIZE, u16_len as _)
+                nstd_vec_new_with_cap(&NSTD_ALLOCATOR, CHAR_SIZE, CHAR_ALIGN, u16_len as _)
             {
                 // Fill the buffer.
                 let buf_ptr = nstd_vec_as_ptr_mut(&mut buf).cast();

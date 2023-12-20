@@ -3,7 +3,7 @@ extern crate alloc;
 #[cfg(windows)]
 use crate::os::windows::alloc::{
     nstd_os_windows_alloc_allocate, nstd_os_windows_alloc_allocate_zeroed,
-    nstd_os_windows_alloc_deallocate, nstd_os_windows_alloc_reallocate,
+    nstd_os_windows_alloc_deallocate,
     NSTDWindowsAllocError::{
         self, NSTD_WINDOWS_ALLOC_ERROR_HEAP_NOT_FOUND, NSTD_WINDOWS_ALLOC_ERROR_INVALID_HEAP,
         NSTD_WINDOWS_ALLOC_ERROR_INVALID_LAYOUT, NSTD_WINDOWS_ALLOC_ERROR_MEMORY_NOT_FOUND,
@@ -16,7 +16,7 @@ use crate::{
             nstd_core_alloc_layout_align, nstd_core_alloc_layout_new,
             nstd_core_alloc_layout_new_unchecked, nstd_core_alloc_layout_size, NSTDAllocLayout,
         },
-        mem::{nstd_core_mem_copy, nstd_core_mem_dangling_mut, nstd_core_mem_zero},
+        mem::{nstd_core_mem_copy, nstd_core_mem_dangling_mut},
         optional::NSTDOptional,
     },
     NSTDAny, NSTDAnyMut, NSTD_NULL,
@@ -43,7 +43,9 @@ impl<T> CBox<T> {
             // SAFETY: This operation is safe.
             0 => unsafe { Some(Self(nstd_core_mem_dangling_mut(), PhantomData)) },
             size => {
-                match nstd_core_alloc_layout_new(size, core::mem::align_of::<T>()) {
+                #[allow(unused_unsafe)]
+                // SAFETY: This operation is safe.
+                match unsafe { nstd_core_alloc_layout_new(size, core::mem::align_of::<T>()) } {
                     // SAFETY: `size` is greater than 0.
                     NSTDOptional::Some(layout) => match unsafe { nstd_alloc_allocate(layout) } {
                         NSTD_NULL => None,
@@ -484,6 +486,7 @@ pub unsafe fn nstd_alloc_allocate_zeroed(layout: NSTDAllocLayout) -> NSTDAnyMut 
             any(target_env = "wasi", target_os = "wasi"),
             target_os = "teeos"
         ))] {
+            use crate::core::mem::nstd_core_mem_zero;
             let ptr = nstd_alloc_allocate(layout);
             if !ptr.is_null() {
                 nstd_core_mem_zero(ptr.cast(), nstd_core_alloc_layout_size(layout));

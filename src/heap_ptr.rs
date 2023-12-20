@@ -25,7 +25,8 @@ pub struct NSTDHeapPtr<'a> {
 impl<'a> NSTDHeapPtr<'a> {
     /// Constructs a zero-sized [`NSTDHeapPtr`].
     #[inline]
-    const fn zero_sized(allocator: &'a NSTDAllocator) -> Self {
+    #[allow(clippy::missing_const_for_fn)]
+    fn zero_sized(allocator: &'a NSTDAllocator) -> Self {
         Self {
             allocator,
             ptr: NSTD_NULL,
@@ -38,7 +39,9 @@ impl Drop for NSTDHeapPtr<'_> {
     /// [`NSTDHeapPtr`]'s destructor.
     #[inline]
     fn drop(&mut self) {
-        if nstd_core_alloc_layout_size(self.layout) > 0 {
+        #[allow(unused_unsafe)]
+        // SAFETY: This operation is safe.
+        if unsafe { nstd_core_alloc_layout_size(self.layout) } > 0 {
             // SAFETY: The heap object's size is non-zero.
             unsafe { (self.allocator.deallocate)(self.allocator.state, self.ptr, self.layout) };
         }
