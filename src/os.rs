@@ -41,9 +41,11 @@ pub const NSTD_OS_ANDROID: u8 = 0;
 
 /// Constant that is only set if the target operating system is DragonFly BSD.
 #[cfg(target_os = "dragonfly")]
+#[allow(clippy::doc_markdown)]
 pub const NSTD_OS_DRAGONFLY: u8 = 1;
 /// Constant that is only set if the target operating system is DragonFly BSD.
 #[cfg(not(target_os = "dragonfly"))]
+#[allow(clippy::doc_markdown)]
 pub const NSTD_OS_DRAGONFLY: u8 = 0;
 
 /// Constant that is only set if the target operating system is FreeBSD.
@@ -55,16 +57,20 @@ pub const NSTD_OS_FREEBSD: u8 = 0;
 
 /// Constant that is only set if the target operating system is NetBSD.
 #[cfg(target_os = "netbsd")]
+#[allow(clippy::doc_markdown)]
 pub const NSTD_OS_NETBSD: u8 = 1;
 /// Constant that is only set if the target operating system is NetBSD.
 #[cfg(not(target_os = "netbsd"))]
+#[allow(clippy::doc_markdown)]
 pub const NSTD_OS_NETBSD: u8 = 0;
 
 /// Constant that is only set if the target operating system is OpenBSD.
 #[cfg(target_os = "openbsd")]
+#[allow(clippy::doc_markdown)]
 pub const NSTD_OS_OPENBSD: u8 = 1;
 /// Constant that is only set if the target operating system is OpenBSD.
 #[cfg(not(target_os = "openbsd"))]
+#[allow(clippy::doc_markdown)]
 pub const NSTD_OS_OPENBSD: u8 = 0;
 
 /// Constant that is only set if the target operating system is BSD based.
