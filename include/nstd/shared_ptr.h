@@ -1,6 +1,7 @@
 #ifndef NSTD_SHARED_PTR_H
 #define NSTD_SHARED_PTR_H
 #include "alloc.h"
+#include "core/alloc.h"
 #include "core/optional.h"
 #include "nstd.h"
 
@@ -10,8 +11,8 @@ typedef struct {
     const NSTDAllocator *allocator;
     /// A raw pointer to private data about the shared object.
     NSTDAnyMut ptr;
-    /// The size of the shared pointer's memory buffer.
-    NSTDUInt size;
+    /// The shared object's memory layout.
+    NSTDAllocLayout layout;
 } NSTDSharedPtr;
 
 /// Represents an optional value of type `NSTDSharedPtr`.
@@ -23,7 +24,7 @@ NSTDOptional(NSTDSharedPtr) NSTDOptionalSharedPtr;
 ///
 /// - `const NSTDAllocator *allocator` - The memory allocator.
 ///
-/// - `NSTDUInt element_size` - The size of the shared object.
+/// - `NSTDAllocLayout layout` - The shared object's memory layout.
 ///
 /// - `NSTDAny init` - A pointer to the object to initialize the shared pointer with.
 ///
@@ -34,9 +35,9 @@ NSTDOptional(NSTDSharedPtr) NSTDOptionalSharedPtr;
 ///
 /// # Safety
 ///
-/// `init` must be a pointer to a value that is valid for reads of `element_size` bytes.
+/// `init` must be a pointer to a value that is valid for reads based on `layout`.
 NSTDAPI NSTDOptionalSharedPtr
-nstd_shared_ptr_new(const NSTDAllocator *allocator, NSTDUInt element_size, NSTDAny init);
+nstd_shared_ptr_new(const NSTDAllocator *allocator, NSTDAllocLayout layout, NSTDAny init);
 
 /// Creates a new zero-initialized instance of a shared pointer.
 ///
@@ -44,7 +45,7 @@ nstd_shared_ptr_new(const NSTDAllocator *allocator, NSTDUInt element_size, NSTDA
 ///
 /// - `const NSTDAllocator *allocator` - The memory allocator.
 ///
-/// - `NSTDUInt element_size` - The size of the shared object.
+/// - `NSTDAllocLayout layout` - The shared object's memory layout.
 ///
 /// # Returns
 ///
@@ -56,7 +57,7 @@ nstd_shared_ptr_new(const NSTDAllocator *allocator, NSTDUInt element_size, NSTDA
 /// The data to be stored in the shared pointer must be safely representable by an all-zero byte
 /// pattern.
 NSTDAPI NSTDOptionalSharedPtr
-nstd_shared_ptr_new_zeroed(const NSTDAllocator *allocator, NSTDUInt element_size);
+nstd_shared_ptr_new_zeroed(const NSTDAllocator *allocator, NSTDAllocLayout layout);
 
 /// Shares `shared_ptr`.
 ///

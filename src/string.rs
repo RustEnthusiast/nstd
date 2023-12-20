@@ -89,7 +89,7 @@ pub type NSTDOptionalString<'a> = NSTDOptional<NSTDString<'a>>;
 #[nstdapi]
 pub const fn nstd_string_new(allocator: &NSTDAllocator) -> NSTDString<'_> {
     NSTDString {
-        bytes: nstd_vec_new(allocator, 1),
+        bytes: nstd_vec_new(allocator, 1, 1),
     }
 }
 
@@ -119,7 +119,7 @@ pub fn nstd_string_new_with_cap(
     allocator: &NSTDAllocator,
     cap: NSTDUInt,
 ) -> NSTDOptionalString<'_> {
-    match nstd_vec_new_with_cap(allocator, 1, cap) {
+    match nstd_vec_new_with_cap(allocator, 1, 1, cap) {
         NSTDOptional::Some(bytes) => NSTDOptional::Some(NSTDString { bytes }),
         NSTDOptional::None => NSTDOptional::None,
     }
@@ -161,7 +161,7 @@ pub unsafe fn nstd_string_from_str<'a>(
     str: &NSTDStr,
 ) -> NSTDOptionalString<'a> {
     let bytes = nstd_core_str_as_bytes(str);
-    match nstd_vec_from_slice(allocator, &bytes) {
+    match nstd_vec_from_slice(allocator, &bytes, 1) {
         NSTDOptional::Some(bytes) => NSTDOptional::Some(NSTDString { bytes }),
         NSTDOptional::None => NSTDOptional::None,
     }

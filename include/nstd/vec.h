@@ -14,6 +14,8 @@ typedef struct {
     NSTDAnyMut ptr;
     /// The number of bytes each value in the vector takes up.
     NSTDUInt stride;
+    /// The memory alignment for the buffer.
+    NSTDUInt align;
     /// The number of active elements in the vector.
     NSTDUInt len;
     /// The number of values allocated in the memory buffer.
@@ -31,10 +33,17 @@ NSTDOptional(NSTDVec) NSTDOptionalVec;
 ///
 /// - `NSTDUInt stride` - The size in bytes of each value in the vector.
 ///
+/// - `NSTDUInt align` - The alignment of each value in the vector.
+///
 /// # Returns
 ///
 /// `NSTDVec vec` - The new vector.
-NSTDAPI NSTDVec nstd_vec_new(const NSTDAllocator *allocator, NSTDUInt stride);
+///
+/// # Panics
+///
+/// This operation will panic if either `align` is not a power of two or `stride` is not a multiple
+/// of `align`.
+NSTDAPI NSTDVec nstd_vec_new(const NSTDAllocator *allocator, NSTDUInt stride, NSTDUInt align);
 
 /// Creates a new vector initialized with the given capacity.
 ///
@@ -44,14 +53,17 @@ NSTDAPI NSTDVec nstd_vec_new(const NSTDAllocator *allocator, NSTDUInt stride);
 ///
 /// - `NSTDUInt stride` - The size in bytes of each value in the vector.
 ///
+/// - `NSTDUInt align` - The alignment of each value in the vector.
+///
 /// - `NSTDUInt cap` - The initial capacity for the vector.
 ///
 /// # Returns
 ///
 /// `NSTDOptionalVec vec` - The new vector on success, or an uninitialized "none" variant if
 /// allocation fails.
-NSTDAPI NSTDOptionalVec
-nstd_vec_new_with_cap(const NSTDAllocator *allocator, NSTDUInt stride, NSTDUInt cap);
+NSTDAPI NSTDOptionalVec nstd_vec_new_with_cap(
+    const NSTDAllocator *allocator, NSTDUInt stride, NSTDUInt align, NSTDUInt cap
+);
 
 /// Creates a new vector from a slice.
 ///
@@ -61,6 +73,8 @@ nstd_vec_new_with_cap(const NSTDAllocator *allocator, NSTDUInt stride, NSTDUInt 
 ///
 /// - `const NSTDSlice *slice` - The slice to copy data from.
 ///
+/// - `NSTDUInt align` - The alignment of each value in the slice.
+///
 /// # Returns
 ///
 /// `NSTDOptionalVec vec` - The new vector with a copy of `slice`'s contents on success, or an
@@ -69,7 +83,8 @@ nstd_vec_new_with_cap(const NSTDAllocator *allocator, NSTDUInt stride, NSTDUInt 
 /// # Safety
 ///
 /// The caller of this function must ensure that `slice`'s data is valid for reads.
-NSTDAPI NSTDOptionalVec nstd_vec_from_slice(const NSTDAllocator *allocator, const NSTDSlice *slice);
+NSTDAPI NSTDOptionalVec
+nstd_vec_from_slice(const NSTDAllocator *allocator, const NSTDSlice *slice, NSTDUInt align);
 
 /// Creates a new deep copy of `vec`.
 ///
