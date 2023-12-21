@@ -128,13 +128,11 @@ pub const fn nstd_core_alloc_layout_array(
 #[nstdapi]
 #[allow(clippy::arithmetic_side_effects)]
 pub const unsafe fn nstd_core_alloc_layout_array_unchecked(
-    size: NSTDUInt,
+    mut size: NSTDUInt,
     align: NSTDUInt,
     len: NSTDUInt,
 ) -> NSTDAllocLayout {
-    let off = size.wrapping_rem(align);
-    let size = size.wrapping_add(align - off);
-    let size = size.wrapping_mul(len);
+    size *= len;
     NSTDAllocLayout { size, align }
 }
 
