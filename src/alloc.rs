@@ -423,6 +423,20 @@ pub unsafe fn nstd_alloc_allocate(layout: NSTDAllocLayout) -> NSTDAnyMut {
             let mut ptr = NSTD_NULL;
             libc::posix_memalign(&mut ptr, align, size);
             ptr
+        } else if #[cfg(target_os = "solid_asp3")] {
+            use crate::NSTD_INT_MAX;
+            let mut size = nstd_core_alloc_layout_size(layout);
+            let align = nstd_core_alloc_layout_align(layout);
+            #[allow(clippy::arithmetic_side_effects)]
+            let off = size % align;
+            #[allow(clippy::arithmetic_side_effects)]
+            if off != 0 {
+                size = match size.checked_add(align - off) {
+                    Some(size) if size <= NSTD_INT_MAX => size,
+                    _ => return NSTD_NULL,
+                };
+            }
+            libc::aligned_alloc(align, size)
         } else if #[cfg(windows)] {
             nstd_os_windows_alloc_allocate(layout)
         } else {
@@ -484,6 +498,7 @@ pub unsafe fn nstd_alloc_allocate_zeroed(layout: NSTDAllocLayout) -> NSTDAnyMut 
         if #[cfg(any(
             unix,
             any(target_env = "wasi", target_os = "wasi"),
+            target_os = "solid_asp3",
             target_os = "teeos"
         ))] {
             use crate::core::mem::nstd_core_mem_zero;
@@ -622,6 +637,7 @@ pub unsafe fn nstd_alloc_deallocate(ptr: NSTDAnyMut, layout: NSTDAllocLayout) ->
         if #[cfg(any(
             unix,
             any(target_env = "wasi", target_os = "wasi"),
+            target_os = "solid_asp3",
             target_os = "teeos"
         ))] {
             libc::free(ptr);
