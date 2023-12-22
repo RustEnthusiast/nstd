@@ -1,10 +1,21 @@
 # TBD
-## Changed
+## Added
 ### `nstd.core`
 - Added `core.alloc`.
+## Changed
+### `nstd.alloc`
+- Allocation functions now use `NSTDAllocLayout`.
+### `nstd.core`
 - `nstd_core_mem_copy[_overlapping]` functions are no longer `const`.
+### `nstd.heap_ptr`
+- `nstd_heap_ptr_new[_zeroed]` functions now take an `NSTDAllocLayout`.
 ### `nstd.os`
 - Always define operating system constants as a `u8` value of either 0 or 1.
+- Standalone allocation functions now use `NSTDAllocLayout`.
+### `nstd.shared_ptr`
+- `nstd_shared_ptr_new[_zeroed]` functions now take an `NSTDAllocLayout`.
+### `nstd.vec`
+- `NSTDVec` constructors now take an `align` argument.
 
 # 0.12.0
 ## Changed
