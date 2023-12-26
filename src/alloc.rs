@@ -413,10 +413,72 @@ pub(crate) static GLOBAL_ALLOCATOR: NSTDAllocator = NSTDAllocator {
 pub unsafe fn nstd_alloc_allocate(layout: NSTDAllocLayout) -> NSTDAnyMut {
     cfg_if! {
         if #[cfg(any(
-            unix,
-            any(target_env = "wasi", target_os = "wasi"),
-            target_os = "teeos"
+            all(
+                target_os = "linux",
+                target_env = "gnu",
+                any(
+                    target_arch = "arm",
+                    target_arch = "aarch64",
+                    target_arch = "csky",
+                    target_arch = "loongarch64",
+                    target_arch = "m68k",
+                    target_arch = "mips",
+                    target_arch = "mips32r6",
+                    target_arch = "mips64",
+                    target_arch = "mips64r6",
+                    target_arch = "powerpc64",
+                    target_arch = "sparc",
+                    target_arch = "sparc64",
+                    target_arch = "x86",
+                    target_arch = "x86_64"
+                )
+            ),
+            all(
+                target_os = "linux",
+                any(target_env = "musl", target_env = "ohos"),
+                any(
+                    target_arch = "arm",
+                    target_arch = "aarch64",
+                    target_arch = "mips",
+                    target_arch = "riscv32",
+                    target_arch = "x86",
+                    target_arch = "x86_64"
+                )
+            ),
+            all(
+                target_os = "android",
+                any(
+                    target_arch = "aarch64",
+                    target_arch = "riscv64",
+                    target_arch = "x86",
+                    target_arch = "x86_64"
+                )
+            ),
+            all(
+                any(
+                    target_os = "macos",
+                    target_os = "ios",
+                    target_os = "tvos",
+                    target_os = "watchos"
+                ),
+                any(target_pointer_width = "32", target_arch = "aarch64", target_arch = "x86_64")
+            ),
+            all(target_os = "freebsd", target_arch = "x86_64"),
+            target_env = "wasi",
+            target_os = "wasi",
+            target_os = "emscripten"
         ))] {
+            let align = nstd_core_alloc_layout_align(layout);
+            if align <= core::mem::align_of::<libc::max_align_t>() {
+                libc::malloc(nstd_core_alloc_layout_size(layout))
+            } else {
+                let size = nstd_core_alloc_layout_size(layout);
+                let min_align = core::mem::size_of::<NSTDAnyMut>();
+                let mut ptr = NSTD_NULL;
+                libc::posix_memalign(&mut ptr, align.max(min_align), size);
+                ptr
+            }
+        } else if #[cfg(any(unix, target_os = "teeos"))] {
             let size = nstd_core_alloc_layout_size(layout);
             let min_align = core::mem::size_of::<NSTDAnyMut>();
             let align = nstd_core_alloc_layout_align(layout).max(min_align);
