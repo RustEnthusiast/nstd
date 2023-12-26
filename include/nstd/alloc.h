@@ -1,5 +1,6 @@
 #ifndef NSTD_ALLOC_H
 #define NSTD_ALLOC_H
+#include "core/alloc.h"
 #include "nstd.h"
 
 /// Describes an error returned from allocation functions.
@@ -22,20 +23,17 @@ typedef enum {
 typedef struct {
     /// An opaque pointer to the allocator's state.
     NSTDAny state;
-    /// Allocates a contiguous sequence of `size` bytes in memory.
+    /// Allocates a new block of memory.
     ///
     /// If allocation fails, a null pointer is returned.
     ///
-    /// If allocation succeeds, this returns a pointer that is suitably aligned for any type with
-    /// [fundamental alignment](https://en.cppreference.com/w/c/language/object#Alignment), i.e.,
-    /// the returned pointer will be suitably aligned for
-    /// [max_align_t](https://en.cppreference.com/w/c/types/max_align_t).
-    ///
-    /// Allocation will fail if `size` is greater than `NSTDInt`'s max value.
+    /// If allocation succeeds, this returns a pointer to the new memory that is suitably aligned
+    /// for `layout`'s alignment and the number of bytes allocated is at least equal to `layout`'s
+    /// size.
     ///
     /// # Parameters:
     ///
-    /// - `NSTDUInt size` - The number of bytes to allocate.
+    /// - `NSTDAllocLayout layout` - Describes the memory layout to allocate for.
     ///
     /// # Returns
     ///
@@ -43,26 +41,21 @@ typedef struct {
     ///
     /// # Safety
     ///
-    /// - Behavior is undefined if `size` is zero.
+    /// - Behavior is undefined if `layout`'s size is zero.
     ///
     /// - The new memory buffer should be considered uninitialized.
-    NSTDAnyMut (*allocate)(NSTDAny, NSTDUInt);
-    /// Allocates a contiguous sequence of `size` bytes in memory.
-    ///
-    /// The allocated memory is zero-initialized.
+    NSTDAnyMut (*allocate)(NSTDAny, NSTDAllocLayout);
+    /// Allocates a new block of zero-initialized memory.
     ///
     /// If allocation fails, a null pointer is returned.
     ///
-    /// If allocation succeeds, this returns a pointer that is suitably aligned for any type with
-    /// [fundamental alignment](https://en.cppreference.com/w/c/language/object#Alignment), i.e.,
-    /// the returned pointer will be suitably aligned for
-    /// [max_align_t](https://en.cppreference.com/w/c/types/max_align_t).
-    ///
-    /// Allocation will fail if `size` is greater than `NSTDInt`'s max value.
+    /// If allocation succeeds, this returns a pointer to the new memory that is suitably aligned
+    /// for `layout`'s alignment and the number of bytes allocated is at least equal to `layout`'s
+    /// size.
     ///
     /// # Parameters:
     ///
-    /// - `NSTDUInt size` - The number of bytes to allocate.
+    /// - `NSTDAllocLayout layout` - Describes the memory layout to allocate for.
     ///
     /// # Returns
     ///
@@ -70,11 +63,9 @@ typedef struct {
     ///
     /// # Safety
     ///
-    /// - Behavior is undefined if `size` is zero.
-    NSTDAnyMut (*allocate_zeroed)(NSTDAny, NSTDUInt);
+    /// Behavior is undefined if `layout`'s size is zero.
+    NSTDAnyMut (*allocate_zeroed)(NSTDAny, NSTDAllocLayout);
     /// Reallocates memory that was previously allocated by this allocator.
-    ///
-    /// Reallocation will fail if `new_size` is greater than `NSTDInt`'s max value.
     ///
     /// On successful reallocation, `ptr` will point to the new memory location and
     /// `NSTD_ALLOC_ERROR_NONE` will be returned. If this is not the case and reallocation fails,
@@ -84,9 +75,9 @@ typedef struct {
     ///
     /// - `NSTDAnyMut *ptr` - A pointer to the allocated memory.
     ///
-    /// - `NSTDUInt size` - The number of bytes currently allocated.
+    /// - `NSTDAllocLayout old_layout` - Describes the previous memory layout.
     ///
-    /// - `NSTDUInt new_size` - The number of bytes to reallocate.
+    /// - `NSTDAllocLayout new_layout` - Describes the new memory layout to allocate for.
     ///
     /// # Returns
     ///
@@ -94,24 +85,19 @@ typedef struct {
     ///
     /// # Safety
     ///
-    /// - Behavior is undefined if `new_size` is zero.
+    /// - Behavior is undefined if `new_layout`'s size is zero.
     ///
-    /// - Behavior is undefined if `ptr` is not a value returned by this allocator.
+    /// - Behavior is undefined if `ptr` is not a pointer to memory allocated by this allocator.
     ///
-    /// - `size` must be the same value that was used to allocate the memory buffer.
-    NSTDAllocError (*reallocate)(NSTDAny, NSTDAnyMut *, NSTDUInt, NSTDUInt);
+    /// - `old_layout` must be the same value that was used to allocate the memory buffer.
+    NSTDAllocError (*reallocate)(NSTDAny, NSTDAnyMut *, NSTDAllocLayout, NSTDAllocLayout);
     /// Deallocates memory that was previously allocated by this allocator.
-    ///
-    /// On successful deallocation, `ptr` will be set to null and `NSTD_ALLOC_ERROR_NONE` will be
-    /// returned. If this is not the case and deallocation fails, the pointer will remain untouched
-    /// and the appropriate error is returned.
     ///
     /// # Parameters:
     ///
-    /// - `NSTDAnyMut *ptr` - A pointer to the allocated memory, once freed the pointer is set to
-    /// null.
+    /// - `NSTDAnyMut ptr` - A pointer to the allocated memory.
     ///
-    /// - `NSTDUInt size` - The number of bytes currently allocated.
+    /// - `NSTDAllocLayout layout` - Describes the layout of memory that `ptr` points to.
     ///
     /// # Returns
     ///
@@ -119,21 +105,25 @@ typedef struct {
     ///
     /// # Safety
     ///
-    /// - Behavior is undefined if `ptr` is not a value returned by this allocator.
+    /// - Behavior is undefined if `ptr` is not a pointer to memory allocated by this allocator.
     ///
-    /// - `size` must be the same value that was used to allocate the memory buffer.
-    NSTDAllocError (*deallocate)(NSTDAny, NSTDAnyMut *, NSTDUInt);
+    /// - `layout` must be the same value that was used to allocate the memory buffer.
+    NSTDAllocError (*deallocate)(NSTDAny, NSTDAnyMut, NSTDAllocLayout);
 } NSTDAllocator;
 
 /// `nstd`'s default allocator.
 NSTDAPI const NSTDAllocator NSTD_ALLOCATOR;
 
-/// Allocates a block of memory on the heap.
-/// The number of bytes to be allocated is specified by `size`.
+/// Allocates a new block of memory.
+///
+/// If allocation fails, a null pointer is returned.
+///
+/// If allocation succeeds, this returns a pointer to the new memory that is suitably aligned for
+/// `layout`'s alignment and the number of bytes allocated is at least equal to `layout`'s size.
 ///
 /// # Parameters:
 ///
-/// - `NSTDUInt size` - The number of bytes to allocate on the heap.
+/// - `NSTDAllocLayout layout` - Describes the memory layout to allocate for.
 ///
 /// # Returns
 ///
@@ -141,16 +131,22 @@ NSTDAPI const NSTDAllocator NSTD_ALLOCATOR;
 ///
 /// # Safety
 ///
-/// - Behavior is undefined if `size` is zero.
+/// - Behavior is undefined if `layout`'s size is zero.
 ///
 /// - The new memory buffer should be considered uninitialized.
-NSTDAPI NSTDAnyMut nstd_alloc_allocate(NSTDUInt size);
+NSTDAPI NSTDAnyMut nstd_alloc_allocate(NSTDAllocLayout layout);
 
-/// Allocates a block of zero-initialized memory on the heap.
+/// Allocates a new block of zero-initialized memory.
+///
+/// If allocation fails, a null pointer is returned.
+///
+/// If allocation succeeds, this returns a pointer to the new memory that is suitably aligned
+/// for `layout`'s alignment and the number of bytes allocated is at least equal to `layout`'s
+/// size.
 ///
 /// # Parameters:
 ///
-/// - `NSTDUInt size` - The number of bytes to allocate on the heap.
+/// - `NSTDAllocLayout layout` - Describes the memory layout to allocate for.
 ///
 /// # Returns
 ///
@@ -158,22 +154,22 @@ NSTDAPI NSTDAnyMut nstd_alloc_allocate(NSTDUInt size);
 ///
 /// # Safety
 ///
-/// Behavior is undefined if `size` is zero.
-NSTDAPI NSTDAnyMut nstd_alloc_allocate_zeroed(NSTDUInt size);
+/// Behavior is undefined if `layout`'s size is zero.
+NSTDAPI NSTDAnyMut nstd_alloc_allocate_zeroed(NSTDAllocLayout layout);
 
-/// Reallocates a block of memory previously allocated by `nstd_alloc_allocate[_zeroed]`.
+/// Reallocates memory that was previously allocated by this allocator.
 ///
-/// If everything goes right, the pointer will point to the new memory location and
-/// `NSTD_ALLOC_ERROR_NONE` will be returned. If this is not the case and allocation fails, the
-/// pointer will remain untouched and the appropriate error is returned.
+/// On successful reallocation, `ptr` will point to the new memory location and
+/// `NSTD_ALLOC_ERROR_NONE` will be returned. If this is not the case and reallocation fails,
+/// the pointer will remain untouched and the appropriate error is returned.
 ///
 /// # Parameters:
 ///
 /// - `NSTDAnyMut *ptr` - A pointer to the allocated memory.
 ///
-/// - `NSTDUInt size` - The number of bytes currently allocated.
+/// - `NSTDAllocLayout old_layout` - Describes the previous memory layout.
 ///
-/// - `NSTDUInt new_size` - The number of bytes to reallocate.
+/// - `NSTDAllocLayout new_layout` - Describes the new memory layout to allocate for.
 ///
 /// # Returns
 ///
@@ -181,20 +177,21 @@ NSTDAPI NSTDAnyMut nstd_alloc_allocate_zeroed(NSTDUInt size);
 ///
 /// # Safety
 ///
-/// - Behavior is undefined if `new_size` is zero.
+/// - Behavior is undefined if `new_layout`'s size is zero.
 ///
-/// - Behavior is undefined if `ptr` is not a value returned by `nstd_alloc_allocate[_zeroed]`.
+/// - Behavior is undefined if `ptr` is not a pointer to memory allocated by this allocator.
 ///
-/// - `size` must be the same value that was used to allocate the memory buffer.
-NSTDAPI NSTDAllocError nstd_alloc_reallocate(NSTDAnyMut *ptr, NSTDUInt size, NSTDUInt new_size);
+/// - `old_layout` must be the same value that was used to allocate the memory buffer.
+NSTDAPI NSTDAllocError
+nstd_alloc_reallocate(NSTDAnyMut *ptr, NSTDAllocLayout old_layout, NSTDAllocLayout new_layout);
 
-/// Deallocates a block of memory previously allocated by `nstd_alloc_allocate[_zeroed]`.
+/// Deallocates memory that was previously allocated by this allocator.
 ///
 /// # Parameters:
 ///
-/// - `NSTDAnyMut *ptr` - A pointer to the allocated memory, once freed the pointer is set to null.
+/// - `NSTDAnyMut ptr` - A pointer to the allocated memory.
 ///
-/// - `NSTDUInt size` - The number of bytes to free.
+/// - `NSTDAllocLayout layout` - Describes the layout of memory that `ptr` points to.
 ///
 /// # Returns
 ///
@@ -202,9 +199,9 @@ NSTDAPI NSTDAllocError nstd_alloc_reallocate(NSTDAnyMut *ptr, NSTDUInt size, NST
 ///
 /// # Safety
 ///
-/// - Behavior is undefined if `ptr` is not a value returned by `nstd_alloc_allocate[_zeroed]`.
+/// - Behavior is undefined if `ptr` is not a pointer to memory allocated by this allocator.
 ///
-/// - `size` must be the same value that was used to allocate the memory buffer.
-NSTDAPI NSTDAllocError nstd_alloc_deallocate(NSTDAnyMut *ptr, NSTDUInt size);
+/// - `layout` must be the same value that was used to allocate the memory buffer.
+NSTDAPI NSTDAllocError nstd_alloc_deallocate(NSTDAnyMut ptr, NSTDAllocLayout layout);
 
 #endif

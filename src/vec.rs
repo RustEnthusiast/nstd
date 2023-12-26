@@ -6,6 +6,7 @@ use crate::{
         NSTDAllocator, GLOBAL_ALLOCATOR, NSTD_ALLOCATOR,
     },
     core::{
+        alloc::{nstd_core_alloc_layout_array, nstd_core_alloc_layout_array_unchecked},
         def::{NSTDByte, NSTDErrorCode},
         mem::{nstd_core_mem_copy, nstd_core_mem_copy_overlapping, nstd_core_mem_dangling_mut},
         optional::NSTDOptional,
@@ -29,6 +30,8 @@ pub struct NSTDVec<'a> {
     ptr: NSTDAnyMut,
     /// The number of bytes each value in the vector takes up.
     stride: NSTDUInt,
+    /// The memory alignment for the buffer.
+    align: NSTDUInt,
     /// The number of active elements in the vector.
     len: NSTDUInt,
     /// The number of values allocated in the memory buffer.
@@ -44,6 +47,7 @@ impl<'a> NSTDVec<'a> {
             allocator: &GLOBAL_ALLOCATOR,
             ptr: data.as_mut_ptr().cast(),
             stride: core::mem::size_of::<T>(),
+            align: core::mem::align_of::<T>(),
             len: data.len(),
             cap,
         }
@@ -113,8 +117,15 @@ impl Drop for NSTDVec<'_> {
     fn drop(&mut self) {
         let buffer_len = self.buffer_byte_len();
         if buffer_len > 0 {
+            // SAFETY:
+            // - `self.align` is always a nonzero power of two.
+            // - `self.stride` is always a multiple of `self.align`.
+            // - The buffer's capacity in bytes never exceeds `NSTDInt`'s max value.
+            let layout = unsafe {
+                nstd_core_alloc_layout_array_unchecked(self.stride, self.align, self.cap)
+            };
             // SAFETY: The vector has allocated.
-            unsafe { (self.allocator.deallocate)(self.allocator.state, &mut self.ptr, buffer_len) };
+            unsafe { (self.allocator.deallocate)(self.allocator.state, self.ptr, layout) };
         }
     }
 }
@@ -130,9 +141,11 @@ impl<A> FromIterator<A> for NSTDVec<'_> {
     ///
     /// This operation will panic if allocating fails.
     fn from_iter<T: IntoIterator<Item = A>>(iter: T) -> Self {
+        let size = core::mem::size_of::<A>();
+        let align = core::mem::align_of::<A>();
         #[allow(unused_unsafe)]
         // SAFETY: This operation is safe.
-        let mut s = unsafe { nstd_vec_new(&NSTD_ALLOCATOR, core::mem::size_of::<A>()) };
+        let mut s = unsafe { nstd_vec_new(&NSTD_ALLOCATOR, size, align) };
         let mut errc;
         for v in iter {
             // SAFETY: `v` is stored on the stack.
@@ -166,9 +179,16 @@ pub type NSTDOptionalVec<'a> = NSTDOptional<NSTDVec<'a>>;
 ///
 /// - `NSTDUInt stride` - The size in bytes of each value in the vector.
 ///
+/// - `NSTDUInt align` - The alignment of each value in the vector.
+///
 /// # Returns
 ///
 /// `NSTDVec vec` - The new vector.
+///
+/// # Panics
+///
+/// This operation will panic if either `align` is not a power of two or `stride` is not a multiple
+/// of `align`.
 ///
 /// # Example
 ///
@@ -176,16 +196,24 @@ pub type NSTDOptionalVec<'a> = NSTDOptional<NSTDVec<'a>>;
 /// use nstd_sys::{alloc::NSTD_ALLOCATOR, vec::nstd_vec_new};
 ///
 /// const SIZE: usize = core::mem::size_of::<u32>();
+/// const ALIGN: usize = core::mem::align_of::<u32>();
 ///
-/// let vec = unsafe { nstd_vec_new(&NSTD_ALLOCATOR, SIZE) };
+/// let vec = unsafe { nstd_vec_new(&NSTD_ALLOCATOR, SIZE, ALIGN) };
 /// ```
 #[inline]
 #[nstdapi]
-pub const fn nstd_vec_new(allocator: &NSTDAllocator, stride: NSTDUInt) -> NSTDVec<'_> {
+#[allow(clippy::arithmetic_side_effects)]
+pub const fn nstd_vec_new(
+    allocator: &NSTDAllocator,
+    stride: NSTDUInt,
+    align: NSTDUInt,
+) -> NSTDVec<'_> {
+    assert!(crate::core::mem::is_power_of_two(align) && stride % align == 0);
     NSTDVec {
         allocator,
         ptr: nstd_core_mem_dangling_mut(),
         stride,
+        align,
         cap: 0,
         len: 0,
     }
@@ -198,6 +226,8 @@ pub const fn nstd_vec_new(allocator: &NSTDAllocator, stride: NSTDUInt) -> NSTDVe
 /// - `const NSTDAllocator *allocator` - The memory allocator.
 ///
 /// - `NSTDUInt stride` - The size in bytes of each value in the vector.
+///
+/// - `NSTDUInt align` - The alignment of each value in the vector.
 ///
 /// - `NSTDUInt cap` - The initial capacity for the vector.
 ///
@@ -216,11 +246,12 @@ pub const fn nstd_vec_new(allocator: &NSTDAllocator, stride: NSTDUInt) -> NSTDVe
 /// };
 ///
 /// const SIZE: usize = core::mem::size_of::<i16>();
+/// const ALIGN: usize = core::mem::align_of::<i16>();
 ///
 /// unsafe {
 ///     let numbers = [642i16, 324i16, 190i16];
 ///     let numbers = nstd_core_slice_new(numbers.as_ptr().cast(), SIZE, 3).unwrap();
-///     let mut vec = nstd_vec_new_with_cap(&NSTD_ALLOCATOR, SIZE, 3).unwrap();
+///     let mut vec = nstd_vec_new_with_cap(&NSTD_ALLOCATOR, SIZE, ALIGN, 3).unwrap();
 ///     assert!(nstd_vec_extend(&mut vec, &numbers) == NSTD_ALLOC_ERROR_NONE);
 ///     for i in 0..nstd_vec_len(&vec) {
 ///         let sv = nstd_core_slice_get(&numbers, i).cast::<i16>();
@@ -234,27 +265,33 @@ pub const fn nstd_vec_new(allocator: &NSTDAllocator, stride: NSTDUInt) -> NSTDVe
 pub fn nstd_vec_new_with_cap(
     allocator: &NSTDAllocator,
     stride: NSTDUInt,
+    align: NSTDUInt,
     cap: NSTDUInt,
 ) -> NSTDOptionalVec<'_> {
     // Check if either `stride` or `cap` are zero.
     if stride == 0 || cap == 0 {
-        return NSTDOptional::Some(NSTDVec {
-            allocator,
-            ptr: nstd_core_mem_dangling_mut(),
-            stride,
-            cap,
-            len: 0,
-        });
+        #[allow(clippy::arithmetic_side_effects)]
+        if crate::core::mem::is_power_of_two(align) && stride % align == 0 {
+            return NSTDOptional::Some(NSTDVec {
+                allocator,
+                ptr: nstd_core_mem_dangling_mut(),
+                stride,
+                align,
+                cap,
+                len: 0,
+            });
+        }
     }
     // Attempt to allocate the memory buffer.
-    if let Some(buf_size) = cap.checked_mul(stride) {
+    else if let NSTDOptional::Some(layout) = nstd_core_alloc_layout_array(stride, align, cap) {
         // SAFETY: Both `stride` & `cap` are above 0.
-        let ptr = unsafe { (allocator.allocate)(allocator.state, buf_size) };
+        let ptr = unsafe { (allocator.allocate)(allocator.state, layout) };
         if !ptr.is_null() {
             return NSTDOptional::Some(NSTDVec {
                 allocator,
                 ptr,
                 stride,
+                align,
                 cap,
                 len: 0,
             });
@@ -270,6 +307,8 @@ pub fn nstd_vec_new_with_cap(
 /// - `const NSTDAllocator *allocator` - The memory allocator.
 ///
 /// - `const NSTDSlice *slice` - The slice to copy data from.
+///
+/// - `NSTDUInt align` - The alignment of each value in the slice.
 ///
 /// # Returns
 ///
@@ -290,11 +329,12 @@ pub fn nstd_vec_new_with_cap(
 /// };
 ///
 /// const SIZE: usize = core::mem::size_of::<u128>();
+/// const ALIGN: usize = core::mem::align_of::<u128>();
 ///
 /// unsafe {
 ///     let numbers = [59237u128, 13953u128, 50285u128];
 ///     let numbers = nstd_core_slice_new(numbers.as_ptr().cast(), SIZE, 3).unwrap();
-///     let mut vec = nstd_vec_from_slice(&NSTD_ALLOCATOR, &numbers).unwrap();
+///     let mut vec = nstd_vec_from_slice(&NSTD_ALLOCATOR, &numbers, ALIGN).unwrap();
 ///     for i in 0..nstd_vec_len(&vec) {
 ///         let sv = nstd_core_slice_get(&numbers, i).cast::<u128>();
 ///         let vv = nstd_vec_get(&vec, i).cast::<u128>();
@@ -307,22 +347,30 @@ pub fn nstd_vec_new_with_cap(
 pub unsafe fn nstd_vec_from_slice<'a>(
     allocator: &'a NSTDAllocator,
     slice: &NSTDSlice,
+    align: NSTDUInt,
 ) -> NSTDOptionalVec<'a> {
     let stride = nstd_core_slice_stride(slice);
     let len = nstd_core_slice_len(slice);
+    #[allow(clippy::arithmetic_side_effects)]
     if len > 0 {
         // Allocate the new vector.
-        let NSTDOptional::Some(mut vec) = nstd_vec_new_with_cap(allocator, stride, len) else {
-            return NSTDOptional::None;
-        };
-        #[allow(clippy::arithmetic_side_effects)]
-        let bytes = len * stride;
-        nstd_core_mem_copy(vec.ptr.cast(), nstd_core_slice_as_ptr(slice).cast(), bytes);
-        vec.len = len;
-        NSTDOptional::Some(vec)
-    } else {
-        NSTDOptional::Some(nstd_vec_new(allocator, stride))
+        if let NSTDOptional::Some(mut vec) = nstd_vec_new_with_cap(allocator, stride, align, len) {
+            let bytes = len * stride;
+            nstd_core_mem_copy(vec.ptr.cast(), nstd_core_slice_as_ptr(slice).cast(), bytes);
+            vec.len = len;
+            return NSTDOptional::Some(vec);
+        }
+    } else if crate::core::mem::is_power_of_two(align) && stride % align == 0 {
+        return NSTDOptional::Some(NSTDVec {
+            allocator,
+            ptr: nstd_core_mem_dangling_mut(),
+            stride,
+            align,
+            cap: 0,
+            len: 0,
+        });
     }
+    NSTDOptional::None
 }
 
 /// Creates a new deep copy of `vec`.
@@ -339,7 +387,7 @@ pub unsafe fn nstd_vec_from_slice<'a>(
 pub fn nstd_vec_clone<'a>(vec: &NSTDVec<'a>) -> NSTDOptionalVec<'a> {
     if vec.len > 0 {
         let NSTDOptional::Some(mut cloned) =
-            nstd_vec_new_with_cap(vec.allocator, vec.stride, vec.len)
+            nstd_vec_new_with_cap(vec.allocator, vec.stride, vec.align, vec.len)
         else {
             return NSTDOptional::None;
         };
@@ -348,7 +396,7 @@ pub fn nstd_vec_clone<'a>(vec: &NSTDVec<'a>) -> NSTDOptionalVec<'a> {
         cloned.len = vec.len;
         NSTDOptional::Some(cloned)
     } else {
-        NSTDOptional::Some(nstd_vec_new(vec.allocator, vec.stride))
+        NSTDOptional::Some(nstd_vec_new(vec.allocator, vec.stride, vec.align))
     }
 }
 
@@ -433,7 +481,7 @@ pub const fn nstd_vec_stride(vec: &NSTDVec<'_>) -> NSTDUInt {
 /// };
 ///
 /// unsafe {
-///     let vec = nstd_vec_new_with_cap(&NSTD_ALLOCATOR, 2, 16).unwrap();
+///     let vec = nstd_vec_new_with_cap(&NSTD_ALLOCATOR, 8, 2, 16).unwrap();
 ///     assert!(nstd_vec_reserved(&vec) == 16);
 /// }
 /// ```
@@ -572,11 +620,12 @@ pub fn nstd_vec_end_mut(vec: &mut NSTDVec<'_>) -> NSTDAnyMut {
 /// };
 ///
 /// const SIZE: usize = core::mem::size_of::<i64>();
+/// const ALIGN: usize = core::mem::size_of::<i64>();
 ///
 /// unsafe {
 ///     let numbers = [-639i64, 429i64, -440i64];
 ///     let numbers = nstd_core_slice_new(numbers.as_ptr().cast(), SIZE, 3).unwrap();
-///     let mut vec = nstd_vec_from_slice(&NSTD_ALLOCATOR, &numbers).unwrap();
+///     let mut vec = nstd_vec_from_slice(&NSTD_ALLOCATOR, &numbers, ALIGN).unwrap();
 ///     for i in 0..nstd_vec_len(&vec) {
 ///         let sv = nstd_core_slice_get(&numbers, i).cast::<i64>();
 ///         let vv = nstd_vec_get(&vec, i).cast::<i64>();
@@ -625,11 +674,12 @@ pub const fn nstd_vec_get(vec: &NSTDVec<'_>, mut pos: NSTDUInt) -> NSTDAny {
 /// };
 ///
 /// const SIZE: usize = core::mem::size_of::<i64>();
+/// const ALIGN: usize = core::mem::size_of::<i64>();
 ///
 /// unsafe {
 ///     let numbers = [639i64, -429i64, 440i64];
 ///     let numbers = nstd_core_slice_new(numbers.as_ptr().cast(), SIZE, 3).unwrap();
-///     let mut vec = nstd_vec_from_slice(&NSTD_ALLOCATOR, &numbers).unwrap();
+///     let mut vec = nstd_vec_from_slice(&NSTD_ALLOCATOR, &numbers, ALIGN).unwrap();
 ///     for i in 0..nstd_vec_len(&vec) {
 ///         let vv = nstd_vec_get_mut(&mut vec, i).cast::<i64>();
 ///         assert!(!vv.is_null());
@@ -677,9 +727,10 @@ pub fn nstd_vec_get_mut(vec: &mut NSTDVec<'_>, pos: NSTDUInt) -> NSTDAnyMut {
 /// };
 ///
 /// const SIZE: usize = core::mem::size_of::<f64>();
+/// const ALIGN: usize = core::mem::size_of::<f64>();
 ///
 /// unsafe {
-///     let mut vec = nstd_vec_new(&NSTD_ALLOCATOR, SIZE);
+///     let mut vec = nstd_vec_new(&NSTD_ALLOCATOR, SIZE, ALIGN);
 ///     let values: [f64; 3] = [6.0, 3.1, 9.4];
 ///     for value in values {
 ///         nstd_vec_push(&mut vec, addr_of!(value).cast());
@@ -729,9 +780,10 @@ pub unsafe fn nstd_vec_push(vec: &mut NSTDVec<'_>, value: NSTDAny) -> NSTDAllocE
 /// };
 ///
 /// const SIZE: usize = core::mem::size_of::<f64>();
+/// const ALIGN: usize = core::mem::size_of::<f64>();
 ///
 /// unsafe {
-///     let mut vec = nstd_vec_new(&NSTD_ALLOCATOR, SIZE);
+///     let mut vec = nstd_vec_new(&NSTD_ALLOCATOR, SIZE, ALIGN);
 ///     let values: [f64; 3] = [9.4, 3.1, 6.0];
 ///     let values_slice = nstd_core_slice_new(values.as_ptr().cast(), SIZE, 3).unwrap();
 ///     nstd_vec_extend(&mut vec, &values_slice);
@@ -787,11 +839,12 @@ pub fn nstd_vec_pop(vec: &mut NSTDVec<'_>) -> NSTDAny {
 /// };
 ///
 /// const SIZE: usize = core::mem::size_of::<u32>();
+/// const ALIGN: usize = core::mem::size_of::<u32>();
 ///
 /// unsafe {
 ///     let slice: [u32; 4] = [1, 2, 3, 5];
 ///     let slice = nstd_core_slice_new(slice.as_ptr().cast(), SIZE, 4).unwrap();
-///     let mut vec = nstd_vec_from_slice(&NSTD_ALLOCATOR, &slice).unwrap();
+///     let mut vec = nstd_vec_from_slice(&NSTD_ALLOCATOR, &slice, ALIGN).unwrap();
 ///     let four = 4u32;
 ///     assert!(nstd_vec_insert(&mut vec, addr_of!(four).cast(), 3) == 0);
 ///     for i in 1..=5 {
@@ -861,11 +914,12 @@ pub unsafe fn nstd_vec_insert(
 /// };
 ///
 /// const SIZE: usize = core::mem::size_of::<u32>();
+/// const ALIGN: usize = core::mem::align_of::<u32>();
 ///
 /// unsafe {
 ///     let slice: [u32; 5] = [1, 2, 3, 4, 5];
 ///     let slice = nstd_core_slice_new(slice.as_ptr().cast(), SIZE, 5).unwrap();
-///     let mut vec = nstd_vec_from_slice(&NSTD_ALLOCATOR, &slice).unwrap();
+///     let mut vec = nstd_vec_from_slice(&NSTD_ALLOCATOR, &slice, ALIGN).unwrap();
 ///     assert!(nstd_vec_remove(&mut vec, 0) == 0);
 ///     assert!(nstd_vec_remove(&mut vec, 3) == 0);
 ///     for i in 0..3 {
@@ -930,11 +984,12 @@ pub fn nstd_vec_remove(vec: &mut NSTDVec<'_>, mut index: NSTDUInt) -> NSTDErrorC
 /// };
 ///
 /// const SIZE: usize = core::mem::size_of::<i128>();
+/// const ALIGN: usize = core::mem::size_of::<i128>();
 ///
 /// unsafe {
 ///     let values: [i128; 5] = [1, 2, 3, 4, 5];
 ///     let slice = nstd_core_slice_new(values.as_ptr().cast(), SIZE, 5).unwrap();
-///     let mut vec = nstd_vec_new(&NSTD_ALLOCATOR, SIZE);
+///     let mut vec = nstd_vec_new(&NSTD_ALLOCATOR, SIZE, ALIGN);
 ///     assert!(nstd_vec_extend(&mut vec, &slice) == NSTD_ALLOC_ERROR_NONE);
 ///     for i in 0..5 {
 ///         let v = nstd_vec_get(&vec, i);
@@ -1037,23 +1092,32 @@ pub fn nstd_vec_reserve(vec: &mut NSTDVec<'_>, size: NSTDUInt) -> NSTDAllocError
         // This can't be 0 because the vector is non-null.
         // After an nstd vector has allocated it will always have at least one value allocated.
         // An example of this behavior can be seen in `nstd_vec_shrink`.
-        let byte_len = vec.buffer_byte_len();
-        let Some(new_byte_len) = byte_len.checked_add(bytes_to_alloc) else {
+        let Some(new_cap) = vec.cap.checked_add(size) else {
             return NSTDAllocError::NSTD_ALLOC_ERROR_INVALID_LAYOUT;
         };
+        let new_layout = match nstd_core_alloc_layout_array(vec.stride, vec.align, new_cap) {
+            NSTDOptional::Some(new_layout) => new_layout,
+            NSTDOptional::None => return NSTDAllocError::NSTD_ALLOC_ERROR_INVALID_LAYOUT,
+        };
+        // SAFETY: `byte_len` is never greater than `NSTDInt`'s max value, `vec.align` is valid.
+        let old_layout =
+            unsafe { nstd_core_alloc_layout_array_unchecked(vec.stride, vec.align, vec.cap) };
         // SAFETY: The vector is non-null & the lengths are above 0.
         let errc = unsafe {
-            (vec.allocator.reallocate)(vec.allocator.state, &mut vec.ptr, byte_len, new_byte_len)
+            (vec.allocator.reallocate)(vec.allocator.state, &mut vec.ptr, old_layout, new_layout)
         };
         // On success increase the buffer length.
-        #[allow(clippy::arithmetic_side_effects)]
         if errc == NSTD_ALLOC_ERROR_NONE {
-            vec.cap += size;
+            vec.cap = new_cap;
         }
         errc
     } else {
+        let layout = match nstd_core_alloc_layout_array(vec.stride, vec.align, size) {
+            NSTDOptional::Some(layout) => layout,
+            NSTDOptional::None => return NSTDAllocError::NSTD_ALLOC_ERROR_INVALID_LAYOUT,
+        };
         // SAFETY: `bytes_to_alloc` is above 0.
-        let mem = unsafe { (vec.allocator.allocate)(vec.allocator.state, bytes_to_alloc) };
+        let mem = unsafe { (vec.allocator.allocate)(vec.allocator.state, layout) };
         if !mem.is_null() {
             vec.ptr = mem;
             vec.cap = size;
@@ -1076,22 +1140,33 @@ pub fn nstd_vec_reserve(vec: &mut NSTDVec<'_>, size: NSTDUInt) -> NSTDAllocError
 pub fn nstd_vec_shrink(vec: &mut NSTDVec<'_>) -> NSTDAllocError {
     // Make sure the vector's capacity is greater than it's length.
     if vec.cap > vec.len {
+        let new_cap = vec.len.max(1);
         // Make sure the vector's stride is greater than 0 before reallocating.
         if vec.stride > 0 {
-            let current_len = vec.buffer_byte_len();
             // Make sure to allocate at least one element to avoid undefined behavior.
-            let new_len = vec.byte_len().max(vec.stride);
+            let new_layout = match nstd_core_alloc_layout_array(vec.stride, vec.align, new_cap) {
+                NSTDOptional::Some(new_layout) => new_layout,
+                NSTDOptional::None => return NSTDAllocError::NSTD_ALLOC_ERROR_INVALID_LAYOUT,
+            };
+            // SAFETY: `byte_len` is never greater than `NSTDInt`'s max value, `vec.align` is valid.
+            let old_layout =
+                unsafe { nstd_core_alloc_layout_array_unchecked(vec.stride, vec.align, vec.cap) };
             // SAFETY: The vector is non-null & the lengths are above 0.
             let errc = unsafe {
-                (vec.allocator.reallocate)(vec.allocator.state, &mut vec.ptr, current_len, new_len)
+                (vec.allocator.reallocate)(
+                    vec.allocator.state,
+                    &mut vec.ptr,
+                    old_layout,
+                    new_layout,
+                )
             };
             if errc == NSTD_ALLOC_ERROR_NONE {
                 // The buffer's new length is at least 1.
-                vec.cap = vec.len.max(1);
+                vec.cap = new_cap;
             }
             return errc;
         }
-        vec.cap = vec.len.max(1);
+        vec.cap = new_cap;
     }
     NSTD_ALLOC_ERROR_NONE
 }

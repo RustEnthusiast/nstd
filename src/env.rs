@@ -167,7 +167,9 @@ pub unsafe fn nstd_env_remove_var(key: &NSTDStr) {
 /// This operation will panic if any program arguments contain invalid Unicode.
 #[nstdapi]
 pub fn nstd_env_args() -> NSTDVec<'static> {
-    let mut args = nstd_vec_new(&NSTD_ALLOCATOR, core::mem::size_of::<NSTDString<'_>>());
+    let size = core::mem::size_of::<NSTDString<'_>>();
+    let align = core::mem::align_of::<NSTDString<'_>>();
+    let mut args = nstd_vec_new(&NSTD_ALLOCATOR, size, align);
     for arg in std::env::args() {
         let arg = NSTDString::from_string(arg);
         // SAFETY: `arg` is stored on the stack.
@@ -191,7 +193,9 @@ pub fn nstd_env_args() -> NSTDVec<'static> {
 /// This operation will panic if any environment variables contain invalid Unicode.
 #[nstdapi]
 pub fn nstd_env_vars() -> NSTDVec<'static> {
-    let mut vars = nstd_vec_new(&NSTD_ALLOCATOR, core::mem::size_of::<[NSTDString<'_>; 2]>());
+    let size = core::mem::size_of::<[NSTDString<'_>; 2]>();
+    let align = core::mem::align_of::<[NSTDString<'_>; 2]>();
+    let mut vars = nstd_vec_new(&NSTD_ALLOCATOR, size, align);
     for (k, v) in std::env::vars() {
         let var = [NSTDString::from_string(k), NSTDString::from_string(v)];
         // SAFETY: `var` is stored on the stack.

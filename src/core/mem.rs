@@ -14,7 +14,7 @@ pub(crate) const MAX_ALIGN: usize = 16;
 /// Checks if `align` is a power of 2.
 #[inline]
 #[allow(clippy::arithmetic_side_effects)]
-const fn is_power_of_two(align: NSTDUInt) -> NSTDBool {
+pub(crate) const fn is_power_of_two(align: NSTDUInt) -> NSTDBool {
     (align != 0) && ((align & (align - 1)) == 0)
 }
 

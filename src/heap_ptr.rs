@@ -1,7 +1,13 @@
 //! A pointer type for single value heap allocation.
 use crate::{
     alloc::NSTDAllocator,
-    core::{mem::nstd_core_mem_copy, optional::NSTDOptional},
+    core::{
+        alloc::{
+            nstd_core_alloc_layout_new_unchecked, nstd_core_alloc_layout_size, NSTDAllocLayout,
+        },
+        mem::nstd_core_mem_copy,
+        optional::NSTDOptional,
+    },
     NSTDAny, NSTDAnyMut, NSTDUInt, NSTD_NULL,
 };
 use nstdapi::nstdapi;
@@ -13,17 +19,19 @@ pub struct NSTDHeapPtr<'a> {
     allocator: &'a NSTDAllocator,
     /// A raw pointer to the value on the heap.
     ptr: NSTDAnyMut,
-    /// The size of the object in bytes.
-    size: NSTDUInt,
+    /// The heap object's memory layout.
+    layout: NSTDAllocLayout,
 }
 impl<'a> NSTDHeapPtr<'a> {
     /// Constructs a zero-sized [`NSTDHeapPtr`].
     #[inline]
-    const fn zero_sized(allocator: &'a NSTDAllocator) -> Self {
+    #[allow(clippy::missing_const_for_fn)]
+    fn zero_sized(allocator: &'a NSTDAllocator) -> Self {
         Self {
             allocator,
             ptr: NSTD_NULL,
-            size: 0,
+            // SAFETY: `size` is 0, `align` is 1.
+            layout: unsafe { nstd_core_alloc_layout_new_unchecked(0, 1) },
         }
     }
 }
@@ -31,9 +39,11 @@ impl Drop for NSTDHeapPtr<'_> {
     /// [`NSTDHeapPtr`]'s destructor.
     #[inline]
     fn drop(&mut self) {
-        if self.size > 0 {
+        #[allow(unused_unsafe)]
+        // SAFETY: This operation is safe.
+        if unsafe { nstd_core_alloc_layout_size(self.layout) } > 0 {
             // SAFETY: The heap object's size is non-zero.
-            unsafe { (self.allocator.deallocate)(self.allocator.state, &mut self.ptr, self.size) };
+            unsafe { (self.allocator.deallocate)(self.allocator.state, self.ptr, self.layout) };
         }
     }
 }
@@ -57,7 +67,7 @@ pub type NSTDOptionalHeapPtr<'a> = NSTDOptional<NSTDHeapPtr<'a>>;
 ///
 /// - `const NSTDAllocator *allocator` - The memory allocator.
 ///
-/// - `NSTDUInt element_size` - The size (in bytes) of the heap object.
+/// - `NSTDAllocLayout layout` - The heap object's memory layout.
 ///
 /// - `NSTDAny init` - A pointer to the object to initialize the heap object with.
 ///
@@ -68,37 +78,41 @@ pub type NSTDOptionalHeapPtr<'a> = NSTDOptional<NSTDHeapPtr<'a>>;
 ///
 /// # Safety
 ///
-/// `init` must be a pointer to a value that is valid for reads of `element_size` bytes.
+/// `init` must be a pointer to a value that is valid for reads based on `layout`.
 ///
 /// # Example
 ///
 /// ```
 /// use core::ptr::addr_of;
-/// use nstd_sys::{alloc::NSTD_ALLOCATOR, heap_ptr::nstd_heap_ptr_new};
-///
-/// const SIZE: usize = core::mem::size_of::<char>();
+/// use nstd_sys::{
+///     alloc::NSTD_ALLOCATOR, core::alloc::nstd_core_alloc_layout_new, heap_ptr::nstd_heap_ptr_new,
+/// };
 ///
 /// let v = '🦀';
-/// let hptr = unsafe { nstd_heap_ptr_new(&NSTD_ALLOCATOR, SIZE, addr_of!(v).cast()).unwrap() };
+/// let size = core::mem::size_of::<char>();
+/// let align = core::mem::align_of::<char>();
+/// let layout = nstd_core_alloc_layout_new(size, align).unwrap();
+/// let hptr = unsafe { nstd_heap_ptr_new(&NSTD_ALLOCATOR, layout, addr_of!(v).cast()).unwrap() };
 /// ```
 #[nstdapi]
 pub unsafe fn nstd_heap_ptr_new(
     allocator: &NSTDAllocator,
-    element_size: NSTDUInt,
+    layout: NSTDAllocLayout,
     init: NSTDAny,
 ) -> NSTDOptionalHeapPtr<'_> {
-    if element_size == 0 {
+    let size = nstd_core_alloc_layout_size(layout);
+    if size == 0 {
         NSTDOptional::Some(NSTDHeapPtr::zero_sized(allocator))
     } else {
-        let mem = (allocator.allocate)(allocator.state, element_size);
-        if mem.is_null() {
+        let ptr = (allocator.allocate)(allocator.state, layout);
+        if ptr.is_null() {
             return NSTDOptional::None;
         }
-        nstd_core_mem_copy(mem.cast(), init.cast(), element_size);
+        nstd_core_mem_copy(ptr.cast(), init.cast(), size);
         NSTDOptional::Some(NSTDHeapPtr {
             allocator,
-            ptr: mem,
-            size: element_size,
+            ptr,
+            layout,
         })
     }
 }
@@ -109,7 +123,7 @@ pub unsafe fn nstd_heap_ptr_new(
 ///
 /// - `const NSTDAllocator *allocator` - The memory allocator.
 ///
-/// - `NSTDUInt element_size` - The size (in bytes) of the heap object.
+/// - `NSTDAllocLayout layout` - The heap object's memory layout.
 ///
 /// # Returns
 ///
@@ -126,33 +140,35 @@ pub unsafe fn nstd_heap_ptr_new(
 /// ```
 /// use nstd_sys::{
 ///     alloc::NSTD_ALLOCATOR,
+///     core::alloc::nstd_core_alloc_layout_new,
 ///     heap_ptr::{nstd_heap_ptr_get, nstd_heap_ptr_new_zeroed},
 /// };
 ///
-/// const SIZE: usize = core::mem::size_of::<u64>();
-///
 /// unsafe {
-///     let hptr = nstd_heap_ptr_new_zeroed(&NSTD_ALLOCATOR, SIZE).unwrap();
+///     let size = core::mem::size_of::<u64>();
+///     let align = core::mem::align_of::<u64>();
+///     let layout = nstd_core_alloc_layout_new(size, align).unwrap();
+///     let hptr = nstd_heap_ptr_new_zeroed(&NSTD_ALLOCATOR, layout).unwrap();
 ///     assert!(*nstd_heap_ptr_get(&hptr).cast::<u64>() == 0);
 /// }
 /// ```
 #[nstdapi]
 pub unsafe fn nstd_heap_ptr_new_zeroed(
     allocator: &NSTDAllocator,
-    element_size: NSTDUInt,
+    layout: NSTDAllocLayout,
 ) -> NSTDOptionalHeapPtr<'_> {
-    if element_size == 0 {
+    if nstd_core_alloc_layout_size(layout) == 0 {
         NSTDOptional::Some(NSTDHeapPtr::zero_sized(allocator))
     } else {
-        // SAFETY: `element_size` is not 0.
-        let mem = unsafe { (allocator.allocate_zeroed)(allocator.state, element_size) };
-        if mem.is_null() {
+        // SAFETY: `size` is not 0.
+        let ptr = unsafe { (allocator.allocate_zeroed)(allocator.state, layout) };
+        if ptr.is_null() {
             return NSTDOptional::None;
         }
         NSTDOptional::Some(NSTDHeapPtr {
             allocator,
-            ptr: mem,
-            size: element_size,
+            ptr,
+            layout,
         })
     }
 }
@@ -174,7 +190,7 @@ pub fn nstd_heap_ptr_clone<'a>(hptr: &NSTDHeapPtr<'a>) -> NSTDOptionalHeapPtr<'a
         NSTDOptional::Some(NSTDHeapPtr::zero_sized(hptr.allocator))
     } else {
         // SAFETY: `size` is not 0.
-        let mem = unsafe { (hptr.allocator.allocate)(hptr.allocator.state, size) };
+        let mem = unsafe { (hptr.allocator.allocate)(hptr.allocator.state, hptr.layout) };
         if mem.is_null() {
             return NSTDOptional::None;
         }
@@ -183,7 +199,7 @@ pub fn nstd_heap_ptr_clone<'a>(hptr: &NSTDHeapPtr<'a>) -> NSTDOptionalHeapPtr<'a
         NSTDOptional::Some(NSTDHeapPtr {
             allocator: hptr.allocator,
             ptr: mem,
-            size,
+            layout: hptr.layout,
         })
     }
 }
@@ -218,20 +234,22 @@ pub const fn nstd_heap_ptr_allocator<'a>(hptr: &NSTDHeapPtr<'a>) -> &'a NSTDAllo
 /// ```
 /// use nstd_sys::{
 ///     alloc::NSTD_ALLOCATOR,
+///     core::alloc::nstd_core_alloc_layout_new,
 ///     heap_ptr::{nstd_heap_ptr_new_zeroed, nstd_heap_ptr_size},
 /// };
 ///
-/// const SIZE: usize = core::mem::size_of::<i32>();
-///
 /// unsafe {
-///     let hptr = nstd_heap_ptr_new_zeroed(&NSTD_ALLOCATOR, SIZE).unwrap();
-///     assert!(nstd_heap_ptr_size(&hptr) == SIZE);
+///     let size = core::mem::size_of::<i32>();
+///     let align = core::mem::align_of::<i32>();
+///     let layout = nstd_core_alloc_layout_new(size, align).unwrap();
+///     let hptr = nstd_heap_ptr_new_zeroed(&NSTD_ALLOCATOR, layout).unwrap();
+///     assert!(nstd_heap_ptr_size(&hptr) == size);
 /// }
 /// ```
 #[inline]
 #[nstdapi]
 pub const fn nstd_heap_ptr_size(hptr: &NSTDHeapPtr<'_>) -> NSTDUInt {
-    hptr.size
+    nstd_core_alloc_layout_size(hptr.layout)
 }
 
 /// Returns an immutable raw pointer to the object on the heap.
@@ -254,14 +272,16 @@ pub const fn nstd_heap_ptr_size(hptr: &NSTDHeapPtr<'_>) -> NSTDUInt {
 /// use core::ptr::addr_of;
 /// use nstd_sys::{
 ///     alloc::NSTD_ALLOCATOR,
+///     core::alloc::nstd_core_alloc_layout_new,
 ///     heap_ptr::{nstd_heap_ptr_get, nstd_heap_ptr_new},
 /// };
 ///
-/// const SIZE: usize = core::mem::size_of::<i128>();
-///
 /// unsafe {
 ///     let v = -46923i128;
-///     let hptr = nstd_heap_ptr_new(&NSTD_ALLOCATOR, SIZE, addr_of!(v).cast()).unwrap();
+///     let size = core::mem::size_of::<i128>();
+///     let align = core::mem::align_of::<i128>();
+///     let layout = nstd_core_alloc_layout_new(size, align).unwrap();
+///     let hptr = nstd_heap_ptr_new(&NSTD_ALLOCATOR, layout, addr_of!(v).cast()).unwrap();
 ///     assert!(*nstd_heap_ptr_get(&hptr).cast::<i128>() == v);
 /// }
 /// ```
@@ -291,14 +311,16 @@ pub const fn nstd_heap_ptr_get(hptr: &NSTDHeapPtr<'_>) -> NSTDAny {
 /// use core::ptr::addr_of;
 /// use nstd_sys::{
 ///     alloc::NSTD_ALLOCATOR,
+///     core::alloc::nstd_core_alloc_layout_new,
 ///     heap_ptr::{nstd_heap_ptr_get_mut, nstd_heap_ptr_new},
 /// };
 ///
-/// const SIZE: usize = core::mem::size_of::<i128>();
-///
 /// unsafe {
 ///     let v = 32964i128;
-///     let mut hptr = nstd_heap_ptr_new(&NSTD_ALLOCATOR, SIZE, addr_of!(v).cast()).unwrap();
+///     let size = core::mem::size_of::<i128>();
+///     let align = core::mem::align_of::<i128>();
+///     let layout = nstd_core_alloc_layout_new(size, align).unwrap();
+///     let mut hptr = nstd_heap_ptr_new(&NSTD_ALLOCATOR, layout, addr_of!(v).cast()).unwrap();
 ///     let hv = nstd_heap_ptr_get_mut(&mut hptr).cast::<i128>();
 ///     assert!(*hv == v);
 ///     *hv = -46923;

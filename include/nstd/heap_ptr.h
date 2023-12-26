@@ -1,6 +1,7 @@
 #ifndef NSTD_HEAP_PTR_H
 #define NSTD_HEAP_PTR_H
 #include "alloc.h"
+#include "core/alloc.h"
 #include "core/optional.h"
 #include "nstd.h"
 
@@ -10,8 +11,8 @@ typedef struct {
     const NSTDAllocator *allocator;
     /// A raw pointer to the value on the heap.
     NSTDAnyMut ptr;
-    /// The size of the object in bytes.
-    NSTDUInt size;
+    /// The heap object's memory layout.
+    NSTDAllocLayout layout;
 } NSTDHeapPtr;
 
 /// Represents an optional value of type `NSTDHeapPtr`.
@@ -23,7 +24,7 @@ NSTDOptional(NSTDHeapPtr) NSTDOptionalHeapPtr;
 ///
 /// - `const NSTDAllocator *allocator` - The memory allocator.
 ///
-/// - `NSTDUInt element_size` - The size (in bytes) of the heap object.
+/// - `NSTDAllocLayout layout` - The heap object's memory layout.
 ///
 /// - `NSTDAny init` - A pointer to the object to initialize the heap object with.
 ///
@@ -34,9 +35,9 @@ NSTDOptional(NSTDHeapPtr) NSTDOptionalHeapPtr;
 ///
 /// # Safety
 ///
-/// `init` must be a pointer to a value that is valid for reads of `element_size` bytes.
+/// `init` must be a pointer to a value that is valid for reads based on `layout`.
 NSTDAPI NSTDOptionalHeapPtr
-nstd_heap_ptr_new(const NSTDAllocator *allocator, NSTDUInt element_size, NSTDAny init);
+nstd_heap_ptr_new(const NSTDAllocator *allocator, NSTDAllocLayout layout, NSTDAny init);
 
 /// Creates a new zero-initialized heap allocated object.
 ///
@@ -44,7 +45,7 @@ nstd_heap_ptr_new(const NSTDAllocator *allocator, NSTDUInt element_size, NSTDAny
 ///
 /// - `const NSTDAllocator *allocator` - The memory allocator.
 ///
-/// - `NSTDUInt element_size` - The size (in bytes) of the heap object.
+/// - `NSTDAllocLayout layout` - The heap object's memory layout.
 ///
 /// # Returns
 ///
@@ -56,7 +57,7 @@ nstd_heap_ptr_new(const NSTDAllocator *allocator, NSTDUInt element_size, NSTDAny
 /// The data to be stored in the heap pointer must be safely representable by an all-zero byte
 /// pattern.
 NSTDAPI NSTDOptionalHeapPtr
-nstd_heap_ptr_new_zeroed(const NSTDAllocator *allocator, NSTDUInt element_size);
+nstd_heap_ptr_new_zeroed(const NSTDAllocator *allocator, NSTDAllocLayout layout);
 
 /// Creates a clone of a heap allocated object.
 ///

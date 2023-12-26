@@ -1,14 +1,18 @@
 //! Low level memory allocation for Windows.
 pub mod heap;
-use crate::{NSTDAnyMut, NSTDUInt, NSTD_INT_MAX, NSTD_NULL};
-use nstdapi::nstdapi;
-use windows_sys::Win32::System::Memory::{
-    GetProcessHeap, HeapAlloc, HeapFree, HeapReAlloc, HEAP_ZERO_MEMORY,
+use crate::{
+    core::{
+        alloc::{nstd_core_alloc_layout_align, nstd_core_alloc_layout_size, NSTDAllocLayout},
+        mem::{nstd_core_mem_copy, nstd_core_mem_zero},
+    },
+    NSTDAnyMut,
 };
+use libc::{aligned_free, aligned_malloc};
+use nstdapi::nstdapi;
 
 /// Describes an error returned from allocation functions for Windows.
 #[nstdapi]
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 #[allow(non_camel_case_types)]
 pub enum NSTDWindowsAllocError {
     /// No error occurred.
@@ -29,7 +33,7 @@ pub enum NSTDWindowsAllocError {
 ///
 /// # Parameters:
 ///
-/// - `NSTDUInt size` - The number of bytes to allocate.
+/// - `NSTDAllocLayout layout` - Describes the memory layout to allocate for.
 ///
 /// # Returns
 ///
@@ -37,48 +41,48 @@ pub enum NSTDWindowsAllocError {
 ///
 /// # Safety
 ///
-/// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapalloc>.
+/// - Behavior is undefined if `layout`'s size is zero.
+///
+/// - The new memory buffer should be considered uninitialized.
 ///
 /// # Example
 ///
 /// ```
 /// use nstd_sys::{
-///     core::mem::nstd_core_mem_zero,
+///     core::{alloc::nstd_core_alloc_layout_new, mem::nstd_core_mem_zero},
 ///     os::windows::alloc::{
 ///         nstd_os_windows_alloc_allocate, nstd_os_windows_alloc_deallocate,
 ///         NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_NONE,
 ///     },
 /// };
 ///
-/// const SIZE: usize = core::mem::size_of::<[u32; 5]>();
 ///
 /// unsafe {
-///     let mut buf = nstd_os_windows_alloc_allocate(SIZE);
+///     let size = core::mem::size_of::<[u32; 5]>();
+///     let align = core::mem::align_of::<[u32; 5]>();
+///     let layout = nstd_core_alloc_layout_new(size, align).unwrap();
+///     let buf = nstd_os_windows_alloc_allocate(layout);
 ///     assert!(!buf.is_null());
 ///
-///     nstd_core_mem_zero(buf.cast(), SIZE);
+///     nstd_core_mem_zero(buf.cast(), size);
 ///     assert!(*buf.cast::<[u32; 5]>() == [0u32; 5]);
 ///
-///     assert!(nstd_os_windows_alloc_deallocate(&mut buf) == NSTD_WINDOWS_ALLOC_ERROR_NONE);
+///     nstd_os_windows_alloc_deallocate(buf);
 /// }
 /// ```
 #[inline]
 #[nstdapi]
-pub unsafe fn nstd_os_windows_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
-    if size <= NSTD_INT_MAX {
-        let heap = GetProcessHeap();
-        if heap != 0 {
-            return HeapAlloc(heap, 0, size);
-        }
-    }
-    NSTD_NULL
+pub unsafe fn nstd_os_windows_alloc_allocate(layout: NSTDAllocLayout) -> NSTDAnyMut {
+    let size = nstd_core_alloc_layout_size(layout);
+    let align = nstd_core_alloc_layout_align(layout);
+    aligned_malloc(size, align)
 }
 
 /// Allocates a new block of zero-initialized memory on the current process' heap.
 ///
 /// # Parameters:
 ///
-/// - `NSTDUInt size` - The number of bytes to allocate.
+/// - `NSTDAllocLayout layout` - Describes the memory layout to allocate for.
 ///
 /// # Returns
 ///
@@ -86,49 +90,50 @@ pub unsafe fn nstd_os_windows_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
 ///
 /// # Safety
 ///
-/// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapalloc>.
+/// Behavior is undefined if `layout`'s size is zero.
 ///
 /// # Example
 ///
 /// ```
-/// use nstd_sys::os::windows::alloc::{
-///     nstd_os_windows_alloc_allocate_zeroed, nstd_os_windows_alloc_deallocate,
-///     NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_NONE,
+/// use nstd_sys::{
+///     core::alloc::nstd_core_alloc_layout_new,
+///     os::windows::alloc::{
+///         nstd_os_windows_alloc_allocate_zeroed, nstd_os_windows_alloc_deallocate,
+///         NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_NONE,
+///     },
 /// };
 ///
-/// const SIZE: usize = core::mem::size_of::<[i64; 5]>();
 ///
 /// unsafe {
-///     let mut buf = nstd_os_windows_alloc_allocate_zeroed(SIZE);
+///     let size = core::mem::size_of::<[i64; 5]>();
+///     let align = core::mem::align_of::<[i64; 5]>();
+///     let layout = nstd_core_alloc_layout_new(size, align).unwrap();
+///     let buf = nstd_os_windows_alloc_allocate_zeroed(layout);
 ///     assert!(!buf.is_null());
 ///     assert!(*buf.cast::<[i64; 5]>() == [0i64; 5]);
-///     assert!(nstd_os_windows_alloc_deallocate(&mut buf) == NSTD_WINDOWS_ALLOC_ERROR_NONE);
+///     nstd_os_windows_alloc_deallocate(buf);
 /// }
 /// ```
 #[inline]
 #[nstdapi]
-pub unsafe fn nstd_os_windows_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMut {
-    if size <= NSTD_INT_MAX {
-        let heap = GetProcessHeap();
-        if heap != 0 {
-            return HeapAlloc(heap, HEAP_ZERO_MEMORY, size);
-        }
+pub unsafe fn nstd_os_windows_alloc_allocate_zeroed(layout: NSTDAllocLayout) -> NSTDAnyMut {
+    let ptr = nstd_os_windows_alloc_allocate(layout);
+    if !ptr.is_null() {
+        nstd_core_mem_zero(ptr.cast(), nstd_core_alloc_layout_size(layout));
     }
-    NSTD_NULL
+    ptr
 }
 
 /// Reallocates a block of memory previously allocated by
 /// `nstd_os_windows_alloc_allocate[_zeroed]`.
 ///
-/// If everything goes right, the pointer will point to the new memory location and 0 will be
-/// returned. If this is not the case and allocation fails, the pointer will remain untouched and a
-/// value of nonzero is returned.
-///
 /// # Parameters:
 ///
 /// - `NSTDAnyMut *ptr` - A pointer to the allocated memory.
 ///
-/// - `NSTDUInt new_size` - The number of bytes to reallocate.
+/// - `NSTDAllocLayout old_layout` - Describes the previous memory layout.
+///
+/// - `NSTDAllocLayout new_layout` - Describes the new memory layout to allocate for.
 ///
 /// # Returns
 ///
@@ -136,49 +141,54 @@ pub unsafe fn nstd_os_windows_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMu
 ///
 /// # Safety
 ///
-/// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heaprealloc>.
+/// - Behavior is undefined if `new_layout`'s size is zero.
+///
+/// - `ptr` must point to memory previously allocated with `old_layout`.
 ///
 /// # Example
 ///
 /// ```
-/// use nstd_sys::os::windows::alloc::{
-///     nstd_os_windows_alloc_allocate_zeroed, nstd_os_windows_alloc_deallocate,
-///     nstd_os_windows_alloc_reallocate, NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_NONE,
+/// use nstd_sys::{
+///     core::alloc::nstd_core_alloc_layout_new,
+///     os::windows::alloc::{
+///         nstd_os_windows_alloc_allocate_zeroed, nstd_os_windows_alloc_deallocate,
+///         nstd_os_windows_alloc_reallocate, NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_NONE,
+///     },
 /// };
 ///
-/// const SIZE: usize = core::mem::size_of::<[i16; 10]>();
 ///
 /// unsafe {
-///     let mut buf = nstd_os_windows_alloc_allocate_zeroed(SIZE);
-///     assert!(!buf.is_null());
-///     assert!(*buf.cast::<[i16; 10]>() == [0i16; 10]);
-///
-///     let mut errc = nstd_os_windows_alloc_reallocate(&mut buf, SIZE / 2);
+///     let mut size = core::mem::size_of::<i128>();
+///     let mut align = core::mem::align_of::<i128>();
+///     let layout = nstd_core_alloc_layout_new(size, align).unwrap();
+///     let mut mem = nstd_os_windows_alloc_allocate_zeroed(layout);
+///     assert!(!mem.is_null());
+///     size = core::mem::size_of::<i64>();
+///     align = core::mem::align_of::<i64>();
+///     let new_layout = nstd_core_alloc_layout_new(size, align).unwrap();
+///     let errc = nstd_os_windows_alloc_reallocate(&mut mem, layout, new_layout);
 ///     assert!(errc == NSTD_WINDOWS_ALLOC_ERROR_NONE);
-///     assert!(*buf.cast::<[i16; 5]>() == [0i16; 5]);
-///
-///     errc = nstd_os_windows_alloc_deallocate(&mut buf);
-///     assert!(errc == NSTD_WINDOWS_ALLOC_ERROR_NONE);
+///     assert!(*mem.cast::<i64>() == 0);
+///     nstd_os_windows_alloc_deallocate(mem);
 /// }
 /// ```
+#[inline]
 #[nstdapi]
 pub unsafe fn nstd_os_windows_alloc_reallocate(
     ptr: &mut NSTDAnyMut,
-    new_size: NSTDUInt,
+    old_layout: NSTDAllocLayout,
+    new_layout: NSTDAllocLayout,
 ) -> NSTDWindowsAllocError {
-    if new_size > NSTD_INT_MAX {
-        return NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_INVALID_LAYOUT;
+    let new_mem = nstd_os_windows_alloc_allocate(new_layout);
+    if new_mem.is_null() {
+        return NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_OUT_OF_MEMORY;
     }
-    match GetProcessHeap() {
-        0 => NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_HEAP_NOT_FOUND,
-        heap => match HeapReAlloc(heap, 0, *ptr, new_size) {
-            NSTD_NULL => NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_OUT_OF_MEMORY,
-            new_mem => {
-                *ptr = new_mem;
-                NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_NONE
-            }
-        },
-    }
+    let old_size = nstd_core_alloc_layout_size(old_layout);
+    let new_size = nstd_core_alloc_layout_size(new_layout);
+    nstd_core_mem_copy(new_mem.cast(), (*ptr).cast(), old_size.min(new_size));
+    nstd_os_windows_alloc_deallocate(*ptr);
+    *ptr = new_mem;
+    NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_NONE
 }
 
 /// Deallocates a block of memory previously allocated by
@@ -186,41 +196,35 @@ pub unsafe fn nstd_os_windows_alloc_reallocate(
 ///
 /// # Parameters:
 ///
-/// - `NSTDAnyMut *ptr` - A pointer to the allocated memory.
-///
-/// # Returns
-///
-/// `NSTDWindowsAllocError errc` - The allocation operation error code.
+/// - `NSTDAnyMut ptr` - A pointer to the allocated memory.
 ///
 /// # Safety
 ///
-/// See <https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapfree>.
+/// Behavior is undefined if `ptr` does not point to memory allocated by
+/// `nstd_os_windows_alloc_allocate[_zeroed]`.
 ///
 /// # Example
 ///
 /// ```
-/// use nstd_sys::os::windows::alloc::{
-///     nstd_os_windows_alloc_allocate, nstd_os_windows_alloc_deallocate,
-///     NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_NONE,
+/// use nstd_sys::{
+///     core::alloc::nstd_core_alloc_layout_new,
+///     os::windows::alloc::{
+///         nstd_os_windows_alloc_allocate, nstd_os_windows_alloc_deallocate,
+///         NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_NONE,
+///     },
 /// };
 ///
 /// unsafe {
-///     let mut buf = nstd_os_windows_alloc_allocate(128);
+///     let size = core::mem::size_of::<[f64; 4]>();
+///     let align = core::mem::align_of::<[f64; 4]>();
+///     let layout = nstd_core_alloc_layout_new(size, align).unwrap();
+///     let buf = nstd_os_windows_alloc_allocate(layout);
 ///     assert!(!buf.is_null());
-///     assert!(nstd_os_windows_alloc_deallocate(&mut buf) == NSTD_WINDOWS_ALLOC_ERROR_NONE);
+///     nstd_os_windows_alloc_deallocate(buf);
 /// }
 /// ```
+#[inline]
 #[nstdapi]
-pub unsafe fn nstd_os_windows_alloc_deallocate(ptr: &mut NSTDAnyMut) -> NSTDWindowsAllocError {
-    match GetProcessHeap() {
-        0 => NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_HEAP_NOT_FOUND,
-        heap => {
-            if HeapFree(heap, 0, *ptr) == 0 {
-                NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_MEMORY_NOT_FOUND
-            } else {
-                *ptr = NSTD_NULL;
-                NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_NONE
-            }
-        }
-    }
+pub unsafe fn nstd_os_windows_alloc_deallocate(ptr: NSTDAnyMut) {
+    aligned_free(ptr);
 }

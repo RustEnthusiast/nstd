@@ -84,7 +84,7 @@ pub fn nstd_cstring_new_with_cap(
     allocator: &NSTDAllocator,
     cap: NSTDUInt,
 ) -> NSTDOptionalCString<'_> {
-    if let NSTDOptional::Some(mut bytes) = nstd_vec_new_with_cap(allocator, 1, cap) {
+    if let NSTDOptional::Some(mut bytes) = nstd_vec_new_with_cap(allocator, 1, 1, cap) {
         let nul: NSTDChar = 0;
         // SAFETY: `nul` is stored on the stack.
         if unsafe { nstd_vec_push(&mut bytes, addr_of!(nul).cast()) } == NSTD_ALLOC_ERROR_NONE {
@@ -162,7 +162,7 @@ pub unsafe fn nstd_cstring_from_cstr_unchecked<'a>(
     cstr: &NSTDCStr,
 ) -> NSTDOptionalCString<'a> {
     let bytes = nstd_core_cstr_as_bytes(cstr);
-    if let NSTDOptional::Some(mut bytes) = nstd_vec_from_slice(allocator, &bytes) {
+    if let NSTDOptional::Some(mut bytes) = nstd_vec_from_slice(allocator, &bytes, 1) {
         let null: NSTDChar = 0;
         let null = addr_of!(null).cast();
         if nstd_vec_push(&mut bytes, null) == NSTD_ALLOC_ERROR_NONE {

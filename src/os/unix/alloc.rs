@@ -1,6 +1,12 @@
 //! Memory allocation for Unix-like systems.
-use crate::{NSTDAnyMut, NSTDUInt, NSTD_INT_MAX, NSTD_NULL};
-use libc::{calloc, free, malloc, realloc};
+use crate::{
+    core::{
+        alloc::{nstd_core_alloc_layout_align, nstd_core_alloc_layout_size, NSTDAllocLayout},
+        mem::{nstd_core_mem_copy, nstd_core_mem_zero},
+    },
+    NSTDAnyMut, NSTD_NULL,
+};
+use libc::{free, posix_memalign};
 use nstdapi::nstdapi;
 
 /// Describes an error returned from an `nstd.os.unix.alloc` function.
@@ -12,15 +18,13 @@ pub enum NSTDUnixAllocError {
     NSTD_UNIX_ALLOC_ERROR_NONE,
     /// Allocating or reallocating failed.
     NSTD_UNIX_ALLOC_ERROR_OUT_OF_MEMORY,
-    /// An allocation function received input parameters that resulted in an invalid memory layout.
-    NSTD_UNIX_ALLOC_ERROR_INVALID_LAYOUT,
 }
 
 /// Allocates a block of memory on the heap, returning a pointer to it.
 ///
 /// # Parameters:
 ///
-/// - `NSTDUInt size` - The number of bytes to allocate for the new block of memory.
+/// - `NSTDAllocLayout layout` - Describes the memory layout to allocate for.
 ///
 /// # Returns
 ///
@@ -28,33 +32,42 @@ pub enum NSTDUnixAllocError {
 ///
 /// # Safety
 ///
-/// See <https://man7.org/linux/man-pages/man3/malloc.3.html>.
+/// - Behavior is undefined if `layout`'s size is zero.
+///
+/// - The new memory buffer should be considered uninitialized.
 ///
 /// # Example
 ///
 /// ```
-/// use nstd_sys::os::unix::alloc::{nstd_os_unix_alloc_allocate, nstd_os_unix_alloc_deallocate};
+/// use nstd_sys::{
+///     core::alloc::nstd_core_alloc_layout_new,
+///     os::unix::alloc::{nstd_os_unix_alloc_allocate, nstd_os_unix_alloc_deallocate},
+/// };
 ///
 /// unsafe {
-///     let mut mem = nstd_os_unix_alloc_allocate(24);
+///     let size = core::mem::size_of::<u128>();
+///     let align = core::mem::align_of::<u128>();
+///     let layout = nstd_core_alloc_layout_new(size, align).unwrap();
+///     let mem = nstd_os_unix_alloc_allocate(layout);
 ///     assert!(!mem.is_null());
-///     nstd_os_unix_alloc_deallocate(&mut mem);
+///     nstd_os_unix_alloc_deallocate(mem);
 /// }
 /// ```
 #[inline]
 #[nstdapi]
-pub unsafe fn nstd_os_unix_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
-    match size <= NSTD_INT_MAX {
-        true => malloc(size),
-        false => NSTD_NULL,
-    }
+pub unsafe fn nstd_os_unix_alloc_allocate(layout: NSTDAllocLayout) -> NSTDAnyMut {
+    let size = nstd_core_alloc_layout_size(layout);
+    let align = nstd_core_alloc_layout_align(layout).max(core::mem::size_of::<NSTDAnyMut>());
+    let mut ptr = NSTD_NULL;
+    posix_memalign(&mut ptr, align, size);
+    ptr
 }
 
 /// Allocates a block of zero initialized memory on the heap, returning a pointer to it.
 ///
 /// # Parameters:
 ///
-/// - `NSTDUInt size` - The number of bytes to allocate for the new block of memory.
+/// - `NSTDAllocLayout layout` - Describes the memory layout to allocate for.
 ///
 /// # Returns
 ///
@@ -62,31 +75,34 @@ pub unsafe fn nstd_os_unix_alloc_allocate(size: NSTDUInt) -> NSTDAnyMut {
 ///
 /// # Safety
 ///
-/// See <https://man7.org/linux/man-pages/man3/calloc.3p.html>.
+/// Behavior is undefined if `layout`'s size is zero.
 ///
 /// # Example
 ///
 /// ```
-/// use nstd_sys::os::unix::alloc::{
-///     nstd_os_unix_alloc_allocate_zeroed, nstd_os_unix_alloc_deallocate,
+/// use nstd_sys::{
+///     core::alloc::nstd_core_alloc_layout_new,
+///     os::unix::alloc::{nstd_os_unix_alloc_allocate_zeroed, nstd_os_unix_alloc_deallocate},
 /// };
 ///
-/// const SIZE: usize = core::mem::size_of::<isize>();
-///
 /// unsafe {
-///     let mut mem = nstd_os_unix_alloc_allocate_zeroed(SIZE);
+///     let size = core::mem::size_of::<isize>();
+///     let align = core::mem::align_of::<isize>();
+///     let layout = nstd_core_alloc_layout_new(size, align).unwrap();
+///     let mem = nstd_os_unix_alloc_allocate_zeroed(layout);
 ///     assert!(!mem.is_null());
 ///     assert!(*mem.cast::<isize>() == 0);
-///     nstd_os_unix_alloc_deallocate(&mut mem);
+///     nstd_os_unix_alloc_deallocate(mem);
 /// }
 /// ```
 #[inline]
 #[nstdapi]
-pub unsafe fn nstd_os_unix_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMut {
-    match size <= NSTD_INT_MAX {
-        true => calloc(size, 1),
-        false => NSTD_NULL,
+pub unsafe fn nstd_os_unix_alloc_allocate_zeroed(layout: NSTDAllocLayout) -> NSTDAnyMut {
+    let ptr = nstd_os_unix_alloc_allocate(layout);
+    if !ptr.is_null() {
+        nstd_core_mem_zero(ptr.cast(), nstd_core_alloc_layout_size(layout));
     }
+    ptr
 }
 
 /// Reallocates a block of memory previously allocated by `nstd_os_unix_alloc_allocate[_zeroed]`.
@@ -95,7 +111,9 @@ pub unsafe fn nstd_os_unix_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMut {
 ///
 /// - `NSTDAnyMut *ptr` - A pointer to the block of memory to reallocate.
 ///
-/// - `NSTDUInt new_size` - The new size of the memory block.
+/// - `NSTDAllocLayout old_layout` - Describes the previous memory layout.
+///
+/// - `NSTDAllocLayout new_layout` - Describes the new memory layout to allocate for.
 ///
 /// # Returns
 ///
@@ -103,40 +121,52 @@ pub unsafe fn nstd_os_unix_alloc_allocate_zeroed(size: NSTDUInt) -> NSTDAnyMut {
 ///
 /// # Safety
 ///
-/// See <https://man7.org/linux/man-pages/man3/realloc.3p.html>.
+/// - Behavior is undefined if `new_layout`'s size is zero.
+///
+/// - `ptr` must point to memory previously allocated with `old_layout`.
 ///
 /// # Example
 ///
 /// ```
-/// use nstd_sys::os::unix::alloc::{
-///     nstd_os_unix_alloc_allocate_zeroed, nstd_os_unix_alloc_deallocate,
-///     nstd_os_unix_alloc_reallocate, NSTDUnixAllocError::NSTD_UNIX_ALLOC_ERROR_NONE,
+/// use nstd_sys::{
+///     core::alloc::nstd_core_alloc_layout_new,
+///     os::unix::alloc::{
+///         nstd_os_unix_alloc_allocate_zeroed, nstd_os_unix_alloc_deallocate,
+///         nstd_os_unix_alloc_reallocate, NSTDUnixAllocError::NSTD_UNIX_ALLOC_ERROR_NONE,
+///     },
 /// };
 ///
-/// const SIZE: usize = core::mem::size_of::<u64>();
-/// const NEW_SIZE: usize = core::mem::size_of::<u32>();
 ///
 /// unsafe {
-///     let mut mem = nstd_os_unix_alloc_allocate_zeroed(SIZE);
+///     let mut size = core::mem::size_of::<u64>();
+///     let mut align = core::mem::align_of::<u64>();
+///     let layout = nstd_core_alloc_layout_new(size, align).unwrap();
+///     let mut mem = nstd_os_unix_alloc_allocate_zeroed(layout);
 ///     assert!(!mem.is_null());
-///     let errc = nstd_os_unix_alloc_reallocate(&mut mem, NEW_SIZE);
+///     size = core::mem::size_of::<u32>();
+///     align = core::mem::align_of::<u32>();
+///     let new_layout = nstd_core_alloc_layout_new(size, align).unwrap();
+///     let errc = nstd_os_unix_alloc_reallocate(&mut mem, layout, new_layout);
 ///     assert!(errc == NSTD_UNIX_ALLOC_ERROR_NONE);
 ///     assert!(*mem.cast::<u32>() == 0);
-///     nstd_os_unix_alloc_deallocate(&mut mem);
+///     nstd_os_unix_alloc_deallocate(mem);
 /// }
 /// ```
+#[inline]
 #[nstdapi]
 pub unsafe fn nstd_os_unix_alloc_reallocate(
     ptr: &mut NSTDAnyMut,
-    new_size: NSTDUInt,
+    old_layout: NSTDAllocLayout,
+    new_layout: NSTDAllocLayout,
 ) -> NSTDUnixAllocError {
-    if new_size > NSTD_INT_MAX {
-        return NSTDUnixAllocError::NSTD_UNIX_ALLOC_ERROR_INVALID_LAYOUT;
-    }
-    let new_mem = realloc(*ptr, new_size);
+    let new_mem = nstd_os_unix_alloc_allocate(new_layout);
     if new_mem.is_null() {
         return NSTDUnixAllocError::NSTD_UNIX_ALLOC_ERROR_OUT_OF_MEMORY;
     }
+    let old_size = nstd_core_alloc_layout_size(old_layout);
+    let new_size = nstd_core_alloc_layout_size(new_layout);
+    nstd_core_mem_copy(new_mem.cast(), (*ptr).cast(), old_size.min(new_size));
+    nstd_os_unix_alloc_deallocate(*ptr);
     *ptr = new_mem;
     NSTDUnixAllocError::NSTD_UNIX_ALLOC_ERROR_NONE
 }
@@ -145,26 +175,32 @@ pub unsafe fn nstd_os_unix_alloc_reallocate(
 ///
 /// # Parameters:
 ///
-/// - `NSTDAnyMut *ptr` - A pointer to the block of memory to free.
+/// - `NSTDAnyMut ptr` - A pointer to the block of memory to free.
 ///
 /// # Safety
 ///
-/// See <https://man7.org/linux/man-pages/man3/free.3p.html>.
+/// Behavior is undefined if `ptr` does not point to memory allocated by
+/// `nstd_os_unix_alloc_allocate[_zeroed]`.
 ///
 /// # Example
 ///
 /// ```
-/// use nstd_sys::os::unix::alloc::{nstd_os_unix_alloc_allocate, nstd_os_unix_alloc_deallocate};
+/// use nstd_sys::{
+///     core::alloc::nstd_core_alloc_layout_new,
+///     os::unix::alloc::{nstd_os_unix_alloc_allocate, nstd_os_unix_alloc_deallocate},
+/// };
 ///
 /// unsafe {
-///     let mut mem = nstd_os_unix_alloc_allocate(32);
+///     let size = core::mem::size_of::<[i16; 8]>();
+///     let align = core::mem::align_of::<[i16; 8]>();
+///     let layout = nstd_core_alloc_layout_new(size, align).unwrap();
+///     let mem = nstd_os_unix_alloc_allocate(layout);
 ///     assert!(!mem.is_null());
-///     nstd_os_unix_alloc_deallocate(&mut mem);
+///     nstd_os_unix_alloc_deallocate(mem);
 /// }
 /// ```
 #[inline]
 #[nstdapi]
-pub unsafe fn nstd_os_unix_alloc_deallocate(ptr: &mut NSTDAnyMut) {
-    free(*ptr);
-    *ptr = NSTD_NULL;
+pub unsafe fn nstd_os_unix_alloc_deallocate(ptr: NSTDAnyMut) {
+    free(ptr);
 }
