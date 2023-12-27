@@ -1,9 +1,9 @@
 //! A pointer type for single value heap allocation.
 use crate::{
-    alloc::NSTDAllocator,
     core::{
         alloc::{
             nstd_core_alloc_layout_new_unchecked, nstd_core_alloc_layout_size, NSTDAllocLayout,
+            NSTDAllocator,
         },
         mem::nstd_core_mem_copy,
         optional::NSTDOptional,

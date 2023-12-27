@@ -2,32 +2,16 @@
 pub mod heap;
 use crate::{
     core::{
-        alloc::{nstd_core_alloc_layout_align, nstd_core_alloc_layout_size, NSTDAllocLayout},
+        alloc::{
+            nstd_core_alloc_layout_align, nstd_core_alloc_layout_size, NSTDAllocError,
+            NSTDAllocLayout,
+        },
         mem::{nstd_core_mem_copy, nstd_core_mem_zero},
     },
     NSTDAnyMut,
 };
 use libc::{aligned_free, aligned_malloc};
 use nstdapi::nstdapi;
-
-/// Describes an error returned from allocation functions for Windows.
-#[nstdapi]
-#[derive(Clone, Copy, PartialEq, Eq)]
-#[allow(non_camel_case_types)]
-pub enum NSTDWindowsAllocError {
-    /// No error occurred.
-    NSTD_WINDOWS_ALLOC_ERROR_NONE,
-    /// Allocating or reallocating failed.
-    NSTD_WINDOWS_ALLOC_ERROR_OUT_OF_MEMORY,
-    /// Deallocating memory failed.
-    NSTD_WINDOWS_ALLOC_ERROR_MEMORY_NOT_FOUND,
-    /// Getting a handle to a heap failed.
-    NSTD_WINDOWS_ALLOC_ERROR_HEAP_NOT_FOUND,
-    /// A heap is invalid.
-    NSTD_WINDOWS_ALLOC_ERROR_INVALID_HEAP,
-    /// An allocation function received input parameters that resulted in an invalid memory layout.
-    NSTD_WINDOWS_ALLOC_ERROR_INVALID_LAYOUT,
-}
 
 /// Allocates a new block of memory on the current process' heap.
 ///
@@ -50,10 +34,7 @@ pub enum NSTDWindowsAllocError {
 /// ```
 /// use nstd_sys::{
 ///     core::{alloc::nstd_core_alloc_layout_new, mem::nstd_core_mem_zero},
-///     os::windows::alloc::{
-///         nstd_os_windows_alloc_allocate, nstd_os_windows_alloc_deallocate,
-///         NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_NONE,
-///     },
+///     os::windows::alloc::{nstd_os_windows_alloc_allocate, nstd_os_windows_alloc_deallocate},
 /// };
 ///
 ///
@@ -99,7 +80,6 @@ pub unsafe fn nstd_os_windows_alloc_allocate(layout: NSTDAllocLayout) -> NSTDAny
 ///     core::alloc::nstd_core_alloc_layout_new,
 ///     os::windows::alloc::{
 ///         nstd_os_windows_alloc_allocate_zeroed, nstd_os_windows_alloc_deallocate,
-///         NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_NONE,
 ///     },
 /// };
 ///
@@ -137,7 +117,7 @@ pub unsafe fn nstd_os_windows_alloc_allocate_zeroed(layout: NSTDAllocLayout) -> 
 ///
 /// # Returns
 ///
-/// `NSTDWindowsAllocError errc` - The allocation operation error code.
+/// `NSTDAllocError errc` - The allocation operation error code.
 ///
 /// # Safety
 ///
@@ -149,10 +129,10 @@ pub unsafe fn nstd_os_windows_alloc_allocate_zeroed(layout: NSTDAllocLayout) -> 
 ///
 /// ```
 /// use nstd_sys::{
-///     core::alloc::nstd_core_alloc_layout_new,
+///     core::alloc::{nstd_core_alloc_layout_new, NSTDAllocError::NSTD_ALLOC_ERROR_NONE},
 ///     os::windows::alloc::{
 ///         nstd_os_windows_alloc_allocate_zeroed, nstd_os_windows_alloc_deallocate,
-///         nstd_os_windows_alloc_reallocate, NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_NONE,
+///         nstd_os_windows_alloc_reallocate,
 ///     },
 /// };
 ///
@@ -167,7 +147,7 @@ pub unsafe fn nstd_os_windows_alloc_allocate_zeroed(layout: NSTDAllocLayout) -> 
 ///     align = core::mem::align_of::<i64>();
 ///     let new_layout = nstd_core_alloc_layout_new(size, align).unwrap();
 ///     let errc = nstd_os_windows_alloc_reallocate(&mut mem, layout, new_layout);
-///     assert!(errc == NSTD_WINDOWS_ALLOC_ERROR_NONE);
+///     assert!(errc == NSTD_ALLOC_ERROR_NONE);
 ///     assert!(*mem.cast::<i64>() == 0);
 ///     nstd_os_windows_alloc_deallocate(mem);
 /// }
@@ -178,17 +158,17 @@ pub unsafe fn nstd_os_windows_alloc_reallocate(
     ptr: &mut NSTDAnyMut,
     old_layout: NSTDAllocLayout,
     new_layout: NSTDAllocLayout,
-) -> NSTDWindowsAllocError {
+) -> NSTDAllocError {
     let new_mem = nstd_os_windows_alloc_allocate(new_layout);
     if new_mem.is_null() {
-        return NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_OUT_OF_MEMORY;
+        return NSTDAllocError::NSTD_ALLOC_ERROR_OUT_OF_MEMORY;
     }
     let old_size = nstd_core_alloc_layout_size(old_layout);
     let new_size = nstd_core_alloc_layout_size(new_layout);
     nstd_core_mem_copy(new_mem.cast(), (*ptr).cast(), old_size.min(new_size));
     nstd_os_windows_alloc_deallocate(*ptr);
     *ptr = new_mem;
-    NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_NONE
+    NSTDAllocError::NSTD_ALLOC_ERROR_NONE
 }
 
 /// Deallocates a block of memory previously allocated by
@@ -210,7 +190,6 @@ pub unsafe fn nstd_os_windows_alloc_reallocate(
 ///     core::alloc::nstd_core_alloc_layout_new,
 ///     os::windows::alloc::{
 ///         nstd_os_windows_alloc_allocate, nstd_os_windows_alloc_deallocate,
-///         NSTDWindowsAllocError::NSTD_WINDOWS_ALLOC_ERROR_NONE,
 ///     },
 /// };
 ///

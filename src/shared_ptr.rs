@@ -1,10 +1,9 @@
 //! A reference counting smart pointer.
 use crate::{
-    alloc::NSTDAllocator,
     core::{
         alloc::{
             nstd_core_alloc_layout_align, nstd_core_alloc_layout_new, nstd_core_alloc_layout_size,
-            NSTDAllocLayout,
+            NSTDAllocLayout, NSTDAllocator,
         },
         mem::nstd_core_mem_copy,
         optional::NSTDOptional,

@@ -1,6 +1,6 @@
 #ifndef NSTD_VEC_H
 #define NSTD_VEC_H
-#include "alloc.h"
+#include "core/alloc.h"
 #include "core/def.h"
 #include "core/optional.h"
 #include "core/slice.h"

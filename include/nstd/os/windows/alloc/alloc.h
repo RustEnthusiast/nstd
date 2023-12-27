@@ -3,20 +3,6 @@
 #include "../../../core/alloc.h"
 #include "../../../nstd.h"
 
-/// Describes an error returned from allocation functions for Windows.
-typedef enum {
-    /// No error occurred.
-    NSTD_WINDOWS_ALLOC_ERROR_NONE,
-    /// Allocating or reallocating failed.
-    NSTD_WINDOWS_ALLOC_ERROR_OUT_OF_MEMORY,
-    /// Deallocating memory failed.
-    NSTD_WINDOWS_ALLOC_ERROR_MEMORY_NOT_FOUND,
-    /// Getting a handle to a heap failed.
-    NSTD_WINDOWS_ALLOC_ERROR_HEAP_NOT_FOUND,
-    /// A heap is invalid.
-    NSTD_WINDOWS_ALLOC_ERROR_INVALID_HEAP
-} NSTDWindowsAllocError;
-
 /// Allocates a new block of memory on the current process' heap.
 ///
 /// # Parameters:
@@ -62,14 +48,14 @@ NSTDAPI NSTDAnyMut nstd_os_windows_alloc_allocate_zeroed(NSTDAllocLayout layout)
 ///
 /// # Returns
 ///
-/// `NSTDWindowsAllocError errc` - The allocation operation error code.
+/// `NSTDAllocError errc` - The allocation operation error code.
 ///
 /// # Safety
 ///
 /// - Behavior is undefined if `new_layout`'s size is zero.
 ///
 /// - `ptr` must point to memory previously allocated with `old_layout`.
-NSTDAPI NSTDWindowsAllocError nstd_os_windows_alloc_reallocate(
+NSTDAPI NSTDAllocError nstd_os_windows_alloc_reallocate(
     NSTDAnyMut *ptr, NSTDAllocLayout old_layout, NSTDAllocLayout new_layout
 );
 

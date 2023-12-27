@@ -1,12 +1,13 @@
 //! A dynamically sized contiguous sequence of values.
 extern crate alloc;
 use crate::{
-    alloc::{
-        NSTDAllocError::{self, NSTD_ALLOC_ERROR_NONE},
-        NSTDAllocator, GLOBAL_ALLOCATOR, NSTD_ALLOCATOR,
-    },
+    alloc::{GLOBAL_ALLOCATOR, NSTD_ALLOCATOR},
     core::{
-        alloc::{nstd_core_alloc_layout_array, nstd_core_alloc_layout_array_unchecked},
+        alloc::{
+            nstd_core_alloc_layout_array, nstd_core_alloc_layout_array_unchecked,
+            NSTDAllocError::{self, NSTD_ALLOC_ERROR_NONE},
+            NSTDAllocator,
+        },
         def::{NSTDByte, NSTDErrorCode},
         mem::{nstd_core_mem_copy, nstd_core_mem_copy_overlapping, nstd_core_mem_dangling_mut},
         optional::NSTDOptional,
@@ -240,8 +241,11 @@ pub const fn nstd_vec_new(
 ///
 /// ```
 /// use nstd_sys::{
-///     alloc::{NSTDAllocError::NSTD_ALLOC_ERROR_NONE, NSTD_ALLOCATOR},
-///     core::slice::{nstd_core_slice_get, nstd_core_slice_new},
+///     alloc::NSTD_ALLOCATOR,
+///     core::{
+///         alloc::NSTDAllocError::NSTD_ALLOC_ERROR_NONE,
+///         slice::{nstd_core_slice_get, nstd_core_slice_new},
+///     },
 ///     vec::{nstd_vec_extend, nstd_vec_get, nstd_vec_len, nstd_vec_new_with_cap},
 /// };
 ///
@@ -978,8 +982,8 @@ pub fn nstd_vec_remove(vec: &mut NSTDVec<'_>, mut index: NSTDUInt) -> NSTDErrorC
 ///
 /// ```
 /// use nstd_sys::{
-///     alloc::{NSTDAllocError::NSTD_ALLOC_ERROR_NONE, NSTD_ALLOCATOR},
-///     core::slice::nstd_core_slice_new,
+///     alloc::NSTD_ALLOCATOR,
+///     core::{alloc::NSTDAllocError::NSTD_ALLOC_ERROR_NONE, slice::nstd_core_slice_new},
 ///     vec::{nstd_vec_extend, nstd_vec_get, nstd_vec_new},
 /// };
 ///

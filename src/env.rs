@@ -1,7 +1,10 @@
 //! Process environment management.
 use crate::{
-    alloc::{NSTDAllocError::NSTD_ALLOC_ERROR_NONE, NSTD_ALLOCATOR},
-    core::{optional::NSTDOptional, result::NSTDResult, str::NSTDStr},
+    alloc::NSTD_ALLOCATOR,
+    core::{
+        alloc::NSTDAllocError::NSTD_ALLOC_ERROR_NONE, optional::NSTDOptional, result::NSTDResult,
+        str::NSTDStr,
+    },
     io::{NSTDIOError, NSTDIOStringResult},
     string::{NSTDOptionalString, NSTDString},
     vec::{nstd_vec_new, nstd_vec_push, NSTDVec},

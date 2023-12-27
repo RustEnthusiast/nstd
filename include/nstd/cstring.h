@@ -1,6 +1,6 @@
 #ifndef NSTD_CSTRING_H
 #define NSTD_CSTRING_H
-#include "alloc.h"
+#include "core/alloc.h"
 #include "core/cstr/cstr.h"
 #include "core/optional.h"
 #include "core/slice.h"

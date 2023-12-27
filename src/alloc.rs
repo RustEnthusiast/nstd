@@ -4,17 +4,13 @@ extern crate alloc;
 use crate::os::windows::alloc::{
     nstd_os_windows_alloc_allocate, nstd_os_windows_alloc_allocate_zeroed,
     nstd_os_windows_alloc_deallocate,
-    NSTDWindowsAllocError::{
-        self, NSTD_WINDOWS_ALLOC_ERROR_HEAP_NOT_FOUND, NSTD_WINDOWS_ALLOC_ERROR_INVALID_HEAP,
-        NSTD_WINDOWS_ALLOC_ERROR_INVALID_LAYOUT, NSTD_WINDOWS_ALLOC_ERROR_MEMORY_NOT_FOUND,
-        NSTD_WINDOWS_ALLOC_ERROR_NONE, NSTD_WINDOWS_ALLOC_ERROR_OUT_OF_MEMORY,
-    },
 };
 use crate::{
     core::{
         alloc::{
             nstd_core_alloc_layout_align, nstd_core_alloc_layout_new,
-            nstd_core_alloc_layout_new_unchecked, nstd_core_alloc_layout_size, NSTDAllocLayout,
+            nstd_core_alloc_layout_new_unchecked, nstd_core_alloc_layout_size, NSTDAllocError,
+            NSTDAllocLayout, NSTDAllocator,
         },
         mem::{nstd_core_mem_copy, nstd_core_mem_dangling_mut},
         optional::NSTDOptional,
@@ -118,148 +114,6 @@ impl<T> Drop for CBox<T> {
         }
     }
 }
-
-/// Describes an error returned from allocation functions.
-#[repr(C)]
-#[derive(Clone, Copy, PartialEq, Eq)]
-#[allow(non_camel_case_types)]
-pub enum NSTDAllocError {
-    /// No error occurred.
-    NSTD_ALLOC_ERROR_NONE,
-    /// Allocating or reallocating failed.
-    NSTD_ALLOC_ERROR_OUT_OF_MEMORY,
-    /// Deallocating memory failed.
-    NSTD_ALLOC_ERROR_MEMORY_NOT_FOUND,
-    /// Getting a handle to a heap failed.
-    NSTD_ALLOC_ERROR_HEAP_NOT_FOUND,
-    /// A heap is invalid.
-    NSTD_ALLOC_ERROR_INVALID_HEAP,
-    /// An allocation function received input parameters that resulted in an invalid memory layout.
-    NSTD_ALLOC_ERROR_INVALID_LAYOUT,
-}
-#[cfg(windows)]
-impl From<NSTDWindowsAllocError> for NSTDAllocError {
-    /// Converts an [`NSTDWindowsAllocError`] into an [`NSTDAllocError`].
-    fn from(err: NSTDWindowsAllocError) -> Self {
-        match err {
-            NSTD_WINDOWS_ALLOC_ERROR_NONE => Self::NSTD_ALLOC_ERROR_NONE,
-            NSTD_WINDOWS_ALLOC_ERROR_OUT_OF_MEMORY => Self::NSTD_ALLOC_ERROR_OUT_OF_MEMORY,
-            NSTD_WINDOWS_ALLOC_ERROR_MEMORY_NOT_FOUND => Self::NSTD_ALLOC_ERROR_MEMORY_NOT_FOUND,
-            NSTD_WINDOWS_ALLOC_ERROR_HEAP_NOT_FOUND => Self::NSTD_ALLOC_ERROR_HEAP_NOT_FOUND,
-            NSTD_WINDOWS_ALLOC_ERROR_INVALID_HEAP => Self::NSTD_ALLOC_ERROR_INVALID_HEAP,
-            NSTD_WINDOWS_ALLOC_ERROR_INVALID_LAYOUT => Self::NSTD_ALLOC_ERROR_INVALID_LAYOUT,
-        }
-    }
-}
-
-/// A structure of function pointers making up an allocator's virtual function table.
-#[nstdapi]
-#[derive(Clone, Copy)]
-pub struct NSTDAllocator {
-    /// An opaque pointer to the allocator's state.
-    pub state: NSTDAny,
-    /// Allocates a new block of memory.
-    ///
-    /// If allocation fails, a null pointer is returned.
-    ///
-    /// If allocation succeeds, this returns a pointer to the new memory that is suitably aligned
-    /// for `layout`'s alignment and the number of bytes allocated is at least equal to `layout`'s
-    /// size.
-    ///
-    /// # Parameters:
-    ///
-    /// - `NSTDAllocLayout layout` - Describes the memory layout to allocate for.
-    ///
-    /// # Returns
-    ///
-    /// `NSTDAnyMut ptr` - A pointer to the allocated memory, null on error.
-    ///
-    /// # Safety
-    ///
-    /// - Behavior is undefined if `layout`'s size is zero.
-    ///
-    /// - The new memory buffer should be considered uninitialized.
-    pub allocate: unsafe extern "C" fn(NSTDAny, NSTDAllocLayout) -> NSTDAnyMut,
-    /// Allocates a new block of zero-initialized memory.
-    ///
-    /// If allocation fails, a null pointer is returned.
-    ///
-    /// If allocation succeeds, this returns a pointer to the new memory that is suitably aligned
-    /// for `layout`'s alignment and the number of bytes allocated is at least equal to `layout`'s
-    /// size.
-    ///
-    /// # Parameters:
-    ///
-    /// - `NSTDAllocLayout layout` - Describes the memory layout to allocate for.
-    ///
-    /// # Returns
-    ///
-    /// `NSTDAnyMut ptr` - A pointer to the allocated memory, null on error.
-    ///
-    /// # Safety
-    ///
-    /// Behavior is undefined if `layout`'s size is zero.
-    pub allocate_zeroed: unsafe extern "C" fn(NSTDAny, NSTDAllocLayout) -> NSTDAnyMut,
-    /// Reallocates memory that was previously allocated by this allocator.
-    ///
-    /// On successful reallocation, `ptr` will point to the new memory location and
-    /// `NSTD_ALLOC_ERROR_NONE` will be returned. If this is not the case and reallocation fails,
-    /// the pointer will remain untouched and the appropriate error is returned.
-    ///
-    /// # Parameters:
-    ///
-    /// - `NSTDAnyMut *ptr` - A pointer to the allocated memory.
-    ///
-    /// - `NSTDAllocLayout old_layout` - Describes the previous memory layout.
-    ///
-    /// - `NSTDAllocLayout new_layout` - Describes the new memory layout to allocate for.
-    ///
-    /// # Returns
-    ///
-    /// `NSTDAllocError errc` - The allocation operation error code.
-    ///
-    /// # Safety
-    ///
-    /// - Behavior is undefined if `new_layout`'s size is zero.
-    ///
-    /// - Behavior is undefined if `ptr` is not a pointer to memory allocated by this allocator.
-    ///
-    /// - `old_layout` must be the same value that was used to allocate the memory buffer.
-    pub reallocate: unsafe extern "C" fn(
-        NSTDAny,
-        &mut NSTDAnyMut,
-        NSTDAllocLayout,
-        NSTDAllocLayout,
-    ) -> NSTDAllocError,
-    /// Deallocates memory that was previously allocated by this allocator.
-    ///
-    /// # Parameters:
-    ///
-    /// - `NSTDAnyMut ptr` - A pointer to the allocated memory.
-    ///
-    /// - `NSTDAllocLayout layout` - Describes the layout of memory that `ptr` points to.
-    ///
-    /// # Returns
-    ///
-    /// `NSTDAllocError errc` - The allocation operation error code.
-    ///
-    /// # Safety
-    ///
-    /// - Behavior is undefined if `ptr` is not a pointer to memory allocated by this allocator.
-    ///
-    /// - `layout` must be the same value that was used to allocate the memory buffer.
-    pub deallocate: unsafe extern "C" fn(NSTDAny, NSTDAnyMut, NSTDAllocLayout) -> NSTDAllocError,
-}
-/// # Safety
-///
-/// The allocator's state must be able to be safely *shared* between threads.
-// SAFETY: The user guarantees that the state is thread-safe.
-unsafe impl Send for NSTDAllocator {}
-/// # Safety
-///
-/// The allocator's state must be able to be safely shared between threads.
-// SAFETY: The user guarantees that the state is thread-safe.
-unsafe impl Sync for NSTDAllocator {}
 
 /// Forwards an `NSTD_ALLOCATOR`'s `allocate` call to `nstd_alloc_allocate`.
 #[inline]
@@ -397,8 +251,8 @@ pub(crate) static GLOBAL_ALLOCATOR: NSTDAllocator = NSTDAllocator {
 ///
 /// ```
 /// use nstd_sys::{
-///     alloc::{nstd_alloc_allocate, nstd_alloc_deallocate, NSTDAllocError::NSTD_ALLOC_ERROR_NONE},
-///     core::alloc::nstd_core_alloc_layout_new,
+///     alloc::{nstd_alloc_allocate, nstd_alloc_deallocate},
+///     core::alloc::{nstd_core_alloc_layout_new, NSTDAllocError::NSTD_ALLOC_ERROR_NONE},
 /// };
 ///
 /// unsafe {
@@ -536,11 +390,8 @@ pub unsafe fn nstd_alloc_allocate(layout: NSTDAllocLayout) -> NSTDAnyMut {
 ///
 /// ```
 /// use nstd_sys::{
-///     alloc::{
-///         nstd_alloc_allocate_zeroed, nstd_alloc_deallocate,
-///         NSTDAllocError::NSTD_ALLOC_ERROR_NONE,
-///     },
-///     core::alloc::nstd_core_alloc_layout_new,
+///     alloc::{nstd_alloc_allocate_zeroed, nstd_alloc_deallocate},
+///     core::alloc::{nstd_core_alloc_layout_new, NSTDAllocError::NSTD_ALLOC_ERROR_NONE},
 /// };
 ///
 /// unsafe {
@@ -612,11 +463,8 @@ pub unsafe fn nstd_alloc_allocate_zeroed(layout: NSTDAllocLayout) -> NSTDAnyMut 
 ///
 /// ```
 /// use nstd_sys::{
-///     alloc::{
-///         nstd_alloc_allocate_zeroed, nstd_alloc_deallocate, nstd_alloc_reallocate,
-///         NSTDAllocError::NSTD_ALLOC_ERROR_NONE,
-///     },
-///     core::alloc::nstd_core_alloc_layout_new,
+///     alloc::{nstd_alloc_allocate_zeroed, nstd_alloc_deallocate, nstd_alloc_reallocate},
+///     core::alloc::{nstd_core_alloc_layout_new, NSTDAllocError::NSTD_ALLOC_ERROR_NONE},
 /// };
 ///
 ///
@@ -680,8 +528,8 @@ pub unsafe fn nstd_alloc_reallocate(
 ///
 /// ```
 /// use nstd_sys::{
-///     alloc::{nstd_alloc_allocate, nstd_alloc_deallocate, NSTDAllocError::NSTD_ALLOC_ERROR_NONE},
-///     core::alloc::nstd_core_alloc_layout_new,
+///     alloc::{nstd_alloc_allocate, nstd_alloc_deallocate},
+///     core::alloc::{nstd_core_alloc_layout_new, NSTDAllocError::NSTD_ALLOC_ERROR_NONE},
 /// };
 ///
 /// unsafe {

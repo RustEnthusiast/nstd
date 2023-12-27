@@ -1,8 +1,8 @@
 //! Dynamically sized UTF-8 encoded byte string.
 extern crate alloc;
 use crate::{
-    alloc::{NSTDAllocError, NSTDAllocator},
     core::{
+        alloc::{NSTDAllocError, NSTDAllocator},
         def::NSTDByte,
         optional::NSTDOptional,
         slice::{nstd_core_slice_new_unchecked, NSTDSlice},
@@ -370,7 +370,8 @@ pub const fn nstd_string_cap(string: &NSTDString<'_>) -> NSTDUInt {
 ///
 /// ```
 /// use nstd_sys::{
-///     alloc::{NSTDAllocError::NSTD_ALLOC_ERROR_NONE, NSTD_ALLOCATOR},
+///     alloc::NSTD_ALLOCATOR,
+///     core::alloc::NSTDAllocError::NSTD_ALLOC_ERROR_NONE,
 ///     string::{nstd_string_new, nstd_string_push},
 /// };
 ///
@@ -412,8 +413,8 @@ pub fn nstd_string_push(string: &mut NSTDString<'_>, chr: NSTDUnichar) -> NSTDAl
 ///
 /// ```
 /// use nstd_sys::{
-///     alloc::{NSTDAllocError::NSTD_ALLOC_ERROR_NONE, NSTD_ALLOCATOR},
-///     core::str::nstd_core_str_from_raw_cstr,
+///     alloc::NSTD_ALLOCATOR,
+///     core::{alloc::NSTDAllocError::NSTD_ALLOC_ERROR_NONE, str::nstd_core_str_from_raw_cstr},
 ///     string::{nstd_string_new, nstd_string_push_str},
 /// };
 ///

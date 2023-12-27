@@ -3,14 +3,6 @@
 #include "../../core/alloc.h"
 #include "../../nstd.h"
 
-/// Describes an error returned from an `nstd.os.unix.alloc` function.
-typedef enum {
-    /// No error occurred.
-    NSTD_UNIX_ALLOC_ERROR_NONE,
-    /// Allocating or reallocating failed.
-    NSTD_UNIX_ALLOC_ERROR_OUT_OF_MEMORY
-} NSTDUnixAllocError;
-
 /// Allocates a block of memory on the heap, returning a pointer to it.
 ///
 /// # Parameters:
@@ -55,14 +47,14 @@ NSTDAPI NSTDAnyMut nstd_os_unix_alloc_allocate_zeroed(NSTDAllocLayout layout);
 ///
 /// # Returns
 ///
-/// `NSTDUnixAllocError errc` - The allocation operation error code.
+/// `NSTDAllocError errc` - The allocation operation error code.
 ///
 /// # Safety
 ///
 /// - Behavior is undefined if `new_layout`'s size is zero.
 ///
 /// - `ptr` must point to memory previously allocated with `old_layout`.
-NSTDAPI NSTDUnixAllocError nstd_os_unix_alloc_reallocate(
+NSTDAPI NSTDAllocError nstd_os_unix_alloc_reallocate(
     NSTDAnyMut *ptr, NSTDAllocLayout old_layout, NSTDAllocLayout new_layout
 );
 

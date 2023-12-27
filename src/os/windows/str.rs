@@ -1,7 +1,8 @@
 //! String slice extensions for Windows.
 use crate::{
-    alloc::{NSTDAllocError::NSTD_ALLOC_ERROR_NONE, NSTD_ALLOCATOR},
+    alloc::NSTD_ALLOCATOR,
     core::{
+        alloc::NSTDAllocError::NSTD_ALLOC_ERROR_NONE,
         optional::NSTDOptional,
         str::{nstd_core_str_as_ptr, nstd_core_str_byte_len, NSTDStr},
     },

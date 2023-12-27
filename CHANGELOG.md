@@ -4,6 +4,7 @@
 - Added `core.alloc`.
 ## Changed
 ### `nstd.alloc`
+- `NSTDAllocError` & `NSTDAllocator` were moved into `core.alloc`.
 - Allocation functions now use `NSTDAllocLayout`.
 ### `nstd.core`
 - `nstd_core_mem_copy[_overlapping]` functions are no longer `const`.
@@ -16,6 +17,9 @@
 - `nstd_shared_ptr_new[_zeroed]` functions now take an `NSTDAllocLayout`.
 ### `nstd.vec`
 - `NSTDVec` constructors now take an `align` argument.
+## Removed
+### `nstd.os`
+- Removed `NSTD[Unix|Windows]AllocError` in favor of `NSTDAllocError`.
 
 # 0.12.0
 ## Changed

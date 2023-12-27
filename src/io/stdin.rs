@@ -1,7 +1,8 @@
 //! A handle to the standard input stream.
 use crate::{
-    alloc::{CBox, NSTDAllocError},
+    alloc::CBox,
     core::{
+        alloc::NSTDAllocError,
         optional::{gen_optional, NSTDOptional},
         result::NSTDResult,
         slice::{NSTDSlice, NSTDSliceMut},

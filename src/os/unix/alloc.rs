@@ -1,24 +1,16 @@
 //! Memory allocation for Unix-like systems.
 use crate::{
     core::{
-        alloc::{nstd_core_alloc_layout_align, nstd_core_alloc_layout_size, NSTDAllocLayout},
+        alloc::{
+            nstd_core_alloc_layout_align, nstd_core_alloc_layout_size, NSTDAllocError,
+            NSTDAllocLayout,
+        },
         mem::{nstd_core_mem_copy, nstd_core_mem_zero},
     },
     NSTDAnyMut, NSTD_NULL,
 };
 use libc::{free, posix_memalign};
 use nstdapi::nstdapi;
-
-/// Describes an error returned from an `nstd.os.unix.alloc` function.
-#[nstdapi]
-#[derive(Clone, Copy, PartialEq, Eq)]
-#[allow(non_camel_case_types)]
-pub enum NSTDUnixAllocError {
-    /// No error occurred.
-    NSTD_UNIX_ALLOC_ERROR_NONE,
-    /// Allocating or reallocating failed.
-    NSTD_UNIX_ALLOC_ERROR_OUT_OF_MEMORY,
-}
 
 /// Allocates a block of memory on the heap, returning a pointer to it.
 ///
@@ -117,7 +109,7 @@ pub unsafe fn nstd_os_unix_alloc_allocate_zeroed(layout: NSTDAllocLayout) -> NST
 ///
 /// # Returns
 ///
-/// `NSTDUnixAllocError errc` - The allocation operation error code.
+/// `NSTDAllocError errc` - The allocation operation error code.
 ///
 /// # Safety
 ///
@@ -129,10 +121,10 @@ pub unsafe fn nstd_os_unix_alloc_allocate_zeroed(layout: NSTDAllocLayout) -> NST
 ///
 /// ```
 /// use nstd_sys::{
-///     core::alloc::nstd_core_alloc_layout_new,
+///     core::alloc::{nstd_core_alloc_layout_new, NSTDAllocError::NSTD_ALLOC_ERROR_NONE},
 ///     os::unix::alloc::{
 ///         nstd_os_unix_alloc_allocate_zeroed, nstd_os_unix_alloc_deallocate,
-///         nstd_os_unix_alloc_reallocate, NSTDUnixAllocError::NSTD_UNIX_ALLOC_ERROR_NONE,
+///         nstd_os_unix_alloc_reallocate,
 ///     },
 /// };
 ///
@@ -147,7 +139,7 @@ pub unsafe fn nstd_os_unix_alloc_allocate_zeroed(layout: NSTDAllocLayout) -> NST
 ///     align = core::mem::align_of::<u32>();
 ///     let new_layout = nstd_core_alloc_layout_new(size, align).unwrap();
 ///     let errc = nstd_os_unix_alloc_reallocate(&mut mem, layout, new_layout);
-///     assert!(errc == NSTD_UNIX_ALLOC_ERROR_NONE);
+///     assert!(errc == NSTD_ALLOC_ERROR_NONE);
 ///     assert!(*mem.cast::<u32>() == 0);
 ///     nstd_os_unix_alloc_deallocate(mem);
 /// }
@@ -158,17 +150,17 @@ pub unsafe fn nstd_os_unix_alloc_reallocate(
     ptr: &mut NSTDAnyMut,
     old_layout: NSTDAllocLayout,
     new_layout: NSTDAllocLayout,
-) -> NSTDUnixAllocError {
+) -> NSTDAllocError {
     let new_mem = nstd_os_unix_alloc_allocate(new_layout);
     if new_mem.is_null() {
-        return NSTDUnixAllocError::NSTD_UNIX_ALLOC_ERROR_OUT_OF_MEMORY;
+        return NSTDAllocError::NSTD_ALLOC_ERROR_OUT_OF_MEMORY;
     }
     let old_size = nstd_core_alloc_layout_size(old_layout);
     let new_size = nstd_core_alloc_layout_size(new_layout);
     nstd_core_mem_copy(new_mem.cast(), (*ptr).cast(), old_size.min(new_size));
     nstd_os_unix_alloc_deallocate(*ptr);
     *ptr = new_mem;
-    NSTDUnixAllocError::NSTD_UNIX_ALLOC_ERROR_NONE
+    NSTDAllocError::NSTD_ALLOC_ERROR_NONE
 }
 
 /// Deallocates a block of memory previously allocated by `nstd_os_unix_alloc_allocate[_zeroed]`.

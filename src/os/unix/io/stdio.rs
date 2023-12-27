@@ -10,8 +10,8 @@ use super::{
     NSTDUnixIOResult,
 };
 use crate::{
-    alloc::NSTDAllocError::NSTD_ALLOC_ERROR_NONE,
     core::{
+        alloc::NSTDAllocError::NSTD_ALLOC_ERROR_NONE,
         result::NSTDResult,
         slice::{
             nstd_core_slice_as_ptr, nstd_core_slice_len, nstd_core_slice_mut_as_ptr,

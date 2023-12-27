@@ -1,8 +1,8 @@
 //! Contains common I/O operations for [Read] & [Write] with `nstd` types.
 #![allow(dead_code)]
 use crate::{
-    alloc::NSTDAllocError,
     core::{
+        alloc::NSTDAllocError,
         result::NSTDResult,
         slice::{NSTDSlice, NSTDSliceMut},
         str::nstd_core_str_from_bytes_unchecked,

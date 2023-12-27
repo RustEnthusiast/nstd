@@ -1,10 +1,10 @@
 //! A dynamically sized, null terminated, C string.
 use crate::{
-    alloc::{
-        NSTDAllocError::{self, NSTD_ALLOC_ERROR_NONE},
-        NSTDAllocator,
-    },
     core::{
+        alloc::{
+            NSTDAllocError::{self, NSTD_ALLOC_ERROR_NONE},
+            NSTDAllocator,
+        },
         cstr::{
             nstd_core_cstr_as_bytes, nstd_core_cstr_get_null, nstd_core_cstr_is_null_terminated,
             nstd_core_cstr_new_unchecked, NSTDCStr,
@@ -421,8 +421,8 @@ pub fn nstd_cstring_push(cstring: &mut NSTDCString<'_>, chr: NSTDChar) -> NSTDAl
 ///
 /// ```
 /// use nstd_sys::{
-///     alloc::{NSTDAllocError::NSTD_ALLOC_ERROR_NONE, NSTD_ALLOCATOR},
-///     core::cstr::nstd_core_cstr_from_raw,
+///     alloc::NSTD_ALLOCATOR,
+///     core::{alloc::NSTDAllocError::NSTD_ALLOC_ERROR_NONE, cstr::nstd_core_cstr_from_raw},
 ///     cstring::{nstd_cstring_new, nstd_cstring_push_cstr},
 ///     NSTDChar,
 /// };
