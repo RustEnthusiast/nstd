@@ -1,7 +1,7 @@
 //! A sized pointer to some arbitrary type.
 use crate::{
     core::{
-        mem::nstd_core_mem_copy,
+        mem::{nstd_core_mem_copy, nstd_core_mem_is_aligned},
         optional::{gen_optional, NSTDOptional},
     },
     NSTDAny, NSTDAnyMut, NSTDUInt, NSTD_INT_MAX,
@@ -16,6 +16,8 @@ pub struct NSTDPtr {
     raw: NSTDAny,
     /// The size of the object being pointed to.
     size: NSTDUInt,
+    /// The alignment of the object being pointed to.
+    align: NSTDUInt,
 }
 gen_optional!(NSTDOptionalPtr, NSTDPtr);
 
@@ -27,16 +29,26 @@ gen_optional!(NSTDOptionalPtr, NSTDPtr);
 ///
 /// - `NSTDUInt size` - The number of bytes that `obj`'s type occupies.
 ///
+/// - `NSTDUInt align` - The alignment of the object that `obj` points to.
+///
 /// # Returns
 ///
 /// `NSTDOptionalPtr ptr` - A new instance of `NSTDPtr` that points to `obj` on success, or
-/// an uninitialized "none" variant if either `obj` is null or `size` is greater than `NSTDInt`'s
-/// max value.
+/// an uninitialized "none" variant if `obj` is null or unaligned or if `size` is greater than
+/// `NSTDInt`'s max value.
+///
+/// # Panics
+///
+/// This operation will panic if `align` is not a power of two.
 #[inline]
 #[nstdapi]
-pub fn nstd_core_ptr_new(obj: NSTDAny, size: NSTDUInt) -> NSTDOptionalPtr {
-    match !obj.is_null() && size <= NSTD_INT_MAX {
-        true => NSTDOptional::Some(NSTDPtr { raw: obj, size }),
+pub fn nstd_core_ptr_new(obj: NSTDAny, size: NSTDUInt, align: NSTDUInt) -> NSTDOptionalPtr {
+    match !obj.is_null() && nstd_core_mem_is_aligned(obj, align) && size <= NSTD_INT_MAX {
+        true => NSTDOptional::Some(NSTDPtr {
+            raw: obj,
+            size,
+            align,
+        }),
         false => NSTDOptional::None,
     }
 }
@@ -49,18 +61,33 @@ pub fn nstd_core_ptr_new(obj: NSTDAny, size: NSTDUInt) -> NSTDOptionalPtr {
 ///
 /// - `NSTDUInt size` - The number of bytes that `obj`'s type occupies.
 ///
+/// - `NSTDUInt align` - The alignment of the object that `obj` points to.
+///
 /// # Returns
 ///
 /// `NSTDPtr ptr` - A new instance of `NSTDPtr` that points to `obj`.
 ///
 /// # Safety
 ///
-/// The user of this function must ensure that `obj` is non-null and `size` is not greater than
-/// `NSTDInt`'s max value.
+/// - `obj` must be non-null.
+///
+/// - `obj` must be aligned to `align`.
+///
+/// - `align` must be a nonzero power of two.
+///
+/// - `size` must not be greater than `NSTDInt`'s max value.
 #[inline]
 #[nstdapi]
-pub const unsafe fn nstd_core_ptr_new_unchecked(obj: NSTDAny, size: NSTDUInt) -> NSTDPtr {
-    NSTDPtr { raw: obj, size }
+pub const unsafe fn nstd_core_ptr_new_unchecked(
+    obj: NSTDAny,
+    size: NSTDUInt,
+    align: NSTDUInt,
+) -> NSTDPtr {
+    NSTDPtr {
+        raw: obj,
+        size,
+        align,
+    }
 }
 
 /// Returns the size of the object being pointed to.
@@ -80,10 +107,11 @@ pub const unsafe fn nstd_core_ptr_new_unchecked(obj: NSTDAny, size: NSTDUInt) ->
 /// use nstd_sys::core::ptr::{nstd_core_ptr_new, nstd_core_ptr_size};
 ///
 /// unsafe {
-///     const VALUE_SIZE: usize = core::mem::size_of::<isize>();
+///     const SIZE: usize = core::mem::size_of::<isize>();
+///     const ALIGN: usize = core::mem::align_of::<isize>();
 ///     let x = 33isize;
-///     let ptr = nstd_core_ptr_new(addr_of!(x).cast(), VALUE_SIZE).unwrap();
-///     assert!(nstd_core_ptr_size(&ptr) == VALUE_SIZE);
+///     let ptr = nstd_core_ptr_new(addr_of!(x).cast(), SIZE, ALIGN).unwrap();
+///     assert!(nstd_core_ptr_size(&ptr) == SIZE);
 /// }
 /// ```
 #[inline]
@@ -109,9 +137,10 @@ pub const fn nstd_core_ptr_size(ptr: &NSTDPtr) -> NSTDUInt {
 /// use nstd_sys::core::ptr::{nstd_core_ptr_get, nstd_core_ptr_new};
 ///
 /// unsafe {
-///     const VALUE_SIZE: usize = core::mem::size_of::<u32>();
+///     const SIZE: usize = core::mem::size_of::<u32>();
+///     const ALIGN: usize = core::mem::align_of::<u32>();
 ///     let x = 45u32;
-///     let ptr = nstd_core_ptr_new(addr_of!(x).cast(), VALUE_SIZE).unwrap();
+///     let ptr = nstd_core_ptr_new(addr_of!(x).cast(), SIZE, ALIGN).unwrap();
 ///     assert!(*nstd_core_ptr_get(&ptr).cast::<u32>() == x);
 /// }
 /// ```
@@ -128,6 +157,8 @@ pub struct NSTDPtrMut {
     raw: NSTDAnyMut,
     /// The size of the object being pointed to.
     size: NSTDUInt,
+    /// The alignment of the object being pointed to.
+    align: NSTDUInt,
 }
 gen_optional!(NSTDOptionalPtrMut, NSTDPtrMut);
 
@@ -139,16 +170,30 @@ gen_optional!(NSTDOptionalPtrMut, NSTDPtrMut);
 ///
 /// - `NSTDUInt size` - The number of bytes that `obj`'s type occupies.
 ///
+/// - `NSTDUInt align` - The alignment of the object that `obj` points to.
+///
 /// # Returns
 ///
 /// `NSTDOptionalPtrMut ptr` - A new instance of `NSTDPtrMut` that points to `obj` on success, or
-/// an uninitialized "none" variant if either `obj` is null or `size` is greater than `NSTDInt`'s
-/// max value.
+/// an uninitialized "none" variant if `obj` is null or unaligned or if `size` is greater than
+/// `NSTDInt`'s max value.
+///
+/// # Panics
+///
+/// This operation will panic if `align` is not a power of two.
 #[inline]
 #[nstdapi]
-pub fn nstd_core_ptr_mut_new(obj: NSTDAnyMut, size: NSTDUInt) -> NSTDOptionalPtrMut {
-    match !obj.is_null() && size <= NSTD_INT_MAX {
-        true => NSTDOptional::Some(NSTDPtrMut { raw: obj, size }),
+pub fn nstd_core_ptr_mut_new(
+    obj: NSTDAnyMut,
+    size: NSTDUInt,
+    align: NSTDUInt,
+) -> NSTDOptionalPtrMut {
+    match !obj.is_null() && nstd_core_mem_is_aligned(obj, align) && size <= NSTD_INT_MAX {
+        true => NSTDOptional::Some(NSTDPtrMut {
+            raw: obj,
+            size,
+            align,
+        }),
         false => NSTDOptional::None,
     }
 }
@@ -161,18 +206,33 @@ pub fn nstd_core_ptr_mut_new(obj: NSTDAnyMut, size: NSTDUInt) -> NSTDOptionalPtr
 ///
 /// - `NSTDUInt size` - The number of bytes that `obj`'s type occupies.
 ///
+/// - `NSTDUInt align` - The alignment of the object that `obj` points to.
+///
 /// # Returns
 ///
 /// `NSTDPtrMut ptr` - A new instance of `NSTDPtrMut` that points to `obj`.
 ///
 /// # Safety
 ///
-/// The user of this function must ensure that `obj` is non-null and `size` is not greater than
-/// `NSTDInt`'s max value.
+/// - `obj` must be non-null.
+///
+/// - `obj` must be aligned to `align`.
+///
+/// - `align` must be a nonzero power of two.
+///
+/// - `size` must not be greater than `NSTDInt`'s max value.
 #[inline]
 #[nstdapi]
-pub const unsafe fn nstd_core_ptr_mut_new_unchecked(obj: NSTDAnyMut, size: NSTDUInt) -> NSTDPtrMut {
-    NSTDPtrMut { raw: obj, size }
+pub const unsafe fn nstd_core_ptr_mut_new_unchecked(
+    obj: NSTDAnyMut,
+    size: NSTDUInt,
+    align: NSTDUInt,
+) -> NSTDPtrMut {
+    NSTDPtrMut {
+        raw: obj,
+        size,
+        align,
+    }
 }
 
 /// Creates an immutable version of a mutable pointer.
@@ -188,7 +248,7 @@ pub const unsafe fn nstd_core_ptr_mut_new_unchecked(obj: NSTDAnyMut, size: NSTDU
 #[nstdapi]
 pub const fn nstd_core_ptr_mut_as_const(ptr: &NSTDPtrMut) -> NSTDPtr {
     // SAFETY: `ptr.raw` is never null, `ptr.size` is never greater than `NSTDInt`'s max value.
-    unsafe { nstd_core_ptr_new_unchecked(ptr.raw, ptr.size) }
+    unsafe { nstd_core_ptr_new_unchecked(ptr.raw, ptr.size, ptr.align) }
 }
 
 /// Returns the size of the object being pointed to.
@@ -208,10 +268,11 @@ pub const fn nstd_core_ptr_mut_as_const(ptr: &NSTDPtrMut) -> NSTDPtr {
 /// use nstd_sys::core::ptr::{nstd_core_ptr_mut_new, nstd_core_ptr_mut_size};
 ///
 /// unsafe {
-///     const VALUE_SIZE: usize = core::mem::size_of::<isize>();
+///     const SIZE: usize = core::mem::size_of::<isize>();
+///     const ALIGN: usize = core::mem::align_of::<isize>();
 ///     let mut x = 33isize;
-///     let ptr = nstd_core_ptr_mut_new(addr_of_mut!(x).cast(), VALUE_SIZE).unwrap();
-///     assert!(nstd_core_ptr_mut_size(&ptr) == VALUE_SIZE);
+///     let ptr = nstd_core_ptr_mut_new(addr_of_mut!(x).cast(), SIZE, ALIGN).unwrap();
+///     assert!(nstd_core_ptr_mut_size(&ptr) == SIZE);
 /// }
 /// ```
 #[inline]
@@ -237,9 +298,10 @@ pub const fn nstd_core_ptr_mut_size(ptr: &NSTDPtrMut) -> NSTDUInt {
 /// use nstd_sys::core::ptr::{nstd_core_ptr_mut_get, nstd_core_ptr_mut_new};
 ///
 /// unsafe {
-///     const VALUE_SIZE: usize = core::mem::size_of::<u32>();
+///     const SIZE: usize = core::mem::size_of::<u32>();
+///     const ALIGN: usize = core::mem::align_of::<u32>();
 ///     let mut x = 8u32;
-///     let mut ptr = nstd_core_ptr_mut_new(addr_of_mut!(x).cast(), VALUE_SIZE).unwrap();
+///     let mut ptr = nstd_core_ptr_mut_new(addr_of_mut!(x).cast(), SIZE, ALIGN).unwrap();
 ///     let x_ptr = nstd_core_ptr_mut_get(&mut ptr).cast();
 ///     *x_ptr *= 2;
 ///     assert!(x == *x_ptr);
@@ -268,9 +330,10 @@ pub fn nstd_core_ptr_mut_get(ptr: &mut NSTDPtrMut) -> NSTDAnyMut {
 /// use nstd_sys::core::ptr::{nstd_core_ptr_mut_get_const, nstd_core_ptr_mut_new};
 ///
 /// unsafe {
-///     const VALUE_SIZE: usize = core::mem::size_of::<u32>();
+///     const SIZE: usize = core::mem::size_of::<u32>();
+///     const ALIGN: usize = core::mem::align_of::<u32>();
 ///     let mut x = 45u32;
-///     let ptr = nstd_core_ptr_mut_new(addr_of_mut!(x).cast(), VALUE_SIZE).unwrap();
+///     let ptr = nstd_core_ptr_mut_new(addr_of_mut!(x).cast(), SIZE, ALIGN).unwrap();
 ///     assert!(*nstd_core_ptr_mut_get_const(&ptr).cast::<u32>() == x);
 /// }
 /// ```
@@ -306,9 +369,10 @@ pub const fn nstd_core_ptr_mut_get_const(ptr: &NSTDPtrMut) -> NSTDAny {
 /// };
 ///
 /// unsafe {
-///     const VALUE_SIZE: usize = core::mem::size_of::<i64>();
+///     const SIZE: usize = core::mem::size_of::<i64>();
+///     const ALIGN: usize = core::mem::align_of::<i64>();
 ///     let mut x = -69i64;
-///     let mut ptr = nstd_core_ptr_mut_new(addr_of_mut!(x).cast(), VALUE_SIZE).unwrap();
+///     let mut ptr = nstd_core_ptr_mut_new(addr_of_mut!(x).cast(), SIZE, ALIGN).unwrap();
 ///     let y = 420i64;
 ///     nstd_core_ptr_mut_write(&mut ptr, addr_of!(y).cast());
 ///     assert!(x == y);

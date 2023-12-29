@@ -9,6 +9,8 @@ typedef struct {
     NSTDAny raw;
     /// The size of the object being pointed to.
     NSTDUInt size;
+    /// The alignment of the object being pointed to.
+    NSTDUInt align;
 } NSTDPtr;
 
 /// Represents an optional value of type `NSTDPtr`.
@@ -22,12 +24,18 @@ NSTDOptional(NSTDPtr) NSTDOptionalPtr;
 ///
 /// - `NSTDUInt size` - The number of bytes that `obj`'s type occupies.
 ///
+/// - `NSTDUInt align` - The alignment of the object that `obj` points to.
+///
 /// # Returns
 ///
 /// `NSTDOptionalPtr ptr` - A new instance of `NSTDPtr` that points to `obj` on success, or
-/// an uninitialized "none" variant if either `obj` is null or `size` is greater than `NSTDInt`'s
-/// max value.
-NSTDAPI NSTDOptionalPtr nstd_core_ptr_new(NSTDAny obj, NSTDUInt size);
+/// an uninitialized "none" variant if `obj` is null or unaligned or if `size` is greater than
+/// `NSTDInt`'s max value.
+///
+/// # Panics
+///
+/// This operation will panic if `align` is not a power of two.
+NSTDAPI NSTDOptionalPtr nstd_core_ptr_new(NSTDAny obj, NSTDUInt size, NSTDUInt align);
 
 /// Creates a new instance of `NSTDPtr` without checking if `obj` is null.
 ///
@@ -37,15 +45,22 @@ NSTDAPI NSTDOptionalPtr nstd_core_ptr_new(NSTDAny obj, NSTDUInt size);
 ///
 /// - `NSTDUInt size` - The number of bytes that `obj`'s type occupies.
 ///
+/// - `NSTDUInt align` - The alignment of the object that `obj` points to.
+///
 /// # Returns
 ///
 /// `NSTDPtr ptr` - A new instance of `NSTDPtr` that points to `obj`.
 ///
 /// # Safety
 ///
-/// The user of this function must ensure that `obj` is non-null and `size` is not greater than
-/// `NSTDInt`'s max value.
-NSTDAPI NSTDPtr nstd_core_ptr_new_unchecked(NSTDAny obj, NSTDUInt size);
+/// - `obj` must be non-null.
+///
+/// - `obj` must be aligned to `align`.
+///
+/// - `align` must be a nonzero power of two.
+///
+/// - `size` must not be greater than `NSTDInt`'s max value.
+NSTDAPI NSTDPtr nstd_core_ptr_new_unchecked(NSTDAny obj, NSTDUInt size, NSTDUInt align);
 
 /// Returns the size of the object being pointed to.
 ///
@@ -75,6 +90,8 @@ typedef struct {
     NSTDAnyMut raw;
     /// The size of the object being pointed to.
     NSTDUInt size;
+    /// The alignment of the object being pointed to.
+    NSTDUInt align;
 } NSTDPtrMut;
 
 /// Represents an optional value of type `NSTDPtrMut`.
@@ -88,12 +105,18 @@ NSTDOptional(NSTDPtrMut) NSTDOptionalPtrMut;
 ///
 /// - `NSTDUInt size` - The number of bytes that `obj`'s type occupies.
 ///
+/// - `NSTDUInt align` - The alignment of the object that `obj` points to.
+///
 /// # Returns
 ///
 /// `NSTDOptionalPtrMut ptr` - A new instance of `NSTDPtrMut` that points to `obj` on success, or
-/// an uninitialized "none" variant if either `obj` is null or `size` is greater than `NSTDInt`'s
-/// max value.
-NSTDAPI NSTDOptionalPtrMut nstd_core_ptr_mut_new(NSTDAnyMut obj, NSTDUInt size);
+/// an uninitialized "none" variant if `obj` is null or unaligned or if `size` is greater than
+/// `NSTDInt`'s max value.
+///
+/// # Panics
+///
+/// This operation will panic if `align` is not a power of two.
+NSTDAPI NSTDOptionalPtrMut nstd_core_ptr_mut_new(NSTDAnyMut obj, NSTDUInt size, NSTDUInt align);
 
 /// Creates a new instance of `NSTDPtrMut` without checking if `obj` is null.
 ///
@@ -103,15 +126,22 @@ NSTDAPI NSTDOptionalPtrMut nstd_core_ptr_mut_new(NSTDAnyMut obj, NSTDUInt size);
 ///
 /// - `NSTDUInt size` - The number of bytes that `obj`'s type occupies.
 ///
+/// - `NSTDUInt align` - The alignment of the object that `obj` points to.
+///
 /// # Returns
 ///
 /// `NSTDPtrMut ptr` - A new instance of `NSTDPtrMut` that points to `obj`.
 ///
 /// # Safety
 ///
-/// The user of this function must ensure that `obj` is non-null and `size` is not greater than
-/// `NSTDInt`'s max value.
-NSTDAPI NSTDPtrMut nstd_core_ptr_mut_new_unchecked(NSTDAnyMut obj, NSTDUInt size);
+/// - `obj` must be non-null.
+///
+/// - `obj` must be aligned to `align`.
+///
+/// - `align` must be a nonzero power of two.
+///
+/// - `size` must not be greater than `NSTDInt`'s max value.
+NSTDAPI NSTDPtrMut nstd_core_ptr_mut_new_unchecked(NSTDAnyMut obj, NSTDUInt size, NSTDUInt align);
 
 /// Creates an immutable version of a mutable pointer.
 ///

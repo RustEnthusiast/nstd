@@ -162,7 +162,7 @@ pub unsafe fn nstd_cstring_from_cstr_unchecked<'a>(
     cstr: &NSTDCStr,
 ) -> NSTDOptionalCString<'a> {
     let bytes = nstd_core_cstr_as_bytes(cstr);
-    if let NSTDOptional::Some(mut bytes) = nstd_vec_from_slice(allocator, &bytes, 1) {
+    if let NSTDOptional::Some(mut bytes) = nstd_vec_from_slice(allocator, &bytes) {
         let null: NSTDChar = 0;
         let null = addr_of!(null).cast();
         if nstd_vec_push(&mut bytes, null) == NSTD_ALLOC_ERROR_NONE {

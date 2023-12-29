@@ -379,7 +379,7 @@ pub unsafe fn nstd_core_mem_swap(x: *mut NSTDByte, y: *mut NSTDByte, num: NSTDUI
 /// ```
 /// use nstd_sys::core::{mem::nstd_core_mem_dangling, slice::nstd_core_slice_new};
 ///
-/// let slice = unsafe { nstd_core_slice_new(nstd_core_mem_dangling(), 1, 0).unwrap() };
+/// let slice = unsafe { nstd_core_slice_new(nstd_core_mem_dangling(), 1, 1, 0).unwrap() };
 /// ```
 #[inline]
 #[nstdapi]
@@ -399,7 +399,7 @@ pub const fn nstd_core_mem_dangling() -> NSTDAny {
 /// ```
 /// use nstd_sys::core::{mem::nstd_core_mem_dangling_mut, slice::nstd_core_slice_mut_new};
 ///
-/// let slice = unsafe { nstd_core_slice_mut_new(nstd_core_mem_dangling_mut(), 1, 0).unwrap() };
+/// let slice = unsafe { nstd_core_slice_mut_new(nstd_core_mem_dangling_mut(), 1, 1, 0).unwrap() };
 /// ```
 #[inline]
 #[nstdapi]

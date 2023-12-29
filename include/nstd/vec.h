@@ -73,8 +73,6 @@ NSTDAPI NSTDOptionalVec nstd_vec_new_with_cap(
 ///
 /// - `const NSTDSlice *slice` - The slice to copy data from.
 ///
-/// - `NSTDUInt align` - The alignment of each value in the slice.
-///
 /// # Returns
 ///
 /// `NSTDOptionalVec vec` - The new vector with a copy of `slice`'s contents on success, or an
@@ -83,8 +81,7 @@ NSTDAPI NSTDOptionalVec nstd_vec_new_with_cap(
 /// # Safety
 ///
 /// The caller of this function must ensure that `slice`'s data is valid for reads.
-NSTDAPI NSTDOptionalVec
-nstd_vec_from_slice(const NSTDAllocator *allocator, const NSTDSlice *slice, NSTDUInt align);
+NSTDAPI NSTDOptionalVec nstd_vec_from_slice(const NSTDAllocator *allocator, const NSTDSlice *slice);
 
 /// Creates a new deep copy of `vec`.
 ///

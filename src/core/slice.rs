@@ -1,7 +1,7 @@
 //! A view into a sequence of values in memory.
 use crate::{
     core::{
-        mem::{nstd_core_mem_copy, nstd_core_mem_dangling, nstd_core_mem_dangling_mut},
+        mem::{nstd_core_mem_copy, nstd_core_mem_is_aligned},
         optional::{gen_optional, NSTDOptional},
     },
     NSTDAny, NSTDAnyMut, NSTDUInt, NSTD_INT_MAX, NSTD_NULL,
@@ -18,6 +18,8 @@ pub struct NSTDSlice {
     len: NSTDUInt,
     /// The slice's stride.
     stride: NSTDUInt,
+    /// The slice's align.
+    align: NSTDUInt,
 }
 impl NSTDSlice {
     /// Creates a new [`NSTDSlice`] from a Rust slice.
@@ -28,6 +30,7 @@ impl NSTDSlice {
             ptr: s.as_ptr().cast(),
             len: s.len(),
             stride: core::mem::size_of::<T>(),
+            align: core::mem::align_of::<T>(),
         }
     }
 
@@ -66,18 +69,35 @@ gen_optional!(NSTDOptionalSlice, NSTDSlice);
 ///
 /// - `NSTDUInt stride` - The number of bytes each element occupies.
 ///
+/// - `NSTDUInt align` - The alignment of each element in the slice.
+///
 /// - `NSTDUInt len` - The number of elements in the sequence.
 ///
 /// # Returns
 ///
 /// `NSTDOptionalSlice slice` - The new slice on success, or an uninitialized "none" variant if
-/// either `ptr` is null or the slice's length in bytes would exceed `NSTDInt`'s max value.
-#[inline]
+/// `ptr` is null, `align` is not a power of two, `stride` is not a multiple of `align`, `ptr` is
+/// not a multiple of `align`, or the slice's length in bytes would exceed `NSTDInt`'s max value.
 #[nstdapi]
-pub fn nstd_core_slice_new(ptr: NSTDAny, stride: NSTDUInt, len: NSTDUInt) -> NSTDOptionalSlice {
+pub fn nstd_core_slice_new(
+    ptr: NSTDAny,
+    stride: NSTDUInt,
+    align: NSTDUInt,
+    len: NSTDUInt,
+) -> NSTDOptionalSlice {
     if let Some(size) = len.checked_mul(stride) {
-        if size <= NSTD_INT_MAX && !ptr.is_null() {
-            return NSTDOptional::Some(NSTDSlice { ptr, len, stride });
+        if size <= NSTD_INT_MAX
+            && crate::core::mem::is_power_of_two(align)
+            && stride % align == 0
+            && !ptr.is_null()
+            && nstd_core_mem_is_aligned(ptr, align)
+        {
+            return NSTDOptional::Some(NSTDSlice {
+                ptr,
+                len,
+                stride,
+                align,
+            });
         }
     }
     NSTDOptional::None
@@ -91,6 +111,8 @@ pub fn nstd_core_slice_new(ptr: NSTDAny, stride: NSTDUInt, len: NSTDUInt) -> NST
 ///
 /// - `NSTDUInt stride` - The number of bytes each element occupies.
 ///
+/// - `NSTDUInt align` - The alignment of each element in the slice.
+///
 /// - `NSTDUInt len` - The number of elements in the sequence.
 ///
 /// # Returns
@@ -99,16 +121,29 @@ pub fn nstd_core_slice_new(ptr: NSTDAny, stride: NSTDUInt, len: NSTDUInt) -> NST
 ///
 /// # Safety
 ///
-/// The user of this function must ensure that `ptr` is non-null, and that the slice's total length
-/// in bytes will not exceed `NSTDInt`'s max value.
+/// - `ptr` must be non-null.
+///
+/// - `align` must be a nonzero power of two.
+///
+/// - `stride` must be a multiple of `align`.
+///
+/// - `ptr` must be a multiple of `align`.
+///
+/// - The slice's total length in bytes will not exceed `NSTDInt`'s max value.
 #[inline]
 #[nstdapi]
 pub const unsafe fn nstd_core_slice_new_unchecked(
     ptr: NSTDAny,
     stride: NSTDUInt,
+    align: NSTDUInt,
     len: NSTDUInt,
 ) -> NSTDSlice {
-    NSTDSlice { ptr, len, stride }
+    NSTDSlice {
+        ptr,
+        len,
+        stride,
+        align,
+    }
 }
 
 /// Creates a new empty slice with a given `stride`.
@@ -117,16 +152,25 @@ pub const unsafe fn nstd_core_slice_new_unchecked(
 ///
 /// - `NSTDUInt stride` - The number of bytes each element occupies.
 ///
+/// - `NSTDUInt align` - The alignment of each element in the slice.
+///
 /// # Returns
 ///
 /// `NSTDSlice slice` - The new empty slice.
+///
+/// # Panics
+///
+/// This operation will panic if either `align` is not a power of two or `stride` is not a multiple
+/// of `align`.
 #[inline]
 #[nstdapi]
-pub const fn nstd_core_slice_empty(stride: NSTDUInt) -> NSTDSlice {
+pub const fn nstd_core_slice_empty(stride: NSTDUInt, align: NSTDUInt) -> NSTDSlice {
+    assert!(crate::core::mem::is_power_of_two(align) && stride % align == 0);
     NSTDSlice {
-        ptr: nstd_core_mem_dangling(),
+        ptr: align as NSTDAny,
         len: 0,
         stride,
+        align,
     }
 }
 
@@ -148,7 +192,7 @@ pub const fn nstd_core_slice_empty(stride: NSTDUInt) -> NSTDSlice {
 /// unsafe {
 ///     let bytes = "Hello, world!".as_bytes();
 ///     let bytes_ptr = bytes.as_ptr().cast();
-///     let slice = nstd_core_slice_new(bytes_ptr, 1, bytes.len()).unwrap();
+///     let slice = nstd_core_slice_new(bytes_ptr, 1, 1, bytes.len()).unwrap();
 ///     assert!(nstd_core_slice_as_ptr(&slice) == bytes_ptr);
 /// }
 /// ```
@@ -176,7 +220,7 @@ pub const fn nstd_core_slice_as_ptr(slice: &NSTDSlice) -> NSTDAny {
 /// unsafe {
 ///     let bytes = "Goodbye, world!".as_bytes();
 ///     let len = bytes.len();
-///     let slice = nstd_core_slice_new(bytes.as_ptr().cast(), 1, len).unwrap();
+///     let slice = nstd_core_slice_new(bytes.as_ptr().cast(), 1, 1, len).unwrap();
 ///     assert!(nstd_core_slice_len(&slice) == len);
 /// }
 /// ```
@@ -203,7 +247,7 @@ pub const fn nstd_core_slice_len(slice: &NSTDSlice) -> NSTDUInt {
 ///
 /// unsafe {
 ///     let bytes = "Hello, world!".as_bytes();
-///     let slice = nstd_core_slice_new(bytes.as_ptr().cast(), 1, bytes.len()).unwrap();
+///     let slice = nstd_core_slice_new(bytes.as_ptr().cast(), 1, 1, bytes.len()).unwrap();
 ///     assert!(nstd_core_slice_stride(&slice) == 1);
 /// }
 /// ```
@@ -211,6 +255,33 @@ pub const fn nstd_core_slice_len(slice: &NSTDSlice) -> NSTDUInt {
 #[nstdapi]
 pub const fn nstd_core_slice_stride(slice: &NSTDSlice) -> NSTDUInt {
     slice.stride
+}
+
+/// Returns the alignment of each value in a slice.
+///
+/// # Parameters:
+///
+/// - `const NSTDSlice *slice` - The slice.
+///
+/// # Returns
+///
+/// `NSTDUInt align` - The alignment of each value in the slice.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::slice::{nstd_core_slice_align, nstd_core_slice_new};
+///
+/// unsafe {
+///     let bytes = "Hello, world!".as_bytes();
+///     let slice = nstd_core_slice_new(bytes.as_ptr().cast(), 1, 1, bytes.len()).unwrap();
+///     assert!(nstd_core_slice_align(&slice) == 1);
+/// }
+/// ```
+#[inline]
+#[nstdapi]
+pub const fn nstd_core_slice_align(slice: &NSTDSlice) -> NSTDUInt {
+    slice.align
 }
 
 /// Returns an immutable pointer to the element at index `pos` in `slice`.
@@ -232,10 +303,12 @@ pub const fn nstd_core_slice_stride(slice: &NSTDSlice) -> NSTDUInt {
 /// use nstd_sys::core::slice::{nstd_core_slice_get, nstd_core_slice_new};
 ///
 /// const STRIDE: usize = core::mem::size_of::<i32>();
+/// const ALIGN: usize = core::mem::align_of::<i32>();
 ///
 /// unsafe {
 ///     let numbers: [i32; 3] = [33, 103, 45];
-///     let slice = nstd_core_slice_new(numbers.as_ptr().cast(), STRIDE, numbers.len()).unwrap();
+///     let slice =
+///         nstd_core_slice_new(numbers.as_ptr().cast(), STRIDE, ALIGN, numbers.len()).unwrap();
 ///
 ///     assert!(*nstd_core_slice_get(&slice, 0).cast::<i32>() == 33);
 ///     assert!(*nstd_core_slice_get(&slice, 1).cast::<i32>() == 103);
@@ -272,12 +345,13 @@ pub const fn nstd_core_slice_get(slice: &NSTDSlice, mut pos: NSTDUInt) -> NSTDAn
 /// use nstd_sys::core::slice::{nstd_core_slice_first, nstd_core_slice_new};
 ///
 /// const STRIDE: usize = core::mem::size_of::<u64>();
+/// const ALIGN: usize = core::mem::align_of::<u64>();
 ///
 /// unsafe {
 ///     let numbers: [u64; 3] = [707, 23043, 8008];
 ///     let numbers_ptr = numbers.as_ptr().cast();
-///     let slice = nstd_core_slice_new(numbers_ptr, STRIDE, numbers.len()).unwrap();
-///     let empty = nstd_core_slice_new(numbers_ptr, STRIDE, 0).unwrap();
+///     let slice = nstd_core_slice_new(numbers_ptr, STRIDE, ALIGN, numbers.len()).unwrap();
+///     let empty = nstd_core_slice_new(numbers_ptr, STRIDE, ALIGN, 0).unwrap();
 ///
 ///     assert!(nstd_core_slice_first(&slice) == numbers_ptr);
 ///     assert!(*nstd_core_slice_first(&slice).cast::<u64>() == 707);
@@ -310,12 +384,13 @@ pub const fn nstd_core_slice_first(slice: &NSTDSlice) -> NSTDAny {
 /// use nstd_sys::core::slice::{nstd_core_slice_last, nstd_core_slice_new};
 ///
 /// const STRIDE: usize = core::mem::size_of::<u64>();
+/// const ALIGN: usize = core::mem::align_of::<u64>();
 ///
 /// unsafe {
 ///     let numbers: [u64; 3] = [717, 421, 4317];
 ///     let numbers_ptr = numbers.as_ptr().cast();
-///     let slice = nstd_core_slice_new(numbers_ptr, STRIDE, numbers.len()).unwrap();
-///     let empty = nstd_core_slice_new(numbers_ptr, STRIDE, 0).unwrap();
+///     let slice = nstd_core_slice_new(numbers_ptr, STRIDE, ALIGN, numbers.len()).unwrap();
+///     let empty = nstd_core_slice_new(numbers_ptr, STRIDE, ALIGN, 0).unwrap();
 ///
 ///     assert!(*nstd_core_slice_last(&slice).cast::<u64>() == 4317);
 ///     assert!(nstd_core_slice_last(&empty).is_null());
@@ -340,6 +415,8 @@ pub struct NSTDSliceMut {
     len: NSTDUInt,
     /// The slice's stride.
     stride: NSTDUInt,
+    /// The slice's align.
+    align: NSTDUInt,
 }
 impl NSTDSliceMut {
     /// Creates a mutable Rust slice from this `NSTDSliceMut`.
@@ -371,21 +448,35 @@ gen_optional!(NSTDOptionalSliceMut, NSTDSliceMut);
 ///
 /// - `NSTDUInt stride` - The number of bytes each element occupies.
 ///
+/// - `NSTDUInt align` - The alignment of each element in the slice.
+///
 /// - `NSTDUInt len` - The number of elements in the sequence.
 ///
 /// # Returns
 ///
 /// `NSTDOptionalSliceMut slice` - The new slice on success, or an uninitialized "none" variant if
-/// either `ptr` is null or the slice's length in bytes would exceed `NSTDInt`'s max value.
+/// `ptr` is null, `align` is not a power of two, `stride` is not a multiple of `align`, `ptr` is
+/// not a multiple of `align`, or the slice's length in bytes would exceed `NSTDInt`'s max value.
 #[nstdapi]
 pub fn nstd_core_slice_mut_new(
     ptr: NSTDAnyMut,
     stride: NSTDUInt,
+    align: NSTDUInt,
     len: NSTDUInt,
 ) -> NSTDOptionalSliceMut {
     if let Some(size) = len.checked_mul(stride) {
-        if size <= NSTD_INT_MAX && !ptr.is_null() {
-            return NSTDOptional::Some(NSTDSliceMut { ptr, len, stride });
+        if size <= NSTD_INT_MAX
+            && crate::core::mem::is_power_of_two(align)
+            && stride % align == 0
+            && !ptr.is_null()
+            && nstd_core_mem_is_aligned(ptr, align)
+        {
+            return NSTDOptional::Some(NSTDSliceMut {
+                ptr,
+                len,
+                stride,
+                align,
+            });
         }
     }
     NSTDOptional::None
@@ -399,6 +490,8 @@ pub fn nstd_core_slice_mut_new(
 ///
 /// - `NSTDUInt stride` - The number of bytes each element occupies.
 ///
+/// - `NSTDUInt align` - The alignment of each element in the slice.
+///
 /// - `NSTDUInt len` - The number of elements in the sequence.
 ///
 /// # Returns
@@ -407,16 +500,29 @@ pub fn nstd_core_slice_mut_new(
 ///
 /// # Safety
 ///
-/// The user of this function must ensure that `ptr` is non-null, and that the slice's total length
-/// in bytes will not exceed `NSTDInt`'s max value.
+/// - `ptr` must be non-null.
+///
+/// - `align` must be a nonzero power of two.
+///
+/// - `stride` must be a multiple of `align`.
+///
+/// - `ptr` must be a multiple of `align`.
+///
+/// - The slice's total length in bytes will not exceed `NSTDInt`'s max value.
 #[inline]
 #[nstdapi]
 pub const unsafe fn nstd_core_slice_mut_new_unchecked(
     ptr: NSTDAnyMut,
     stride: NSTDUInt,
+    align: NSTDUInt,
     len: NSTDUInt,
 ) -> NSTDSliceMut {
-    NSTDSliceMut { ptr, len, stride }
+    NSTDSliceMut {
+        ptr,
+        len,
+        stride,
+        align,
+    }
 }
 
 /// Creates a new empty slice with a given `stride`.
@@ -425,16 +531,25 @@ pub const unsafe fn nstd_core_slice_mut_new_unchecked(
 ///
 /// - `NSTDUInt stride` - The number of bytes each element occupies.
 ///
+/// - `NSTDUInt align` - The alignment of each element in the slice.
+///
 /// # Returns
 ///
 /// `NSTDSliceMut slice` - The new empty slice.
+///
+/// # Panics
+///
+/// This operation will panic if either `align` is not a power of two or `stride` is not a multiple
+/// of `align`.
 #[inline]
 #[nstdapi]
-pub const fn nstd_core_slice_mut_empty(stride: NSTDUInt) -> NSTDSliceMut {
+pub const fn nstd_core_slice_mut_empty(stride: NSTDUInt, align: NSTDUInt) -> NSTDSliceMut {
+    assert!(crate::core::mem::is_power_of_two(align) && stride % align == 0);
     NSTDSliceMut {
-        ptr: nstd_core_mem_dangling_mut(),
+        ptr: align as NSTDAnyMut,
         len: 0,
         stride,
+        align,
     }
 }
 
@@ -453,7 +568,7 @@ pub const fn nstd_core_slice_mut_as_const(slice: &NSTDSliceMut) -> NSTDSlice {
     let ptr = nstd_core_slice_mut_as_ptr_const(slice);
     let stride = nstd_core_slice_mut_stride(slice);
     // SAFETY: `ptr` is never null.
-    unsafe { nstd_core_slice_new_unchecked(ptr, stride, slice.len) }
+    unsafe { nstd_core_slice_new_unchecked(ptr, stride, slice.align, slice.len) }
 }
 
 /// Returns a raw pointer to the slice's memory.
@@ -474,11 +589,12 @@ pub const fn nstd_core_slice_mut_as_const(slice: &NSTDSliceMut) -> NSTDSlice {
 /// };
 ///
 /// const STRIDE: usize = core::mem::size_of::<u16>();
+/// const ALIGN: usize = core::mem::align_of::<u16>();
 ///
 /// unsafe {
 ///     let mut buf: [u16; 3] = [3, 5, 7];
 ///     let ptr = buf.as_mut_ptr().cast();
-///     let mut slice = nstd_core_slice_mut_new(ptr, STRIDE, buf.len()).unwrap();
+///     let mut slice = nstd_core_slice_mut_new(ptr, STRIDE, ALIGN, buf.len()).unwrap();
 ///
 ///     *nstd_core_slice_mut_as_ptr(&mut slice).cast::<u16>() = 1;
 ///     assert!(*nstd_core_slice_mut_get_const(&slice, 0).cast::<u16>() == 1);
@@ -508,7 +624,7 @@ pub fn nstd_core_slice_mut_as_ptr(slice: &mut NSTDSliceMut) -> NSTDAnyMut {
 /// unsafe {
 ///     let mut m33 = String::from("33marrow");
 ///     let raw_ptr = m33.as_mut_ptr().cast();
-///     let slice = nstd_core_slice_mut_new(raw_ptr, 1, m33.len()).unwrap();
+///     let slice = nstd_core_slice_mut_new(raw_ptr, 1, 1, m33.len()).unwrap();
 ///     assert!(nstd_core_slice_mut_as_ptr_const(&slice) == raw_ptr);
 /// }
 /// ```
@@ -536,7 +652,7 @@ pub const fn nstd_core_slice_mut_as_ptr_const(slice: &NSTDSliceMut) -> NSTDAny {
 /// unsafe {
 ///     let mut bye = String::from("Goodbye, cruel world!");
 ///     let len = bye.len();
-///     let slice = nstd_core_slice_mut_new(bye.as_mut_ptr().cast(), 1, len).unwrap();
+///     let slice = nstd_core_slice_mut_new(bye.as_mut_ptr().cast(), 1, 1, len).unwrap();
 ///     assert!(nstd_core_slice_mut_len(&slice) == len);
 /// }
 /// ```
@@ -563,7 +679,7 @@ pub const fn nstd_core_slice_mut_len(slice: &NSTDSliceMut) -> NSTDUInt {
 ///
 /// unsafe {
 ///     let mut hw = String::from("Hello, world!");
-///     let slice = nstd_core_slice_mut_new(hw.as_mut_ptr().cast(), 1, hw.len()).unwrap();
+///     let slice = nstd_core_slice_mut_new(hw.as_mut_ptr().cast(), 1, 1, hw.len()).unwrap();
 ///     assert!(nstd_core_slice_mut_stride(&slice) == 1);
 /// }
 /// ```
@@ -571,6 +687,33 @@ pub const fn nstd_core_slice_mut_len(slice: &NSTDSliceMut) -> NSTDUInt {
 #[nstdapi]
 pub const fn nstd_core_slice_mut_stride(slice: &NSTDSliceMut) -> NSTDUInt {
     slice.stride
+}
+
+/// Returns the alignment of each value in a slice.
+///
+/// # Parameters:
+///
+/// - `const NSTDSliceMut *slice` - The slice.
+///
+/// # Returns
+///
+/// `NSTDUInt align` - The alignment of each value in the slice.
+///
+/// # Example
+///
+/// ```
+/// use nstd_sys::core::slice::{nstd_core_slice_mut_align, nstd_core_slice_mut_new};
+///
+/// unsafe {
+///     let mut bytes = b"Hello, world!".to_vec();
+///     let slice = nstd_core_slice_mut_new(bytes.as_mut_ptr().cast(), 1, 1, bytes.len()).unwrap();
+///     assert!(nstd_core_slice_mut_align(&slice) == 1);
+/// }
+/// ```
+#[inline]
+#[nstdapi]
+pub const fn nstd_core_slice_mut_align(slice: &NSTDSliceMut) -> NSTDUInt {
+    slice.align
 }
 
 /// Returns a pointer to the element at index `pos` in `slice`.
@@ -592,11 +735,12 @@ pub const fn nstd_core_slice_mut_stride(slice: &NSTDSliceMut) -> NSTDUInt {
 /// use nstd_sys::core::slice::{nstd_core_slice_mut_get, nstd_core_slice_mut_new};
 ///
 /// const STRIDE: usize = core::mem::size_of::<i32>();
+/// const ALIGN: usize = core::mem::align_of::<i32>();
 ///
 /// unsafe {
 ///     let mut numbers = [0i32; 3];
 ///     let ptr = numbers.as_mut_ptr().cast();
-///     let mut slice = nstd_core_slice_mut_new(ptr, STRIDE, numbers.len()).unwrap();
+///     let mut slice = nstd_core_slice_mut_new(ptr, STRIDE, ALIGN, numbers.len()).unwrap();
 ///
 ///     *nstd_core_slice_mut_get(&mut slice, 0).cast::<i32>() = 33;
 ///     *nstd_core_slice_mut_get(&mut slice, 1).cast::<i32>() = 103;
@@ -629,11 +773,12 @@ pub fn nstd_core_slice_mut_get(slice: &mut NSTDSliceMut, pos: NSTDUInt) -> NSTDA
 /// use nstd_sys::core::slice::{nstd_core_slice_mut_get_const, nstd_core_slice_mut_new};
 ///
 /// const STRIDE: usize = core::mem::size_of::<i32>();
+/// const ALIGN: usize = core::mem::align_of::<i32>();
 ///
 /// unsafe {
 ///     let mut numbers: [i32; 3] = [33, 103, 45];
 ///     let ptr = numbers.as_mut_ptr().cast();
-///     let slice = nstd_core_slice_mut_new(ptr, STRIDE, numbers.len()).unwrap();
+///     let slice = nstd_core_slice_mut_new(ptr, STRIDE, ALIGN, numbers.len()).unwrap();
 ///
 ///     assert!(*nstd_core_slice_mut_get_const(&slice, 0).cast::<i32>() == 33);
 ///     assert!(*nstd_core_slice_mut_get_const(&slice, 1).cast::<i32>() == 103);
@@ -670,10 +815,11 @@ pub const fn nstd_core_slice_mut_get_const(slice: &NSTDSliceMut, mut pos: NSTDUI
 /// use nstd_sys::core::slice::{nstd_core_slice_mut_first, nstd_core_slice_mut_new};
 ///
 /// const STRIDE: usize = core::mem::size_of::<u64>();
+/// const ALIGN: usize = core::mem::align_of::<u64>();
 ///
 /// let mut numbers: [u64; 3] = [707, 23043, 8008];
 /// let ptr = numbers.as_mut_ptr().cast();
-/// let mut slice = unsafe { nstd_core_slice_mut_new(ptr, STRIDE, numbers.len()).unwrap() };
+/// let mut slice = unsafe { nstd_core_slice_mut_new(ptr, STRIDE, ALIGN, numbers.len()).unwrap() };
 ///
 /// unsafe { *nstd_core_slice_mut_first(&mut slice).cast::<u64>() = 101 };
 /// assert!(numbers[0] == 101);
@@ -701,12 +847,13 @@ pub fn nstd_core_slice_mut_first(slice: &mut NSTDSliceMut) -> NSTDAnyMut {
 /// use nstd_sys::core::slice::{nstd_core_slice_mut_first_const, nstd_core_slice_mut_new};
 ///
 /// const STRIDE: usize = core::mem::size_of::<u64>();
+/// const ALIGN: usize = core::mem::align_of::<u64>();
 ///
 /// unsafe {
 ///     let mut numbers: [u64; 3] = [707, 23043, 8008];
 ///     let numbers_ptr = numbers.as_mut_ptr().cast();
-///     let slice = nstd_core_slice_mut_new(numbers_ptr, STRIDE, numbers.len()).unwrap();
-///     let empty = nstd_core_slice_mut_new(numbers_ptr, STRIDE, 0).unwrap();
+///     let slice = nstd_core_slice_mut_new(numbers_ptr, STRIDE, ALIGN, numbers.len()).unwrap();
+///     let empty = nstd_core_slice_mut_new(numbers_ptr, STRIDE, ALIGN, 0).unwrap();
 ///
 ///     assert!(nstd_core_slice_mut_first_const(&slice) == numbers_ptr);
 ///     assert!(*nstd_core_slice_mut_first_const(&slice).cast::<u64>() == 707);
@@ -739,11 +886,12 @@ pub const fn nstd_core_slice_mut_first_const(slice: &NSTDSliceMut) -> NSTDAny {
 /// use nstd_sys::core::slice::{nstd_core_slice_mut_last, nstd_core_slice_mut_new};
 ///
 /// const STRIDE: usize = core::mem::size_of::<u64>();
+/// const ALIGN: usize = core::mem::align_of::<u64>();
 ///
 /// unsafe {
 ///     let mut numbers: [u64; 3] = [717, 421, 4317];
 ///     let ptr = numbers.as_mut_ptr().cast();
-///     let mut slice = nstd_core_slice_mut_new(ptr, STRIDE, numbers.len()).unwrap();
+///     let mut slice = nstd_core_slice_mut_new(ptr, STRIDE, ALIGN, numbers.len()).unwrap();
 ///
 ///     *nstd_core_slice_mut_last(&mut slice).cast::<u64>() = 1738;
 ///     assert!(numbers[2] == 1738);
@@ -772,12 +920,13 @@ pub fn nstd_core_slice_mut_last(slice: &mut NSTDSliceMut) -> NSTDAnyMut {
 /// use nstd_sys::core::slice::{nstd_core_slice_mut_last_const, nstd_core_slice_mut_new};
 ///
 /// const STRIDE: usize = core::mem::size_of::<u64>();
+/// const ALIGN: usize = core::mem::align_of::<u64>();
 ///
 /// unsafe {
 ///     let mut numbers: [u64; 3] = [717, 421, 4317];
 ///     let numbers_ptr = numbers.as_mut_ptr().cast();
-///     let slice = nstd_core_slice_mut_new(numbers_ptr, STRIDE, numbers.len()).unwrap();
-///     let empty = nstd_core_slice_mut_new(numbers_ptr, STRIDE, 0).unwrap();
+///     let slice = nstd_core_slice_mut_new(numbers_ptr, STRIDE, ALIGN, numbers.len()).unwrap();
+///     let empty = nstd_core_slice_mut_new(numbers_ptr, STRIDE, ALIGN, 0).unwrap();
 ///
 ///     assert!(*nstd_core_slice_mut_last_const(&slice).cast::<u64>() == 4317);
 ///     assert!(nstd_core_slice_mut_last_const(&empty).is_null());
@@ -821,14 +970,16 @@ pub const fn nstd_core_slice_mut_last_const(slice: &NSTDSliceMut) -> NSTDAny {
 /// };
 ///
 /// const STRIDE: usize = core::mem::size_of::<u32>();
+/// const ALIGN: usize = core::mem::align_of::<u32>();
 ///
 /// let mut dest_arr = [0u32; 5];
 /// let src_arr: [u32; 5] = [7, 43, 32, 90, 15];
 ///
 /// unsafe {
 ///     let ptr = dest_arr.as_mut_ptr().cast();
-///     let mut dest = nstd_core_slice_mut_new(ptr, STRIDE, dest_arr.len()).unwrap();
-///     let src = nstd_core_slice_new(src_arr.as_ptr().cast(), STRIDE, src_arr.len()).unwrap();
+///     let mut dest = nstd_core_slice_mut_new(ptr, STRIDE, ALIGN, dest_arr.len()).unwrap();
+///     let src =
+///         nstd_core_slice_new(src_arr.as_ptr().cast(), STRIDE, ALIGN, src_arr.len()).unwrap();
 ///
 ///     nstd_core_slice_mut_copy(&mut dest, &src);
 ///     assert!(dest_arr == src_arr);

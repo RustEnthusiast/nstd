@@ -161,7 +161,7 @@ pub unsafe fn nstd_string_from_str<'a>(
     str: &NSTDStr,
 ) -> NSTDOptionalString<'a> {
     let bytes = nstd_core_str_as_bytes(str);
-    match nstd_vec_from_slice(allocator, &bytes, 1) {
+    match nstd_vec_from_slice(allocator, &bytes) {
         NSTDOptional::Some(bytes) => NSTDOptional::Some(NSTDString { bytes }),
         NSTDOptional::None => NSTDOptional::None,
     }
@@ -388,7 +388,7 @@ pub fn nstd_string_push(string: &mut NSTDString<'_>, chr: NSTDUnichar) -> NSTDAl
     // SAFETY: `buf`'s data is stored on the stack, UTF-8 characters never occupy more than 4
     // bytes.
     unsafe {
-        let buf = nstd_core_slice_new_unchecked(buf.as_ptr().cast(), 1, chr.len_utf8());
+        let buf = nstd_core_slice_new_unchecked(buf.as_ptr().cast(), 1, 1, chr.len_utf8());
         nstd_vec_extend(&mut string.bytes, &buf)
     }
 }

@@ -12,8 +12,9 @@ use crate::{
         mem::{nstd_core_mem_copy, nstd_core_mem_copy_overlapping, nstd_core_mem_dangling_mut},
         optional::NSTDOptional,
         slice::{
-            nstd_core_slice_as_ptr, nstd_core_slice_len, nstd_core_slice_mut_new_unchecked,
-            nstd_core_slice_new_unchecked, nstd_core_slice_stride, NSTDSlice, NSTDSliceMut,
+            nstd_core_slice_align, nstd_core_slice_as_ptr, nstd_core_slice_len,
+            nstd_core_slice_mut_new_unchecked, nstd_core_slice_new_unchecked,
+            nstd_core_slice_stride, NSTDSlice, NSTDSliceMut,
         },
     },
     NSTDAny, NSTDAnyMut, NSTDBool, NSTDUInt, NSTD_NULL,
@@ -254,7 +255,7 @@ pub const fn nstd_vec_new(
 ///
 /// unsafe {
 ///     let numbers = [642i16, 324i16, 190i16];
-///     let numbers = nstd_core_slice_new(numbers.as_ptr().cast(), SIZE, 3).unwrap();
+///     let numbers = nstd_core_slice_new(numbers.as_ptr().cast(), SIZE, ALIGN, 3).unwrap();
 ///     let mut vec = nstd_vec_new_with_cap(&NSTD_ALLOCATOR, SIZE, ALIGN, 3).unwrap();
 ///     assert!(nstd_vec_extend(&mut vec, &numbers) == NSTD_ALLOC_ERROR_NONE);
 ///     for i in 0..nstd_vec_len(&vec) {
@@ -312,8 +313,6 @@ pub fn nstd_vec_new_with_cap(
 ///
 /// - `const NSTDSlice *slice` - The slice to copy data from.
 ///
-/// - `NSTDUInt align` - The alignment of each value in the slice.
-///
 /// # Returns
 ///
 /// `NSTDOptionalVec vec` - The new vector with a copy of `slice`'s contents on success, or an
@@ -337,8 +336,8 @@ pub fn nstd_vec_new_with_cap(
 ///
 /// unsafe {
 ///     let numbers = [59237u128, 13953u128, 50285u128];
-///     let numbers = nstd_core_slice_new(numbers.as_ptr().cast(), SIZE, 3).unwrap();
-///     let mut vec = nstd_vec_from_slice(&NSTD_ALLOCATOR, &numbers, ALIGN).unwrap();
+///     let numbers = nstd_core_slice_new(numbers.as_ptr().cast(), SIZE, ALIGN, 3).unwrap();
+///     let mut vec = nstd_vec_from_slice(&NSTD_ALLOCATOR, &numbers).unwrap();
 ///     for i in 0..nstd_vec_len(&vec) {
 ///         let sv = nstd_core_slice_get(&numbers, i).cast::<u128>();
 ///         let vv = nstd_vec_get(&vec, i).cast::<u128>();
@@ -351,9 +350,9 @@ pub fn nstd_vec_new_with_cap(
 pub unsafe fn nstd_vec_from_slice<'a>(
     allocator: &'a NSTDAllocator,
     slice: &NSTDSlice,
-    align: NSTDUInt,
 ) -> NSTDOptionalVec<'a> {
     let stride = nstd_core_slice_stride(slice);
+    let align = nstd_core_slice_align(slice);
     let len = nstd_core_slice_len(slice);
     #[allow(clippy::arithmetic_side_effects)]
     if len > 0 {
@@ -364,17 +363,15 @@ pub unsafe fn nstd_vec_from_slice<'a>(
             vec.len = len;
             return NSTDOptional::Some(vec);
         }
-    } else if crate::core::mem::is_power_of_two(align) && stride % align == 0 {
-        return NSTDOptional::Some(NSTDVec {
-            allocator,
-            ptr: nstd_core_mem_dangling_mut(),
-            stride,
-            align,
-            cap: 0,
-            len: 0,
-        });
     }
-    NSTDOptional::None
+    NSTDOptional::Some(NSTDVec {
+        allocator,
+        ptr: nstd_core_mem_dangling_mut(),
+        stride,
+        align,
+        cap: 0,
+        len: 0,
+    })
 }
 
 /// Creates a new deep copy of `vec`.
@@ -509,7 +506,7 @@ pub const fn nstd_vec_reserved(vec: &NSTDVec<'_>) -> NSTDUInt {
 #[nstdapi]
 pub const fn nstd_vec_as_slice(vec: &NSTDVec<'_>) -> NSTDSlice {
     // SAFETY: `vec.ptr` is checked, vector lengths are never greater than `NSTDInt`'s max value.
-    unsafe { nstd_core_slice_new_unchecked(vec.ptr, vec.stride, vec.len) }
+    unsafe { nstd_core_slice_new_unchecked(vec.ptr, vec.stride, vec.align, vec.len) }
 }
 
 /// Returns a slice containing all of a vector's active elements.
@@ -525,7 +522,7 @@ pub const fn nstd_vec_as_slice(vec: &NSTDVec<'_>) -> NSTDSlice {
 #[nstdapi]
 pub fn nstd_vec_as_slice_mut(vec: &mut NSTDVec<'_>) -> NSTDSliceMut {
     // SAFETY: `vec.ptr` is checked, vector lengths are never greater than `NSTDInt`'s max value.
-    unsafe { nstd_core_slice_mut_new_unchecked(vec.ptr, vec.stride, vec.len) }
+    unsafe { nstd_core_slice_mut_new_unchecked(vec.ptr, vec.stride, vec.align, vec.len) }
 }
 
 /// Returns a pointer to a vector's raw data.
@@ -628,8 +625,8 @@ pub fn nstd_vec_end_mut(vec: &mut NSTDVec<'_>) -> NSTDAnyMut {
 ///
 /// unsafe {
 ///     let numbers = [-639i64, 429i64, -440i64];
-///     let numbers = nstd_core_slice_new(numbers.as_ptr().cast(), SIZE, 3).unwrap();
-///     let mut vec = nstd_vec_from_slice(&NSTD_ALLOCATOR, &numbers, ALIGN).unwrap();
+///     let numbers = nstd_core_slice_new(numbers.as_ptr().cast(), SIZE, ALIGN, 3).unwrap();
+///     let mut vec = nstd_vec_from_slice(&NSTD_ALLOCATOR, &numbers).unwrap();
 ///     for i in 0..nstd_vec_len(&vec) {
 ///         let sv = nstd_core_slice_get(&numbers, i).cast::<i64>();
 ///         let vv = nstd_vec_get(&vec, i).cast::<i64>();
@@ -682,8 +679,8 @@ pub const fn nstd_vec_get(vec: &NSTDVec<'_>, mut pos: NSTDUInt) -> NSTDAny {
 ///
 /// unsafe {
 ///     let numbers = [639i64, -429i64, 440i64];
-///     let numbers = nstd_core_slice_new(numbers.as_ptr().cast(), SIZE, 3).unwrap();
-///     let mut vec = nstd_vec_from_slice(&NSTD_ALLOCATOR, &numbers, ALIGN).unwrap();
+///     let numbers = nstd_core_slice_new(numbers.as_ptr().cast(), SIZE, ALIGN, 3).unwrap();
+///     let mut vec = nstd_vec_from_slice(&NSTD_ALLOCATOR, &numbers).unwrap();
 ///     for i in 0..nstd_vec_len(&vec) {
 ///         let vv = nstd_vec_get_mut(&mut vec, i).cast::<i64>();
 ///         assert!(!vv.is_null());
@@ -789,7 +786,7 @@ pub unsafe fn nstd_vec_push(vec: &mut NSTDVec<'_>, value: NSTDAny) -> NSTDAllocE
 /// unsafe {
 ///     let mut vec = nstd_vec_new(&NSTD_ALLOCATOR, SIZE, ALIGN);
 ///     let values: [f64; 3] = [9.4, 3.1, 6.0];
-///     let values_slice = nstd_core_slice_new(values.as_ptr().cast(), SIZE, 3).unwrap();
+///     let values_slice = nstd_core_slice_new(values.as_ptr().cast(), SIZE, ALIGN, 3).unwrap();
 ///     nstd_vec_extend(&mut vec, &values_slice);
 ///     for value in values.iter().rev() {
 ///         assert!(*value == *nstd_vec_pop(&mut vec).cast::<f64>());
@@ -847,8 +844,8 @@ pub fn nstd_vec_pop(vec: &mut NSTDVec<'_>) -> NSTDAny {
 ///
 /// unsafe {
 ///     let slice: [u32; 4] = [1, 2, 3, 5];
-///     let slice = nstd_core_slice_new(slice.as_ptr().cast(), SIZE, 4).unwrap();
-///     let mut vec = nstd_vec_from_slice(&NSTD_ALLOCATOR, &slice, ALIGN).unwrap();
+///     let slice = nstd_core_slice_new(slice.as_ptr().cast(), SIZE, ALIGN, 4).unwrap();
+///     let mut vec = nstd_vec_from_slice(&NSTD_ALLOCATOR, &slice).unwrap();
 ///     let four = 4u32;
 ///     assert!(nstd_vec_insert(&mut vec, addr_of!(four).cast(), 3) == 0);
 ///     for i in 1..=5 {
@@ -922,8 +919,8 @@ pub unsafe fn nstd_vec_insert(
 ///
 /// unsafe {
 ///     let slice: [u32; 5] = [1, 2, 3, 4, 5];
-///     let slice = nstd_core_slice_new(slice.as_ptr().cast(), SIZE, 5).unwrap();
-///     let mut vec = nstd_vec_from_slice(&NSTD_ALLOCATOR, &slice, ALIGN).unwrap();
+///     let slice = nstd_core_slice_new(slice.as_ptr().cast(), SIZE, ALIGN, 5).unwrap();
+///     let mut vec = nstd_vec_from_slice(&NSTD_ALLOCATOR, &slice).unwrap();
 ///     assert!(nstd_vec_remove(&mut vec, 0) == 0);
 ///     assert!(nstd_vec_remove(&mut vec, 3) == 0);
 ///     for i in 0..3 {
@@ -988,11 +985,11 @@ pub fn nstd_vec_remove(vec: &mut NSTDVec<'_>, mut index: NSTDUInt) -> NSTDErrorC
 /// };
 ///
 /// const SIZE: usize = core::mem::size_of::<i128>();
-/// const ALIGN: usize = core::mem::size_of::<i128>();
+/// const ALIGN: usize = core::mem::align_of::<i128>();
 ///
 /// unsafe {
 ///     let values: [i128; 5] = [1, 2, 3, 4, 5];
-///     let slice = nstd_core_slice_new(values.as_ptr().cast(), SIZE, 5).unwrap();
+///     let slice = nstd_core_slice_new(values.as_ptr().cast(), SIZE, ALIGN, 5).unwrap();
 ///     let mut vec = nstd_vec_new(&NSTD_ALLOCATOR, SIZE, ALIGN);
 ///     assert!(nstd_vec_extend(&mut vec, &slice) == NSTD_ALLOC_ERROR_NONE);
 ///     for i in 0..5 {

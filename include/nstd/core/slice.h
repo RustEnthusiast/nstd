@@ -11,6 +11,8 @@ typedef struct {
     NSTDUInt len;
     /// The slice's stride.
     NSTDUInt stride;
+    /// The slice's align.
+    NSTDUInt align;
 } NSTDSlice;
 
 /// Represents an optional value of type `NSTDSlice`.
@@ -24,13 +26,17 @@ NSTDOptional(NSTDSlice) NSTDOptionalSlice;
 ///
 /// - `NSTDUInt stride` - The number of bytes each element occupies.
 ///
+/// - `NSTDUInt align` - The alignment of each element in the slice.
+///
 /// - `NSTDUInt len` - The number of elements in the sequence.
 ///
 /// # Returns
 ///
 /// `NSTDOptionalSlice slice` - The new slice on success, or an uninitialized "none" variant if
-/// either `ptr` is null or the slice's length in bytes would exceed `NSTDInt`'s max value.
-NSTDAPI NSTDOptionalSlice nstd_core_slice_new(NSTDAny ptr, NSTDUInt stride, NSTDUInt len);
+/// `ptr` is null, `align` is not a power of two, `stride` is not a multiple of `align`, `ptr` is
+/// not a multiple of `align`, or the slice's length in bytes would exceed `NSTDInt`'s max value.
+NSTDAPI NSTDOptionalSlice
+nstd_core_slice_new(NSTDAny ptr, NSTDUInt stride, NSTDUInt align, NSTDUInt len);
 
 /// Creates a new slice from raw data without checking if `ptr` is null.
 ///
@@ -40,6 +46,8 @@ NSTDAPI NSTDOptionalSlice nstd_core_slice_new(NSTDAny ptr, NSTDUInt stride, NSTD
 ///
 /// - `NSTDUInt stride` - The number of bytes each element occupies.
 ///
+/// - `NSTDUInt align` - The alignment of each element in the slice.
+///
 /// - `NSTDUInt len` - The number of elements in the sequence.
 ///
 /// # Returns
@@ -48,9 +56,17 @@ NSTDAPI NSTDOptionalSlice nstd_core_slice_new(NSTDAny ptr, NSTDUInt stride, NSTD
 ///
 /// # Safety
 ///
-/// The user of this function must ensure that `ptr` is non-null, and that the slice's total length
-/// in bytes will not exceed `NSTDInt`'s max value.
-NSTDAPI NSTDSlice nstd_core_slice_new_unchecked(NSTDAny ptr, NSTDUInt stride, NSTDUInt len);
+/// - `ptr` must be non-null.
+///
+/// - `align` must be a nonzero power of two.
+///
+/// - `stride` must be a multiple of `align`.
+///
+/// - `ptr` must be a multiple of `align`.
+///
+/// - The slice's total length in bytes will not exceed `NSTDInt`'s max value.
+NSTDAPI NSTDSlice
+nstd_core_slice_new_unchecked(NSTDAny ptr, NSTDUInt stride, NSTDUInt align, NSTDUInt len);
 
 /// Creates a new empty slice with a given `stride`.
 ///
@@ -58,10 +74,17 @@ NSTDAPI NSTDSlice nstd_core_slice_new_unchecked(NSTDAny ptr, NSTDUInt stride, NS
 ///
 /// - `NSTDUInt stride` - The number of bytes each element occupies.
 ///
+/// - `NSTDUInt align` - The alignment of each element in the slice.
+///
 /// # Returns
 ///
 /// `NSTDSlice slice` - The new empty slice.
-NSTDAPI NSTDSlice nstd_core_slice_empty(NSTDUInt stride);
+///
+/// # Panics
+///
+/// This operation will panic if either `align` is not a power of two or `stride` is not a multiple
+/// of `align`.
+NSTDAPI NSTDSlice nstd_core_slice_empty(NSTDUInt stride, NSTDUInt align);
 
 /// Returns a raw pointer to the slice's memory.
 ///
@@ -95,6 +118,17 @@ NSTDAPI NSTDUInt nstd_core_slice_len(const NSTDSlice *slice);
 ///
 /// `NSTDUInt stride` - The size of each value in the slice.
 NSTDAPI NSTDUInt nstd_core_slice_stride(const NSTDSlice *slice);
+
+/// Returns the alignment of each value in a slice.
+///
+/// # Parameters:
+///
+/// - `const NSTDSlice *slice` - The slice.
+///
+/// # Returns
+///
+/// `NSTDUInt align` - The alignment of each value in the slice.
+NSTDAPI NSTDUInt nstd_core_slice_align(const NSTDSlice *slice);
 
 /// Returns an immutable pointer to the element at index `pos` in `slice`.
 ///
@@ -142,6 +176,8 @@ typedef struct {
     NSTDUInt len;
     /// The slice's stride.
     NSTDUInt stride;
+    /// The slice's align.
+    NSTDUInt align;
 } NSTDSliceMut;
 
 /// Represents an optional value of type `NSTDSliceMut`.
@@ -155,13 +191,17 @@ NSTDOptional(NSTDSliceMut) NSTDOptionalSliceMut;
 ///
 /// - `NSTDUInt stride` - The number of bytes each element occupies.
 ///
+/// - `NSTDUInt align` - The alignment of each element in the slice.
+///
 /// - `NSTDUInt len` - The number of elements in the sequence.
 ///
 /// # Returns
 ///
 /// `NSTDOptionalSliceMut slice` - The new slice on success, or an uninitialized "none" variant if
-/// either `ptr` is null or the slice's length in bytes would exceed `NSTDInt`'s max value.
-NSTDAPI NSTDOptionalSliceMut nstd_core_slice_mut_new(NSTDAnyMut ptr, NSTDUInt stride, NSTDUInt len);
+/// `ptr` is null, `align` is not a power of two, `stride` is not a multiple of `align`, `ptr` is
+/// not a multiple of `align`, or the slice's length in bytes would exceed `NSTDInt`'s max value.
+NSTDAPI NSTDOptionalSliceMut
+nstd_core_slice_mut_new(NSTDAnyMut ptr, NSTDUInt stride, NSTDUInt align, NSTDUInt len);
 
 /// Creates a new slice from raw data without checking if `ptr` is null.
 ///
@@ -171,6 +211,8 @@ NSTDAPI NSTDOptionalSliceMut nstd_core_slice_mut_new(NSTDAnyMut ptr, NSTDUInt st
 ///
 /// - `NSTDUInt stride` - The number of bytes each element occupies.
 ///
+/// - `NSTDUInt align` - The alignment of each element in the slice.
+///
 /// - `NSTDUInt len` - The number of elements in the sequence.
 ///
 /// # Returns
@@ -179,10 +221,17 @@ NSTDAPI NSTDOptionalSliceMut nstd_core_slice_mut_new(NSTDAnyMut ptr, NSTDUInt st
 ///
 /// # Safety
 ///
-/// The user of this function must ensure that `ptr` is non-null, and that the slice's total length
-/// in bytes will not exceed `NSTDInt`'s max value.
+/// - `ptr` must be non-null.
+///
+/// - `align` must be a nonzero power of two.
+///
+/// - `stride` must be a multiple of `align`.
+///
+/// - `ptr` must be a multiple of `align`.
+///
+/// - The slice's total length in bytes will not exceed `NSTDInt`'s max value.
 NSTDAPI NSTDSliceMut
-nstd_core_slice_mut_new_unchecked(NSTDAnyMut ptr, NSTDUInt stride, NSTDUInt len);
+nstd_core_slice_mut_new_unchecked(NSTDAnyMut ptr, NSTDUInt stride, NSTDUInt align, NSTDUInt len);
 
 /// Creates a new empty slice with a given `stride`.
 ///
@@ -190,10 +239,17 @@ nstd_core_slice_mut_new_unchecked(NSTDAnyMut ptr, NSTDUInt stride, NSTDUInt len)
 ///
 /// - `NSTDUInt stride` - The number of bytes each element occupies.
 ///
+/// - `NSTDUInt align` - The alignment of each element in the slice.
+///
 /// # Returns
 ///
 /// `NSTDSliceMut slice` - The new empty slice.
-NSTDAPI NSTDSliceMut nstd_core_slice_mut_empty(NSTDUInt stride);
+///
+/// # Panics
+///
+/// This operation will panic if either `align` is not a power of two or `stride` is not a multiple
+/// of `align`.
+NSTDAPI NSTDSliceMut nstd_core_slice_mut_empty(NSTDUInt stride, NSTDUInt align);
 
 /// Creates an immutable version of a mutable slice.
 ///
@@ -249,6 +305,17 @@ NSTDAPI NSTDUInt nstd_core_slice_mut_len(const NSTDSliceMut *slice);
 ///
 /// `NSTDUInt stride` - The size of each value in the slice.
 NSTDAPI NSTDUInt nstd_core_slice_mut_stride(const NSTDSliceMut *slice);
+
+/// Returns the alignment of each value in a slice.
+///
+/// # Parameters:
+///
+/// - `const NSTDSliceMut *slice` - The slice.
+///
+/// # Returns
+///
+/// `NSTDUInt align` - The alignment of each value in the slice.
+NSTDAPI NSTDUInt nstd_core_slice_mut_align(const NSTDSliceMut *slice);
 
 /// Returns a pointer to the element at index `pos` in `slice`.
 ///

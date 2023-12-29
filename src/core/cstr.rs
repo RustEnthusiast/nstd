@@ -203,7 +203,7 @@ pub unsafe fn nstd_core_cstr_from_raw_with_null(raw: *const NSTDChar) -> NSTDCSt
 #[nstdapi]
 pub const fn nstd_core_cstr_as_bytes(cstr: &NSTDCStr) -> NSTDSlice {
     // SAFETY: `cstr.ptr` is never null.
-    unsafe { nstd_core_slice_new_unchecked(cstr.ptr.cast(), 1, cstr.len) }
+    unsafe { nstd_core_slice_new_unchecked(cstr.ptr.cast(), 1, 1, cstr.len) }
 }
 
 /// Returns a pointer to the first character in a C string slice.
@@ -675,7 +675,7 @@ pub const fn nstd_core_cstr_mut_as_const(cstr: &NSTDCStrMut) -> NSTDCStr {
 #[nstdapi]
 pub const fn nstd_core_cstr_mut_as_bytes(cstr: &NSTDCStrMut) -> NSTDSlice {
     // SAFETY: `cstr.ptr` is never null.
-    unsafe { nstd_core_slice_new_unchecked(cstr.ptr.cast(), 1, cstr.len) }
+    unsafe { nstd_core_slice_new_unchecked(cstr.ptr.cast(), 1, 1, cstr.len) }
 }
 
 /// Returns a pointer to the first character in a C string slice.

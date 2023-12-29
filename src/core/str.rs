@@ -283,7 +283,7 @@ pub unsafe fn nstd_core_str_from_raw_cstr_with_null(cstr: *const NSTDChar) -> NS
 ///
 /// let s_str = "Hello, world!\0";
 /// unsafe {
-///     let bytes = nstd_core_slice_new(s_str.as_ptr().cast(), 1, s_str.len()).unwrap();
+///     let bytes = nstd_core_slice_new(s_str.as_ptr().cast(), 1, 1, s_str.len()).unwrap();
 ///     let str = nstd_core_str_from_bytes(&bytes).unwrap();
 ///     assert!(nstd_core_str_byte_len(&str) == 14);
 /// }
@@ -333,7 +333,7 @@ pub const unsafe fn nstd_core_str_from_bytes(bytes: &NSTDSlice) -> NSTDOptionalS
 ///
 /// let s_str = "Goodbye, world!\0";
 /// unsafe {
-///     let bytes = nstd_core_slice_new(s_str.as_ptr().cast(), 1, s_str.len()).unwrap();
+///     let bytes = nstd_core_slice_new(s_str.as_ptr().cast(), 1, 1, s_str.len()).unwrap();
 ///     let str = nstd_core_str_from_bytes_unchecked(&bytes);
 ///     assert!(nstd_core_str_byte_len(&str) == 16);
 /// }
@@ -393,7 +393,7 @@ pub const fn nstd_core_str_as_cstr(str: &NSTDStr) -> NSTDCStr {
 pub const fn nstd_core_str_as_bytes(str: &NSTDStr) -> NSTDSlice {
     // SAFETY: `str.ptr` is never null, string slice lengths are never greater than `NSTDInt`'s max
     // value.
-    unsafe { nstd_core_slice_new_unchecked(str.ptr.cast(), 1, str.len) }
+    unsafe { nstd_core_slice_new_unchecked(str.ptr.cast(), 1, 1, str.len) }
 }
 
 /// Returns a raw pointer to a string slice's memory.
@@ -561,7 +561,7 @@ pub const unsafe fn nstd_core_str_substr(str: &NSTDStr, range: NSTDURange) -> NS
     // Create the byte slice with `range` and use it to create the new string slice.
     let start = str.ptr.add(range.start).cast();
     #[allow(clippy::arithmetic_side_effects)]
-    let bytes = nstd_core_slice_new_unchecked(start, 1, range.end - range.start);
+    let bytes = nstd_core_slice_new_unchecked(start, 1, 1, range.end - range.start);
     nstd_core_str_from_bytes(&bytes)
 }
 
@@ -1034,7 +1034,8 @@ pub unsafe fn nstd_core_str_mut_from_raw_cstr_with_null(cstr: *mut NSTDChar) -> 
 ///
 /// let mut s_str = String::from("Hello, world!\0");
 /// unsafe {
-///     let mut bytes = nstd_core_slice_mut_new(s_str.as_mut_ptr().cast(), 1, s_str.len()).unwrap();
+///     let mut bytes =
+///         nstd_core_slice_mut_new(s_str.as_mut_ptr().cast(), 1, 1, s_str.len()).unwrap();
 ///     let str = nstd_core_str_mut_from_bytes(&mut bytes).unwrap();
 ///     assert!(nstd_core_str_mut_byte_len(&str) == 14);
 /// }
@@ -1084,7 +1085,8 @@ pub unsafe fn nstd_core_str_mut_from_bytes(bytes: &mut NSTDSliceMut) -> NSTDOpti
 ///
 /// let mut s_str = String::from("Goodbye, world!\0");
 /// unsafe {
-///     let mut bytes = nstd_core_slice_mut_new(s_str.as_mut_ptr().cast(), 1, s_str.len()).unwrap();
+///     let mut bytes =
+///         nstd_core_slice_mut_new(s_str.as_mut_ptr().cast(), 1, 1, s_str.len()).unwrap();
 ///     let str = nstd_core_str_mut_from_bytes_unchecked(&mut bytes);
 ///     assert!(nstd_core_str_mut_byte_len(&str) == 16);
 /// }
@@ -1163,7 +1165,7 @@ pub const fn nstd_core_str_mut_as_cstr(str: &NSTDStrMut) -> NSTDCStr {
 pub const fn nstd_core_str_mut_as_bytes(str: &NSTDStrMut) -> NSTDSlice {
     // SAFETY: `str.ptr` is never null, string slice lengths are never greater than `NSTDInt`'s max
     // value.
-    unsafe { nstd_core_slice_new_unchecked(str.ptr.cast(), 1, str.len) }
+    unsafe { nstd_core_slice_new_unchecked(str.ptr.cast(), 1, 1, str.len) }
 }
 
 /// Returns an immutable raw pointer to a string slice's memory.
@@ -1338,7 +1340,7 @@ pub unsafe fn nstd_core_str_mut_substr(
     // Create the byte slice with `range` and use it to create the new string slice.
     let start = str.ptr.add(range.start).cast();
     #[allow(clippy::arithmetic_side_effects)]
-    let mut bytes = nstd_core_slice_mut_new_unchecked(start, 1, range.end - range.start);
+    let mut bytes = nstd_core_slice_mut_new_unchecked(start, 1, 1, range.end - range.start);
     nstd_core_str_mut_from_bytes(&mut bytes)
 }
 
