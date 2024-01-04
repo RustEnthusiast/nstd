@@ -1,4 +1,4 @@
-# TBD
+# 0.13.0
 ## Added
 ### `nstd.core`
 - Added `core.alloc`.
