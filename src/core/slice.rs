@@ -86,6 +86,7 @@ pub fn nstd_core_slice_new(
     len: NSTDUInt,
 ) -> NSTDOptionalSlice {
     if let Some(size) = len.checked_mul(stride) {
+        #[allow(clippy::arithmetic_side_effects)]
         if size <= NSTD_INT_MAX
             && crate::core::mem::is_power_of_two(align)
             && stride % align == 0
@@ -164,6 +165,7 @@ pub const unsafe fn nstd_core_slice_new_unchecked(
 /// of `align`.
 #[inline]
 #[nstdapi]
+#[allow(clippy::arithmetic_side_effects)]
 pub const fn nstd_core_slice_empty(stride: NSTDUInt, align: NSTDUInt) -> NSTDSlice {
     assert!(crate::core::mem::is_power_of_two(align) && stride % align == 0);
     NSTDSlice {
@@ -465,6 +467,7 @@ pub fn nstd_core_slice_mut_new(
     len: NSTDUInt,
 ) -> NSTDOptionalSliceMut {
     if let Some(size) = len.checked_mul(stride) {
+        #[allow(clippy::arithmetic_side_effects)]
         if size <= NSTD_INT_MAX
             && crate::core::mem::is_power_of_two(align)
             && stride % align == 0
@@ -543,6 +546,7 @@ pub const unsafe fn nstd_core_slice_mut_new_unchecked(
 /// of `align`.
 #[inline]
 #[nstdapi]
+#[allow(clippy::arithmetic_side_effects)]
 pub const fn nstd_core_slice_mut_empty(stride: NSTDUInt, align: NSTDUInt) -> NSTDSliceMut {
     assert!(crate::core::mem::is_power_of_two(align) && stride % align == 0);
     NSTDSliceMut {

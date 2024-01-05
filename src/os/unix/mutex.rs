@@ -331,6 +331,7 @@ pub fn nstd_os_unix_mutex_timed_lock<'m, 'a>(
 /// `NSTDAny data` - A pointer to the mutex's data.
 #[inline]
 #[nstdapi]
+#[allow(clippy::missing_const_for_fn)]
 pub fn nstd_os_unix_mutex_get(guard: &NSTDUnixMutexGuard<'_, '_>) -> NSTDAny {
     // SAFETY: `mutex` is behind a valid reference.
     nstd_heap_ptr_get(unsafe { &*guard.mutex.data.get() })
