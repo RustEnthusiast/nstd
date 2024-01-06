@@ -120,6 +120,36 @@ pub const fn nstd_core_ptr_size(ptr: &NSTDPtr) -> NSTDUInt {
     ptr.size
 }
 
+/// Returns the alignment of the object being pointed to.
+///
+/// # Parameters:
+///
+/// - `const NSTDPtr *ptr` - The pointer.
+///
+/// # Returns
+///
+/// `NSTDUInt align` - The alignment of the object pointed to by `ptr`.
+///
+/// # Examples
+///
+/// ```
+/// use core::ptr::addr_of;
+/// use nstd_sys::core::ptr::{nstd_core_ptr_align, nstd_core_ptr_new};
+///
+/// unsafe {
+///     const SIZE: usize = core::mem::size_of::<[u8; 32]>();
+///     const ALIGN: usize = core::mem::align_of::<[u8; 32]>();
+///     let x = [33u8; 32];
+///     let ptr = nstd_core_ptr_new(addr_of!(x).cast(), SIZE, ALIGN).unwrap();
+///     assert!(nstd_core_ptr_align(&ptr) == ALIGN);
+/// }
+/// ```
+#[inline]
+#[nstdapi]
+pub const fn nstd_core_ptr_align(ptr: &NSTDPtr) -> NSTDUInt {
+    ptr.align
+}
+
 /// Returns a raw immutable pointer to the object pointed to by `ptr`.
 ///
 /// # Parameters:
@@ -279,6 +309,36 @@ pub const fn nstd_core_ptr_mut_as_const(ptr: &NSTDPtrMut) -> NSTDPtr {
 #[nstdapi]
 pub const fn nstd_core_ptr_mut_size(ptr: &NSTDPtrMut) -> NSTDUInt {
     ptr.size
+}
+
+/// Returns the alignment of the object being pointed to.
+///
+/// # Parameters:
+///
+/// - `const NSTDPtrMut *ptr` - The pointer.
+///
+/// # Returns
+///
+/// `NSTDUInt align` - The alignment of the object pointed to by `ptr`.
+///
+/// # Examples
+///
+/// ```
+/// use core::ptr::addr_of_mut;
+/// use nstd_sys::core::ptr::{nstd_core_ptr_mut_align, nstd_core_ptr_mut_new};
+///
+/// unsafe {
+///     const SIZE: usize = core::mem::size_of::<[u8; 32]>();
+///     const ALIGN: usize = core::mem::align_of::<[u8; 32]>();
+///     let mut x = [33u8; 32];
+///     let ptr = nstd_core_ptr_mut_new(addr_of_mut!(x).cast(), SIZE, ALIGN).unwrap();
+///     assert!(nstd_core_ptr_mut_align(&ptr) == ALIGN);
+/// }
+/// ```
+#[inline]
+#[nstdapi]
+pub const fn nstd_core_ptr_mut_align(ptr: &NSTDPtrMut) -> NSTDUInt {
+    ptr.align
 }
 
 /// Returns a raw pointer to the object pointed to by `ptr`.

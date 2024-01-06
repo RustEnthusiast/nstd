@@ -73,6 +73,17 @@ NSTDAPI NSTDPtr nstd_core_ptr_new_unchecked(NSTDAny obj, NSTDUInt size, NSTDUInt
 /// `NSTDUInt size` - The size of the object pointed to by `ptr`.
 NSTDAPI NSTDUInt nstd_core_ptr_size(const NSTDPtr *ptr);
 
+/// Returns the alignment of the object being pointed to.
+///
+/// # Parameters:
+///
+/// - `const NSTDPtr *ptr` - The pointer.
+///
+/// # Returns
+///
+/// `NSTDUInt align` - The alignment of the object pointed to by `ptr`.
+NSTDAPI NSTDUInt nstd_core_ptr_align(const NSTDPtr *ptr);
+
 /// Returns a raw immutable pointer to the object pointed to by `ptr`.
 ///
 /// # Parameters:
@@ -164,6 +175,17 @@ NSTDAPI NSTDPtr nstd_core_ptr_mut_as_const(const NSTDPtrMut *ptr);
 ///
 /// `NSTDUInt size` - The size of the object pointed to by `ptr`.
 NSTDAPI NSTDUInt nstd_core_ptr_mut_size(const NSTDPtrMut *ptr);
+
+/// Returns the alignment of the object being pointed to.
+///
+/// # Parameters:
+///
+/// - `const NSTDPtrMut *ptr` - The pointer.
+///
+/// # Returns
+///
+/// `NSTDUInt align` - The alignment of the object pointed to by `ptr`.
+NSTDAPI NSTDUInt nstd_core_ptr_mut_align(const NSTDPtrMut *ptr);
 
 /// Returns a raw pointer to the object pointed to by `ptr`.
 ///
