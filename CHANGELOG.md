@@ -1,3 +1,8 @@
+# TBD
+## Added
+### `nstd`
+- Added `NSTDAnyRef[Mut]::from_ptr`.
+
 # 0.13.0
 ## Added
 ### `nstd.core`

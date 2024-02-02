@@ -246,6 +246,22 @@ impl<'a, T> From<&'a mut T> for NSTDRefMut<'a, T> {
 #[derive(Clone, Copy)]
 pub struct NSTDAnyRef<'a>(&'a c_void);
 impl NSTDAnyRef<'_> {
+    /// Creates a new FFI-safe reference from a raw pointer.
+    ///
+    /// # Safety
+    ///
+    /// - `ptr` must be non-null, properly aligned, and
+    /// [dereferenceable](https://doc.rust-lang.org/std/ptr/index.html#safety).
+    ///
+    /// - `ptr` must point to an initialized instance of `T`.
+    ///
+    /// - You must manually enforce Rust's aliasing rules since lifetime `'a` is not concrete for
+    /// this constructor.
+    #[inline]
+    pub const unsafe fn from_ptr<T>(ptr: *const T) -> Self {
+        Self(::core::mem::transmute(ptr))
+    }
+
     /// Returns a raw pointer to the referenced data.
     #[inline]
     const fn as_ptr<T>(&self) -> *const T {
@@ -283,6 +299,22 @@ impl<'a, T> From<&'a mut T> for NSTDAnyRef<'a> {
 #[repr(transparent)]
 pub struct NSTDAnyRefMut<'a>(&'a mut c_void);
 impl NSTDAnyRefMut<'_> {
+    /// Creates a new FFI-safe reference from a raw pointer.
+    ///
+    /// # Safety
+    ///
+    /// - `ptr` must be non-null, properly aligned, and
+    /// [dereferenceable](https://doc.rust-lang.org/std/ptr/index.html#safety).
+    ///
+    /// - `ptr` must point to an initialized instance of `T`.
+    ///
+    /// - You must manually enforce Rust's aliasing rules since lifetime `'a` is not concrete for
+    /// this constructor.
+    #[inline]
+    pub unsafe fn from_ptr<T>(ptr: *mut T) -> Self {
+        Self(::core::mem::transmute(ptr))
+    }
+
     /// Returns a raw pointer to the referenced data.
     #[inline]
     const fn as_ptr<T>(&self) -> *const T {
